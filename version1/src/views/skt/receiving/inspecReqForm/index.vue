@@ -1812,7 +1812,7 @@ const getDisabledFollowStatusNRole = () => {
 
   <!-- Note / Details -->
   <section>
-    <VRow style="font-size: 12px;">
+    <VRow style="font-size: 12px;" class="mb-1">
       <VCol cols="12">
         <span
           class=""
@@ -1825,29 +1825,36 @@ const getDisabledFollowStatusNRole = () => {
       <VCol cols="6">
         Details of Limitation Condition
       </VCol>
-      <VCol cols="6">
-        <VTextarea
-          v-model="headerInsp.note"
-          auto-grow
-          :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
-        >
-          <template #label>
-            <span style="font-size: 12px;">Enter Your Note                </span>
-          </template>
-        </VTextarea>
-      </VCol>
-      <VCol cols="6">
-        <VTextarea
-          v-model="headerInsp.details"
-          auto-grow
-          :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
-        >
-          <template #label>
-            <span style="font-size: 12px;">Enter Details</span>
-          </template>
-        </VTextarea>
-      </VCol>
     </VRow>
+
+    <table class="custom-table">
+      <tbody>
+        <tr>
+          <td>
+            <VTextarea
+              v-model="headerInsp.note"
+              auto-grow
+              :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
+            >
+              <template #label>
+                <span style="font-size: 12px;">Enter Your Note                </span>
+              </template>
+            </VTextarea>
+          </td>
+          <td>
+            <VTextarea
+              v-model="headerInsp.details"
+              auto-grow
+              :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
+            >
+              <template #label>
+                <span style="font-size: 12px;">Enter Details</span>
+              </template>
+            </VTextarea>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 
   <section>
