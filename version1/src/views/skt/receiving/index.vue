@@ -332,6 +332,49 @@ const colorStatusWithId2 = id => {
   }
 }
 
+const colorStatusWithCheckBox = id => {
+  switch (id) {
+  case 0:
+    return { color: 'grey-lighten-1', message: 'grey-lighten-1' }
+  case 1:
+    return { color: '#FFEBEE', message: 'red' }
+  case 2:
+    return { color: '#FCE4EC', message: 'pink-lighten-4' }
+  case 3:
+    return { color: '#EDE7F6', message: 'purple-lighten-4' }
+  case 4:
+    return { color: '#D1C4E9', message: 'deep-purple-lighten-4' }
+  case 5:
+    return { color: '#E8EAF6', message: 'indigo' }
+  case 6:
+    return { color: '#E3F2FD', message: 'blue' }
+  case 7:
+    return { color: '#E1F5FE', message: 'light-blue' }
+  case 8:
+    return { color: '#E0F7FA', message: 'cyan-lighten-4' }
+  case 9:
+    return { color: '#E0F2F1', message: 'teal' }
+  case 10:
+    return { color: '#F1F8E9', message: 'cycan' }
+  case 11:
+    return { color: '#F9FBE7', message: 'cycan' }
+  case 12:
+    return { color: '#FFFDE7', message: 'brown' }
+  case 13:
+    return { color: '#FFF3E0', message: 'orange' }
+  case 14:
+    return { color: '#FBE9E7', message: 'deep-orange-derken-4' }
+  case 15:
+    return { color: '#EFEBE9', message: 'brown' }
+  case 16:
+    return { color: '#FFCDD2', message: 'red-lighten-2' }
+  case 17:
+    return { color: '#E8F5E9', message: 'green-lighten-2' }
+  default:
+    return { color: 'grey', message: 'grey' }
+  }
+}
+
 watchEffect(() => {
   console.log('statusFilter****++', statusFilter)
 })
@@ -340,6 +383,12 @@ watchEffect(() => {
 
 //----------------------- Filter Status 
 const progressLinearNoData = ref(false)
+
+const handleSelection = (selected, item) => {
+  if (item.statusId === 17 || item.statusId === 15) {
+    this.selectedDataTables = selected
+  }
+}
 
 const GetStockUpdate = () => {
   progressLinearNoData.value = false
@@ -437,6 +486,7 @@ const headers = [
     key: 'data-table-select',
     align: "center",
     fixed: true,
+    readonly: true,
   },
   {
     title: 'Status',
@@ -965,6 +1015,8 @@ const selectedPrintLabel = ref([])
 
 const selectedDataTables = ref([])
 
+const selectedItemIdForColotRow = ref(null)
+
 const testCheckBox = () => {
   console.log("%c selectedDataTables: ", "color: blue; background-color: yellow; font-size: 16px", selectedDataTables.value)
 
@@ -975,6 +1027,8 @@ const statusCheckApprove = ref('')
 const approveReceivingPlant = () => {
   selectedDataTables.value.forEach(item => {
     // นำ poEtlLogDetailJournalID จากแต่ละ item ไปใส่ใน URL
+
+    selectedItemIdForColotRow.value = item.itemCode
 
     if(item.statusId === 15 ){
       statusCheckApprove.value = item.statusId
@@ -1010,6 +1064,186 @@ const approveReceivingPlant = () => {
     
   })
 }
+
+const isSelected = item => {
+  
+  return selectedDataTables.value.some(
+    selectedItem => selectedItem.journalID === item.journalID,
+  )
+}
+
+const row_classes = item => {
+  console.log('itemdd', item)
+
+  // const classes = []
+  // if (item.statusId === 'active') {
+  //   classes.push('active-row')
+  // } else {
+  //   classes.push('inactive-row')
+  // }
+
+  const rowClass = 'active-row'
+  
+  return rowClass
+  
+  return classes
+}
+
+const testBtn = () => {
+  console.log('selectedDataTables', selectedDataTables.value)
+}
+
+//----------------- ธำหะ ------------------------
+const rowSelect = idx => {
+  console.dir(idx)
+  this.selectedRow = idx
+}
+
+const selectedRow = ref(null)
+
+const  remove = key => {
+  this.headers = this.headers.filter(header => header.key !== key)
+}
+
+const headers2 = [
+  {
+    title: 'Dessert (100g serving)',
+    align: 'start',
+    sortable: false,
+    key: 'name',
+  },
+  { title: 'Calories', key: 'calories' },
+  { title: 'Fat (g)', key: 'fat' },
+  { title: 'Carbs (g)', key: 'carbs' },
+  { title: 'Protein (g)', key: 'protein' },
+  { title: 'Iron (%)', key: 'iron' },
+]
+
+const desserts2 = [
+  {
+    name: 'Frozen Yogurt',
+    calories: 159,
+    fat: 6.0,
+    carbs: 24,
+    protein: 4.0,
+    iron: '1%',
+  },
+  {
+    name: 'Ice cream sandwich',
+    calories: 237,
+    fat: 9.0,
+    carbs: 37,
+    protein: 4.3,
+    iron: '1%',
+  },
+  {
+    name: 'Eclair',
+    calories: 262,
+    fat: 16.0,
+    carbs: 23,
+    protein: 6.0,
+    iron: '7%',
+  },
+  {
+    name: 'Cupcake',
+    calories: 305,
+    fat: 3.7,
+    carbs: 67,
+    protein: 4.3,
+    iron: '8%',
+  },
+  {
+    name: 'Gingerbread',
+    calories: 356,
+    fat: 16.0,
+    carbs: 49,
+    protein: 3.9,
+    iron: '16%',
+  },
+  {
+    name: 'Jelly bean',
+    calories: 375,
+    fat: 0.0,
+    carbs: 94,
+    protein: 0.0,
+    iron: '0%',
+  },
+  {
+    name: 'Lollipop',
+    calories: 392,
+    fat: 0.2,
+    carbs: 98,
+    protein: 0,
+    iron: '2%',
+  },
+  {
+    name: 'Honeycomb',
+    calories: 408,
+    fat: 3.2,
+    carbs: 87,
+    protein: 6.5,
+    iron: '45%',
+  },
+  {
+    name: 'Donut',
+    calories: 452,
+    fat: 25.0,
+    carbs: 51,
+    protein: 4.9,
+    iron: '22%',
+  },
+  {
+    name: 'KitKat',
+    calories: 518,
+    fat: 26.0,
+    carbs: 65,
+    protein: 7,
+    iron: '6%',
+  },
+]
+
+const desserts3 = [
+  {
+    id: 1,
+    name: 'T-Shirt',
+    size: 'M',
+    color: 'Red',
+    price: 19.99,
+    quantity: 10,
+  },
+  {
+    id: 2,
+    name: 'Jeans',
+    size: '32',
+    color: 'Blue',
+    price: 49.99,
+    quantity: 5,
+  },
+  {
+    id: 3,
+    name: 'Sweater',
+    size: 'L',
+    color: 'Green',
+    price: 29.99,
+    quantity: 7,
+  },
+  {
+    id: 4,
+    name: 'Jacket',
+    size: 'XL',
+    color: 'Black',
+    price: 89.99,
+    quantity: 3,
+  },
+  {
+    id: 5,
+    name: 'Socks',
+    size: 'One Size',
+    color: 'White',
+    price: 9.99,
+    quantity: 20,
+  },
+]
 
 //-------- Fuction Cancel --------------------------------
 const isDialogSubmitFailedVisible = ref(false)
@@ -1422,7 +1656,7 @@ const dessertsTest = ref([
                       class="d-flex align-center"
                       style="font-size: 12px;"
                     >
-                      Choose Status
+                      Select Status
                     </span>
                   </template>
 
@@ -1631,10 +1865,10 @@ const dessertsTest = ref([
           </VBtn>
 
           <VBtn
-            v-if="false"
+            v-if="true"
             :disabled="insetSwitch1 === 'issues'"
             style="font-size: 12px;"
-            @click="testMoldelSearch"
+            @click="testBtn"
           >
             Test
           </VBtn>
@@ -3439,7 +3673,8 @@ const dessertsTest = ref([
     </VCard>
   </section>
 
-  <section>
+  <!-- data Table -->
+  <section v-if="false">
     <VCard>
       <CardText>
         <VProgressLinear
@@ -3460,15 +3695,16 @@ const dessertsTest = ref([
           <span>Loading Data....</span>
         </VProgressLinear>
         <VDataTable
-          v-if="products.length > 0 && progressLinearNoData === false"
+          v-if="Array.isArray(products) && products.length > 0 && progressLinearNoData === false"
           v-model="selectedDataTables"
           show-select
           :headers="headers"
           :items="products"
           :items-per-page="10"
           item-selectable="selectable"
-          class="text-no-wrap elevation-1"
+          class="elevation-1"
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
+          :item-class="row_classes" 
         >
           <template #item.statusText="{ item }">
             <td
@@ -3520,7 +3756,7 @@ const dessertsTest = ref([
           </template>
 
           <template #item.itemName="{ item }">
-            <div
+            <td
               class="px-0"
               style="min-width: 200px;  justify-content: start;"
             >
@@ -3529,7 +3765,7 @@ const dessertsTest = ref([
                 class="text-wrap"
                 v-html="item.raw.itemName.replace(/\s/g, '&nbsp;')"
               />
-            </div>
+            </td>
           </template>
 
           <template #item.concatTradename="{ item }">
@@ -3688,6 +3924,243 @@ const dessertsTest = ref([
       </CardText>
     </VCard>
   </section> 
+
+
+  <!-- Data Table Beta1.0 -->
+  <section>
+    <VCard>
+      <CardText>
+        <VProgressLinear
+          v-if="progressLinearNoData"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="!products.length > 0 && progressLinearNoData === false"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data....</span>
+        </VProgressLinear>
+        <VDataTable
+          v-if="Array.isArray(products) && products.length > 0 && progressLinearNoData === false"
+          v-model="selectedDataTables"
+          show-select
+          :headers="headers"
+          :items="products"
+          :items-per-page="10"
+          item-selectable="selectable"
+          class="elevation-1"
+          :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
+          :item-class="row_classes" 
+        >
+          <template #item="{ item }">
+            <tr>
+              <td
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                class="text-center px-2"
+                style="position: sticky; z-index: 1; left: 0;"
+              >
+                <VCheckboxBtn
+                  v-if="item.raw.statusId === 17 || item.raw.statusId === 15"
+                  v-model="selectedDataTables"
+                  :value="item.raw"
+                  @update:modelValue="(selected) => handleSelection(selected, item.raw)"
+                />
+              </td>
+              <td
+                class="text-center px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
+              >
+                <VChip
+                  :color="colorStatusWithId2(item.raw.statusId).color"
+                  class="font-weight-medium"
+                  style="min-height: 40px;"
+                  :style="{ color: colorStatusWithId(item.raw.statusId).message }"
+                >
+                  <span
+                    v-if="debugMode === false"
+                    style="font-size: 12px;"
+                    class="text-wrap"
+                  >{{ item.raw.statusText }}</span>
+                  <span
+                    v-if="debugMode === true"
+                    style="font-size: 12px;"
+                    class="text-wrap"
+                  >{{ debugMode }} {{ item.raw.statusText }}[{{ item.raw.poEtlLogDetailJournalID }}]({{ item.raw.receiveTypeName }})</span>
+                </VChip>
+              </td>
+              <td
+                class="px-2"
+                style="min-width: 30px;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-center "
+                >{{ item.raw.no }}</span>
+              </td>
+              <td
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                class="px-2"
+                style="min-width: 30px;  justify-content: start;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.itemCode }}</span>
+              </td>
+              <td
+                class="px-2"
+                style="min-width: 200px;  justify-content: start;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="max-width: 200px; font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.itemName.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              <td
+                class="px-2 "
+                style="width: 100%; min-width: 250px;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="max-width: 200px; font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.concatTradename.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              <td
+                class="px-2"
+                style="justify-content: start;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.supplierId }}</span>
+              </td>
+              <td
+                class="px-2"
+                style="justify-content: start;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="max-width: 200px; font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.supplierName.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              <td
+                class="text-center px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              > 
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.purchaseOrderNo }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class=""
+                >{{ convertDate(item.raw.deliveryDate) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.batch }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.purchasingQuantityPcs.toLocaleString()) }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ formatNumber(item.raw.purchasingAmountKgs) }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.purchasingQuantityRcvdPcs.toLocaleString()) }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ formatNumber(item.raw.purchasingAmountRcvdKgs) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.updatedBy }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span style="font-size: 12px;">{{ convertDate(item.raw.updatedDate) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="justify-content: center;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <VBtn
+                  color="info"
+                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode)"
+                >
+                  <div style="font-size: 12px;">
+                    Action
+                  </div>
+                </VBtn>
+              </td>
+            </tr>
+          </template>
+        </VDataTable>
+      </CardText>
+    </VCard>
+  </section>
 
   <section v-if="false">
     <div>
@@ -3863,6 +4336,14 @@ const dessertsTest = ref([
   overflow-wrap: break-word; /* ให้ข้อความตัดบรรทัดเมื่อยาวเกิน */
   white-space: normal; /* ให้ข้อความสามารถตัดบรรทัดได้ */
   word-wrap: break-word; /* รองรับข้อความตัดบรรทัด */
+}
+
+.active-row {
+  background-color: lightgreen;
+}
+
+.inactive-row {
+  background-color: lightcoral;
 }
 </style>
 
