@@ -1,0 +1,42 @@
+@use "sass:map";
+@use "utils";
+
+$vertical-nav-horizontal-padding-margin-custom: 1.75rem;
+
+// ℹ️ We created this SCSS var to extract the start padding
+// Docs: https://sass-lang.com/documentation/modules/string
+// $vertical-nav-horizontal-padding => 0 8px;
+// string.index(#{$vertical-nav-horizontal-padding}, " ") + 1 => 2
+//   string.index(#{$vertical-nav-horizontal-padding}, " ") => 1
+// string.slice(0 8px, 2, -1) => 8px => $card-actions-padding-x
+
+$vertical-nav-horizontal-padding-start: utils.get-first-value($vertical-nav-horizontal-padding-margin-custom) !default;
+
+@forward "@core/scss/base/variables" with(
+  // 👉 Vertical nav
+  // This is used by nav items & nav header
+  $vertical-nav-horizontal-spacing: 0.75rem !default,
+  $vertical-nav-header-inline-spacing: 0.75rem 0.25rem !default,
+  $vertical-nav-horizontal-padding: 1rem 0.75rem !default,
+
+  // Section title margin bottom
+  $vertical-nav-section-title-mb: 0.75rem !default,
+
+  // Vertical nav header padding
+  $vertical-nav-header-padding: 1rem 0.75rem !default,
+  $vertical-nav-items-nested-icon-size: 0.5rem !default,
+
+  // 👉 Horizontal nav
+  // Horizontal nav icons
+  $horizontal-nav-third-level-icon-size: 0.5rem !default,
+  $horizontal-nav-items-icon-margin-inline-end: 0.75rem !default,
+);
+
+// 👉 expansion panel
+$expansion-panel-border-radius-custom: 8px !default;
+
+// 👉 range-slider
+$slider-thumb-label-color: rgb(0, 0, 0) !default;
+
+// 👉 switch
+$switch-thumb-inactive-color: rgb(255, 255, 255) !default;

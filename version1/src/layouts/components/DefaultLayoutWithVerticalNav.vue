@@ -1,0 +1,250 @@
+<script setup>
+import navItems from '@/navigation/vertical'
+import { useThemeConfig } from '@core/composable/useThemeConfig'
+
+// Components
+import Footer from '@/layouts/components/Footer.vue'
+import NavBarI18n from '@/layouts/components/NavBarI18n.vue'
+import NavBarNotifications from '@/layouts/components/NavBarNotifications.vue'
+import NavbarShortcuts from '@/layouts/components/NavbarShortcuts.vue'
+import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
+import WhereHouse from '@/layouts/components/WhereHouse.vue'
+import NavSearchBar from '@/layouts/components/NavSearchBar.vue'
+import UserProfile from '@/layouts/components/UserProfile.vue'
+
+
+// @layouts plugin
+import { VerticalNavLayout } from '@layouts'
+import axios from '@axios'
+
+const { appRouteTransition, isLessThanOverlayNavBreakpoint, isVerticalNavCollapsed } = useThemeConfig()
+const { width: windowWidth } = useWindowSize()
+
+// ℹ️ Provide animation name for vertical nav collapse icon.
+const verticalNavHeaderActionAnimationName = ref(null)
+
+watch(isVerticalNavCollapsed, val => {
+  verticalNavHeaderActionAnimationName.value = val ? 'rotate-180' : 'rotate-back-180'
+})
+
+const router = useRouter() 
+
+const NameUser = ref('addmin001')
+const whereHouseName = localStorage.getItem('WarehouseNameAtIcons')
+
+import { urlApi } from '@/api'
+
+const whereHouseSelectedItem = ([])
+const whereRoomNameSet = ref('')
+
+const items = []
+
+
+// Get access token from localStorage in another page
+const accessToken = localStorage.getItem('accessTokenAtStore')
+
+// console.log("accessToken:",accessToken)
+
+const wareHouseName = ref('')
+const wareHouseId = ref('')
+
+
+const GetWhereHouse = () => {
+  axios.get(`${urlApi.value}/api/Auth/GetLocation`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+    .then(response => {
+      const responseData = response.data
+
+      console.log('Wharehouse ****', responseData)
+
+      wareHouseName.value = responseData[0].name
+      wareHouseId.value = responseData[0].id
+
+      // Extracting the id and name properties
+      for (let i = 0; i < responseData.length; i++) {
+        const { id, name } = responseData[i]
+
+        items.push({ id, name })
+      }
+
+      for (let i = 0; i < items.length; i++) {
+        // console.log('items loop:'+[i],items[i])
+
+        if ( items[i].id ===  whereHouseName){
+          // console.log('items[i].Name:',items[i].name)
+          wareHouseName.value = items[i].name
+          wareHouseId.value = items[i].id
+          localStorage.setItem('WarehouseNameAtIcons', items[i].name)
+          localStorage.setItem('WarehouseIDAtIcons', items[i].id)
+          break
+        } else {
+          // console.log('items'+items[i].id,'Not Match',whereHouseName)
+        }
+      }
+
+
+      // console.log('localStorage Warehouse: ',localStorage.getItem('WarehouseNameAtIcons'))
+      whereRoomNameSet.value = localStorage.getItem('WarehouseNameAtIcons')
+
+      // Now `items` contains an array of objects with id and name properties
+      // console.log('items location whereHouse At menu Warehouse:',items)
+
+    })
+    .catch(error => {
+      // Handle errors
+      console.error('Error:', error)
+    })
+
+    
+}
+
+// watchEffect(GetWhereHouse)
+
+
+watchEffect(() => {
+  NameUser.value = localStorage.getItem('userCheck')
+  GetWhereHouse()
+})
+
+const removeUserCheck = () => {
+  localStorage.removeItem('userCheck')
+
+  // Clear the access token from localStorage
+  localStorage.removeItem('accessToken')
+
+  // Clear the access token from localStorage
+  localStorage.removeItem('accessTokenAtStore')
+
+  // Clear the access token from localStorage
+  localStorage.removeItem('whereHouseName')
+
+
+  localStorage.removeItem('WarehouseNameAtIcons')
+
+  localStorage.removeItem('companyId')
+  localStorage.removeItem('companyName')
+  localStorage.removeItem('companyLogo')
+
+  console.log("LOout!")
+
+  router.replace('/login')
+  
+}
+
+//----------------- Hidden navigation NavBarNotifications
+// <NavBarNotifications class="me-3" />
+</script>
+
+<template>
+  <VerticalNavLayout :nav-items="navItems">
+    <!-- 👉 navbar -->
+    <template #navbar="{ toggleVerticalOverlayNavActive }">
+      <div class="d-flex align-center py-2">
+        <IconBtn
+          v-if="isLessThanOverlayNavBreakpoint(windowWidth)"
+          class="ms-n3"
+          @click="toggleVerticalOverlayNavActive(true)"
+        >
+          <VIcon icon="mdi-menu" />
+        </IconBtn>
+
+
+        <VSpacer />
+        <NavBarI18n
+          v-if="false"
+          class="me-1"
+        />
+        <WhereHouse
+          v-if="false"
+          disabled
+          class="d-flex justify-end"
+        />
+
+
+        <VChip color="white">
+          <span class="text-black">WH:&nbsp;&nbsp;</span> <span v-if="false" class="text-primary">{{ wareHouseName }}</span>&nbsp;<span style="text-transform: capitalize;" class="text-primary">{{ NameUser }}</span>
+        </VChip>
+
+        
+        
+        <NavbarThemeSwitcher v-if="true" class="me-1" />
+        <UserProfile v-if="false" />
+
+        <VHover
+          to="/login"
+          class="cursor-pointer"
+          @click="removeUserCheck"
+        >
+          <template #default="{ isHovering, props }">
+            <div
+              class="d-flex align-center justify-space-around"
+              @click="removeUserCheck"
+            >
+              <VAvatar
+                class="cursor-pointer"
+                v-bind="props"
+                :color="isHovering ? 'red' : 'black'"
+                size="30"
+                @click="removeUserCheck"
+              >
+                <VIcon
+                  size="18"
+                  icon="ri-login-box-line"
+                />
+              </VAvatar>
+            </div>
+          </template>
+        </VHover>
+      </div>
+    </template>
+
+    <!-- 👉 Pages -->
+    <RouterView v-slot="{ Component }">
+      <Transition
+        :name="appRouteTransition"
+        mode="out-in"
+      >
+        <Component :is="Component" />
+      </Transition>
+    </RouterView>
+
+    <!-- 👉 Footer -->
+    <template #footer>
+      <Footer />
+    </template>
+
+    <!-- 👉 Customizer -->
+    <TheCustomizer  v-if="false" />
+  </VerticalNavLayout>
+</template>
+
+<style lang="scss">
+@keyframes rotate-180 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+
+@keyframes rotate-back-180 {
+  from { transform: rotate(180deg); }
+  to { transform: rotate(0deg); }
+}
+
+.layout-vertical-nav {
+  .nav-header {
+    .header-action {
+      animation-duration: 0s;
+      animation-duration: 0.35s;
+      animation-fill-mode: forwards;
+      animation-name: v-bind(verticalNavHeaderActionAnimationName);
+      transform: rotate(0deg);
+    }
+  }
+}
+
+.hover-red:hover {
+  background-color: red !important;
+}
+</style>
