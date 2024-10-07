@@ -192,7 +192,7 @@ const getHearderInsp = () => {
         headerInsp.value.lastUpdatedSuperInsp = data[0].inspSupervisorDate
 
         // purchaseOrder.value = response.data[0]
-        console.log('[*****Headers]]!!: ', data)
+        console.log('[*****Headers]]!!: ', data[0])
     
       })
       .catch(error => {
@@ -1861,7 +1861,7 @@ const getDisabledFollowStatusNRole = () => {
     <!-- Quality Evalution -->
     <VRow>
       <VCol cols="12">
-        <span class="mb-2">Quality Evalution</span>
+        <span class="mb-2">Quality Evaluation</span>
         <table class="custom-table mt-2">
           <thead>
             <tr>
@@ -2229,7 +2229,7 @@ const getDisabledFollowStatusNRole = () => {
             :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
             @click="rejectInsp"
           >
-            Reject {{ wordForSubmit }}
+            Reject
           </VBtn>
         </VCardText>
       </VCard>

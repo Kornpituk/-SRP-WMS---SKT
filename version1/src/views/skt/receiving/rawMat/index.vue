@@ -151,28 +151,28 @@ const purchaseOrder = ref({
   packagingTypeName: '',
   storagePlaceNo: '',
 
-  actualMakerLotNo_1: dataHeaderReceving.value.packagingQtyKg || 0, 
+  actualMakerLotNo_1: null, 
   actualNetCountKgs_1: NetCountPackage.value,
   actualAmountUnits_1: null,
   actualTotalQuantityKgs_1: null,
   customManufacturerName_1: '',
   customLable_1: '',
 
-  actualMakerLotNo_2: dataHeaderReceving.value.packagingQtyKg,
+  actualMakerLotNo_2: null,
   actualNetCountKgs_2: NetCountPackage.value,
   actualAmountUnits_2: null,
   actualTotalQuantityKgs_2: null,
   customManufacturerName_2: '',
   customLable_2: '',
 
-  actualMakerLotNo_3: dataHeaderReceving.value.packagingQtyKg,
+  actualMakerLotNo_3: null,
   actualNetCountKgs_3: null,
   actualAmountUnits_3: null,
   actualTotalQuantityKgs_3: null,
   customManufacturerName_3: '',
   customLable_3: '',
 
-  actualMakerLotNo_4: dataHeaderReceving.value.packagingQtyKg,
+  actualMakerLotNo_4: null,
   actualNetCountKgs_4: null,
   actualAmountUnits_4: null,
   actualTotalQuantityKgs_4: null,
@@ -180,13 +180,24 @@ const purchaseOrder = ref({
   customLable_4: '',
 
 
-  actualMakerLotNo_5: dataHeaderReceving.value.packagingQtyKg,
+  actualMakerLotNo_5: null,
   actualNetCountKgs_5: null,
   actualAmountUnits_5: null,
   actualTotalQuantityKgs_5: null,
   customManufacturerName_5: '',
   customLable_5: '',
 })
+
+const deliveryQuantity = ref({
+  netCount: "",
+  packagingQtyKg: "",
+  amount: "",
+  totalQuantity: "",
+})
+
+const testPC = () => {
+  console.log("Testing", purchaseOrder)
+}
 
 const generatedReceivingForm = () => {
 
@@ -366,8 +377,12 @@ const getHearderReceivingForm = () => {
 
         purchaseOrder.value.receivedDate = data[0].receivedDate
 
+        //------------------------- DeliveryQueue ------------------------
+        deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
+        deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
+
         // purchaseOrder.value = response.data[0]
-        console.log('[*****Headers]]!!: ', data[0].receivedDate )
+        console.log('[*****Headers]]!!: ', data[0])
 
         console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
     
@@ -413,7 +428,7 @@ const getLotReceivingForm = () => {
 
         purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
 
-        console.log('[*****Headers Lot]]!!:', NetCountPackage.value)
+        console.log('[*****Headers Lot]]!!:', lotData[0])
     
       })
       .catch(error => {
@@ -579,33 +594,61 @@ const saveHeaderReceivingForm = async () => {
 }
 
 //--------------- save Lot --------------------------------
+
+const alertErrorLot = ref({
+  alertMakerLot1: null,
+  alertMakerLot2: null,
+  alertMakerLot3: null,
+  alertMakerLot4: null,
+  alertMakerLot5: null,
+
+  alertAmountLot1: null,
+  alertAmountLot2: null,
+  alertAmountLot3: null,
+  alertAmountLot4: null,
+  alertAmountLot5: null,
+})
+
 const saveLotReceivingForm = async () => {
-
-  // console.error('Error: actualMakerLotNo_1 is empty or undefined. in')
-
   const body = []
+  let hasError = false
 
-  // ตรวจสอบให้แน่ใจว่า actualMakerLotNo_1 มีค่าไม่เป็นค่าว่างหรือ undefined
-  if (!purchaseOrder.value.actualMakerLotNo_1 || purchaseOrder.value.actualMakerLotNo_1 === '' || purchaseOrder.value.actualMakerLotNo_1 === undefined) {
-    console.error('Error: actualMakerLotNo_1 is empty or undefined.')
-    
-    throw "Error: actualMakerLotNo_1 is empty or undefined."
-  }
-
-  // วน loop สำหรับ lot numbers ตั้งแต่ 1 ถึง 5
+  // ตรวจสอบว่า actualMakerLotNo มีค่า (ไม่เป็นค่าว่างหรือ undefined)
   for (let i = 1; i <= 5; i++) {
-    const lot = {
-      actualMakerLotNo: purchaseOrder.value[`actualMakerLotNo_${i}`] || '',
-      actualNetCountKgs: purchaseOrder.value[`actualNetCountKgs_${i}`] || 0,
-      actualAmountUnits: purchaseOrder.value[`actualAmountUnits_${i}`] || 0,
-      actualTotalQuantityKgs: purchaseOrder.value[`actualTotalQuantityKgs_${i}`] || 0,
-      customManufacturerName: purchaseOrder.value[`customManufacturerName_${i}`] || '',
-      customLable: purchaseOrder.value[`customLable_${i}`] || '',
+    const actualMakerLotNo = purchaseOrder.value[`actualMakerLotNo_${i}`]
+    const actualAmount = purchaseOrder.value[`actualAmountUnits_${i}`]
+
+    // ตรวจสอบเงื่อนไขว่า Lot No. ว่างแต่ Amount มีค่า
+    if (!actualMakerLotNo && actualAmount) {
+      alertErrorLot.value[`alertMakerLot${i}`] = `The Lot No.${i} field cannot be left blank. Please enter the required information without leaving any spaces.`
+      hasError = true  // มีข้อผิดพลาด
+    } else {
+      // เคลียร์ค่าแจ้งเตือน ถ้าไม่มีข้อผิดพลาด
+      alertErrorLot.value[`alertMakerLot${i}`] = null
     }
 
-    body.push(lot)
+    // ถ้าไม่มีข้อผิดพลาด และ actualMakerLotNo มีค่า
+    if (actualMakerLotNo && actualMakerLotNo.trim()) {
+      const lot = {
+        actualMakerLotNo: actualMakerLotNo,
+        actualNetCountKgs: purchaseOrder.value[`actualNetCountKgs_${i}`] || '',
+        actualAmountUnits: purchaseOrder.value[`actualAmountUnits_${i}`] || '',
+        actualTotalQuantityKgs: purchaseOrder.value[`actualTotalQuantityKgs_${i}`] || '',
+        customManufacturerName: purchaseOrder.value[`customManufacturerName_${i}`] || '',
+        customLable: purchaseOrder.value[`customLable_${i}`] || '',
+      }
+
+      // เพิ่ม lot ลงใน body เฉพาะเมื่อ actualMakerLotNo มีค่า
+      body.push(lot)
+    }
   }
 
+  // ถ้ามีข้อผิดพลาด ให้หยุดการทำงาน
+  if (hasError) {
+    throw "Error: Some actualMakerLotNo fields are empty while their respective amounts are not."
+  }
+
+  // ถ้าไม่มีข้อผิดพลาด ส่งข้อมูลไปยัง API
   try {
     const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-lot-details/${data.value.poEtlLogDetailJournalID}`, body, {
       headers: {
@@ -615,12 +658,12 @@ const saveLotReceivingForm = async () => {
       },
     })
 
-    console.log('[ sssssssssssss saveLotReceivingForm] success:', body)
-
-    return response.data  // คืนค่า response กลับไป
+    console.log('[saveLotReceivingForm] success:', body)
+    
+    return response.data
   } catch (error) {
     console.error('Error [saveLotReceivingForm]:', error)
-    throw error  // โยนข้อผิดพลาดให้ฟังก์ชันที่เรียกใช้จัดการ
+    throw error
   }
 }
 
@@ -1007,6 +1050,63 @@ const dataRaeMatRequest = ref([
     input: [{ no1: purchaseOrder.value.actualTotalQuantityKgs_1, no2: purchaseOrder.value.actualTotalQuantityKgs_2, no3: purchaseOrder.value.actualTotalQuantityKgs_3, no4: purchaseOrder.value.actualTotalQuantityKgs_4, no5: purchaseOrder.value.actualTotalQuantityKgs_5, total: purchaseOrder.value.actualTotalQuantityKgs_5 }],
   },
 ])
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+watchEffect(() => {
+  if(purchaseOrder.value.actualMakerLotNo_1 || purchaseOrder.value.actualMakerLotNo_1 ==! ''){
+    if(data.value.receiveTypeId === 2){
+      purchaseOrder.value.actualNetCountKgs_1 = deliveryQuantity.value.netCount
+    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
+      purchaseOrder.value.actualNetCountKgs_1 = deliveryQuantity.value.packagingQtyKg
+    }
+  }else{
+    purchaseOrder.value.actualNetCountKgs_1 = null
+  }
+  if(purchaseOrder.value.actualMakerLotNo_2 || purchaseOrder.value.actualMakerLotNo_2 ==! ''){
+    if(data.value.receiveTypeId === 2){
+      purchaseOrder.value.actualNetCountKgs_2 = deliveryQuantity.value.netCount
+    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
+      purchaseOrder.value.actualNetCountKgs_2 = deliveryQuantity.value.packagingQtyKg
+    }
+  }else{
+    purchaseOrder.value.actualNetCountKgs_2 = null
+  }
+  if(purchaseOrder.value.actualMakerLotNo_3 || purchaseOrder.value.actualMakerLotNo_3 ==! ''){
+    if(data.value.receiveTypeId === 2){
+      purchaseOrder.value.actualNetCountKgs_3 = deliveryQuantity.value.netCount
+    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
+      purchaseOrder.value.actualNetCountKgs_3 = deliveryQuantity.value.packagingQtyKg
+    }
+  }else{
+    purchaseOrder.value.actualNetCountKgs_3 = null
+  }
+  if(purchaseOrder.value.actualMakerLotNo_4){
+    if(data.value.receiveTypeId === 2){
+      purchaseOrder.value.actualNetCountKgs_4 = deliveryQuantity.value.netCount
+    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
+      purchaseOrder.value.actualNetCountKgs_4 = deliveryQuantity.value.packagingQtyKg
+    }
+  }
+  if(purchaseOrder.value.actualMakerLotNo_5){
+    if(data.value.receiveTypeId === 2){
+      purchaseOrder.value.actualNetCountKgs_5 = deliveryQuantity.value.netCount
+    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
+      purchaseOrder.value.actualNetCountKgs_5 = deliveryQuantity.value.packagingQtyKg
+    }
+  }
+
+  // ---------------------- Amount ---------------------  
+  for (let i = 1; i <= 5; i++) {
+    const amountUnits = purchaseOrder.value[`actualAmountUnits_${i}`]
+    const makerLotNo = purchaseOrder.value[`actualMakerLotNo_${i}`]
+
+    if (amountUnits && makerLotNo === null) {
+      purchaseOrder.value[`actualMakerLotNo_${i}`] = ""
+    } else if (amountUnits === "") {
+      purchaseOrder.value[`actualMakerLotNo_${i}`] = null
+    }
+  }
+})
 
 // ฟังก์ชันสำหรับคำนวณค่า total
 
@@ -1457,6 +1557,12 @@ const getDisabledFollowStatusNRole = () => {
       </table>
     </VCol>
 
+    <section>
+      <VBtn @click="testPC">
+        Test
+      </VBtn>
+    </section>
+
     <!-- Purchasing Order -->
     <VCol
       cols="12"
@@ -1517,7 +1623,7 @@ const getDisabledFollowStatusNRole = () => {
                 density="compact"
                 :style="{ width: '100%', minWidth: '150px', fontSize: '12px !important;' }"
                 :rules="[
-                  value => !!value || 'This field is required', 
+                  value => !!value.trim() || 'Lot No.1 is required.', 
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
                 maxlegth="20"
@@ -1537,7 +1643,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               2
             </th>
-            <th
+            <td
               class="text-center"
               colspan="1"
             >
@@ -1545,7 +1651,8 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_2"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                  value => (purchaseOrder.actualAmountUnits_2 && value ===null) || (!purchaseOrder.actualAmountUnits_2) || 'Lot No.2 is required.',
+                  value => value.length <= 20 || 'Must be 20 characters or less',
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -1557,7 +1664,7 @@ const getDisabledFollowStatusNRole = () => {
                   />
                 </template>
               </VTextField>
-            </th>
+            </td>
             <th
               class="text-center"
               colspan="1"
@@ -1573,6 +1680,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_3"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
+                  value => (purchaseOrder.actualAmountUnits_3 && value ===null) || (!purchaseOrder.actualAmountUnits_3) || 'Lot No.3 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
                
@@ -1602,6 +1710,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_4"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
+                  value => (purchaseOrder.actualAmountUnits_4 && value ===null) || (!purchaseOrder.actualAmountUnits_4) || 'Lot No.4 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
                 density="compact"
@@ -1631,6 +1740,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_5"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
+                  value => (purchaseOrder.actualAmountUnits_5 && value ===null) || (!purchaseOrder.actualAmountUnits_5) || 'Lot No.5 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
                 density="compact"
@@ -1675,20 +1785,19 @@ const getDisabledFollowStatusNRole = () => {
               Net Count.(Kg)
             </th>
           
-            <th
+            <td
               class="text-center"
               colspan="2"
             >
               <VTextField
+                v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_1"
                 :style="{ width: '100%', minWidth: '150px' }"
                 density="compact"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
-
-
                 ]"
                 @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_1')"
               >
@@ -1705,7 +1814,7 @@ const getDisabledFollowStatusNRole = () => {
                 :style="{ width: '100%', minWidth: '150px' }"
                 density="compact"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
@@ -1719,16 +1828,19 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                 </template>
               </VTextField>
-            </th>
+
+              {{ purchaseOrder.actualNetCountKgs_1 }}
+            </td>
           
-            <th
+            <td
               class="text-center"
               colspan="2"
             >
               <VTextField
+                v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_2"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
 
@@ -1748,7 +1860,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_2"
                 v-model="purchaseOrder.actualNetCountKgs_2"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
@@ -1764,16 +1876,18 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                 </template>
               </VTextField>
-            </th>
+              {{ purchaseOrder.actualNetCountKgs_2 }}
+            </td>
           
-            <th
+            <td
               class="text-center"
               colspan="2"
             >
               <VTextField
+                v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_3"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
 
@@ -1793,7 +1907,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_3"
                 v-model="purchaseOrder.actualNetCountKgs_3"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
@@ -1809,15 +1923,17 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                 </template>
               </VTextField>
-            </th>
-            <th
+              {{ purchaseOrder.actualNetCountKgs_3 }}
+            </td>
+            <td
               class="text-center"
               colspan="2"
             >
               <VTextField
+                v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_4"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
 
@@ -1837,7 +1953,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_4"
                 v-model="purchaseOrder.actualNetCountKgs_4"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
@@ -1853,12 +1969,14 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                 </template>
               </VTextField>
-            </th>
-            <th colspan="2">
+              {{ purchaseOrder.actualNetCountKgs_4 }}
+            </td>
+            <td colspan="2">
               <VTextField
+                v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_5"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
 
@@ -1878,7 +1996,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_5"
                 v-model="purchaseOrder.actualNetCountKgs_5"
                 :rules="[ 
-                  v => !!v && /^\d+(\.\d{0,2})?$/.test(v) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
@@ -1895,7 +2013,8 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;" />
                 </template>
               </VTextField>
-            </th>
+              {{ purchaseOrder.actualNetCountKgs_5 }}
+            </td>
             <td
               class="text-center"
               colspan="2"
@@ -1940,7 +2059,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_1"
                 :rules="[
-                  v => !!v && /^\d+$/.test(v) || 'กรุณากรอกเฉพาะตัวเลขเท่านั้น'
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                 ]"
                 density="compact"
                 style="font-size: 16px; text-align: end;"
@@ -1962,7 +2081,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_2"
                 :rules="[
-                  v => !!v && /^\d+$/.test(v) || 'กรุณากรอกเฉพาะตัวเลขเท่านั้น'
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -1984,7 +2103,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_3"
                 :rules="[
-                  v => !!v && /^\d+$/.test(v) || 'กรุณากรอกเฉพาะตัวเลขเท่านั้น'
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -2005,7 +2124,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_4"
                 :rules="[
-                  v => !!v && /^\d+$/.test(v) || 'กรุณากรอกเฉพาะตัวเลขเท่านั้น'
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -2027,7 +2146,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_5"
                 :rules="[
-                  v => !!v && /^\d+$/.test(v) || 'กรุณากรอกเฉพาะตัวเลขเท่านั้น'
+                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -2577,7 +2696,7 @@ const getDisabledFollowStatusNRole = () => {
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      File Input COA
+                      File Upload COA
                     </span>
                   </template>
                 </VFileInput>
@@ -2855,7 +2974,7 @@ const getDisabledFollowStatusNRole = () => {
     </VCol>
     
     <!-- Dialog Step Save Draft -->
-    <section>
+    <section style="font-size: 12px;">
       <VDialog
         v-model="isDialogVisibleStepSaveDraft"
         width="80%"
@@ -2897,7 +3016,7 @@ const getDisabledFollowStatusNRole = () => {
                     />
                   </VAvatar>
                 </div>
-                <div><span>Save Draft Header</span></div>
+                <div><span style="font-size: 12px;">Save Draft Header</span></div>
               </VCol>
               <VCol
                 class="text-center d-flex flex-column align-center justify-center mx-auto"
@@ -2929,7 +3048,7 @@ const getDisabledFollowStatusNRole = () => {
                     />
                   </VAvatar>
                 </div>
-                <div><span>Save Draft Lot</span></div>
+                <div><span style="font-size: 12px;">Save Draft Lot</span></div>
               </VCol>
               <VCol
                 class="text-center d-flex flex-column align-center justify-center mx-auto"
@@ -2961,9 +3080,39 @@ const getDisabledFollowStatusNRole = () => {
                     />
                   </VAvatar>
                 </div>
-                <div><span>Save Draft COA</span></div>
+                <div><span style="font-size: 12px;">Save Draft COA</span></div>
               </VCol>
             </VRow>
+          </VCardText>
+          <VCardText
+            v-if="alertErrorLot"
+            class="text-start"
+          >
+            <VDivider />
+            <div>
+              <VAlert
+                title="Error Lot"
+                type="error"
+                variant="outlined"
+                closable
+              >
+                <div
+                  v-for="(value, key) in alertErrorLot"
+                  :key="key"
+                >
+                  <span
+                    v-if="value"
+                    style="font-size: 14px;"
+                  ><VIcon icon="ri-error-warning-fill" />{{ key }}: {{ value }}
+                  </span>
+                  <span
+                    v-if="!value"
+                    style="font-size: 14px;"
+                  ><VIcon color="success" icon="ri-checkbox-circle-fill" />{{ key }} {{ value }}
+                  </span>
+                </div>
+              </VAlert>
+            </div>
           </VCardText>
         </VCard>
       </VDialog>
@@ -3115,10 +3264,6 @@ const getDisabledFollowStatusNRole = () => {
 <style scoped>
 .table-container {
   overflow-x: auto;
-}
-
-.text-center {
-  text-align: center;
 }
 
 .text-wrap {

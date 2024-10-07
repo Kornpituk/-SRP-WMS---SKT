@@ -3,6 +3,7 @@ import { useTheme } from 'vuetify'
 import ScrollToTop from '@core/components/ScrollToTop.vue'
 import { useThemeConfig } from '@core/composable/useThemeConfig'
 import { hexToRgb } from '@layouts/utils'
+import ErrorMan from '../src/pages/pages/misc/under-maintenance.vue'
 
 const router = useRouter() 
 
@@ -72,8 +73,13 @@ handleSkinChanges()
   <VLocaleProvider :rtl="isAppRtl">
     <!-- ℹ️ This is required to set the background color of active nav link based on currently active global theme's primary -->
     <VApp :style="`--v-global-theme-primary: ${hexToRgb(global.current.value.colors.primary)}`">
+      <!--
+        <RouterView />
+        <ScrollToTop /> 
+      --> 
       <RouterView />
       <ScrollToTop />
+      <!-- <ErrorMan /> -->
     </VApp>
   </VLocaleProvider>
 </template>

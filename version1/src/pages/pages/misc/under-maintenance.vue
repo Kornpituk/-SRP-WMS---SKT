@@ -28,6 +28,7 @@ const miscThemeMask = useGenerateImageVariant(miscMaskLight, miscMaskDark)
       />
 
       <VBtn
+        v-if="false"
         to="/"
         class="mt-10"
       >

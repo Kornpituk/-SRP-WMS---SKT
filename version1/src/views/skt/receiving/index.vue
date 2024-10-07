@@ -442,7 +442,7 @@ const GetStockUpdate = () => {
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
 
-      const filteredData = data.filter(item => item.receiveTypeId !== 3)
+      const filteredData = data.filter(item => item.receiveTypeId !== 3 && item.receiveTypeId !== 1)
 
       // Add No. field to each product (after filtering)
       products.value = filteredData.map((item, index) => ({
@@ -890,6 +890,14 @@ const roleAuthor = ref('manager')
 
 //----------------------------- Dialog Action ----------------------------------------------------------------
 //--- Dialog Print / Receiving / Ins  ----------------------------------------------------------------
+
+const isDialogVisibleActionPrintLabel = ref(false)
+
+const printLabel = ref(false)
+const printForm = ref(false)
+
+const selectedPrintLabel = ref([])
+
 const isDialogVisibleAction = ref(false)
 
 const detailsReceiv = ref({
@@ -907,6 +915,7 @@ const detailsReceiv = ref({
   updatedDate: '',
   updatedBy: '',
 })
+
 
 const journalIDModel = ref('')
 const updateByReceivingPlan = ref('')
@@ -1001,12 +1010,6 @@ const completeSubmit = () => {
   isDialogConfirmVisible.value = false
 }
 
-const isDialogVisibleActionPrintLabel = ref(false)
-
-const printLabel = ref(false)
-const printForm = ref()
-
-const selectedPrintLabel = ref([])
 
 //-------------------------------------- Sub Fuction --------------------------------
 //-------- Fuction Action --------------------------------
@@ -2575,7 +2578,7 @@ const dessertsTest = ref([
     >
       <VCard
         class="text-center"
-        title="Print Type"
+        title="Print"
       >
         <DialogCloseBtn
           variant="text"
@@ -2584,14 +2587,17 @@ const dessertsTest = ref([
         />
         <VCardText class="text-end">
           <VRow>
-            <VCol cols="6">
+            <VCol
+              cols="6"
+              @click="printLabel = true, printForm = false"
+            >
               <VHover>
                 <template #default="{ isHovering, props }">
                   <VCard
                     class="cursor-pointer"
                     v-bind="props"
                     ripple
-                    :color="isHovering ? 'yellow-lighten-4' : undefined"
+                    :color="isHovering || printLabel ? 'yellow-lighten-4' : undefined"
                   >
                     <VCardText class="d-flex justify-center">
                       <VIcon
@@ -2600,20 +2606,23 @@ const dessertsTest = ref([
                       />
                     </VCardText>
                     <VCardText class="text-center">
-                      <span>Print Label</span>
+                      <span>Label</span>
                     </VCardText>
                   </VCard>
                 </template>
               </VHover>
             </VCol>
-            <VCol cols="6">
+            <VCol
+              cols="6"
+              @click="printForm = true, printLabel = false"
+            >
               <VHover>
                 <template #default="{ isHovering, props }">
                   <VCard
                     class="cursor-pointer"
                     v-bind="props"
                     ripple
-                    :color="isHovering ? 'light-blue-lighten-4' : undefined"
+                    :color="isHovering || printForm ? 'light-blue-lighten-4' : undefined"
                   >
                     <VCardText class="d-flex justify-center">
                       <VIcon
@@ -2622,7 +2631,7 @@ const dessertsTest = ref([
                       />
                     </VCardText>
                     <VCardText class="text-center">
-                      <span>Print Form</span>
+                      <span>Form</span>
                     </VCardText>
                   </VCard>
                 </template>
@@ -2635,42 +2644,60 @@ const dessertsTest = ref([
           <VContainer
             fluid
             class="py-0"
-          >
-            <p>{{ selectedPrintLabel }}</p>
+          />
 
-            <!-- Align VCheckbox items to the right -->
-            <VCheckbox
-              v-model="selectedPrintLabel"
-              label="Raw Material"
-              value="Raw Material"
-              class="ms-auto"
-            />
-            <VCheckbox
-              v-model="selectedPrintLabel"
-              label="Inspection"
-              value="Inspection"
-              class="ms-auto"
-            />
-            <VCheckbox
-              v-model="selectedPrintLabel"
-              label="Lorry"
-              value="Lorry"
-              class="ms-auto"
-            />
-          </VContainer>
+          <VRow v-if="printForm">
+            <VCol cols="6" />
+            <VCol cols="6">
+              <!-- Align VCheckbox items to the right -->
+              <VCheckbox
+                v-model="selectedPrintLabel"
+                label="Raw Material"
+                value="Raw Material"
+                class="ms-auto"
+              />
+              <VCheckbox
+                v-model="selectedPrintLabel"
+                label="Inspection"
+                value="Inspection"
+                class="ms-auto"
+              />
+              <VCheckbox
+                v-model="selectedPrintLabel"
+                label="Lorry"
+                value="Lorry"
+                class="ms-auto"
+              />
+              <VDivider class="my-4" />
+              <span>
+                <VTextField
+                  v-model="weight"
+                  label="Copies"
+                  type="number"
+                  density="compact"
+                  placeholder="0"
+                />
+              </span>
+            </VCol>
+          </VRow>
 
-          <VDivider class="my-4" />
-
-          <span>
-            <VTextField
-              v-model="weight"
-              label="Form"
-              suffix="Coppy"
-              type="number"
-              density="compact"
-              placeholder="0"
-            />
-          </span>
+          <VRow v-if="printLabel">
+            <VCol cols="6">
+              <VDivider class="my-4" />
+              <span>
+                <VTextField
+                  v-model="weight"
+                  label="Copies"
+                  type="number"
+                  density="compact"
+                  placeholder="0"
+                />
+              </span>
+            </VCol>
+            <VCol cols="6">
+              <!-- Align VCheckbox items to the right -->
+            </VCol>
+          </VRow>
         </VCardText>
       </VCard>
     </VDialog>
@@ -3959,6 +3986,22 @@ const dessertsTest = ref([
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
           :item-class="row_classes" 
         >
+          <template #header.data-table-select="{ allSelected, selectAll, someSelected }">
+            <VCheckboxBtn
+              :indeterminate="someSelected && !allSelected"
+              :model-value="allSelected"
+              color="primary"
+              @update:model-value="selectAll(!allSelected)"
+            />
+          </template>
+
+          <template #item.data-table-select="{ internalItem, isSelected, toggleSelect }">
+            <VCheckboxBtn
+              :model-value="isSelected(internalItem)"
+              color="primary"
+              @update:model-value="toggleSelect(internalItem)"
+            />
+          </template>
           <template #item="{ item }">
             <tr>
               <td
@@ -3997,14 +4040,11 @@ const dessertsTest = ref([
                 </VChip>
               </td>
               <td
-                class="px-2"
+                class="px-2 text-center"
                 style="min-width: 30px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
-                <span
-                  style="font-size: 12px;"
-                  class="text-center "
-                >{{ item.raw.no }}</span>
+                <span style="font-size: 12px;">{{ item.raw.no }}</span>
               </td>
               <td
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
@@ -4040,7 +4080,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2"
-                style="justify-content: start;"
+                style="min-width: 150px; justify-content: start;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
@@ -4060,8 +4100,9 @@ const dessertsTest = ref([
                 />
               </td>
               <td
-                class="text-center px-2"
+                class="text-start px-2"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                style="min-width: 100px;"
               > 
                 <span
                   style="font-size: 12px;"
@@ -4070,6 +4111,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="text-center px-2"
+                style="min-width: 150px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
@@ -4128,6 +4170,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="text-start px-2"
+                style="min-width: 150px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
@@ -4137,6 +4180,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="text-center px-2"
+                style="min-width: 130px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span style="font-size: 12px;">{{ convertDate(item.raw.updatedDate) }}</span>
