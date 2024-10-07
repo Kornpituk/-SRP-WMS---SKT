@@ -609,6 +609,48 @@ const alertErrorLot = ref({
   alertAmountLot5: null,
 })
 
+// ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Lot No.
+const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
+  if (!actualMakerLotNo && actualAmount) {
+    alertErrorLot.value[`alertMakerLot${i}`] = `The Lot No.${i} field cannot be left blank. Please enter the required information without leaving any spaces.`
+    
+    return true  // มีข้อผิดพลาด
+  } else {
+    alertErrorLot.value[`alertMakerLot${i}`] = null
+    
+    return false
+  }
+}
+
+// ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Amount(Unit)
+const validateAmount = (i, actualMakerLotNo, actualAmount) => {
+  // เริ่มต้นข้อความแสดงข้อผิดพลาด
+  let errorMessage = ''
+
+  // ตรวจสอบเงื่อนไขแรก
+  if (actualMakerLotNo && !actualAmount) {
+    errorMessage += 
+      `The Amount(Unit)${i} field cannot be left blank. Please enter the required information without leaving any spaces. `
+  } 
+
+  // ตรวจสอบเงื่อนไขที่สอง
+  if (actualAmount <= 0 && actualAmount !== null) {
+    errorMessage += 
+      `The Amount(Unit)${i}, Invalid input detected. Ensure the amount entered is not less than 1. `
+  }
+
+  // ถ้ามีข้อความข้อผิดพลาด
+  if (errorMessage) {
+    alertErrorLot.value[`alertAmountLot${i}`] = errorMessage.trim() // ลบช่องว่างที่ไม่จำเป็น
+    
+    return true  // มีข้อผิดพลาด
+  } else {
+    alertErrorLot.value[`alertAmountLot${i}`] = null // ไม่มีข้อผิดพลาด
+    
+    return false // ไม่มีข้อผิดพลาด
+  }
+}
+
 const saveLotReceivingForm = async () => {
   const body = []
   let hasError = false
@@ -618,13 +660,13 @@ const saveLotReceivingForm = async () => {
     const actualMakerLotNo = purchaseOrder.value[`actualMakerLotNo_${i}`]
     const actualAmount = purchaseOrder.value[`actualAmountUnits_${i}`]
 
-    // ตรวจสอบเงื่อนไขว่า Lot No. ว่างแต่ Amount มีค่า
-    if (!actualMakerLotNo && actualAmount) {
-      alertErrorLot.value[`alertMakerLot${i}`] = `The Lot No.${i} field cannot be left blank. Please enter the required information without leaving any spaces.`
-      hasError = true  // มีข้อผิดพลาด
-    } else {
-      // เคลียร์ค่าแจ้งเตือน ถ้าไม่มีข้อผิดพลาด
-      alertErrorLot.value[`alertMakerLot${i}`] = null
+    // ตรวจสอบข้อผิดพลาด
+    const lotNoError = validateLotNo(i, actualMakerLotNo, actualAmount)
+    const amountError = validateAmount(i, actualMakerLotNo, actualAmount)
+
+    // ถ้ามีข้อผิดพลาดจะตั้งค่า hasError = true
+    if (lotNoError || amountError) {
+      hasError = true
     }
 
     // ถ้าไม่มีข้อผิดพลาด และ actualMakerLotNo มีค่า
@@ -1648,10 +1690,29 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
             >
               <VTextField
+                v-if="purchaseOrder.actualMakerLotNo_2"
                 v-model="purchaseOrder.actualMakerLotNo_2"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => (purchaseOrder.actualAmountUnits_2 && value ===null) || (!purchaseOrder.actualAmountUnits_2) || 'Lot No.2 is required.',
+                  value => (purchaseOrder.actualAmountUnits_2 && value === null) || (!purchaseOrder.actualAmountUnits_2) || 'Lot No.2 is required.',
+                  value => value.length <= 20 || 'Must be 20 characters or less',
+                ]"
+                density="compact"
+                style="font-size: 16px;"
+              >
+                <template #label>
+                  <VIcon
+                    color="green"
+                    icon="ri-edit-line"
+                  />
+                </template>
+              </VTextField>
+              <VTextField
+                v-if="!purchaseOrder.actualMakerLotNo_2"
+                v-model="purchaseOrder.actualMakerLotNo_2"
+                :style="{ width: '100%', minWidth: '150px' }"
+                :rules="[
+                  value => (purchaseOrder.actualAmountUnits_2 && value === null) || (!purchaseOrder.actualAmountUnits_2) || 'Lot No.2 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less',
                 ]"
                 density="compact"
@@ -2060,6 +2121,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_1"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
                 style="font-size: 16px; text-align: end;"
@@ -2082,6 +2144,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_2"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -2104,6 +2167,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_3"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -2125,6 +2189,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_4"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -2147,6 +2212,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_5"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -3091,8 +3157,7 @@ const getDisabledFollowStatusNRole = () => {
             <VDivider />
             <div>
               <VAlert
-                title="Error Lot"
-                type="error"
+                title="Details Lot"
                 variant="outlined"
                 closable
               >
@@ -3103,12 +3168,18 @@ const getDisabledFollowStatusNRole = () => {
                   <span
                     v-if="value"
                     style="font-size: 14px;"
-                  ><VIcon icon="ri-error-warning-fill" />{{ key }}: {{ value }}
+                  ><VIcon
+                    color="error"
+                    icon="ri-error-warning-fill"
+                  />{{ key }}: {{ value }}
                   </span>
                   <span
                     v-if="!value"
                     style="font-size: 14px;"
-                  ><VIcon color="success" icon="ri-checkbox-circle-fill" />{{ key }} {{ value }}
+                  ><VIcon
+                    color="success"
+                    icon="ri-checkbox-circle-fill"
+                  />{{ key }} {{ value }}
                   </span>
                 </div>
               </VAlert>
