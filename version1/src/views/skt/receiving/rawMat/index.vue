@@ -259,6 +259,16 @@ const generatedJournalId = () => {
     })
 }
 
+//----------------------------------- Set configuration Status ---
+
+const readonlyAllInput = () => {
+  return statusId.value !== 3 && statusId.value !== 1 && statusId.value !== 8 && statusId.value !== 9
+}
+
+const hidedAllIconInput = () => {
+  return statusId.value === 3 || statusId.value === 1
+}
+
 watch(() => {
   console.log('Gene 1')
   generatedJournalId()
@@ -440,7 +450,6 @@ const getLotReceivingForm = () => {
 
 const coaFiles = ref([])
 
-
 //--------------- COA
 
 let startTime
@@ -474,6 +483,8 @@ const rules = [
 watchEffect(() => {
   console.log('fileMuti++', fileMuti.value)
   console.log('files+++', files.value)
+
+  
 })
 
 const getCOAReceivingForm = () => {
@@ -1540,6 +1551,7 @@ const getDisabledFollowStatusNRole = () => {
           >
             <VSelect
               v-model="purchaseOrder.selectedMakerName"
+              :readonly="readonlyAllInput()"
               :items="itemsManufacturer"
               item-title="makerName"
               item-value="productId"
@@ -1653,6 +1665,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualMakerLotNo_1"
+                :readonly="readonlyAllInput()"
                 density="compact"
                 :style="{ width: '100%', minWidth: '150px', fontSize: '12px !important;' }"
                 :rules="[
@@ -1662,8 +1675,9 @@ const getDisabledFollowStatusNRole = () => {
                 maxlegth="20"
                 class="custom-text-field"
               >
-                <template #label>
+                <template v-if="hidedAllIconInput" #label>
                   <VIcon
+                    
                     color="green"
                     icon="ri-edit-line"
                   />
@@ -1682,15 +1696,19 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualMakerLotNo_2"
+                :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => (purchaseOrder.actualAmountUnits_2 && value === null) || (!purchaseOrder.actualAmountUnits_2) || 'Lot No.2 is required.',
+                  value => (purchaseOrder.actualAmountUnits_2 && value === null) || (purchaseOrder.actualAmountUnits_2) || 'Lot No.2 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less',
                 ]"
                 density="compact"
                 style="font-size: 16px;"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon
                     color="green"
                     icon="ri-edit-line"
@@ -1710,6 +1728,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualMakerLotNo_3"
+                :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
                   value => (purchaseOrder.actualAmountUnits_3 && value === null) || (!purchaseOrder.actualAmountUnits_3) || 'Lot No.3 is required.',
@@ -1718,7 +1737,10 @@ const getDisabledFollowStatusNRole = () => {
                 density="compact"
                 style="font-size: 16px;"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon
                     color="green"
                     icon="ri-edit-line"
@@ -1739,6 +1761,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualMakerLotNo_4"
+                :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
                   value => (purchaseOrder.actualAmountUnits_4 && value === null) || (!purchaseOrder.actualAmountUnits_4) || 'Lot No.4 is required.',
@@ -1747,7 +1770,10 @@ const getDisabledFollowStatusNRole = () => {
                 density="compact"
                 style="font-size: 16px;"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon
                     color="green"
                     icon="ri-edit-line"
@@ -1768,6 +1794,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualMakerLotNo_5"
+                :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
                   value => (purchaseOrder.actualAmountUnits_5 && value === null) || (!purchaseOrder.actualAmountUnits_5) || 'Lot No.5 is required.',
@@ -1776,7 +1803,10 @@ const getDisabledFollowStatusNRole = () => {
                 density="compact"
                 style="font-size: 16px;"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon
                     color="green"
                     icon="ri-edit-line"
@@ -1805,6 +1835,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.invoiceNo"
+                :readonly="readonlyAllInput()"
                 density="compact"
               />
             </th>
@@ -1820,6 +1851,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="2"
             >
               <VTextField
+                
                 v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_1"
                 :style="{ width: '100%', minWidth: '150px' }"
@@ -1831,7 +1863,10 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
                 @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_1')"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
                 <template #append-inner>
@@ -2070,6 +2105,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <AppDateTimePicker
                 v-model="purchaseOrder.expectDeliveryDate"
+                :readonly="readonlyAllInput()"
                 density="compact"
                 prepend-inner-icon="ri-calendar-schedule-fill"
                 :config="{ dateFormat: 'd/m/Y' }"
@@ -2090,6 +2126,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_1"
+                :readonly="readonlyAllInput()"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
@@ -2098,7 +2135,10 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px; text-align: end;"
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_1')"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
                 <template #append-inner>
@@ -2113,6 +2153,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_2"
+                :readonly="readonlyAllInput()"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
@@ -2121,7 +2162,10 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_2')"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
                 <template #append-inner>
@@ -2136,6 +2180,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_3"
+                :readonly="readonlyAllInput()"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
@@ -2144,7 +2189,10 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_3')"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
                 <template #append-inner>
@@ -2158,6 +2206,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_4"
+                :readonly="readonlyAllInput()"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
@@ -2166,7 +2215,10 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_4')"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
                 <template #append-inner>
@@ -2180,6 +2232,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.actualAmountUnits_5"
+                :readonly="readonlyAllInput()"
                 :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
@@ -2188,7 +2241,10 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_5')"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
                 <template #append-inner>
@@ -2404,6 +2460,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.customManufacturerName_1"
+                :readonly="readonlyAllInput()"
                 density="compact"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
@@ -2411,7 +2468,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 250 || 'Must be 250 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2422,6 +2482,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.customManufacturerName_2"
+                :readonly="readonlyAllInput()"
                 density="compact"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
@@ -2429,7 +2490,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 250 || 'Must be 250 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2441,6 +2505,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.customManufacturerName_3"
+                :readonly="readonlyAllInput()"
                 density="compact"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
@@ -2448,7 +2513,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 250 || 'Must be 250 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2459,6 +2527,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.customManufacturerName_4"
+                :readonly="readonlyAllInput()"
                 density="compact"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
@@ -2466,7 +2535,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 250 || 'Must be 250 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2477,6 +2549,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.customManufacturerName_5"
+                :readonly="readonlyAllInput()"
                 density="compact"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
@@ -2484,7 +2557,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 250 || 'Must be 250 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2517,6 +2593,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               <VTextField
                 v-model="purchaseOrder.customLable_1"
+                :readonly="readonlyAllInput()"
                 density="compact"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
@@ -2524,7 +2601,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 100 || 'Must be 100 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2537,13 +2617,17 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.customLable_2"
                 density="compact"
+                :readonly="readonlyAllInput()"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
                   value => value.length <= 100 || 'Must be 100 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2557,13 +2641,17 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.customLable_3"
                 density="compact"
+                :readonly="readonlyAllInput()"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
                   value => value.length <= 100 || 'Must be 100 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2576,13 +2664,17 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.customLable_4"
                 density="compact"
+                :readonly="readonlyAllInput()"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
                   value => value.length <= 100 || 'Must be 100 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2595,13 +2687,17 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-model="purchaseOrder.customLable_5"
                 density="compact"
+                :readonly="readonlyAllInput()"
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
                   value => value.length <= 100 || 'Must be 100 characters or less'
                 ]"
               >
-                <template #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon icon="ri-edit-line" />
                 </template>
               </VTextField>
@@ -2656,6 +2752,7 @@ const getDisabledFollowStatusNRole = () => {
           <th>
             <VTextarea
               v-model="purchaseOrder.noteText"
+              :readonly="readonlyAllInput()"
               clearable
               clear-icon="ri-close-line"
               label="Notes"
@@ -2673,7 +2770,10 @@ const getDisabledFollowStatusNRole = () => {
         <tr>
           <th>
             <div class="demo-space-x">
-              <VCheckbox v-model="purchaseOrder.isForHalalProduct">
+              <VCheckbox
+                v-model="purchaseOrder.isForHalalProduct"
+                :readonly="readonlyAllInput()"
+              >
                 <template #label>
                   <span style="font-size: 12px;">
                     RM for Halal Product
@@ -2691,7 +2791,10 @@ const getDisabledFollowStatusNRole = () => {
         <tr>
           <th>
             <div class="demo-space-x">
-              <VCheckbox v-model="purchaseOrder.isForRspoProduct">
+              <VCheckbox
+                v-model="purchaseOrder.isForRspoProduct"
+                :readonly="readonlyAllInput()"
+              >
                 <template #label>
                   <span style="font-size: 12px;">
                     RM for RSPO Product
@@ -2718,8 +2821,8 @@ const getDisabledFollowStatusNRole = () => {
             <VRow>
               <VCol cols="12">
                 <VFileInput
+                  v-if="hidedAllIconInput"
                   v-model="files"
-                  placeholder="Upload your documents"
                   accept="image/png, image/jpeg, image/bmp"
                   prepend-icon="mdi-paperclip"
                   multiple
@@ -2807,6 +2910,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VCardText>
                   <VCardActions>
                     <VBtn
+                      v-if="hidedAllIconInput"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -2847,6 +2951,7 @@ const getDisabledFollowStatusNRole = () => {
 
                   <VCardActions>
                     <VBtn
+                      v-if="hidedAllIconInput"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -2865,6 +2970,7 @@ const getDisabledFollowStatusNRole = () => {
                 cols="12"
               >
                 <VBtn
+                  v-if="hidedAllIconInput"
                   color="red"
                   @click="deleteAllCIA"
                 >
