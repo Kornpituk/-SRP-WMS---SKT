@@ -2759,7 +2759,7 @@ const getDisabledFollowStatusNRole = () => {
               :readonly="readonlyAllInput()"
               clearable
               clear-icon="ri-close-line"
-              label="Notes"
+              label="Enter Your Notes"
               placeholder="Text"
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
             />

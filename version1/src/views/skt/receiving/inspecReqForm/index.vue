@@ -1288,9 +1288,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].okState"
                 :mandatory="false"
-                :rules="!item.itemAnalyticals[0].okState ?[
+                :rules="[
                   v => v !== -1 || 'Actual value is required!',
-                ] : []"
+                ]"
               >
                 <VRow>
                   <VCol cols="6">
@@ -1323,10 +1323,6 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
                 density="compact"
               />
-              <span
-                v-if="!item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].okState === -1"
-                class="text-red"
-              >Actual value is required!</span>
             </td>
 
             <td
@@ -1369,10 +1365,6 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
-              <span
-                v-if="!item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].okState === -1"
-                class="text-red"
-              >Actual value is required!</span>
             </td>
 
             <td
@@ -1415,10 +1407,6 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
-              <span
-                v-if="!item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].okState === -1"
-                class="text-red"
-              >Actual value is required!</span>
             </td>
 
             <td
@@ -1461,10 +1449,6 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
-              <span
-                v-if="!item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].okState === -1"
-                class="text-red"
-              >Actual value is required!</span>
             </td>
 
             <td
@@ -1507,10 +1491,6 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
-              <span
-                v-if="!item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].okState === -1"
-                class="text-red"
-              >Actual value is required!</span>
             </td>
           </tr>
           
@@ -1718,7 +1698,7 @@ const getDisabledFollowStatusNRole = () => {
                 density="compact"
               />
               <span
-                v-if="!item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].okState === -1"
+                v-if="!item.itemAnalyticals[0] && item.itemAnalyticals[0].okState === -1"
                 class="text-red"
               >Analysis result is required!</span>
             </td>
@@ -1759,10 +1739,6 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[1].actualAnalysis"
                 density="compact"
               />
-              <span
-                v-if="!item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].okState === -1"
-                class="text-red"
-              >Analysis result is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1801,10 +1777,6 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[2].actualAnalysis"
                 density="compact"
               />
-              <span
-                v-if="!item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].okState === -1"
-                class="text-red"
-              >Analysis result is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1843,10 +1815,6 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[3].actualAnalysis"
                 density="compact"
               />
-              <span
-                v-if="!item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].okState === -1"
-                class="text-red"
-              >Analysis result is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1889,10 +1857,6 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[4].actualAnalysis"
                 density="compact"
               />
-              <span
-                v-if="!item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].okState === -1"
-                class="text-red"
-              >Analysis result is required!</span>
             </td>
           </tr>
         </table>
@@ -1930,7 +1894,7 @@ const getDisabledFollowStatusNRole = () => {
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
             >
               <template #label>
-                <span style="font-size: 12px;">Enter Your Note                </span>
+                <span style="font-size: 12px;">Enter Your Notes                </span>
               </template>
             </VTextarea>
           </td>
