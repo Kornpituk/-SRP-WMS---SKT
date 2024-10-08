@@ -442,7 +442,7 @@ const GetStockUpdate = () => {
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
 
-      const filteredData = data.filter(item => item.receiveTypeId !== 3 && item.receiveTypeId !== 1)
+      const filteredData = data.filter(item => item.receiveTypeId !== 44)
 
       // Add No. field to each product (after filtering)
       products.value = filteredData.map((item, index) => ({
@@ -1033,7 +1033,7 @@ const approveReceivingPlant = () => {
 
     selectedItemIdForColotRow.value = item.itemCode
 
-    if(item.statusId === 15 ){
+    if(item.statusId === 15 || item.statusId === 7){
       statusCheckApprove.value = item.statusId
       axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/whapproval/${item.poEtlLogDetailJournalID}`, {}, {
         headers: {
@@ -2368,7 +2368,7 @@ const dessertsTest = ref([
             style="font-size: 12px;"
             @click="isDialogVisibleActionPrintLabel = true"
           >
-            Print Label
+            Print Label &  Form
           </VBtn>
           <VBtn
             v-if="detailsReceiv.statusText !== 'ETL Failed!' && detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && detailsReceiv.statusText !== 'Cancel'"
@@ -2549,7 +2549,7 @@ const dessertsTest = ref([
             color="warning"
             @click="isDialogVisibleActionPrintLabel = true"
           >
-            Print Label
+            Print Label & Form
           </VBtn>
 
           <VBtn
@@ -2652,20 +2652,20 @@ const dessertsTest = ref([
               <!-- Align VCheckbox items to the right -->
               <VCheckbox
                 v-model="selectedPrintLabel"
-                label="Raw Material"
-                value="Raw Material"
+                label="Receiving Form"
+                value="Receiving Form"
                 class="ms-auto"
               />
               <VCheckbox
                 v-model="selectedPrintLabel"
-                label="Inspection"
-                value="Inspection"
+                label="Inspection Request Form"
+                value="Inspection Request Form"
                 class="ms-auto"
               />
               <VCheckbox
                 v-model="selectedPrintLabel"
-                label="Lorry"
-                value="Lorry"
+                label="Lorry Loading Check List"
+                value="Lorry Loading Check List"
                 class="ms-auto"
               />
               <VDivider class="my-4" />
@@ -2678,21 +2678,17 @@ const dessertsTest = ref([
                   placeholder="0"
                 />
               </span>
+              <div class="mt-4">
+                <VBtn style="width: 100%;">
+                  Print
+                </VBtn>
+              </div>
             </VCol>
           </VRow>
 
           <VRow v-if="printLabel">
             <VCol cols="6">
-              <VDivider class="my-4" />
-              <span>
-                <VTextField
-                  v-model="weight"
-                  label="Copies"
-                  type="number"
-                  density="compact"
-                  placeholder="0"
-                />
-              </span>
+              <span />
             </VCol>
             <VCol cols="6">
               <!-- Align VCheckbox items to the right -->
@@ -3952,7 +3948,6 @@ const dessertsTest = ref([
     </VCard>
   </section> 
 
-
   <!-- Data Table Beta1.0 -->
   <section>
     <VCard>
@@ -4058,11 +4053,11 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2"
-                style="min-width: 200px;  justify-content: start;"
+                style="max-width: 300px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
-                  style="max-width: 200px; font-size: 12px;"
+                  style="font-size: 12px;"
                   class="text-wrap"
                   v-html="item.raw.itemName.replace(/\s/g, '&nbsp;')"
                 />
@@ -4294,7 +4289,7 @@ const dessertsTest = ref([
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.3(Last Updated 12/09/2024) Rows of Data {{ products.length }}
+          Version : 2.3(Last Updated 12/09/2024) {{ products.length }} Rows of Data 
         </VAlert>
       </VCardText>
     </VCard>

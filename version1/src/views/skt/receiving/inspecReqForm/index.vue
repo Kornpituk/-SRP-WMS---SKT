@@ -72,6 +72,8 @@ const headerInsp =ref({
   lastUpdatedStaffInsp: null,
   lastUpdatedSuperInsp: null,
 
+  remarkReject: null,
+
 })
 
 const analysistInsp = ref({
@@ -191,6 +193,9 @@ const getHearderInsp = () => {
         headerInsp.value.lastUpdatedStaffInsp = data[0].inspStaffUpdatedDate
         headerInsp.value.lastUpdatedSuperInsp = data[0].inspSupervisorDate
 
+        // reject
+        headerInsp.value.remarkReject = data[0].statusComments
+
         // purchaseOrder.value = response.data[0]
         console.log('[*****Headers]]!!: ', data[0])
     
@@ -274,6 +279,9 @@ const analyticalItemsResults = ref([])
 const columnRadio = ref(1)
 const inlineRadio = ref('radio-1')
 
+const textValue = () => {
+  console.log("[textValue]", analysisItems.value)
+}
 
 // ข้อมูลต้นแบบที่เราจะเก็บเพื่อส่งไปยัง API
 const formData = ref({
@@ -504,6 +512,30 @@ const approveInsp = () => {
     })
 }
 
+const approveReceivingPlant = () => {
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/whapproval/${data.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+    .then(response => {
+      console.log(`Response for poEtlLogDetailJournalID ${data.value.poEtlLogDetailJournalID}:`, response.data)
+
+      // isDialogSubmitSuccessVisible.value = true
+      isDialogConfirmVisible.value = false
+
+      // รีเฟรชหน้าจอทั้งหมด
+      location.reload()
+    })
+    .catch(error => {
+      // Handle errors
+      console.error(`Error for poEtlLogDetailJournalID ${data.value.poEtlLogDetailJournalID}:`, error)
+      isDialogSubmitFailedVisible.value = true
+    })
+}
+
 //------------------- Btn ----------------------------
 
 const btnSaveDraft = () => {
@@ -669,8 +701,15 @@ const saveDraftButton = word => {
 }
 
 const areaTextRemarkButton = word => {
-  isDialogTextAreaVisible.value = true
-  wordForSubmit.value = word
+  if(word === 'APPROVE REJECT'){
+    wordForSubmit.value = word
+    isDialogConfirmVisible.value = true
+  }else {
+    isDialogTextAreaVisible.value = true
+    wordForSubmit.value = word
+  }
+
+  
 }
 
 const submitButtonVisible = word => {
@@ -840,6 +879,7 @@ const getDisabledFollowStatusNRole = () => {
               <VCol cols="6">
                 <VCheckbox
                   v-model="checkBoxCOAYes"
+                  
                   readonly
                 >
                   <template #label>
@@ -1009,6 +1049,12 @@ const getDisabledFollowStatusNRole = () => {
       </VCardText>
     </VCard>
   </VDialog>
+
+  <section>
+    <VBtn @click="textValue">
+      Test
+    </VBtn>
+  </section>
 
   <!-- Raw Material Inspection Request Form -->
   <VRow class="mt-4">
@@ -1242,6 +1288,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].okState"
                 :mandatory="false"
+                :rules="!item.itemAnalyticals[0].okState ?[
+                  v => v !== -1 || 'Actual value is required!',
+                ] : []"
               >
                 <VRow>
                   <VCol cols="6">
@@ -1269,10 +1318,15 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].actualAnalysis"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                  value => value !== '' || !value || 'Actual value is required!',
+                  value => value.length <= 20 || 'Must be 20 characters or less',
                 ]"
                 density="compact"
               />
+              <span
+                v-if="!item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].okState === -1"
+                class="text-red"
+              >Actual value is required!</span>
             </td>
 
             <td
@@ -1315,6 +1369,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+              <span
+                v-if="!item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].okState === -1"
+                class="text-red"
+              >Actual value is required!</span>
             </td>
 
             <td
@@ -1357,6 +1415,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+              <span
+                v-if="!item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].okState === -1"
+                class="text-red"
+              >Actual value is required!</span>
             </td>
 
             <td
@@ -1399,6 +1461,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+              <span
+                v-if="!item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].okState === -1"
+                class="text-red"
+              >Actual value is required!</span>
             </td>
 
             <td
@@ -1441,6 +1507,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+              <span
+                v-if="!item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].okState === -1"
+                class="text-red"
+              >Actual value is required!</span>
             </td>
           </tr>
           
@@ -1647,6 +1717,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[0].actualAnalysis"
                 density="compact"
               />
+              <span
+                v-if="!item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].okState === -1"
+                class="text-red"
+              >Analysis result is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1685,6 +1759,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[1].actualAnalysis"
                 density="compact"
               />
+              <span
+                v-if="!item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].okState === -1"
+                class="text-red"
+              >Analysis result is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1723,6 +1801,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[2].actualAnalysis"
                 density="compact"
               />
+              <span
+                v-if="!item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].okState === -1"
+                class="text-red"
+              >Analysis result is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1761,6 +1843,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[3].actualAnalysis"
                 density="compact"
               />
+              <span
+                v-if="!item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].okState === -1"
+                class="text-red"
+              >Analysis result is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1803,6 +1889,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[4].actualAnalysis"
                 density="compact"
               />
+              <span
+                v-if="!item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].okState === -1"
+                class="text-red"
+              >Analysis result is required!</span>
             </td>
           </tr>
         </table>
@@ -1812,7 +1902,10 @@ const getDisabledFollowStatusNRole = () => {
 
   <!-- Note / Details -->
   <section>
-    <VRow style="font-size: 12px;" class="mb-1">
+    <VRow
+      style="font-size: 12px;"
+      class="mb-1"
+    >
       <VCol cols="12">
         <span
           class=""
@@ -1866,7 +1959,7 @@ const getDisabledFollowStatusNRole = () => {
           <thead>
             <tr>
               <th colspan="3">
-                Approve
+                Accept
               </th>
               <th colspan="3">
                 Reject
@@ -1899,7 +1992,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
               </td>
               <td colspan="6">
-                <span v-if="statusId === 7 || statusId === 16">Comments Rejected because of the following error</span>
+                <span v-if="statusId === 7 || statusId === 16">{{ headerInsp.remarkReject }}</span>
               </td>
             </tr>
           </tbody>
@@ -1919,7 +2012,7 @@ const getDisabledFollowStatusNRole = () => {
             class="text-center"
             cols="12"
           >
-            WareHouse
+            Warehouse
           </VCol>
           <VCol
             style="border: 1px solid black;"
@@ -2003,7 +2096,7 @@ const getDisabledFollowStatusNRole = () => {
 
   <!-- BTN -->
   <section
-    v-if="statusId !== null && statusId !== undefined && statusId !== 6 && statusId !== 16 && statusId !== 15 && statusId !== 17"
+    v-if="statusId === 4 || statusId === 5"
     cols="12"
     class="my-4"
   >
@@ -2026,6 +2119,7 @@ const getDisabledFollowStatusNRole = () => {
     </div>
   </section>
 
+  <!-- Btn Approve , Reject, Back to edit -->
   <section
     v-if="statusId !== null && statusId === 6"
     class="mt-6"
@@ -2052,6 +2146,44 @@ const getDisabledFollowStatusNRole = () => {
         Reject
       </VBtn>
       <VBtn
+        color="green"
+        style="font-size: 12px;"
+        @click="approvetButtonVisible('ACCEPT')"
+      >
+        Accept
+      </VBtn>
+    </div>
+  </section>
+
+  <!-- Btn Approval -->
+  <section
+    v-if="statusId === 7 || statusId === 15"
+    class="mt-6"
+  >
+    <div
+      style="font-size: 12px;"
+      class="d-flex justify-end px-0"
+    >
+      <VBtn
+        v-if="false"
+        class=""
+        color="info"
+        style="font-size: 12px;"
+        @click="areaTextRemarkButton('Back To Edit')"
+      >
+        Back To Edit
+      </VBtn>
+      <VBtn
+        v-if="statusId === 7"
+        class="mx-2"
+        color="error"
+        style="font-size: 12px;"
+        @click="areaTextRemarkButton('APPROVE REJECT')"
+      >
+        Approve Reject
+      </VBtn>
+      <VBtn
+        v-if="statusId === 15"
         color="green"
         style="font-size: 12px;"
         @click="approvetButtonVisible('APPROVE')"
@@ -2112,9 +2244,23 @@ const getDisabledFollowStatusNRole = () => {
             {{ wordForSubmit }}
           </VBtn>
           <VBtn
-            v-if="wordForSubmit === 'APPROVE'"
-            color="green"
+            v-if="['APPROVE'].includes(wordForSubmit)"
+            color="success"
+            @click="approveReceivingPlant"
+          >
+            {{ wordForSubmit }}
+          </VBtn>
+          <VBtn
+            v-if="['ACCEPT'].includes(wordForSubmit)"
+            color="success"
             @click="approveInsp"
+          >
+            {{ wordForSubmit }}
+          </VBtn>
+          <VBtn
+            v-if="['APPROVE REJECT'].includes(wordForSubmit)"
+            color="warning"
+            @click="approveReceivingPlant"
           >
             {{ wordForSubmit }}
           </VBtn>

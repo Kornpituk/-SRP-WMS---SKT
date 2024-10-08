@@ -1602,7 +1602,7 @@ const getDisabledFollowStatusNRole = () => {
       </table>
     </VCol>
 
-    <section>
+    <section v-if="false">
       <VBtn @click="testPC">
         Test
       </VBtn>
@@ -1675,7 +1675,10 @@ const getDisabledFollowStatusNRole = () => {
                 maxlegth="20"
                 class="custom-text-field"
               >
-                <template v-if="hidedAllIconInput" #label>
+                <template
+                  v-if="hidedAllIconInput"
+                  #label
+                >
                   <VIcon
                     
                     color="green"
@@ -1698,10 +1701,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_2"
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => (purchaseOrder.actualAmountUnits_2 && value === null) || (purchaseOrder.actualAmountUnits_2) || 'Lot No.2 is required.',
+                :rules="!purchaseOrder.actualAmountUnits_2 ? [
+                  value => (purchaseOrder.actualAmountUnits_2 && value === null) || 'Lot No.2 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less',
-                ]"
+                ] : []"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -1727,13 +1730,14 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
             >
               <VTextField
+              
                 v-model="purchaseOrder.actualMakerLotNo_3"
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => (purchaseOrder.actualAmountUnits_3 && value === null) || (!purchaseOrder.actualAmountUnits_3) || 'Lot No.3 is required.',
+                :rules="!purchaseOrder.actualMakerLotNo_3 ? [
+                  value => (purchaseOrder.actualAmountUnits_3 && value === null) || 'Lot No.3 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
-                ]"
+                ] : []"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -1763,10 +1767,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_4"
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => (purchaseOrder.actualAmountUnits_4 && value === null) || (!purchaseOrder.actualAmountUnits_4) || 'Lot No.4 is required.',
+                :rules="!purchaseOrder.actualMakerLotNo_4 ? [
+                  value => (purchaseOrder.actualAmountUnits_4 && value === null) || 'Lot No.4 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
-                ]"
+                ] : []"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -1796,10 +1800,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_5"
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => (purchaseOrder.actualAmountUnits_5 && value === null) || (!purchaseOrder.actualAmountUnits_5) || 'Lot No.5 is required.',
+                :rules="! purchaseOrder.actualMakerLotNo_5 ?[
+                  value => (purchaseOrder.actualAmountUnits_5 && value === null) || 'Lot No.5 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
-                ]"
+                ] : []"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -2105,8 +2109,8 @@ const getDisabledFollowStatusNRole = () => {
             >
               <AppDateTimePicker
                 v-model="purchaseOrder.expectDeliveryDate"
-                :readonly="readonlyAllInput()"
                 density="compact"
+                :readonly="!readonlyAllInput()"
                 prepend-inner-icon="ri-calendar-schedule-fill"
                 :config="{ dateFormat: 'd/m/Y' }"
                 class="custom-date-time-picker"
