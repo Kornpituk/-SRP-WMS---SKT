@@ -65,9 +65,9 @@ const imgNameDialog = ref('')
 const roleAccount = ref('issues')
 
 watchEffect(() => {
-  if(localStorage.getItem('userCheck') === 'supwh'){
+  if (localStorage.getItem('userCheck') === 'supwh') {
     roleAccount.value = 'manager'
-  } else if(localStorage.getItem('userCheck') === 'staff'){
+  } else if (localStorage.getItem('userCheck') === 'staff') {
     roleAccount.value = 'issues'
   }
 })
@@ -95,7 +95,7 @@ const getManufacturer = () => {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
+      Authorization: `Bearer ${accessTokenAtStore}`,
     },
   },
   {})
@@ -104,10 +104,10 @@ const getManufacturer = () => {
       itemsManufacturer.value = response.data.data
 
       // console.log('[itemsManufacturer.value]!!: ', itemsManufacturer.value)
-    
+
     })
     .catch(error => {
-    // Handle errors
+      // Handle errors
       console.error('Error:', error)
     })
 }
@@ -151,7 +151,7 @@ const purchaseOrder = ref({
   packagingTypeName: '',
   storagePlaceNo: '',
 
-  actualMakerLotNo_1: null, 
+  actualMakerLotNo_1: null,
   actualNetCountKgs_1: NetCountPackage.value,
   actualAmountUnits_1: null,
   actualTotalQuantityKgs_1: null,
@@ -205,7 +205,7 @@ const generatedReceivingForm = () => {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
+      Authorization: `Bearer ${accessTokenAtStore}`,
     },
     params: {
       poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
@@ -218,7 +218,7 @@ const generatedReceivingForm = () => {
       // itemsManufacturer.value = response.data.data
 
       console.log('[*****generatedReceivingForm]!!: ', response.data)
-  
+
     })
     .catch(error => {
       // Handle errors
@@ -236,7 +236,7 @@ const generatedJournalId = () => {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
+      Authorization: `Bearer ${accessTokenAtStore}`,
     },
   },
   {})
@@ -287,7 +287,7 @@ const resetDataRaeMatRequest = () => {
           // รีเซ็ตค่าของ noX ให้เป็น 0
           item.input[0][noKey] = 0
         }
-        
+
         return item
       })
     }
@@ -316,7 +316,7 @@ const detailsReceivingForm = () => {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
+      Authorization: `Bearer ${accessTokenAtStore}`,
     },
   },
   {})
@@ -325,22 +325,22 @@ const detailsReceivingForm = () => {
       purchaseOrder.value = response.data.datas
 
       // console.log('[products.value]!!: ', purchaseOrder.value)
-    
+
     })
     .catch(error => {
-    // Handle errors
+      // Handle errors
       console.error('Error:', error)
     })
 }
 
 //------------- Header
 const getHearderReceivingForm = () => {
-  if(poEtlLogDetailJournalIDQueryParameters.value){
+  if (poEtlLogDetailJournalIDQueryParameters.value) {
     axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`, 
+        Authorization: `Bearer ${accessTokenAtStore}`,
       },
     },
     {})
@@ -385,27 +385,27 @@ const getHearderReceivingForm = () => {
         console.log('[*****Headers]]!!: ', data[0])
 
         console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
-    
+
       })
       .catch(error => {
         // Handle errors
         console.error('Error:', error)
       })
-  }else {
+  } else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
   }
-  
+
 }
 
 //--------------- Lot
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const getLotReceivingForm = () => {
-  if(poEtlLogDetailJournalIDQueryParameters.value){
+  if (poEtlLogDetailJournalIDQueryParameters.value) {
     axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/get-lot/${poEtlLogDetailJournalIDQueryParameters.value}`, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`, 
+        Authorization: `Bearer ${accessTokenAtStore}`,
       },
     })
       .then(response => {
@@ -429,10 +429,10 @@ const getLotReceivingForm = () => {
         purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
 
         console.log('[*****Headers Lot]]!!:', lotData[0])
-    
+
       })
       .catch(error => {
-      // Handle errors
+        // Handle errors
         console.error('Error:', error)
       })
   }
@@ -462,18 +462,18 @@ const rules = [
       if (file.size > maxFileSizeMB * 1024 * 1024) {
         fileMuti.value = null
         files.value = null
-        
+
         return `File size should be less than ${maxFileSizeMB} MB!`
       }
     }
-    
+
     return true
   },
 ]
 
 watchEffect(() => {
-  console.log('fileMuti++',  fileMuti.value)
-  console.log('files+++',  files.value)
+  console.log('fileMuti++', fileMuti.value)
+  console.log('files+++', files.value)
 })
 
 const getCOAReceivingForm = () => {
@@ -539,7 +539,7 @@ const saveReceivingForm = () => {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
+      Authorization: `Bearer ${accessTokenAtStore}`,
     },
   },
   {})
@@ -547,10 +547,10 @@ const saveReceivingForm = () => {
       console.log('[products.value]!!: ', response.data)
       isDialogSubmitSuccessVisible.value = true
       isDialogConfirmVisible.value = false
-    
+
     })
     .catch(error => {
-    // Handle errors
+      // Handle errors
       isDialogSubmitFailedVisible.value = true
       console.error('Error:', error)
     })
@@ -585,7 +585,7 @@ const saveHeaderReceivingForm = async () => {
     })
 
     console.log('[saveHeaderReceivingForm] success:', response.data)
-    
+
     return response.data  // คืนค่า response กลับไป
   } catch (error) {
     console.error('Error [saveHeaderReceivingForm]:', error)
@@ -613,11 +613,11 @@ const alertErrorLot = ref({
 const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
   if (!actualMakerLotNo && actualAmount) {
     alertErrorLot.value[`alertMakerLot${i}`] = `The Lot No.${i} field cannot be left blank. Please enter the required information without leaving any spaces.`
-    
+
     return true  // มีข้อผิดพลาด
   } else {
     alertErrorLot.value[`alertMakerLot${i}`] = null
-    
+
     return false
   }
 }
@@ -629,24 +629,24 @@ const validateAmount = (i, actualMakerLotNo, actualAmount) => {
 
   // ตรวจสอบเงื่อนไขแรก
   if (actualMakerLotNo && !actualAmount) {
-    errorMessage += 
+    errorMessage +=
       `The Amount(Unit)${i} field cannot be left blank. Please enter the required information without leaving any spaces. `
-  } 
+  }
 
   // ตรวจสอบเงื่อนไขที่สอง
   if (actualAmount <= 0 && actualAmount !== null) {
-    errorMessage += 
+    errorMessage +=
       `The Amount(Unit)${i}, Invalid input detected. Ensure the amount entered is not less than 1. `
   }
 
   // ถ้ามีข้อความข้อผิดพลาด
   if (errorMessage) {
     alertErrorLot.value[`alertAmountLot${i}`] = errorMessage.trim() // ลบช่องว่างที่ไม่จำเป็น
-    
+
     return true  // มีข้อผิดพลาด
   } else {
     alertErrorLot.value[`alertAmountLot${i}`] = null // ไม่มีข้อผิดพลาด
-    
+
     return false // ไม่มีข้อผิดพลาด
   }
 }
@@ -701,7 +701,7 @@ const saveLotReceivingForm = async () => {
     })
 
     console.log('[saveLotReceivingForm] success:', body)
-    
+
     return response.data
   } catch (error) {
     console.error('Error [saveLotReceivingForm]:', error)
@@ -716,30 +716,30 @@ const base64ToFile = (base64String, filename) => {
   let bstr = atob(arr[1])
   let n = bstr.length
   let u8arr = new Uint8Array(n)
-  while(n--){
+  while (n--) {
     u8arr[n] = bstr.charCodeAt(n)
   }
-  
+
   return new File([u8arr], filename, { type: mime })
 }
 
 const base64ToBlob = (base64, mimeType) => {
   const byteCharacters = atob(base64)
   const byteArrays = []
-  
+
   for (let offset = 0; offset < byteCharacters.length; offset += 512) {
     const slice = byteCharacters.slice(offset, offset + 512)
     const byteNumbers = new Array(slice.length)
-    
+
     for (let i = 0; i < slice.length; i++) {
       byteNumbers[i] = slice.charCodeAt(i)
     }
-    
+
     const byteArray = new Uint8Array(byteNumbers)
 
     byteArrays.push(byteArray)
   }
-  
+
   return new Blob(byteArrays, { type: mimeType })
 }
 
@@ -782,13 +782,13 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
   // ถ้าไม่มีไฟล์ใหม่หรือไฟล์เก่าเลย ให้หยุดการทำงาน
   if (!hasNewFiles && !hasOldFiles) {
     console.log('No files to save.')
-    
+
   }
 
   deleteCOARecevingFrom() // ลบไฟล์เก่าก่อนทำการอัปโหลดไฟล์ใหม่และเก่ารวมกัน
 
   // ส่ง formData ที่รวมไฟล์เก่าและไฟล์ใหม่ไปยัง API
-  
+
   try {
     console.log('formData++', formData)
 
@@ -822,7 +822,7 @@ const deleteCOARecevingFrom = () => {
     .catch(error => {
       console.error('Error:', error)
     })
-  
+
 }
 
 const deleteAllCIA = () => {
@@ -853,15 +853,15 @@ const isDialogVisibleStepSaveDraft = ref(false)
 
 //---------- Step 1 ------------------------
 const iconStep1 = ref('ri-save-3-line')
-const colorStep1 =ref('secondary')
+const colorStep1 = ref('secondary')
 
 //---------- Step 2 ------------------------
 const iconStep2 = ref('ri-save-3-line')
-const colorStep2 =ref('secondary')
+const colorStep2 = ref('secondary')
 
 //---------- Step 3 ------------------------
 const iconStep3 = ref('ri-save-3-line')
-const colorStep3 =ref('secondary')
+const colorStep3 = ref('secondary')
 
 //------------ loadind 1---------------------
 const loadindingSaveDatft1 = ref(false)
@@ -891,7 +891,7 @@ const submitButtonVisibleNew = async word => {
     loadindingSaveDatft1.value = true
 
     // Step 1: saveLotReceivingForm
-    
+
     await saveHeaderReceivingForm()
     console.log('saveHeaderReceivingForm success')
 
@@ -905,7 +905,7 @@ const submitButtonVisibleNew = async word => {
     iconStep1.value = 'ri-error-warning-line'
     colorStep1.value = 'error'
     wordForSubmit.value = "SAVE HEADER"
-    
+
     loadindingSaveDatftFailed1.value = false
     loadindingSaveDatftSeccess1.value = false
 
@@ -913,7 +913,7 @@ const submitButtonVisibleNew = async word => {
     isDialogConfirmVisible.value = false
 
     // isDialogSubmitFailedVisible.value = true
-    
+
     return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
   }
 
@@ -927,7 +927,7 @@ const submitButtonVisibleNew = async word => {
     console.log('saveLotReceivingForm success')
     iconStep2.value = 'ri-check-line'
     colorStep2.value = 'success'
-    
+
     loadindingSaveDatftSeccess2.value = true
     loadindingSaveDatft2.value = false
   } catch (error) {
@@ -945,7 +945,7 @@ const submitButtonVisibleNew = async word => {
     // wordForSubmit.value = '2'
     isDialogConfirmVisible.value = false
     isDialogSubmitFailedVisible.value = false
-    
+
     return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
   }
 
@@ -972,7 +972,7 @@ const submitButtonVisibleNew = async word => {
 
     isDialogSubmitFailedVisible.value = false
     isDialogConfirmVisible.value = false
-    
+
     return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
   }
 
@@ -995,7 +995,7 @@ const submitReceivingForm = async () => {
     // ถ้า submitButtonVisibleNew() ไม่สำเร็จ (สมมติว่ามันคืนค่า false เมื่อไม่สำเร็จ)
     if (!isSuccess) {
       console.log('submitButtonVisibleNew failed, stopping submission.')
-      
+
       return // หยุดการทำงาน
     }
 
@@ -1054,18 +1054,18 @@ const makerLotNo4 = ref('')
 const makerLotNo5 = ref('')
 
 function formatDate(dateString) {
-  if(dateString === null || dateString === '' || dateString === undefined ){
+  if (dateString === null || dateString === '' || dateString === undefined) {
     return 'Null'
-  }else if(dateString.length > 0){
+  } else if (dateString.length > 0) {
     const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
     const day = String(date.getDate()).padStart(2, '0')
     const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
     const year = date.getFullYear()
 
     return `${day}/${month}/${year}`
-    
+
   }
-  
+
   return 'null'
 }
 
@@ -1079,87 +1079,77 @@ const convertToInt = value => {
 }
 
 const dataRaeMatRequest = ref([
-  { header: 'makerLotNo',
+  {
+    header: 'makerLotNo',
     input: [{ no1: purchaseOrder.value.actualMakerLotNo_1, no2: purchaseOrder.value.actualMakerLotNo_2, no3: purchaseOrder.value.actualMakerLotNo_3, no4: purchaseOrder.value.actualMakerLotNo_4, no5: purchaseOrder.value.actualMakerLotNo_5 }],
   },
-  { header: 'netCount',
+  {
+    header: 'netCount',
     input: [{ no1: purchaseOrder.value.actualNetCountKgs_1, no2: purchaseOrder.value.actualNetCountKgs_2, no3: purchaseOrder.value.actualNetCountKgs_3, no4: purchaseOrder.value.actualNetCountKgs_4, no5: purchaseOrder.value.actualNetCountKgs_5, total: 0 }],
   },
-  { header: 'amount',
+  {
+    header: 'amount',
     input: [{ no1: 0, no2: 0, no3: 0, no4: 0, no5: 0, total: 0 }],
   },
-  { header: 'packing',
+  {
+    header: 'packing',
     input: [{ no1: purchaseOrder.value.actualTotalQuantityKgs_1, no2: purchaseOrder.value.actualTotalQuantityKgs_2, no3: purchaseOrder.value.actualTotalQuantityKgs_3, no4: purchaseOrder.value.actualTotalQuantityKgs_4, no5: purchaseOrder.value.actualTotalQuantityKgs_5, total: purchaseOrder.value.actualTotalQuantityKgs_5 }],
   },
 ])
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 watchEffect(() => {
-  if(purchaseOrder.value.actualMakerLotNo_1 || purchaseOrder.value.actualMakerLotNo_1 ==! ''){
-    if(data.value.receiveTypeId === 2){
-      purchaseOrder.value.actualNetCountKgs_1 = deliveryQuantity.value.netCount
-    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
-      purchaseOrder.value.actualNetCountKgs_1 = deliveryQuantity.value.packagingQtyKg
-    }
-  }else{
-    purchaseOrder.value.actualNetCountKgs_1 = null
-  }
-  if(purchaseOrder.value.actualMakerLotNo_2 || purchaseOrder.value.actualMakerLotNo_2 ==! ''){
-    if(data.value.receiveTypeId === 2){
-      purchaseOrder.value.actualNetCountKgs_2 = deliveryQuantity.value.netCount
-    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
-      purchaseOrder.value.actualNetCountKgs_2 = deliveryQuantity.value.packagingQtyKg
-    }
-  }else{
-    purchaseOrder.value.actualNetCountKgs_2 = null
-  }
-  if(purchaseOrder.value.actualMakerLotNo_3 || purchaseOrder.value.actualMakerLotNo_3 ==! ''){
-    if(data.value.receiveTypeId === 2){
-      purchaseOrder.value.actualNetCountKgs_3 = deliveryQuantity.value.netCount
-    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
-      purchaseOrder.value.actualNetCountKgs_3 = deliveryQuantity.value.packagingQtyKg
-    }
-  }else{
-    purchaseOrder.value.actualNetCountKgs_3 = null
-  }
-  if(purchaseOrder.value.actualMakerLotNo_4){
-    if(data.value.receiveTypeId === 2){
-      purchaseOrder.value.actualNetCountKgs_4 = deliveryQuantity.value.netCount
-    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
-      purchaseOrder.value.actualNetCountKgs_4 = deliveryQuantity.value.packagingQtyKg
+  const updateNetCountKgs = (index, lotNo, netCountField) => {
+    if (lotNo) {
+      if (data.value.receiveTypeId === 2) {
+        purchaseOrder.value[netCountField] = dataHeaderReceving.value.packagingQtyKg
+      } else if (data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0) {
+        purchaseOrder.value[netCountField] = data.value.purchasingAmountKgs
+      }
+    } else {
+      purchaseOrder.value[netCountField] = null
     }
   }
-  if(purchaseOrder.value.actualMakerLotNo_5){
-    if(data.value.receiveTypeId === 2){
-      purchaseOrder.value.actualNetCountKgs_5 = deliveryQuantity.value.netCount
-    }else if(data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0){
-      purchaseOrder.value.actualNetCountKgs_5 = deliveryQuantity.value.packagingQtyKg
-    }
+
+  // ใช้ลูปในการจัดการ lotNo 1 ถึง 5
+  for (let i = 1; i <= 5; i++) {
+    const lotNo = purchaseOrder.value[`actualMakerLotNo_${i}`]
+    const netCountField = `actualNetCountKgs_${i}`
+
+    updateNetCountKgs(i, lotNo, netCountField)
   }
+  
 
   // ---------------------- Amount ---------------------  
   for (let i = 1; i <= 5; i++) {
     const amountUnits = purchaseOrder.value[`actualAmountUnits_${i}`]
     const makerLotNo = purchaseOrder.value[`actualMakerLotNo_${i}`]
 
-    if (amountUnits && makerLotNo === null) {
-      purchaseOrder.value[`actualMakerLotNo_${i}`] = ""
-    } else if (amountUnits === "") {
-      purchaseOrder.value[`actualMakerLotNo_${i}`] = null
+    if (makerLotNo === "") {
+      purchaseOrder.value[`actualAmountUnits_${i}`] = ""
     }
+
+    // } else if (amountUnits === "") {
+    //   purchaseOrder.value[`actualMakerLotNo_${i}`] = null
+    // }
+  }
+
+  // ---------------------- reset grand net count  ---------------------
+  if(purchaseOrder.value.actualMeanNetCountKgs === 'NaN'){
+    purchaseOrder.value.actualMeanNetCountKgs = 0
   }
 })
 
 // ฟังก์ชันสำหรับคำนวณค่า total
 
 const calculationPONew = () => {
-  if(purchaseOrder.value){
-    
+  if (purchaseOrder.value) {
+
     const covertFloatFixedTwo = number => {
-      if(number === '' || number === undefined){
+      if (number === '' || number === undefined) {
         return 0
       }
-      
+
       return parseFloat(number).toFixed(2)
     }
 
@@ -1168,11 +1158,11 @@ const calculationPONew = () => {
     }
 
     //------------------- Total Amount
-    const totalAmount = (covertToInteger(purchaseOrder.value.actualAmountUnits_1)+
-    covertToInteger(purchaseOrder.value.actualAmountUnits_2)+ 
-    covertToInteger(purchaseOrder.value.actualAmountUnits_3)+ 
-    covertToInteger(purchaseOrder.value.actualAmountUnits_4)+ 
-    covertToInteger(purchaseOrder.value.actualAmountUnits_5)
+    const totalAmount = (covertToInteger(purchaseOrder.value.actualAmountUnits_1) +
+      covertToInteger(purchaseOrder.value.actualAmountUnits_2) +
+      covertToInteger(purchaseOrder.value.actualAmountUnits_3) +
+      covertToInteger(purchaseOrder.value.actualAmountUnits_4) +
+      covertToInteger(purchaseOrder.value.actualAmountUnits_5)
     )
 
 
@@ -1200,7 +1190,7 @@ function formatNumberWithCommas(value) {
   const parts = value.split('.')
 
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  
+
   return parts.join('.')
 }
 
@@ -1208,7 +1198,7 @@ const formatNumber = value => {
   if (value !== null && value !== undefined) {
     return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
-  
+
   return '0.00'
 }
 
@@ -1216,7 +1206,7 @@ const formatNumberToLocal = value => {
   if (value !== null && value !== undefined) {
     return parseFloat(value).toLocaleString(undefined)
   }
-  
+
   return '0'
 }
 
@@ -1295,7 +1285,7 @@ const showDialogImageMuti = (img, name) => {
     img = `data:image/png;base64,${img}`
   }
 
-  isDialogVisibleImgFileMuti.value =true
+  isDialogVisibleImgFileMuti.value = true
   imgDialog.value = img
   imgNameDialog.value = name
 }
@@ -1443,11 +1433,11 @@ const tabDisablingConfig = {
 const getDisabledFollowStatusNRole = () => {
   const status = data.value.statusId
   const role = roleAccount.value
-  
+
   // console.log('Status Raw:', status)
   // console.log('Role Raw:', role)
   // console.log('Disabled Tabs Raw:', tabDisablingConfig[status]?.[role])
-  
+
   return tabDisablingConfig[status]?.[role] || false
 }
 </script>
@@ -1469,7 +1459,7 @@ const getDisabledFollowStatusNRole = () => {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center mt-4"
       >
-        Raw  Material  Receiving  Form
+        Raw Material Receiving Form
       </div>
     </VCol>
 
@@ -1565,7 +1555,8 @@ const getDisabledFollowStatusNRole = () => {
                   :key="index"
                   style="font-size: 12px;"
                   class="d-flex justify-center"
-                > <!-- ปรับขนาดข้อความที่เลือก -->
+                >
+                  <!-- ปรับขนาดข้อความที่เลือก -->
                   {{ item.title }}
                 </span>
               </template>
@@ -1665,7 +1656,7 @@ const getDisabledFollowStatusNRole = () => {
                 density="compact"
                 :style="{ width: '100%', minWidth: '150px', fontSize: '12px !important;' }"
                 :rules="[
-                  value => !!value.trim() || 'Lot No.1 is required.', 
+                  value => !!value.trim() || 'Lot No.1 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
                 maxlegth="20"
@@ -1690,25 +1681,6 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
             >
               <VTextField
-                v-if="purchaseOrder.actualMakerLotNo_2"
-                v-model="purchaseOrder.actualMakerLotNo_2"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => (purchaseOrder.actualAmountUnits_2 && value === null) || (!purchaseOrder.actualAmountUnits_2) || 'Lot No.2 is required.',
-                  value => value.length <= 20 || 'Must be 20 characters or less',
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template #label>
-                  <VIcon
-                    color="green"
-                    icon="ri-edit-line"
-                  />
-                </template>
-              </VTextField>
-              <VTextField
-                v-if="!purchaseOrder.actualMakerLotNo_2"
                 v-model="purchaseOrder.actualMakerLotNo_2"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
@@ -1733,7 +1705,6 @@ const getDisabledFollowStatusNRole = () => {
               3
             </th>
             <th
-              
               class="text-center"
               colspan="1"
             >
@@ -1741,10 +1712,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_3"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => (purchaseOrder.actualAmountUnits_3 && value ===null) || (!purchaseOrder.actualAmountUnits_3) || 'Lot No.3 is required.',
+                  value => (purchaseOrder.actualAmountUnits_3 && value === null) || (!purchaseOrder.actualAmountUnits_3) || 'Lot No.3 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
-               
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -1771,7 +1741,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_4"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => (purchaseOrder.actualAmountUnits_4 && value ===null) || (!purchaseOrder.actualAmountUnits_4) || 'Lot No.4 is required.',
+                  value => (purchaseOrder.actualAmountUnits_4 && value === null) || (!purchaseOrder.actualAmountUnits_4) || 'Lot No.4 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
                 density="compact"
@@ -1793,7 +1763,6 @@ const getDisabledFollowStatusNRole = () => {
               5
             </th>
             <th
-              
               class="text-center"
               colspan="1"
             >
@@ -1801,7 +1770,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_5"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => (purchaseOrder.actualAmountUnits_5 && value ===null) || (!purchaseOrder.actualAmountUnits_5) || 'Lot No.5 is required.',
+                  value => (purchaseOrder.actualAmountUnits_5 && value === null) || (!purchaseOrder.actualAmountUnits_5) || 'Lot No.5 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
                 density="compact"
@@ -1845,7 +1814,7 @@ const getDisabledFollowStatusNRole = () => {
             >
               Net Count.(Kg)
             </th>
-          
+
             <td
               class="text-center"
               colspan="2"
@@ -1855,9 +1824,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualNetCountKgs_1"
                 :style="{ width: '100%', minWidth: '150px' }"
                 density="compact"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
+                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
                 ]"
                 @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_1')"
@@ -1874,9 +1843,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualNetCountKgs_1"
                 :style="{ width: '100%', minWidth: '150px' }"
                 density="compact"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
+                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
                 ]"
@@ -1892,7 +1861,7 @@ const getDisabledFollowStatusNRole = () => {
 
               {{ purchaseOrder.actualNetCountKgs_1 }}
             </td>
-          
+
             <td
               class="text-center"
               colspan="2"
@@ -1900,9 +1869,9 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_2"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
+                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
 
                 ]"
@@ -1920,9 +1889,9 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_2"
                 v-model="purchaseOrder.actualNetCountKgs_2"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
+                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
                 ]"
@@ -1939,7 +1908,7 @@ const getDisabledFollowStatusNRole = () => {
               </VTextField>
               {{ purchaseOrder.actualNetCountKgs_2 }}
             </td>
-          
+
             <td
               class="text-center"
               colspan="2"
@@ -1947,9 +1916,9 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_3"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
+                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
 
                 ]"
@@ -1967,9 +1936,9 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_3"
                 v-model="purchaseOrder.actualNetCountKgs_3"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
+                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
                 ]"
@@ -1993,9 +1962,9 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_4"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
+                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
 
                 ]"
@@ -2013,9 +1982,9 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_4"
                 v-model="purchaseOrder.actualNetCountKgs_4"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
+                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
                 ]"
@@ -2032,13 +2001,16 @@ const getDisabledFollowStatusNRole = () => {
               </VTextField>
               {{ purchaseOrder.actualNetCountKgs_4 }}
             </td>
-            <td colspan="2">
+            <td
+              colspan="2"
+              class="text-center"
+            >
               <VTextField
                 v-if="false"
                 v-model="purchaseOrder.actualNetCountKgs_5"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) || 
+                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
                     `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
 
                 ]"
@@ -2056,9 +2028,9 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_5"
                 v-model="purchaseOrder.actualNetCountKgs_5"
-                :rules="[ 
+                :rules="[
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) || 
+                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
 
 
@@ -2111,9 +2083,8 @@ const getDisabledFollowStatusNRole = () => {
             >
               Amount (Unit)
             </th>
-          
+
             <th
-            
               class="text-center"
               colspan="2"
             >
@@ -2135,7 +2106,7 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
             </th>
-          
+
             <th
               class="text-center"
               colspan="2"
@@ -2158,7 +2129,7 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
             </th>
-          
+
             <th
               class="text-center"
               colspan="2"
@@ -2204,7 +2175,6 @@ const getDisabledFollowStatusNRole = () => {
               </VTextField>
             </th>
             <th
-              
               class="text-center"
               colspan="2"
             >
@@ -2261,9 +2231,8 @@ const getDisabledFollowStatusNRole = () => {
               colspan="2"
               rowspan="3"
             />
-          
+
             <td
-              
               class="text-start"
               colspan="2"
             >
@@ -2271,9 +2240,8 @@ const getDisabledFollowStatusNRole = () => {
                 <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_1) }}
               </div>
             </td>
-          
+
             <td
-              
               class="text-start"
               colspan="2"
             >
@@ -2281,7 +2249,7 @@ const getDisabledFollowStatusNRole = () => {
                 <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_2) }}
               </div>
             </td>
-          
+
             <td
               class="text-start"
               colspan="2"
@@ -2291,7 +2259,6 @@ const getDisabledFollowStatusNRole = () => {
               </div>
             </td>
             <td
-              
               class="text-start"
               colspan="2"
             >
@@ -2300,7 +2267,6 @@ const getDisabledFollowStatusNRole = () => {
               </div>
             </td>
             <td
-              
               class="text-start"
               colspan="2"
             >
@@ -2330,7 +2296,8 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 150px; max-width: 150px;"
             >
-              <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{ formatNumber(data.purchasingAmountKgs) }}</span>
+              <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
+                formatNumber(data.purchasingAmountKgs) }}</span>
               <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
             </td>
             <th
@@ -2343,7 +2310,7 @@ const getDisabledFollowStatusNRole = () => {
               class="text-center"
               colspan="2"
             />
-          
+
             <th
               :disabled="purchaseOrder.actualMakerLotNo_3 === null || purchaseOrder.actualMakerLotNo_3 === undefined"
               class="text-center"
@@ -2389,7 +2356,7 @@ const getDisabledFollowStatusNRole = () => {
               class="text-center"
               colspan="2"
             />
-          
+
             <th
               :disabled="purchaseOrder.actualMakerLotNo_3 === null || purchaseOrder.actualMakerLotNo_3 === undefined"
               class="text-center"
@@ -2467,7 +2434,7 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
             </th>
-          
+
             <th
               class="text-center"
               colspan="2"
@@ -2505,7 +2472,6 @@ const getDisabledFollowStatusNRole = () => {
               </VTextField>
             </th>
             <th
-              
               class="text-center"
               colspan="2"
             >
@@ -2582,7 +2548,7 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
             </th>
-          
+
             <th
               disabled="!purchaseOrder.actualMakerLotNo_3"
               class="text-center"
@@ -2783,7 +2749,7 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VProgressLinear>
             </div>
-            
+
             <VRow
               v-if="files.length"
               class="pa-2 d-flex justify-center bg-green-lighten-5"
@@ -2872,13 +2838,13 @@ const getDisabledFollowStatusNRole = () => {
                       :src="'data:image/png;base64,' + file.coAFile"
                       height="150"
                       contain
-                      @click="showDialogImageMuti(file.coAFile, file.coAFileName )"
+                      @click="showDialogImageMuti(file.coAFile, file.coAFileName)"
                     />
                     <div class="d-flex flex-column align-center">
                       <span>{{ file.coAFileName }}</span>
                     </div>
                   </VCardText>
-                  
+
                   <VCardActions>
                     <VBtn
                       variant="flat"
@@ -2973,7 +2939,9 @@ const getDisabledFollowStatusNRole = () => {
                 class="mx-2"
                 icon="ri-calendar-schedule-fill"
                 size="30"
-              />{{ formatDate(dataHeaderReceving.updatedDate) }}
+              />{{
+                formatDate(dataHeaderReceving.updatedDate)
+              }}
             </div>
           </td>
           <td
@@ -2985,7 +2953,8 @@ const getDisabledFollowStatusNRole = () => {
                 class="mx-2"
                 icon="ri-calendar-schedule-fill"
                 size="30"
-              />{{ formatDate(dataHeaderReceving.approveRejectDate) }}
+              />{{
+                formatDate(dataHeaderReceving.approveRejectDate) }}
             </div>
           </td>
         </tr>
@@ -3038,7 +3007,7 @@ const getDisabledFollowStatusNRole = () => {
         style="font-size: 12px;"
       >For Inspection </span>
     </VCol>
-    
+
     <!-- Dialog Step Save Draft -->
     <section style="font-size: 12px;">
       <VDialog
@@ -3168,18 +3137,20 @@ const getDisabledFollowStatusNRole = () => {
                   <span
                     v-if="value"
                     style="font-size: 14px;"
-                  ><VIcon
-                    color="error"
-                    icon="ri-error-warning-fill"
-                  />{{ key }}: {{ value }}
+                  >
+                    <VIcon
+                      color="error"
+                      icon="ri-error-warning-fill"
+                    />{{ key }}: {{ value }}
                   </span>
                   <span
                     v-if="!value"
                     style="font-size: 14px;"
-                  ><VIcon
-                    color="success"
-                    icon="ri-checkbox-circle-fill"
-                  />{{ key }} {{ value }}
+                  >
+                    <VIcon
+                      color="success"
+                      icon="ri-checkbox-circle-fill"
+                    />{{ key }} {{ value }}
                   </span>
                 </div>
               </VAlert>
@@ -3206,7 +3177,8 @@ const getDisabledFollowStatusNRole = () => {
               />
             </div>
             <div class="text-center">
-              <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }} Transaction?</span>
+              <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
+                Transaction?</span>
             </div>
           </VCardText>
 
@@ -3218,7 +3190,7 @@ const getDisabledFollowStatusNRole = () => {
               Cancel
             </VBtn>
             <VBtn
-              v-if=" wordForSubmit === 'SUBMIT' "
+              v-if="wordForSubmit === 'SUBMIT'"
               color="green"
               @click="submitReceivingForm"
             >
@@ -3338,9 +3310,15 @@ const getDisabledFollowStatusNRole = () => {
 }
 
 .text-wrap {
-  overflow-wrap: break-word; /* Ensures long words are wrapped */
-  white-space: normal; /* Allows text to wrap */
-  word-wrap: break-word; /* Breaks long words if necessary */
+  overflow-wrap: break-word;
+
+  /* Ensures long words are wrapped */
+  white-space: normal;
+
+  /* Allows text to wrap */
+  word-wrap: break-word;
+
+  /* Breaks long words if necessary */
 }
 
 .custom-table {
@@ -3404,10 +3382,14 @@ const getDisabledFollowStatusNRole = () => {
 }
 
 .custom-date-time-picker >>> input {
-  font-size: 12px; /* ปรับขนาดของข้อความในฟิลด์ */
+  font-size: 12px;
+
+  /* ปรับขนาดของข้อความในฟิลด์ */
 }
 
 .custom-date-time-picker >>> input icon--prepend {
-  font-size: 12px; /* ปรับขนาดของไอคอนที่อยู่ด้านหน้า */
+  font-size: 12px;
+
+  /* ปรับขนาดของไอคอนที่อยู่ด้านหน้า */
 }
 </style>
