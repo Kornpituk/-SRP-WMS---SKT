@@ -367,66 +367,114 @@ watch(() => {
 })
 
 //--------------- save header --------------------------------
-const saveHeaderInspect = () => {
+const saveHeaderInspect = async () => {
+  try {
+    const body = {
+      limConditionDetail: headerInsp.value.details,
+      note: headerInsp.value.note,
+    }
 
-  const body = {
-    limConditionDetail: headerInsp.value.details,
-    note: headerInsp.value.note,
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    // console.log('[products.value]!!: ', response.data)
+    // isDialogSubmitSuccessVisible.value = true
+  } catch (error) {
+    // Handle errors
+    isDialogSubmitFailedVisible.value = true
+    console.error('Error:', error)
   }
-
-  axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-      console.log('[products.value]!!: ', response.data)
-      isDialogSubmitSuccessVisible.value = true
-  
-    })
-    .catch(error => {
-      // Handle errors
-      isDialogSubmitFailedVisible.value = true
-      console.error('Error:', error)
-    })
 }
 
 //--------------- save Lot --------------------------------
-const saveLotInspect = () => {
-  // วนลูปทีละ item ใน analysisItems
-  analysisItems.value.forEach(item => {
-    // วนลูปทีละ analyticalItem ใน itemAnalyticals
-    item.itemAnalyticals.forEach((analyticalItem, index) => {
-      // สร้าง body สำหรับแต่ละ analyticalItem
+//---------------- Validate
+const emptyFields = ref([])
+
+const checkEmptyFields = () => {
+  const emptyFieldsList = []
+
+  analysisItems.value.forEach((item, itemIndex) => {
+    item.itemAnalyticals.forEach((analyticalItem, analyticalIndex) => {
       const body = {
-        updatedBy: '', // ข้อมูลที่ต้องการส่ง
         inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
         actualAnalysis: analyticalItem.actualAnalysis,
         okState: analyticalItem.okState,
       }
 
-      // ส่ง body ไปยัง API ทีละตัว
-      axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails`, body, {
-        headers: {
-          'accept': '*/*',
-          'x-location': `${whereHouse.value}`,
-          Authorization: `Bearer ${accessTokenAtStore}`,
-        },
-      })
-        .then(response => {
-          console.log('[response]: ', response.data)
-          isDialogSubmitSuccessVisible.value = true  // แสดง dialog เมื่อสำเร็จ
-        })
-        .catch(error => {
-        // แสดง dialog เมื่อมีข้อผิดพลาด
-          isDialogSubmitFailedVisible.value = true
-          console.error('Error:', error)
-        })
+      const indexLabelFiled = `Analytical Item ${itemIndex + 1} : Invalid actual value of Lot ${analyticalIndex + 1} !`
+
+      const indexLabelSuccessed =  `Analytical Item ${itemIndex + 1} : actual value of Lot ${analyticalIndex + 1} !`
+
+      // ตรวจสอบว่าต้องเช็ค actualAnalysis หรือ okState ตามค่า needActualValue
+      if (item.needActualValue) {
+        // เช็คเฉพาะ actualAnalysis
+        if (!body.actualAnalysis) {
+          emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true })
+        } else {
+          emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false })
+        }
+      } else {
+        // เช็คเฉพาะ okState
+        if (body.okState === -1) {
+          emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true })
+        } else {
+          emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false })
+        }
+      }
     })
   })
+
+  return emptyFieldsList
+}
+
+//---------------- api
+const saveLotInspect = async () => {
+  emptyFields.value = checkEmptyFields()
+  console.log('Validate lot Insp', emptyFields.value)
+
+  // if (emptyFields.length > 0) {
+  //   console.log("Empty Fields:", emptyFields)
+  //   isDialogSubmitFailedVisible.value = true  // แสดง dialog ถ้าพบค่าว่าง
+    
+  //   return  // หยุดการบันทึกถ้ามีค่าว่าง
+  // }
+
+  try {
+    for (const item of analysisItems.value) {
+      for (const analyticalItem of item.itemAnalyticals) {
+        // สร้าง body สำหรับแต่ละ analyticalItem
+        const body = {
+          updatedBy: '', // ข้อมูลที่ต้องการส่ง
+          inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+          actualAnalysis: analyticalItem.actualAnalysis,
+          okState: analyticalItem.okState,
+        }
+
+        // ส่ง body ไปยัง API ทีละตัว
+        const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails/${data.value.poEtlLogDetailJournalID}`, body, {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        })
+
+        console.log('[response]: ', response.data)
+      }
+    }
+
+    // แสดง dialog เมื่อสำเร็จ
+    // isDialogSubmitSuccessVisible.value = true
+  } catch (error) {
+    // แสดง dialog เมื่อมีข้อผิดพลาด
+    isDialogSubmitFailedVisible.value = true
+    console.error('Error:', error)
+  }
 }
 
 //--------------- Submit --------------------------------
@@ -537,10 +585,6 @@ const approveReceivingPlant = () => {
 }
 
 //------------------- Btn ----------------------------
-
-const btnSaveDraft = () => {
-  saveHeaderInspect()
-}
 
 const  coaFiles = ref([])
 
@@ -685,7 +729,144 @@ const isDialogConfirmVisible = ref(false)
 const isDialogSubmitSuccessVisible = ref(false)
 const isDialogTextAreaVisible = ref(false)
 
+//-------------------- Watch Validate --------------------------------
+const isDialogVisibleStepSaveDraft = ref(false)
+
+
+
+//---------- Step 1 ------------------------
+const iconStep1 = ref('ri-save-3-line')
+const colorStep1 = ref('secondary')
+
+//---------- Step 2 ------------------------
+const iconStep2 = ref('ri-save-3-line')
+const colorStep2 = ref('secondary')
+
+//---------- Step 3 ------------------------
+const iconStep3 = ref('ri-save-3-line')
+const colorStep3 = ref('secondary')
+
+//------------ loadind 1---------------------
+const loadindingSaveDatft1 = ref(false)
+const loadindingSaveDatftFailed1 = ref(false)
+const loadindingSaveDatftSeccess1 = ref(false)
+
+//------------ loadind 2 ---------------------
+const loadindingSaveDatft2 = ref(false)
+const loadindingSaveDatftFailed2 = ref(false)
+const loadindingSaveDatftSeccess2 = ref(false)
+
+//------------ loadind 3 ---------------------
+const loadindingSaveDatft3 = ref(false)
+const loadindingSaveDatftFailed3 = ref(false)
+const loadindingSaveDatftSeccess3 = ref(false)
+
 const wordForSubmit = ref('Word')
+
+const submitButtonVisibleNew = async word => {
+  wordForSubmit.value = word
+  isDialogVisibleStepSaveDraft.value = true
+
+  try {
+    // Start Step 1
+    loadindingSaveDatft1.value = true
+
+    // Step 1: saveLotReceivingForm
+
+    await saveHeaderInspect()
+    console.log('saveHeaderReceivingForm success')
+
+    iconStep1.value = 'ri-check-line'
+    colorStep1.value = 'success'
+    loadindingSaveDatftSeccess1.value = true
+    loadindingSaveDatft1.value = false
+  } catch (error) {
+    console.error('saveLotReceivingForm failed:', error)
+
+    iconStep1.value = 'ri-error-warning-line'
+    colorStep1.value = 'error'
+    wordForSubmit.value = "SAVE HEADER"
+
+    loadindingSaveDatftFailed1.value = false
+    loadindingSaveDatftSeccess1.value = false
+
+    loadindingSaveDatft1.value = false
+    isDialogConfirmVisible.value = false
+
+    // isDialogSubmitFailedVisible.value = true
+
+    return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
+  }
+
+  try {
+    // Start Step 2
+    loadindingSaveDatft2.value = true
+
+    // Step 2: saveHeaderReceivingForm
+    // console.error('Error: actualMakerLotNo_1 is empty or undefined. out')
+    await saveLotInspect()
+    console.log('saveLotReceivingForm success')
+    iconStep2.value = 'ri-check-line'
+    colorStep2.value = 'success'
+
+    loadindingSaveDatftSeccess2.value = true
+    loadindingSaveDatft2.value = false
+  } catch (error) {
+    console.error('saveLotReceivingForm failed:', error)
+    wordForSubmit.value = "SAVE LOT"
+    iconStep2.value = 'ri-error-warning-line'
+    colorStep2.value = 'error'
+    wordForSubmit.value = "SAVE COA"
+
+    loadindingSaveDatftFailed2.value = false
+    loadindingSaveDatftSeccess2.value = false
+
+    loadindingSaveDatft2.value = false
+
+    // wordForSubmit.value = '2'
+    isDialogConfirmVisible.value = false
+    isDialogSubmitFailedVisible.value = false
+
+    return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
+  }
+
+  // try {
+  //   // Start Step 1
+  //   loadindingSaveDatft3.value = true
+
+  //   // Step 3: saveCOARecevingFrom
+  //   await saveCOARecevingFrom()
+  //   console.log('saveCOARecevingFrom success')
+  //   iconStep3.value = 'ri-check-line'
+  //   colorStep3.value = 'success'
+  //   loadindingSaveDatftSeccess3.value = true
+  //   loadindingSaveDatft3.value = false
+  // } catch (error) {
+  //   console.error('saveCOARecevingFrom failed:', error)
+  //   iconStep3.value = 'ri-error-warning-line'
+  //   colorStep3.value = 'error'
+
+  //   loadindingSaveDatftFailed3.value = false
+  //   loadindingSaveDatftSeccess3.value = false
+
+  //   loadindingSaveDatft3.value = false
+
+  //   isDialogSubmitFailedVisible.value = false
+  //   isDialogConfirmVisible.value = false
+
+  //   return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
+  // }
+
+  // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
+  // isDialogVisibleStepSaveDraft.value = false
+
+  // location.reload()
+
+  // isDialogSubmitSuccessVisible.value = true
+  isDialogConfirmVisible.value = false
+
+  return true
+}
 
 const submitButton = word => {
   isDialogConfirmVisible.value = true
@@ -695,7 +876,6 @@ const submitButton = word => {
 
 const saveDraftButton = word => {
   saveHeaderInspect()
-
   saveLotInspect()
   wordForSubmit.value = word
 }
@@ -708,8 +888,6 @@ const areaTextRemarkButton = word => {
     isDialogTextAreaVisible.value = true
     wordForSubmit.value = word
   }
-
-  
 }
 
 const submitButtonVisible = word => {
@@ -1314,6 +1492,11 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].actualAnalysis"
@@ -1323,6 +1506,11 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
                 density="compact"
               />
+              
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[0].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
 
             <td
@@ -1357,6 +1545,11 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
                 v-model="item.itemAnalyticals[1].actualAnalysis"
@@ -1365,6 +1558,11 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[1].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
 
             <td
@@ -1399,6 +1597,11 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
                 v-model="item.itemAnalyticals[2].actualAnalysis"
@@ -1407,6 +1610,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[2].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
 
             <td
@@ -1441,6 +1648,11 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
                 v-model="item.itemAnalyticals[3].actualAnalysis"
@@ -1449,6 +1661,11 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[3].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
 
             <td
@@ -1483,6 +1700,11 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
                 v-model="item.itemAnalyticals[4].actualAnalysis"
@@ -1491,6 +1713,10 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[4].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
           </tr>
           
@@ -1692,6 +1918,11 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.itemAnalyticals[0].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].actualAnalysis"
@@ -1734,11 +1965,21 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.itemAnalyticals[1].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
                 v-model="item.itemAnalyticals[1].actualAnalysis"
                 density="compact"
               />
+
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[1].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1772,11 +2013,21 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.itemAnalyticals[2].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
                 v-model="item.itemAnalyticals[2].actualAnalysis"
                 density="compact"
               />
+
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[2].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1810,11 +2061,21 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.itemAnalyticals[3].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
                 v-model="item.itemAnalyticals[3].actualAnalysis"
                 density="compact"
               />
+
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[3].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1848,6 +2109,11 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              <span
+                v-if="!item.needActualValue && item.itemAnalyticals[4].okState === -1"
+                class="text-red"
+              >Analysis result Not/ON is required!</span>
+
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
                 v-model="item.itemAnalyticals[2].actualAnalysis"
@@ -1857,6 +2123,11 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[4].actualAnalysis"
                 density="compact"
               />
+
+              <span
+                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[4].actualAnalysis"
+                class="text-red"
+              >Actual value Text is required!</span>
             </td>
           </tr>
         </table>
@@ -2069,7 +2340,7 @@ const getDisabledFollowStatusNRole = () => {
         class="mx-4"
         color="warning"
         style="font-size: 12px;"
-        @click="saveDraftButton('SAVE DRAFT')"
+        @click="submitButtonVisibleNew('SAVE DRAFT')"
       >
         SAVE DRAFT
       </VBtn>
@@ -2170,6 +2441,173 @@ const getDisabledFollowStatusNRole = () => {
         Approve Reject
       </VBtn>
     </div>
+  </section>
+
+  <!-- Dialog Step Save Draft -->
+  <section style="font-size: 12px;">
+    <VDialog
+      v-model="isDialogVisibleStepSaveDraft"
+      width="90%"
+    >
+      <!-- Dialog Content -->
+      <VCard
+        class="text-center"
+        title="Save Draft"
+      >
+        <VCardText class="pa-1">
+          <VRow>
+            <VCol
+              class="text-center d-flex flex-column align-center justify-center mx-auto"
+              cols="4"
+            >
+              <div>
+                <VProgressLinear
+                  v-if="loadindingSaveDatft1"
+                  indeterminate
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftSeccess1"
+                  model-value="100"
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftFailed1"
+                  model-value="0"
+                />
+                <VAvatar
+                  class="my-2"
+                  size="150"
+                  :color="colorStep1"
+                >
+                  <VIcon
+                    size="100"
+                    :icon="iconStep1"
+                  />
+                </VAvatar>
+              </div>
+              <div><span style="font-size: 12px;">Save Draft Header</span></div>
+            </VCol>
+            <VCol
+              class="text-center d-flex flex-column align-center justify-center mx-auto"
+              cols="4"
+            >
+              <div>
+                <VProgressLinear
+                  v-if="loadindingSaveDatft2"
+                  indeterminate
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftSeccess2"
+                  model-value="100"
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftFailed2"
+                  model-value="0"
+                />
+                <VAvatar
+                  class="my-2"
+                  size="150"
+                  :color="colorStep2"
+                >
+                  <VIcon
+                    size="100"
+                    :icon="iconStep2"
+                  />
+                </VAvatar>
+              </div>
+              <div><span style="font-size: 12px;">Save Draft Lot</span></div>
+            </VCol>
+            <VCol
+              class="text-center d-flex flex-column align-center justify-center mx-auto"
+              cols="4"
+            >
+              <div>
+                <VProgressLinear
+                  v-if="loadindingSaveDatft3"
+                  indeterminate
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftSeccess3"
+                  model-value="100"
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftFailed3"
+                  model-value="0"
+                />
+                <VAvatar
+                  class="my-2"
+                  size="150"
+                  :color="colorStep3"
+                >
+                  <VIcon
+                    size="100"
+                    :icon="iconStep3"
+                  />
+                </VAvatar>
+              </div>
+              <div><span style="font-size: 12px;">Save Draft COA</span></div>
+            </VCol>
+          </VRow>
+        </VCardText>
+
+        <VCardText
+          v-if="emptyFields"
+          class="text-start"
+        >
+          <VDivider />
+          <div>
+            <VAlert
+              title="Details Lot"
+              variant="outlined"
+            >
+              <VRow>
+                <VCol
+                  v-for="(field, index) in emptyFields"
+                  :key="index"
+                  cols="4"
+                >
+                  <div :style="{ backgroundColor: field.isEmpty ? '#FBE9E7' : '#E8F5E9', borderRadius: '10px', }">
+                    <span
+                      v-if="field.isEmpty"
+                      style="font-size: 14px;"
+                    >
+                      <VIcon
+                        color="error"
+                        icon="ri-error-warning-fill"
+                      />
+                      <span>{{ field.indexLabelFiled }}: Failed</span>
+                      <div>
+                        <span v-if="field.body.actualAnalysis === ''">Free text: {{ field.body.actualAnalysis }}  Please ensure that the field is filled. <br></span>
+                        <span v-else-if="field.body.okState === -1">Checkbox: Please ensure that the field is filled. <br></span>
+                      </div>
+                    </span>
+                    <span
+                      v-else
+                      style="font-size: 14px;"
+                    >
+                      <VIcon
+                        color="success"
+                        icon="ri-checkbox-circle-fill"
+                      />
+                      {{ field.indexLabelSuccessed }}: Successed
+                      <div>
+                        <span v-if="field.body.actualAnalysis !== ''">Free text: {{ field.body.actualAnalysis }} <br></span>
+                        <span v-else-if="field.body.okState !== -1">Checkbox: <span v-if="field.body.okState === 0">NOT</span> <span v-if="field.body.okState === 1">OK</span> <br></span>
+                      </div>
+                    </span>
+                  </div>
+                </VCol>
+              </VRow>
+            </VAlert>
+          </div>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </section>
 
   <!-- Dialog Submit -->

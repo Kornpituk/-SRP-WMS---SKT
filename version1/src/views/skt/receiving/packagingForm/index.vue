@@ -575,6 +575,7 @@ const saveDraftData = () => {
       <div>
         <h2>Packaging Form Header</h2>
         <pre>{{ analyticalItemsData }}</pre>
+        <pre>{{ dataHeader }}</pre>
 
         <!-- Display error message if there's an error -->
         <div
@@ -779,9 +780,12 @@ const saveDraftData = () => {
             <th colspan="1">
               Amount (Piece)
             </th>
-            <th colspan="4">
-              <VTextField density="compact" />
-            </th>
+            <td
+              colspan="4"
+              class="text-center"
+            >
+              <span>{{ dataHeader.purchasingQuantityPcs }}</span>
+            </td>
           </tr>
           <tr>
             <th colspan="7" />
@@ -810,23 +814,13 @@ const saveDraftData = () => {
             <td colspan="2">
               {{ item.specRange }}
             </td>
-            <td colspan="1">
-              <VTextField
-                v-model="item.ActualC"
-                density="compact"
-              />
-            </td>
-            <td colspan="2">
+            <td colspan="1" />
+            <td
+              Style="min-width: 200px;"
+              colspan="4"
+            >
               <VTextField
                 v-model="asdasd"
-                :style="{ width: '150px', maxWidth: '300px' }"
-                density="compact"
-              />
-            </td>
-            <td colspan="2">
-              <VTextField
-                v-model="asdasd"
-                :style="{ width: '150px', maxWidth: '300px' }"
                 density="compact"
               />
             </td>
@@ -884,7 +878,7 @@ const saveDraftData = () => {
                 <VCol cols="12">
                   <VImg
                     max-height="350px"
-                    :src="image"
+                    :src="dataHeader.packagingImg"
                   />
                 </VCol>
               </VRow>
@@ -1194,6 +1188,158 @@ const saveDraftData = () => {
     </VDialog>
   </section>
 
+  <!-- Dialog Step Save Draft -->
+  <section style="font-size: 12px;">
+    <VDialog
+      v-model="isDialogVisibleStepSaveDraft"
+      width="80%"
+    >
+      <!-- Dialog Content -->
+      <VCard
+        class="text-center"
+        title="Save Draft"
+      >
+        <VCardText class="pa-1">
+          <VRow>
+            <VCol
+              class="text-center d-flex flex-column align-center justify-center mx-auto"
+              cols="4"
+            >
+              <div>
+                <VProgressLinear
+                  v-if="loadindingSaveDatft1"
+                  indeterminate
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftSeccess1"
+                  model-value="100"
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftFailed1"
+                  model-value="0"
+                />
+                <VAvatar
+                  class="my-2"
+                  size="150"
+                  :color="colorStep1"
+                >
+                  <VIcon
+                    size="100"
+                    :icon="iconStep1"
+                  />
+                </VAvatar>
+              </div>
+              <div><span style="font-size: 12px;">Save Draft Header</span></div>
+            </VCol>
+            <VCol
+              class="text-center d-flex flex-column align-center justify-center mx-auto"
+              cols="4"
+            >
+              <div>
+                <VProgressLinear
+                  v-if="loadindingSaveDatft2"
+                  indeterminate
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftSeccess2"
+                  model-value="100"
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftFailed2"
+                  model-value="0"
+                />
+                <VAvatar
+                  class="my-2"
+                  size="150"
+                  :color="colorStep2"
+                >
+                  <VIcon
+                    size="100"
+                    :icon="iconStep2"
+                  />
+                </VAvatar>
+              </div>
+              <div><span style="font-size: 12px;">Save Draft Lot</span></div>
+            </VCol>
+            <VCol
+              class="text-center d-flex flex-column align-center justify-center mx-auto"
+              cols="4"
+            >
+              <div>
+                <VProgressLinear
+                  v-if="loadindingSaveDatft3"
+                  indeterminate
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftSeccess3"
+                  model-value="100"
+                  color="primary"
+                />
+                <VProgressLinear
+                  v-if="loadindingSaveDatftFailed3"
+                  model-value="0"
+                />
+                <VAvatar
+                  class="my-2"
+                  size="150"
+                  :color="colorStep3"
+                >
+                  <VIcon
+                    size="100"
+                    :icon="iconStep3"
+                  />
+                </VAvatar>
+              </div>
+              <div><span style="font-size: 12px;">Save Draft COA</span></div>
+            </VCol>
+          </VRow>
+        </VCardText>
+        <VCardText
+          v-if="alertErrorLot"
+          class="text-start"
+        >
+          <VDivider />
+          <div>
+            <VAlert
+              title="Details Lot"
+              variant="outlined"
+              closable
+            >
+              <div
+                v-for="(value, key) in alertErrorLot"
+                :key="key"
+              >
+                <span
+                  v-if="value"
+                  style="font-size: 14px;"
+                >
+                  <VIcon
+                    color="error"
+                    icon="ri-error-warning-fill"
+                  />{{ key }}: {{ value }}
+                </span>
+                <span
+                  v-if="!value"
+                  style="font-size: 14px;"
+                >
+                  <VIcon
+                    color="success"
+                    icon="ri-checkbox-circle-fill"
+                  />{{ key }} {{ value }}
+                </span>
+              </div>
+            </VAlert>
+          </div>
+        </VCardText>
+      </VCard>
+    </VDialog>
+  </section>
+
   <!-- Btn -->
   <VRow>
     <VCol cols="4" />
@@ -1202,6 +1348,7 @@ const saveDraftData = () => {
       class="d-flex justify-end"
     >
       <VBtn
+
         height="100%"
         width="150px"
         color="warning"
@@ -1210,6 +1357,7 @@ const saveDraftData = () => {
         Save daft
       </VBtn>
       <VBtn
+
         height="100%"
         width="150px"
         class="mx-2"
@@ -1219,6 +1367,7 @@ const saveDraftData = () => {
         Reject
       </VBtn>
       <VBtn
+
         height="40px"
         width="150px"
       >
