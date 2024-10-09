@@ -406,24 +406,26 @@ const checkEmptyFields = () => {
         okState: analyticalItem.okState,
       }
 
-      const indexLabelFiled = `Analytical Item ${itemIndex + 1} : Invalid actual value of Lot ${analyticalIndex + 1} !`
+      const indexLabelFiled = `${itemIndex + 1}. ${item.analyticalItem} maker Lot ${analyticalIndex + 1} !`
 
-      const indexLabelSuccessed =  `Analytical Item ${itemIndex + 1} : actual value of Lot ${analyticalIndex + 1} !`
+      const indexLabelSuccessed =  `${itemIndex + 1}. ${item.analyticalItem} maker Lot ${analyticalIndex + 1} !`
+      const needActualCheck = item.needActualValue
 
       // ตรวจสอบว่าต้องเช็ค actualAnalysis หรือ okState ตามค่า needActualValue
       if (item.needActualValue) {
+
         // เช็คเฉพาะ actualAnalysis
         if (!body.actualAnalysis) {
-          emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true })
+          emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
         } else {
-          emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false })
+          emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false, needActualCheck })
         }
       } else {
         // เช็คเฉพาะ okState
         if (body.okState === -1) {
-          emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true })
+          emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
         } else {
-          emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false })
+          emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false, needActualCheck })
         }
       }
     })
@@ -2580,10 +2582,10 @@ const getDisabledFollowStatusNRole = () => {
                         color="error"
                         icon="ri-error-warning-fill"
                       />
-                      <span>{{ field.indexLabelFiled }}: Failed</span>
+                      <span>{{ field.indexLabelFiled }}: Failed </span>
                       <div>
-                        <span v-if="field.body.actualAnalysis === ''">Free text: {{ field.body.actualAnalysis }}  Please ensure that the field is filled. <br></span>
-                        <span v-else-if="field.body.okState === -1">Checkbox: Please ensure that the field is filled. <br></span>
+                        <span v-if="!field.body.actualAnalysis && field.needActualCheck">Free text: {{ field.body.actualAnalysis }}  Please ensure that the field is filled. <br></span>
+                        <span v-else-if="field.body.okState === -1 && !field.needActualCheck">Checkbox: Please ensure that the field is filled. <br></span>
                       </div>
                     </span>
                     <span
@@ -2596,8 +2598,8 @@ const getDisabledFollowStatusNRole = () => {
                       />
                       {{ field.indexLabelSuccessed }}: Successed
                       <div>
-                        <span v-if="field.body.actualAnalysis !== ''">Free text: {{ field.body.actualAnalysis }} <br></span>
-                        <span v-else-if="field.body.okState !== -1">Checkbox: <span v-if="field.body.okState === 0">NOT</span> <span v-if="field.body.okState === 1">OK</span> <br></span>
+                        <span v-if="field.body.actualAnalysis && field.needActualCheck">Free text: {{ field.body.actualAnalysis }} <br></span>
+                        <span v-else-if="field.body.okState !== -1 && !field.needActualCheck">Checkbox: <span v-if="field.body.okState === 0">NOT</span> <span v-if="field.body.okState === 1">OK</span> <br></span>
                       </div>
                     </span>
                   </div>
