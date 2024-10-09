@@ -78,3 +78,71 @@ export const controllerDeleteAllCIA = {
     files.value = []
   },
 }
+
+//--------------------------------------------------------------------- Real --------------------
+import { ReceivingFormService, GetLotPackagingFormService } from '@/services/skt/receivingPlan/packaging/services'
+
+//--- header --------------------------------
+
+export const useReceivingFormController = () => {
+  const packagingFormHeader = ref(null)
+  const errorMessage = ref(null)
+
+  const fetchPackagingFormHeader = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessage.value = null
+      console.log('Fetching Packaging Form Header...')
+
+      const result = await ReceivingFormService.getHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Received data:', result)
+        packagingFormHeader.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in fetchPackagingFormHeader:', error)
+      errorMessage.value = error.message
+    }
+  }
+
+  return {
+    packagingFormHeader,
+    errorMessage,
+    fetchPackagingFormHeader,
+  }
+}
+
+//--- lot --------------------------------
+export const useGetLotPackagingFormController = () => {
+  const packagingFormLot = ref(null)
+  const errorMessageLot = ref(null)
+
+  const fetchPackagingFormLot = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageLot.value = null
+      console.log('Fetching Packaging Form Header...')
+
+      const result = await GetLotPackagingFormService.GetHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Received data:', result)
+        packagingFormLot.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in fetchPackagingFormLot:', error)
+      errorMessageLot.value = error.message
+    }
+  }
+
+  return {
+    packagingFormLot,
+    errorMessageLot,
+    fetchPackagingFormLot,
+  }
+}
+
+//--- COA --------------------------------

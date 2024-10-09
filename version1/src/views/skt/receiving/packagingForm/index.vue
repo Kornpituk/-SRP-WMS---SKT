@@ -1,12 +1,19 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import axiosIns from '@axios'
+import { ref, onMounted, watchEffect } from "vue"
 import image from "./image/image.png"
+
+import { urlApi } from '@/api'
 
 // import { controllerDeleteAllCIA,  ReceivingModel } from "/Users/code/Easetrack/SRP_Store/src/controller/skt/receivingFrom/packaging/controller"
 
 const props = defineProps({
   Data: Array,
 })
+
+//---------------------- Import Api for Url *****
+const whereHouse = ref(localStorage.getItem('whereHouseName'))
+const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const route = useRoute()
 
@@ -291,8 +298,60 @@ const dateSupervisorWarehouseApprove = ref(new Date())
 const dateStaffWarehouse = ref(new Date())
 const dateSupervisorWarehouse = ref(new Date())
 
+function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
 //------------------------------ Basic -----------------------------------------------------
 const isDialogRejectVisible = ref(false)
+
+//---------------------------------- Controllers ----------------------------------------------------
+const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
+
+const getHearderPackagingForm = () => {
+  if (poEtlLogDetailJournalIDQueryParameters.value) {
+    axiosIns.get(`${urlApi.value}/api/v1/Packaging/View/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    },
+    {})
+      .then(response => {
+
+        const data = response.data.data
+
+        console.log('[*****Headers]]!!: ', response.data.data)
+
+      })
+      .catch(error => {
+        // Handle errors
+        console.error('Error:', error)
+      })
+  } else {
+    console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+  }
+
+}
+
+//---------------------------------- Call function functions --------------------------------
+
+// watchEffect(() => {
+//   getHearderPackagingForm()
+// })
 
 //--------------------------------- MVC ----------------------------------------------------
 // Import composable ที่เราสร้างสำหรับ logic การจัดการไฟล์
@@ -303,6 +362,139 @@ import { handleFilesOMvc,
 } from '@/controllers/skt/receivingFrom/packaging/controller'
 
 import { modelHeader } from '@/model/skt/receivingPlan/packaging/lotDataModel'
+
+//--------------------------------- real --------------------------
+import { useReceivingFormController, useGetLotPackagingFormController } from '@/controllers/skt/receivingFrom/packaging/controller'
+
+const dataHeader = ref({
+  rmInspectionRequestFormJournalId: null,
+  productId: "",
+  productName: "",
+  supplierId: "",
+  supplierName: "",
+  tradeName: "",
+  makerName: "",
+  coAChecked: false,
+  remark: "",
+  note: "",
+  limConditionDetail: "",
+  sktLot: "",
+  purchaseOrderNo: "",
+  purchasingQuantityPcs: 0,
+  actualCheck: true,
+  inspStaffUpdateBy: "",
+  inspStaffUpdateDate: "",
+  whUpdateBy: "",
+  whUpdateDate: "",
+  receivedDate: "",
+  isAccept: false,
+  isReject: false,
+  statusComments: "",
+  packagingImg: null,
+})
+
+// const dataHeader = ref(null)
+
+const { packagingFormHeader, errorMessage, fetchPackagingFormHeader } = useReceivingFormController()
+
+// Call API
+//---- header --------------------------------
+const checkCOAYes = ref(null)
+const checkCOANo = ref(null)
+
+fetchPackagingFormHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+
+//---- lot --------------------------------
+// const dataLot = ref({
+//   pkgInspReqFormAnalyticalItemsJournalId: 0,
+//   sqnText: "",
+//   typeID: 0,
+//   typeName: "",
+//   analyticalItem: "",
+//   method: "",
+//   specRange: "",
+//   needActualValue: false,
+// })
+
+const analyticalItemsData = ref([])
+
+const { packagingFormLot, errorMessageLot, fetchPackagingFormLot } = useGetLotPackagingFormController()
+
+fetchPackagingFormLot(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+watchEffect(() => {
+  // ตรวจสอบว่า packagingFormHeader มีข้อมูลหรือไม่
+  if (packagingFormHeader.value && packagingFormHeader.value.length > 0) {
+    const receivedData = packagingFormHeader.value[0] // รับข้อมูลอ็อบเจกต์แรก
+
+    // กำหนดค่าทั้งหมดให้กับ dataHeader
+    dataHeader.value = {
+      rmInspectionRequestFormJournalId: receivedData.rmInspectionRequestFormJournalId,
+      productId: receivedData.productId,
+      productName: receivedData.productName,
+      supplierId: receivedData.supplierId,
+      supplierName: receivedData.supplierName,
+      tradeName: receivedData.tradeName,
+      makerName: receivedData.makerName,
+      coAChecked: receivedData.coAChecked,
+      remark: receivedData.remark,
+      note: receivedData.note,
+      limConditionDetail: receivedData.limConditionDetail,
+      sktLot: receivedData.sktLot,
+      purchaseOrderNo: receivedData.purchaseOrderNo,
+      purchasingQuantityPcs: receivedData.purchasingQuantityPcs,
+      actualCheck: receivedData.actualCheck,
+      inspStaffUpdateBy: receivedData.inspStaffUpdateBy,
+      inspStaffUpdateDate: receivedData.inspStaffUpdateDate,
+      whUpdateBy: receivedData.whUpdateBy,
+      whUpdateDate: receivedData.whUpdateDate,
+      receivedDate: receivedData.receivedDate,
+      isAccept: receivedData.isAccept,
+      isReject: receivedData.isReject,
+      statusComments: receivedData.statusComments,
+      packagingImg: receivedData.packagingImg,
+    }
+  }
+
+  if(dataHeader.value.coAChecked === true){
+    checkCOAYes.value = dataHeader.value.coAChecked
+  }else if(dataHeader.value.coAChecked === false){
+    checkCOANo.value = !dataHeader.value.coAChecked
+  }
+
+  analyticalItemsData.value = packagingFormLot
+
+  if (packagingFormLot.length > 0) {
+    // กำหนดค่าให้ dataLot จากอาร์เรย์ที่ได้รับจาก API
+    const receivedData = packagingFormLot[0] // ใช้ข้อมูลอ็อบเจกต์แรก
+
+    dataLot.value = {
+      pkgInspReqFormAnalyticalItemsJournalId: receivedData.pkgInspReqFormAnalyticalItemsJournalId,
+      sqnText: receivedData.sqnText,
+      typeID: receivedData.typeID,
+      typeName: receivedData.typeName,
+      analyticalItem: receivedData.analyticalItem,
+      method: receivedData.method,
+      specRange: receivedData.specRange,
+      needActualValue: receivedData.needActualValue,
+    }
+  }
+
+})
+
+
+//---- COA --------------------------------
+
+
+
+
+
+
+
+
+
+
 
 //------------- Headers --------------------------------
 // สร้างตัวแปรเพื่อเก็บไฟล์ที่เลือก
@@ -360,12 +552,6 @@ const saveDraftData = () => {
 </script>
 
 <template>
-  <div>
-    <VCard v-if="false">
-      <!-- View using Vuetify components -->
-      <p>{{ data.poEtlLogDetailJournalID }}</p>
-    </VCard>
-  </div>
   <VRow>
     <VCol cols="12">
       <h2 class="text-center">
@@ -374,12 +560,27 @@ const saveDraftData = () => {
     </VCol>
   </VRow>
 
+  
+
   <!-- mvc -->
-  <VRow v-if="false">
+  <VRow v-if="true">
     <VCol cols="12">
       <div>
         <h4>Test Result (Mock Data):</h4>
         <pre>{{ testResult }}</pre>
+      </div>
+
+      <div>
+        <h2>Packaging Form Header</h2>
+        <pre>{{ analyticalItemsData }}</pre>
+
+        <!-- Display error message if there's an error -->
+        <div
+          v-if="errorMessage"
+          class="error-message"
+        >
+          <p>Error: {{ errorMessage }}</p>
+        </div>
       </div>
     </VCol>
   </VRow>
@@ -414,7 +615,7 @@ const saveDraftData = () => {
             class="text-center"
             colspan="3"
           >
-            {{ data.itemName }}
+            {{ dataHeader.productName }}
           </td>
           <th
             rowspan="1"
@@ -435,7 +636,7 @@ const saveDraftData = () => {
             colspan="3"
             class="text-center"
           >
-            {{ data.supplierName }}
+            {{ dataHeader.supplierName }}
           </td>
         </tr>
         <tr>
@@ -449,7 +650,7 @@ const saveDraftData = () => {
             colspan="2"
             class=""
           >
-            {{ data.updatedDate }}
+            {{ formatDate(dataHeader.receivedDate) }}
           </td>
           <th
             colspan="2"
@@ -461,13 +662,13 @@ const saveDraftData = () => {
             colspan="3"
             class="text-center"
           >
-            {{ data.concatTradename }}
+            {{ dataHeader.tradeName }}
           </td>
           <td
             colspan="2"
             class="text-center"
           >
-            {{ data.itemCode }}
+            {{ dataHeader.productId }}
           </td>
           <th colspan="2">
             Manufacturer Name
@@ -476,7 +677,7 @@ const saveDraftData = () => {
             class="text-center"
             colspan="3"
           >
-            {{ data.ManufacturerName }}
+            {{ dataHeader.makerName }}
           </td>
         </tr>
         <tr>
@@ -491,16 +692,18 @@ const saveDraftData = () => {
               <VCol cols="6">
                 <div class="demo-space-x">
                   <VCheckbox
-                    v-model="checkboxOne"
+                    v-model="checkCOAYes"
                     label="Yes"
+                    readonly
                   />
                 </div>
               </VCol>
               <VCol cols="6">
                 <div class="demo-space-x">
                   <VCheckbox
-                    v-model="checkboxTwo"
+                    v-model="checkCOANo"
                     label="No"
+                    readonly
                   />
                 </div>
               </VCol>
@@ -532,11 +735,8 @@ const saveDraftData = () => {
       cols="12"
       style="overflow-x: auto; white-space: nowrap;"
     >
-      <!-- Table Old -->
-      <table
-        v-if="false"
-        class="custom-table"
-      >
+      <!-- Table New MVC -->
+      <table class="custom-table">
         <thead>
           <tr>
             <th
@@ -594,7 +794,7 @@ const saveDraftData = () => {
             :key="index"
           >
             <th colspan="1">
-              {{ index+1 }}
+              {{ index + 1 }}
             </th>
             <td colspan="2">
               {{ item.AItem }}
@@ -627,62 +827,7 @@ const saveDraftData = () => {
             </td>
           </tr>
         </tbody>
-      </table>
-
-      <!-- Table New MVC -->
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th
-              colspan="1"
-              rowspan="2"
-            >
-              No.
-            </th>
-            <th
-              colspan="2"
-              rowspan="2"
-            >
-              Analysis Items
-            </th>
-            <th
-              colspan="2"
-              rowspan="2"
-            >
-              Checking Method
-            </th>
-            <th
-              colspan="2"
-              rowspan="2"
-            >
-              Specification Ranges
-            </th>
-            <th colspan="1">
-              P/O NO.
-            </th>
-            <th colspan="4">
-              <VTextField density="compact" />
-            </th>
-          </tr>
-          <tr>
-            <th colspan="1">
-              Amount (Piece)
-            </th>
-            <th colspan="4">
-              <VTextField density="compact" />
-            </th>
-          </tr>
-          <tr>
-            <th colspan="7" />
-            <th colspan="1">
-              Actual Check
-            </th>
-            <th colspan="4">
-              <VTextField density="compact" />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+        <tbody v-if="false">
           <tr
             v-for="(item, index) in testResult"
             :key="index"
@@ -1103,7 +1248,7 @@ const saveDraftData = () => {
 .custom-table th,
 .custom-table td {
   border: 1px solid black;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .custom-table th,

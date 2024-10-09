@@ -57,3 +57,59 @@ export const parseData = data => {
   // คุณสามารถเพิ่มการจัดการข้อมูลเพิ่มเติมที่นี่ เช่น แปลงรูปแบบข้อมูล
   return data || []
 }
+
+//----------------------------------------------- Real -------------------------------- -
+//-- Header --------------------------------
+export const ReceivingFormService = {
+  async getHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/Packaging/View/${poEtlLogDetailJournalID}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in getHearderPackagingForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+}
+
+//-- Lot --------------------------------
+
+export const GetLotPackagingFormService = {
+  async GetHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/Packaging/Analyticalltems/${poEtlLogDetailJournalID}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in getHearderPackagingForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+}
+
+//-- COA --------------------------------
