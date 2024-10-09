@@ -1557,20 +1557,21 @@ const getDisabledFollowStatusNRole = () => {
               item-value="productId"
               label="Select"
               persistent-hint
+              center-affix="true"
               return-object
               density="compact"
               single-line
               style="font-size: 12px;"
             >
-              <template #selection="{ item, index }">
-                <span
-                  :key="index"
-                  style="font-size: 12px;"
+              <template #selection="{ item }">
+                <div
                   class="d-flex justify-center"
+                  style="width: 100%;"
                 >
-                  <!-- ปรับขนาดข้อความที่เลือก -->
-                  {{ item.title }}
-                </span>
+                  <span style="font-size: 12px;" class="text-center">
+                    {{ item.title }}
+                  </span>
+                </div>
               </template>
             </VSelect>
           </td>
@@ -3489,6 +3490,10 @@ const getDisabledFollowStatusNRole = () => {
 .v-text-field >>> input {
   font-size: 12px;
   text-transform: capitalize;
+}
+
+.v-field >>> input {
+  text-align: center;
 }
 
 .custom-date-time-picker >>> input {
