@@ -406,16 +406,16 @@ fetchPackagingFormHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.va
 
 
 //---- lot --------------------------------
-// const dataLot = ref({
-//   pkgInspReqFormAnalyticalItemsJournalId: 0,
-//   sqnText: "",
-//   typeID: 0,
-//   typeName: "",
-//   analyticalItem: "",
-//   method: "",
-//   specRange: "",
-//   needActualValue: false,
-// })
+const dataLot = ref({
+  pkgInspReqFormAnalyticalItemsJournalId: 0,
+  sqnText: "",
+  typeID: 0,
+  typeName: "",
+  analyticalItem: "",
+  method: "",
+  specRange: "",
+  needActualValue: false,
+})
 
 const analyticalItemsData = ref([])
 
@@ -463,7 +463,9 @@ watchEffect(() => {
     checkCOANo.value = !dataHeader.value.coAChecked
   }
 
-  analyticalItemsData.value = packagingFormLot
+  if (packagingFormLot.value) {
+    analyticalItemsData.value = packagingFormLot.value
+  }
 
   if (packagingFormLot.length > 0) {
     // กำหนดค่าให้ dataLot จากอาร์เรย์ที่ได้รับจาก API
@@ -766,9 +768,12 @@ const saveDraftData = () => {
             <th colspan="1">
               P/O NO.
             </th>
-            <th colspan="4">
-              <VTextField density="compact" />
-            </th>
+            <td
+              colspan="4"
+              class="text-center"
+            >
+              <span>{{ dataHeader.purchaseOrderNo }}</span>
+            </td>
           </tr>
           <tr>
             <th colspan="1">
@@ -790,20 +795,20 @@ const saveDraftData = () => {
         </thead>
         <tbody>
           <tr
-            v-for="(item, index) in testResult"
+            v-for="(item, index) in analyticalItemsData"
             :key="index"
           >
-            <th colspan="1">
-              {{ index + 1 }}
-            </th>
-            <td colspan="2">
-              {{ item.AItem }}
+            <td colspan="1">
+              {{ index+1 }}
             </td>
             <td colspan="2">
-              {{ item.CheckM }}
+              {{ item.analyticalItem }}
             </td>
             <td colspan="2">
-              {{ item.SR }}
+              {{ item.method }}
+            </td>
+            <td colspan="2">
+              {{ item.specRange }}
             </td>
             <td colspan="1">
               <VTextField
@@ -813,14 +818,14 @@ const saveDraftData = () => {
             </td>
             <td colspan="2">
               <VTextField
-                v-model="item.A"
+                v-model="asdasd"
                 :style="{ width: '150px', maxWidth: '300px' }"
                 density="compact"
               />
             </td>
             <td colspan="2">
               <VTextField
-                v-model="item.B"
+                v-model="asdasd"
                 :style="{ width: '150px', maxWidth: '300px' }"
                 density="compact"
               />
@@ -914,17 +919,17 @@ const saveDraftData = () => {
           <tr>
             <th colspan="6">
               <VTextarea
-                v-model="textareaValue"
+                v-model="dataHeader.note"
                 variant="plain"
-                placeholder="Note"
+                placeholder="Enter Your Notes"
                 auto-grow
               />
             </th>
             <th colspan="6">
               <VTextarea
-                v-model="textareaValue"
+                v-model="dataHeader.remark"
                 variant="plain"
-                placeholder="Details"
+                placeholder="Enter Your Details"
                 auto-grow
               />
             </th>
@@ -1112,30 +1117,36 @@ const saveDraftData = () => {
           <tr>
             <td colspan="6">
               <VTextField
+                v-model="dataHeader.inspStaffUpdateBy"
                 density="compact"
                 label="Staff"
+                readonly
               />
             </td>
             <td colspan="6">
               <VTextField
+                v-model="dataHeader.whUpdateBy"
                 density="compact"
                 label="Supervisor"
+                readonly
               />
             </td>
           </tr>
           <tr>
             <td colspan="6">
               <VueDatePicker
-                v-model="dateStaffInspection"
+                v-model="dataHeader.inspStaffUpdateDate"
                 :max-date="new Date()"
                 :enable-time-picker="false"
+                readonly
               />
             </td>
             <td colspan="6">
               <VueDatePicker
-                v-model="dateStaffInspection"
+                v-model="dataHeader.whUpdateDate"
                 :max-date="new Date()"
                 :enable-time-picker="false"
+                readonly
               />
             </td>
           </tr>
