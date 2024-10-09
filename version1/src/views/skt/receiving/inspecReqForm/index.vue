@@ -999,7 +999,7 @@ const getDisabledFollowStatusNRole = () => {
           <th colspan="4" />
           <th
             colspan="1"
-            class="text-center"
+            class="text-start"
           >
             SKT Name
           </th>
@@ -1008,7 +1008,7 @@ const getDisabledFollowStatusNRole = () => {
           </td>
           <th
             colspan="1"
-            class="text-center"
+            class="text-start"
           >
             Raw Mat. Code
           </th>
@@ -1028,7 +1028,7 @@ const getDisabledFollowStatusNRole = () => {
           </td>
           <th
             colspan="1"
-            class="text-center"
+            class="text-start"
           >
             Trade Name
           </th>
@@ -2176,7 +2176,7 @@ const getDisabledFollowStatusNRole = () => {
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
             >
               <template #label>
-                <span style="font-size: 12px;">Enter Details</span>
+                <span style="font-size: 12px;">Enter Your Details</span>
               </template>
             </VTextarea>
           </td>
@@ -2251,7 +2251,7 @@ const getDisabledFollowStatusNRole = () => {
           </VCol>
           <VCol
             style="border: 1px solid black;"
-            class="text-center"
+            class="text-start"
             cols="6"
           >
             <div style="font-size: 12px;">
@@ -2267,7 +2267,7 @@ const getDisabledFollowStatusNRole = () => {
           </VCol>
           <VCol
             style="border: 1px solid black;"
-            class="text-center"
+            class="text-start"
             cols="6"
           >
             <div style="font-size: 12px;">
@@ -2294,7 +2294,7 @@ const getDisabledFollowStatusNRole = () => {
           </VCol>
           <VCol
             style="border: 1px solid black;"
-            class="text-center"
+            class="text-start"
             cols="6"
           >
             <div style="font-size: 12px;">
@@ -2310,7 +2310,7 @@ const getDisabledFollowStatusNRole = () => {
           </VCol>
           <VCol
             style="border: 1px solid black;"
-            class="text-center"
+            class="text-start"
             cols="6"
           >
             <div style="font-size: 12px;">

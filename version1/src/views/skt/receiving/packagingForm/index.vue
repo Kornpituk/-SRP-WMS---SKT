@@ -565,7 +565,7 @@ const saveDraftData = () => {
   
 
   <!-- mvc -->
-  <VRow v-if="true">
+  <VRow v-if="false">
     <VCol cols="12">
       <div>
         <h4>Test Result (Mock Data):</h4>
@@ -626,7 +626,7 @@ const saveDraftData = () => {
             class=""
           >
             <div class="text-center">
-              <span style="font-size: 16px;">Raw Mat. Code</span>
+              <span>Raw Mat. Code</span>
             </div>
           </th>
           <th
@@ -685,7 +685,7 @@ const saveDraftData = () => {
         </tr>
         <tr>
           <th colspan="7">
-            Certification of analysis from manufacturer
+            Certification of Analysis From Manufacturer
           </th>
           <td
             class="text-center"
@@ -752,7 +752,7 @@ const saveDraftData = () => {
               colspan="2"
               rowspan="2"
             >
-              Analysis Items
+              Analytical Items
             </th>
             <th
               colspan="2"
@@ -890,13 +890,13 @@ const saveDraftData = () => {
   </VRow>
 
   <!-- Note -->
-  <VRow>
+  <VRow style="font-size: 12px;">
     <!-- Note -->
     <VCol
       cols="6"
       class="text-decoration-underlined pb-2"
     >
-      Note
+      Notes
     </VCol>
     <VCol
       cols="6"
@@ -914,18 +914,22 @@ const saveDraftData = () => {
             <th colspan="6">
               <VTextarea
                 v-model="dataHeader.note"
-                variant="plain"
-                placeholder="Enter Your Notes"
                 auto-grow
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">Enter Your Notes</span>
+                </template>
+              </VTextarea>
             </th>
             <th colspan="6">
               <VTextarea
                 v-model="dataHeader.remark"
-                variant="plain"
-                placeholder="Enter Your Details"
                 auto-grow
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">Enter Your Details</span>
+                </template>
+              </VTextarea>
             </th>
           </tr>
         </thead>
@@ -934,9 +938,9 @@ const saveDraftData = () => {
   </VRow>
 
   <!-- Quality Evalution -->
-  <VRow>
+  <VRow style="font-size: 12px;">
     <VCol cols="12">
-      <span class="mb-2">Quality Evalution</span>
+      <span class="mb-2">Quality Evaluation</span>
       <table class="custom-table mt-2">
         <thead>
           <tr>
@@ -983,7 +987,7 @@ const saveDraftData = () => {
   </VRow>
   
   <!-- COA -->
-  <VRow>
+  <VRow style="font-size: 12px;">
     <VCol cols="12">
       <div class="mb-2">
         COA
@@ -995,7 +999,7 @@ const saveDraftData = () => {
               <VCol cols="12">
                 <VFileInput
                   v-model="files"
-                  label="File Input COA"
+                  label="File Upload COA"
                   placeholder="Upload your documents"
                   multiple
                   prepend-icon="mdi-paperclip"
@@ -1094,8 +1098,8 @@ const saveDraftData = () => {
   </VRow>
 
   <!-- Warehouse -->
-  <VRow>
-    <VCol cols="6">
+  <VRow style="font-size: 12px;">
+    <VCol cols="12">
       <table class="custom-table">
         <thead>
           <tr>
@@ -1110,38 +1114,34 @@ const saveDraftData = () => {
         <tbody>
           <tr>
             <td colspan="6">
-              <VTextField
-                v-model="dataHeader.inspStaffUpdateBy"
-                density="compact"
-                label="Staff"
-                readonly
-              />
+              <span>Staff: {{ dataHeader.inspStaffUpdateBy }}</span>
             </td>
             <td colspan="6">
-              <VTextField
-                v-model="dataHeader.whUpdateBy"
-                density="compact"
-                label="Supervisor"
-                readonly
-              />
+              <span>Staff: {{ dataHeader.whUpdateBy }}</span>
             </td>
           </tr>
           <tr>
             <td colspan="6">
-              <VueDatePicker
-                v-model="dataHeader.inspStaffUpdateDate"
-                :max-date="new Date()"
-                :enable-time-picker="false"
-                readonly
-              />
+              <div v-if="dataHeader.inspStaffUpdateDate">
+                <VIcon
+                  class="mx-2"
+                  icon="ri-calendar-schedule-fill"
+                  size="20"
+                />{{
+                  formatDate(dataHeader.inspStaffUpdateDate)
+                }}
+              </div>
             </td>
             <td colspan="6">
-              <VueDatePicker
-                v-model="dataHeader.whUpdateDate"
-                :max-date="new Date()"
-                :enable-time-picker="false"
-                readonly
-              />
+              <div v-if="dataHeader.whUpdateDate">
+                <VIcon
+                  class="mx-2"
+                  icon="ri-calendar-schedule-fill"
+                  size="20"
+                />{{
+                  formatDate(dataHeader.whUpdateDate)
+                }}
+              </div>
             </td>
           </tr>
         </tbody>
