@@ -484,6 +484,19 @@ const filteredFields = computed(() => {
 const saveLotInspect = async () => {
   emptyFields.value = checkEmptyFields()
 
+  // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
+  const hasErrors = emptyFields.value.some(field => field.isEmpty)
+  
+  // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
+  if (hasErrors) {
+    console.log('Cannot proceed: There are errors in the fields.')
+
+    // แสดง dialog แจ้งเตือนถ้าจำเป็น
+    isDialogSubmitFailedVisible.value = true
+    
+    return // หยุดการทำงาน
+  }
+
   try {
     for (const item of analysisItems.value) {
       for (const analyticalItem of item.itemAnalyticals) {
@@ -2612,7 +2625,10 @@ const getDisabledFollowStatusNRole = () => {
                 <VCol cols="6">
                   Details Lot
                 </VCol>
-                <VCol cols="6" class="d-flex justify-end">
+                <VCol
+                  cols="6"
+                  class="d-flex justify-end"
+                >
                   <VSwitch
                     v-model="showOnlyErrors"
                     :label="showOnlyErrors ? 'Show All Details' : 'Show Only Errors'"
