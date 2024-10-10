@@ -59,6 +59,32 @@ export const parseData = data => {
 }
 
 //----------------------------------------------- Real -------------------------------- -
+//----------- Genter ----------------------------
+export const PackagingFormService = {
+  async generatePackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/Packaging/Generate/${poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data Genterate:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in generatePackagingForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+}
+
 //-- Header --------------------------------
 export const ReceivingFormService = {
   async getHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
@@ -72,7 +98,7 @@ export const ReceivingFormService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data:', response.data.data)
+        console.log('Service Response data Header:', response.data.data)
         
         return response.data.data
       } else {
@@ -99,7 +125,7 @@ export const GetLotPackagingFormService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data:', response.data.data)
+        console.log('Service Response data Lot:', response.data.data)
         
         return response.data.data
       } else {
@@ -110,6 +136,54 @@ export const GetLotPackagingFormService = {
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
   },
+
+  async SaveHearderPackagingForm(body, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/Packaging/Save/${poEtlLogDetailJournalID}`, body, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response save data header:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in SaveHearderPackagingForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
 }
 
 //-- COA --------------------------------
+
+export const GetCOAService = {
+  async GetCOAPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/Packaging/GetCoa/${poEtlLogDetailJournalID}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data COA:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in GetCOAPackagingForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+}

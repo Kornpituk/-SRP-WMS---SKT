@@ -1,7 +1,7 @@
 <script setup>
 import axiosIns from '@axios'
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
-import { ref, watch } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 
 const props = defineProps({
   Data: Array,
@@ -395,6 +395,45 @@ const saveHeaderInspect = async () => {
 //---------------- Validate
 const emptyFields = ref([])
 
+const showOnlyErrors = ref(false) // ตั้งเป็น true เพื่อแสดงเฉพาะค่า error
+
+watchEffect(() => {
+  for (let i = 0; i < analysisItems.value.length; i++) {
+    console.log('Test', analysisItems.value[i])
+  }
+})
+
+const checkOkState = (item, typeId, indexAnalysis) => {
+  // ตรวจสอบว่ามีค่าใน itemAnalyticals ก่อนที่จะเข้าถึง
+  if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis) {
+    const analyticalItem = item.itemAnalyticals[indexAnalysis]
+    if (analyticalItem.okState != null) {
+      return !item.needActualValue &&
+             item.typeID === typeId &&
+             analyticalItem.okState === -1
+
+      // ตรวจสอบ okState เท่ากับ -1
+    }
+  }
+  
+  return false
+}
+
+const checkAnalysitItem = (item, typeId, indexAnalysis) => {
+  // ตรวจสอบว่ามีค่าใน itemAnalyticals ก่อนที่จะเข้าถึง
+  if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis) {
+    const analyticalItem = item.itemAnalyticals[indexAnalysis]
+    
+    return item.needActualValue &&
+             item.typeID === typeId &&
+             !analyticalItem.actualAnalysis 
+
+    // ตรวจสอบ okState เท่ากับ -1
+  }
+  
+  return false
+}
+
 const checkEmptyFields = () => {
   const emptyFieldsList = []
 
@@ -413,7 +452,6 @@ const checkEmptyFields = () => {
 
       // ตรวจสอบว่าต้องเช็ค actualAnalysis หรือ okState ตามค่า needActualValue
       if (item.needActualValue) {
-
         // เช็คเฉพาะ actualAnalysis
         if (!body.actualAnalysis) {
           emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
@@ -434,17 +472,17 @@ const checkEmptyFields = () => {
   return emptyFieldsList
 }
 
+const filteredFields = computed(() => {
+  if (!showOnlyErrors.value) {
+    return emptyFields.value.filter(field => field.isEmpty) // กรองเฉพาะค่า error
+  }
+  
+  return emptyFields.value // แสดงทั้งหมด
+})
+
 //---------------- api
 const saveLotInspect = async () => {
   emptyFields.value = checkEmptyFields()
-  console.log('Validate lot Insp', emptyFields.value)
-
-  // if (emptyFields.length > 0) {
-  //   console.log("Empty Fields:", emptyFields)
-  //   isDialogSubmitFailedVisible.value = true  // แสดง dialog ถ้าพบค่าว่าง
-    
-  //   return  // หยุดการบันทึกถ้ามีค่าว่าง
-  // }
 
   try {
     for (const item of analysisItems.value) {
@@ -458,7 +496,7 @@ const saveLotInspect = async () => {
         }
 
         // ส่ง body ไปยัง API ทีละตัว
-        const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails/${data.value.poEtlLogDetailJournalID}`, body, {
+        const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails`, body, {
           headers: {
             'accept': '*/*',
             'x-location': `${whereHouse.value}`,
@@ -1010,7 +1048,7 @@ const getDisabledFollowStatusNRole = () => {
           </td>
           <th
             colspan="1"
-            class="text-start"
+            class="text-center"
           >
             Raw Mat. Code
           </th>
@@ -1495,7 +1533,7 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0].okState === -1"
+                v-if="checkOkState(item, item.typeID, 0)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
 
@@ -1508,9 +1546,9 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
                 density="compact"
               />
-              
+
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[0].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 0)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -1547,10 +1585,12 @@ const getDisabledFollowStatusNRole = () => {
                 </VRow>
               </VRadioGroup>
 
+              
               <span
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1].okState === -1"
+                v-if="checkOkState(item, item.typeID, 1)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
+
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
@@ -1560,9 +1600,8 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
-
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[1].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 1)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -1600,9 +1639,10 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2].okState === -1"
+                v-if="checkOkState(item, item.typeID, 2)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
+
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
@@ -1612,8 +1652,9 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[2].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 2)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -1651,7 +1692,7 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3].okState === -1"
+                v-if="checkOkState(item, item.typeID, 3)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
 
@@ -1665,7 +1706,7 @@ const getDisabledFollowStatusNRole = () => {
               />
 
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[3].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 3)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -1703,7 +1744,7 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4].okState === -1"
+                v-if="checkOkState(item, item.typeID, 4)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
 
@@ -1715,8 +1756,9 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ]"
               />
+
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[4].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 4)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -1921,19 +1963,21 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.itemAnalyticals[0].okState === -1"
+                v-if="checkOkState(item, item.typeID, 0)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
+
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].actualAnalysis"
                 density="compact"
               />
+
               <span
-                v-if="!item.itemAnalyticals[0] && item.itemAnalyticals[0].okState === -1"
+                v-if="checkAnalysitItem(item, item.typeID, 0)"
                 class="text-red"
-              >Analysis result is required!</span>
+              >Actual value Text is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -1968,7 +2012,7 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.itemAnalyticals[1].okState === -1"
+                v-if="checkOkState(item, item.typeID, 1)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
 
@@ -1979,7 +2023,7 @@ const getDisabledFollowStatusNRole = () => {
               />
 
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[1].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 1)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -2016,7 +2060,7 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.itemAnalyticals[2].okState === -1"
+                v-if="checkOkState(item, item.typeID, 2)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
 
@@ -2027,7 +2071,7 @@ const getDisabledFollowStatusNRole = () => {
               />
 
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[2].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 2)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -2064,7 +2108,7 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.itemAnalyticals[3].okState === -1"
+                v-if="checkOkState(item, item.typeID, 3)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
 
@@ -2075,7 +2119,7 @@ const getDisabledFollowStatusNRole = () => {
               />
 
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[3].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 3)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -2112,7 +2156,7 @@ const getDisabledFollowStatusNRole = () => {
               </VRadioGroup>
 
               <span
-                v-if="!item.needActualValue && item.itemAnalyticals[4].okState === -1"
+                v-if="checkOkState(item, item.typeID, 4)"
                 class="text-red"
               >Analysis result Not/ON is required!</span>
 
@@ -2127,7 +2171,7 @@ const getDisabledFollowStatusNRole = () => {
               />
 
               <span
-                v-if="item.needActualValue && item.typeID === 1 && !item.itemAnalyticals[4].actualAnalysis"
+                v-if="checkAnalysitItem(item, item.typeID, 4)"
                 class="text-red"
               >Actual value Text is required!</span>
             </td>
@@ -2563,13 +2607,19 @@ const getDisabledFollowStatusNRole = () => {
         >
           <VDivider />
           <div>
-            <VAlert
-              title="Details Lot"
-              variant="outlined"
-            >
+            <VAlert variant="outlined">
               <VRow>
+                <VCol cols="6">
+                  Details Lot
+                </VCol>
+                <VCol cols="6" class="d-flex justify-end">
+                  <VSwitch
+                    v-model="showOnlyErrors"
+                    :label="showOnlyErrors ? 'Show All Details' : 'Show Only Errors'"
+                  />
+                </VCol>
                 <VCol
-                  v-for="(field, index) in emptyFields"
+                  v-for="(field, index) in filteredFields"
                   :key="index"
                   cols="4"
                 >

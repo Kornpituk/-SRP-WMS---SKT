@@ -1495,7 +1495,7 @@ const getDisabledFollowStatusNRole = () => {
             SKT Name
           </th>
           <td
-            class="text-center"
+            class="text-start"
             colspan="3"
           >
             {{ dataHeaderReceving.productName }}
@@ -1505,7 +1505,7 @@ const getDisabledFollowStatusNRole = () => {
             colspan="2"
             class=""
           >
-            <div class="text-start">
+            <div class="text-center">
               <span style="font-size: 12px;">Raw Mat. Code</span>
             </div>
           </th>
@@ -1517,7 +1517,7 @@ const getDisabledFollowStatusNRole = () => {
           </th>
           <td
             colspan="3"
-            class="text-center"
+            class="text-start"
           >
             {{ dataHeaderReceving.supplierName }}
           </td>
@@ -1531,7 +1531,7 @@ const getDisabledFollowStatusNRole = () => {
           </th>
           <td
             colspan="3"
-            class="text-center"
+            class="text-start"
           >
             {{ dataHeaderReceving.tradeName }}
           </td>
@@ -1582,7 +1582,7 @@ const getDisabledFollowStatusNRole = () => {
           </th>
           <td
             colspan="3"
-            class="text-center"
+            class="text-start"
           >
             {{ formatDate(purchaseOrder.receivedDate) }}
           </td>

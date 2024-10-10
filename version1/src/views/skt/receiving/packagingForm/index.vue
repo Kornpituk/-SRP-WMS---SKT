@@ -364,7 +364,12 @@ import { handleFilesOMvc,
 import { modelHeader } from '@/model/skt/receivingPlan/packaging/lotDataModel'
 
 //--------------------------------- real --------------------------
-import { useReceivingFormController, useGetLotPackagingFormController } from '@/controllers/skt/receivingFrom/packaging/controller'
+import { useReceivingFormController, 
+  useGetLotPackagingFormController, 
+  useGetCOAPackagingFormController,
+  useGeneratePackagingFormController,
+  usePackagingSaveHeaderFormController,
+} from '@/controllers/skt/receivingFrom/packaging/controller'
 
 const dataHeader = ref({
   rmInspectionRequestFormJournalId: null,
@@ -393,16 +398,67 @@ const dataHeader = ref({
   packagingImg: null,
 })
 
+
+
+// Call API
+//------------------------------------------- Gennterate
+
+const { packagingFormGenerate, errorMessageGenerate, fetchPackagingFormGenerate } = useGeneratePackagingFormController()
+
+fetchPackagingFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+
+//---- header --------------------------------
+//----- GET
+const checkCOAYes = ref(null)
+const checkCOANo = ref(null)
+
 // const dataHeader = ref(null)
 
 const { packagingFormHeader, errorMessage, fetchPackagingFormHeader } = useReceivingFormController()
 
-// Call API
-//---- header --------------------------------
-const checkCOAYes = ref(null)
-const checkCOANo = ref(null)
-
 fetchPackagingFormHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+//----- POST
+const { packagingFormSaveHeader, errorSaveDraftMessage, saveDraftPackagingFormHeader } = usePackagingSaveHeaderFormController()
+
+saveDraftPackagingFormHeader(dataHeader.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+const handleSaveDraft = async () => {
+  const result = await saveDraftPackagingFormHeader(dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+  if (result.success) {
+    // แสดง dialog เมื่อสำเร็จ
+    isDialogSubmitSuccessVisible.value = true
+  } else {
+    // แสดง dialog เมื่อมีข้อผิดพลาด
+    isDialogSubmitFailedVisible.value = true
+  }
+}
+
+const saveHeaderPackaging = async () => {
+  try {
+    const body = {
+      limConditionDetail: headerInsp.value.details,
+      note: headerInsp.value.note,
+    }
+
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    // console.log('[products.value]!!: ', response.data)
+    // isDialogSubmitSuccessVisible.value = true
+  } catch (error) {
+    // Handle errors
+    isDialogSubmitFailedVisible.value = true
+    console.error('Error:', error)
+  }
+}
 
 
 //---- lot --------------------------------
@@ -488,12 +544,14 @@ watchEffect(() => {
 
 //---- COA --------------------------------
 
+const fileCoaHeader = ref([])
 
+const { packagingFormCoaHeader, errorMessageCOA, fetchPackagingFormCoaHeader } = useGetCOAPackagingFormController()
 
+fetchPackagingFormCoaHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
-
-
-
+watchEffect(() => {
+})
 
 
 
@@ -615,7 +673,7 @@ const saveDraftData = () => {
             SKT Name
           </th>
           <td
-            class="text-center"
+            class="text-start"
             colspan="3"
           >
             {{ dataHeader.productName }}
@@ -637,7 +695,7 @@ const saveDraftData = () => {
           </th>
           <td
             colspan="3"
-            class="text-center"
+            class="text-start"
           >
             {{ dataHeader.supplierName }}
           </td>
@@ -663,7 +721,7 @@ const saveDraftData = () => {
           </th>
           <td
             colspan="3"
-            class="text-center"
+            class="text-start"
           >
             {{ dataHeader.tradeName }}
           </td>
@@ -677,7 +735,7 @@ const saveDraftData = () => {
             Manufacturer Name
           </th>
           <td
-            class="text-center"
+            class="text-start"
             colspan="3"
           >
             {{ dataHeader.makerName }}
@@ -874,14 +932,25 @@ const saveDraftData = () => {
         <thead>
           <tr>
             <th>
-              <VRow>
-                <VCol cols="12">
-                  <VImg
-                    max-height="350px"
-                    :src="dataHeader.packagingImg"
-                  />
-                </VCol>
-              </VRow>
+              <div>
+                <VRow>
+                  <VCol
+                    v-for="(item, index) in packagingFormCoaHeader"
+                    :key="index"
+                    cols="4"
+                  >
+                    <VCard>
+                      <VImg
+                        :src="item.fileUri"
+                        alt="Image Preview"
+                      />
+                      <VCardText>
+                        <span>Name: {{ item.fileName }}</span>
+                      </VCardText>
+                    </VCard>
+                  </VCol>
+                </VRow>
+              </div>
             </th>
           </tr>
         </thead>
@@ -896,7 +965,7 @@ const saveDraftData = () => {
       cols="6"
       class="text-decoration-underlined pb-2"
     >
-      Notes
+      Note
     </VCol>
     <VCol
       cols="6"
@@ -917,7 +986,7 @@ const saveDraftData = () => {
                 auto-grow
               >
                 <template #label>
-                  <span style="font-size: 12px;">Enter Your Notes</span>
+                  <span style="font-size: 12px;">Enter Your Nots</span>
                 </template>
               </VTextarea>
             </th>
@@ -945,7 +1014,7 @@ const saveDraftData = () => {
         <thead>
           <tr>
             <th colspan="3">
-              Approve
+              Accept
             </th>
             <th colspan="3">
               Reject
@@ -1097,55 +1166,43 @@ const saveDraftData = () => {
     </VDialog>
   </VRow>
 
-  <!-- Warehouse -->
-  <VRow style="font-size: 12px;">
+  <VRow class="my-6">
     <VCol cols="12">
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th
-              class="text-center"
-              colspan="12"
-            >
-              Warehouse
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="6">
-              <span>Staff: {{ dataHeader.inspStaffUpdateBy }}</span>
-            </td>
-            <td colspan="6">
-              <span>Staff: {{ dataHeader.whUpdateBy }}</span>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="6">
-              <div v-if="dataHeader.inspStaffUpdateDate">
-                <VIcon
-                  class="mx-2"
-                  icon="ri-calendar-schedule-fill"
-                  size="20"
-                />{{
-                  formatDate(dataHeader.inspStaffUpdateDate)
-                }}
-              </div>
-            </td>
-            <td colspan="6">
-              <div v-if="dataHeader.whUpdateDate">
-                <VIcon
-                  class="mx-2"
-                  icon="ri-calendar-schedule-fill"
-                  size="20"
-                />{{
-                  formatDate(dataHeader.whUpdateDate)
-                }}
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <VRow>
+        <VCol
+          style="border: 1px solid black; font-size: 12px;"
+          class="text-center"
+          cols="12"
+        >
+          Warehouse
+        </VCol>
+        <VCol
+          style="border: 1px solid black;"
+          class="text-start"
+          cols="6"
+        >
+          <div style="font-size: 12px;">
+            Staff:  {{ dataHeader.inspStaffUpdateBy }}
+          </div>
+          <VDivider />
+          <div style="font-size: 12px;">
+            <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
+          </div>
+        </VCol>
+        <VCol
+          style="border: 1px solid black;"
+          class="text-start"
+          cols="6"
+        >
+          <div style="font-size: 12px;">
+            Supervisor: {{ dataHeader.whUpdateBy }}
+          </div>
+          <VDivider />
+          <div style="font-size: 12px;">
+            <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
+          </div>
+        </VCol>
+      </VRow>
     </VCol>
   </VRow>
 

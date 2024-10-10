@@ -80,10 +80,40 @@ export const controllerDeleteAllCIA = {
 }
 
 //--------------------------------------------------------------------- Real --------------------
-import { ReceivingFormService, GetLotPackagingFormService } from '@/services/skt/receivingPlan/packaging/services'
+import { ReceivingFormService, GetLotPackagingFormService, GetCOAService, PackagingFormService } from '@/services/skt/receivingPlan/packaging/services'
+
+//----- Generate ----------------------------
+export const useGeneratePackagingFormController = () => {
+  const packagingFormGenerate = ref(null)
+  const errorMessageGenerate = ref(null)
+
+  const fetchPackagingFormGenerate = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageGenerate.value = null
+      console.log('Fetching Packaging Form Header...')
+
+      const result = await PackagingFormService.generatePackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Packaging data Generate Controller:', result)
+        packagingFormGenerate.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in fetchPackagingFormGenerate:', error)
+      errorMessageGenerate.value = error.message
+    }
+  }
+
+  return {
+    packagingFormGenerate,
+    errorMessageGenerate,
+    fetchPackagingFormGenerate,
+  }
+}
 
 //--- header --------------------------------
-
 export const useReceivingFormController = () => {
   const packagingFormHeader = ref(null)
   const errorMessage = ref(null)
@@ -96,7 +126,7 @@ export const useReceivingFormController = () => {
       const result = await ReceivingFormService.getHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
       
       if (result) {
-        console.log('Received data:', result)
+        console.log('Received data Header Controller:', result)
         packagingFormHeader.value = result
       } else {
         console.warn('No data returned from the API')
@@ -114,6 +144,38 @@ export const useReceivingFormController = () => {
   }
 }
 
+export const usePackagingSaveHeaderFormController = () => {
+  const packagingFormSaveHeader = ref(null)
+  const errorSaveDraftMessage = ref(null)
+
+  const saveDraftPackagingFormHeader = async (body, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorSaveDraftMessage.value = null
+      console.log('Fetching Packaging Form Save Draft Header...')
+
+      const result = await ReceivingFormService.getHearderPackagingForm(body, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Received data Save Draft Header Controller:', result)
+        packagingFormSaveHeader.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in saveDraftPackagingFormSaveHeader:', error)
+      errorSaveDraftMessage.value = error.message
+    }
+  }
+
+  return {
+    packagingFormSaveHeader,
+    errorSaveDraftMessage,
+    saveDraftPackagingFormHeader,
+  }
+}
+
+
+
 //--- lot --------------------------------
 export const useGetLotPackagingFormController = () => {
   const packagingFormLot = ref(null)
@@ -127,7 +189,7 @@ export const useGetLotPackagingFormController = () => {
       const result = await GetLotPackagingFormService.GetHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
       
       if (result) {
-        console.log('Received data:', result)
+        console.log('Received data Lot Controller:', result)
         packagingFormLot.value = result
       } else {
         console.warn('No data returned from the API')
@@ -146,3 +208,32 @@ export const useGetLotPackagingFormController = () => {
 }
 
 //--- COA --------------------------------
+export const useGetCOAPackagingFormController = () => {
+  const packagingFormCoaHeader = ref(null)
+  const errorMessageCoaHeader = ref(null)
+
+  const fetchPackagingFormCoaHeader = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageCoaHeader.value = null
+      console.log('Fetching Packaging Form COA...')
+
+      const result = await GetCOAService.GetCOAPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Received data COA Controller:', result)
+        packagingFormCoaHeader.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in fetchPackagingFormCoaHeader:', error)
+      errorMessageCoaHeader.value = error.message
+    }
+  }
+
+  return {
+    packagingFormCoaHeader,
+    errorMessageCoaHeader,
+    fetchPackagingFormCoaHeader,
+  }
+}
