@@ -146,7 +146,7 @@ export const useAcceptPackagingFormController = () => {
   }
 }
 
-import { createModelReject } from '@/model/skt/receivingPlan/packaging/headerModel'
+import { createModelReject, createDraftBody } from '@/model/skt/receivingPlan/packaging/headerModel'
 
 export const useRejectPackagingFormController = () => {
   const packagingFormReject = ref(null)
@@ -213,9 +213,12 @@ export const useReceivingFormController = () => {
   }
 }
 
-import { createDraftBody } from '@/model/skt/receivingPlan/packaging/headerModel'
-
 export const handleSaveDraft = async (poEtlLogDetailJournalID, dataHeader, urlApi, whereHouse, accessTokenAtStore) => {
+  // ตรวจสอบค่าว่างใน dataHeader
+  if (!dataHeader.limConditionDetail || !dataHeader.coAChecked || !dataHeader.note || !dataHeader.limConditionDetail) {
+    return { success: false, error: 'Required fields are missing.' }
+  }
+
   const body = createDraftBody(dataHeader)
   
   return await saveDraftPackagingFormHeader(poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore)

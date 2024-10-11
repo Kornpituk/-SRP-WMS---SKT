@@ -403,10 +403,11 @@ const dataHeader = ref({
 // Call API
 //------------------------------------------- Gennterate
 
-const { packagingFormGenerate, errorMessageGenerate, fetchPackagingFormGenerate } = useGeneratePackagingFormController()
+watchEffect(() => {
+  const { packagingFormGenerate, errorMessageGenerate, fetchPackagingFormGenerate } = useGeneratePackagingFormController()
 
-fetchPackagingFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
-
+  fetchPackagingFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+})
 
 //---- header --------------------------------
 //----- GET
@@ -579,7 +580,18 @@ const saveDraftLotDetails = async () => {
 
 //---- COA --------------------------------
 
+//-------------------- Model Image --------------------
+
+const fileCoaTestPath = ref('')
+
 const fileCoaHeader = ref([])
+
+const showDialogImageMutiNew = (img, name) => {
+
+  isDialogVisibleImgFileMuti.value = true
+  imgDialog.value = img
+  imgNameDialog.value = name
+}
 
 const { packagingFormCoaHeader, errorMessageCOA, fetchPackagingFormCoaHeader } = useGetCOAPackagingFormController()
 
@@ -726,7 +738,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  location.reload()
+  // location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -751,8 +763,6 @@ const saveDraftData = word => {
       </h2>
     </VCol>
   </VRow>
-
-  
 
   <!-- mvc -->
   <VRow v-if="false">
@@ -983,7 +993,14 @@ const saveDraftData = word => {
               Actual Check
             </th>
             <th colspan="4">
-              <VTextField v-model="dataHeader.actualCheck" density="compact" />
+              <VTextField
+                v-model="dataHeader.actualCheck"
+                type="number"
+                density="compact"
+                :rules="[
+                  value => !!value.trim() || 'Actual Check is required.',
+                ]"
+              />
             </th>
           </tr>
         </thead>
@@ -1012,6 +1029,9 @@ const saveDraftData = word => {
               <VTextField
                 v-model="item.sqnText"
                 density="compact"
+                :rules="[
+                  value => !!value.trim() || 'AnalyticalItem Check is required.',
+                ]"
               />
             </td>
           </tr>
@@ -1026,23 +1046,13 @@ const saveDraftData = word => {
           <tr>
             <th>
               <div>
-                <VRow>
-                  <VCol
-                    v-for="(item, index) in packagingFormCoaHeader"
-                    :key="index"
-                    cols="4"
-                  >
-                    <VCard>
-                      <VImg
-                        :src="item.fileUri"
-                        alt="Image Preview"
-                      />
-                      <VCardText>
-                        <span>Name: {{ item.fileName }}</span>
-                      </VCardText>
-                    </VCard>
-                  </VCol>
-                </VRow>
+                <VCard @click="showDialogImageMutiNew(dataHeader.packagingImg)">
+                  <VImg
+                    :src="dataHeader.packagingImg"
+                    alt="Image Preview"
+                    style="height: 250px;"
+                  />
+                </VCard>
               </div>
             </th>
           </tr>
@@ -1077,6 +1087,9 @@ const saveDraftData = word => {
               <VTextarea
                 v-model="dataHeader.note"
                 auto-grow
+                :rules="[
+                  value => !!value.trim() || 'Notes is required.',
+                ]"
               >
                 <template #label>
                   <span style="font-size: 12px;">Enter Your Nots</span>
@@ -1087,6 +1100,9 @@ const saveDraftData = word => {
               <VTextarea
                 v-model="dataHeader.limConditionDetail"
                 auto-grow
+                :rules="[
+                  value => !!value.trim() || 'Details is required.',
+                ]"
               >
                 <template #label>
                   <span style="font-size: 12px;">Enter Your Details</span>
@@ -1228,35 +1244,6 @@ const saveDraftData = word => {
         </tr>
       </Table>
     </VCol> 
-    <VDialog
-      v-model="isDialogVisibleImgFileMuti"
-      width="500"
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardTitle class="bg-primary">
-          <div class="d-flex justify-space-between">
-            <span>{{ imgNameDialog }}</span>
-            <VBtn
-              icon="mdi-close"
-              color="white"
-              size="small"
-              variant="tonal"
-              @click="isDialogVisibleImgFileMuti = false"
-            />
-          </div>
-        </VCardTitle>
-
-        <VCardText>
-          <VImg
-            role="presentation"
-            :src="imgDialog"
-            height="100%"
-            contain
-          />
-        </VCardText>
-      </VCard>
-    </VDialog>
   </VRow>
 
   <VRow class="my-6">
@@ -1298,6 +1285,37 @@ const saveDraftData = word => {
       </VRow>
     </VCol>
   </VRow>
+
+  <!-- Dialog Image -->
+  <VDialog
+    v-model="isDialogVisibleImgFileMuti"
+    width="80%"
+  >
+    <!-- Dialog Content -->
+    <VCard>
+      <VCardTitle class="bg-primary">
+        <div class="d-flex justify-space-between">
+          COA
+          <VBtn
+            icon="mdi-close"
+            color="white"
+            size="small"
+            variant="tonal"
+            @click="isDialogVisibleImgFileMuti = false"
+          />
+        </div>
+      </VCardTitle>
+
+      <VCardText>
+        <VImg
+          role="presentation"
+          :src="imgDialog"
+          height="80%"
+          contain
+        />
+      </VCardText>
+    </VCard>
+  </VDialog>
 
   <!-- Dialog Reject -->
   <section>

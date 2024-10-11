@@ -172,8 +172,10 @@ export const saveDraftPackagingFormHeader = async (poEtlLogDetailJournalID, body
     
     return { success: true, data: response.data }
   } catch (error) {
-    console.error('Error:', error)
+    const errorMsg = error.response ? error.response.data : 'Network or server error'
     
+    console.error('Error:', error)
+
     return { success: false, error }
   }
 }
