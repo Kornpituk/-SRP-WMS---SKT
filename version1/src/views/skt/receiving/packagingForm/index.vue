@@ -586,12 +586,46 @@ const fileCoaTestPath = ref('')
 
 const fileCoaHeader = ref([])
 
+const fileCoaNew = ref([])
+
 const showDialogImageMutiNew = (img, name) => {
 
   isDialogVisibleImgFileMuti.value = true
   imgDialog.value = img
   imgNameDialog.value = name
 }
+
+const testCoa = () => {
+  console.log('Test Coa', fileCoaNew.value)
+}
+
+const fileUrls = ref({}) // เก็บ URLs ที่ถูกสร้างขึ้น
+
+// ฟังก์ชันสำหรับสร้าง URL ของไฟล์
+const getFileUrl = file => {
+  if (!fileUrls.value[file.name]) {
+    fileUrls.value[file.name] = URL.createObjectURL(file)
+  }
+  
+  return fileUrls.value[file.name]
+}
+
+// ฟังก์ชันสำหรับลบไฟล์และปล่อย URL
+const removeFileN = index => {
+  const file = fileCoaNew.value[index]
+  if (fileUrls.value[file.name]) {
+    URL.revokeObjectURL(fileUrls.value[file.name]) // ปล่อย URL
+    delete fileUrls.value[file.name] // ลบ URL จาก object
+  }
+  fileCoaNew.value.splice(index, 1) // ลบไฟล์จาก array
+}
+
+// ปล่อย URL ทั้งหมดเมื่อ component ถูกทำลาย
+onBeforeUnmount(() => {
+  Object.values(fileUrls.value).forEach(url => {
+    URL.revokeObjectURL(url) // ปล่อย URL ที่สร้างไว้ทั้งหมด
+  })
+})
 
 const { packagingFormCoaHeader, errorMessageCOA, fetchPackagingFormCoaHeader } = useGetCOAPackagingFormController()
 
@@ -1173,25 +1207,26 @@ const saveDraftData = word => {
       <Table class="custom-table">
         <tr>
           <th>
-            <VRow v-if="!files.length">
+            <VRow>
               <VCol cols="12">
                 <VFileInput
-                  v-model="files"
+                  v-model="fileCoaNew"
                   label="File Upload COA"
                   placeholder="Upload your documents"
                   multiple
                   prepend-icon="mdi-paperclip"
-                  @change="handleFilesO"
                 />
               </VCol>
             </VRow>
 
-            <VRow
-              v-if="files.length"
-              class="pa-2 d-flex justify-center"
-            >
+            <VBtn @click="testCoa">
+              Test Coa
+            </VBtn>
+
+            <!-- fILE Image New -->
+            <VRow class="pa-2 d-flex justify-center text-center bg-green-lighten-5">
               <VCol
-                v-for="(file, index) in files"
+                v-for="(file, index) in fileCoaNew"
                 :key="index"
                 cols="12"
                 md="4"
@@ -1202,14 +1237,50 @@ const saveDraftData = word => {
                     <VImg
                       role="presentation"
                       :alt="file.name"
-                      :src="file.src"
+                      :src="getFileUrl(file)"
                       height="150"
                       contain
-                      @click="showDialogImageMuti(file.src, file.name )"
+                      @click="showDialogImageMuti(file.fileUri, file.name )"
                     />
                     <div class="d-flex flex-column align-center">
                       <span>{{ file.name }}</span>
-                      <span>{{ file.size }} KB</span>
+                    </div>
+                  </VCardText>
+                  <VCardActions>
+                    <VBtn
+                      variant="flat"
+                      width="100%"
+                      color="error"
+                      @click="removeFileN(index)"
+                    >
+                      <VIcon>ri-delete-bin-5-fill</VIcon>
+                    </VBtn>
+                  </VCardActions>
+                </VCard>
+              </VCol>
+            </VRow>
+
+            <!-- fILE Image Old -->
+            <VRow class="pa-2 d-flex justify-center text-center">
+              <VCol
+                v-for="(file, index) in packagingFormCoaHeader"
+                :key="index"
+                cols="12"
+                md="4"
+                lg="3"
+              >
+                <VCard>
+                  <VCardText>
+                    <VImg
+                      role="presentation"
+                      :alt="file.fileName"
+                      :src="file.fileUri"
+                      height="150"
+                      contain
+                      @click="showDialogImageMuti(file.fileUri, file.fileName )"
+                    />
+                    <div class="d-flex flex-column align-center">
+                      <span>{{ file.fileName }}</span>
                     </div>
                   </VCardText>
                   <VCardActions>
@@ -1226,7 +1297,7 @@ const saveDraftData = word => {
               </VCol>
             </VRow>
 
-            <div v-if="coaFiles.length || files.length">
+            <div>
               <VCol
                 class="d-flex justify-end"
                 cols="12"
