@@ -785,8 +785,6 @@ const isDialogTextAreaVisible = ref(false)
 //-------------------- Watch Validate --------------------------------
 const isDialogVisibleStepSaveDraft = ref(false)
 
-
-
 //---------- Step 1 ------------------------
 const iconStep1 = ref('ri-save-3-line')
 const colorStep1 = ref('secondary')
@@ -1525,19 +1523,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -1578,19 +1576,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -1631,19 +1629,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -1684,19 +1682,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -1736,19 +1734,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -1955,19 +1953,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -2004,19 +2002,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -2052,19 +2050,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -2100,19 +2098,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>
@@ -2148,19 +2146,19 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VRow>
                   <VCol cols="6">
-                    <VRadio :value="0">
+                    <VRadio :value="1">
                       <template #label>
                         <div style="font-size: 12px;">
-                          NOT
+                          OK
                         </div>
                       </template>
                     </VRadio>
                   </VCol>
                   <VCol cols="6">
-                    <VRadio :value="1">
+                    <VRadio :value="0">
                       <template #label>
                         <div style="font-size: 12px;">
-                          OK
+                          NOT
                         </div>
                       </template>
                     </VRadio>

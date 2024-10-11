@@ -333,45 +333,48 @@ const colorStatusWithId2 = id => {
 }
 
 const colorStatusWithCheckBox = id => {
+
   switch (id) {
-  case 0:
-    return { color: 'grey-lighten-1', message: 'grey-lighten-1' }
-  case 1:
-    return { color: '#FFEBEE', message: 'red' }
-  case 2:
-    return { color: '#FCE4EC', message: 'pink-lighten-4' }
-  case 3:
-    return { color: '#EDE7F6', message: 'purple-lighten-4' }
-  case 4:
-    return { color: '#D1C4E9', message: 'deep-purple-lighten-4' }
-  case 5:
-    return { color: '#E8EAF6', message: 'indigo' }
-  case 6:
-    return { color: '#E3F2FD', message: 'blue' }
+  // case 0:
+  //   return { color: 'grey-lighten-1', message: 'grey-lighten-1' }
+  // case 1:
+  //   return { color: '#FFEBEE', message: 'red' }
+  // case 2:
+  //   return { color: '#FCE4EC', message: 'pink-lighten-4' }
+  // case 3:
+  //   return { color: '#EDE7F6', message: 'purple-lighten-4' }
+  // case 4:
+  //   return { color: '#D1C4E9', message: 'deep-purple-lighten-4' }
+  // case 5:
+  //   return { color: '#E8EAF6', message: 'indigo' }
+  // case 6:
+  //   return { color: '#E3F2FD', message: 'blue' }
   case 7:
     return { color: '#E1F5FE', message: 'light-blue' }
-  case 8:
-    return { color: '#E0F7FA', message: 'cyan-lighten-4' }
-  case 9:
-    return { color: '#E0F2F1', message: 'teal' }
-  case 10:
-    return { color: '#F1F8E9', message: 'cycan' }
-  case 11:
-    return { color: '#F9FBE7', message: 'cycan' }
-  case 12:
-    return { color: '#FFFDE7', message: 'brown' }
-  case 13:
-    return { color: '#FFF3E0', message: 'orange' }
-  case 14:
-    return { color: '#FBE9E7', message: 'deep-orange-derken-4' }
+
+  // case 8:
+  //   return { color: '#E0F7FA', message: 'cyan-lighten-4' }
+  // case 9:
+  //   return { color: '#E0F2F1', message: 'teal' }
+  // case 10:
+  //   return { color: '#F1F8E9', message: 'cycan' }
+  // case 11:
+  //   return { color: '#F9FBE7', message: 'cycan' }
+  // case 12:
+  //   return { color: '#FFFDE7', message: 'brown' }
+  // case 13:
+  //   return { color: '#FFF3E0', message: 'orange' }
+  // case 14:
+  //   return { color: '#FBE9E7', message: 'deep-orange-derken-4' }
   case 15:
     return { color: '#EFEBE9', message: 'brown' }
-  case 16:
-    return { color: '#FFCDD2', message: 'red-lighten-2' }
-  case 17:
-    return { color: '#E8F5E9', message: 'green-lighten-2' }
+
+  // case 16:
+  //   return { color: '#FFCDD2', message: 'red-lighten-2' }
+  // case 17:
+  //   return { color: '#E8F5E9', message: 'green-lighten-2' }
   default:
-    return { color: 'grey', message: 'grey' }
+    return { color: '', message: 'grey' }
   }
 }
 
@@ -1069,7 +1072,6 @@ const approveReceivingPlant = () => {
 }
 
 const isSelected = item => {
-  
   return selectedDataTables.value.some(
     selectedItem => selectedItem.journalID === item.journalID,
   )
@@ -4005,7 +4007,7 @@ const dessertsTest = ref([
                 style="position: sticky; z-index: 1; left: 0;"
               >
                 <VCheckboxBtn
-                  v-if="item.raw.statusId === 17 || item.raw.statusId === 15"
+                  v-if="item.raw.statusId === 7 || item.raw.statusId === 15"
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"
