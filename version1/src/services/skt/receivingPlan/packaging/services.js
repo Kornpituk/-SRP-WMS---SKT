@@ -107,9 +107,9 @@ export const PackagingFormService = {
     }
   },
 
-  async acceptPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+  async rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/Packaging/Accept/${poEtlLogDetailJournalID}`, {}, {
+      const response = await axios.post(`${urlApi}/api/v1/Packaging/Reject/${poEtlLogDetailJournalID}`, comment, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -118,15 +118,15 @@ export const PackagingFormService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data Genterate:', response.data.data)
+        console.log('Service Response data Reject:', response.data.data)
         
         return response.data.data
       } else {
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.error('Error in generatePackagingForm:', error)
-      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      console.error('Error in rejectPackagingForm:', error)
+      throw new Error(`Failed to reject for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
   },
 }

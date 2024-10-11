@@ -146,6 +146,41 @@ export const useAcceptPackagingFormController = () => {
   }
 }
 
+import { createModelReject } from '@/model/skt/receivingPlan/packaging/headerModel'
+
+export const useRejectPackagingFormController = () => {
+  const packagingFormReject = ref(null)
+  const errorMessageReject = ref(null)
+
+  const rejectPackagingForm = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageReject.value = null
+      console.log('Reject Packaging Form...')
+
+      const comment = createModelReject(dataHeader)
+
+
+      const result = await PackagingFormService.rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Packaging data Reject Controller:', result)
+        packagingFormReject.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in rejectPackagingForm:', error)
+      errorMessageReject.value = error.message
+    }
+  }
+
+  return {
+    packagingFormReject,
+    errorMessageReject,
+    rejectPackagingForm,
+  }
+}
+
 
 //--- header --------------------------------
 export const useReceivingFormController = () => {
