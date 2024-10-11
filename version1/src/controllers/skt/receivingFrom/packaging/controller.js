@@ -80,7 +80,10 @@ export const controllerDeleteAllCIA = {
 }
 
 //--------------------------------------------------------------------- Real --------------------
-import { ReceivingFormService, GetLotPackagingFormService, GetCOAService, PackagingFormService } from '@/services/skt/receivingPlan/packaging/services'
+import { ReceivingFormService, 
+  GetLotPackagingFormService, 
+  GetCOAService, PackagingFormService, 
+  saveDraftPackagingFormHeader, saveDraftLotItemsBatch  } from '@/services/skt/receivingPlan/packaging/services'
 
 //----- Generate ----------------------------
 export const useGeneratePackagingFormController = () => {
@@ -144,36 +147,13 @@ export const useReceivingFormController = () => {
   }
 }
 
-export const usePackagingSaveHeaderFormController = () => {
-  const packagingFormSaveHeader = ref(null)
-  const errorSaveDraftMessage = ref(null)
+import { createDraftBody } from '@/model/skt/receivingPlan/packaging/headerModel'
 
-  const saveDraftPackagingFormHeader = async (body, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
-    try {
-      errorSaveDraftMessage.value = null
-      console.log('Fetching Packaging Form Save Draft Header...')
-
-      const result = await ReceivingFormService.getHearderPackagingForm(body, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
-      
-      if (result) {
-        console.log('Received data Save Draft Header Controller:', result)
-        packagingFormSaveHeader.value = result
-      } else {
-        console.warn('No data returned from the API')
-      }
-    } catch (error) {
-      console.error('Error in saveDraftPackagingFormSaveHeader:', error)
-      errorSaveDraftMessage.value = error.message
-    }
-  }
-
-  return {
-    packagingFormSaveHeader,
-    errorSaveDraftMessage,
-    saveDraftPackagingFormHeader,
-  }
+export const handleSaveDraft = async (poEtlLogDetailJournalID, dataHeader, urlApi, whereHouse, accessTokenAtStore) => {
+  const body = createDraftBody(dataHeader)
+  
+  return await saveDraftPackagingFormHeader(poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore)
 }
-
 
 
 //--- lot --------------------------------
@@ -206,6 +186,24 @@ export const useGetLotPackagingFormController = () => {
     fetchPackagingFormLot,
   }
 }
+
+import { createDraftLot, createLotItem  } from '@/model/skt/receivingPlan/packaging/lotDataModel'
+
+// export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
+//   const body = createDraftLot(dataLot)
+  
+//   return await saveDraftPackagingFormHeader(body, urlApi, whereHouse, accessTokenAtStore)
+// }
+
+export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
+  // สร้าง body ที่ประกอบไปด้วยไอเทมที่ผ่านการจัดรูปแบบแล้ว
+  const formattedItems = dataLot.map(createLotItem)
+
+  // เรียกใช้ service ในการส่งข้อมูล
+  return await saveDraftLotItemsBatch(formattedItems, urlApi, whereHouse, accessTokenAtStore)
+}
+
+
 
 //--- COA --------------------------------
 export const useGetCOAPackagingFormController = () => {

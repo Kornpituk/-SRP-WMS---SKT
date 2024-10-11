@@ -30,3 +30,16 @@ export function createPayload(data) {
     suppDate: data.suppDate,
   }
 }
+
+export const createDraftLot = dataLot => {
+  return {
+    inspReqLotJournalId: dataLot.limConditionDetail,
+    actualAnalysis: dataLot.note,
+    okState: dataLot.coAChecked,
+  }
+}
+
+export const createLotItem = itemLot => ({
+  pkgInspReqFormAnalyticalItemsJournalId: itemLot.pkgInspReqFormAnalyticalItemsJournalId,
+  sqnText: itemLot.sqnText,
+})

@@ -24,3 +24,13 @@ const dataHeader = ref({
   statusComments: "",
   packagingImg: null,
 })
+
+
+export const createDraftBody = dataHeader => {
+  return {
+    limConditionDetail: dataHeader.limConditionDetail,
+    note: dataHeader.note,
+    coAChecked: dataHeader.coAChecked,
+    actualCheck: dataHeader.actualCheck,
+  }
+}

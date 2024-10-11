@@ -368,7 +368,7 @@ import { useReceivingFormController,
   useGetLotPackagingFormController, 
   useGetCOAPackagingFormController,
   useGeneratePackagingFormController,
-  usePackagingSaveHeaderFormController,
+  handleSaveDraft, handleSaveDraftLot,
 } from '@/controllers/skt/receivingFrom/packaging/controller'
 
 const dataHeader = ref({
@@ -420,27 +420,37 @@ const { packagingFormHeader, errorMessage, fetchPackagingFormHeader } = useRecei
 fetchPackagingFormHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
 //----- POST
-const { packagingFormSaveHeader, errorSaveDraftMessage, saveDraftPackagingFormHeader } = usePackagingSaveHeaderFormController()
+// const { packagingFormSaveHeader, errorSaveDraftMessage, saveDraftPackagingFormHeader } = usePackagingSaveHeaderFormController()
 
-saveDraftPackagingFormHeader(dataHeader.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+// saveDraftPackagingFormHeader(dataHeader.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
-const handleSaveDraft = async () => {
-  const result = await saveDraftPackagingFormHeader(dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+// const handleSaveDraft = async () => {
 
-  if (result.success) {
-    // แสดง dialog เมื่อสำเร็จ
-    isDialogSubmitSuccessVisible.value = true
-  } else {
-    // แสดง dialog เมื่อมีข้อผิดพลาด
-    isDialogSubmitFailedVisible.value = true
-  }
-}
+//   const body = {
+//     limConditionDetail: dataHeader.value.limConditionDetail,
+//     note: dataHeader.value.note,
+//     coAChecked: dataHeader.value.coAChecked,
+//     actualCheck: dataHeader.value.actualCheck,
+//   }
+
+//   const result = await saveDraftPackagingFormHeader(body, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+//   if (result.success) {
+//     // แสดง dialog เมื่อสำเร็จ
+//     isDialogSubmitSuccessVisible.value = true
+//   } else {
+//     // แสดง dialog เมื่อมีข้อผิดพลาด
+//     isDialogSubmitFailedVisible.value = true
+//   }
+// }
 
 const saveHeaderPackaging = async () => {
   try {
     const body = {
-      limConditionDetail: headerInsp.value.details,
-      note: headerInsp.value.note,
+      limConditionDetail: dataHeader.value.limConditionDetail,
+      note: dataHeader.value.note,
+      coAChecked: dataHeader.value.coAChecked,
+      actualCheck: dataHeader.value.actualCheck,
     }
 
     const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
@@ -457,6 +467,16 @@ const saveHeaderPackaging = async () => {
     // Handle errors
     isDialogSubmitFailedVisible.value = true
     console.error('Error:', error)
+  }
+}
+
+const saveDraftHeader = async () => {
+  const result = await handleSaveDraft(poEtlLogDetailJournalIDQueryParameters.value, dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+  if (result.success) {
+    isDialogSubmitSuccessVisible.value = true
+  } else {
+    isDialogSubmitFailedVisible.value = true
   }
 }
 
@@ -541,6 +561,17 @@ watchEffect(() => {
 
 })
 
+const saveDraftLotDetails = async () => {
+
+  const result = await handleSaveDraftLot(analyticalItemsData.value, urlApi.value, whereHouse, accessTokenAtStore)
+
+  if (result.success) {
+    console.log('Save lot details successful')
+  } else {
+    console.error('Failed to save lot details')
+  }
+}
+
 
 //---- COA --------------------------------
 
@@ -552,9 +583,6 @@ fetchPackagingFormCoaHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi
 
 watchEffect(() => {
 })
-
-
-
 
 //------------- Headers --------------------------------
 // สร้างตัวแปรเพื่อเก็บไฟล์ที่เลือก
@@ -604,9 +632,11 @@ const handleSubmit = () => {
 //---------------------- Function Btn ----------------------------------------------------------------
 // ฟังก์ชันบันทึกข้อมูล (ส่งข้อมูลไปยัง model หรือ API)
 const saveDraftData = () => {
-  saveMockData(testResult.value)
-  saveMockHeaderData(headersMvc.value)
-  handleSubmit()
+  // saveMockData(testResult.value)
+  // saveMockHeaderData(headersMvc.value)
+  // handleSubmit()
+  saveDraftHeader()
+  saveDraftLotDetails()
   console.log('Lot :', testResult.value)
 }
 </script>
@@ -878,46 +908,7 @@ const saveDraftData = () => {
               colspan="4"
             >
               <VTextField
-                v-model="asdasd"
-                density="compact"
-              />
-            </td>
-          </tr>
-        </tbody>
-        <tbody v-if="false">
-          <tr
-            v-for="(item, index) in testResult"
-            :key="index"
-          >
-            <th colspan="1">
-              {{ index + 1 }}
-            </th>
-            <td colspan="2">
-              {{ item.AItem }}
-            </td>
-            <td colspan="2">
-              {{ item.CheckM }}
-            </td>
-            <td colspan="2">
-              {{ item.SR }}
-            </td>
-            <td colspan="1">
-              <VTextField
-                v-model="item.ActualC"
-                density="compact"
-              />
-            </td>
-            <td colspan="2">
-              <VTextField
-                v-model="item.A"
-                :style="{ width: '150px', maxWidth: '300px' }"
-                density="compact"
-              />
-            </td>
-            <td colspan="2">
-              <VTextField
-                v-model="item.B"
-                :style="{ width: '150px', maxWidth: '300px' }"
+                v-model="item.sqnText"
                 density="compact"
               />
             </td>
@@ -992,7 +983,7 @@ const saveDraftData = () => {
             </th>
             <th colspan="6">
               <VTextarea
-                v-model="dataHeader.remark"
+                v-model="dataHeader.limConditionDetail"
                 auto-grow
               >
                 <template #label>

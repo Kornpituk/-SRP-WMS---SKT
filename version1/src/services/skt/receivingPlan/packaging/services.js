@@ -111,6 +111,25 @@ export const ReceivingFormService = {
   },
 }
 
+export const saveDraftPackagingFormHeader = async (poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore) => {
+  try {
+    const response = await axios.post(`${urlApi}/api/v1/Packaging/Save/${poEtlLogDetailJournalID}`, body, {
+      headers: {
+        'accept': '*/*',
+        'x-location': whereHouse,
+        'Authorization': `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    
+    return { success: true, data: response.data }
+  } catch (error) {
+    console.error('Error:', error)
+    
+    return { success: false, error }
+  }
+}
+
 //-- Lot --------------------------------
 
 export const GetLotPackagingFormService = {
@@ -136,30 +155,57 @@ export const GetLotPackagingFormService = {
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
   },
-
-  async SaveHearderPackagingForm(body, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
-    try {
-      const response = await axios.post(`${urlApi}/api/v1/Packaging/Save/${poEtlLogDetailJournalID}`, body, {
-        headers: {
-          'accept': '*/*',
-          'x-location': whereHouse,
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      
-      if (response && response.data) {
-        console.log('Service Response save data header:', response.data.data)
-        
-        return response.data.data
-      } else {
-        throw new Error('No data received from the server')
-      }
-    } catch (error) {
-      console.error('Error in SaveHearderPackagingForm:', error)
-      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
-    }
-  },
 }
+
+const saveSingleLotDetail = async (item, url, warehouse, token) => {
+  try {
+    const response = await axiosIns.post(`${url}/api/v1/Packaging/SaveLotDetails`, item, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${warehouse}`,
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+
+    return {
+      success: true,
+      data: response.data,
+    }
+  } catch (error) {
+    console.error('Error in saveSingleLotDetail:', error)
+    
+    return {
+      success: false,
+      error: error,
+    }
+  }
+}
+
+export const saveDraftLotItemsBatch = async (items, urlApi, whereHouse, accessTokenAtStore) => {
+  try {
+    const body = items.map(item => ({
+      inspReqLotJournalId: item.pkgInspReqFormAnalyticalItemsJournalId,
+      actualAnalysis: item.sqnText,
+      okState: 0,
+    }))
+
+    const response = await axios.post(`${urlApi}/api/v1/Packaging/SaveLotDetails`, body, {
+      headers: {
+        'accept': '*/*',
+        'x-location': whereHouse,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    return { success: true, data: response.data }
+  } catch (error) {
+    console.error('Error:', error)
+    
+    return { success: false }
+  }
+}
+
+
 
 //-- COA --------------------------------
 
