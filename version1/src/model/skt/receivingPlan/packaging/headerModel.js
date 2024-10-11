@@ -34,3 +34,9 @@ export const createDraftBody = dataHeader => {
     actualCheck: dataHeader.actualCheck,
   }
 }
+
+export const createModelReject = dataHeader => {
+  return {
+    statusComments: dataHeader.statusComments,
+  }
+}

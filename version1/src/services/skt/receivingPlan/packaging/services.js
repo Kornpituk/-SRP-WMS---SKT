@@ -83,8 +83,56 @@ export const PackagingFormService = {
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
   },
+
+  async acceptPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/Packaging/Accept/${poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data Genterate:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in generatePackagingForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async acceptPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/Packaging/Accept/${poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data Genterate:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in generatePackagingForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
 }
 
+//----------- Accept ----------------------------
+//----------- Reject ----------------------------
 //-- Header --------------------------------
 export const ReceivingFormService = {
   async getHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
@@ -181,14 +229,40 @@ const saveSingleLotDetail = async (item, url, warehouse, token) => {
   }
 }
 
-export const saveDraftLotItemsBatch = async (items, urlApi, whereHouse, accessTokenAtStore) => {
-  try {
-    const body = items.map(item => ({
-      inspReqLotJournalId: item.pkgInspReqFormAnalyticalItemsJournalId,
-      actualAnalysis: item.sqnText,
-      okState: 0,
-    }))
+// export const saveDraftLotItemsBatch = async (items, urlApi, whereHouse, accessTokenAtStore) => {
+//   try {
+//     const body = items.map(item => ({
+//       inspReqLotJournalId: item.pkgInspReqFormAnalyticalItemsJournalId,
+//       actualAnalysis: item.sqnText,
+//       okState: 0,
+//     }))
 
+//     const response = await axios.post(`${urlApi}/api/v1/Packaging/SaveLotDetails`, body, {
+//       headers: {
+//         'accept': '*/*',
+//         'x-location': whereHouse,
+//         Authorization: `Bearer ${accessTokenAtStore}`,
+//       },
+//     })
+
+//     return { success: true, data: response.data }
+//   } catch (error) {
+//     console.error('Error:', error)
+    
+//     return { success: false }
+//   }
+// }
+
+export const saveDraftLotItemsBatch = async (item, urlApi, whereHouse, accessTokenAtStore) => {
+  const body = {
+    inspReqLotJournalId: item.pkgInspReqFormAnalyticalItemsJournalId,
+    actualAnalysis: item.sqnText,
+    okState: 0,
+
+    // อื่นๆ
+  }
+
+  try {
     const response = await axios.post(`${urlApi}/api/v1/Packaging/SaveLotDetails`, body, {
       headers: {
         'accept': '*/*',
@@ -197,11 +271,11 @@ export const saveDraftLotItemsBatch = async (items, urlApi, whereHouse, accessTo
       },
     })
 
-    return { success: true, data: response.data }
-  } catch (error) {
-    console.error('Error:', error)
     
-    return { success: false }
+    return { success: true, data: response.data } // ส่งข้อมูลกลับไป
+  } catch (error) {
+    console.error('Error sending draft lot item:', error)
+    throw { success: false, error }
   }
 }
 

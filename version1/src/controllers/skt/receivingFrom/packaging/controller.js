@@ -116,6 +116,37 @@ export const useGeneratePackagingFormController = () => {
   }
 }
 
+export const useAcceptPackagingFormController = () => {
+  const packagingFormAccept = ref(null)
+  const errorMessageAccept = ref(null)
+
+  const acceptPackagingForm = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageAccept.value = null
+      console.log('accept Packaging Form...')
+
+      const result = await PackagingFormService.acceptPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Packaging data Accept Controller:', result)
+        packagingFormAccept.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in acceptPackagingForm:', error)
+      errorMessageAccept.value = error.message
+    }
+  }
+
+  return {
+    packagingFormAccept,
+    errorMessageAccept,
+    acceptPackagingForm,
+  }
+}
+
+
 //--- header --------------------------------
 export const useReceivingFormController = () => {
   const packagingFormHeader = ref(null)
@@ -196,12 +227,27 @@ import { createDraftLot, createLotItem  } from '@/model/skt/receivingPlan/packag
 // }
 
 export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
-  // สร้าง body ที่ประกอบไปด้วยไอเทมที่ผ่านการจัดรูปแบบแล้ว
-  const formattedItems = dataLot.map(createLotItem)
+  try {
+    // วนลูปผ่านรายการข้อมูลใน dataLot
+    for (const item of dataLot) {
+      // เรียกใช้ service เพื่อส่งข้อมูลทีละตัว
+      const result = await saveDraftLotItemsBatch(item, urlApi, whereHouse, accessTokenAtStore)
 
-  // เรียกใช้ service ในการส่งข้อมูล
-  return await saveDraftLotItemsBatch(formattedItems, urlApi, whereHouse, accessTokenAtStore)
+      console.log('Success:', result) // แสดงผลลัพธ์ที่ได้
+      
+      return result
+    }
+
+    // แสดง dialog เมื่อสำเร็จ
+    // isDialogSubmitSuccessVisible.value = true
+  } catch (error) {
+    // แสดง dialog เมื่อมีข้อผิดพลาด
+    // isDialogSubmitFailedVisible.value = true
+    console.error('Error saving draft lot:', error)
+  }
 }
+
+
 
 
 

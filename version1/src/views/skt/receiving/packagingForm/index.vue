@@ -470,13 +470,16 @@ const saveHeaderPackaging = async () => {
   }
 }
 
+
 const saveDraftHeader = async () => {
   const result = await handleSaveDraft(poEtlLogDetailJournalIDQueryParameters.value, dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
   if (result.success) {
-    isDialogSubmitSuccessVisible.value = true
+    // isDialogSubmitSuccessVisible.value = true
+    console.log('Save header details successful')
   } else {
-    isDialogSubmitFailedVisible.value = true
+    // isDialogSubmitFailedVisible.value = true
+    console.error('Failed to save header details')
   }
 }
 
@@ -561,6 +564,7 @@ watchEffect(() => {
 
 })
 
+//----- POST
 const saveDraftLotDetails = async () => {
 
   const result = await handleSaveDraftLot(analyticalItemsData.value, urlApi.value, whereHouse, accessTokenAtStore)
@@ -582,61 +586,159 @@ const { packagingFormCoaHeader, errorMessageCOA, fetchPackagingFormCoaHeader } =
 fetchPackagingFormCoaHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
 watchEffect(() => {
+
 })
-
-//------------- Headers --------------------------------
-// สร้างตัวแปรเพื่อเก็บไฟล์ที่เลือก
-const filesMvc = ref([])
-const headersMvc = ref(null)
-
-// ฟังก์ชันที่จัดการไฟล์เมื่อผู้ใช้เลือกไฟล์
-const onFilesSelected = () => {
-  handleFilesOMvc(filesMvc.value)
-}
-
-// เก็บข้อมูลที่จะนำมาแสดงผล
-const testResult = ref(null)
-
-// เมื่อ component ทำงาน ให้ดึงข้อมูลจาก controller
-onMounted(() => {
-  testResult.value = getMockData()
-})
-
-//-------------------- Lot --------------------
-
-//--------------------- Get --------------------
-// ตั้งค่า dataModel โดยใช้ modelHeader
-const dataModel = ref({ ...modelHeader })
-
-// ข้อมูลที่มาจาก route
-
-const routeData = ref(getRouteData())
-
-const propsData = ref(getPropsData(props.Data))
-
-//--------------------- Post --------------------
-
-console.log("dataModel", dataModel.value)
-
-// ฟังก์ชันสำหรับการส่งข้อมูล
-const handleSubmit = () => {
-  if(routeData.value){
-    submitData(routeData.value)
-    console.log("propsData data !", routeData.value)
-  }else {
-    console.log("propsData note data !")
-  }
-  
-}
 
 //---------------------- Function Btn ----------------------------------------------------------------
+
+//-------------------- Watch Validate --------------------------------
+const isDialogVisibleStepSaveDraft = ref(false)
+
+//--------------------------- Dialog Submit -------------------------------
+const isDialogConfirmVisible = ref(false)
+const isDialogSubmitSuccessVisible = ref(false)
+const isDialogTextAreaVisible = ref(false)
+
+//---------- Step 1 ------------------------
+const iconStep1 = ref('ri-save-3-line')
+const colorStep1 = ref('secondary')
+
+//---------- Step 2 ------------------------
+const iconStep2 = ref('ri-save-3-line')
+const colorStep2 = ref('secondary')
+
+//---------- Step 3 ------------------------
+const iconStep3 = ref('ri-save-3-line')
+const colorStep3 = ref('secondary')
+
+//------------ loadind 1---------------------
+const loadindingSaveDatft1 = ref(false)
+const loadindingSaveDatftFailed1 = ref(false)
+const loadindingSaveDatftSeccess1 = ref(false)
+
+//------------ loadind 2 ---------------------
+const loadindingSaveDatft2 = ref(false)
+const loadindingSaveDatftFailed2 = ref(false)
+const loadindingSaveDatftSeccess2 = ref(false)
+
+//------------ loadind 3 ---------------------
+const loadindingSaveDatft3 = ref(false)
+const loadindingSaveDatftFailed3 = ref(false)
+const loadindingSaveDatftSeccess3 = ref(false)
+
+const wordForSubmit = ref('Word')
+
+const submitButtonVisibleNew = async word => {
+  wordForSubmit.value = word
+  isDialogVisibleStepSaveDraft.value = true
+
+  try {
+    // Start Step 1
+    loadindingSaveDatft1.value = true
+
+    // Step 1: saveLotReceivingForm
+
+    await saveDraftHeader()
+    console.log('saveHeaderReceivingForm success')
+
+    iconStep1.value = 'ri-check-line'
+    colorStep1.value = 'success'
+    loadindingSaveDatftSeccess1.value = true
+    loadindingSaveDatft1.value = false
+  } catch (error) {
+    console.error('saveLotReceivingForm failed:', error)
+
+    iconStep1.value = 'ri-error-warning-line'
+    colorStep1.value = 'error'
+    wordForSubmit.value = "SAVE HEADER"
+
+    loadindingSaveDatftFailed1.value = false
+    loadindingSaveDatftSeccess1.value = false
+
+    loadindingSaveDatft1.value = false
+    isDialogConfirmVisible.value = false
+
+    // isDialogSubmitFailedVisible.value = true
+
+    return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
+  }
+
+  try {
+    // Start Step 2
+    loadindingSaveDatft2.value = true
+
+    // Step 2: saveHeaderReceivingForm
+    // console.error('Error: actualMakerLotNo_1 is empty or undefined. out')
+    await saveDraftLotDetails()
+    console.log('saveLotReceivingForm success')
+    iconStep2.value = 'ri-check-line'
+    colorStep2.value = 'success'
+
+    loadindingSaveDatftSeccess2.value = true
+    loadindingSaveDatft2.value = false
+  } catch (error) {
+    console.error('saveLotReceivingForm failed:', error)
+    wordForSubmit.value = "SAVE LOT"
+    iconStep2.value = 'ri-error-warning-line'
+    colorStep2.value = 'error'
+    wordForSubmit.value = "SAVE COA"
+
+    loadindingSaveDatftFailed2.value = false
+    loadindingSaveDatftSeccess2.value = false
+
+    loadindingSaveDatft2.value = false
+
+    // wordForSubmit.value = '2'
+    isDialogConfirmVisible.value = false
+
+    // isDialogSubmitFailedVisible.value = false
+
+    return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
+  }
+
+  // try {
+  //   // Start Step 1
+  //   loadindingSaveDatft3.value = true
+
+  //   // Step 3: saveCOARecevingFrom
+  //   await saveCOARecevingFrom()
+  //   console.log('saveCOARecevingFrom success')
+  //   iconStep3.value = 'ri-check-line'
+  //   colorStep3.value = 'success'
+  //   loadindingSaveDatftSeccess3.value = true
+  //   loadindingSaveDatft3.value = false
+  // } catch (error) {
+  //   console.error('saveCOARecevingFrom failed:', error)
+  //   iconStep3.value = 'ri-error-warning-line'
+  //   colorStep3.value = 'error'
+
+  //   loadindingSaveDatftFailed3.value = false
+  //   loadindingSaveDatftSeccess3.value = false
+
+  //   loadindingSaveDatft3.value = false
+
+  //   isDialogSubmitFailedVisible.value = false
+  //   isDialogConfirmVisible.value = false
+
+  //   return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
+  // }
+
+  // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
+  // isDialogVisibleStepSaveDraft.value = false
+
+  location.reload()
+
+  // isDialogSubmitSuccessVisible.value = true
+  isDialogConfirmVisible.value = false
+
+  return true
+}
+
+
 // ฟังก์ชันบันทึกข้อมูล (ส่งข้อมูลไปยัง model หรือ API)
-const saveDraftData = () => {
-  // saveMockData(testResult.value)
-  // saveMockHeaderData(headersMvc.value)
-  // handleSubmit()
-  saveDraftHeader()
-  saveDraftLotDetails()
+const saveDraftData = word => {
+  submitButtonVisibleNew()
+  wordForSubmit.value = word
   console.log('Lot :', testResult.value)
 }
 </script>
@@ -881,7 +983,7 @@ const saveDraftData = () => {
               Actual Check
             </th>
             <th colspan="4">
-              <VTextField density="compact" />
+              <VTextField v-model="dataHeader.actualCheck" density="compact" />
             </th>
           </tr>
         </thead>
@@ -1384,6 +1486,114 @@ const saveDraftData = () => {
             </VAlert>
           </div>
         </VCardText>
+      </VCard>
+    </VDialog>
+  </section>
+
+  <!-- Dialog Submit -->
+  <section>
+    <VDialog
+      v-model="isDialogConfirmVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="warning"
+              icon="ri-question-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
+              Transaction?</span>
+          </div>
+        </VCardText>
+
+        <VCardAction class="d-flex justify-space-between pa-4">
+          <VBtn
+            color="error"
+            @click="isDialogConfirmVisible = false"
+          >
+            Cancel
+          </VBtn>
+          <VBtn
+            v-if="wordForSubmit === 'SUBMIT'"
+            color="green"
+            @click="submitReceivingForm"
+          >
+            {{ wordForSubmit }}
+          </VBtn>
+        </VCardAction>
+      </VCard>
+    </VDialog>
+  </section>
+  <!-- Dialog Submit Success -->
+  <section>
+    <VDialog
+      v-model="isDialogSubmitSuccessVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="success"
+              icon="ri-checkbox-circle-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
+          </div>
+        </VCardText>
+
+        <VCardAction
+          v-if="false"
+          class="d-flex justify-center pa-4"
+        >
+          <VBtn
+            color="success"
+            @click="submitConfirm"
+          >
+            Continue
+          </VBtn>
+        </VCardAction>
+      </VCard>
+    </VDialog>
+  </section>
+  <!-- Dialog Submit Failed -->
+  <section>
+    <VDialog
+      v-model="isDialogSubmitFailedVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="error"
+              icon="ri-error-warning-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
+          </div>
+        </VCardText>
+
+        <VCardAction class="d-flex justify-center pa-4">
+          <VBtn
+            color="error"
+            @click="submitFailed"
+          >
+            Continue
+          </VBtn>
+        </VCardAction>
       </VCard>
     </VDialog>
   </section>
