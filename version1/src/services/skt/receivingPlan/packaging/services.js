@@ -281,8 +281,6 @@ export const saveDraftLotItemsBatch = async (item, urlApi, whereHouse, accessTok
   }
 }
 
-
-
 //-- COA --------------------------------
 
 export const GetCOAService = {
@@ -306,6 +304,31 @@ export const GetCOAService = {
     } catch (error) {
       console.error('Error in GetCOAPackagingForm:', error)
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+}
+
+export const SaveCOAService = {
+  async saveDraftCOAForm(files, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
+    const formData = new FormData()
+
+    // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
+    files.forEach(file => {
+      formData.append('files', file)
+    })
+
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/SaveCoA/${poEtlLogDetailJournalID}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      throw new Error(`Error while saving COA: ${error.message}`)
     }
   },
 }

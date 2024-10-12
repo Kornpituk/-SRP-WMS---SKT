@@ -369,6 +369,7 @@ import { useReceivingFormController,
   useGetCOAPackagingFormController,
   useGeneratePackagingFormController,
   handleSaveDraft, handleSaveDraftLot,
+  useSaveCOAFormController,
 } from '@/controllers/skt/receivingFrom/packaging/controller'
 
 const dataHeader = ref({
@@ -588,6 +589,11 @@ const fileCoaHeader = ref([])
 
 const fileCoaNew = ref([])
 
+//- Get
+const { packagingFormCoaHeader, errorMessageCoaHeader, fetchPackagingFormCoaHeader } = useGetCOAPackagingFormController()
+
+fetchPackagingFormCoaHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
 const showDialogImageMutiNew = (img, name) => {
 
   isDialogVisibleImgFileMuti.value = true
@@ -596,7 +602,7 @@ const showDialogImageMutiNew = (img, name) => {
 }
 
 const testCoa = () => {
-  console.log('Test Coa', fileCoaNew.value)
+  console.log('Test Coa', packagingFormCoaHeader)
 }
 
 const fileUrls = ref({}) // เก็บ URLs ที่ถูกสร้างขึ้น
@@ -627,13 +633,21 @@ onBeforeUnmount(() => {
   })
 })
 
-const { packagingFormCoaHeader, errorMessageCOA, fetchPackagingFormCoaHeader } = useGetCOAPackagingFormController()
 
-fetchPackagingFormCoaHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
-watchEffect(() => {
+const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
 
-})
+//--- save draf
+
+const handleSaveDraftCoa = async () => {
+  if (fileCoaNew.value.length === 0) {
+    alert('Please upload at least one file')
+    
+    return
+  }
+
+  await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
+}
 
 //---------------------- Function Btn ----------------------------------------------------------------
 
@@ -1217,6 +1231,9 @@ const saveDraftData = word => {
                   prepend-icon="mdi-paperclip"
                 />
               </VCol>
+              <div v-if="errorMessageCOA">
+                {{ errorMessageCOA.message }}
+              </div>
             </VRow>
 
             <VBtn @click="testCoa">
@@ -1224,7 +1241,10 @@ const saveDraftData = word => {
             </VBtn>
 
             <!-- fILE Image New -->
-            <VRow class="pa-2 d-flex justify-center text-center bg-green-lighten-5">
+            <VRow
+              v-if="fileCoaNew.length > 0"
+              class="pa-2 d-flex justify-center text-center bg-green-lighten-5"
+            >
               <VCol
                 v-for="(file, index) in fileCoaNew"
                 :key="index"
@@ -1233,6 +1253,14 @@ const saveDraftData = word => {
                 lg="3"
               >
                 <VCard>
+                  <VCardTitle class="d-flex justify-start">
+                    <VChip
+                      variant="elevated"
+                      color="success"
+                    >
+                      New
+                    </VChip>
+                  </VCardTitle>
                   <VCardText>
                     <VImg
                       role="presentation"
@@ -1240,7 +1268,7 @@ const saveDraftData = word => {
                       :src="getFileUrl(file)"
                       height="150"
                       contain
-                      @click="showDialogImageMuti(file.fileUri, file.name )"
+                      @click="showDialogImageMutiNew(getFileUrl(file), file.name)"
                     />
                     <div class="d-flex flex-column align-center">
                       <span>{{ file.name }}</span>
@@ -1381,7 +1409,7 @@ const saveDraftData = word => {
         <VImg
           role="presentation"
           :src="imgDialog"
-          height="80%"
+          height="750"
           contain
         />
       </VCardText>
@@ -1726,6 +1754,10 @@ const saveDraftData = word => {
             submit
           </VCol>
         </VRow>
+      </VBtn>
+
+      <VBtn @click="handleSaveDraftCoa">
+        Save Coa
       </VBtn>
     </VCol>
   </VRow>

@@ -83,7 +83,9 @@ export const controllerDeleteAllCIA = {
 import { ReceivingFormService, 
   GetLotPackagingFormService, 
   GetCOAService, PackagingFormService, 
-  saveDraftPackagingFormHeader, saveDraftLotItemsBatch  } from '@/services/skt/receivingPlan/packaging/services'
+  saveDraftPackagingFormHeader, saveDraftLotItemsBatch,
+  SaveCOAService,
+} from '@/services/skt/receivingPlan/packaging/services'
 
 //----- Generate ----------------------------
 export const useGeneratePackagingFormController = () => {
@@ -286,9 +288,6 @@ export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessToke
 }
 
 
-
-
-
 //--- COA --------------------------------
 export const useGetCOAPackagingFormController = () => {
   const packagingFormCoaHeader = ref(null)
@@ -317,5 +316,48 @@ export const useGetCOAPackagingFormController = () => {
     packagingFormCoaHeader,
     errorMessageCoaHeader,
     fetchPackagingFormCoaHeader,
+  }
+}
+
+
+export const useSaveCOAFormController = () => {
+  const saveCoaForm = ref(null) // เก็บข้อมูล response ของการบันทึก
+  const errorMessageSaveCoa = ref(null) // เก็บข้อความแจ้งข้อผิดพลาด
+
+  const handleSaveDraftCoaForm = async (files, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) => {
+    try {
+      // ตรวจสอบว่ามีไฟล์และข้อมูลก่อนที่จะดำเนินการบันทึก
+      if (!files || files.length === 0) {
+        throw new Error('No files selected')
+      }
+
+      if (!poEtlLogDetailJournalID || !urlApi || !accessToken) {
+        throw new Error('Missing required parameters')
+      }
+
+      errorMessageSaveCoa.value = null
+      console.log('Saving Draft Form COA...')
+
+      // เรียกใช้ Service เพื่อบันทึกข้อมูล
+      const result = await SaveCOAService.saveDraftCOAForm(files, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
+
+      if (result?.success) {
+        console.log('Save data COA Controller:', result)
+        saveCoaForm.value = { data: result, success: true } // เก็บข้อมูล response
+      } else {
+        throw new Error('Failed to save data')
+      }
+    } catch (error) {
+      console.error('Error in handleSaveDraftCoaForm:', error)
+
+      // เก็บข้อมูลข้อผิดพลาด
+      errorMessageSaveCoa.value = { message: error.message, success: false }
+    }
+  }
+
+  return {
+    saveCoaForm,
+    errorMessageSaveCoa,
+    handleSaveDraftCoaForm, // เปลี่ยนชื่อเป็น handleSaveDraftCoaForm เพื่อให้ชัดเจน
   }
 }
