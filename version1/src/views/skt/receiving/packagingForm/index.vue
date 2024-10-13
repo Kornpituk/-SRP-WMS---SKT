@@ -369,7 +369,7 @@ import { useReceivingFormController,
   useGetCOAPackagingFormController,
   useGeneratePackagingFormController,
   handleSaveDraft, handleSaveDraftLot,
-  useSaveCOAFormController,
+  useSaveCOAFormController, useDeleteCoaFormController,
 } from '@/controllers/skt/receivingFrom/packaging/controller'
 
 const dataHeader = ref({
@@ -590,9 +590,9 @@ const fileCoaHeader = ref([])
 const fileCoaNew = ref([])
 
 //- Get
-const { packagingFormCoaHeader, errorMessageCoaHeader, fetchPackagingFormCoaHeader } = useGetCOAPackagingFormController()
+const { getFormCoa, errorMessageCoaHeader, fetchFormCoaHeader } = useGetCOAPackagingFormController()
 
-fetchPackagingFormCoaHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+fetchFormCoaHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
 const showDialogImageMutiNew = (img, name) => {
 
@@ -602,7 +602,7 @@ const showDialogImageMutiNew = (img, name) => {
 }
 
 const testCoa = () => {
-  console.log('Test Coa', packagingFormCoaHeader)
+  console.log('Test Coa', getFormCoa)
 }
 
 const fileUrls = ref({}) // เก็บ URLs ที่ถูกสร้างขึ้น
@@ -633,11 +633,15 @@ onBeforeUnmount(() => {
   })
 })
 
+//---- delete coa
 
+const { packagingFormGenerate, errorMessageDeleteCoa, deleteCoaForm } = useDeleteCoaFormController()
 
-const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
 
 //--- save draf
+const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
+
+
 
 const handleSaveDraftCoa = async () => {
   if (fileCoaNew.value.length === 0) {
@@ -645,6 +649,8 @@ const handleSaveDraftCoa = async () => {
     
     return
   }
+
+  deleteCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
 
   await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
 }
@@ -1291,7 +1297,7 @@ const saveDraftData = word => {
             <!-- fILE Image Old -->
             <VRow class="pa-2 d-flex justify-center text-center">
               <VCol
-                v-for="(file, index) in packagingFormCoaHeader"
+                v-for="(file, index) in getFormCoa"
                 :key="index"
                 cols="12"
                 md="4"

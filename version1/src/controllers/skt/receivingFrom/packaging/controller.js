@@ -290,10 +290,10 @@ export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessToke
 
 //--- COA --------------------------------
 export const useGetCOAPackagingFormController = () => {
-  const packagingFormCoaHeader = ref(null)
+  const getFormCoa = ref(null)
   const errorMessageCoaHeader = ref(null)
 
-  const fetchPackagingFormCoaHeader = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+  const fetchFormCoaHeader = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageCoaHeader.value = null
       console.log('Fetching Packaging Form COA...')
@@ -302,20 +302,50 @@ export const useGetCOAPackagingFormController = () => {
       
       if (result) {
         console.log('Received data COA Controller:', result)
-        packagingFormCoaHeader.value = result
+        getFormCoa.value = result
       } else {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.error('Error in fetchPackagingFormCoaHeader:', error)
+      console.error('Error in getFormCoa:', error)
       errorMessageCoaHeader.value = error.message
     }
   }
 
   return {
-    packagingFormCoaHeader,
+    getFormCoa,
     errorMessageCoaHeader,
-    fetchPackagingFormCoaHeader,
+    fetchFormCoaHeader,
+  }
+}
+
+export const useDeleteCoaFormController = () => {
+  const packagingFormGenerate = ref(null)
+  const errorMessageDeleteCoa = ref(null)
+
+  const deleteCoaForm = async (poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
+    try {
+      errorMessageDeleteCoa.value = null
+      console.log('delete coa form ...')
+
+      const result = await SaveCOAService.deleteCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('delete coa Controller:', result)
+        packagingFormGenerate.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in deleteCoaForm:', error)
+      errorMessageDeleteCoa.value = error.message
+    }
+  }
+
+  return {
+    packagingFormGenerate,
+    errorMessageDeleteCoa,
+    deleteCoaForm,
   }
 }
 
