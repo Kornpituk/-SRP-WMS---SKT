@@ -370,6 +370,7 @@ import { useReceivingFormController,
   useGeneratePackagingFormController,
   handleSaveDraft, handleSaveDraftLot,
   useSaveCOAFormController, useDeleteCoaFormController,
+  useDeleteAllCoaFormController,
 } from '@/controllers/skt/receivingFrom/packaging/controller'
 
 const dataHeader = ref({
@@ -578,7 +579,6 @@ const saveDraftLotDetails = async () => {
   }
 }
 
-
 //---- COA --------------------------------
 
 //-------------------- Model Image --------------------
@@ -602,7 +602,12 @@ const showDialogImageMutiNew = (img, name) => {
 }
 
 const testCoa = () => {
-  console.log('Test Coa', getFormCoa)
+  console.log('Test Coa', fileCoaNew.value)
+}
+
+
+const testCoaO = () => {
+  console.log('Test Coa', getFormCoa.value)
 }
 
 const fileUrls = ref({}) // เก็บ URLs ที่ถูกสร้างขึ้น
@@ -616,6 +621,13 @@ const getFileUrl = file => {
   return fileUrls.value[file.name]
 }
 
+const coaIdForDelete = ref([])
+
+const testCoaODelete = () => {
+  console.log('Test Coa', coaIdForDelete.value)
+}
+
+
 // ฟังก์ชันสำหรับลบไฟล์และปล่อย URL
 const removeFileN = index => {
   const file = fileCoaNew.value[index]
@@ -624,6 +636,28 @@ const removeFileN = index => {
     delete fileUrls.value[file.name] // ลบ URL จาก object
   }
   fileCoaNew.value.splice(index, 1) // ลบไฟล์จาก array
+}
+
+const removeFileO = (index, id) => {
+  const file = getFormCoa.value[index]
+  if (fileUrls.value[file.name]) {
+    URL.revokeObjectURL(fileUrls.value[file.name]) // ปล่อย URL
+    delete fileUrls.value[file.name] // ลบ URL จาก object
+  }
+
+  // เพิ่ม journalID เข้าไปใน coaIdForDelete
+  coaIdForDelete.value.push(id)
+
+  getFormCoa.value.splice(index, 1) // ลบไฟล์จาก array
+
+}
+
+const deleteAllStart = ref(false)
+
+const removeFileAll = () => {
+  getFormCoa.value = []
+  fileCoaNew.value = []
+  deleteAllStart.value = true
 }
 
 // ปล่อย URL ทั้งหมดเมื่อ component ถูกทำลาย
@@ -637,22 +671,27 @@ onBeforeUnmount(() => {
 
 const { packagingFormGenerate, errorMessageDeleteCoa, deleteCoaForm } = useDeleteCoaFormController()
 
+const { resultDeleteAllCoa, errorMessageDeleteAllCoa, deleteAllCoaForm } = useDeleteAllCoaFormController()
 
 //--- save draf
 const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
 
-
-
 const handleSaveDraftCoa = async () => {
-  if (fileCoaNew.value.length === 0) {
-    alert('Please upload at least one file')
+  // if (fileCoaNew.value.length === 0) {
+  //   alert('Please upload at least one file')
     
-    return
+  //   return
+  // }
+
+  if(deleteAllStart.value === true){
+    deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
+  }else {
+    deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
+
+    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
   }
 
-  deleteCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
-
-  await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
+  
 }
 
 //---------------------- Function Btn ----------------------------------------------------------------
@@ -762,37 +801,37 @@ const submitButtonVisibleNew = async word => {
     return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
   }
 
-  // try {
-  //   // Start Step 1
-  //   loadindingSaveDatft3.value = true
+  try {
+    // Start Step 1
+    loadindingSaveDatft3.value = true
 
-  //   // Step 3: saveCOARecevingFrom
-  //   await saveCOARecevingFrom()
-  //   console.log('saveCOARecevingFrom success')
-  //   iconStep3.value = 'ri-check-line'
-  //   colorStep3.value = 'success'
-  //   loadindingSaveDatftSeccess3.value = true
-  //   loadindingSaveDatft3.value = false
-  // } catch (error) {
-  //   console.error('saveCOARecevingFrom failed:', error)
-  //   iconStep3.value = 'ri-error-warning-line'
-  //   colorStep3.value = 'error'
+    // Step 3: saveCOARecevingFrom
+    await handleSaveDraftCoa()
+    console.log('saveCOARecevingFrom success')
+    iconStep3.value = 'ri-check-line'
+    colorStep3.value = 'success'
+    loadindingSaveDatftSeccess3.value = true
+    loadindingSaveDatft3.value = false
+  } catch (error) {
+    console.error('saveCOARecevingFrom failed:', error)
+    iconStep3.value = 'ri-error-warning-line'
+    colorStep3.value = 'error'
 
-  //   loadindingSaveDatftFailed3.value = false
-  //   loadindingSaveDatftSeccess3.value = false
+    loadindingSaveDatftFailed3.value = false
+    loadindingSaveDatftSeccess3.value = false
 
-  //   loadindingSaveDatft3.value = false
+    loadindingSaveDatft3.value = false
 
-  //   isDialogSubmitFailedVisible.value = false
-  //   isDialogConfirmVisible.value = false
+    isDialogSubmitFailedVisible.value = false
+    isDialogConfirmVisible.value = false
 
-  //   return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
-  // }
+    return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
+  }
 
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  // location.reload()
+  location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -1242,7 +1281,10 @@ const saveDraftData = word => {
               </div>
             </VRow>
 
-            <VBtn @click="testCoa">
+            <VBtn
+              v-if="false"
+              @click="testCoa"
+            >
               Test Coa
             </VBtn>
 
@@ -1322,7 +1364,7 @@ const saveDraftData = word => {
                       variant="flat"
                       width="100%"
                       color="error"
-                      @click="removeFile(index)"
+                      @click="removeFileO(index, file.journalID)"
                     >
                       <VIcon>ri-delete-bin-5-fill</VIcon>
                     </VBtn>
@@ -1338,7 +1380,7 @@ const saveDraftData = word => {
               >
                 <VBtn
                   color="red"
-                  @click="deleteAllCIA"
+                  @click="removeFileAll"
                 >
                   <VIcon icon="ri-delete-bin-6-line" />
                   Delete All COA

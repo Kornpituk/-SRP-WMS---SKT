@@ -317,6 +317,8 @@ export const SaveCOAService = {
       formData.append('files', file)
     })
 
+    console.log("Files Upload", files)
+
     try {
       const response = await axios.post(`${urlApi}/api/v1/${form}/SaveCoA/${poEtlLogDetailJournalID}`, formData, {
         headers: {
@@ -332,9 +334,7 @@ export const SaveCOAService = {
     }
   },
 
-  async deleteCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
-
-    const body = 0
+  async deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
 
     try {
       const response = await axios.post(`${urlApi}/api/v1/${form}/DeleteCoa/${poEtlLogDetailJournalID}`, body, {
@@ -355,6 +355,31 @@ export const SaveCOAService = {
     } catch (error) {
       console.error('Error in deleteCoaForm:', error)
       throw new Error(`Failed to delete coa for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+
+  async deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/DeleteAllCoA/${poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data all detelete coa:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data delete all coa from the server')
+      }
+    } catch (error) {
+      console.error('Error in deleteAllCoaForm:', error)
+      throw new Error(`Failed to delete all coa for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
   },
 }

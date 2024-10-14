@@ -323,12 +323,12 @@ export const useDeleteCoaFormController = () => {
   const packagingFormGenerate = ref(null)
   const errorMessageDeleteCoa = ref(null)
 
-  const deleteCoaForm = async (poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
+  const deleteCoaForm = async (body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
     try {
       errorMessageDeleteCoa.value = null
       console.log('delete coa form ...')
 
-      const result = await SaveCOAService.deleteCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+      const result = await SaveCOAService.deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
       if (result) {
         console.log('delete coa Controller:', result)
@@ -346,6 +346,36 @@ export const useDeleteCoaFormController = () => {
     packagingFormGenerate,
     errorMessageDeleteCoa,
     deleteCoaForm,
+  }
+}
+
+export const useDeleteAllCoaFormController = () => {
+  const resultDeleteAllCoa = ref(null)
+  const errorMessageDeleteAllCoa = ref(null)
+
+  const deleteAllCoaForm = async (poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
+    try {
+      errorMessageDeleteAllCoa.value = null
+      console.log('delete coa form ...')
+
+      const result = await SaveCOAService.deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('delete all coa Controller:', result)
+        resultDeleteAllCoa.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in deleteAllCoaForm:', error)
+      errorMessageDeleteAllCoa.value = error.message
+    }
+  }
+
+  return {
+    resultDeleteAllCoa,
+    errorMessageDeleteAllCoa,
+    deleteAllCoaForm,
   }
 }
 
