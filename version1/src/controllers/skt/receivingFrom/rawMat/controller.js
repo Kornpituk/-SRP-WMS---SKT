@@ -1,4 +1,4 @@
-import { coaService } from '@/services/skt/gobal/service'
+import { coaService } from '@/services/skt/receivingPlan/rawMat/service'
 
 
 export const useGetCOAFormController = () => {
@@ -32,7 +32,7 @@ export const useGetCOAFormController = () => {
 }
   
 export const useDeleteCoaFormController = () => {
-  const packagingFormGenerate = ref(null)
+  const resultDeleteByIdCoa = ref(null)
   const errorMessageDeleteCoa = ref(null)
 
   const deleteCoaForm = async (body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
@@ -40,13 +40,14 @@ export const useDeleteCoaFormController = () => {
       errorMessageDeleteCoa.value = null
       console.log('delete coa form ...')
 
-      const result = await SaveCOAService.deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+      const result = await coaService.deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
-      if (result) {
-        console.log('delete coa Controller:', result)
-        packagingFormGenerate.value = result
+      if (result?.success) {
+        console.log('delete coa Controller success:', result)
+        resultDeleteByIdCoa.value = { data: result, success: true } 
       } else {
         console.warn('No data returned from the API')
+        throw new Error('Failed to delete by id data')
       }
     } catch (error) {
       console.error('Error in deleteCoaForm:', error)
@@ -55,7 +56,7 @@ export const useDeleteCoaFormController = () => {
   }
 
   return {
-    packagingFormGenerate,
+    resultDeleteByIdCoa,
     errorMessageDeleteCoa,
     deleteCoaForm,
   }
@@ -70,7 +71,7 @@ export const useDeleteAllCoaFormController = () => {
       errorMessageDeleteAllCoa.value = null
       console.log('delete coa form ...')
 
-      const result = await SaveCOAService.deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+      const result = await coaService.deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
       if (result) {
         console.log('delete all coa Controller:', result)
@@ -90,7 +91,6 @@ export const useDeleteAllCoaFormController = () => {
     deleteAllCoaForm,
   }
 }
-  
   
 export const useSaveCOAFormController = () => {
   const saveCoaForm = ref(null) // เก็บข้อมูล response ของการบันทึก
@@ -121,7 +121,9 @@ export const useSaveCOAFormController = () => {
       }
     } catch (error) {
       console.error('Error in handleSaveDraftCoaForm:', error)
-  
+
+      // saveCoaForm.value = { data: result, success: false }
+
       // เก็บข้อมูลข้อผิดพลาด
       errorMessageSaveCoa.value = { message: error.message, success: false }
     }

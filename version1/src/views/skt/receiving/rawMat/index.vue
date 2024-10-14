@@ -448,9 +448,18 @@ const getLotReceivingForm = () => {
   }
 }
 
+import { useGetCOAFormController, 
+  useDeleteCoaFormController, 
+  useDeleteAllCoaFormController, 
+  useSaveCOAFormController } from '@/controllers/skt/receivingFrom/rawMat/controller'
+
 const coaFiles = ref([])
 
 //--------------- COA
+
+const { getCoaForm, errorMessageGetCoa, fetchCoaForm } = useGetCOAFormController()
+
+fetchCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
 
 let startTime
 
@@ -720,6 +729,107 @@ const saveLotReceivingForm = async () => {
   }
 }
 
+// -------------------------- Save COA ---------------------------
+const fileCoaNew = ref([])
+const coaIdForDelete = ref([])
+const fileUrls = ref({}) // เก็บ URLs ที่ถูกสร้างขึ้น
+
+// ฟังก์ชันสำหรับสร้าง URL ของไฟล์
+const getFileUrl = file => {
+  if (!fileUrls.value[file.name]) {
+    fileUrls.value[file.name] = URL.createObjectURL(file)
+  }
+  
+  return fileUrls.value[file.name]
+}
+
+const testCoaNew = () => {
+  console.log('Test Coa', fileCoaNew.value)
+}
+
+const testCoaODelete = () => {
+  console.log('Test Coa', coaIdForDelete.value)
+}
+
+// ฟังก์ชันสำหรับลบไฟล์และปล่อย URL
+const removeFileN = index => {
+  const file = fileCoaNew.value[index]
+  if (fileUrls.value[file.name]) {
+    URL.revokeObjectURL(fileUrls.value[file.name]) // ปล่อย URL
+    delete fileUrls.value[file.name] // ลบ URL จาก object
+  }
+  fileCoaNew.value.splice(index, 1) // ลบไฟล์จาก array
+}
+
+const removeFileO = (index, id) => {
+  const file = getCoaForm.value[index]
+  if (fileUrls.value[file.name]) {
+    URL.revokeObjectURL(fileUrls.value[file.name]) // ปล่อย URL
+    delete fileUrls.value[file.name] // ลบ URL จาก object
+  }
+
+  // เพิ่ม journalID เข้าไปใน coaIdForDelete
+  coaIdForDelete.value.push(id)
+
+  getCoaForm.value.splice(index, 1) // ลบไฟล์จาก array
+
+}
+
+const deleteAllStart = ref(false)
+
+const removeFileAll = () => {
+  getCoaForm.value = []
+  fileCoaNew.value = []
+  deleteAllStart.value = true
+}
+
+// ปล่อย URL ทั้งหมดเมื่อ component ถูกทำลาย
+onBeforeUnmount(() => {
+  Object.values(fileUrls.value).forEach(url => {
+    URL.revokeObjectURL(url) // ปล่อย URL ที่สร้างไว้ทั้งหมด
+  })
+})
+
+//---- delete coa
+
+const { resultDeleteByIdCoa, errorMessageDeleteCoa, deleteCoaForm } = useDeleteCoaFormController()
+
+const { resultDeleteAllCoa, errorMessageDeleteAllCoa, deleteAllCoaForm } = useDeleteAllCoaFormController()
+
+//--- save draf
+const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
+
+const handleSaveDraftCoa = async () => {
+  // if (fileCoaNew.value.length === 0) {
+  //   alert('Please upload at least one file')
+    
+  //   return
+  // }
+
+  if(deleteAllStart.value === true){
+    deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
+  }else {
+    console.log("Upload Start++++")
+
+    await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
+    console.log("deleteCoaForm Started++++", resultDeleteByIdCoa.value.success)
+    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
+
+    // console.log('%c[generatedJournalId] Result!!: ', "color: yellow; font-weight: bold", resultDeleteByIdCoa.data.success)
+    if (saveCoaForm || resultDeleteByIdCoa.value.success === true) {
+      console.log('Save coa  successful', saveCoaForm.value.success)
+      console.log('Delete by id coa  successful', resultDeleteByIdCoa.value.success)
+      
+      return true
+    } else {
+      console.error('Failed to save coa')
+      throw 'Failed to save coa'
+    }
+  }
+
+  
+}
+
 // ฟังก์ชันเพื่อแปลง Base64 กลับเป็นไฟล์
 const base64ToFile = (base64String, filename) => {
   let arr = base64String.split(',')
@@ -897,7 +1007,7 @@ const submitButtonVisibleNew = async word => {
   wordForSubmit.value = word
   isDialogVisibleStepSaveDraft.value = true
 
-  try {
+  try { // Start Step 1
     // Start Step 1
     loadindingSaveDatft1.value = true
 
@@ -928,7 +1038,7 @@ const submitButtonVisibleNew = async word => {
     return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
   }
 
-  try {
+  try { // Start Step 2
     // Start Step 2
     loadindingSaveDatft2.value = true
 
@@ -960,12 +1070,12 @@ const submitButtonVisibleNew = async word => {
     return // หยุดการทำงานหากฟังก์ชันนี้ล้มเหลว
   }
 
-  try {
-    // Start Step 1
+  try { // Start Step 3
+    // Start Step 3
     loadindingSaveDatft3.value = true
 
     // Step 3: saveCOARecevingFrom
-    await saveCOARecevingFrom()
+    await handleSaveDraftCoa()
     console.log('saveCOARecevingFrom success')
     iconStep3.value = 'ri-check-line'
     colorStep3.value = 'success'
@@ -988,9 +1098,9 @@ const submitButtonVisibleNew = async word => {
   }
 
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
-  isDialogVisibleStepSaveDraft.value = false
+  // isDialogVisibleStepSaveDraft.value = false
 
-  location.reload()
+  // location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -1263,26 +1373,6 @@ const handleInputAmount = (e, AmountUnits) => {
   }
 }
 
-const handleInput = e => {
-  let value = e.target.value.replace(/,/g, '') // ลบจุลภาคออกก่อน
-
-  // ตรวจสอบว่าเป็นตัวเลขที่ถูกต้องหรือไม่ (รวมทั้งทศนิยม)
-  const regex = /^[0-9]*\.?[0-9]*$/
-  if (!regex.test(value)) {
-    return // ถ้าไม่ใช่ตัวเลขหรือทศนิยมที่ถูกต้อง ก็ไม่ให้เปลี่ยนค่า
-  }
-
-  // ถ้าเป็นตัวเลขให้จัดรูปแบบ
-  if (!isNaN(value) && value !== '') {
-    value = parseFloat(value)
-
-    // จัดรูปแบบตัวเลขให้มีเครื่องหมายจุลภาคและทศนิยม 2 ตำแหน่ง
-    purchaseOrder.value.actualTotalQuantityKgs_1 = value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  } else {
-    purchaseOrder.value.actualTotalQuantityKgs_1 = e.target.value
-  }
-}
-
 // watchEffect จะเรียกใช้ calculateTotals ทุกครั้งที่ข้อมูลใน dataRaeMatRequest เปลี่ยนแปลง
 watchEffect(() => {
   calculationPONew()
@@ -1291,10 +1381,10 @@ watchEffect(() => {
 const showDialogImageMuti = (img, name) => {
 
   // ตรวจสอบว่าข้อมูล img มี "data:image/png;base64," นำหน้าหรือไม่
-  if (!img.startsWith('data:image')) {
-    // ถ้าไม่มี ให้เพิ่ม "data:image/png;base64," นำหน้า
-    img = `data:image/png;base64,${img}`
-  }
+  // if (!img.startsWith('data:image')) {
+  //   // ถ้าไม่มี ให้เพิ่ม "data:image/png;base64," นำหน้า
+  //   img = `data:image/png;base64,${img}`
+  // }
 
   isDialogVisibleImgFileMuti.value = true
   imgDialog.value = img
@@ -1568,7 +1658,10 @@ const getDisabledFollowStatusNRole = () => {
                   class="d-flex justify-center"
                   style="width: 100%;"
                 >
-                  <span style="font-size: 12px;" class="text-center">
+                  <span
+                    style="font-size: 12px;"
+                    class="text-center"
+                  >
                     {{ item.title }}
                   </span>
                 </div>
@@ -2812,6 +2905,7 @@ const getDisabledFollowStatusNRole = () => {
       </Table>
     </VCol>
 
+    
     <!-- COA -->
     <VCol cols="12">
       <div
@@ -2826,13 +2920,11 @@ const getDisabledFollowStatusNRole = () => {
             <VRow>
               <VCol cols="12">
                 <VFileInput
-                  v-if="hidedAllIconInput"
-                  v-model="files"
+                  v-model="fileCoaNew"
                   accept="image/png, image/jpeg, image/bmp"
                   prepend-icon="mdi-paperclip"
                   multiple
                   color="black"
-                  @change="handleFilesO"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
@@ -2842,6 +2934,10 @@ const getDisabledFollowStatusNRole = () => {
                 </VFileInput>
               </VCol>
             </VRow>
+
+            <VBtn @click="testCoaNew">
+              TestNew
+            </VBtn>
 
             <div class="demo-space-y">
               <VProgressLinear
@@ -2858,12 +2954,13 @@ const getDisabledFollowStatusNRole = () => {
               </VProgressLinear>
             </div>
 
+            <!-- Upload -->
             <VRow
-              v-if="files.length"
+              v-if="fileCoaNew.length"
               class="pa-2 d-flex justify-center bg-green-lighten-5"
             >
               <VCol
-                v-for="(file, index) in files"
+                v-for="(file, index) in fileCoaNew"
                 :key="index"
                 cols="12"
                 md="4"
@@ -2883,10 +2980,10 @@ const getDisabledFollowStatusNRole = () => {
                       <VImg
                         role="presentation"
                         :alt="file.name"
-                        :src="file.src"
+                        :src="getFileUrl(file)"
                         height="150"
                         contain
-                        @click="showDialogImageMuti(file.src, file.name)"
+                        @click="showDialogImageMuti(getFileUrl(file), file.name)"
                       />
                     </template>
 
@@ -2900,15 +2997,6 @@ const getDisabledFollowStatusNRole = () => {
                       />
                     </template>
 
-                    <div>
-                      <VImg
-                        role="presentation"
-                        :src="fileCoaTestPath"
-                        height="150"
-                        contain
-                      />
-                    </div>
-
                     <div class="d-flex flex-column align-center">
                       <span>{{ file.name }}</span>
                     </div>
@@ -2919,7 +3007,7 @@ const getDisabledFollowStatusNRole = () => {
                       variant="flat"
                       width="100%"
                       color="error"
-                      @click="removeFile(index)"
+                      @click="removeFileN(index)"
                     >
                       <VIcon>ri-delete-bin-5-fill</VIcon>
                     </VBtn>
@@ -2928,12 +3016,13 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </VRow>
 
+            <!-- o -->
             <VRow
-              v-if="coaFiles.length"
+              v-if="getCoaForm"
               class="pa-2 d-flex justify-center"
             >
               <VCol
-                v-for="(file, index) in coaFiles"
+                v-for="(file, index) in getCoaForm"
                 :key="index"
                 cols="12"
                 md="4"
@@ -2944,13 +3033,13 @@ const getDisabledFollowStatusNRole = () => {
                     <VImg
                       role="presentation"
                       :alt="file.coAFileName"
-                      :src="'data:image/png;base64,' + file.coAFile"
+                      :src="file.fileUri"
                       height="150"
                       contain
-                      @click="showDialogImageMuti(file.coAFile, file.coAFileName)"
+                      @click="showDialogImageMuti(file.fileUri, file.fileName)"
                     />
                     <div class="d-flex flex-column align-center">
-                      <span>{{ file.coAFileName }}</span>
+                      <span>{{ file.fileName }}</span>
                     </div>
                   </VCardText>
 
@@ -2960,7 +3049,7 @@ const getDisabledFollowStatusNRole = () => {
                       variant="flat"
                       width="100%"
                       color="error"
-                      @click="removeFileDraft(index)"
+                      @click="removeFileO(index, file.journalID)"
                     >
                       <VIcon>ri-delete-bin-5-fill</VIcon>
                     </VBtn>

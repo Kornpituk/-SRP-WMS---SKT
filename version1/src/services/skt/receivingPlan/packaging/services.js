@@ -328,9 +328,9 @@ export const SaveCOAService = {
         },
       })
 
-      return response.data
+      return { success: true, data: response.data }
     } catch (error) {
-      throw new Error(`Error while saving COA: ${error.message}`)
+      throw { success: false, error }
     }
   },
 

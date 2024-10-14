@@ -602,9 +602,12 @@ const showDialogImageMutiNew = (img, name) => {
 }
 
 const testCoa = () => {
-  console.log('Test Coa', fileCoaNew.value)
+  console.log('Test Coa')
 }
 
+const showValueUpload = index => {
+  console.log("Start Upload!!", index)
+}
 
 const testCoaO = () => {
   console.log('Test Coa', getFormCoa.value)
@@ -688,7 +691,13 @@ const handleSaveDraftCoa = async () => {
   }else {
     deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
 
-    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
+    const result = await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
+
+    if (result.success) {
+      console.log('Save coa  successful')
+    } else {
+      console.error('Failed to save coa')
+    }
   }
 
   
@@ -831,7 +840,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  location.reload()
+  // location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
