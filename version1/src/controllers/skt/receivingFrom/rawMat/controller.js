@@ -73,9 +73,9 @@ export const useDeleteAllCoaFormController = () => {
 
       const result = await coaService.deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
-      if (result) {
+      if (result?.success) {
         console.log('delete all coa Controller:', result)
-        resultDeleteAllCoa.value = result
+        resultDeleteAllCoa.value = { data: result, success: true }
       } else {
         console.warn('No data returned from the API')
       }

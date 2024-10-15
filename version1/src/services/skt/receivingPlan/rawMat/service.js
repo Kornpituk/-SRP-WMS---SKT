@@ -61,9 +61,9 @@ export const coaService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data detelete coa:', response.data.data)
+        console.log('Service Response data detelete coa:', response.data.messageResult)
         
-        return { success: true, data: response.data }
+        return { success: true, data: response.data.messageResult }
       } else {
         throw new Error('No data delete coa from the server')
       }
@@ -77,7 +77,7 @@ export const coaService = {
   async deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
 
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/DeleteAllCoA/${poEtlLogDetailJournalID}`, {}, {
+      const response = await axios.delete(`${urlApi}/api/v1/${form}/deleteAll/${poEtlLogDetailJournalID}`, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -86,15 +86,16 @@ export const coaService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data all detelete coa:', response.data.data)
+        console.log('Service Response data all detelete coa:', response.data.messageResult)
         
-        return response.data.data
+        return { success: true, data: response.data.messageResult }
       } else {
         throw new Error('No data delete all coa from the server')
       }
     } catch (error) {
       console.error('Error in deleteAllCoaForm:', error)
-      throw new Error(`Failed to delete all coa for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      error = new Error(`Failed to delete all coa for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
     }
   },
 

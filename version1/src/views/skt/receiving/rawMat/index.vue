@@ -629,6 +629,29 @@ const alertErrorLot = ref({
   alertAmountLot5: null,
 })
 
+const alertTextValidateInput = ({
+  alertTextActualMakerLotNo: '',
+  alertTextActualMakerLotNo_1: '',
+  alertTextActualMakerLotNo_2: '',
+  alertTextActualMakerLotNo_3: '',
+  alertTextActualMakerLotNo_4: '',
+  alertTextActualMakerLotNo_5: '',
+})
+
+const validateLotNoInput = (actualAmountUnits, actualMakerLotNo, index) => {
+  if(!actualMakerLotNo && actualAmountUnits){
+    alertTextValidateInput.value.alertTextValidateInput = `Lot No.${index} is required`
+    
+    return true
+  }else if(actualMakerLotNo && !actualAmountUnits){
+    alertTextValidateInput.value.alertTextValidateInput = `Lot No.${index} is required.`
+    
+    return true
+  }else{
+    return false
+  }
+}
+
 // ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Lot No.
 const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
   if (!actualMakerLotNo && actualAmount) {
@@ -807,24 +830,42 @@ const handleSaveDraftCoa = async () => {
   // }
 
   if(deleteAllStart.value === true){
-    deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
-  }else {
-    console.log("Upload Start++++")
-
-    await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
-    console.log("deleteCoaForm Started++++", resultDeleteByIdCoa.value.success)
-    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
-
-    // console.log('%c[generatedJournalId] Result!!: ', "color: yellow; font-weight: bold", resultDeleteByIdCoa.data.success)
-    if (saveCoaForm || resultDeleteByIdCoa.value.success === true) {
-      console.log('Save coa  successful', saveCoaForm.value.success)
-      console.log('Delete by id coa  successful', resultDeleteByIdCoa.value.success)
+    await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
+    if (resultDeleteAllCoa.value.success) {
+      console.log('Delete all coa  successful', resultDeleteAllCoa.value.success)
       
-      return true
+      return resultDeleteAllCoa
+    } else {
+      console.error('Failed to delete all coa')
+      throw 'Failed to save coa'
+    }
+  }
+  if(fileCoaNew.value.length > 0){
+    console.log("Upload Start++++")
+    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
+    if (saveCoaForm) {
+      console.log('Save coa  successful', saveCoaForm.value.success)
+      
+      return saveCoaForm
     } else {
       console.error('Failed to save coa')
       throw 'Failed to save coa'
     }
+  }
+  if(coaIdForDelete.value.length > 0){
+    console.log("delete by id Start++++")
+    await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
+    if (resultDeleteByIdCoa.value.success === true) {
+      console.log('Delete coa by id successful', resultDeleteByIdCoa.value.success)
+      
+      return resultDeleteByIdCoa
+    } else {
+      console.error('Failed to save coa')
+      throw 'Failed to delete coa by id'
+    }
+  }
+  else {
+    throw 'Failed to handleSaveDraftCoa'
   }
 
   
@@ -1100,7 +1141,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  // location.reload()
+  location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -1795,10 +1836,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_2"
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
-                :rules="!purchaseOrder.actualAmountUnits_2 ? [
-                  value => (purchaseOrder.actualAmountUnits_2 && value === null) || 'Lot No.2 is required.',
+                :rules="[
                   value => value.length <= 20 || 'Must be 20 characters or less',
-                ] : []"
+                ]"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -1812,6 +1852,12 @@ const getDisabledFollowStatusNRole = () => {
                   />
                 </template>
               </VTextField>
+              <span
+                v-if="validateLotNoInput(actualAmountUnits_2, actualMakerLotNo_2, 2)"
+                class="text-red"
+              >
+                {{ alertTextValidateInput.alertTextActualMakerLotNo }}
+              </span>
             </td>
             <th
               class="text-center"
@@ -1829,7 +1875,7 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="!purchaseOrder.actualMakerLotNo_3 ? [
-                  value => (purchaseOrder.actualAmountUnits_3 && value === null) || 'Lot No.3 is required.',
+                  value => (purchaseOrder.actualAmountUnits_3 && value === '' ) || 'Lot No.3 is required.',
                   value => value.length <= 20 || 'Must be 20 characters or less'
                 ] : []"
                 density="compact"
@@ -2990,7 +3036,7 @@ const getDisabledFollowStatusNRole = () => {
                     <!-- ตรวจสอบว่าถ้าเป็น PDF -->
                     <template v-else-if="file.type === 'application/pdf'">
                       <iframe
-                        :src="file.src"
+                        :src="getFileUrl(file)"
                         width="100%"
                         height="150"
                         style="border: none;"
@@ -3066,7 +3112,7 @@ const getDisabledFollowStatusNRole = () => {
                 <VBtn
                   v-if="hidedAllIconInput"
                   color="red"
-                  @click="deleteAllCIA"
+                  @click="removeFileAll"
                 >
                   <VIcon icon="ri-delete-bin-6-line" />
                   Delete All COA
