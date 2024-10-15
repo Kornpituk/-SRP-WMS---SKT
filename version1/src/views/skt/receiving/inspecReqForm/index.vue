@@ -911,7 +911,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  // location.reload()
+  location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -1471,7 +1471,6 @@ const getDisabledFollowStatusNRole = () => {
             <td
               v-if="item.typeID === 1"
               colspan="2"
-              style="text-transform: capitalize;"
             >
               <span>{{ item.analyticalItem }}</span>
             </td>
@@ -1479,7 +1478,6 @@ const getDisabledFollowStatusNRole = () => {
               v-if="item.typeID === 1"
               class="text-center"
               colspan="2"
-              style="text-transform: capitalize;"
             >
               <span>{{ item.unit }}</span>
             </td>
@@ -1487,7 +1485,6 @@ const getDisabledFollowStatusNRole = () => {
               v-if="item.typeID === 1"
               class="text-center"
               colspan="2"
-              style="text-transform: capitalize;"
             >
               <span>{{ item.methodCode }}</span>
             </td>
@@ -1495,7 +1492,6 @@ const getDisabledFollowStatusNRole = () => {
               v-if="item.typeID === 1"
               class="text-center"
               colspan="2"
-              style="text-transform: capitalize;"
             >
               <span>{{ item.specRange }}</span>
             </td>
@@ -1503,7 +1499,6 @@ const getDisabledFollowStatusNRole = () => {
               v-if="item.typeID === 1"
               class="text-center"
               colspan="1"
-              style="text-transform: capitalize;"
             >
               <span>{{ item.actualAnalysis }}</span>
             </td>
@@ -1869,25 +1864,6 @@ const getDisabledFollowStatusNRole = () => {
             </tr>
           </div>
 
-          <!-- Reference Item -->
-          <tr>
-            <td
-              class="text-center"
-              colspan="1"
-            />
-            <td
-              class="text-start"
-              colspan="14"
-            >
-              <div class="d-flex align-center">
-                <VIcon
-                  color="primary"
-                  icon="ri-circle-fill"
-                /> = After Arrival Of Raw Material, We Have To Actually Analyze Every Lot.
-              </div>
-            </td>
-          </tr>
-
           <tr
             v-for="(item , index) in analysisItems"
             :key="index"
@@ -2187,6 +2163,25 @@ const getDisabledFollowStatusNRole = () => {
               >Actual value Text is required!</span>
             </td>
           </tr>
+
+          <!-- Reference Item -->
+          <tr>
+            <td
+              class="text-center"
+              colspan="1"
+            />
+            <td
+              class="text-start"
+              colspan="14"
+            >
+              <div class="d-flex align-center">
+                <VIcon
+                  color="primary"
+                  icon="ri-circle-fill"
+                /> = After Arrival Of Raw Material, We Have To Actually Analyze Every Lot.
+              </div>
+            </td>
+          </tr>
         </table>
       </div>
     </VCol>
@@ -2242,57 +2237,73 @@ const getDisabledFollowStatusNRole = () => {
     </table>
   </section>
 
-  <section>
-    <!-- Quality Evalution -->
+  <!-- Quality Evaluation -->
+  <section class="mt-5">
     <VRow>
-      <VCol cols="12">
-        <span class="mb-2">Quality Evaluation</span>
-        <table class="custom-table mt-2">
-          <thead>
-            <tr>
-              <th colspan="3">
-                Accept
-              </th>
-              <th colspan="3">
-                Reject
-              </th>
-              <th colspan="6">
-                Comment
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colspan="3">
-                <div class="d-flex justify-center">
-                  <VIcon
-                    v-if="statusId === 17 || statusId === 15"
-                    color="success"
-                    size="60"
-                    icon="ri-checkbox-circle-fill"
-                  />
-                </div>
-              </td>
-              <td colspan="3">
-                <div class="d-flex justify-center">
-                  <VIcon
-                    v-if="statusId === 7 || statusId === 16"
-                    color="red"
-                    size="60"
-                    icon="ri-close-circle-fill"
-                  />
-                </div>
-              </td>
-              <td colspan="6">
-                <span v-if="statusId === 7 || statusId === 16">{{ headerInsp.remarkReject }}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <VCol class="px-0" style="font-size: 12px;" cols="12">Quality Evaluation</VCol>
+      <VCol
+        style="border: 1px solid black;"
+        cols="4"
+        class="d-flex align-center"
+      >
+        <VRow>
+          <VCol
+            cols="1"
+            class="d-flex align-center"
+            style="font-size: 12px; font-weight: bolder;"
+          >
+            Accept
+          </VCol>
+          <VCol
+            class="d-flex justify-center"
+            cols="10"
+          >
+            <VIcon
+              v-if="statusId === 17 || statusId === 15"
+              color="success"
+              size="60"
+              icon="ri-checkbox-circle-fill"
+            />
+          </VCol>
+        </VRow>
+      </VCol>
+      <VCol
+        style="border: 1px solid black;"
+        cols="4"
+        class="d-flex align-center"
+      >
+        <VRow >
+          <VCol
+            cols="1"
+            class="d-flex align-center"
+            style="font-size: 12px; font-weight: bolder;"
+          >
+            Reject
+          </VCol>
+          <VCol
+            class="d-flex justify-center"
+            cols="11"
+          >
+            <VIcon
+              v-if="statusId === 7 || statusId === 16"
+              color="red"
+              size="60"
+              icon="ri-close-circle-fill"
+            />
+          </VCol>
+        </VRow>
+      </VCol>
+      <VCol
+        style="border: 1px solid black;"
+        cols="4"
+        class="d-flex align-center"
+      >
+        <span style="font-size: 12px; font-weight: bolder;">Comment:</span>	&nbsp;	&nbsp;
+        <span v-if="statusId === 7 || statusId === 16">{{ headerInsp.remarkReject }}</span>
       </VCol>
     </VRow>
   </section>
-
+  
   <!-- WareHouse / Inspection -->
   <section>
     <!-- WareHouse / Inspection -->
@@ -2576,38 +2587,6 @@ const getDisabledFollowStatusNRole = () => {
                 </VAvatar>
               </div>
               <div><span style="font-size: 12px;">Save Draft Lot</span></div>
-            </VCol>
-            <VCol
-              class="text-center d-flex flex-column align-center justify-center mx-auto"
-              cols="4"
-            >
-              <div>
-                <VProgressLinear
-                  v-if="loadindingSaveDatft3"
-                  indeterminate
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftSeccess3"
-                  model-value="100"
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftFailed3"
-                  model-value="0"
-                />
-                <VAvatar
-                  class="my-2"
-                  size="150"
-                  :color="colorStep3"
-                >
-                  <VIcon
-                    size="100"
-                    :icon="iconStep3"
-                  />
-                </VAvatar>
-              </div>
-              <div><span style="font-size: 12px;">Save Draft COA</span></div>
             </VCol>
           </VRow>
         </VCardText>

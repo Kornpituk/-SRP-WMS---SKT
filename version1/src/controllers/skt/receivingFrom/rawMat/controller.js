@@ -30,6 +30,36 @@ export const useGetCOAFormController = () => {
     fetchCoaForm,
   }
 }
+
+export const useGetCOAFilePackagingFormController = () => {
+  const getFileCoa = ref(null)
+  const errorMessageFileCoa = ref(null)
+
+  const fetchFileCoaHeader = async (fileName, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
+    try {
+      errorMessageFileCoa.value = null
+      console.log('++++Fetching Packaging Form File COA...')
+
+      const result = await coaService.GetFileCOAForm(fileName, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+      
+      if (result?.success) {
+        console.log('Fetched data file COA Controller:', result)
+        getFileCoa.value = { data: result, success: true }
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in getFileCoa:', error)
+      errorMessageFileCoa.value = error.message
+    }
+  }
+
+  return {
+    getFileCoa,
+    errorMessageFileCoa,
+    fetchFileCoaHeader,
+  }
+}
   
 export const useDeleteCoaFormController = () => {
   const resultDeleteByIdCoa = ref(null)

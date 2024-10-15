@@ -370,7 +370,7 @@ import { useReceivingFormController,
   useGeneratePackagingFormController,
   handleSaveDraft, handleSaveDraftLot,
   useSaveCOAFormController, useDeleteCoaFormController,
-  useDeleteAllCoaFormController,
+  useDeleteAllCoaFormController, useGetCOAFilePackagingFormController,
 } from '@/controllers/skt/receivingFrom/packaging/controller'
 
 const dataHeader = ref({
@@ -601,6 +601,21 @@ const showDialogImageMutiNew = (img, name) => {
   imgNameDialog.value = name
 }
 
+// ---- Get File 
+
+const { getFileCoa, errorMessageFileCoa, fetchFileCoaHeader } = useGetCOAFilePackagingFormController()
+
+const getFileCoaByName = nameFiel => {
+  fetchFileCoaHeader(nameFiel, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+  console.log("+++++++getFileCoa.value", getFileCoa.value)
+
+  return getFileCoa.value
+}
+
+getFileCoaByName('6aaf646f-d008-4e6a-aa46-75a17fc180b4.png')
+
+
 const testCoa = () => {
   console.log('Test Coa')
 }
@@ -672,7 +687,7 @@ onBeforeUnmount(() => {
 
 //---- delete coa
 
-const { packagingFormGenerate, errorMessageDeleteCoa, deleteCoaForm } = useDeleteCoaFormController()
+const { resultDeleteByIdCoa, errorMessageDeleteCoa, deleteCoaForm } = useDeleteCoaFormController()
 
 const { resultDeleteAllCoa, errorMessageDeleteAllCoa, deleteAllCoaForm } = useDeleteAllCoaFormController()
 
@@ -687,17 +702,44 @@ const handleSaveDraftCoa = async () => {
   // }
 
   if(deleteAllStart.value === true){
-    deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
-  }else {
-    deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
+    await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
+    if (resultDeleteAllCoa.value.success === true) {
+      console.log('Delete coa all  successful')
+      
+      return resultDeleteAllCoa
+    } else {
+      console.error('Failed to delete all coa')
+      throw 'Failed to delete all coa'
+    }
+  }
+  if(coaIdForDelete.value.length > 0){
+    await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
 
-    const result = await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
+    if (resultDeleteByIdCoa.value.success === true) {
+      console.log('Delete coa by id  successful')
 
-    if (result.success) {
+      return resultDeleteByIdCoa
+    } else {
+      console.error('Failed to delete by id coa')
+      throw 'Failed to delete by id coa'
+    }
+  }
+
+  if(fileCoaNew.value.length > 0){
+    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
+
+    if (saveCoaForm.value.success) {
       console.log('Save coa  successful')
+
+      return saveCoaForm
     } else {
       console.error('Failed to save coa')
+      throw 'Failed to save coa'
     }
+  }
+
+  else {
+    throw 'Failed to handleSaveDraftCoa'
   }
 
   
@@ -1218,51 +1260,72 @@ const saveDraftData = word => {
   </VRow>
 
   <!-- Quality Evalution -->
-  <VRow style="font-size: 12px;">
+
+  <VRow class="mx-1">
     <VCol cols="12">
-      <span class="mb-2">Quality Evaluation</span>
-      <table class="custom-table mt-2">
-        <thead>
-          <tr>
-            <th colspan="3">
+      <VRow>
+        <VCol class="px-0" style="font-size: 12px;" cols="12">Quality Evaluation</VCol>
+        <VCol
+          style="border: 1px solid black;"
+          cols="4"
+          class="d-flex align-center"
+        >
+          <VRow>
+            <VCol
+              cols="1"
+              class="d-flex align-center"
+              style="font-size: 12px; font-weight: bolder;"
+            >
               Accept
-            </th>
-            <th colspan="3">
+            </VCol>
+            <VCol
+              class="d-flex justify-center"
+              cols="10"
+            >
+              <VIcon
+                v-if="statusId === 17 || statusId === 15"
+                color="success"
+                size="60"
+                icon="ri-checkbox-circle-fill"
+              />
+            </VCol>
+          </VRow>
+        </VCol>
+        <VCol
+          style="border: 1px solid black;"
+          cols="4"
+          class="d-flex align-center"
+        >
+          <VRow>
+            <VCol
+              cols="1"
+              class="d-flex align-center"
+              style="font-size: 12px; font-weight: bolder;"
+            >
               Reject
-            </th>
-            <th colspan="6">
-              Comment
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="3">
-              <div class="d-flex justify-center">
-                <VIcon
-                  v-if="statusId === 17 || statusId === 15"
-                  color="success"
-                  size="60"
-                  icon="ri-checkbox-circle-fill"
-                />
-              </div>
-            </td>
-            <td colspan="3">
-              <div class="d-flex justify-center">
-                <VIcon
-                  v-if="statusId === 7 || statusId === 16"
-                  color="red"
-                  size="60"
-                  icon="ri-close-circle-fill"
-                />
-              </div>
-            </td>
-            <td colspan="6">
-              <span v-if="statusId === 7 || statusId === 16">Comments Rejected because of the following error</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </VCol>
+            <VCol
+              class="d-flex justify-center"
+              cols="11"
+            >
+              <VIcon
+                v-if="statusId === 7 || statusId === 16"
+                color="red"
+                size="60"
+                icon="ri-close-circle-fill"
+              />
+            </VCol>
+          </VRow>
+        </VCol>
+        <VCol
+          style="border: 1px solid black;"
+          cols="4"
+          class="d-flex align-center"
+        >
+          <span style="font-size: 12px; font-weight: bolder;">Comment:</span>	&nbsp;	&nbsp;
+          <span v-if="statusId === 7 || statusId === 16">{{ headerInsp.remarkReject }}</span>
+        </VCol>
+      </VRow>
     </VCol>
   </VRow>
   
@@ -1280,6 +1343,7 @@ const saveDraftData = word => {
                 <VFileInput
                   v-model="fileCoaNew"
                   label="File Upload COA"
+                  accept="image/png, image/jpeg, image/bmp, application/pdf"
                   placeholder="Upload your documents"
                   multiple
                   prepend-icon="mdi-paperclip"
@@ -1319,14 +1383,27 @@ const saveDraftData = word => {
                     </VChip>
                   </VCardTitle>
                   <VCardText>
-                    <VImg
-                      role="presentation"
-                      :alt="file.name"
-                      :src="getFileUrl(file)"
-                      height="150"
-                      contain
-                      @click="showDialogImageMutiNew(getFileUrl(file), file.name)"
-                    />
+                    <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
+                    <template v-if="file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/bmp'">
+                      <VImg
+                        role="presentation"
+                        :alt="file.name"
+                        :src="getFileUrl(file)"
+                        height="150"
+                        contain
+                        @click="showDialogImageMuti(getFileUrl(file), file.name)"
+                      />
+                    </template>
+
+                    <!-- ตรวจสอบว่าถ้าเป็น PDF -->
+                    <template v-else-if="file.type === 'application/pdf'">
+                      <iframe
+                        :src="getFileUrl(file)"
+                        width="100%"
+                        height="150"
+                        style="border: none;"
+                      />
+                    </template>
                     <div class="d-flex flex-column align-center">
                       <span>{{ file.name }}</span>
                     </div>
@@ -1356,14 +1433,27 @@ const saveDraftData = word => {
               >
                 <VCard>
                   <VCardText>
-                    <VImg
-                      role="presentation"
-                      :alt="file.fileName"
-                      :src="file.fileUri"
-                      height="150"
-                      contain
-                      @click="showDialogImageMuti(file.fileUri, file.fileName )"
-                    />
+                    <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
+                    <template v-if="file.contentType === 'image/png' || file.contentType === 'image/jpeg' || file.contentType === 'image/bmp'">
+                      <VImg
+                        role="presentation"
+                        :alt="file.name"
+                        :src="file.fileUri"
+                        height="150"
+                        contain
+                        @click="showDialogImageMuti(file.fileUri, file.name)"
+                      />
+                    </template>
+
+                    <!-- ตรวจสอบว่าถ้าเป็น PDF -->
+                    <template v-else-if="file.contentType === 'application/pdf'">
+                      <iframe
+                        :src="'https://docs.google.com/viewer?url=' + file.fileUri + '&embedded=true'"
+                        width="100%"
+                        height="150"
+                        style="border: none;"
+                      />
+                    </template>
                     <div class="d-flex flex-column align-center">
                       <span>{{ file.fileName }}</span>
                     </div>
@@ -1813,7 +1903,10 @@ const saveDraftData = word => {
         </VRow>
       </VBtn>
 
-      <VBtn @click="handleSaveDraftCoa">
+      <VBtn
+        v-if="false"
+        @click="handleSaveDraftCoa"
+      >
         Save Coa
       </VBtn>
     </VCol>

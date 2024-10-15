@@ -319,8 +319,38 @@ export const useGetCOAPackagingFormController = () => {
   }
 }
 
+export const useGetCOAFilePackagingFormController = () => {
+  const getFileCoa = ref(null)
+  const errorMessageFileCoa = ref(null)
+
+  const fetchFileCoaHeader = async (fileName, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageFileCoa.value = null
+      console.log('++++Fetching Packaging Form File COA...')
+
+      const result = await GetCOAService.GetFileCOAPackagingForm(fileName, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result?.success) {
+        console.log('Fetched data file COA Controller:', result)
+        getFileCoa.value = { data: result, success: true }
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in getFileCoa:', error)
+      errorMessageFileCoa.value = error.message
+    }
+  }
+
+  return {
+    getFileCoa,
+    errorMessageFileCoa,
+    fetchFileCoaHeader,
+  }
+}
+
 export const useDeleteCoaFormController = () => {
-  const packagingFormGenerate = ref(null)
+  const resultDeleteByIdCoa = ref(null)
   const errorMessageDeleteCoa = ref(null)
 
   const deleteCoaForm = async (body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
@@ -330,9 +360,9 @@ export const useDeleteCoaFormController = () => {
 
       const result = await SaveCOAService.deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
-      if (result) {
+      if (result?.success) {
         console.log('delete coa Controller:', result)
-        packagingFormGenerate.value = result
+        resultDeleteByIdCoa.value = { data: result, success: true }
       } else {
         console.warn('No data returned from the API')
       }
@@ -343,7 +373,7 @@ export const useDeleteCoaFormController = () => {
   }
 
   return {
-    packagingFormGenerate,
+    resultDeleteByIdCoa,
     errorMessageDeleteCoa,
     deleteCoaForm,
   }
@@ -360,9 +390,9 @@ export const useDeleteAllCoaFormController = () => {
 
       const result = await SaveCOAService.deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
-      if (result) {
+      if (result?.success) {
         console.log('delete all coa Controller:', result)
-        resultDeleteAllCoa.value = result
+        resultDeleteAllCoa.value = { data: result, success: true }
       } else {
         console.warn('No data returned from the API')
       }

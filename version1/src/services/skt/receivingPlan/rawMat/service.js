@@ -26,6 +26,30 @@ export const coaService = {
     }
   },
 
+  async GetFileCOAForm(fileName, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/getfile?fileName=${fileName}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data file COA:', response.data)
+        
+        return { success: true, data: response.data }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in GetCOAPackagingForm:', error)
+      error = new Error(`Failed to file coa for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
+    }
+  },
+
   async saveDraftCOAForm(files, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
     const formData = new FormData()
   

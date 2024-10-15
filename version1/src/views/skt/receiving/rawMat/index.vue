@@ -822,13 +822,13 @@ const { resultDeleteAllCoa, errorMessageDeleteAllCoa, deleteAllCoaForm } = useDe
 //--- save draf
 const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const handleSaveDraftCoa = async () => {
-  // if (fileCoaNew.value.length === 0) {
-  //   alert('Please upload at least one file')
+  if (!fileCoaNew.value.length > 0 && !getCoaForm.value.length > 0) {
+    alert('Please upload at least one file')
     
-  //   return
-  // }
-
+    throw 'Failed to save coa. Plase Upload COA ones.'
+  }
   if(deleteAllStart.value === true){
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success) {
@@ -863,6 +863,9 @@ const handleSaveDraftCoa = async () => {
       console.error('Failed to save coa')
       throw 'Failed to delete coa by id'
     }
+  }
+  if(getCoaForm.value.length > 0){
+    return getCoaForm.value
   }
   else {
     throw 'Failed to handleSaveDraftCoa'
@@ -1141,7 +1144,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  location.reload()
+  // location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -1721,7 +1724,7 @@ const getDisabledFollowStatusNRole = () => {
             {{ formatDate(purchaseOrder.receivedDate) }}
           </td>
           <th
-            class=""
+            class="text-center"
             colspan="2"
           >
             SKT LOT No.
@@ -2272,7 +2275,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_1"
                 :readonly="readonlyAllInput()"
                 :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
@@ -2299,7 +2302,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_2"
                 :readonly="readonlyAllInput()"
                 :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
@@ -2326,7 +2329,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_3"
                 :readonly="readonlyAllInput()"
                 :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
@@ -2352,7 +2355,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_4"
                 :readonly="readonlyAllInput()"
                 :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
@@ -2378,7 +2381,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualAmountUnits_5"
                 :readonly="readonlyAllInput()"
                 :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
                   v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                 ]"
                 density="compact"
@@ -2967,7 +2970,7 @@ const getDisabledFollowStatusNRole = () => {
               <VCol cols="12">
                 <VFileInput
                   v-model="fileCoaNew"
-                  accept="image/png, image/jpeg, image/bmp"
+                  accept="image/png, image/jpeg, image/bmp, application/pdf"
                   prepend-icon="mdi-paperclip"
                   multiple
                   color="black"
@@ -3043,7 +3046,10 @@ const getDisabledFollowStatusNRole = () => {
                       />
                     </template>
 
-                    <div class="d-flex flex-column align-center">
+                    <div
+                      v-if="false"
+                      class="d-flex flex-column align-center"
+                    >
                       <span>{{ file.name }}</span>
                     </div>
                   </VCardText>
@@ -3076,15 +3082,31 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <VCard>
                   <VCardText>
-                    <VImg
-                      role="presentation"
-                      :alt="file.coAFileName"
-                      :src="file.fileUri"
-                      height="150"
-                      contain
-                      @click="showDialogImageMuti(file.fileUri, file.fileName)"
-                    />
-                    <div class="d-flex flex-column align-center">
+                    <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
+                    <template v-if="file.contentType === 'image/png' || file.contentType === 'image/jpeg' || file.contentType === 'image/bmp'">
+                      <VImg
+                        role="presentation"
+                        :alt="file.name"
+                        :src="file.fileUri"
+                        height="150"
+                        contain
+                        @click="showDialogImageMuti(file.fileUri, file.name)"
+                      />
+                    </template>
+
+                    <!-- ตรวจสอบว่าถ้าเป็น PDF -->
+                    <template v-else-if="file.contentType === 'application/pdf'">
+                      <iframe
+                        :src="'https://docs.google.com/viewer?url=' + file.fileUri + '&embedded=true'"
+                        width="100%"
+                        height="150"
+                        style="border: none;"
+                      />
+                    </template>
+                    <div
+                      v-if="false"
+                      class="d-flex flex-column align-center"
+                    >
                       <span>{{ file.fileName }}</span>
                     </div>
                   </VCardText>

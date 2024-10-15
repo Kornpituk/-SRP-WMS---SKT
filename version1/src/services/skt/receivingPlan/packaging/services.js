@@ -306,6 +306,30 @@ export const GetCOAService = {
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
   },
+
+  async GetFileCOAPackagingForm(fileName, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/Packaging/getfile?fileName=${fileName}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data file COA:', response.data)
+        
+        return { success: true, data: response.data }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.error('Error in GetCOAPackagingForm:', error)
+      error = new Error(`Failed to file coa for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
+    }
+  },
 }
 
 export const SaveCOAService = {
@@ -346,15 +370,16 @@ export const SaveCOAService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data detelete coa:', response.data.data)
+        console.log('Service Response data detelete coa:', response.data.messageResult)
         
-        return response.data.data
+        return { success: true, data: response.data.messageResult }
       } else {
         throw new Error('No data delete coa from the server')
       }
     } catch (error) {
       console.error('Error in deleteCoaForm:', error)
-      throw new Error(`Failed to delete coa for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      error = new Error(`Deleted to coa by id for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
     }
   },
 
@@ -371,15 +396,16 @@ export const SaveCOAService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data all detelete coa:', response.data.data)
+        console.log('Service Response data all detelete coa:', response.data.messageResult)
         
-        return response.data.data
+        return { success: true, data: response.data.messageResult }
       } else {
         throw new Error('No data delete all coa from the server')
       }
     } catch (error) {
       console.error('Error in deleteAllCoaForm:', error)
-      throw new Error(`Failed to delete all coa for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      error = new Error(`Deleted to coa all for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
     }
   },
 }
