@@ -577,6 +577,40 @@ const saveReceivingForm = () => {
 }
 
 //--------------- save header --------------------------------
+const textAlertError = ref({
+  mgs: '',
+  success: false,
+})
+
+const validateHeader = () => {
+  textAlertError.value.success = true
+  console.log("Start validateHeader!!++1")
+
+  let value = 'NaN'
+
+  if(purchaseOrder.value.actualMeanNetCountKgs  === value ){
+    textAlertError.value.mgs += 'Net Count Kgs failed.'
+    textAlertError.value.success = false
+  }
+
+  if(purchaseOrder.value.actualGrandAmountUnits === value){
+    textAlertError.value.mgs += 'Total Amount Units failed.'
+    textAlertError.value.success = false
+  }
+
+  if(purchaseOrder.value.actualGrandTotalQuantityKgs === value){
+    textAlertError.value.mgs += 'Total Quantity Kgs failed.'
+    textAlertError.value.success = false
+  }
+
+  console.log("End validateHeader!!++1", typeof purchaseOrder.value.actualMeanNetCountKgs, purchaseOrder.value.actualMeanNetCountKgs)
+  console.log("End validateHeader!!++1", typeof  purchaseOrder.value.actualGrandAmountUnits, purchaseOrder.value.actualGrandAmountUnits)
+  console.log("End validateHeader!!++1", typeof  purchaseOrder.value.actualGrandTotalQuantityKgs, purchaseOrder.value.actualGrandTotalQuantityKgs)
+  console.log("End validateHeader!!++1", textAlertError.value.success)
+
+  return textAlertError.value.success
+}
+
 const saveHeaderReceivingForm = async () => {
   const body = {
     poEtlLogDetailJournalID: purchaseOrder.value.poEtlLogDetailJournalID,
@@ -586,13 +620,21 @@ const saveHeaderReceivingForm = async () => {
     invoiceNo: purchaseOrder.value.invoiceNo,
     expectDeliveryDate: purchaseOrder.value.expectDeliveryDate,
     customManufacturerName: purchaseOrder.value.customManufacturerName,
+    
     actualMeanNetCountKgs: purchaseOrder.value.actualMeanNetCountKgs,
     actualGrandAmountUnits: purchaseOrder.value.actualGrandAmountUnits,
     actualGrandTotalQuantityKgs: purchaseOrder.value.actualGrandTotalQuantityKgs,
+
     noteText: purchaseOrder.value.noteText,
     isForHalalProduct: purchaseOrder.value.isForHalalProduct,
     isForRspoProduct: purchaseOrder.value.isForRspoProduct,
     updatedBy: purchaseOrder.value.updatedBy,
+  }
+
+  const validatedHeader = ref(validateHeader())
+
+  if(!validatedHeader.value){
+    throw 'Save header Failed'+textAlertError.value.msg
   }
 
   try {
@@ -616,49 +658,205 @@ const saveHeaderReceivingForm = async () => {
 //--------------- save Lot --------------------------------
 
 const alertErrorLot = ref({
-  alertMakerLot1: null,
-  alertMakerLot2: null,
-  alertMakerLot3: null,
-  alertMakerLot4: null,
-  alertMakerLot5: null,
 
-  alertAmountLot1: null,
-  alertAmountLot2: null,
-  alertAmountLot3: null,
-  alertAmountLot4: null,
-  alertAmountLot5: null,
+  alertMakerLot1: {
+    index: 1,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot1: {
+    index: 1,
+    msg: '',
+    success: false,
+  },
+
+  alertMakerLot2: {
+    index: 2,
+    msg: '',
+    success: false,
+  },
+  alertAmountLot2: {
+    index: 2,
+    msg: '',
+    success: false,
+  },
+
+  alertMakerLot3: {
+    index: 3,
+    msg: '',
+    success: false,
+  },
+  alertAmountLot3: {
+    index: 3,
+    msg: '',
+    success: false,
+  },
+
+  alertMakerLot4: {
+    index: 4,
+    msg: '',
+    success: false,
+  },
+  alertAmountLot4: {
+    index: 4,
+    msg: '',
+    success: false,
+  },
+
+  alertMakerLot5: {
+    index: 5,
+    msg: '',
+    success: false,
+  },
+  alertAmountLot5: {
+    index: 5,
+    msg: '',
+    success: false,
+  },
 })
 
-const alertTextValidateInput = ref('')
+const alertErrorAmount = ref({
+
+  alertAmountLot1: {
+    index: 1,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot2: {
+    index: 2,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot3: {
+    index: 3,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot4: {
+    index: 4,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot5: {
+    index: 5,
+    msg: '',
+    success: false,
+  },
+})
 
 const validateLotNoInput = (actualAmountUnits, actualMakerLotNo, index) => {
-  if(actualMakerLotNo && !actualAmountUnits){
-    alertTextValidateInput.value = `Lot No.${index} is required.`
-    
-    return true
+  if(!actualMakerLotNo && actualAmountUnits){
+    return `Lot No.${index} is required.`
   }else{
-    return false
+    
+    return ''
   }
 }
 
 const validateAmountInput = (actualAmountUnits, actualMakerLotNo, index) => {
   if(actualMakerLotNo && !actualAmountUnits){
-    alertTextValidateInput.value = `Amount(Unit)${index} is required.`
-    
-    return true
+    return `Amount(Unit)${index} is required.`
   }else{
-    return false
+    return ''
   }
+}
+
+// // ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Lot No.
+// const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
+//   // if(!actualMakerLotNo){
+//   //   alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} field missing.`
+//   //   alertErrorLot.value[`alertMakerLot${i}`].success = false
+
+//   //   return true  // มีข้อผิดพลาด
+//   // }
+
+//   if(!actualMakerLotNo && !purchaseOrder.value[`actualMakerLotNo_${i+1}`]){
+//     alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} Successed.`
+//     alertErrorLot.value[`alertMakerLot${i}`].success = true
+
+//     return false
+//   }
+
+//   if(!actualMakerLotNo && purchaseOrder.value[`actualMakerLotNo_${i+1}`]){
+//     alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} field missing.`
+//     alertErrorLot.value[`alertMakerLot${i}`].success = false
+
+//     return true  // มีข้อผิดพลาด
+//   }
+  
+//   if (!actualMakerLotNo && actualAmount) {
+//     alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} field cannot be left blank. Please enter the required information without leaving any spaces.`
+//     alertErrorLot.value[`alertMakerLot${i}`].success = false
+
+//     return true  // มีข้อผิดพลาด
+//   } 
+//   else {
+//     alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} Successed.`
+//     alertErrorLot.value[`alertMakerLot${i}`].success = true
+
+//     return false
+//   }
+// }
+
+const validateMissing = l => {
+  if(l === 1 && !purchaseOrder.value[`actualMakerLotNo_${l}`]){
+    return 0
+  }
+  if(!purchaseOrder.value[`actualMakerLotNo_${l}`]){
+
+    for (let i = l+1; i <= 5; i++) {
+
+      if(purchaseOrder.value[`actualMakerLotNo_${i}`] || purchaseOrder.value[`actualAmountUnits_${i}`]){
+        return 0
+      }
+    }
+
+    if(purchaseOrder.value[`actualAmountUnits_${l}`]){
+      return 0
+    }
+    
+    return -1
+  }
+
+  return 1
 }
 
 // ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Lot No.
 const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
-  if (!actualMakerLotNo && actualAmount) {
-    alertErrorLot.value[`alertMakerLot${i}`] = `The Lot No.${i} field cannot be left blank. Please enter the required information without leaving any spaces.`
+
+  const validate = ref(validateMissing(i))
+
+  console.log("validate++++3", validate.value)
+
+  if(validate.value === 0){
+    alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot - missing.`
+    alertErrorLot.value[`alertMakerLot${i}`].success = false
+
+    return true  // มีข้อผิดพลาด
+  }
+
+  // if(!actualMakerLotNo && !purchaseOrder.value[`actualMakerLotNo_${i+1}`] ){
+  //   alertErrorLot.value[`alertMakerLot${i}`].msg = The Lot No.${i} field missing.
+  //   alertErrorLot.value[`alertMakerLot${i}`].success = false
+
+  //   return true  // มีข้อผิดพลาด
+  // }
+
+
+
+  if (validate.value === 0 && actualAmount) {
+    alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot - Field cannot be left blank. Please enter the required information without leaving any spaces.`
+    alertErrorLot.value[`alertMakerLot${i}`].success = false
 
     return true  // มีข้อผิดพลาด
   } else {
-    alertErrorLot.value[`alertMakerLot${i}`] = null
+    alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot -  Successed.`
+    alertErrorLot.value[`alertMakerLot${i}`].success = true
 
     return false
   }
@@ -667,28 +865,37 @@ const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
 // ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Amount(Unit)
 const validateAmount = (i, actualMakerLotNo, actualAmount) => {
   // เริ่มต้นข้อความแสดงข้อผิดพลาด
+
+  const validate = ref(validateMissing(i))
   let errorMessage = ''
 
-  // ตรวจสอบเงื่อนไขแรก
-  if (actualMakerLotNo && !actualAmount) {
-    errorMessage +=
-      `The Amount(Unit)${i} field cannot be left blank. Please enter the required information without leaving any spaces. `
+  if(validate.value === 0 || validate.value === 1){
+    
+    // ตรวจสอบเงื่อนไขแรก
+    if (!actualAmount) {
+      errorMessage +=
+      `- Amount(Unit) - field blank`
+    }
+
+    // ตรวจสอบเงื่อนไขที่สอง
+    else if (actualAmount < 1 && actualAmount !== null) {
+      errorMessage +=
+      `- Amount(Unit) - more than 1. `
+    }
   }
 
-  // ตรวจสอบเงื่อนไขที่สอง
-  if (actualAmount <= 0 && actualAmount !== null) {
-    errorMessage +=
-      `The Amount(Unit)${i}, Invalid input detected. Ensure the amount entered is not less than 1. `
-  }
+  // cnosole.log("errorMessage+++", errorMessage)
 
   // ถ้ามีข้อความข้อผิดพลาด
   if (errorMessage) {
-    alertErrorLot.value[`alertAmountLot${i}`] = errorMessage.trim() // ลบช่องว่างที่ไม่จำเป็น
-
+    alertErrorLot.value[`alertAmountLot${i}`].msg = errorMessage.trim() // ลบช่องว่างที่ไม่จำเป็น
+    alertErrorLot.value[`alertAmountLot${i}`].success = false
+    
     return true  // มีข้อผิดพลาด
   } else {
-    alertErrorLot.value[`alertAmountLot${i}`] = null // ไม่มีข้อผิดพลาด
-
+    alertErrorLot.value[`alertAmountLot${i}`].msg  = `- Amount(Unit) - Successed.` // ไม่มีข้อผิดพลาด
+    alertErrorLot.value[`alertAmountLot${i}`].success = true
+    
     return false // ไม่มีข้อผิดพลาด
   }
 }
@@ -1834,6 +2041,12 @@ const getDisabledFollowStatusNRole = () => {
                   />
                 </template>
               </VTextField>
+              <span
+                v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1)"
+                class="text-red"
+              >
+                {{ validateLotNoInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) }}
+              </span>
             </th>
             <th
               class="text-center"
@@ -1865,6 +2078,12 @@ const getDisabledFollowStatusNRole = () => {
                   />
                 </template>
               </VTextField>
+              <span
+                v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2)"
+                class="text-red"
+              >
+                {{ validateLotNoInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2) }}
+              </span>
             </td>
             <th
               class="text-center"
@@ -1897,6 +2116,12 @@ const getDisabledFollowStatusNRole = () => {
                   />
                 </template>
               </VTextField>
+              <span
+                v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3) !== ''"
+                class="text-red"
+              >
+                {{ validateLotNoInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3) }}
+              </span>
             </th>
             <th
               class="text-center"
@@ -1929,6 +2154,12 @@ const getDisabledFollowStatusNRole = () => {
                   />
                 </template>
               </VTextField>
+              <span
+                v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4) !== ''"
+                class="text-red"
+              >
+                {{ validateLotNoInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4) }}
+              </span>
             </th>
             <th
               class="text-center"
@@ -1961,6 +2192,12 @@ const getDisabledFollowStatusNRole = () => {
                   />
                 </template>
               </VTextField>
+              <span
+                v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5) !== ''"
+                class="text-red"
+              >
+                {{ validateLotNoInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5) }}
+              </span>
             </th>
             <th
               class="text-center"
@@ -2295,10 +2532,10 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
               <span
-                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1)"
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) !== ''"
                 class="text-red"
               >
-                {{ alertTextValidateInput }}
+                {{ validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) }}
               </span>
             </th>
 
@@ -2328,10 +2565,10 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
               <span
-                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2)"
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2) !== ''"
                 class="text-red"
               >
-                {{ alertTextValidateInput }}
+                {{ validateAmountInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2) }}
               </span>
             </th>
 
@@ -2348,7 +2585,6 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
                 density="compact"
                 style="font-size: 16px;"
-                @input="(e) => handleInputAmount(e, 'actualAmountUnits_3')"
               >
                 <template
                   v-if="hidedAllIconInput"
@@ -2361,10 +2597,10 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
               <span
-                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3)"
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3) !== ''"
                 class="text-red"
               >
-                {{ alertTextValidateInput }}
+                {{ validateAmountInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3) }}
               </span>
             </th>
             <th
@@ -2393,10 +2629,10 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
               <span
-                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4)"
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4) !== ''"
                 class="text-red"
               >
-                {{ alertTextValidateInput }}
+                {{ validateAmountInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4) }}
               </span>
             </th>
             <th
@@ -2425,10 +2661,10 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
               <span
-                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5)"
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5) !== ''"
                 class="text-red"
               >
-                {{ alertTextValidateInput }}
+                {{ validateAmountInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5) }}
               </span>
             </th>
             <td
@@ -3417,8 +3653,14 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </VRow>
           </VCardText>
+          <VCardText />
+          <!-- Header -->
+          <VCardText v-if="!textAlertError.success">
+            <span>Header Validated : <span class="text-red">{{ textAlertError.mgs }} </span></span>
+          </VCardText>
+          <!-- Lot -->
           <VCardText
-            v-if="alertErrorLot"
+            v-if="alertErrorLot && textAlertError.success"
             class="text-start"
           >
             <VDivider />
@@ -3429,26 +3671,28 @@ const getDisabledFollowStatusNRole = () => {
                 closable
               >
                 <div
-                  v-for="(value, key) in alertErrorLot"
-                  :key="key"
+                  v-for="(value, key, index) in alertErrorLot"
+                  :key="index"
                 >
                   <span
-                    v-if="value"
+                    v-if="!value.success"
                     style="font-size: 14px;"
                   >
                     <VIcon
                       color="error"
                       icon="ri-error-warning-fill"
-                    />{{ key }}: {{ value }}
+                    />Lot No.{{ value.index }} 
+                    {{ value.msg }}
                   </span>
                   <span
-                    v-if="!value"
+                    v-if="value.success"
                     style="font-size: 14px;"
                   >
                     <VIcon
                       color="success"
                       icon="ri-checkbox-circle-fill"
-                    />{{ key }} {{ value }}
+                    />Lot No.{{ value.index }}
+                    {{ value.msg }}
                   </span>
                 </div>
               </VAlert>
