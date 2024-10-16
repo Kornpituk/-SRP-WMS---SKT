@@ -2247,20 +2247,21 @@ const getDisabledFollowStatusNRole = () => {
             >
               Expect Delivery Date
             </th>
-            <th
+            <td
               class="text-center"
               colspan="2"
             >
               <AppDateTimePicker
+                v-if="!readonlyAllInput()"
                 v-model="purchaseOrder.expectDeliveryDate"
                 density="compact"
-                :readonly="!readonlyAllInput()"
                 prepend-inner-icon="ri-calendar-schedule-fill"
                 :config="{ dateFormat: 'd/m/Y' }"
                 class="custom-date-time-picker"
                 :style="{ fontSize: '12px;' }"
               />
-            </th>
+              <span v-if="readonlyAllInput()"><VIcon icon="ri-calendar-schedule-fill" />{{ purchaseOrder.expectDeliveryDate }}</span>
+            </td>
             <th
               class="text-center"
               colspan="2"
@@ -2931,8 +2932,6 @@ const getDisabledFollowStatusNRole = () => {
             <VTextarea
               v-model="purchaseOrder.noteText"
               :readonly="readonlyAllInput()"
-              clearable
-              clear-icon="ri-close-line"
               label="Enter Your Notes"
               placeholder="Text"
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
@@ -2999,6 +2998,7 @@ const getDisabledFollowStatusNRole = () => {
             <VRow>
               <VCol cols="12">
                 <VFileInput
+                  v-if="!readonlyAllInput()"
                   v-model="fileCoaNew"
                   accept="image/png, image/jpeg, image/bmp, application/pdf"
                   prepend-icon="mdi-paperclip"
@@ -3085,7 +3085,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VCardText>
                   <VCardActions>
                     <VBtn
-                      v-if="hidedAllIconInput"
+                      v-if="!readonlyAllInput()"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -3143,7 +3143,7 @@ const getDisabledFollowStatusNRole = () => {
 
                   <VCardActions>
                     <VBtn
-                      v-if="hidedAllIconInput"
+                      v-if="!readonlyAllInput()"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -3162,7 +3162,7 @@ const getDisabledFollowStatusNRole = () => {
                 cols="12"
               >
                 <VBtn
-                  v-if="hidedAllIconInput"
+                  v-if="!readonlyAllInput()"
                   color="red"
                   @click="removeFileAll"
                 >

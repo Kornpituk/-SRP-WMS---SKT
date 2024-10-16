@@ -1555,7 +1555,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[0].actualAnalysis"
                 :rules="[
                   value => value !== '' || !value || 'Actual value is required!',
-                  value => value.length <= 20 || 'Must be 20 characters or less',
+                  value => value.length <= 45 || 'Must be 45 characters or less',
                 ]"
                 density="compact"
               />
@@ -1610,7 +1610,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[1].actualAnalysis"
                 density="compact"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                  value => value.length <= 45 || 'Must be 45 characters or less'
                 ]"
               />
               <span
@@ -1662,7 +1662,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[2].actualAnalysis"
                 density="compact"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                  value => value.length <= 45 || 'Must be 45 characters or less'
                 ]"
               />
 
@@ -1714,7 +1714,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[3].actualAnalysis"
                 density="compact"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                  value => value.length <= 45 || 'Must be 45 characters or less'
                 ]"
               />
 
@@ -1766,7 +1766,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[4].actualAnalysis"
                 density="compact"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                  value => value.length <= 45 || 'Must be 45 characters or less'
                 ]"
               />
 
