@@ -631,8 +631,6 @@ const alertErrorLot = ref({
 
 const alertTextValidateInput = ref('')
 
-
-
 const validateLotNoInput = (actualAmountUnits, actualMakerLotNo, index) => {
   if(actualMakerLotNo && !actualAmountUnits){
     alertTextValidateInput.value = `Lot No.${index} is required.`

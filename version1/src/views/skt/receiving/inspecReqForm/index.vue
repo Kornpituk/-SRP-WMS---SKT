@@ -80,6 +80,13 @@ const analysistInsp = ref({
 
 })
 
+import { useGetCOAFormController } from '@/utilities/utilities'
+
+//--------------------------- convert----------------------------
+const { covertValue, errorMessageGetCoa, formatNumber } = useGetCOAFormController()
+
+
+
 //--------------------------- API --------------------------------
 
 //-------------- Generate---------------------------------------
@@ -1395,7 +1402,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span>{{ formatNumberToLocal(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
+              <span>{{ formatNumber(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
             </td>
           </tr>
 
@@ -1417,7 +1424,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_0) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_0) }}</span>
             </td>
             <td
               
@@ -1425,7 +1432,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_1) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_1) }}</span>
             </td>
             <td
               
@@ -1433,7 +1440,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_2) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_2) }}</span>
             </td>
             <td
              
@@ -1441,7 +1448,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_3) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_3) }}</span>
             </td>
             <td 
               
@@ -1449,7 +1456,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_4) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_4) }}</span>
             </td>
           </tr>
 
