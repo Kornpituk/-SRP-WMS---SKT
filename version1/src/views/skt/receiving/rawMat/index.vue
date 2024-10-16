@@ -580,6 +580,9 @@ const saveReceivingForm = () => {
 const textAlertError = ref({
   mgs: '',
   success: false,
+
+  note: '',
+  coa: '',
 })
 
 const validateHeader = () => {
@@ -602,11 +605,6 @@ const validateHeader = () => {
     textAlertError.value.mgs += 'Total Quantity Kgs failed.'
     textAlertError.value.success = false
   }
-
-  console.log("End validateHeader!!++1", typeof purchaseOrder.value.actualMeanNetCountKgs, purchaseOrder.value.actualMeanNetCountKgs)
-  console.log("End validateHeader!!++1", typeof  purchaseOrder.value.actualGrandAmountUnits, purchaseOrder.value.actualGrandAmountUnits)
-  console.log("End validateHeader!!++1", typeof  purchaseOrder.value.actualGrandTotalQuantityKgs, purchaseOrder.value.actualGrandTotalQuantityKgs)
-  console.log("End validateHeader!!++1", textAlertError.value.success)
 
   return textAlertError.value.success
 }
@@ -635,6 +633,12 @@ const saveHeaderReceivingForm = async () => {
 
   if(!validatedHeader.value){
     throw 'Save header Failed'+textAlertError.value.msg
+  }
+
+  if(!purchaseOrder.value.noteText){
+    textAlertError.value.success = false
+    textAlertError.value.note = "Request Note"
+    throw 'Save header Failed. request note.'
   }
 
   try {
@@ -765,43 +769,6 @@ const validateAmountInput = (actualAmountUnits, actualMakerLotNo, index) => {
     return ''
   }
 }
-
-// // ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Lot No.
-// const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
-//   // if(!actualMakerLotNo){
-//   //   alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} field missing.`
-//   //   alertErrorLot.value[`alertMakerLot${i}`].success = false
-
-//   //   return true  // มีข้อผิดพลาด
-//   // }
-
-//   if(!actualMakerLotNo && !purchaseOrder.value[`actualMakerLotNo_${i+1}`]){
-//     alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} Successed.`
-//     alertErrorLot.value[`alertMakerLot${i}`].success = true
-
-//     return false
-//   }
-
-//   if(!actualMakerLotNo && purchaseOrder.value[`actualMakerLotNo_${i+1}`]){
-//     alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} field missing.`
-//     alertErrorLot.value[`alertMakerLot${i}`].success = false
-
-//     return true  // มีข้อผิดพลาด
-//   }
-  
-//   if (!actualMakerLotNo && actualAmount) {
-//     alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} field cannot be left blank. Please enter the required information without leaving any spaces.`
-//     alertErrorLot.value[`alertMakerLot${i}`].success = false
-
-//     return true  // มีข้อผิดพลาด
-//   } 
-//   else {
-//     alertErrorLot.value[`alertMakerLot${i}`].msg = `The Lot No.${i} Successed.`
-//     alertErrorLot.value[`alertMakerLot${i}`].success = true
-
-//     return false
-//   }
-// }
 
 const validateMissing = l => {
   if(l === 1 && !purchaseOrder.value[`actualMakerLotNo_${l}`]){
@@ -1034,9 +1001,11 @@ const handleSaveDraftCoa = async () => {
   const result = ref(1)
 
   if (!fileCoaNew.value.length > 0 && !getCoaForm.value.length > 0) {
-    alert('Please upload at least one file')
+    // alert('Please upload at least one file')
     result.value -=1
-    throw 'Failed to save coa. Plase Upload COA ones.'
+    textAlertError.value.success = false
+    textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+    throw 'Failed To Save COA. Plase Upload COA Ones.'
   }
   if(deleteAllStart.value === true){
     console.log("Delete All Start++++")
@@ -1361,7 +1330,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  // location.reload()
+  location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -1524,6 +1493,7 @@ watchEffect(() => {
 
 // ฟังก์ชันสำหรับคำนวณค่า total
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const calculationPONew = () => {
   if (purchaseOrder.value) {
 
@@ -1549,11 +1519,11 @@ const calculationPONew = () => {
 
 
     //------------------- Total Qty By Columns ----------------
-    const totlaQty_1 = (purchaseOrder.value.actualNetCountKgs_1) * (purchaseOrder.value.actualAmountUnits_1)
-    const totlaQty_2 = (purchaseOrder.value.actualNetCountKgs_2) * (purchaseOrder.value.actualAmountUnits_2)
-    const totlaQty_3 = (purchaseOrder.value.actualNetCountKgs_3) * (purchaseOrder.value.actualAmountUnits_3)
-    const totlaQty_4 = (purchaseOrder.value.actualNetCountKgs_4) * (purchaseOrder.value.actualAmountUnits_4)
-    const totlaQty_5 = (purchaseOrder.value.actualNetCountKgs_5) * (purchaseOrder.value.actualAmountUnits_5)
+    const totlaQty_1 = (purchaseOrder.value.actualNetCountKgs_1) * (purchaseOrder.value.actualAmountUnits_1) || 0.00
+    const totlaQty_2 = (purchaseOrder.value.actualNetCountKgs_2) * (purchaseOrder.value.actualAmountUnits_2) || 0.00
+    const totlaQty_3 = (purchaseOrder.value.actualNetCountKgs_3) * (purchaseOrder.value.actualAmountUnits_3) || 0.00
+    const totlaQty_4 = (purchaseOrder.value.actualNetCountKgs_4) * (purchaseOrder.value.actualAmountUnits_4) || 0.00
+    const totlaQty_5 = (purchaseOrder.value.actualNetCountKgs_5) * (purchaseOrder.value.actualAmountUnits_5) || 0.00
 
     purchaseOrder.value.actualTotalQuantityKgs_1 = parseFloat(totlaQty_1).toFixed(2)
     purchaseOrder.value.actualTotalQuantityKgs_2 = parseFloat(totlaQty_2).toFixed(2)
@@ -1563,8 +1533,8 @@ const calculationPONew = () => {
 
     //---------------------- Total all
     purchaseOrder.value.actualMeanNetCountKgs = covertFloatFixedTwo(purchaseOrder.value.actualNetCountKgs_1) || 0
-    purchaseOrder.value.actualGrandAmountUnits = covertToInteger(totalAmount)
-    purchaseOrder.value.actualGrandTotalQuantityKgs = covertFloatFixedTwo(totlaQty_1 + totlaQty_2 + totlaQty_3 + totlaQty_4 + totlaQty_5)
+    purchaseOrder.value.actualGrandAmountUnits = covertToInteger(totalAmount) || 0.00
+    purchaseOrder.value.actualGrandTotalQuantityKgs = covertFloatFixedTwo(totlaQty_1 + totlaQty_2 + totlaQty_3 + totlaQty_4 + totlaQty_5) || 0.00
   }
 }
 
@@ -1616,22 +1586,21 @@ const handleInputNetCount = (e, actualNetCountKgs) => {
 const handleInputAmount = (e, AmountUnits) => {
   let value = e.target.value
 
+  // ตรวจสอบว่าเป็นตัวเลขจำนวนเต็มเท่านั้น (ไม่รวมทศนิยม)
+  const regex = /^[0-9]*$/
+
+  // หากไม่ตรงกับเงื่อนไขของ regex จะคืนค่าสุดท้ายที่ถูกต้อง
+  if (!regex.test(value)) {
+    value = value.replace(/\D/g, '') // ลบตัวอักษรที่ไม่ใช่ตัวเลขออก
+  }
+
   // จำกัดจำนวนหลักรวมไม่เกิน 8 หลัก
-  if (value.replace('.', '').length > 8) {
+  if (value.length > 8) {
     value = value.slice(0, 8) // ตัดค่าที่เกินออก
   }
 
-  // ตรวจสอบว่าเป็นตัวเลขที่มีทศนิยม 2 ตำแหน่ง
-  if (value && value.includes('.')) {
-    const [intPart, decimalPart] = value.split('.')
-    if (decimalPart.length > 2) {
-      purchaseOrder.value[AmountUnits] = `${intPart}`
-    } else {
-      purchaseOrder.value[AmountUnits] = value
-    }
-  } else {
-    purchaseOrder.value[AmountUnits] = value
-  }
+  // อัปเดตค่าใน purchaseOrder
+  purchaseOrder.value[AmountUnits] = value
 }
 
 // watchEffect จะเรียกใช้ calculateTotals ทุกครั้งที่ข้อมูลใน dataRaeMatRequest เปลี่ยนแปลง
@@ -2585,6 +2554,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
                 density="compact"
                 style="font-size: 16px;"
+                @input="(e) => handleInputAmount(e, 'actualAmountUnits_3')"
               >
                 <template
                   v-if="hidedAllIconInput"
@@ -3170,8 +3140,14 @@ const getDisabledFollowStatusNRole = () => {
               :readonly="readonlyAllInput()"
               label="Enter Your Notes"
               placeholder="Text"
-              :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
+              :rules="[
+                v => v.length <= 1000 || 'Max 1000 characters',
+              ]"
             />
+            <span
+              v-if="textAlertError.note && !purchaseOrder.noteText"
+              class="text-red"
+            >{{ textAlertError.note }}</span>
           </th>
         </tr>
       </Table>
@@ -3250,7 +3226,7 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </VRow>
 
-            <VBtn @click="testCoaNew">
+            <VBtn v-if="false" @click="testCoaNew">
               TestNew
             </VBtn>
 
@@ -3407,6 +3383,8 @@ const getDisabledFollowStatusNRole = () => {
                 </VBtn>
               </VCol>
             </div>
+
+            <span class="text-red" v-if="textAlertError.coa || !getCoaForm">!{{ textAlertError.coa }}</span>
           </th>
         </tr>
       </Table>
@@ -3544,6 +3522,7 @@ const getDisabledFollowStatusNRole = () => {
 
     <!-- Dialog Step Save Draft -->
     <section style="font-size: 12px;">
+      n
       <VDialog
         v-model="isDialogVisibleStepSaveDraft"
         width="80%"
@@ -3655,8 +3634,16 @@ const getDisabledFollowStatusNRole = () => {
           </VCardText>
           <VCardText />
           <!-- Header -->
-          <VCardText v-if="!textAlertError.success">
-            <span>Header Validated : <span class="text-red">{{ textAlertError.mgs }} </span></span>
+          <VCardText v-if="!textAlertError.success && textAlertError.note">
+            <VAlert 
+              title="Verify The Accuracy Of The Header"
+              variant="outlined"
+              closable
+              class="text-start"
+            >
+              <span v-if="false" class="text-start">Header Validated :</span> <span class="text-red">{{ textAlertError.mgs }} </span>
+              <span class="text-start">Alert Note :</span> <span class="text-red">{{ textAlertError.note }} </span>
+            </VAlert>
           </VCardText>
           <!-- Lot -->
           <VCardText
@@ -3666,7 +3653,7 @@ const getDisabledFollowStatusNRole = () => {
             <VDivider />
             <div>
               <VAlert
-                title="Details Lot"
+                title="Verify the accuracy of the Lot"
                 variant="outlined"
                 closable
               >
@@ -3697,6 +3684,17 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
               </VAlert>
             </div>
+          </VCardText>
+          <!-- Coa -->
+          <VCardText v-if="!textAlertError.success && textAlertError.coa && !textAlertError.note">
+            <VAlert 
+              title="Verify The Accuracy Of The COA"
+              variant="outlined"
+              closable
+              class="text-start"
+            >
+              <span class="text-start">Alert COA :</span> <span class="text-red">{{ textAlertError.coa }} </span>
+            </VAlert>
           </VCardText>
         </VCard>
       </VDialog>
