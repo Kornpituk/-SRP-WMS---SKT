@@ -398,9 +398,9 @@ const emptyFields = ref([])
 const showOnlyErrors = ref(false) // ตั้งเป็น true เพื่อแสดงเฉพาะค่า error
 
 watchEffect(() => {
-  for (let i = 0; i < analysisItems.value.length; i++) {
-    console.log('Test', analysisItems.value[i])
-  }
+  // for (let i = 0; i < analysisItems.value.length; i++) {
+  //   console.log('Test', analysisItems.value[i])
+  // }
 })
 
 const checkOkState = (item, typeId, indexAnalysis) => {
@@ -1143,7 +1143,7 @@ const getDisabledFollowStatusNRole = () => {
                 <template v-if="index < limitedImages.length - 1">
                   <VCardText class="pa-1">
                     <VImg
-                      :src="'data:image/png;base64,'+image.coAFile"
+                      :src="image.fileUri"
                       aspect-ratio="1"
                     />
                   </VCardText>
@@ -1182,7 +1182,7 @@ const getDisabledFollowStatusNRole = () => {
                     <VCarouselItem
                       v-for="(image, index) in coaFiles"
                       :key="index"
-                      :src="'data:image/png;base64,'+image.coAFile"
+                      :src="image.fileUri"
                     />
                   </VCarousel>
 
@@ -1259,7 +1259,7 @@ const getDisabledFollowStatusNRole = () => {
               v-for="(item, i) in coaFiles"
               :key="item"
               :value="i"
-              :src="'data:image/png;base64,'+ item.coAFile"
+              :src="item.fileUri"
             >
               <VSheet
                 v-if="false"

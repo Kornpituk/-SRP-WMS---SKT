@@ -629,22 +629,23 @@ const alertErrorLot = ref({
   alertAmountLot5: null,
 })
 
-const alertTextValidateInput = ({
-  alertTextActualMakerLotNo: '',
-  alertTextActualMakerLotNo_1: '',
-  alertTextActualMakerLotNo_2: '',
-  alertTextActualMakerLotNo_3: '',
-  alertTextActualMakerLotNo_4: '',
-  alertTextActualMakerLotNo_5: '',
-})
+const alertTextValidateInput = ref('')
+
+
 
 const validateLotNoInput = (actualAmountUnits, actualMakerLotNo, index) => {
-  if(!actualMakerLotNo && actualAmountUnits){
-    alertTextValidateInput.value.alertTextValidateInput = `Lot No.${index} is required`
+  if(actualMakerLotNo && !actualAmountUnits){
+    alertTextValidateInput.value = `Lot No.${index} is required.`
     
     return true
-  }else if(actualMakerLotNo && !actualAmountUnits){
-    alertTextValidateInput.value.alertTextValidateInput = `Lot No.${index} is required.`
+  }else{
+    return false
+  }
+}
+
+const validateAmountInput = (actualAmountUnits, actualMakerLotNo, index) => {
+  if(actualMakerLotNo && !actualAmountUnits){
+    alertTextValidateInput.value = `Amount(Unit)${index} is required.`
     
     return true
   }else{
@@ -1866,12 +1867,6 @@ const getDisabledFollowStatusNRole = () => {
                   />
                 </template>
               </VTextField>
-              <span
-                v-if="validateLotNoInput(actualAmountUnits_2, actualMakerLotNo_2, 2)"
-                class="text-red"
-              >
-                {{ alertTextValidateInput.alertTextActualMakerLotNo }}
-              </span>
             </td>
             <th
               class="text-center"
@@ -1888,10 +1883,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_3"
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
-                :rules="!purchaseOrder.actualMakerLotNo_3 ? [
-                  value => (purchaseOrder.actualAmountUnits_3 && value === '' ) || 'Lot No.3 is required.',
+                :rules="[
                   value => value.length <= 20 || 'Must be 20 characters or less'
-                ] : []"
+                ]"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -1921,10 +1915,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_4"
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
-                :rules="!purchaseOrder.actualMakerLotNo_4 ? [
-                  value => (purchaseOrder.actualAmountUnits_4 && value === null) || 'Lot No.4 is required.',
+                :rules="[
                   value => value.length <= 20 || 'Must be 20 characters or less'
-                ] : []"
+                ]"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -1954,10 +1947,9 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.actualMakerLotNo_5"
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
-                :rules="! purchaseOrder.actualMakerLotNo_5 ?[
-                  value => (purchaseOrder.actualAmountUnits_5 && value === null) || 'Lot No.5 is required.',
+                :rules="[
                   value => value.length <= 20 || 'Must be 20 characters or less'
-                ] : []"
+                ]"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -2052,7 +2044,7 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VTextField>
 
-              {{ purchaseOrder.actualNetCountKgs_1 }}
+              {{ formatNumber(purchaseOrder.actualNetCountKgs_1) }}
             </td>
 
             <td
@@ -2099,7 +2091,7 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                 </template>
               </VTextField>
-              {{ purchaseOrder.actualNetCountKgs_2 }}
+              {{ formatNumber(purchaseOrder.actualNetCountKgs_2) }}
             </td>
 
             <td
@@ -2146,7 +2138,7 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                 </template>
               </VTextField>
-              {{ purchaseOrder.actualNetCountKgs_3 }}
+              {{ formatNumber(purchaseOrder.actualNetCountKgs_3) }}
             </td>
             <td
               class="text-center"
@@ -2192,7 +2184,7 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                 </template>
               </VTextField>
-              {{ purchaseOrder.actualNetCountKgs_4 }}
+              {{ formatNumber(purchaseOrder.actualNetCountKgs_4) }}
             </td>
             <td
               colspan="2"
@@ -2239,7 +2231,7 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;" />
                 </template>
               </VTextField>
-              {{ purchaseOrder.actualNetCountKgs_5 }}
+              {{ formatNumber(purchaseOrder.actualNetCountKgs_5) }}
             </td>
             <td
               class="text-center"
@@ -2303,6 +2295,12 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
                 </template>
               </VTextField>
+              <span
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1)"
+                class="text-red"
+              >
+                {{ alertTextValidateInput }}
+              </span>
             </th>
 
             <th
@@ -2330,6 +2328,12 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
                 </template>
               </VTextField>
+              <span
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2)"
+                class="text-red"
+              >
+                {{ alertTextValidateInput }}
+              </span>
             </th>
 
             <th
@@ -2357,6 +2361,12 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
                 </template>
               </VTextField>
+              <span
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3)"
+                class="text-red"
+              >
+                {{ alertTextValidateInput }}
+              </span>
             </th>
             <th
               class="text-center"
@@ -2383,6 +2393,12 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
                 </template>
               </VTextField>
+              <span
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4)"
+                class="text-red"
+              >
+                {{ alertTextValidateInput }}
+              </span>
             </th>
             <th
               class="text-center"
@@ -2409,6 +2425,12 @@ const getDisabledFollowStatusNRole = () => {
                   <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
                 </template>
               </VTextField>
+              <span
+                v-if="validateAmountInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5)"
+                class="text-red"
+              >
+                {{ alertTextValidateInput }}
+              </span>
             </th>
             <td
               class="text-center"
@@ -2965,7 +2987,6 @@ const getDisabledFollowStatusNRole = () => {
       </Table>
     </VCol>
 
-    
     <!-- COA -->
     <VCol cols="12">
       <div
