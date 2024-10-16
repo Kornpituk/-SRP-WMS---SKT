@@ -824,18 +824,24 @@ const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormC
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const handleSaveDraftCoa = async () => {
+
+  const result = ref(1)
+
   if (!fileCoaNew.value.length > 0 && !getCoaForm.value.length > 0) {
     alert('Please upload at least one file')
-    
+    result.value -=1
     throw 'Failed to save coa. Plase Upload COA ones.'
   }
   if(deleteAllStart.value === true){
+    console.log("Delete All Start++++")
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success) {
       console.log('Delete all coa  successful', resultDeleteAllCoa.value.success)
+      result.value += 1
       
-      return resultDeleteAllCoa
+      
     } else {
+      result.value -=1
       console.error('Failed to delete all coa')
       throw 'Failed to save coa'
     }
@@ -845,9 +851,11 @@ const handleSaveDraftCoa = async () => {
     await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (saveCoaForm) {
       console.log('Save coa  successful', saveCoaForm.value.success)
+      result.value += 1
       
-      return saveCoaForm
+      // return saveCoaForm
     } else {
+      result.value -=1
       console.error('Failed to save coa')
       throw 'Failed to save coa'
     }
@@ -857,21 +865,24 @@ const handleSaveDraftCoa = async () => {
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteByIdCoa.value.success === true) {
       console.log('Delete coa by id successful', resultDeleteByIdCoa.value.success)
+      result.value += 1
       
-      return resultDeleteByIdCoa
+      // return resultDeleteByIdCoa
     } else {
+      result.value -=1
       console.error('Failed to save coa')
       throw 'Failed to delete coa by id'
     }
   }
   if(getCoaForm.value.length > 0){
-    return getCoaForm.value
+    result.value += 1
   }
-  else {
+  if(result.value <= 0) {
     throw 'Failed to handleSaveDraftCoa'
   }
-
+  console.log("Result COA", result.value)
   
+  return result
 }
 
 // ฟังก์ชันเพื่อแปลง Base64 กลับเป็นไฟล์
