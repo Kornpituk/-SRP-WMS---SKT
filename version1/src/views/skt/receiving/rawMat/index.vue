@@ -451,7 +451,7 @@ const getLotReceivingForm = () => {
 import { useGetCOAFormController, 
   useDeleteCoaFormController, 
   useDeleteAllCoaFormController, 
-  useSaveCOAFormController } from '@/controllers/skt/receivingFrom/rawMat/controller'
+  useSaveCOAFormController } from '@/services/skt/receivingFrom/rawMat/controller'
 
 const coaFiles = ref([])
 

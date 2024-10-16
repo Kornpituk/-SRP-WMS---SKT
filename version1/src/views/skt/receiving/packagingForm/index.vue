@@ -359,7 +359,7 @@ import { handleFilesOMvc,
   getMockData, saveMockData, 
   saveMockHeaderData, getPropsData,
   getRouteData, submitData,
-} from '@/controllers/skt/receivingFrom/packaging/controller'
+} from '@/services/skt/receivingFrom/packaging/controller'
 
 import { modelHeader } from '@/model/skt/receivingPlan/packaging/lotDataModel'
 
@@ -371,7 +371,7 @@ import { useReceivingFormController,
   handleSaveDraft, handleSaveDraftLot,
   useSaveCOAFormController, useDeleteCoaFormController,
   useDeleteAllCoaFormController, useGetCOAFilePackagingFormController,
-} from '@/controllers/skt/receivingFrom/packaging/controller'
+} from '@/services/skt/receivingFrom/packaging/controller'
 
 const dataHeader = ref({
   rmInspectionRequestFormJournalId: null,

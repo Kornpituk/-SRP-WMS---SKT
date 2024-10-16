@@ -1,4 +1,4 @@
-import { coaService } from '@/services/skt/receivingPlan/rawMat/service'
+import { coaService } from '@/repository/skt/receivingPlan/rawMat/service'
 
 
 export const useGetCOAFormController = () => {

@@ -1,4 +1,4 @@
-import { uploadFiles, fetchMockData, saveMockDataToAPI, parseData  } from '@/services/skt/receivingPlan/packaging/services'
+import { uploadFiles, fetchMockData, saveMockDataToAPI, parseData  } from '@/repository/skt/receivingPlan/packaging/services'
 
 import { FileModel, dataHeaderModel } from '@/model/skt/receivingPlan/packaging/model'
 
@@ -85,7 +85,7 @@ import { ReceivingFormService,
   GetCOAService, PackagingFormService, 
   saveDraftPackagingFormHeader, saveDraftLotItemsBatch,
   SaveCOAService,
-} from '@/services/skt/receivingPlan/packaging/services'
+} from '@/repository/skt/receivingPlan/packaging/services'
 
 //----- Generate ----------------------------
 export const useGeneratePackagingFormController = () => {
