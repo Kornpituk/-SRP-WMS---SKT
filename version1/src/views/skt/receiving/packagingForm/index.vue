@@ -423,29 +423,6 @@ const { packagingFormHeader, errorMessage, fetchPackagingFormHeader } = useRecei
 fetchPackagingFormHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
 //----- POST
-// const { packagingFormSaveHeader, errorSaveDraftMessage, saveDraftPackagingFormHeader } = usePackagingSaveHeaderFormController()
-
-// saveDraftPackagingFormHeader(dataHeader.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
-
-// const handleSaveDraft = async () => {
-
-//   const body = {
-//     limConditionDetail: dataHeader.value.limConditionDetail,
-//     note: dataHeader.value.note,
-//     coAChecked: dataHeader.value.coAChecked,
-//     actualCheck: dataHeader.value.actualCheck,
-//   }
-
-//   const result = await saveDraftPackagingFormHeader(body, urlApi.value, whereHouse.value, accessTokenAtStore)
-
-//   if (result.success) {
-//     // แสดง dialog เมื่อสำเร็จ
-//     isDialogSubmitSuccessVisible.value = true
-//   } else {
-//     // แสดง dialog เมื่อมีข้อผิดพลาด
-//     isDialogSubmitFailedVisible.value = true
-//   }
-// }
 
 const saveHeaderPackaging = async () => {
   try {
@@ -473,7 +450,6 @@ const saveHeaderPackaging = async () => {
   }
 }
 
-
 const saveDraftHeader = async () => {
   const result = await handleSaveDraft(poEtlLogDetailJournalIDQueryParameters.value, dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
@@ -485,7 +461,6 @@ const saveDraftHeader = async () => {
     console.error('Failed to save header details')
   }
 }
-
 
 //---- lot --------------------------------
 const dataLot = ref({
@@ -645,7 +620,6 @@ const testCoaODelete = () => {
   console.log('Test Coa', coaIdForDelete.value)
 }
 
-
 // ฟังก์ชันสำหรับลบไฟล์และปล่อย URL
 const removeFileN = index => {
   const file = fileCoaNew.value[index]
@@ -694,22 +668,28 @@ const { resultDeleteAllCoa, errorMessageDeleteAllCoa, deleteAllCoaForm } = useDe
 //--- save draf
 const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
 
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const handleSaveDraftCoa = async () => {
-  // if (fileCoaNew.value.length === 0) {
-  //   alert('Please upload at least one file')
-    
-  //   return
-  // }
+  const result = ref(1)
+
+  if (!fileCoaNew.value.length > 0 && !getFormCoa.value.length > 0) {
+    alert('Please upload at least one file')
+    result.value -=1
+    throw 'Failed to save coa. Plase Upload COA ones.'
+  }
 
   if(deleteAllStart.value === true){
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success === true) {
       console.log('Delete coa all  successful')
-      
-      return resultDeleteAllCoa
+      result.value +=1
+
+      // return resultDeleteAllCoa
     } else {
+      result.value -=1
       console.error('Failed to delete all coa')
-      throw 'Failed to delete all coa'
+      throw 'Failed to delete all coa'  
     }
   }
   if(coaIdForDelete.value.length > 0){
@@ -717,9 +697,11 @@ const handleSaveDraftCoa = async () => {
 
     if (resultDeleteByIdCoa.value.success === true) {
       console.log('Delete coa by id  successful')
+      result.value +=1
 
-      return resultDeleteByIdCoa
+      // return resultDeleteByIdCoa
     } else {
+      result.value -=1
       console.error('Failed to delete by id coa')
       throw 'Failed to delete by id coa'
     }
@@ -730,17 +712,25 @@ const handleSaveDraftCoa = async () => {
 
     if (saveCoaForm.value.success) {
       console.log('Save coa  successful')
+      result.value +=1
 
-      return saveCoaForm
+      // return saveCoaForm
     } else {
+      result.value -=1
       console.error('Failed to save coa')
       throw 'Failed to save coa'
     }
   }
 
-  else {
+  if(getFormCoa.value.length > 0){
+    result.value += 1
+  }
+
+  if(result.value <= 0) {
     throw 'Failed to handleSaveDraftCoa'
   }
+
+  return result
 
   
 }
@@ -1264,7 +1254,13 @@ const saveDraftData = word => {
   <VRow class="mx-1">
     <VCol cols="12">
       <VRow>
-        <VCol class="px-0" style="font-size: 12px;" cols="12">Quality Evaluation</VCol>
+        <VCol
+          class="px-0"
+          style="font-size: 12px;"
+          cols="12"
+        >
+          Quality Evaluation
+        </VCol>
         <VCol
           style="border: 1px solid black;"
           cols="4"
