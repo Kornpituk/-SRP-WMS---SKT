@@ -1,22 +1,22 @@
 export const useGetCOAFormController = () => {
-  const covertValue = ref(null)
-  const errorMessageGetCoa = ref(null)
+  // const covertValue = ref(null)
+
+  // const errorMessageGetCoa = ref(null)
     
   const formatNumber = value => {
     if (value !== null && value !== undefined) {
-      covertValue.value = parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-
-      return covertValue.value
+      return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     }
   
-    covertValue.value = '0.00'
+    // covertValue.value = '0.00'
     
-    return covertValue.value
+    return 0.00
   }
     
   return {
-    covertValue,
-    errorMessageGetCoa,
+    // covertValue,
+
+    // errorMessageGetCoa,
     formatNumber,
   }
 }

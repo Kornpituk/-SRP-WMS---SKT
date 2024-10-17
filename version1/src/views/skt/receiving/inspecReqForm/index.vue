@@ -83,9 +83,11 @@ const analysistInsp = ref({
 import { useGetCOAFormController } from '@/utilities/utilities'
 
 //--------------------------- convert----------------------------
-const { covertValue, errorMessageGetCoa, formatNumber } = useGetCOAFormController()
+const { formatNumber } = useGetCOAFormController()
 
-
+const covertFloatFixedTwo = convert => {
+  return formatNumber(convert)
+}
 
 //--------------------------- API --------------------------------
 
@@ -410,26 +412,35 @@ watchEffect(() => {
   // }
 })
 
+const textAlertErrorOkState = ref('')
+
 const checkOkState = (item, typeId, indexAnalysis) => {
   // ตรวจสอบว่ามีค่าใน itemAnalyticals ก่อนที่จะเข้าถึง
   if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis) {
     const analyticalItem = item.itemAnalyticals[indexAnalysis]
     if (analyticalItem.okState != null) {
+      textAlertErrorOkState.value = 'Analysis result OK/NOT is required!'
+      
       return !item.needActualValue &&
              item.typeID === typeId &&
              analyticalItem.okState === -1
 
       // ตรวจสอบ okState เท่ากับ -1
+      
     }
   }
   
   return false
 }
 
+const textAlertErrorAnalysitItem = ref('')
+
 const checkAnalysitItem = (item, typeId, indexAnalysis) => {
   // ตรวจสอบว่ามีค่าใน itemAnalyticals ก่อนที่จะเข้าถึง
   if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis) {
     const analyticalItem = item.itemAnalyticals[indexAnalysis]
+
+    textAlertErrorAnalysitItem.value = 'Analysis result Text is required!'
     
     return item.needActualValue &&
              item.typeID === typeId &&
@@ -1402,7 +1413,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span>{{ formatNumber(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
+              <span>{{ covertFloatFixedTwo(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
             </td>
           </tr>
 
@@ -1424,7 +1435,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_0) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_0) }}</span>
             </td>
             <td
               
@@ -1432,7 +1443,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_1) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_1) }}</span>
             </td>
             <td
               
@@ -1440,7 +1451,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_2) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_2) }}</span>
             </td>
             <td
              
@@ -1448,7 +1459,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_3) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_3) }}</span>
             </td>
             <td 
               
@@ -1456,7 +1467,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="1"
               style="min-width: 160px; max-width: 160px;"
             >
-              <span><VIcon icon="ri-functions" />: {{ formatNumber(analysisItemsCode.actualTotalQuantityKgs_4) }}</span>
+              <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_4) }}</span>
             </td>
           </tr>
 
@@ -1548,7 +1559,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 0)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >{{ textAlertErrorOkState }}</span>
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
@@ -1563,7 +1574,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 0)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
 
             <td
@@ -1602,7 +1613,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 1)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >{{ textAlertErrorOkState }}</span>
 
 
               <VTextField
@@ -1616,7 +1627,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 1)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
 
             <td
@@ -1654,7 +1665,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 2)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >{{ textAlertErrorOkState }}</span>
 
 
               <VTextField
@@ -1669,7 +1680,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 2)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
 
             <td
@@ -1707,7 +1718,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 3)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >Analysis result Ok/Not is required!</span>
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
@@ -1721,7 +1732,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 3)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
 
             <td
@@ -1759,7 +1770,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 4)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >Analysis result Ok/Not is required!</span>
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
@@ -1773,7 +1784,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 4)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
           </tr>
           
@@ -1959,7 +1970,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 0)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >Analysis result Ok/Not is required!</span>
 
 
               <VTextField
@@ -1971,7 +1982,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 0)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >Analysis result Ok/Not is required!</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -2008,7 +2019,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 1)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >{{ textAlertErrorOkState }}</span>
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
@@ -2019,7 +2030,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 1)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -2056,7 +2067,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 2)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >{{ textAlertErrorOkState }}</span>
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
@@ -2067,7 +2078,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 2)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -2104,7 +2115,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 3)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >{{ textAlertErrorOkState }}</span>
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
@@ -2115,7 +2126,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 3)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
             <td
               v-if="!item.needActualValue && item.typeID === 2"
@@ -2152,7 +2163,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 4)"
                 class="text-red"
-              >Analysis result Not/ON is required!</span>
+              >{{ textAlertErrorOkState }}</span>
 
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
@@ -2167,7 +2178,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 4)"
                 class="text-red"
-              >Actual value Text is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
           </tr>
 
@@ -2247,7 +2258,13 @@ const getDisabledFollowStatusNRole = () => {
   <!-- Quality Evaluation -->
   <section class="mt-5">
     <VRow>
-      <VCol class="px-0" style="font-size: 12px;" cols="12">Quality Evaluation</VCol>
+      <VCol
+        class="px-0"
+        style="font-size: 12px;"
+        cols="12"
+      >
+        Quality Evaluation
+      </VCol>
       <VCol
         style="border: 1px solid black;"
         cols="4"
@@ -2279,7 +2296,7 @@ const getDisabledFollowStatusNRole = () => {
         cols="4"
         class="d-flex align-center"
       >
-        <VRow >
+        <VRow>
           <VCol
             cols="1"
             class="d-flex align-center"

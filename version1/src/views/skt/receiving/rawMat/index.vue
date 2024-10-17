@@ -635,11 +635,11 @@ const saveHeaderReceivingForm = async () => {
     throw 'Save header Failed'+textAlertError.value.msg
   }
 
-  if(!purchaseOrder.value.noteText){
-    textAlertError.value.success = false
-    textAlertError.value.note = "Request Note"
-    throw 'Save header Failed. request note.'
-  }
+  // if(!purchaseOrder.value.noteText){
+  //   textAlertError.value.success = false
+  //   textAlertError.value.note = "Request Note"
+  //   throw 'Save header Failed. request note.'
+  // }
 
   try {
     const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value.poEtlLogDetailJournalID}`, body, {
@@ -1330,7 +1330,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  location.reload()
+  // location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -3384,7 +3384,7 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </div>
 
-            <span class="text-red" v-if="textAlertError.coa || !getCoaForm">!{{ textAlertError.coa }}</span>
+            <span class="text-red" v-if="textAlertError.coa || !getCoaForm">{{ textAlertError.coa }}</span>
           </th>
         </tr>
       </Table>
@@ -3522,7 +3522,6 @@ const getDisabledFollowStatusNRole = () => {
 
     <!-- Dialog Step Save Draft -->
     <section style="font-size: 12px;">
-      n
       <VDialog
         v-model="isDialogVisibleStepSaveDraft"
         width="80%"
