@@ -995,18 +995,44 @@ const { resultDeleteAllCoa, errorMessageDeleteAllCoa, deleteAllCoaForm } = useDe
 //--- save draf
 const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
 
+const wordForSubmit = ref('Word')
+const trickerSubmit = ref(false)
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const handleSaveDraftCoa = async () => {
 
   const result = ref(1)
 
-  if (!fileCoaNew.value.length > 0 && !getCoaForm.value.length > 0) {
+  if(trickerSubmit.value){
+    console.log("Tricker Submit Start++++")
+    if (!fileCoaNew.value.length > 0 || !getCoaForm.value.length > 0) {
     // alert('Please upload at least one file')
-    result.value -=1
-    textAlertError.value.success = false
-    textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
-    throw 'Failed To Save COA. Plase Upload COA Ones.'
+      result.value -=1
+      textAlertError.value.success = false
+      textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+      throw 'Failed To Save COA. Plase Upload COA Ones.'
+    }
+
+    if(getCoaForm.value.length > 0){
+      result.value += 1
+    }
+
+    if(fileCoaNew.value.length > 0){
+      console.log("Upload Start++++")
+      await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
+      if (saveCoaForm) {
+        console.log('Save coa  successful', saveCoaForm.value.success)
+        result.value += 1
+      
+      // return saveCoaForm
+      } else {
+        result.value -=1
+        console.error('Failed to save coa')
+        throw 'Failed to save coa'
+      }
+    }
   }
+  console.log("Not Tricker Submit Start++++", trickerSubmit.value)
   if(deleteAllStart.value === true){
     console.log("Delete All Start++++")
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
@@ -1021,20 +1047,7 @@ const handleSaveDraftCoa = async () => {
       throw 'Failed to save coa'
     }
   }
-  if(fileCoaNew.value.length > 0){
-    console.log("Upload Start++++")
-    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
-    if (saveCoaForm) {
-      console.log('Save coa  successful', saveCoaForm.value.success)
-      result.value += 1
-      
-      // return saveCoaForm
-    } else {
-      result.value -=1
-      console.error('Failed to save coa')
-      throw 'Failed to save coa'
-    }
-  }
+
   if(coaIdForDelete.value.length > 0){
     console.log("delete by id Start++++")
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
@@ -1048,16 +1061,17 @@ const handleSaveDraftCoa = async () => {
       console.error('Failed to save coa')
       throw 'Failed to delete coa by id'
     }
+    
   }
-  if(getCoaForm.value.length > 0){
-    result.value += 1
-  }
+
   if(result.value <= 0) {
     throw 'Failed to handleSaveDraftCoa'
   }
   console.log("Result COA", result.value)
   
   return result
+
+  // throw 'success!'
 }
 
 // ฟังก์ชันเพื่อแปลง Base64 กลับเป็นไฟล์
@@ -1182,7 +1196,7 @@ const deleteAllCIA = () => {
 }
 
 
-const wordForSubmit = ref('Word')
+
 
 //------------- Dialog Step SaveDraf ----------------------------------------------------------------
 const iconsSteps = [
@@ -1233,8 +1247,14 @@ const loadindingSaveDatftSeccess3 = ref(false)
 
 const countErr = ref(0)
 
+const testWord = word => {
+  console.log('test word', word)
+}
+
 const submitButtonVisibleNew = async word => {
+  
   wordForSubmit.value = word
+  console.log("submit submitButtonVisibleNew1111", wordForSubmit.value, word)
   isDialogVisibleStepSaveDraft.value = true
 
   try { // Start Step 1
@@ -1341,6 +1361,8 @@ const submitButtonVisibleNew = async word => {
 const submitReceivingForm = async () => {
   try {
     // เรียก submitButtonVisibleNew() และรอให้ทำงานเสร็จ
+    trickerSubmit.value = true
+
     const isSuccess = await submitButtonVisibleNew()
 
     // ถ้า submitButtonVisibleNew() ไม่สำเร็จ (สมมติว่ามันคืนค่า false เมื่อไม่สำเร็จ)
@@ -1362,7 +1384,8 @@ const submitReceivingForm = async () => {
     })
       .then(response => {
         console.log('[products.value]!!: ', response.data)
-        location.reload()
+
+        // location.reload()
         isDialogSubmitSuccessVisible.value = true
         isDialogConfirmVisible.value = false
       })
@@ -3226,7 +3249,10 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </VRow>
 
-            <VBtn v-if="false" @click="testCoaNew">
+            <VBtn
+              v-if="false"
+              @click="testCoaNew"
+            >
               TestNew
             </VBtn>
 
@@ -3384,7 +3410,10 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </div>
 
-            <span class="text-red" v-if="textAlertError.coa || !getCoaForm">{{ textAlertError.coa }}</span>
+            <span
+              v-if="textAlertError.coa || !getCoaForm"
+              class="text-red"
+            >{{ textAlertError.coa }}</span>
           </th>
         </tr>
       </Table>
@@ -3640,7 +3669,10 @@ const getDisabledFollowStatusNRole = () => {
               closable
               class="text-start"
             >
-              <span v-if="false" class="text-start">Header Validated :</span> <span class="text-red">{{ textAlertError.mgs }} </span>
+              <span
+                v-if="false"
+                class="text-start"
+              >Header Validated :</span> <span class="text-red">{{ textAlertError.mgs }} </span>
               <span class="text-start">Alert Note :</span> <span class="text-red">{{ textAlertError.note }} </span>
             </VAlert>
           </VCardText>
