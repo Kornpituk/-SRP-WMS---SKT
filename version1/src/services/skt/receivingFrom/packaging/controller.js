@@ -117,6 +117,43 @@ export const useGeneratePackagingFormController = () => {
   }
 }
 
+export const useGeneratePackagingViewFormController = () => {
+  const packagingFormGenerateView = ref(null)
+  const errorMessageGenerateView = ref(null)
+
+  const fetchPackagingViewFormGenerate = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageGenerateView.value = null
+      console.log('Fetching Packaging Form Generate view...')
+
+      const result = await PackagingFormService.generatePackagingIdForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Packaging data Generate view Controller:', result)
+        
+        packagingFormGenerateView.value = result
+
+        return { success: true, data: result }
+      } else {
+        console.warn('No data returned from the API')
+
+        return { success: false, error: 'No data returned from the API /Packaging/View.' }
+      }
+    } catch (error) {
+      console.error('Error in fetchPackagingViewFormGenerate:', error)
+      errorMessageGenerateView.value = error.message
+
+      return { success: false, error: error.message }
+    }
+  }
+
+  return {
+    packagingFormGenerateView,
+    errorMessageGenerateView,
+    fetchPackagingViewFormGenerate,
+  }
+}
+
 export const useAcceptPackagingFormController = () => {
   const packagingFormAccept = ref(null)
   const errorMessageAccept = ref(null)
@@ -166,12 +203,19 @@ export const useRejectPackagingFormController = () => {
       if (result) {
         console.log('Packaging data Reject Controller:', result)
         packagingFormReject.value = result
+        
+        return { success: true, data: result }
       } else {
         console.warn('No data returned from the API')
+        console.error('Failed to Reject:', result)
+        
+        return { success: false, error: 'Failed to Reject.' }
       }
     } catch (error) {
       console.error('Error in rejectPackagingForm:', error)
       errorMessageReject.value = error.message
+      
+      return { success: false, error: error.message }
     }
   }
 

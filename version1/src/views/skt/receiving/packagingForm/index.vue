@@ -17,11 +17,27 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const route = useRoute()
 
+//--------------------------------------- Rule Page By Status -----------------------
+
+const frozeCheck = ref(false)
+
+const frozeCheckVif = ref(true)
+
 const data = ref(JSON.parse(route.query.Data || '[]'))
 
 if(data.value){
   console.log('Data:', data)
 }
+
+const statusId = ref('')
+
+watchEffect(() => {
+  statusId.value = data.value.statusId
+  if(statusId.value !== 10){
+    frozeCheck.value = true
+    console.log("TfrozeCheckVifT", frozeCheck.value)
+  }
+})
 
 const mockData = ref([
   { AItem: "Appearance(Dent/Clearness/Scratch)", CheckM: "By Sight", SR: "No Dent, Clearness, NoScratch", ActualC: [], A: [], B: [] },
@@ -367,7 +383,7 @@ import { modelHeader } from '@/model/skt/receivingPlan/packaging/lotDataModel'
 import { useReceivingFormController, 
   useGetLotPackagingFormController, 
   useGetCOAPackagingFormController,
-  useGeneratePackagingFormController,
+  useGeneratePackagingFormController, useGeneratePackagingViewFormController,
   handleSaveDraft, handleSaveDraftLot,
   useSaveCOAFormController, useDeleteCoaFormController,
   useDeleteAllCoaFormController, useGetCOAFilePackagingFormController,
@@ -401,8 +417,6 @@ const dataHeader = ref({
   packagingImg: null,
 })
 
-
-
 // Call API
 //------------------------------------------- Gennterate
 
@@ -410,6 +424,10 @@ watchEffect(() => {
   const { packagingFormGenerate, errorMessageGenerate, fetchPackagingFormGenerate } = useGeneratePackagingFormController()
 
   fetchPackagingFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+  const { packagingFormGenerateView, errorMessageGenerateView, fetchPackagingViewFormGenerate } = useGeneratePackagingViewFormController()
+
+  fetchPackagingViewFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 })
 
 //---- header --------------------------------
@@ -605,7 +623,20 @@ const handleRejectPackaging = () => {
     textAlertError.value.comment = 'Please provide a comment to reject the packaging.'
     throw 'Please provide a comment to reject the packaging'
   }else{
-    rejectPackagingForm(commentReject.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
+    const result = rejectPackagingForm(commentReject.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
+
+    if (result.success) {
+      console.log('Save lot details successful')
+      alertLotErrorMessage.value.success = false
+      isDialogRejectVisible.value = false
+    } else {
+      console.error('Failed to save lot details')
+      throw 'Failed to save lot details.'
+    }
+
+    // alertLotErrorMessage.value.success = false
+  
+    return true
   }
 
   return true
@@ -830,6 +861,21 @@ const handleSaveDraftCoa = async () => {
       result.value -=1
       console.error('Failed to delete by id coa')
       throw 'Failed to delete by id coa'
+    }
+  }
+
+  if(fileCoaNew.value){
+    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
+
+    if (saveCoaForm) {
+      console.log('Save coa  successful')
+      result.value +=1
+
+      // return saveCoaForm
+    } else {
+      result.value -=1
+      console.error('Failed to save coa')
+      throw 'Failed to save coa'
     }
   }
 
@@ -1254,6 +1300,7 @@ const saveDraftData = word => {
             <th colspan="4">
               <VTextField
                 v-model="dataHeader.actualCheck"
+                :readonly="frozeCheck"
                 density="compact"
                 :rules="[
                   value => !!value.trim() || 'Actual Check is required.',
@@ -1287,6 +1334,7 @@ const saveDraftData = word => {
             >
               <VTextField
                 v-model="item.actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
                 :rules="[
                   value => !!value.trim() || 'AnalyticalItem Check is required.',
@@ -1345,6 +1393,7 @@ const saveDraftData = word => {
             <th colspan="6">
               <VTextarea
                 v-model="dataHeader.note"
+                :readonly="frozeCheck"
                 auto-grow
                 :rules="[
                   value => !!value.trim() || 'Notes is required.',
@@ -1358,6 +1407,7 @@ const saveDraftData = word => {
             <th colspan="6">
               <VTextarea
                 v-model="dataHeader.limConditionDetail"
+                :readonly="frozeCheck"
                 auto-grow
                 :rules="[
                   value => !!value.trim() || 'Details is required.',
@@ -1454,7 +1504,7 @@ const saveDraftData = word => {
                 v-if="statusId === 7 || statusId === 16"
                 style=" white-space: normal; word-wrap: break-word;"
               >
-                <VTextarea v-model="headerInsp.remarkReject" />
+                <VTextarea readonly v-model="data.statusComments" />
               </span>
             </VCol>
           </VRow>
@@ -1475,6 +1525,7 @@ const saveDraftData = word => {
             <VRow>
               <VCol cols="12">
                 <VFileInput
+                  :disabled="frozeCheck"
                   v-model="fileCoaNew"
                   label="File Upload COA"
                   accept="image/png, image/jpeg, image/bmp, application/pdf"
@@ -1544,6 +1595,7 @@ const saveDraftData = word => {
                   </VCardText>
                   <VCardActions>
                     <VBtn
+                      :disabled="frozeCheck"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -1594,6 +1646,7 @@ const saveDraftData = word => {
                   </VCardText>
                   <VCardActions>
                     <VBtn
+                      :disabled="frozeCheck"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -1612,6 +1665,7 @@ const saveDraftData = word => {
                 cols="12"
               >
                 <VBtn
+                  :disabled="frozeCheck"
                   color="red"
                   @click="removeFileAll"
                 >
@@ -2069,7 +2123,7 @@ const saveDraftData = word => {
   </section>
 
   <!-- Btn -->
-  <VRow>
+  <VRow v-if="statusId === 10">
     <VCol cols="4" />
     <VCol
       cols="8"

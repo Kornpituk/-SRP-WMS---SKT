@@ -84,6 +84,29 @@ export const  PackagingFormService = {
     }
   },
 
+  async generatePackagingIdForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/Packaging/View/${poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data Genterate View:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data Genterate View from the server')
+      }
+    } catch (error) {
+      console.error('Error in generatePackagingIdForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   async acceptPackagingForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
     try {
       const response = await axios.post(`${urlApi}/api/v1/${form}/Accept/${poEtlLogDetailJournalID}`, {}, {
@@ -126,9 +149,9 @@ export const  PackagingFormService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data Reject:', response.data.data)
+        console.log('Service Response data Reject:', response.data.messageResult)
         
-        return response.data.data
+        return response.data.messageResult
       } else {
         throw new Error('No data received from the server')
       }

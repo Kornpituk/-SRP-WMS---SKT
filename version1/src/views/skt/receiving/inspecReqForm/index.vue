@@ -121,6 +121,7 @@ const dataPO = ref('')
 const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const frozeCheck = ref(true)
 
 const generatedJournalId = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
@@ -153,6 +154,10 @@ const generatedJournalId = () => {
 watch(() => {
   generatedInsp()
   generatedJournalId()
+
+  if(statusId.value === 4 || statusId.value === 5){
+    frozeCheck.value = false
+  }
 })
 
 //--------------- get header --------------------------------
@@ -1529,6 +1534,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
                 :rules="[
                   v => v !== -1 || 'Actual value is required!',
@@ -1564,6 +1570,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].actualAnalysis"
+                :readonly="frozeCheck"
                 :rules="[
                   value => value !== '' || !value || 'Actual value is required!',
                   value => value.length <= 45 || 'Must be 45 characters or less',
@@ -1585,6 +1592,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
                 v-model="item.itemAnalyticals[1].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
               >
                 <VRow>
@@ -1619,6 +1627,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
                 v-model="item.itemAnalyticals[1].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
                 :rules="[
                   value => value.length <= 45 || 'Must be 45 characters or less'
@@ -1638,6 +1647,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
                 v-model="item.itemAnalyticals[2].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
               >
                 <VRow>
@@ -1671,6 +1681,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
                 v-model="item.itemAnalyticals[2].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
                 :rules="[
                   value => value.length <= 45 || 'Must be 45 characters or less'
@@ -1691,6 +1702,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
                 v-model="item.itemAnalyticals[3].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
               >
                 <VRow>
@@ -1723,6 +1735,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
                 v-model="item.itemAnalyticals[3].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
                 :rules="[
                   value => value.length <= 45 || 'Must be 45 characters or less'
@@ -1743,6 +1756,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
                 v-model="item.itemAnalyticals[4].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
               >
                 <VRow>
@@ -1775,6 +1789,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
                 v-model="item.itemAnalyticals[4].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
                 :rules="[
                   value => value.length <= 45 || 'Must be 45 characters or less'
@@ -1944,6 +1959,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].okState"
                 :mandatory="false"
+                :readonly="frozeCheck"
               >
                 <VRow>
                   <VCol cols="6">
@@ -1977,6 +1993,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
                 v-model="item.itemAnalyticals[0].actualAnalysis"
                 density="compact"
+                :readonly="frozeCheck"
               />
 
               <span
@@ -1992,6 +2009,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
                 v-model="item.itemAnalyticals[1].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
               >
                 <VRow>
@@ -2024,6 +2042,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
                 v-model="item.itemAnalyticals[1].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
               />
 
@@ -2040,6 +2059,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
                 v-model="item.itemAnalyticals[2].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
               >
                 <VRow>
@@ -2072,6 +2092,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
                 v-model="item.itemAnalyticals[2].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
               />
 
@@ -2088,6 +2109,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
                 v-model="item.itemAnalyticals[3].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
               >
                 <VRow>
@@ -2120,6 +2142,7 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
                 v-model="item.itemAnalyticals[3].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
               />
 
@@ -2136,6 +2159,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRadioGroup
                 v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
                 v-model="item.itemAnalyticals[4].okState"
+                :readonly="frozeCheck"
                 :mandatory="false"
               >
                 <VRow>
@@ -2168,10 +2192,12 @@ const getDisabledFollowStatusNRole = () => {
               <VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
                 v-model="item.itemAnalyticals[2].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
               /><VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
                 v-model="item.itemAnalyticals[4].actualAnalysis"
+                :readonly="frozeCheck"
                 density="compact"
               />
 
@@ -2230,6 +2256,7 @@ const getDisabledFollowStatusNRole = () => {
         <tr>
           <td>
             <VTextarea
+              :readonly="frozeCheck"
               v-model="headerInsp.note"
               auto-grow
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
@@ -2239,8 +2266,10 @@ const getDisabledFollowStatusNRole = () => {
               </template>
             </VTextarea>
           </td>
+          {{ frozeCheck }}
           <td>
             <VTextarea
+              :readonly="frozeCheck"
               v-model="headerInsp.details"
               auto-grow
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
@@ -2323,7 +2352,10 @@ const getDisabledFollowStatusNRole = () => {
         class="d-flex align-center"
       >
         <VRow>
-          <VCol cols="2"  class="d-flex align-center">
+          <VCol
+            cols="2"
+            class="d-flex align-center"
+          >
             <span style="font-size: 12px; font-weight: bolder;">Comment:</span>
           </VCol>
           <VCol cols="10">
