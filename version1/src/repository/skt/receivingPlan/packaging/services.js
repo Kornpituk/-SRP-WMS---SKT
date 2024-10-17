@@ -168,6 +168,7 @@ export const ReceivingFormService = {
 }
 
 export const saveDraftPackagingFormHeader = async (poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore) => {
+  console.log("data Service saveDraft", poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore)
   try {
     const response = await axios.post(`${urlApi}/api/v1/Packaging/Save/${poEtlLogDetailJournalID}`, body, {
       headers: {
@@ -266,7 +267,7 @@ const saveSingleLotDetail = async (item, url, warehouse, token) => {
 export const saveDraftLotItemsBatch = async (item, urlApi, whereHouse, accessTokenAtStore) => {
   const body = {
     inspReqLotJournalId: item.pkgInspReqFormAnalyticalItemsJournalId,
-    actualAnalysis: item.sqnText,
+    actualAnalysis: item.actualAnalysis,
     okState: 0,
 
     // อื่นๆ

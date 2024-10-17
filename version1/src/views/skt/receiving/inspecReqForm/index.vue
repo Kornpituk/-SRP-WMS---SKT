@@ -2196,7 +2196,7 @@ const getDisabledFollowStatusNRole = () => {
                 <VIcon
                   color="primary"
                   icon="ri-circle-fill"
-                /> = After Arrival Of Raw Material, We Have To Actually Analyze Every Lot.
+                /> = After arrival of raw material, we have to actually analyze every lot.
               </div>
             </td>
           </tr>
@@ -2322,8 +2322,19 @@ const getDisabledFollowStatusNRole = () => {
         cols="4"
         class="d-flex align-center"
       >
-        <span style="font-size: 12px; font-weight: bolder;">Comment:</span>	&nbsp;	&nbsp;
-        <span v-if="statusId === 7 || statusId === 16">{{ headerInsp.remarkReject }}</span>
+        <VRow>
+          <VCol cols="2"  class="d-flex align-center">
+            <span style="font-size: 12px; font-weight: bolder;">Comment:</span>
+          </VCol>
+          <VCol cols="10">
+            <span
+              v-if="statusId === 7 || statusId === 16"
+              style=" white-space: normal; word-wrap: break-word;"
+            >
+              <VTextarea v-model="headerInsp.remarkReject" />
+            </span>
+          </VCol>
+        </VRow>
       </VCol>
     </VRow>
   </section>

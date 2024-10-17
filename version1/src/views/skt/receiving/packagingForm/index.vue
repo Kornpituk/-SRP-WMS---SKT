@@ -413,6 +413,16 @@ watchEffect(() => {
 })
 
 //---- header --------------------------------
+
+const alertErrorMessage = ref({
+  success: true,
+
+  coaChecked: '',
+  actualCheck: '',
+  note: '',
+  limConditionDetail: '',
+})
+
 //----- GET
 const checkCOAYes = ref(null)
 const checkCOANo = ref(null)
@@ -425,42 +435,44 @@ fetchPackagingFormHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.va
 
 //----- POST
 
-const saveHeaderPackaging = async () => {
-  try {
-    const body = {
-      limConditionDetail: dataHeader.value.limConditionDetail,
-      note: dataHeader.value.note,
-      coAChecked: dataHeader.value.coAChecked,
-      actualCheck: dataHeader.value.actualCheck,
-    }
+const handleInputNumberOnly = e => {
+  let value = e.target.value
 
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    })
+  // ตรวจสอบว่าเป็นตัวเลขจำนวนเต็มเท่านั้น (ไม่รวมทศนิยม)
+  const regex = /^[0-9]*$/
 
-    // console.log('[products.value]!!: ', response.data)
-    // isDialogSubmitSuccessVisible.value = true
-  } catch (error) {
-    // Handle errors
-    isDialogSubmitFailedVisible.value = true
-    console.error('Error:', error)
+  // หากไม่ตรงกับเงื่อนไขของ regex จะคืนค่าสุดท้ายที่ถูกต้อง
+  if (!regex.test(value)) {
+    value = value.replace(/\D/g, '') // ลบตัวอักษรที่ไม่ใช่ตัวเลขออก
   }
+
+  // จำกัดจำนวนหลักรวมไม่เกิน 8 หลัก
+  if (value.length > 8) {
+    value = value.slice(0, 8) // ตัดค่าที่เกินออก
+  }
+
+  // อัปเดตค่าใน dataHeader.actualCheck
+  dataHeader.value.actualCheck = value
 }
 
 const saveDraftHeader = async () => {
+  console.log('Start saveDraftHeader!!')
+
+  if(dataHeader.value === 'null'){
+    throw false
+  }
+
   const result = await handleSaveDraft(poEtlLogDetailJournalIDQueryParameters.value, dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
-  if (result.success) {
+  if (result.success === true) {
     // isDialogSubmitSuccessVisible.value = true
     console.log('Save header details successful')
   } else {
     // isDialogSubmitFailedVisible.value = true
-    console.error('Failed to save header details')
+    throw 'Failed to save header details'+result.success
   }
+
+  return true
 }
 
 //---- lot --------------------------------
@@ -1200,11 +1212,11 @@ const saveDraftData = word => {
             <th colspan="4">
               <VTextField
                 v-model="dataHeader.actualCheck"
-                type="number"
                 density="compact"
                 :rules="[
                   value => !!value.trim() || 'Actual Check is required.',
                 ]"
+                @input="(e) => handleInputNumberOnly(e)"
               />
             </th>
           </tr>
@@ -1389,8 +1401,22 @@ const saveDraftData = word => {
           cols="4"
           class="d-flex align-center"
         >
-          <span style="font-size: 12px; font-weight: bolder;">Comment:</span>	&nbsp;	&nbsp;
-          <span v-if="statusId === 7 || statusId === 16">{{ headerInsp.remarkReject }}</span>
+          <VRow>
+            <VCol
+              cols="2"
+              class="d-flex align-center"
+            >
+              <span style="font-size: 12px; font-weight: bolder;">Comment:</span>
+            </VCol>
+            <VCol cols="10">
+              <span
+                v-if="statusId === 7 || statusId === 16"
+                style=" white-space: normal; word-wrap: break-word;"
+              >
+                <VTextarea v-model="headerInsp.remarkReject" />
+              </span>
+            </VCol>
+          </VRow>
         </VCol>
       </VRow>
     </VCol>

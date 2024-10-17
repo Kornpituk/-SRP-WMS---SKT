@@ -1357,8 +1357,7 @@ const submitButtonVisibleNew = async word => {
 const submitReceivingForm = async () => {
   try {
     // เรียก submitButtonVisibleNew() และรอให้ทำงานเสร็จ
-    trickerSubmit.value = true
-
+    
     const isSuccess = await submitButtonVisibleNew()
 
     // ถ้า submitButtonVisibleNew() ไม่สำเร็จ (สมมติว่ามันคืนค่า false เมื่อไม่สำเร็จ)
@@ -1717,8 +1716,14 @@ const isDialogSubmitFailedVisible = ref(false)
 
 
 const submitButton = word => {
+  trickerSubmit.value = true
   isDialogConfirmVisible.value = true
   wordForSubmit.value = word
+}
+
+const saveDraftButton = word => {
+  trickerSubmit.value = false
+  submitButtonVisibleNew(word)
 }
 
 const areaTextRemarkButton = word => {
@@ -3407,7 +3412,7 @@ const getDisabledFollowStatusNRole = () => {
             </div>
 
             <span
-              v-if="textAlertError.coa || !getCoaForm"
+              v-if="textAlertError.coa && !getCoaForm && trickerSubmit"
               class="text-red"
             >{{ textAlertError.coa }}</span>
           </th>
@@ -3510,7 +3515,7 @@ const getDisabledFollowStatusNRole = () => {
           class="mx-4"
           color="warning"
           style="font-size: 12px;"
-          @click="submitButtonVisibleNew('SAVE DRAFT')"
+          @click="saveDraftButton('SAVE DRAFT')"
         >
           SAVE DRAFT
         </VBtn>

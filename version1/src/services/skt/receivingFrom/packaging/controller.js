@@ -214,15 +214,61 @@ export const useReceivingFormController = () => {
   }
 }
 
-export const handleSaveDraft = async (poEtlLogDetailJournalID, dataHeader, urlApi, whereHouse, accessTokenAtStore) => {
-  // ตรวจสอบค่าว่างใน dataHeader
-  if (!dataHeader.limConditionDetail || !dataHeader.coAChecked || !dataHeader.note || !dataHeader.limConditionDetail) {
-    return { success: false, error: 'Required fields are missing.' }
-  }
+export const handleSaveDraft = async (poEtlLogDetailJournalID, dataHeader, urlApi,
+  whereHouse, accessTokenAtStore,
+) => {
+  try {
+    // ตรวจสอบค่าว่างใน dataHeader
+    // if (
+    //   !dataHeader.limConditionDetail ||
+    //   !dataHeader.coAChecked ||
+    //   !dataHeader.note ||
+    //   !dataHeader.limConditionDetail
+    // ) {
+    //   return { success: false, error: 'Required fields are missing.'+poEtlLogDetailJournalID, dataHeader, urlApi,
+    //     whereHouse, accessTokenAtStore }
+    // }
 
-  const body = createDraftBody(dataHeader)
-  
-  return await saveDraftPackagingFormHeader(poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore)
+    // แสดงผลข้อมูลก่อนส่งเพื่อช่วยในการ debug
+    
+
+    // สร้างข้อมูล body สำหรับการบันทึก
+    const body = createDraftBody(dataHeader)
+
+    console.log(
+      'poEtlLogDetailJournalID+++',
+      poEtlLogDetailJournalID,
+      body,
+      urlApi,
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    // เรียกใช้ฟังก์ชันบันทึกและรอผลลัพธ์
+    const result = await saveDraftPackagingFormHeader(
+      poEtlLogDetailJournalID,
+      body,
+      urlApi,
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    // ตรวจสอบผลลัพธ์การบันทึก
+    if (result?.success) {
+      console.log('Draft saved successfully:', result)
+      
+      return { success: true, data: result }
+    } else {
+      console.error('Failed to save draft:', result)
+      
+      return { success: false, error: 'Failed to save draft.' }
+    }
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+    console.error('Error occurred while saving draft:', error)
+    
+    return { success: false, error: error.message }
+  }
 }
 
 //--- lot --------------------------------
@@ -258,32 +304,42 @@ export const useGetLotPackagingFormController = () => {
 
 import { createDraftLot, createLotItem  } from '@/model/skt/receivingPlan/packaging/lotDataModel'
 
-// export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
-//   const body = createDraftLot(dataLot)
-  
-//   return await saveDraftPackagingFormHeader(body, urlApi, whereHouse, accessTokenAtStore)
-// }
-
 export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
-  try {
-    // วนลูปผ่านรายการข้อมูลใน dataLot
-    for (const item of dataLot) {
-      // เรียกใช้ service เพื่อส่งข้อมูลทีละตัว
-      const result = await saveDraftLotItemsBatch(item, urlApi, whereHouse, accessTokenAtStore)
-
-      console.log('Success:', result) // แสดงผลลัพธ์ที่ได้
-      
-      return result
-    }
-
-    // แสดง dialog เมื่อสำเร็จ
-    // isDialogSubmitSuccessVisible.value = true
-  } catch (error) {
-    // แสดง dialog เมื่อมีข้อผิดพลาด
-    // isDialogSubmitFailedVisible.value = true
-    console.error('Error saving draft lot:', error)
-  }
+  const body = createDraftLot(dataLot)
+  
+  return await saveDraftPackagingFormHeader(body, urlApi, whereHouse, accessTokenAtStore)
 }
+
+// export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
+//   const saveDraftPackagingFormLot = async(dataLot, urlApi, whereHouse, accessTokenAtStore) => {
+//     try {
+
+//       const resultOut = null
+
+//       // วนลูปผ่านรายการข้อมูลใน dataLot
+//       console.log('Success: dataLot', dataLot) // แสดงผลลัพธ์ที่ได้
+//       for (const item of dataLot) {
+//         // เรียกใช้ service เพื่อส่งข้อมูลทีละตัว
+//         const result = await saveDraftLotItemsBatch(item, urlApi, whereHouse, accessTokenAtStore)
+
+//         resultOut = result
+//         console.log('Success:', result) // แสดงผลลัพธ์ที่ได้
+//         console.log('Success: item', item) // แสดงผลลัพธ์ที่ได้
+//       }
+
+//       return { data: resultOut, success: true } 
+
+//       // แสดง dialog เมื่อสำเร็จ
+//       // isDialogSubmitSuccessVisible.value = true
+//     } catch (error) {
+//       // แสดง dialog เมื่อมีข้อผิดพลาด
+//       // isDialogSubmitFailedVisible.value = true
+//       console.error('Error saving draft lot:', error)
+//     }
+//   }
+  
+  
+// }
 
 //--- COA --------------------------------
 export const useGetCOAPackagingFormController = () => {
