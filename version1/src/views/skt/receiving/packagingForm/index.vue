@@ -389,7 +389,7 @@ const dataHeader = ref({
   sktLot: "",
   purchaseOrderNo: "",
   purchasingQuantityPcs: 0,
-  actualCheck: true,
+  actualCheck: 0,
   inspStaffUpdateBy: "",
   inspStaffUpdateDate: "",
   whUpdateBy: "",
@@ -414,8 +414,8 @@ watchEffect(() => {
 
 //---- header --------------------------------
 
-const alertErrorMessage = ref({
-  success: true,
+const alertHeaderErrorMessage = ref({
+  success: false,
 
   coaChecked: '',
   actualCheck: '',
@@ -456,10 +456,21 @@ const handleInputNumberOnly = e => {
 }
 
 const saveDraftHeader = async () => {
-  console.log('Start saveDraftHeader!!')
+  
+  const bodyCheck = dataHeader.value
+
+  // console.log('Start saveDraftHeader!!', bodyCheck.actualCheck)
+
+  if(!bodyCheck.actualCheck){
+    alertHeaderErrorMessage.value.success = true
+
+    alertHeaderErrorMessage.value.actualCheck = "Actual Check is required. Please enter a value."
+    throw 'Actual Check is required. Please enter a value.'
+  }
 
   if(dataHeader.value === 'null'){
-    throw false
+    
+    throw 'dataHeader invalid'
   }
 
   const result = await handleSaveDraft(poEtlLogDetailJournalIDQueryParameters.value, dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
@@ -471,7 +482,8 @@ const saveDraftHeader = async () => {
     // isDialogSubmitFailedVisible.value = true
     throw 'Failed to save header details'+result.success
   }
-
+  alertHeaderErrorMessage.value.success = false
+  
   return true
 }
 
@@ -600,15 +612,45 @@ const handleRejectPackaging = () => {
 }
 
 //----- POST ---------------------------------------------------------------------------------------------------------------------------------
+const alertLotErrorMessage = ref({
+  success: false,
+  actualAnalysis: {},
+
+})
+
+
+//
 const saveDraftLotDetails = async () => {
+
+  const bodyCheck = analyticalItemsData.value
+
+  //validate
+  bodyCheck.forEach((item, index) => {
+    if (!item.actualAnalysis) {
+      alertLotErrorMessage.value.success = false // แสดงว่ามีข้อผิดพลาด
+      // เก็บข้อความแยกตามลำดับไอเท็มที่มีปัญหา
+      alertLotErrorMessage.value.actualAnalysis[`item_${index + 1}`] = `Actual Analysis is required for item ${index + 1}. Please enter a value.`
+    }
+  })
+
+  // ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
+  if (alertLotErrorMessage.value.success) {
+    throw 'Actual Analysis validation failed. Please check the errors.'
+  }
 
   const result = await handleSaveDraftLot(analyticalItemsData.value, urlApi.value, whereHouse, accessTokenAtStore)
 
   if (result.success) {
     console.log('Save lot details successful')
+    alertLotErrorMessage.value.success = false
   } else {
     console.error('Failed to save lot details')
+    throw 'Failed to save lot details.'
   }
+
+  alertLotErrorMessage.value.success = false
+  
+  return true
 }
 
 //---- COA --------------------------------
@@ -1244,7 +1286,7 @@ const saveDraftData = word => {
               colspan="4"
             >
               <VTextField
-                v-model="item.sqnText"
+                v-model="item.actualAnalysis"
                 density="compact"
                 :rules="[
                   value => !!value.trim() || 'AnalyticalItem Check is required.',
@@ -1333,7 +1375,6 @@ const saveDraftData = word => {
   </VRow>
 
   <!-- Quality Evalution -->
-
   <VRow class="mx-1">
     <VCol cols="12">
       <VRow>
@@ -1847,6 +1888,57 @@ const saveDraftData = word => {
               </div>
             </VAlert>
           </div>
+        </VCardText>
+
+        <!-- Header -->
+        <VCardText v-if="alertHeaderErrorMessage.success">
+          <VAlert
+            title="Verify The Accuracy Of The Header"
+            variant="outlined"
+            closable
+            class="text-start"
+          >
+            <span
+              v-if="alertHeaderErrorMessage.actualCheck"
+              class="text-start"
+              style="font-size: 12px;"
+            >Actual Check :</span> <span
+              style="font-size: 12px;"
+              class="text-red"
+            >{{ alertHeaderErrorMessage.actualCheck }} </span>
+          </VAlert>
+        </VCardText>
+
+        <!-- Lot -->
+        <VCardText v-if="alertLotErrorMessage.success">
+          <VAlert
+            title="Verify The Accuracy Of The Lot"
+            variant="outlined"
+            closable
+            class="text-start"
+          >
+            <span
+              class="text-start"
+              style="font-size: 12px;"
+            >
+              Actual Check Errors:
+            </span>
+    
+            <ul>
+              <!-- วนลูปเพื่อแสดงข้อผิดพลาดแต่ละอันใน actualAnalysis -->
+              <li 
+                v-for="(errorMsg, key) in alertLotErrorMessage.actualAnalysis"
+                :key="key"
+                style="font-size: 12px;"
+                class="text-red"
+              >
+                <VIcon
+                  color="error"
+                  icon="ri-error-warning-fill"
+                />{{ key }}: {{ errorMsg }}
+              </li>
+            </ul>
+          </VAlert>
         </VCardText>
 
         <!-- Coa -->

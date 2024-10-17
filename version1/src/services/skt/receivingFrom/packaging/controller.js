@@ -235,15 +235,6 @@ export const handleSaveDraft = async (poEtlLogDetailJournalID, dataHeader, urlAp
     // สร้างข้อมูล body สำหรับการบันทึก
     const body = createDraftBody(dataHeader)
 
-    console.log(
-      'poEtlLogDetailJournalID+++',
-      poEtlLogDetailJournalID,
-      body,
-      urlApi,
-      whereHouse,
-      accessTokenAtStore,
-    )
-
     // เรียกใช้ฟังก์ชันบันทึกและรอผลลัพธ์
     const result = await saveDraftPackagingFormHeader(
       poEtlLogDetailJournalID,
@@ -305,41 +296,44 @@ export const useGetLotPackagingFormController = () => {
 import { createDraftLot, createLotItem  } from '@/model/skt/receivingPlan/packaging/lotDataModel'
 
 export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
-  const body = createDraftLot(dataLot)
-  
-  return await saveDraftPackagingFormHeader(body, urlApi, whereHouse, accessTokenAtStore)
+  try {
+    // ตรวจสอบว่า dataLot มีข้อมูลที่ต้องการหรือไม่
+    if (!dataLot || dataLot.length === 0) {
+      throw new Error('No data provided for saving draft lot')
+    }
+
+    // สร้าง body ข้อมูลสำหรับส่งไปยัง API
+    const body = createDraftLot(dataLot)
+
+    // เก็บผลลัพธ์สำหรับแต่ละ item
+    const results = []
+    let allSuccess = true
+
+    for (const item of dataLot) {
+      // เรียกใช้ service เพื่อส่งข้อมูลทีละตัว
+      const result = await saveDraftLotItemsBatch(item, urlApi, whereHouse, accessTokenAtStore)
+
+      // เก็บผลลัพธ์สำหรับแต่ละ item
+      results.push(result)
+
+      // ตรวจสอบว่ามีการบันทึกสำเร็จหรือไม่
+      if (!result?.success) {
+        allSuccess = false // ถ้าส่งไม่สำเร็จ แสดงว่าไม่สมบูรณ์
+      }
+    }
+
+    // ตรวจสอบผลลัพธ์
+    if (allSuccess) {
+      return { success: true, data: results }
+    } else {
+      throw new Error('Failed to save one or more draft lots')
+    }
+  } catch (error) {
+    console.error('Error in handleSaveDraftLot:', error.message)
+
+    return { success: false, error: error.message }
+  }
 }
-
-// export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
-//   const saveDraftPackagingFormLot = async(dataLot, urlApi, whereHouse, accessTokenAtStore) => {
-//     try {
-
-//       const resultOut = null
-
-//       // วนลูปผ่านรายการข้อมูลใน dataLot
-//       console.log('Success: dataLot', dataLot) // แสดงผลลัพธ์ที่ได้
-//       for (const item of dataLot) {
-//         // เรียกใช้ service เพื่อส่งข้อมูลทีละตัว
-//         const result = await saveDraftLotItemsBatch(item, urlApi, whereHouse, accessTokenAtStore)
-
-//         resultOut = result
-//         console.log('Success:', result) // แสดงผลลัพธ์ที่ได้
-//         console.log('Success: item', item) // แสดงผลลัพธ์ที่ได้
-//       }
-
-//       return { data: resultOut, success: true } 
-
-//       // แสดง dialog เมื่อสำเร็จ
-//       // isDialogSubmitSuccessVisible.value = true
-//     } catch (error) {
-//       // แสดง dialog เมื่อมีข้อผิดพลาด
-//       // isDialogSubmitFailedVisible.value = true
-//       console.error('Error saving draft lot:', error)
-//     }
-//   }
-  
-  
-// }
 
 //--- COA --------------------------------
 export const useGetCOAPackagingFormController = () => {

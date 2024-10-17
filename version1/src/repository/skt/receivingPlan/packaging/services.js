@@ -168,7 +168,6 @@ export const ReceivingFormService = {
 }
 
 export const saveDraftPackagingFormHeader = async (poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore) => {
-  console.log("data Service saveDraft", poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore)
   try {
     const response = await axios.post(`${urlApi}/api/v1/Packaging/Save/${poEtlLogDetailJournalID}`, body, {
       headers: {

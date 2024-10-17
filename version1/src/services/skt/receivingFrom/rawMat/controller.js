@@ -20,7 +20,7 @@ export const useGetCOAFormController = () => {
       }
     } catch (error) {
       console.error('Error in fetchCoaForm:', error)
-      errorMessageGetCoa.value = error.message
+      errorMessageGetCoa.value = error.messag
     }
   }
   
