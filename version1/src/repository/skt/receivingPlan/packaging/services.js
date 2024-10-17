@@ -60,7 +60,7 @@ export const parseData = data => {
 
 //----------------------------------------------- Real -------------------------------- -
 //----------- Genter ----------------------------
-export const PackagingFormService = {
+export const  PackagingFormService = {
   async generatePackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
     try {
       const response = await axios.post(`${urlApi}/api/v1/Packaging/Generate/${poEtlLogDetailJournalID}`, {}, {
@@ -84,9 +84,9 @@ export const PackagingFormService = {
     }
   },
 
-  async acceptPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+  async acceptPackagingForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/Packaging/Accept/${poEtlLogDetailJournalID}`, {}, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/Accept/${poEtlLogDetailJournalID}`, {}, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -105,11 +105,19 @@ export const PackagingFormService = {
       console.error('Error in generatePackagingForm:', error)
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
+
+    console.log("acceptPackagingForm serviece", poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
   },
 
-  async rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+  async rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+    const body = {
+      statusComments: comment,
+    }
+
+    // console.log("rejectPackagingForm serviece", body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+
     try {
-      const response = await axios.post(`${urlApi}/api/v1/Packaging/Reject/${poEtlLogDetailJournalID}`, comment, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/Reject/${poEtlLogDetailJournalID}`, body, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,

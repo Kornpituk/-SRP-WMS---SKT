@@ -1004,8 +1004,7 @@ const handleSaveDraftCoa = async () => {
   const result = ref(1)
 
   if(trickerSubmit.value){
-    console.log("Tricker Submit Start++++")
-    if (!fileCoaNew.value.length > 0 || !getCoaForm.value.length > 0) {
+    if (!fileCoaNew.value.length > 0 || getCoaForm.value.length) {
     // alert('Please upload at least one file')
       result.value -=1
       textAlertError.value.success = false
@@ -1021,7 +1020,7 @@ const handleSaveDraftCoa = async () => {
       console.log("Upload Start++++")
       await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
       if (saveCoaForm) {
-        console.log('Save coa  successful', saveCoaForm.value.success)
+        // console.log('Save coa  successful', saveCoaForm.value.success)
         result.value += 1
       
       // return saveCoaForm
@@ -1032,7 +1031,7 @@ const handleSaveDraftCoa = async () => {
       }
     }
   }
-  console.log("Not Tricker Submit Start++++", trickerSubmit.value)
+
   if(deleteAllStart.value === true){
     console.log("Delete All Start++++")
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
@@ -1194,9 +1193,6 @@ const deleteAllCIA = () => {
   coaFiles.value = []
   files.value = []
 }
-
-
-
 
 //------------- Dialog Step SaveDraf ----------------------------------------------------------------
 const iconsSteps = [

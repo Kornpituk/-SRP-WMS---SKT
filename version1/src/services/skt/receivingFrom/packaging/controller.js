@@ -64,7 +64,6 @@ export function submitData(data) {
   // Example: return this.$http.post('your-api-endpoint', payload);
 }
 
-
 // receivingModel.js
 export const ReceivingModel = {
   getReceivingData(poEtlLogDetailJournalID) {
@@ -122,12 +121,12 @@ export const useAcceptPackagingFormController = () => {
   const packagingFormAccept = ref(null)
   const errorMessageAccept = ref(null)
 
-  const acceptPackagingForm = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+  const acceptPackagingForm = async (poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
     try {
       errorMessageAccept.value = null
       console.log('accept Packaging Form...')
 
-      const result = await PackagingFormService.acceptPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      const result = await PackagingFormService.acceptPackagingForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
       if (result) {
         console.log('Packaging data Accept Controller:', result)
@@ -154,15 +153,15 @@ export const useRejectPackagingFormController = () => {
   const packagingFormReject = ref(null)
   const errorMessageReject = ref(null)
 
-  const rejectPackagingForm = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+  const rejectPackagingForm = async (comment, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
     try {
       errorMessageReject.value = null
       console.log('Reject Packaging Form...')
 
-      const comment = createModelReject(dataHeader)
+      // const comment = createModelReject(dataHeader)
 
 
-      const result = await PackagingFormService.rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      const result = await PackagingFormService.rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
       if (result) {
         console.log('Packaging data Reject Controller:', result)
@@ -226,7 +225,6 @@ export const handleSaveDraft = async (poEtlLogDetailJournalID, dataHeader, urlAp
   return await saveDraftPackagingFormHeader(poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore)
 }
 
-
 //--- lot --------------------------------
 export const useGetLotPackagingFormController = () => {
   const packagingFormLot = ref(null)
@@ -286,7 +284,6 @@ export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessToke
     console.error('Error saving draft lot:', error)
   }
 }
-
 
 //--- COA --------------------------------
 export const useGetCOAPackagingFormController = () => {
@@ -408,7 +405,6 @@ export const useDeleteAllCoaFormController = () => {
     deleteAllCoaForm,
   }
 }
-
 
 export const useSaveCOAFormController = () => {
   const saveCoaForm = ref(null) // เก็บข้อมูล response ของการบันทึก

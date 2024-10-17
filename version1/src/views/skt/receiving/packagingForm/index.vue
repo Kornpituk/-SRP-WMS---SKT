@@ -371,6 +371,7 @@ import { useReceivingFormController,
   handleSaveDraft, handleSaveDraftLot,
   useSaveCOAFormController, useDeleteCoaFormController,
   useDeleteAllCoaFormController, useGetCOAFilePackagingFormController,
+  useRejectPackagingFormController, useAcceptPackagingFormController,
 } from '@/services/skt/receivingFrom/packaging/controller'
 
 const dataHeader = ref({
@@ -474,6 +475,7 @@ const dataLot = ref({
   needActualValue: false,
 })
 
+
 const analyticalItemsData = ref([])
 
 const { packagingFormLot, errorMessageLot, fetchPackagingFormLot } = useGetLotPackagingFormController()
@@ -542,7 +544,50 @@ watchEffect(() => {
 
 })
 
-//----- POST
+//----------------------------------------------- Post ----------------------------------------
+
+const textAlertError = ref({
+  success: true,
+
+  comment: '',
+  coa: '',
+})
+
+//----------------- Accept
+const { acceptPackagingForm } = useAcceptPackagingFormController()
+
+const handleAcceptPackaging = () => {
+  wordForSubmit.value = "SUBMIT"
+
+  const handeSaveDraf = submitButtonVisibleNew()
+
+  if(!handeSaveDraf){
+    throw 'Failed to submit'
+  }
+  isDialogConfirmVisible.value = false
+  acceptPackagingForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
+
+  return true
+}
+
+//----------------- Reject
+const commentReject = ref('')
+const { rejectPackagingForm } = useRejectPackagingFormController()
+
+const handleRejectPackaging = () => {
+
+  if(!commentReject.value){
+    textAlertError.value.success = false
+    textAlertError.value.comment = 'Please provide a comment to reject the packaging.'
+    throw 'Please provide a comment to reject the packaging'
+  }else{
+    rejectPackagingForm(commentReject.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
+  }
+
+  return true
+}
+
+//----- POST ---------------------------------------------------------------------------------------------------------------------------------
 const saveDraftLotDetails = async () => {
 
   const result = await handleSaveDraftLot(analyticalItemsData.value, urlApi.value, whereHouse, accessTokenAtStore)
@@ -668,17 +713,43 @@ const { resultDeleteAllCoa, errorMessageDeleteAllCoa, deleteAllCoaForm } = useDe
 //--- save draf
 const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
 
+const trickerSubmit = ref(false)
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const handleSaveDraftCoa = async () => {
   const result = ref(1)
 
-  if (!fileCoaNew.value.length > 0 && !getFormCoa.value.length > 0) {
-    alert('Please upload at least one file')
-    result.value -=1
-    throw 'Failed to save coa. Plase Upload COA ones.'
-  }
+  console.log("trickerSubmit", trickerSubmit.value)
 
+  if(trickerSubmit.value){
+    console.log("trickerSubmit!++2", fileCoaNew.value, getFormCoa.value)
+    if (!fileCoaNew.value.length > 0 && !getFormCoa.value) {
+      result.value -=1
+      textAlertError.value.success = false
+      textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+      throw 'Failed to save coa. Plase Upload COA ones.'
+    }
+
+    if(getFormCoa.value){
+      result.value += 1
+    }
+
+    if(fileCoaNew.value){
+      await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
+
+      if (saveCoaForm) {
+        console.log('Save coa  successful')
+        result.value +=1
+
+      // return saveCoaForm
+      } else {
+        result.value -=1
+        console.error('Failed to save coa')
+        throw 'Failed to save coa'
+      }
+    }
+  }
+  
   if(deleteAllStart.value === true){
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success === true) {
@@ -692,6 +763,7 @@ const handleSaveDraftCoa = async () => {
       throw 'Failed to delete all coa'  
     }
   }
+
   if(coaIdForDelete.value.length > 0){
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
 
@@ -707,30 +779,16 @@ const handleSaveDraftCoa = async () => {
     }
   }
 
-  if(fileCoaNew.value.length > 0){
-    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
-
-    if (saveCoaForm.value.success) {
-      console.log('Save coa  successful')
-      result.value +=1
-
-      // return saveCoaForm
-    } else {
-      result.value -=1
-      console.error('Failed to save coa')
-      throw 'Failed to save coa'
-    }
-  }
-
-  if(getFormCoa.value.length > 0){
-    result.value += 1
-  }
-
   if(result.value <= 0) {
     throw 'Failed to handleSaveDraftCoa'
   }
 
+
+  textAlertError.value.success = true
+  
   return result
+
+  // throw 'Success!!'
 
   
 }
@@ -827,7 +885,6 @@ const submitButtonVisibleNew = async word => {
     wordForSubmit.value = "SAVE LOT"
     iconStep2.value = 'ri-error-warning-line'
     colorStep2.value = 'error'
-    wordForSubmit.value = "SAVE COA"
 
     loadindingSaveDatftFailed2.value = false
     loadindingSaveDatftSeccess2.value = false
@@ -858,6 +915,8 @@ const submitButtonVisibleNew = async word => {
     iconStep3.value = 'ri-error-warning-line'
     colorStep3.value = 'error'
 
+    wordForSubmit.value = "SUBMIT"
+
     loadindingSaveDatftFailed3.value = false
     loadindingSaveDatftSeccess3.value = false
 
@@ -880,9 +939,21 @@ const submitButtonVisibleNew = async word => {
   return true
 }
 
+//-------------------------- Btn ----------------------------------------------------------------
+const saveDraft = () => {
+  trickerSubmit.value = false
+}
+
+const submitForm = word => {
+  trickerSubmit.value = true
+  wordForSubmit.value = word
+  console.log("submitForm word", word)
+  isDialogConfirmVisible.value = true
+}
 
 // ฟังก์ชันบันทึกข้อมูล (ส่งข้อมูลไปยัง model หรือ API)
 const saveDraftData = word => {
+  trickerSubmit.value = false
   submitButtonVisibleNew()
   wordForSubmit.value = word
   console.log('Lot :', testResult.value)
@@ -1560,7 +1631,7 @@ const saveDraftData = word => {
   </VDialog>
 
   <!-- Dialog Reject -->
-  <section>
+  <section style="font-size: 12px;">
     <VDialog
       v-model="isDialogRejectVisible"
       width="500"
@@ -1575,15 +1646,20 @@ const saveDraftData = word => {
 
         <VCardText>
           <VTextarea
+            v-model="commentReject"
             label="Comment"
             placeholder="Enter Comment Reject"
           />
+          <span
+            v-if="textAlertError.comment && !commentReject"
+            class="text-red"
+          >{{ textAlertError.comment }}</span>
         </VCardText>
 
         <VCardText class="d-flex justify-space-between flex-wrap gap-4">
           <VBtn
             color="error"
-            @click="isDialogRejectVisible = false"
+            @click="handleRejectPackaging"
           >
             Reject
           </VBtn>
@@ -1607,7 +1683,7 @@ const saveDraftData = word => {
       <!-- Dialog Content -->
       <VCard
         class="text-center"
-        title="Save Draft"
+        :title="wordForSubmit"
       >
         <VCardText class="pa-1">
           <VRow>
@@ -1746,6 +1822,22 @@ const saveDraftData = word => {
             </VAlert>
           </div>
         </VCardText>
+
+        <!-- Coa -->
+        <VCardText v-if="!textAlertError.success && textAlertError.coa">
+          <VAlert
+            title="Verify The Accuracy Of The COA"
+            variant="outlined"
+            style="font-size: 12px;"
+            class="text-start"
+            closable
+          >
+            <span class="text-red"><VIcon
+              color="error"
+              icon="ri-error-warning-fill"
+            />{{ textAlertError.coa }}</span>
+          </VAlert>
+        </VCardText>
       </VCard>
     </VDialog>
   </section>
@@ -1782,7 +1874,7 @@ const saveDraftData = word => {
           <VBtn
             v-if="wordForSubmit === 'SUBMIT'"
             color="green"
-            @click="submitReceivingForm"
+            @click="handleAcceptPackaging"
           >
             {{ wordForSubmit }}
           </VBtn>
@@ -1870,7 +1962,7 @@ const saveDraftData = word => {
         height="100%"
         width="150px"
         color="warning"
-        @click="saveDraftData"
+        @click="saveDraftData('SAVE DRAFT')"
       >
         Save daft
       </VBtn>
@@ -1885,9 +1977,9 @@ const saveDraftData = word => {
         Reject
       </VBtn>
       <VBtn
-
-        height="40px"
+        height="4 0px"
         width="150px"
+        @click="submitForm('SUBMIT')"
       >
         <VRow>
           <VCol
