@@ -1025,14 +1025,14 @@ const handleSaveDraftCoa = async () => {
   console.log("Start COA!!!!!", fileCoaNew.value)
 
   if(trickerSubmit.value){
-    if (!fileCoaNew.value || !getCoaForm.value) {
+    if (fileCoaNew.value < 1 || getCoaForm.value < 1) {
     // alert('Please upload at least one file')
       result.value -=1
       textAlertError.value.success = false
       textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
       throw 'Failed To Save COA. Plase Upload COA Ones.'
     }else{
-      console.log("Test")
+      console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
     }
   }
 
@@ -1377,6 +1377,7 @@ const submitButtonVisibleNew = async word => {
   location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
+  console.log("%ctrickerSubmit Step", "color: yellow; font-weight: bold",  trickerSubmit.value)
   isDialogConfirmVisible.value = false
 
   return true
@@ -1385,6 +1386,10 @@ const submitButtonVisibleNew = async word => {
 const submitReceivingForm = async () => {
   try {
     // เรียก submitButtonVisibleNew() และรอให้ทำงานเสร็จ
+
+    trickerSubmit.value = true
+
+    console.log("%ctrickerSubmit Submit", "color: yellow; font-weight: bold", trickerSubmit.value)
     
     const isSuccess = await submitButtonVisibleNew()
 
@@ -1397,6 +1402,8 @@ const submitReceivingForm = async () => {
 
     isDialogConfirmVisible.value = false
     console.log('Submit buttonVisible Start In')
+
+    throw "Success"
 
     axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
       headers: {
@@ -3211,7 +3218,6 @@ const getDisabledFollowStatusNRole = () => {
             >{{ textAlertError.note }}</span>
           </th>
         </tr>
-        {{ !frozeCheck }}
       </Table>
     </VCol>
 
