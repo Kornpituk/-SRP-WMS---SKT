@@ -1375,7 +1375,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  // location.reload()
+  location.reload()
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -1656,12 +1656,6 @@ watchEffect(() => {
 })
 
 const showDialogImageMuti = (img, name) => {
-
-  // ตรวจสอบว่าข้อมูล img มี "data:image/png;base64," นำหน้าหรือไม่
-  // if (!img.startsWith('data:image')) {
-  //   // ถ้าไม่มี ให้เพิ่ม "data:image/png;base64," นำหน้า
-  //   img = `data:image/png;base64,${img}`
-  // }
 
   isDialogVisibleImgFileMuti.value = true
   imgDialog.value = img
@@ -3424,7 +3418,7 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </VRow>
 
-            <div v-if="coaFiles.length || files.length">
+            <div v-if="coaFiles.length || fileCoaNew.length">
               <VCol
                 class="d-flex justify-end"
                 cols="12"
@@ -3471,7 +3465,8 @@ const getDisabledFollowStatusNRole = () => {
           <VImg
             role="presentation"
             :src="imgDialog"
-            height="80%"
+            max-width="100%"
+            max-height="600px"
             contain
           />
         </VCardText>

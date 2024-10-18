@@ -515,9 +515,9 @@ const saveLotInspect = async () => {
     console.log('Cannot proceed: There are errors in the fields.')
 
     // แสดง dialog แจ้งเตือนถ้าจำเป็น
-    isDialogSubmitFailedVisible.value = true
+    // isDialogSubmitFailedVisible.value = true
     
-    return // หยุดการทำงาน
+    throw "Cannot proceed: There are errors in the fields."
   }
 
   try {
@@ -548,34 +548,36 @@ const saveLotInspect = async () => {
     // isDialogSubmitSuccessVisible.value = true
   } catch (error) {
     // แสดง dialog เมื่อมีข้อผิดพลาด
-    isDialogSubmitFailedVisible.value = true
+    // isDialogSubmitFailedVisible.value = true
     console.error('Error:', error)
   }
 }
 
 //--------------- Submit --------------------------------
-const submitInspForm = () => {
-  saveHeaderInspect()
-  saveLotInspect()
-  axiosIns.post(`${urlApi.value}/api/v1/Inspection/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-      console.log('[products.value]!!: ', response.data)
-      isDialogSubmitSuccessVisible.value = true
-      isDialogConfirmVisible.value = false
-    
+const submitInspForm = async () => {
+  try {
+    // รอให้ saveHeaderInspect และ saveLotInspect ทำงานเสร็จสมบูรณ์ก่อน
+    await submitButtonVisibleNew()
+
+    // ส่งข้อมูลไปยัง API เมื่อทุกอย่างเสร็จสิ้น
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
     })
-    .catch(error => {
+
+    console.log('[products.value]!!: ', response.data)
+    isDialogSubmitSuccessVisible.value = true
+    isDialogConfirmVisible.value = false
+
+  } catch (error) {
     // Handle errors
-      console.error('Error:', error)
-      isDialogSubmitFailedVisible.value = true
-    })
+    console.error('Error:', error)
+
+    // isDialogSubmitFailedVisible.value = true
+  }
 }
 
 //-------- Fuction Cancel --------------------------------
