@@ -758,6 +758,16 @@ const removeFileN = index => {
     delete fileUrls.value[file.name] // ลบ URL จาก object
   }
   fileCoaNew.value.splice(index, 1) // ลบไฟล์จาก array
+
+  if(file){
+    if(file.length < 1){
+      fileCoaNew.value = []
+      console.log('clear fileCoaNew complet!')
+    }else{
+      console.log('Test length < 1')
+    }
+    
+  }
 }
 
 const removeFileO = (index, id) => {
@@ -771,6 +781,16 @@ const removeFileO = (index, id) => {
   coaIdForDelete.value.push(id)
 
   getFormCoa.value.splice(index, 1) // ลบไฟล์จาก array
+
+  if(file){
+    if(file.length < 1){
+      getFormCoa.value = []
+      console.log('clear getFormCoa complet!')
+    }else{
+      console.log('Test length < 1')
+    }
+    
+  }
 
 }
 
@@ -1504,7 +1524,10 @@ const saveDraftData = word => {
                 v-if="statusId === 7 || statusId === 16"
                 style=" white-space: normal; word-wrap: break-word;"
               >
-                <VTextarea readonly v-model="data.statusComments" />
+                <VTextarea
+                  v-model="data.statusComments"
+                  readonly
+                />
               </span>
             </VCol>
           </VRow>
@@ -1525,8 +1548,8 @@ const saveDraftData = word => {
             <VRow>
               <VCol cols="12">
                 <VFileInput
-                  :disabled="frozeCheck"
                   v-model="fileCoaNew"
+                  :disabled="frozeCheck"
                   label="File Upload COA"
                   accept="image/png, image/jpeg, image/bmp, application/pdf"
                   placeholder="Upload your documents"

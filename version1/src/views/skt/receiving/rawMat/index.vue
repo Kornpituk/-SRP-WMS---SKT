@@ -955,6 +955,16 @@ const removeFileN = index => {
     delete fileUrls.value[file.name] // ลบ URL จาก object
   }
   fileCoaNew.value.splice(index, 1) // ลบไฟล์จาก array
+
+  if(file){
+    if(file.length < 1){
+      fileCoaNew.value = []
+      console.log('clear fileCoaNew complet!')
+    }else{
+      console.log('Test length < 1')
+    }
+    
+  }
 }
 
 const removeFileO = (index, id) => {
@@ -968,6 +978,16 @@ const removeFileO = (index, id) => {
   coaIdForDelete.value.push(id)
 
   getCoaForm.value.splice(index, 1) // ลบไฟล์จาก array
+
+  if(file){
+    if(file.length < 1){
+      getCoaForm.value = []
+      console.log('clear getCoaForm complet!')
+    }else{
+      console.log('Test length < 1')
+    }
+    
+  }
 
 }
 
@@ -1000,37 +1020,46 @@ const trickerSubmit = ref(false)
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const handleSaveDraftCoa = async () => {
-
   const result = ref(1)
 
+  console.log("Start COA!!!!!")
+  console.log("Start COA!!!!!", fileCoaNew.value)
+
   if(trickerSubmit.value){
-    if (!fileCoaNew.value.length > 0 || getCoaForm.value.length) {
+    if (!fileCoaNew.value || !getCoaForm.value) {
     // alert('Please upload at least one file')
       result.value -=1
       textAlertError.value.success = false
       textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
       throw 'Failed To Save COA. Plase Upload COA Ones.'
-    }
-
-    if(getCoaForm.value.length > 0){
-      result.value += 1
-    }
-
-    if(fileCoaNew.value.length > 0){
-      console.log("Upload Start++++")
-      await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
-      if (saveCoaForm) {
-        // console.log('Save coa  successful', saveCoaForm.value.success)
-        result.value += 1
-      
-      // return saveCoaForm
-      } else {
-        result.value -=1
-        console.error('Failed to save coa')
-        throw 'Failed to save coa'
-      }
+    }else{
+      console.log("Test")
     }
   }
+
+  if(getCoaForm.value){
+    console.log("getCoaForm Start++++")
+    result.value += 1
+  }
+
+  console.log("fileCoaNew.value", fileCoaNew.value)
+
+  if(fileCoaNew.value){
+    console.log("Upload Start++++")
+    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
+    if (saveCoaForm) {
+      // console.log('Save coa  successful', saveCoaForm.value.success)
+      result.value += 1
+      
+      // return saveCoaForm
+    } else {
+      result.value -=1
+      console.error('Failed to save coa')
+      throw 'Failed to save coa'
+    }
+  }
+
+  console.log("fileCoaNew COA!!!!!")
 
   if(deleteAllStart.value === true){
     console.log("Delete All Start++++")
@@ -3561,6 +3590,11 @@ const getDisabledFollowStatusNRole = () => {
           class="text-center"
           title="Save Draft"
         >
+          <DialogCloseBtn
+            variant="text"
+            size="default"
+            @click="isDialogVisibleStepSaveDraft = false"
+          />
           <VCardText class="pa-1">
             <VRow>
               <VCol

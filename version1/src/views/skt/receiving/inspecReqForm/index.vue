@@ -2256,8 +2256,8 @@ const getDisabledFollowStatusNRole = () => {
         <tr>
           <td>
             <VTextarea
-              :readonly="frozeCheck"
               v-model="headerInsp.note"
+              :readonly="frozeCheck"
               auto-grow
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
             >
@@ -2266,11 +2266,10 @@ const getDisabledFollowStatusNRole = () => {
               </template>
             </VTextarea>
           </td>
-          {{ frozeCheck }}
           <td>
             <VTextarea
-              :readonly="frozeCheck"
               v-model="headerInsp.details"
+              :readonly="frozeCheck"
               auto-grow
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
             >
@@ -2589,6 +2588,11 @@ const getDisabledFollowStatusNRole = () => {
         class="text-center"
         title="Save Draft"
       >
+        <DialogCloseBtn
+          variant="text"
+          size="default"
+          @click="isDialogVisibleStepSaveDraft = false"
+        />
         <VCardText class="pa-1">
           <VRow>
             <VCol
