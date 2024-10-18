@@ -1304,7 +1304,7 @@ const getDisabledFollowStatusNRole = () => {
     </VCard>
   </VDialog>
 
-  <section>
+  <section v-if="false">
     <VBtn @click="textValue">
       Test
     </VBtn>
@@ -1578,7 +1578,14 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 45 || 'Must be 45 characters or less',
                 ]"
                 density="compact"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 0)"
@@ -1634,7 +1641,14 @@ const getDisabledFollowStatusNRole = () => {
                 :rules="[
                   value => value.length <= 45 || 'Must be 45 characters or less'
                 ]"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 1)"
                 class="text-red"
@@ -1688,7 +1702,14 @@ const getDisabledFollowStatusNRole = () => {
                 :rules="[
                   value => value.length <= 45 || 'Must be 45 characters or less'
                 ]"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 2)"
@@ -1742,7 +1763,14 @@ const getDisabledFollowStatusNRole = () => {
                 :rules="[
                   value => value.length <= 45 || 'Must be 45 characters or less'
                 ]"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 3)"
@@ -1796,7 +1824,14 @@ const getDisabledFollowStatusNRole = () => {
                 :rules="[
                   value => value.length <= 45 || 'Must be 45 characters or less'
                 ]"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 4)"
@@ -1818,86 +1853,6 @@ const getDisabledFollowStatusNRole = () => {
               Reference
             </th>
           </tr>
-
-          <div v-if="false">
-            <tr
-              v-for="(item , index) in Reference"
-              :key="index"
-            >
-              <td
-                :class="{ 'bg-primary': !item.aa, 'bg-primary': item.aa }"
-                class="text-center"
-                colspan="1"
-              >
-                {{ index + 1 }}
-              </td>
-              <td
-                colspan="2"
-                style="text-transform: capitalize;"
-              >
-                {{ item.analysisItems }}
-              </td>
-              <td
-                class="text-center"
-                colspan="2"
-                style="text-transform: capitalize;"
-              >
-                {{ item.unit }}
-              </td>
-              <td
-                class="text-center"
-                colspan="2"
-                style="text-transform: capitalize;"
-              >
-                {{ item.analysisMethodNo }}
-              </td>
-              <td
-                class="text-center"
-                colspan="2"
-                style="text-transform: capitalize;"
-              >
-                {{ item.specificationRanges }}
-              </td>
-              <td
-                class="text-center"
-                colspan="1"
-                style="text-transform: capitalize;"
-              >
-                {{ item.actualAnalysis }}
-              </td>
-
-              <td
-                class="text-center"
-                colspan="1"
-              >
-                <VTextField density="compact" />
-              </td>
-              <td
-                class="text-center"
-                colspan="1"
-              >
-                <VTextField density="compact" />
-              </td>
-              <td
-                class="text-center"
-                colspan="1"
-              >
-                <VTextField density="compact" />
-              </td>
-              <td
-                class="text-center"
-                colspan="1"
-              >
-                <VTextField density="compact" />
-              </td>
-              <td
-                class="text-center"
-                colspan="1"
-              >
-                <VTextField density="compact" />
-              </td>
-            </tr>
-          </div>
 
           <tr
             v-for="(item , index) in analysisItems"
@@ -1953,7 +1908,7 @@ const getDisabledFollowStatusNRole = () => {
             </td>
 
             <td
-              v-if="!item.needActualValue && item.typeID === 2"
+              v-if="item.typeID === 2"
               class="text-center"
               colspan="1"
             >
@@ -1996,7 +1951,14 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[0].actualAnalysis"
                 density="compact"
                 :readonly="frozeCheck"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 0)"
@@ -2004,7 +1966,7 @@ const getDisabledFollowStatusNRole = () => {
               >Analysis result Ok/Not is required!</span>
             </td>
             <td
-              v-if="!item.needActualValue && item.typeID === 2"
+              v-if="item.typeID === 2"
               class="text-center"
               colspan="1"
             >
@@ -2046,7 +2008,14 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[1].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 1)"
@@ -2054,7 +2023,7 @@ const getDisabledFollowStatusNRole = () => {
               >{{ textAlertErrorAnalysitItem }}</span>
             </td>
             <td
-              v-if="!item.needActualValue && item.typeID === 2"
+              v-if="item.typeID === 2"
               class="text-center"
               colspan="1"
             >
@@ -2096,7 +2065,14 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[2].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 2)"
@@ -2104,7 +2080,7 @@ const getDisabledFollowStatusNRole = () => {
               >{{ textAlertErrorAnalysitItem }}</span>
             </td>
             <td
-              v-if="!item.needActualValue && item.typeID === 2"
+              v-if="item.typeID === 2"
               class="text-center"
               colspan="1"
             >
@@ -2146,7 +2122,14 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[3].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 3)"
@@ -2154,7 +2137,7 @@ const getDisabledFollowStatusNRole = () => {
               >{{ textAlertErrorAnalysitItem }}</span>
             </td>
             <td
-              v-if="!item.needActualValue && item.typeID === 2"
+              v-if="item.typeID === 2"
               class="text-center"
               colspan="1"
             >
@@ -2190,18 +2173,19 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="checkOkState(item, item.typeID, 4)"
                 class="text-red"
               >{{ textAlertErrorOkState }}</span>
-
               <VTextField
-                v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
-                v-model="item.itemAnalyticals[2].actualAnalysis"
-                :readonly="frozeCheck"
-                density="compact"
-              /><VTextField
                 v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
                 v-model="item.itemAnalyticals[4].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
 
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 4)"
@@ -2263,8 +2247,11 @@ const getDisabledFollowStatusNRole = () => {
               auto-grow
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
             >
-              <template #label>
-                <span style="font-size: 12px;">Enter Your Notes                </span>
+              <template
+                v-if="!frozeCheck"
+                #label
+              >
+                <VIcon icon="ri-edit-line" />
               </template>
             </VTextarea>
           </td>
@@ -2275,8 +2262,11 @@ const getDisabledFollowStatusNRole = () => {
               auto-grow
               :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
             >
-              <template #label>
-                <span style="font-size: 12px;">Enter Your Details</span>
+              <template
+                v-if="!frozeCheck"
+                #label
+              >
+                <VIcon icon="ri-edit-line" />
               </template>
             </VTextarea>
           </td>
@@ -2528,7 +2518,7 @@ const getDisabledFollowStatusNRole = () => {
 
   <!-- Btn Approval -->
   <section
-    v-if="statusId === 7 || statusId === 15"
+    v-if="false"
     class="mt-6"
   >
     <div

@@ -316,9 +316,52 @@ const generatedJournalId = () => {
     })
 }
 
-watchEffect(() => {
+watch(() => {
   generatedJournalId()
 })
+
+//---------------------------------- Approve ------------------------------------
+const wordForSubmit = ref('')
+
+const isDialogConfirmVisible = ref(false)
+const isDialogSubmitSuccessVisible = ref(false)
+const isDialogSubmitFailedVisible = ref(false)
+
+const btnApprove = word => {
+  isDialogConfirmVisible.value = true
+  console.log("word")
+  wordForSubmit.value = word
+
+}
+
+const handleAcceptPackaging = word => {
+  console.log("StaertSSSSS!!")
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/whapproval/${dataProps.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+    params: {
+      stockId: whereHouse.value,
+    },
+  },
+  {})
+    .then(response => {
+      console.log('[products.value]!!: ', response.data)
+      window.location.reload()
+      isDialogSubmitSuccessVisible.value = true
+      isDialogConfirmVisible.value = false
+
+     
+    
+    })
+    .catch(error => {
+    // Handle errors
+      console.error('Error:', error)
+      isDialogSubmitFailedVisible.value = true
+    })
+}
 </script>
 
 <template>
@@ -508,7 +551,7 @@ watchEffect(() => {
       />
     </div>
   </div>
-  <div v-if=" receivedTypeId === 1">
+  <div v-if="receivedTypeId === 1">
     <div
       v-for="(tab, index) in tabs2"
       :key="index"
@@ -520,6 +563,130 @@ watchEffect(() => {
       />
     </div>
   </div>
+
+  <div
+    v-if="statusId === 7 || statusId === 15"
+    style="position: fixed;
+    justify-content: center;
+    inline-size: 93%;
+    inset-block-end: 0;"
+    class="d-flex justify-center py-2"
+  >
+    <VBtn
+      class="mb-2"
+      @click="btnApprove('APPROVE')"
+    >
+      Approve
+    </VBtn>
+  </div>
+
+  <!-- Dialog Submit -->
+  <section>
+    <VDialog
+      v-model="isDialogConfirmVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="warning"
+              icon="ri-question-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
+              Transaction?</span>
+          </div>
+        </VCardText>
+
+        <VCardAction class="d-flex justify-space-between pa-4">
+          <VBtn
+            color="error"
+            @click="isDialogConfirmVisible = false"
+          >
+            Cancel
+          </VBtn>
+          <VBtn
+            v-if="wordForSubmit === 'APPROVE'"
+            color="green"
+            @click="handleAcceptPackaging"
+          >
+            {{ wordForSubmit }}
+          </VBtn>
+        </VCardAction>
+      </VCard>
+    </VDialog>
+  </section>
+  <!-- Dialog Submit Success -->
+  <section>
+    <VDialog
+      v-model="isDialogSubmitSuccessVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="success"
+              icon="ri-checkbox-circle-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
+          </div>
+        </VCardText>
+
+        <VCardAction
+          v-if="false"
+          class="d-flex justify-center pa-4"
+        >
+          <VBtn
+            color="success"
+            @click="submitConfirm"
+          >
+            Continue
+          </VBtn>
+        </VCardAction>
+      </VCard>
+    </VDialog>
+  </section>
+  <!-- Dialog Submit Failed -->
+  <section>
+    <VDialog
+      v-model="isDialogSubmitFailedVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="error"
+              icon="ri-error-warning-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
+          </div>
+        </VCardText>
+
+        <VCardAction class="d-flex justify-center pa-4">
+          <VBtn
+            color="error"
+            @click="submitFailed"
+          >
+            Continue
+          </VBtn>
+        </VCardAction>
+      </VCard>
+    </VDialog>
+  </section>
 
   
   

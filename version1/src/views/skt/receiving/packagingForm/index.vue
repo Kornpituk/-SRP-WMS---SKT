@@ -31,7 +31,7 @@ if(data.value){
 
 const statusId = ref('')
 
-watchEffect(() => {
+watch(() => {
   statusId.value = data.value.statusId
   if(statusId.value !== 10){
     frozeCheck.value = true
@@ -414,7 +414,7 @@ const dataHeader = ref({
 // Call API
 //------------------------------------------- Gennterate
 
-watchEffect(() => {
+watch(() => {
   const { packagingFormGenerate, errorMessageGenerate, fetchPackagingFormGenerate } = useGeneratePackagingFormController()
 
   fetchPackagingFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
@@ -422,6 +422,47 @@ watchEffect(() => {
   const { packagingFormGenerateView, errorMessageGenerateView, fetchPackagingViewFormGenerate } = useGeneratePackagingViewFormController()
 
   fetchPackagingViewFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+})
+
+//------------------------------------------- generate view---
+//------------- journalId
+const responseGener = ref([])
+
+const generatedJournalId = () => {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+      console.log('%c[generatedJournalId] nre!!: ', "color: green; font-weight: bold", response.data)
+
+      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+
+        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+
+        statusId.value = item.statusId // เก็บค่า statusId
+      } else {
+        console.error("ไม่มีข้อมูลใน responseGener")
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })
+}
+
+generatedJournalId()
+watch(() => {
+  // generatedJournalId()
+
+  if(statusId.value === 4 || statusId.value === 5){
+    frozeCheck.value = false
+  }
 })
 
 //---- header --------------------------------
@@ -473,16 +514,18 @@ const saveDraftHeader = async () => {
 
   // console.log('Start saveDraftHeader!!', bodyCheck.actualCheck)
 
-  if(!bodyCheck.actualCheck){
-    alertHeaderErrorMessage.value.success = true
+  if(trickerSubmit.value){
+    if(!bodyCheck.actualCheck){
+      alertHeaderErrorMessage.value.success = true
 
-    alertHeaderErrorMessage.value.actualCheck = "Actual Check is required. Please enter a value."
-    throw 'Actual Check is required. Please enter a value.'
-  }
+      alertHeaderErrorMessage.value.actualCheck = "Actual Check is required. Please enter a value."
+      throw 'Actual Check is required. Please enter a value.'
+    }
 
-  if(dataHeader.value === 'null'){
+    if(dataHeader.value === 'null'){
     
-    throw 'dataHeader invalid'
+      throw 'dataHeader invalid'
+    }
   }
 
   const result = await handleSaveDraft(poEtlLogDetailJournalIDQueryParameters.value, dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
@@ -601,6 +644,9 @@ const handleAcceptPackaging = () => {
     throw 'Failed to submit'
   }
   isDialogConfirmVisible.value = false
+
+  // throw 'success'
+
   acceptPackagingForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
 
   return true
@@ -620,6 +666,7 @@ const handleRejectPackaging = () => {
     const result = rejectPackagingForm(commentReject.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
 
     if (result.success) {
+      location.reload()
       console.log('Save lot details successful')
       alertLotErrorMessage.value.success = false
       isDialogRejectVisible.value = false
@@ -643,26 +690,29 @@ const alertLotErrorMessage = ref({
 
 })
 
-
 //
 const saveDraftLotDetails = async () => {
 
   const bodyCheck = analyticalItemsData.value
 
-  //validate
-  bodyCheck.forEach((item, index) => {
-    if (!item.actualAnalysis) {
-      alertLotErrorMessage.value.success = false // แสดงว่ามีข้อผิดพลาด
-      // เก็บข้อความแยกตามลำดับไอเท็มที่มีปัญหา
-      alertLotErrorMessage.value.actualAnalysis[`item_${index + 1}`] = `Actual Analysis is required for item ${index + 1}. Please enter a value.`
+  if(trickerSubmit.value){
+    //validate
+    bodyCheck.forEach((item, index) => {
+      console.log('Validate Lot')
+      if (!item.actualAnalysis || item.actualAnalysis === '') {
+        console.log('Validate Lot if')
+        alertLotErrorMessage.value.success = true // แสดงว่ามีข้อผิดพลาด
+        // เก็บข้อความแยกตามลำดับไอเท็มที่มีปัญหา
+        alertLotErrorMessage.value.actualAnalysis[`item_${index + 1}`] = `Actual Analysis is required for item ${index + 1}. Please enter a value.`
+      }
+    })
+
+    // ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
+    if (alertLotErrorMessage.value.success) {
+      throw 'Actual Analysis validation failed. Please check the errors.'
     }
-  })
-
-  // ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
-  if (alertLotErrorMessage.value.success) {
-    throw 'Actual Analysis validation failed. Please check the errors.'
   }
-
+  
   const result = await handleSaveDraftLot(analyticalItemsData.value, urlApi.value, whereHouse, accessTokenAtStore)
 
   if (result.success) {
@@ -1322,7 +1372,14 @@ const saveDraftData = word => {
                   value => !!value.trim() || 'Actual Check is required.',
                 ]"
                 @input="(e) => handleInputNumberOnly(e)"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
             </th>
           </tr>
         </thead>
@@ -1355,7 +1412,14 @@ const saveDraftData = word => {
                 :rules="[
                   value => !!value.trim() || 'AnalyticalItem Check is required.',
                 ]"
-              />
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
+                </template>
+              </VTextField>
             </td>
           </tr>
         </tbody>
@@ -2183,7 +2247,7 @@ const saveDraftData = word => {
             class="py-2"
             cols="12"
           >
-            submit
+            Accept
           </VCol>
         </VRow>
       </VBtn>

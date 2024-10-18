@@ -261,6 +261,8 @@ const generatedJournalId = () => {
 
 //----------------------------------- Set configuration Status ---
 
+
+
 const readonlyAllInput = () => {
   return statusId.value !== 3 && statusId.value !== 1 && statusId.value !== 8 && statusId.value !== 9
 }
@@ -269,10 +271,16 @@ const hidedAllIconInput = () => {
   return statusId.value === 3 || statusId.value === 1
 }
 
+const frozeCheck = ref(true)
+
 watch(() => {
   console.log('Gene 1')
   generatedJournalId()
   generatedReceivingForm()
+
+  if(statusId.value === 3 || statusId.value === 1){
+    frozeCheck.value = false
+  }
 })
 
 //------------------- Generated Data --------------------------------
@@ -978,16 +986,7 @@ const removeFileO = (index, id) => {
   coaIdForDelete.value.push(id)
 
   getCoaForm.value.splice(index, 1) // ลบไฟล์จาก array
-
-  if(file){
-    if(file.length < 1){
-      getCoaForm.value = []
-      console.log('clear getCoaForm complet!')
-    }else{
-      console.log('Test length < 1')
-    }
-    
-  }
+  
 
 }
 
@@ -1657,6 +1656,12 @@ watchEffect(() => {
 
 const showDialogImageMuti = (img, name) => {
 
+  // ตรวจสอบว่าข้อมูล img มี "data:image/png;base64," นำหน้าหรือไม่
+  // if (!img.startsWith('data:image')) {
+  //   // ถ้าไม่มี ให้เพิ่ม "data:image/png;base64," นำหน้า
+  //   img = `data:image/png;base64,${img}`
+  // }
+
   isDialogVisibleImgFileMuti.value = true
   imgDialog.value = img
   imgNameDialog.value = name
@@ -2047,7 +2052,7 @@ const getDisabledFollowStatusNRole = () => {
                 class="custom-text-field"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon
@@ -2085,7 +2090,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon
@@ -2123,7 +2128,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon
@@ -2161,7 +2166,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon
@@ -2199,7 +2204,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon
@@ -2265,7 +2270,7 @@ const getDisabledFollowStatusNRole = () => {
                 @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_1')"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2505,7 +2510,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="2"
             >
               <AppDateTimePicker
-                v-if="!readonlyAllInput()"
+                v-if="!frozeCheck"
                 v-model="purchaseOrder.expectDeliveryDate"
                 density="compact"
                 prepend-inner-icon="ri-calendar-schedule-fill"
@@ -2538,7 +2543,7 @@ const getDisabledFollowStatusNRole = () => {
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_1')"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2571,7 +2576,7 @@ const getDisabledFollowStatusNRole = () => {
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_2')"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2604,7 +2609,7 @@ const getDisabledFollowStatusNRole = () => {
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_3')"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2636,7 +2641,7 @@ const getDisabledFollowStatusNRole = () => {
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_4')"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2668,7 +2673,7 @@ const getDisabledFollowStatusNRole = () => {
                 @input="(e) => handleInputAmount(e, 'actualAmountUnits_5')"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2901,7 +2906,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2923,7 +2928,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2946,7 +2951,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2968,7 +2973,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -2990,7 +2995,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -3034,7 +3039,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -3057,7 +3062,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -3081,7 +3086,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -3104,7 +3109,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -3127,7 +3132,7 @@ const getDisabledFollowStatusNRole = () => {
                 ]"
               >
                 <template
-                  v-if="hidedAllIconInput"
+                  v-if="!frozeCheck"
                   #label
                 >
                   <VIcon icon="ri-edit-line" />
@@ -3185,18 +3190,28 @@ const getDisabledFollowStatusNRole = () => {
             <VTextarea
               v-model="purchaseOrder.noteText"
               :readonly="readonlyAllInput()"
-              label="Enter Your Notes"
               placeholder="Text"
               :rules="[
                 v => v.length <= 1000 || 'Max 1000 characters',
               ]"
-            />
+            >
+              <template
+                v-if="!frozeCheck"
+                #label
+              >
+                <VIcon
+                  color="green"
+                  icon="ri-edit-line"
+                />
+              </template>
+            </VTextarea>
             <span
               v-if="textAlertError.note && !purchaseOrder.noteText"
               class="text-red"
             >{{ textAlertError.note }}</span>
           </th>
         </tr>
+        {{ !frozeCheck }}
       </Table>
     </VCol>
 
@@ -3257,7 +3272,7 @@ const getDisabledFollowStatusNRole = () => {
             <VRow>
               <VCol cols="12">
                 <VFileInput
-                  v-if="!readonlyAllInput()"
+                  v-if="!frozeCheck"
                   v-model="fileCoaNew"
                   accept="image/png, image/jpeg, image/bmp, application/pdf"
                   prepend-icon="mdi-paperclip"
@@ -3347,7 +3362,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VCardText>
                   <VCardActions>
                     <VBtn
-                      v-if="!readonlyAllInput()"
+                      v-if="!frozeCheck"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -3405,7 +3420,7 @@ const getDisabledFollowStatusNRole = () => {
 
                   <VCardActions>
                     <VBtn
-                      v-if="!readonlyAllInput()"
+                      v-if="!frozeCheck"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -3418,13 +3433,13 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </VRow>
 
-            <div v-if="coaFiles.length || fileCoaNew.length">
+            <div v-if="coaFiles.length || files.length">
               <VCol
                 class="d-flex justify-end"
                 cols="12"
               >
                 <VBtn
-                  v-if="!readonlyAllInput()"
+                  v-if="!frozeCheck"
                   color="red"
                   @click="removeFileAll"
                 >
@@ -3465,8 +3480,7 @@ const getDisabledFollowStatusNRole = () => {
           <VImg
             role="presentation"
             :src="imgDialog"
-            max-width="100%"
-            max-height="600px"
+            height="80%"
             contain
           />
         </VCardText>
@@ -3529,7 +3543,7 @@ const getDisabledFollowStatusNRole = () => {
 
     <!-- BTN -->
     <VCol
-      v-if="statusId === 3 || statusId === 1"
+      v-if="!frozeCheck"
       cols="12"
       class="py-0"
     >
@@ -3563,7 +3577,7 @@ const getDisabledFollowStatusNRole = () => {
     </VCol>
 
     <VCol
-      v-if="statusId === 3 || statusId === 1"
+      v-if="!frozeCheck"
       class="text-end pb-4 pt-1"
       cols="12"
     >
@@ -3585,11 +3599,6 @@ const getDisabledFollowStatusNRole = () => {
           class="text-center"
           title="Save Draft"
         >
-          <DialogCloseBtn
-            variant="text"
-            size="default"
-            @click="isDialogVisibleStepSaveDraft = false"
-          />
           <VCardText class="pa-1">
             <VRow>
               <VCol
