@@ -1021,44 +1021,41 @@ const trickerSubmit = ref(false)
 const handleSaveDraftCoa = async () => {
   const result = ref(1)
 
-  console.log("Start COA!!!!!")
-  console.log("Start COA!!!!!", fileCoaNew.value)
+  // console.log("Start COA!!!!!")
+  // console.log("Start COA!!!!!", fileCoaNew.value)
 
   if(trickerSubmit.value){
-    if (fileCoaNew.value < 1 || getCoaForm.value < 1) {
-    // alert('Please upload at least one file')
-      result.value -=1
-      textAlertError.value.success = false
-      textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
-      throw 'Failed To Save COA. Plase Upload COA Ones.'
-    }else{
-      console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
+    // if (fileCoaNew.value < 1 || getCoaForm.value < 1) {
+    // // alert('Please upload at least one file')
+    //   result.value -=1
+    //   textAlertError.value.success = false
+    //   textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+    //   console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
+    //   throw 'Failed To Save COA. Plase Upload COA Ones.'
+    // }else{
+    //   console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
+    // }
+
+    if(fileCoaNew.value < 1){
+      if( getCoaForm.value < 1){
+        result.value -=1
+        textAlertError.value.success = false
+        textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+        console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
+        throw 'Failed To Save COA. Plase Upload COA Ones.'
+      }else{
+        console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
+      }
     }
+    
+  }else{
+    console.log("No tricker")
   }
 
   if(getCoaForm.value){
     console.log("getCoaForm Start++++")
     result.value += 1
   }
-
-  console.log("fileCoaNew.value", fileCoaNew.value)
-
-  if(fileCoaNew.value){
-    console.log("Upload Start++++")
-    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
-    if (saveCoaForm) {
-      // console.log('Save coa  successful', saveCoaForm.value.success)
-      result.value += 1
-      
-      // return saveCoaForm
-    } else {
-      result.value -=1
-      console.error('Failed to save coa')
-      throw 'Failed to save coa'
-    }
-  }
-
-  console.log("fileCoaNew COA!!!!!")
 
   if(deleteAllStart.value === true){
     console.log("Delete All Start++++")
@@ -1071,6 +1068,21 @@ const handleSaveDraftCoa = async () => {
     } else {
       result.value -=1
       console.error('Failed to delete all coa')
+      throw 'Failed to save coa'
+    }
+  }
+
+  if(fileCoaNew.value){
+    console.log("Upload Start++++")
+    await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
+    if (saveCoaForm) {
+      // console.log('Save coa  successful', saveCoaForm.value.success)
+      result.value += 1
+      
+      // return saveCoaForm
+    } else {
+      result.value -=1
+      console.error('Failed to save coa')
       throw 'Failed to save coa'
     }
   }
@@ -1374,8 +1386,10 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  location.reload()
-
+  if(trickerSubmit.value !== true){
+    location.reload()
+  }
+  
   // isDialogSubmitSuccessVisible.value = true
   console.log("%ctrickerSubmit Step", "color: yellow; font-weight: bold",  trickerSubmit.value)
   isDialogConfirmVisible.value = false
@@ -1403,7 +1417,7 @@ const submitReceivingForm = async () => {
     isDialogConfirmVisible.value = false
     console.log('Submit buttonVisible Start In')
 
-    throw "Success"
+    // throw "Success"
 
     axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
       headers: {
@@ -1415,7 +1429,7 @@ const submitReceivingForm = async () => {
       .then(response => {
         console.log('[products.value]!!: ', response.data)
 
-        // location.reload()
+        location.reload()
         isDialogSubmitSuccessVisible.value = true
         isDialogConfirmVisible.value = false
       })
@@ -1834,7 +1848,7 @@ const getDisabledFollowStatusNRole = () => {
 
 <template>
   <section
-    v-if="debugMode === true"
+    v-if="false"
     class="mt-10"
   >
     {{ purchaseOrder }}

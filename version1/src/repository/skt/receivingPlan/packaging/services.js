@@ -151,7 +151,7 @@ export const  PackagingFormService = {
       if (response && response.data) {
         console.log('Service Response data Reject:', response.data.messageResult)
         
-        return response.data.messageResult
+        return { data: response.data.messageResult, success: true }
       } else {
         throw new Error('No data received from the server')
       }

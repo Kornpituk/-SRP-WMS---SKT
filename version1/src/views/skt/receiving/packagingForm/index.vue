@@ -33,7 +33,7 @@ const statusId = ref('')
 
 watch(() => {
   statusId.value = data.value.statusId
-  if(statusId.value !== 10){
+  if(statusId.value !== 10 && statusId.value !== 1){
     frozeCheck.value = true
     console.log("TfrozeCheckVifT", frozeCheck.value)
   }
@@ -654,25 +654,28 @@ const handleAcceptPackaging = () => {
 
 //----------------- Reject
 const commentReject = ref('')
-const { rejectPackagingForm } = useRejectPackagingFormController()
+const { packagingFormReject, rejectPackagingForm } = useRejectPackagingFormController()
 
-const handleRejectPackaging = () => {
+const handleRejectPackaging = async () => {
 
   if(!commentReject.value){
     textAlertError.value.success = false
     textAlertError.value.comment = 'Please provide a comment to reject the packaging.'
     throw 'Please provide a comment to reject the packaging'
   }else{
-    const result = rejectPackagingForm(commentReject.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
+    const result = await rejectPackagingForm(commentReject.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
 
-    if (result.success) {
-      location.reload()
-      console.log('Save lot details successful')
+    console.log("result Packaing", packagingFormReject.success)
+    if (result.success === true) {
+      
+      console.log('Save lot reject successful')
       alertLotErrorMessage.value.success = false
       isDialogRejectVisible.value = false
+
+      location.reload()
     } else {
-      console.error('Failed to save lot details')
-      throw 'Failed to save lot details.'
+      console.error('Failed to save lot reject')
+      throw 'Failed to save lot reject.'
     }
 
     // alertLotErrorMessage.value.success = false
@@ -881,8 +884,36 @@ const handleSaveDraftCoa = async () => {
       throw 'Failed to save coa. Plase Upload COA ones.'
     }
 
+    // if(fileCoaNew.value < 1){
+    //   if( getFormCoa.value < 1){
+    //     result.value -=1
+    //     textAlertError.value.success = false
+    //     textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+    //     console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
+    //     throw 'Failed To Save COA. Plase Upload COA Ones.'
+    //   }else{
+    //     console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
+    //   }
+    // }
+
     if(getFormCoa.value){
       result.value += 1
+    }
+
+    // console.log("!151551deleteAllStart", deleteAllStart.value)
+
+    if(deleteAllStart.value === true){
+      await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
+      if (resultDeleteAllCoa.value.success === true) {
+        console.log('Delete coa all  successful')
+        result.value +=1
+
+      // return resultDeleteAllCoa
+      } else {
+        result.value -=1
+        console.error('Failed to delete all coa')
+        throw 'Failed to delete all coa'  
+      }
     }
 
     if(fileCoaNew.value){
@@ -914,6 +945,7 @@ const handleSaveDraftCoa = async () => {
       throw 'Failed to delete all coa'  
     }
   }
+  
 
   if(coaIdForDelete.value.length > 0){
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
@@ -1097,7 +1129,9 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  // location.reload()
+  if(trickerSubmit.value !== true){
+    location.reload()
+  }
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -1266,17 +1300,19 @@ const saveDraftData = word => {
               <VCol cols="6">
                 <div class="demo-space-x">
                   <VCheckbox
-                    v-model="checkCOAYes"
+                    v-model="dataHeader.coAChecked"
                     label="Yes"
                     readonly
+                    :checked="dataHeader.coAChecked"
                   />
                 </div>
               </VCol>
               <VCol cols="6">
                 <div class="demo-space-x">
                   <VCheckbox
-                    v-model="checkCOANo"
+                    v-model="dataHeader.coAChecked"
                     label="No"
+                    :value="false"
                     readonly
                   />
                 </div>
@@ -1763,12 +1799,15 @@ const saveDraftData = word => {
     </VCol> 
   </VRow>
 
-  <VRow class="my-6">
+  <VRow
+    v-if="false"
+    class="my-6"
+  >
     <VCol cols="12">
       <VRow>
         <VCol
           style="border: 1px solid black; font-size: 12px;"
-          class="text-center"
+          class="text-cente"
           cols="12"
         >
           Warehouse
@@ -1802,6 +1841,40 @@ const saveDraftData = word => {
       </VRow>
     </VCol>
   </VRow>
+
+  <section class="my-4">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th colspan="12">
+            Warehouse
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="6">
+            <div style="font-size: 12px;">
+              Staff:  {{ dataHeader.inspStaffUpdateBy }}
+            </div>
+            <VDivider />
+            <div style="font-size: 12px;">
+              <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
+            </div>
+          </td>
+          <td colspan="6">
+            <div style="font-size: 12px;">
+              Supervisor: {{ dataHeader.whUpdateBy }}
+            </div>
+            <VDivider />
+            <div style="font-size: 12px;">
+              <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
   <!-- Dialog Image -->
   <VDialog
@@ -2133,7 +2206,7 @@ const saveDraftData = word => {
             Cancel
           </VBtn>
           <VBtn
-            v-if="wordForSubmit === 'SUBMIT'"
+            v-if="wordForSubmit === 'ACCEPT'"
             color="green"
             @click="handleAcceptPackaging"
           >
@@ -2212,7 +2285,7 @@ const saveDraftData = word => {
   </section>
 
   <!-- Btn -->
-  <VRow v-if="statusId === 10">
+  <VRow v-if="statusId === 10 || statusId === 1">
     <VCol cols="4" />
     <VCol
       cols="8"
@@ -2225,7 +2298,7 @@ const saveDraftData = word => {
         color="warning"
         @click="saveDraftData('SAVE DRAFT')"
       >
-        Save daft
+        Save draft
       </VBtn>
       <VBtn
 
@@ -2240,7 +2313,7 @@ const saveDraftData = word => {
       <VBtn
         height="4 0px"
         width="150px"
-        @click="submitForm('SUBMIT')"
+        @click="submitForm('ACCEPT')"
       >
         <VRow>
           <VCol

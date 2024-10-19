@@ -202,9 +202,10 @@ export const useRejectPackagingFormController = () => {
       
       if (result) {
         console.log('Packaging data Reject Controller:', result)
-        packagingFormReject.value = result
+        packagingFormReject.value = result.success
+        console.log('Packaging data Reject Controller packagingFormReject:', packagingFormReject.value)
         
-        return { success: true, data: result }
+        return { data: result, success: true  }
       } else {
         console.warn('No data returned from the API')
         console.error('Failed to Reject:', result)

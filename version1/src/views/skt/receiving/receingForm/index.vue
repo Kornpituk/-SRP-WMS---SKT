@@ -570,7 +570,7 @@ const handleAcceptPackaging = word => {
     justify-content: center;
     inline-size: 93%;
     inset-block-end: 0;"
-    class="d-flex justify-center py-2"
+    class="d-flex justify-center"
   >
     <VBtn
       class="mb-2"

@@ -1578,6 +1578,7 @@ const getDisabledFollowStatusNRole = () => {
                   value => value.length <= 45 || 'Must be 45 characters or less',
                 ]"
                 density="compact"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -1639,8 +1640,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="frozeCheck"
                 density="compact"
                 :rules="[
-                  value => value.length <= 45 || 'Must be 45 characters or less'
+                  value => value.length <= 44 || 'Must be 45 characters or less'
                 ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -1699,9 +1701,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[2].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
-                :rules="[
-                  value => value.length <= 45 || 'Must be 45 characters or less'
+                ::rules="[
+                  value => value.length <= 44 || 'Must be 45 characters or less'
                 ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -1761,8 +1764,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="frozeCheck"
                 density="compact"
                 :rules="[
-                  value => value.length <= 45 || 'Must be 45 characters or less'
+                  value => value.length <= 44 || 'Must be 45 characters or less'
                 ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -2223,56 +2227,61 @@ const getDisabledFollowStatusNRole = () => {
       style="font-size: 12px;"
       class="mb-1"
     >
-      <VCol cols="12">
+      <VCol cols="12 px-0">
         <span
           class=""
           style="font-size: 12px;"
         >Remark: {{ headerInsp.remark }}</span>
       </VCol>
-      <VCol cols="6">
+      <VCol cols="6 px-0">
         Notes
       </VCol>
-      <VCol cols="6">
+      <VCol cols="6 px-0">
         Details of Limitation Condition
       </VCol>
-    </VRow>
 
-    <table class="custom-table">
-      <tbody>
-        <tr>
-          <td>
-            <VTextarea
-              v-model="headerInsp.note"
-              :readonly="frozeCheck"
-              auto-grow
-              :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
-            >
-              <template
-                v-if="!frozeCheck"
-                #label
-              >
-                <VIcon icon="ri-edit-line" />
-              </template>
-            </VTextarea>
-          </td>
-          <td>
-            <VTextarea
-              v-model="headerInsp.details"
-              :readonly="frozeCheck"
-              auto-grow
-              :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
-            >
-              <template
-                v-if="!frozeCheck"
-                #label
-              >
-                <VIcon icon="ri-edit-line" />
-              </template>
-            </VTextarea>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <VCol
+        cols="12"
+        class="px-0"
+      >
+        <table class="custom-table">
+          <tbody>
+            <tr>
+              <td>
+                <VTextarea
+                  v-model="headerInsp.note"
+                  :readonly="frozeCheck"
+                  auto-grow
+                  :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+              </td>
+              <td>
+                <VTextarea
+                  v-model="headerInsp.details"
+                  :readonly="frozeCheck"
+                  auto-grow
+                  :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </VCol>
+    </VRow>
   </section>
 
   <!-- Quality Evaluation -->
