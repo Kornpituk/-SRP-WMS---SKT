@@ -1352,28 +1352,32 @@ const saveDraftData = word => {
             <th
               colspan="1"
               rowspan="2"
+              class="text-center"
             >
               No.
             </th>
             <th
               colspan="2"
               rowspan="2"
+              class="text-center"
             >
               Analytical Items
             </th>
             <th
               colspan="2"
               rowspan="2"
+              class="text-center"
             >
               Checking Method
             </th>
             <th
               colspan="2"
               rowspan="2"
+              class="text-center"
             >
               Specification Ranges
             </th>
-            <th colspan="1">
+            <th colspan="1" class="text-center">
               P/O NO.
             </th>
             <td
@@ -1384,7 +1388,7 @@ const saveDraftData = word => {
             </td>
           </tr>
           <tr>
-            <th colspan="1">
+            <th colspan="1" class="text-center">
               Amount (Piece)
             </th>
             <td
@@ -1396,7 +1400,7 @@ const saveDraftData = word => {
           </tr>
           <tr>
             <th colspan="7" />
-            <th colspan="1">
+            <th colspan="1" class="text-center">
               Actual Check
             </th>
             <th colspan="4">
@@ -1424,7 +1428,7 @@ const saveDraftData = word => {
             v-for="(item, index) in analyticalItemsData"
             :key="index"
           >
-            <td colspan="1">
+            <td colspan="1" class="text-center">
               {{ index+1 }}
             </td>
             <td colspan="2">
