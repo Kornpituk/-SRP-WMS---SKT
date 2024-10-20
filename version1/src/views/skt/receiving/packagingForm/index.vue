@@ -633,7 +633,7 @@ const textAlertError = ref({
 })
 
 //----------------- Accept
-const { acceptPackagingForm } = useAcceptPackagingFormController()
+const { packagingFormAccept, acceptPackagingForm } = useAcceptPackagingFormController()
 
 const handleAcceptPackaging = () => {
   wordForSubmit.value = "SUBMIT"
@@ -648,6 +648,19 @@ const handleAcceptPackaging = () => {
   // throw 'success'
 
   acceptPackagingForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
+
+  // console.log("result Packaing", packagingFormReject.success)
+  if (packagingFormAccept) {
+      
+    console.log('accept reject successful')
+    alertLotErrorMessage.value.success = false
+    isDialogRejectVisible.value = false
+
+    location.reload()
+  } else {
+    console.error('Failed to accept reject')
+    throw 'Failed to accept reject.'
+  }
 
   return true
 }
@@ -1377,7 +1390,10 @@ const saveDraftData = word => {
             >
               Specification Ranges
             </th>
-            <th colspan="1" class="text-center">
+            <th
+              colspan="1"
+              class="text-center"
+            >
               P/O NO.
             </th>
             <td
@@ -1388,7 +1404,10 @@ const saveDraftData = word => {
             </td>
           </tr>
           <tr>
-            <th colspan="1" class="text-center">
+            <th
+              colspan="1"
+              class="text-center"
+            >
               Amount (Piece)
             </th>
             <td
@@ -1400,7 +1419,10 @@ const saveDraftData = word => {
           </tr>
           <tr>
             <th colspan="7" />
-            <th colspan="1" class="text-center">
+            <th
+              colspan="1"
+              class="text-center"
+            >
               Actual Check
             </th>
             <th colspan="4">
@@ -1428,7 +1450,10 @@ const saveDraftData = word => {
             v-for="(item, index) in analyticalItemsData"
             :key="index"
           >
-            <td colspan="1" class="text-center">
+            <td
+              colspan="1"
+              class="text-center"
+            >
               {{ index+1 }}
             </td>
             <td colspan="2">

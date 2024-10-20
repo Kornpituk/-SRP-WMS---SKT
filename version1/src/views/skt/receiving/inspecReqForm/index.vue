@@ -2363,7 +2363,7 @@ const getDisabledFollowStatusNRole = () => {
               v-if="statusId === 7 || statusId === 16"
               style=" white-space: normal; word-wrap: break-word;"
             >
-              <VTextarea v-model="headerInsp.remarkReject" />
+              <VTextarea readonly v-model="headerInsp.remarkReject" />
             </span>
           </VCol>
         </VRow>
