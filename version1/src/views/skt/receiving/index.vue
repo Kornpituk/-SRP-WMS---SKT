@@ -4066,11 +4066,11 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2 "
-                style="width: 100%; min-width: 250px;"
+                style="min-width: 250px; max-width: 250px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
-                  style="max-width: 200px; font-size: 12px;"
+                  style="font-size: 12px;"
                   class="text-wrap"
                   v-html="item.raw.concatTradename.replace(/\s/g, '&nbsp;')"
                 />

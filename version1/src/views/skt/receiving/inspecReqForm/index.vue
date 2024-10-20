@@ -2234,7 +2234,7 @@ const getDisabledFollowStatusNRole = () => {
         >Remark: {{ headerInsp.remark }}</span>
       </VCol>
       <VCol cols="6 px-0">
-        Notes
+        Note
       </VCol>
       <VCol cols="6 px-0">
         Details of Limitation Condition
@@ -2378,7 +2378,7 @@ const getDisabledFollowStatusNRole = () => {
       <VCol cols="6">
         <VRow>
           <VCol
-            style="border: 1px solid black; font-size: 12px;"
+            style="border: 1px solid black; font-size: 12px; font-weight: bolder;"
             class="text-center"
             cols="12"
           >
@@ -2421,7 +2421,7 @@ const getDisabledFollowStatusNRole = () => {
       <VCol cols="6">
         <VRow>
           <VCol
-            style="border: 1px solid black; font-size: 12px;"
+            style="border: 1px solid black; font-size: 12px; font-weight: bolder;"
             class="text-center"
             cols="12"
           >

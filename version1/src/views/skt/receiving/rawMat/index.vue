@@ -3203,7 +3203,7 @@ const getDisabledFollowStatusNRole = () => {
         style="font-size: 12px;"
         class="mb-2"
       >
-        Notes
+        Note
       </div>
       <Table class="custom-table">
         <tr>

@@ -1515,8 +1515,11 @@ const saveDraftData = word => {
                   value => !!value.trim() || 'Notes is required.',
                 ]"
               >
-                <template #label>
-                  <span style="font-size: 12px;">Enter Your Nots</span>
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
                 </template>
               </VTextarea>
             </th>
@@ -1529,8 +1532,11 @@ const saveDraftData = word => {
                   value => !!value.trim() || 'Details is required.',
                 ]"
               >
-                <template #label>
-                  <span style="font-size: 12px;">Enter Your Details</span>
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon icon="ri-edit-line" />
                 </template>
               </VTextarea>
             </th>
@@ -1846,7 +1852,10 @@ const saveDraftData = word => {
     <table class="custom-table">
       <thead>
         <tr>
-          <th colspan="12">
+          <th
+            colspan="12"
+            class="text-center"
+          >
             Warehouse
           </th>
         </tr>
