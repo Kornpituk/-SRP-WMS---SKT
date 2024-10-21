@@ -48,6 +48,78 @@ watchEffect(() => {
   }
 })
 
+//-------------------------------------- Validate input --------------------------------
+const maxLines = 4
+const maxCharsPerLine = 130
+
+const limitTextInputLine4Note = event => {
+  const inputText = event.target.value
+  let lines = inputText.split('\n')
+  
+  const maxLines = 4
+  const maxCharsPerLine = 130
+
+  // ป้องกันไม่ให้พิมพ์เกิน 130 ตัวอักษรในแต่ละบรรทัด
+  for (let i = 0; i < lines.length; i++) {
+    while (lines[i].length > maxCharsPerLine) {
+      // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
+      let extraText = lines[i].slice(maxCharsPerLine)
+      lines[i] = lines[i].slice(0, maxCharsPerLine)
+      
+      if (i + 1 < maxLines) {
+        // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
+        lines.splice(i + 1, 0, extraText)
+      } else {
+        // ถ้าเกิน 4 บรรทัดแล้ว ให้ตัดส่วนที่เกินทิ้ง
+        break
+      }
+    }
+  }
+
+  // ป้องกันไม่ให้เกินจำนวนบรรทัดที่กำหนด
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+  }
+
+  // อัปเดตค่าใน textarea
+  event.target.value = lines.join('\n')
+  headerInsp.value.note = event.target.value
+}
+
+const limitTextInputLine4Details = event => {
+  const inputText = event.target.value
+  let lines = inputText.split('\n')
+  
+  const maxLines = 4
+  const maxCharsPerLine = 130
+
+  // ป้องกันไม่ให้พิมพ์เกิน 130 ตัวอักษรในแต่ละบรรทัด
+  for (let i = 0; i < lines.length; i++) {
+    while (lines[i].length > maxCharsPerLine) {
+      // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
+      let extraText = lines[i].slice(maxCharsPerLine)
+      lines[i] = lines[i].slice(0, maxCharsPerLine)
+      
+      if (i + 1 < maxLines) {
+        // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
+        lines.splice(i + 1, 0, extraText)
+      } else {
+        // ถ้าเกิน 4 บรรทัดแล้ว ให้ตัดส่วนที่เกินทิ้ง
+        break
+      }
+    }
+  }
+
+  // ป้องกันไม่ให้เกินจำนวนบรรทัดที่กำหนด
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+  }
+
+  // อัปเดตค่าใน textarea
+  event.target.value = lines.join('\n')
+  headerInsp.value.details = event.target.value
+}
+
 //------------------------------------ Purchest Item --------------------------------
 const headerInsp =ref({
   sktName: dataProps.value.itemName,
@@ -94,7 +166,7 @@ const covertFloatFixedTwo = convert => {
 //-------------- Generate---------------------------------------
 const generatedInsp = () => {
 
-  axiosIns.post(`${urlApi.value}/api/v1/Inspection/generate/${data.value.poEtlLogDetailJournalID}`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/Inspection/Generate/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -150,6 +222,12 @@ const generatedJournalId = () => {
       console.error('Error:', error)
     })
 }
+
+// watchEffect(() => {
+//   if(statusId.value === 4 || statusId.value === 5){
+//     frozeCheck.value = false
+//   }
+// })
 
 watch(() => {
   generatedInsp()
@@ -508,7 +586,11 @@ const saveLotInspect = async () => {
   emptyFields.value = checkEmptyFields()
 
   // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
-  const hasErrors = emptyFields.value.some(field => field.isEmpty)
+  
+  const hasErrors = null 
+  if(trickerSubmit.value){
+    hasErrors = emptyFields.value.some(field => field.isEmpty)
+  }
   
   // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
   if (hasErrors) {
@@ -554,6 +636,9 @@ const saveLotInspect = async () => {
 }
 
 //--------------- Submit --------------------------------
+
+const trickerSubmit = ref(false)
+
 const submitInspForm = async () => {
   try {
     // รอให้ saveHeaderInspect และ saveLotInspect ทำงานเสร็จสมบูรณ์ก่อน
@@ -571,6 +656,10 @@ const submitInspForm = async () => {
     console.log('[products.value]!!: ', response.data)
     isDialogSubmitSuccessVisible.value = true
     isDialogConfirmVisible.value = false
+
+    location.reload()
+
+    // throw "Sumit Inp Successfully"
 
   } catch (error) {
     // Handle errors
@@ -936,7 +1025,9 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  location.reload()
+  if(trickerSubmit.value !== true){
+    location.reload()
+  }
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -951,8 +1042,8 @@ const submitButton = word => {
 }
 
 const saveDraftButton = word => {
-  saveHeaderInspect()
-  saveLotInspect()
+  trickerSubmit.value = false
+  submitButtonVisibleNew(word)
   wordForSubmit.value = word
 }
 
@@ -967,6 +1058,7 @@ const areaTextRemarkButton = word => {
 }
 
 const submitButtonVisible = word => {
+  trickerSubmit.value = true
   wordForSubmit.value = word
   isDialogConfirmVisible.value = true
 }
@@ -1058,7 +1150,7 @@ const getDisabledFollowStatusNRole = () => {
   </div>
 
   <VRow>
-    <VCol cols="3">
+    <VCol cols="">
       <div
         class="my-4 pa-2 text-center"
         style="border: 1px solid black; font-size: 12px; font-weight: bold;"
@@ -1313,7 +1405,7 @@ const getDisabledFollowStatusNRole = () => {
   <!-- Raw Material Inspection Request Form -->
   <VRow class="mt-4">
     <VCol
-      class="px-0"
+      class=""
       cols="12"
     >
       <div style="overflow-x: auto; white-space: nowrap;">
@@ -1575,7 +1667,7 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="frozeCheck"
                 :rules="[
                   value => value !== '' || !value || 'Actual value is required!',
-                  value => value.length <= 45 || 'Must be 45 characters or less',
+                  value => value.length <= 44 || 'Must be 45 characters or less',
                 ]"
                 density="compact"
                 :maxlength="45" 
@@ -1640,9 +1732,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="frozeCheck"
                 density="compact"
                 :rules="[
-                  value => value.length <= 44 || 'Must be 45 characters or less'
+                  value => value.length <= 44 || 'Must be 45 characters or less',
                 ]"
-                :maxlength="45" 
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -1701,7 +1793,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[2].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
-                ::rules="[
+                :rules="[
                   value => value.length <= 44 || 'Must be 45 characters or less'
                 ]"
                 :maxlength="45" 
@@ -1826,8 +1918,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="frozeCheck"
                 density="compact"
                 :rules="[
-                  value => value.length <= 45 || 'Must be 45 characters or less'
+                  value => value.length <= 44 || 'Must be 45 characters or less'
                 ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -1955,6 +2048,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[0].actualAnalysis"
                 density="compact"
                 :readonly="frozeCheck"
+                :rules="[
+                  value => value.length <= 44 || 'Must be 45 characters or less'
+                ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -2012,6 +2109,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[1].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
+                :rules="[
+                  value => value.length <= 44 || 'Must be 45 characters or less'
+                ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -2069,6 +2170,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[2].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
+                :rules="[
+                  value => value.length <= 44 || 'Must be 45 characters or less'
+                ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -2126,6 +2231,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[3].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
+                :rules="[
+                  value => value.length <= 44 || 'Must be 45 characters or less'
+                ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -2182,6 +2291,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="item.itemAnalyticals[4].actualAnalysis"
                 :readonly="frozeCheck"
                 density="compact"
+                :rules="[
+                  value => value.length <= 44 || 'Must be 45 characters or less'
+                ]"
+                :maxlength="45" 
               >
                 <template
                   v-if="!frozeCheck"
@@ -2227,32 +2340,35 @@ const getDisabledFollowStatusNRole = () => {
       style="font-size: 12px;"
       class="mb-1"
     >
-      <VCol cols="12 px-0">
+      <VCol cols="12 ">
         <span
           class=""
           style="font-size: 12px;"
         >Remark: {{ headerInsp.remark }}</span>
       </VCol>
-      <VCol cols="6 px-0">
+      <VCol cols="6 ">
         Note
       </VCol>
-      <VCol cols="6 px-0">
+      <VCol cols="6 ">
         Details of Limitation Condition
       </VCol>
 
       <VCol
         cols="12"
-        class="px-0"
+        class=""
       >
         <table class="custom-table">
           <tbody>
             <tr>
-              <td>
+              <td colspan="6">
                 <VTextarea
                   v-model="headerInsp.note"
                   :readonly="frozeCheck"
                   auto-grow
-                  :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
+                  :rules="[
+                    v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
+                  ]" 
+                  @input="limitTextInputLine4Note" 
                 >
                   <template
                     v-if="!frozeCheck"
@@ -2262,12 +2378,15 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextarea>
               </td>
-              <td>
+              <td colspan="6">
                 <VTextarea
                   v-model="headerInsp.details"
                   :readonly="frozeCheck"
                   auto-grow
-                  :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
+                  :rules="[
+                    v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
+                  ]" 
+                  @input="limitTextInputLine4Details"
                 >
                   <template
                     v-if="!frozeCheck"
@@ -2286,9 +2405,9 @@ const getDisabledFollowStatusNRole = () => {
 
   <!-- Quality Evaluation -->
   <section class="mt-5">
-    <VRow>
+    <VRow class="px-4">
       <VCol
-        class="px-0"
+        class=""
         style="font-size: 12px;"
         cols="12"
       >
@@ -2363,7 +2482,10 @@ const getDisabledFollowStatusNRole = () => {
               v-if="statusId === 7 || statusId === 16"
               style=" white-space: normal; word-wrap: break-word;"
             >
-              <VTextarea readonly v-model="headerInsp.remarkReject" />
+              <VTextarea
+                v-model="headerInsp.remarkReject"
+                readonly
+              />
             </span>
           </VCol>
         </VRow>
@@ -2374,7 +2496,7 @@ const getDisabledFollowStatusNRole = () => {
   <!-- WareHouse / Inspection -->
   <section>
     <!-- WareHouse / Inspection -->
-    <VRow class="mt-6">
+    <VRow class="mt-6 px-4">
       <VCol cols="6">
         <VRow>
           <VCol
@@ -2475,7 +2597,7 @@ const getDisabledFollowStatusNRole = () => {
         class="mx-4"
         color="warning"
         style="font-size: 12px;"
-        @click="submitButtonVisibleNew('SAVE DRAFT')"
+        @click="saveDraftButton('SAVE DRAFT')"
       >
         SAVE DRAFT
       </VBtn>
@@ -2587,7 +2709,7 @@ const getDisabledFollowStatusNRole = () => {
       <!-- Dialog Content -->
       <VCard
         class="text-center"
-        title="Save Draft"
+        :title="wordForSubmit"
       >
         <DialogCloseBtn
           variant="text"
@@ -2664,7 +2786,7 @@ const getDisabledFollowStatusNRole = () => {
         </VCardText>
 
         <VCardText
-          v-if="emptyFields"
+          v-if="emptyFields && wordForSubmit !== 'SAVE DRAFT'"
           class="text-start"
         >
           <VDivider />

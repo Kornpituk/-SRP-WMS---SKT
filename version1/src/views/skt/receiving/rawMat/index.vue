@@ -261,8 +261,6 @@ const generatedJournalId = () => {
 
 //----------------------------------- Set configuration Status ---
 
-
-
 const readonlyAllInput = () => {
   return statusId.value !== 3 && statusId.value !== 1 && statusId.value !== 8 && statusId.value !== 9
 }
@@ -270,6 +268,10 @@ const readonlyAllInput = () => {
 const hidedAllIconInput = () => {
   return statusId.value === 3 || statusId.value === 1
 }
+
+watchEffect(() => {
+
+})
 
 const frozeCheck = ref(true)
 
@@ -283,7 +285,74 @@ watch(() => {
   }
 })
 
+//--------------------- Input -----------------------------------------
+const maxLines = 4
+const maxCharsPerLine = 130
+
+const limitTextInputLine4 = event => {
+  const inputText = event.target.value
+  let lines = inputText.split('\n')
+  
+  const maxLines = 4
+  const maxCharsPerLine = 130
+
+  // ป้องกันไม่ให้พิมพ์เกิน 130 ตัวอักษรในแต่ละบรรทัด
+  for (let i = 0; i < lines.length; i++) {
+    while (lines[i].length > maxCharsPerLine) {
+      // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
+      let extraText = lines[i].slice(maxCharsPerLine)
+      lines[i] = lines[i].slice(0, maxCharsPerLine)
+      
+      if (i + 1 < maxLines) {
+        // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
+        lines.splice(i + 1, 0, extraText)
+      } else {
+        // ถ้าเกิน 4 บรรทัดแล้ว ให้ตัดส่วนที่เกินทิ้ง
+        break
+      }
+    }
+  }
+
+  // ป้องกันไม่ให้เกินจำนวนบรรทัดที่กำหนด
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+  }
+
+  // อัปเดตค่าใน textarea
+  event.target.value = lines.join('\n')
+  purchaseOrder.value.noteText = event.target.value
+}
+
+// const maxChars = 42
+
 //------------------- Generated Data --------------------------------
+//-------------------------- Generate ----------------------------------
+const generated = () => {
+
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${data.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+
+      // itemsManufacturer.value = response.data.data
+
+      console.log('[generatedReceivingForm]!!: ', response.data)
+
+    })
+    .catch(error => {
+    // Handle errors
+      console.error('Error:', error)
+    })
+}
+
+watch(() => {
+  generated()
+})
 
 //----------------- Function Clear When Maker Lot '' | undifined |----------------------------------------------------------------
 const resetDataRaeMatRequest = () => {
@@ -547,7 +616,6 @@ const getCOAReceivingForm = () => {
 onBeforeUnmount(() => {
   clearInterval(interval.value)
 })
-
 
 watch(() => {
   console.log('Gene 2')
@@ -1857,6 +1925,8 @@ const getDisabledFollowStatusNRole = () => {
     data : {{ }}
   </section>
 
+
+
   <VRow>
     <VCol cols="12">
       <div
@@ -1868,7 +1938,7 @@ const getDisabledFollowStatusNRole = () => {
     </VCol>
 
     <VCol
-      class="text-center mx-4"
+      class="mx-3 pa-2 text-center"
       style="border: 1px solid black; font-size: 12px; font-weight: bold;"
       cols="2"
     >
@@ -2067,9 +2137,9 @@ const getDisabledFollowStatusNRole = () => {
                 :style="{ width: '100%', minWidth: '150px', fontSize: '12px !important;' }"
                 :rules="[
                   value => !!value.trim() || 'Lot No.1 is required.',
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
-                maxlegth="20"
+                :maxlength="45"
                 class="custom-text-field"
               >
                 <template
@@ -2105,8 +2175,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less',
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -2143,8 +2214,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                    value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -2181,8 +2253,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                    value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -2219,8 +2292,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
+                    value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
                 density="compact"
                 style="font-size: 16px;"
               >
@@ -2264,6 +2338,10 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.invoiceNo"
                 :readonly="readonlyAllInput()"
                 density="compact"
+                :rules="[
+                  value => value.length <= 44 || 'Max 45 characters per line.'
+                ]"
+                :maxlength="45"
               />
             </th>
             <th
@@ -2494,8 +2572,6 @@ const getDisabledFollowStatusNRole = () => {
                   v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                   v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
                     `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
-
-
                 ]"
                 density="compact"
                 style="font-size: 16px;"
@@ -2923,8 +2999,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -2945,8 +3022,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -2968,8 +3046,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -2990,8 +3069,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -3012,8 +3092,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -3056,8 +3137,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -3079,8 +3161,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -3103,8 +3186,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -3126,8 +3210,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -3149,8 +3234,9 @@ const getDisabledFollowStatusNRole = () => {
                 style="font-size: 16px;"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -3213,8 +3299,9 @@ const getDisabledFollowStatusNRole = () => {
               :readonly="readonlyAllInput()"
               placeholder="Text"
               :rules="[
-                v => v.length <= 1000 || 'Max 1000 characters',
-              ]"
+                v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
+              ]" 
+              @input="limitTextInputLine4"
             >
               <template
                 v-if="!frozeCheck"

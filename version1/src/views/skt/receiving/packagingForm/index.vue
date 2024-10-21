@@ -411,6 +411,78 @@ const dataHeader = ref({
   packagingImg: null,
 })
 
+//////--------------------------------- Defined Rules Input -------------------------------------------
+const maxLines = 4
+const maxCharsPerLine = 130
+
+const limitTextInputLine4Note = event => {
+  const inputText = event.target.value
+  let lines = inputText.split('\n')
+  
+  const maxLines = 4
+  const maxCharsPerLine = 130
+
+  // ป้องกันไม่ให้พิมพ์เกิน 130 ตัวอักษรในแต่ละบรรทัด
+  for (let i = 0; i < lines.length; i++) {
+    while (lines[i].length > maxCharsPerLine) {
+      // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
+      let extraText = lines[i].slice(maxCharsPerLine)
+      lines[i] = lines[i].slice(0, maxCharsPerLine)
+      
+      if (i + 1 < maxLines) {
+        // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
+        lines.splice(i + 1, 0, extraText)
+      } else {
+        // ถ้าเกิน 4 บรรทัดแล้ว ให้ตัดส่วนที่เกินทิ้ง
+        break
+      }
+    }
+  }
+
+  // ป้องกันไม่ให้เกินจำนวนบรรทัดที่กำหนด
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+  }
+
+  // อัปเดตค่าใน textarea
+  event.target.value = lines.join('\n')
+  dataHeader.value.note = event.target.value
+}
+
+const limitTextInputLine4Details = event => {
+  const inputText = event.target.value
+  let lines = inputText.split('\n')
+  
+  const maxLines = 4
+  const maxCharsPerLine = 130
+
+  // ป้องกันไม่ให้พิมพ์เกิน 130 ตัวอักษรในแต่ละบรรทัด
+  for (let i = 0; i < lines.length; i++) {
+    while (lines[i].length > maxCharsPerLine) {
+      // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
+      let extraText = lines[i].slice(maxCharsPerLine)
+      lines[i] = lines[i].slice(0, maxCharsPerLine)
+      
+      if (i + 1 < maxLines) {
+        // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
+        lines.splice(i + 1, 0, extraText)
+      } else {
+        // ถ้าเกิน 4 บรรทัดแล้ว ให้ตัดส่วนที่เกินทิ้ง
+        break
+      }
+    }
+  }
+
+  // ป้องกันไม่ให้เกินจำนวนบรรทัดที่กำหนด
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+  }
+
+  // อัปเดตค่าใน textarea
+  event.target.value = lines.join('\n')
+  dataHeader.value.limConditionDetail = event.target.value
+}
+
 // Call API
 //------------------------------------------- Gennterate
 
@@ -1433,6 +1505,7 @@ const saveDraftData = word => {
                 :rules="[
                   value => !!value.trim() || 'Actual Check is required.',
                 ]"
+                
                 @input="(e) => handleInputNumberOnly(e)"
               >
                 <template
@@ -1476,7 +1549,9 @@ const saveDraftData = word => {
                 density="compact"
                 :rules="[
                   value => !!value.trim() || 'AnalyticalItem Check is required.',
+                  value => value.length <= 44 || 'Must be 45 characters or less'
                 ]"
+                :maxlength="45"
               >
                 <template
                   v-if="!frozeCheck"
@@ -1542,7 +1617,9 @@ const saveDraftData = word => {
                 auto-grow
                 :rules="[
                   value => !!value.trim() || 'Notes is required.',
+                  v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
                 ]"
+                @input="limitTextInputLine4Note"
               >
                 <template
                   v-if="!frozeCheck"
@@ -1559,7 +1636,9 @@ const saveDraftData = word => {
                 auto-grow
                 :rules="[
                   value => !!value.trim() || 'Details is required.',
+                  v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
                 ]"
+                @input="limitTextInputLine4Details"
               >
                 <template
                   v-if="!frozeCheck"

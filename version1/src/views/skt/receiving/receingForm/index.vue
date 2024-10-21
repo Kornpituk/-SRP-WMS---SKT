@@ -569,7 +569,7 @@ const handleAcceptPackaging = word => {
     style="position: fixed;
           display: flex;
           box-sizing: border-box;
-          justify-content: center;
+          justify-content: cente r;
           padding: 8px;
           inline-size: 105vw;
           inset-block-end: 0;
