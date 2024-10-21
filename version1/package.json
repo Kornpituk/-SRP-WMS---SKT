@@ -58,6 +58,7 @@
     "@intlify/unplugin-vue-i18n": "0.10.0",
     "@vitejs/plugin-vue": "4.2.3",
     "@vitejs/plugin-vue-jsx": "3.0.1",
+    "@vue/cli-service": "^5.0.8",
     "eslint": "8.41.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.27.5",

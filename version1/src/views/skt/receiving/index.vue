@@ -40,6 +40,28 @@ const toggleDebugMode = () => {
   debugMode.value = !debugMode.value
 }
 
+//-------------------------------------- Defined Version --------------------------------
+const buildDate = process.env.BUILD_DATE
+
+const showSection = ref(false)
+
+const handleScroll = () => {
+  // เช็คว่าผู้ใช้เลื่อนถึงด้านล่างสุดหรือไม่
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+    showSection.value = true
+  } else {
+    showSection.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
 
 // Get access token from localStorage in another page
@@ -4280,18 +4302,20 @@ const dessertsTest = ref([
 
   <!-- Footer -->
   <section
-    v-if="true"
-    section
+    v-if="showSection"
     class="fixed-bottom"
   >
     <VCard>
-      <VCardText class="pa-1">
+      <VCardText
+        class="pa-1"
+        style="min-width: 100%;"
+      >
         <VAlert
           color="green-lighten-3"
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.3(Last Updated 12/09/2024) {{ products.length }} Rows of Data 
+          Version : 2.4(Last Updated 21/10/2024 ) {{ products.length }} Rows of Data 
         </VAlert>
       </VCardText>
     </VCard>
@@ -4328,9 +4352,13 @@ const dessertsTest = ref([
 
 .fixed-bottom {
   position: fixed;
+  display: flex;
+  box-sizing: border-box;
   justify-content: center;
-  inline-size: 95%;
+  padding: 8px;
+  inline-size: 100%;
   inset-block-end: 0;
+  max-inline-size: 100%; /* ไม่ให้เกินขอบหน้าจอ */
 }
 
 .spinning {
