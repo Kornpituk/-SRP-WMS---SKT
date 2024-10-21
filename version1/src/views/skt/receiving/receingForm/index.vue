@@ -600,12 +600,14 @@ const handleAcceptPackaging = word => {
     style="position: fixed;
           display: flex;
           box-sizing: border-box;
-          justify-content: cente r;
+          justify-content: start;
           padding: 8px;
           inline-size: 105vw;
           inset-block-end: 0;
+          margin-block-end: 598px;
+          margin-inline-start: 50px;
           max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */"
-    class="d-flex justify-center"
+    class="d-flex justify-start"
   >
     <VBtn
       class="mb-2"

@@ -4077,7 +4077,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2"
-                style="min-width: 250px;"
+                style="min-width: 300px; max-width: 300px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
@@ -4088,7 +4088,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2 "
-                style="min-width: 250px; max-width: 250px;"
+                style="min-width: 250px; max-width: 300px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
@@ -4098,8 +4098,8 @@ const dessertsTest = ref([
                 />
               </td>
               <td
-                class="px-2"
-                style="min-width: 150px; justify-content: start;"
+                class="px-2 text-center"
+                style="min-width: 150px; justify-content: center;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
@@ -4354,10 +4354,11 @@ const dessertsTest = ref([
   position: fixed;
   display: flex;
   box-sizing: border-box;
-  justify-content: center;
-  padding: 8px;
+  justify-content: start;
+  padding: 2px;
   inline-size: 105vw;
   inset-block-end: 0;
+  margin-block-end: 80px;
   max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */
 }
 
