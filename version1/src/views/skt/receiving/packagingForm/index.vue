@@ -32,11 +32,7 @@ if(data.value){
 const statusId = ref('')
 
 watch(() => {
-  statusId.value = data.value.statusId
-  if(statusId.value !== 10 && statusId.value !== 1){
-    frozeCheck.value = true
-    console.log("TfrozeCheckVifT", frozeCheck.value)
-  }
+  
 })
 
 const mockData = ref([
@@ -516,7 +512,7 @@ const generatedJournalId = () => {
       if (response.data && response.data.data && response.data.data.length > 0) {
         responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
 
-        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+        // const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
         statusId.value = item.statusId // เก็บค่า statusId
       } else {
@@ -528,12 +524,16 @@ const generatedJournalId = () => {
     })
 }
 
-generatedJournalId()
 watch(() => {
-  // generatedJournalId()
+  generatedJournalId()
 
   if(statusId.value === 4 || statusId.value === 5){
     frozeCheck.value = false
+  }
+  
+  if(statusId.value !== 10 && statusId.value !== 1){
+    frozeCheck.value = true
+    console.log("TfrozeCheckVifT", frozeCheck.value)
   }
 })
 
@@ -1278,16 +1278,18 @@ const saveDraftData = word => {
     </VCol>
   </VRow>
 
-  <!-- Header -->
   <VRow>
     <VCol
-      class="text-center mx-4"
-      style="border: 1px solid black; font-size: 14px; font-weight: bold;"
+      class="text-center pa-2 mx-3"
+      style="max-width: 150px; border: 1px solid black; font-size: 12px; font-weight: bold;"
       cols="2"
     >
       CONFIDENTIAL
     </VCol>
+  </VRow>
 
+  <!-- Header -->
+  <VRow>
     <VCol
       cols="12"
       style="overflow-x: auto; white-space: nowrap;"
@@ -1532,10 +1534,10 @@ const saveDraftData = word => {
             <td colspan="2">
               {{ item.analyticalItem }}
             </td>
-            <td colspan="2">
+            <td class="text-center" colspan="2">
               {{ item.method }}
             </td>
-            <td colspan="2">
+            <td class="text-center" colspan="2">
               {{ item.specRange }}
             </td>
             <td colspan="1" />
@@ -1828,7 +1830,7 @@ const saveDraftData = word => {
                   </VCardText>
                   <VCardActions>
                     <VBtn
-                      :disabled="frozeCheck"
+                      v-if="!frozeCheck"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -1879,7 +1881,7 @@ const saveDraftData = word => {
                   </VCardText>
                   <VCardActions>
                     <VBtn
-                      :disabled="frozeCheck"
+                      v-if="!frozeCheck"
                       variant="flat"
                       width="100%"
                       color="error"
@@ -1898,7 +1900,7 @@ const saveDraftData = word => {
                 cols="12"
               >
                 <VBtn
-                  :disabled="frozeCheck"
+                  v-if="!frozeCheck"
                   color="red"
                   @click="removeFileAll"
                 >
@@ -1957,40 +1959,49 @@ const saveDraftData = word => {
   </VRow>
 
   <section class="my-4">
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th
-            colspan="12"
-            class="text-center"
-          >
-            Warehouse
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td colspan="6">
-            <div style="font-size: 12px;">
-              Staff:  {{ dataHeader.inspStaffUpdateBy }}
-            </div>
-            <VDivider />
-            <div style="font-size: 12px;">
-              <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
-            </div>
-          </td>
-          <td colspan="6">
-            <div style="font-size: 12px;">
-              Supervisor: {{ dataHeader.whUpdateBy }}
-            </div>
-            <VDivider />
-            <div style="font-size: 12px;">
-              <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <VRow>
+      <VCol
+        cols="12"
+        lg="12"
+      >
+        <table class="custom-table">
+          <tr>
+            <th
+              class="text-center cursor-pointer"
+              colspan="12"
+            >
+              Warehouse
+            </th>
+          </tr>
+          <tr>
+            <td colspan="6">
+              <span>Staff: {{ dataHeader.inspStaffUpdateBy }}</span>
+            </td>
+            <td colspan="6">
+              <span>Supervisor: {{ dataHeader.whUpdateBy }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td
+              style="min-width: 150px;"
+              colspan="6"
+            >
+              <div v-if="dataHeader.inspStaffUpdateDate">
+                <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
+              </div>
+            </td>
+            <td
+              style="min-width: 150px;"
+              colspan="6"
+            >
+              <div v-if="dataHeader.whUpdateDate">
+                <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </VCol>
+    </VRow>
   </section>
 
   <!-- Dialog Image -->
@@ -2040,11 +2051,11 @@ const saveDraftData = word => {
         />
 
         <VCardText>
-          <VTextarea
-            v-model="commentReject"
-            label="Comment"
-            placeholder="Enter Comment Reject"
-          />
+          <VTextarea v-model="commentReject">
+            <template #label>
+              <VIcon icon="ri-edit-line" />
+            </template>
+          </VTextarea>
           <span
             v-if="textAlertError.comment && !commentReject"
             class="text-red"
@@ -2417,6 +2428,7 @@ const saveDraftData = word => {
       >
         Save draft
       </VBtn>
+      {{ statusId }}
       <VBtn
 
         height="100%"

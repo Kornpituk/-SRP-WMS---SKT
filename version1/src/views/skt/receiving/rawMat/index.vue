@@ -1925,8 +1925,6 @@ const getDisabledFollowStatusNRole = () => {
     data : {{ }}
   </section>
 
-
-
   <VRow>
     <VCol cols="12">
       <div
@@ -1936,15 +1934,19 @@ const getDisabledFollowStatusNRole = () => {
         Raw Material Receiving Form
       </div>
     </VCol>
+  </VRow>
 
+  <VRow>
     <VCol
-      class="mx-3 pa-2 text-center"
-      style="border: 1px solid black; font-size: 12px; font-weight: bold;"
+      class="text-center pa-2 mx-3"
+      style="max-width: 150px; border: 1px solid black; font-size: 12px; font-weight: bold;"
       cols="2"
     >
       CONFIDENTIAL
     </VCol>
+  </VRow>
 
+  <VRow>
     <VCol
       cols="12"
       style="overflow-x: auto;"
@@ -2214,7 +2216,7 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                    value => value.length <= 44 || 'Max 45 characters per line.'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
                 :maxlength="45"
                 density="compact"
@@ -2253,7 +2255,7 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                    value => value.length <= 44 || 'Max 45 characters per line.'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
                 :maxlength="45"
                 density="compact"
@@ -2292,7 +2294,7 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 :style="{ width: '100%', minWidth: '150px' }"
                 :rules="[
-                    value => value.length <= 44 || 'Max 45 characters per line.'
+                  value => value.length <= 44 || 'Max 45 characters per line.'
                 ]"
                 :maxlength="45"
                 density="compact"
@@ -3540,7 +3542,7 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
             </VRow>
 
-            <div v-if="coaFiles.length || files.length">
+            <div v-if="coaFiles.length || fileCoaNew.length">
               <VCol
                 class="d-flex justify-end"
                 cols="12"
@@ -3555,7 +3557,6 @@ const getDisabledFollowStatusNRole = () => {
                 </VBtn>
               </VCol>
             </div>
-
             <span
               v-if="textAlertError.coa && !getCoaForm && trickerSubmit"
               class="text-red"

@@ -316,7 +316,38 @@ const generatedJournalId = () => {
     })
 }
 
-watch(() => {
+const generated = () => {
+
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${data.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+
+      // itemsManufacturer.value = response.data.data
+
+      console.log('[generatedReceivingForm]!!: ', response.data.data)
+
+    })
+    .catch(error => {
+      // Handle errors
+      console.error('Error:', error)
+    })
+}
+
+// Watch ค่า statusId และเรียกใช้ generated ถ้ามีการเปลี่ยนแปลง
+watch(statusId.value, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    generated() // เรียกใช้ function generated เมื่อ statusId เปลี่ยน
+  }
+})
+
+// เรียกใช้ generatedJournalId เมื่อ component ถูกสร้างขึ้น
+onMounted(() => {
   generatedJournalId()
 })
 

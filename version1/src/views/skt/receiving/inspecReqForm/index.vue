@@ -476,6 +476,7 @@ const saveHeaderInspect = async () => {
 
     // console.log('[products.value]!!: ', response.data)
     // isDialogSubmitSuccessVisible.value = true
+    return true
   } catch (error) {
     // Handle errors
     isDialogSubmitFailedVisible.value = true
@@ -587,13 +588,13 @@ const saveLotInspect = async () => {
 
   // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
   
-  const hasErrors = null 
-  if(trickerSubmit.value){
-    hasErrors = emptyFields.value.some(field => field.isEmpty)
+  const hasErrors = ref(null)
+  if(trickerSubmit.value === true){
+    hasErrors.value = emptyFields.value.some(field => field.isEmpty)
   }
   
   // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
-  if (hasErrors) {
+  if (hasErrors.value) {
     console.log('Cannot proceed: There are errors in the fields.')
 
     // แสดง dialog แจ้งเตือนถ้าจำเป็น
@@ -628,6 +629,7 @@ const saveLotInspect = async () => {
 
     // แสดง dialog เมื่อสำเร็จ
     // isDialogSubmitSuccessVisible.value = true
+    return true
   } catch (error) {
     // แสดง dialog เมื่อมีข้อผิดพลาด
     // isDialogSubmitFailedVisible.value = true
@@ -653,13 +655,14 @@ const submitInspForm = async () => {
       },
     })
 
-    console.log('[products.value]!!: ', response.data)
-    isDialogSubmitSuccessVisible.value = true
-    isDialogConfirmVisible.value = false
+    // console.log('[products.value]!!: ', response.data)
+
+    // isDialogSubmitSuccessVisible.value = true
+    // isDialogConfirmVisible.value = false
 
     location.reload()
 
-    // throw "Sumit Inp Successfully"
+    return true
 
   } catch (error) {
     // Handle errors
@@ -670,7 +673,7 @@ const submitInspForm = async () => {
 }
 
 //-------- Fuction Cancel --------------------------------
-// const isDialogSubmitFailedVisible = ref(false)
+const isDialogSubmitFailedVisible = ref(false)
 
 const commentReject = ref('')
 const commentBackToEdit = ref('')
@@ -1150,10 +1153,10 @@ const getDisabledFollowStatusNRole = () => {
   </div>
 
   <VRow>
-    <VCol cols="">
+    <VCol cols="2">
       <div
         class="my-4 pa-2 text-center"
-        style="border: 1px solid black; font-size: 12px; font-weight: bold;"
+        style="max-width: 150px; border: 1px solid black; font-size: 12px; font-weight: bold;"
       >
         CONFIDENTIAL
       </div>
@@ -2558,7 +2561,7 @@ const getDisabledFollowStatusNRole = () => {
               Staff: {{ headerInsp.updateByStaffInsp }}
             </div>
             <VDivider />
-            <div
+            <div         
               v-if="headerInsp.lastUpdatedStaffInsp"
               style="font-size: 12px;"
             >
@@ -2980,7 +2983,7 @@ const getDisabledFollowStatusNRole = () => {
       width="500"
     >
       <!-- Dialog Content -->
-      <VCard :title="wordForSubmit">
+      <VCard title="Comment">
         <DialogCloseBtn
           variant="text"
           size="default"
@@ -2991,15 +2994,19 @@ const getDisabledFollowStatusNRole = () => {
           <VTextarea
             v-if="wordForSubmit === 'Back To Edit'"
             v-model="commentBackToEdit"
-            :label="`Remark ${wordForSubmit}`"
-            :placeholder="`Enter Remark ${wordForSubmit}`"
-          />
+          >
+            <template #label>
+              <VIcon icon="ri-edit-line" />
+            </template>
+          </VTextarea>
           <VTextarea
             v-if="wordForSubmit === 'Reject'"
             v-model="commentReject"
-            :label="`Remark ${wordForSubmit}`"
-            :placeholder="`Enter Remark ${wordForSubmit}`"
-          />
+          >
+            <template #label>
+              <VIcon icon="ri-edit-line" />
+            </template>
+          </VTextarea>
         </VCardText>
 
         <VCardText class="d-flex justify-end flex-wrap gap-4">
