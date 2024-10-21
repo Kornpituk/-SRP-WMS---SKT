@@ -37,14 +37,14 @@ watchEffect(() => {
             lg="2"
             sm="12"
           >
-            <span style="font-size: 12px;">&copy;{{ new Date().getFullYear() }} Smart Reform Plus</span>
+            <span style="font-size: 12px;">Copyright &copy;{{ new Date().getFullYear() }} Smart Reform Plus.All Rights Reserved</span>
           </VCol>
           <VCol
             cols="12"
             lg="6"
             sm="12"
           >
-            <span style="font-size: 12px;">All Rights Reserved</span>
+            <span v-if="false" style="font-size: 12px;">All Rights Reserved</span>
           </VCol>
         </VRow>
       </VCol>
@@ -55,7 +55,7 @@ watchEffect(() => {
         md="4"
         sm="4"
       >
-        <span style="font-size: 12px;">Easetrack</span><br>
+        <span style="font-size: 12px;">Easetrack</span>
         <span style="font-size: 12px;">&nbsp;<a
           href="https://github.com/Kornpituk/Update-WMS-WebApp/tree/main"
           @click="openInNewTab"

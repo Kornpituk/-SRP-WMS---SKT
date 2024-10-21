@@ -602,20 +602,42 @@ const handleAcceptPackaging = word => {
           box-sizing: border-box;
           justify-content: start;
           padding: 8px;
-          inline-size: 105vw;
           inset-block-end: 0;
-          margin-block-end: 598px;
-          margin-inline-start: 50px;
-          max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */"
+          margin-block-end: 52px;
+          margin-inline-start: -8px;"
     class="d-flex justify-start"
   >
     <VBtn
+      style="min-width: 320px;"
       class="mb-2"
       @click="btnApprove('APPROVE')"
     >
       Approve
     </VBtn>
   </div>
+
+  <section v-if="false">
+    <VRow
+      style="position: fixed;
+          display: flex;
+          justify-content: start;
+          padding: 8px;
+          inset-block-end: 0;
+          margin-block-end: 52px;
+          margin-inline-start: -8px;"
+      class="d-flex justify-start"
+    >
+      <VCol cols="12">
+        <VBtn
+          width="100%"
+          class="mb-2"
+          @click="btnApprove('APPROVE')"
+        >
+          Approve
+        </VBtn>
+      </VCol>
+    </VRow>
+  </section>
 
   <!-- Dialog Submit -->
   <section>

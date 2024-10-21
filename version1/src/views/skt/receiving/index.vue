@@ -4077,7 +4077,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2"
-                style="min-width: 300px; max-width: 300px;"
+                style="min-width: 300px; max-width: 350px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
@@ -4088,7 +4088,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2 "
-                style="min-width: 250px; max-width: 300px;"
+                style="min-width: 250px; max-width: 350px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
