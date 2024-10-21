@@ -567,9 +567,13 @@ const handleAcceptPackaging = word => {
   <div
     v-if="statusId === 7 || statusId === 15"
     style="position: fixed;
-    justify-content: center;
-    inline-size: 93%;
-    inset-block-end: 0;"
+          display: flex;
+          box-sizing: border-box;
+          justify-content: center;
+          padding: 8px;
+          inline-size: 105vw;
+          inset-block-end: 0;
+          max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */"
     class="d-flex justify-center"
   >
     <VBtn
@@ -688,7 +692,5 @@ const handleAcceptPackaging = word => {
     </VDialog>
   </section>
 
-  
-  
   <VDivider />
 </template>

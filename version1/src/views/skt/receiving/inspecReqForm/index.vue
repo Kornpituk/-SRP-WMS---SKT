@@ -1947,7 +1947,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkOkState(item, item.typeID, 0)"
                 class="text-red"
-              >Analysis result Ok/Not is required!</span>
+              >{{ textAlertErrorOkState }}</span>
 
 
               <VTextField
@@ -1967,7 +1967,7 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="checkAnalysitItem(item, item.typeID, 0)"
                 class="text-red"
-              >Analysis result Ok/Not is required!</span>
+              >{{ textAlertErrorAnalysitItem }}</span>
             </td>
             <td
               v-if="item.typeID === 2"

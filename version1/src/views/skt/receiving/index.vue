@@ -4077,7 +4077,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2"
-                style="max-width: 300px;"
+                style="min-width: 250px;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
@@ -4356,9 +4356,9 @@ const dessertsTest = ref([
   box-sizing: border-box;
   justify-content: center;
   padding: 8px;
-  inline-size: 100%;
+  inline-size: 105vw;
   inset-block-end: 0;
-  max-inline-size: 100%; /* ไม่ให้เกินขอบหน้าจอ */
+  max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */
 }
 
 .spinning {
