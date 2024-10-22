@@ -2341,9 +2341,9 @@ const getDisabledFollowStatusNRole = () => {
                 :readonly="readonlyAllInput()"
                 density="compact"
                 :rules="[
-                  value => value.length <= 44 || 'Max 45 characters per line.'
+                  value => value.length <= 9 || 'Max 10 characters per line.'
                 ]"
-                :maxlength="45"
+                :maxlength="10"
               />
             </th>
             <th

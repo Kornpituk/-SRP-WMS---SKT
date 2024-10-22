@@ -2698,7 +2698,7 @@ const getDisabledFollowStatusNRole = () => {
         class="mx-2"
         color="error"
         style="font-size: 12px;"
-        @click="areaTextRemarkButton('Reject')"
+        @click="areaTextRemarkButton('REJECT')"
       >
         Reject
       </VBtn>
@@ -3062,7 +3062,7 @@ const getDisabledFollowStatusNRole = () => {
             </template>
           </VTextarea>
           <VTextarea
-            v-if="wordForSubmit === 'Reject'"
+            v-if="wordForSubmit === 'REJECT'"
             v-model="commentReject"
           >
             <template #label>
@@ -3074,14 +3074,14 @@ const getDisabledFollowStatusNRole = () => {
         <VCardText class="d-flex justify-end flex-wrap gap-4">
           <VBtn
             v-if="wordForSubmit === 'Back To Edit'"
-            :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
+            :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'REJECT' ? 'error' : 'default')"
             @click="backToEditReceivingPlan"
           >
             Back To Edit
           </VBtn>
           <VBtn
-            v-if="wordForSubmit === 'Reject'"
-            :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
+            v-if="wordForSubmit === 'REJECT'"
+            :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'REJECT' ? 'error' : 'default')"
             @click="rejectInsp"
           >
             Reject
