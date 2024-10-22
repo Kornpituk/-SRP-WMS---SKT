@@ -34,17 +34,10 @@ watchEffect(() => {
         <VRow>
           <VCol
             cols="12"
-            lg="2"
+            lg="8"
             sm="12"
           >
             <span style="font-size: 12px;">Copyright &copy;{{ new Date().getFullYear() }} Smart Reform Plus.All Rights Reserved</span>
-          </VCol>
-          <VCol
-            cols="12"
-            lg="6"
-            sm="12"
-          >
-            <span v-if="false" style="font-size: 12px;">All Rights Reserved</span>
           </VCol>
         </VRow>
       </VCol>

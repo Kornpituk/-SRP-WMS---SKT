@@ -603,7 +603,7 @@ const handleAcceptPackaging = word => {
           justify-content: start;
           padding: 8px;
           inset-block-end: 0;
-          margin-block-end: 52px;
+          margin-block-end: 30px;
           margin-inline-start: -8px;"
     class="d-flex justify-start"
   >
@@ -623,7 +623,7 @@ const handleAcceptPackaging = word => {
           justify-content: start;
           padding: 8px;
           inset-block-end: 0;
-          margin-block-end: 52px;
+          margin-block-end: 20px;
           margin-inline-start: -8px;"
       class="d-flex justify-start"
     >

@@ -531,8 +531,8 @@ watch(() => {
     frozeCheck.value = false
   }
   
-  if(statusId.value !== 10 && statusId.value !== 1){
-    frozeCheck.value = true
+  if(statusId.value !== 10 || statusId.value !== 1){
+    frozeCheck.value = false
     console.log("TfrozeCheckVifT", frozeCheck.value)
   }
 })

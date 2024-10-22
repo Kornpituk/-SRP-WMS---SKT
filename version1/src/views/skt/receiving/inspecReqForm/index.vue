@@ -643,32 +643,38 @@ const trickerSubmit = ref(false)
 
 const submitInspForm = async () => {
   try {
-    // รอให้ saveHeaderInspect และ saveLotInspect ทำงานเสร็จสมบูรณ์ก่อน
-    await submitButtonVisibleNew()
+    // รอให้ submitButtonVisibleNew ทำงานและตรวจสอบว่ามันสำเร็จโดยไม่มี error
+    const submitVisibleResult = await submitButtonVisibleNew()
 
-    // ส่งข้อมูลไปยัง API เมื่อทุกอย่างเสร็จสิ้น
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    })
+    // ตรวจสอบว่า submitButtonVisibleNew สำเร็จ (ไม่เป็น null หรือ false)
+    if (submitVisibleResult) {
+      // ส่งข้อมูลไปยัง API เมื่อ submitButtonVisibleNew สำเร็จ
+      const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': `${whereHouse.value}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      })
 
-    // console.log('[products.value]!!: ', response.data)
+      console.log('[products.value]!!: ', response.data)
 
-    // isDialogSubmitSuccessVisible.value = true
-    // isDialogConfirmVisible.value = false
+      // รีโหลดหน้าเมื่อส่งข้อมูลสำเร็จ
+      location.reload()
 
-    location.reload()
-
-    return true
-
+      return true
+    } else {
+      // ถ้าการตรวจสอบ submitButtonVisibleNew ไม่สำเร็จ แสดง error
+      console.error('submitButtonVisibleNew failed, cannot submit')
+      
+      return false
+    }
   } catch (error) {
-    // Handle errors
+    // จัดการ error
     console.error('Error:', error)
 
     // isDialogSubmitFailedVisible.value = true
+    return false
   }
 }
 
