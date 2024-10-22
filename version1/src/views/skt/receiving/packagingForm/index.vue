@@ -512,7 +512,7 @@ const generatedJournalId = () => {
       if (response.data && response.data.data && response.data.data.length > 0) {
         responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
 
-        // const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
         statusId.value = item.statusId // เก็บค่า statusId
       } else {
@@ -527,14 +527,14 @@ const generatedJournalId = () => {
 watch(() => {
   generatedJournalId()
 
-  if(statusId.value === 4 || statusId.value === 5){
-    frozeCheck.value = false
-  }
-  
-  if(statusId.value !== 10 || statusId.value !== 1){
+  if(statusId.value === 10 || statusId.value === 1){
     frozeCheck.value = false
     console.log("TfrozeCheckVifT", frozeCheck.value)
-  }
+  }else{
+    frozeCheck.value = true
+  } 
+
+
 })
 
 //---- header --------------------------------
@@ -707,34 +707,51 @@ const textAlertError = ref({
 //----------------- Accept
 const { packagingFormAccept, acceptPackagingForm } = useAcceptPackagingFormController()
 
-const handleAcceptPackaging = () => {
-  wordForSubmit.value = "SUBMIT"
-
-  const handeSaveDraf = submitButtonVisibleNew()
-
-  if(!handeSaveDraf){
-    throw 'Failed to submit'
-  }
+const handleAcceptPackaging = async () => {
   isDialogConfirmVisible.value = false
+  try {
+    wordForSubmit.value = "ACCEPT"
 
-  // throw 'success'
+    // รอให้ submitButtonVisibleNew() ทำงานเสร็จ
+    const handeSaveDraf = await submitButtonVisibleNew()
 
-  acceptPackagingForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
+    // ตรวจสอบถ้าการ submit ล้มเหลว
+    if (!handeSaveDraf) {
+      throw new Error('Failed to submit')
+    }
 
-  // console.log("result Packaing", packagingFormReject.success)
-  if (packagingFormAccept) {
-      
-    console.log('accept reject successful')
-    alertLotErrorMessage.value.success = false
+    // ปิด dialog confirm
+    isDialogConfirmVisible.value = false
+
+    // เรียกใช้ฟังก์ชัน acceptPackagingForm
+    await acceptPackagingForm(
+      poEtlLogDetailJournalIDQueryParameters.value, 
+      urlApi.value, 
+      "Packaging", 
+      whereHouse, 
+      accessTokenAtStore,
+    )
+
+    // ตรวจสอบถ้า packagingFormAccept สำเร็จ
+    if (packagingFormAccept) {
+      console.log('accept reject successful')
+      alertLotErrorMessage.value.success = false
+      isDialogRejectVisible.value = false
+
+      location.reload() // รีเฟรชหน้า
+    } else {
+      console.error('Failed to accept reject')
+      isDialogRejectVisible.value = false
+      throw new Error('Failed to accept reject.')
+    }
+
+    return true
+  } catch (error) {
     isDialogRejectVisible.value = false
-
-    location.reload()
-  } else {
-    console.error('Failed to accept reject')
-    throw 'Failed to accept reject.'
+    console.error('Error in handleAcceptPackaging:', error)
+    
+    return false
   }
-
-  return true
 }
 
 //----------------- Reject
@@ -1505,7 +1522,7 @@ const saveDraftData = word => {
                 :readonly="frozeCheck"
                 density="compact"
                 :rules="[
-                  value => !!value.trim() || 'Actual Check is required.',
+                  value => !!value.trim() || 'Actual is required.',
                 ]"
                 
                 @input="(e) => handleInputNumberOnly(e)"
@@ -1534,10 +1551,16 @@ const saveDraftData = word => {
             <td colspan="2">
               {{ item.analyticalItem }}
             </td>
-            <td class="text-center" colspan="2">
+            <td
+              class="text-center"
+              colspan="2"
+            >
               {{ item.method }}
             </td>
-            <td class="text-center" colspan="2">
+            <td
+              class="text-center"
+              colspan="2"
+            >
               {{ item.specRange }}
             </td>
             <td colspan="1" />
@@ -1550,7 +1573,7 @@ const saveDraftData = word => {
                 :readonly="frozeCheck"
                 density="compact"
                 :rules="[
-                  value => !!value.trim() || 'AnalyticalItem Check is required.',
+                  value => !!value.trim() || 'AnalyticalItems is required.',
                   value => value.length <= 44 || 'Must be 45 characters or less'
                 ]"
                 :maxlength="45"
@@ -1601,13 +1624,13 @@ const saveDraftData = word => {
     </VCol>
     <VCol
       cols="6"
-      class="text-decoration-underlined pb-2"
+      class="text-decoration-underlined pb-2 px-0"
     >
       Details of Limitation Condition
     </VCol>
     <VCol
       cols="12"
-      class="pt-0"
+      class="py-0"
     >
       <table class="custom-table">
         <thead>
@@ -1618,7 +1641,6 @@ const saveDraftData = word => {
                 :readonly="frozeCheck"
                 auto-grow
                 :rules="[
-                  value => !!value.trim() || 'Notes is required.',
                   v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
                 ]"
                 @input="limitTextInputLine4Note"
@@ -1637,7 +1659,6 @@ const saveDraftData = word => {
                 :readonly="frozeCheck"
                 auto-grow
                 :rules="[
-                  value => !!value.trim() || 'Details is required.',
                   v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
                 ]"
                 @input="limitTextInputLine4Details"
@@ -1657,7 +1678,7 @@ const saveDraftData = word => {
   </VRow>
 
   <!-- Quality Evalution -->
-  <VRow class="mx-1">
+  <VRow class="mx-0" v-if="false">
     <VCol cols="12">
       <VRow>
         <VCol
@@ -1737,7 +1758,7 @@ const saveDraftData = word => {
                 style=" white-space: normal; word-wrap: break-word;"
               >
                 <VTextarea
-                  v-model="data.statusComments"
+                  v-model="dataHeader.statusComments"
                   readonly
                 />
               </span>
@@ -1745,6 +1766,73 @@ const saveDraftData = word => {
           </VRow>
         </VCol>
       </VRow>
+    </VCol>
+  </VRow>
+
+  <VRow class="pt-4 px-3">
+    <!-- Accept Section -->
+    <VCol
+      cols="1"
+      class="d-flex align-center py-0 justify-center"
+      style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+    >
+      <span style="font-size: 12px; font-weight: bolder;">Accept</span>
+    </VCol>
+
+    <VCol
+      cols="3"
+      class="d-flex align-center justify-center py-0"
+      style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+    >
+      <VIcon
+        v-if="statusId === 17 || statusId === 15"
+        color="success"
+        size="60"
+        icon="ri-checkbox-circle-fill"
+      />
+    </VCol>
+
+    <!-- Reject Section -->
+    <VCol
+      cols="1"
+      class="d-flex align-center justify-center py-0"
+      style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+    >
+      <span style="font-size: 12px; font-weight: bolder;">Reject</span>
+    </VCol>
+
+    <VCol
+      cols="3"
+      class="d-flex align-center justify-center py-0"
+      style="border: 1px solid black;"
+    >
+      <VIcon
+        v-if="statusId === 7 || statusId === 16"
+        color="red"
+        size="60"
+        icon="ri-close-circle-fill"
+      />
+    </VCol>
+
+    <!-- Comment Section -->
+    <VCol
+      cols="4"
+      class="d-flex align-center py-2"
+      style="border-top: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black;"
+    >
+      <div style="width: 100%; text-align: start;">
+        <span
+          style="font-size: 12px; font-weight: bolder;"
+          class="text-center"
+        >Comment:</span>
+        <VTextarea
+          v-if="statusId === 7 || statusId === 16"
+          v-model="dataHeader.statusComments"
+          rows="2"
+          readonly
+          style="white-space: normal; word-wrap: break-word;"
+        />
+      </div>
     </VCol>
   </VRow>
   
@@ -2062,18 +2150,12 @@ const saveDraftData = word => {
           >{{ textAlertError.comment }}</span>
         </VCardText>
 
-        <VCardText class="d-flex justify-space-between flex-wrap gap-4">
+        <VCardText class="d-flex justify-end flex-wrap gap-4">
           <VBtn
             color="error"
             @click="handleRejectPackaging"
           >
             Reject
-          </VBtn>
-          <VBtn
-            color="warning"
-            @click="isDialogRejectVisible = false"
-          >
-            close
           </VBtn>
         </VCardText>
       </VCard>
@@ -2428,7 +2510,6 @@ const saveDraftData = word => {
       >
         Save draft
       </VBtn>
-      {{ statusId }}
       <VBtn
 
         height="100%"

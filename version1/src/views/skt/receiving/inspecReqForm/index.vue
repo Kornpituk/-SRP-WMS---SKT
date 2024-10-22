@@ -2358,13 +2358,16 @@ const getDisabledFollowStatusNRole = () => {
       <VCol cols="6 ">
         Note
       </VCol>
-      <VCol cols="6 ">
+      <VCol
+        cols="6 "
+        class="px-0"
+      >
         Details of Limitation Condition
       </VCol>
 
       <VCol
         cols="12"
-        class=""
+        class="py-0"
       >
         <table class="custom-table">
           <tbody>
@@ -2413,10 +2416,13 @@ const getDisabledFollowStatusNRole = () => {
   </section>
 
   <!-- Quality Evaluation -->
-  <section class="mt-5">
-    <VRow class="px-4">
+  <section class="mt-7 px-3">
+    <VRow
+      v-if="false"
+      class="px-3"
+    >
       <VCol
-        class=""
+        class="px-0"
         style="font-size: 12px;"
         cols="12"
       >
@@ -2500,97 +2506,147 @@ const getDisabledFollowStatusNRole = () => {
         </VRow>
       </VCol>
     </VRow>
+
+    <VRow>
+      <!-- Accept Section -->
+      <VCol
+        cols="1"
+        class="d-flex align-center py-0 justify-center"
+        style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+      >
+        <span style="font-size: 12px; font-weight: bolder;">Accept</span>
+      </VCol>
+
+      <VCol
+        cols="3"
+        class="d-flex align-center justify-center py-0"
+        style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+      >
+        <VIcon
+          v-if="statusId === 17 || statusId === 15"
+          color="success"
+          size="60"
+          icon="ri-checkbox-circle-fill"
+        />
+      </VCol>
+
+      <!-- Reject Section -->
+      <VCol
+        cols="1"
+        class="d-flex align-center justify-center py-0"
+        style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+      >
+        <span style="font-size: 12px; font-weight: bolder;">Reject</span>
+      </VCol>
+
+      <VCol
+        cols="3"
+        class="d-flex align-center justify-center py-0"
+        style="border: 1px solid black;"
+      >
+        <VIcon
+          v-if="statusId === 7 || statusId === 16"
+          color="red"
+          size="60"
+          icon="ri-close-circle-fill"
+        />
+      </VCol>
+
+      <!-- Comment Section -->
+      <VCol
+        cols="4"
+        class="d-flex align-center py-2"
+        style="border-top: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black;"
+      >
+        <div style="width: 100%; text-align: start;">
+          <span style="font-size: 12px; font-weight: bolder;" class="text-center">Comment:</span>
+          <VTextarea
+            v-if="statusId === 7 || statusId === 16"
+            v-model="headerInsp.remarkReject"
+            rows="2"
+            readonly
+            style="white-space: normal; word-wrap: break-word;"
+          />
+        </div>
+      </VCol>
+    </VRow>
   </section>
   
   <!-- WareHouse / Inspection -->
-  <section>
-    <!-- WareHouse / Inspection -->
-    <VRow class="mt-6 px-4">
-      <VCol cols="6">
-        <VRow>
-          <VCol
-            style="border: 1px solid black; font-size: 12px; font-weight: bolder;"
-            class="text-center"
-            cols="12"
-          >
-            Warehouse
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            class="text-start"
-            cols="6"
-          >
-            <div style="font-size: 12px;">
-              Staff: {{ headerInsp.updateByStaffWH }}
-            </div>
-            <VDivider />
-            <div
-              v-if="headerInsp.lastUpdatedStaffWH"
-              style="font-size: 12px;"
+  <section class="my-4">
+    <VRow>
+      <VCol
+        cols="12"
+        lg="12"
+      >
+        <table class="custom-table">
+          <tr>
+            <th
+              class="text-center cursor-pointer"
+              colspan="6"
             >
-              <VIcon icon="ri-calendar-schedule-fill" />{{ formatDate(headerInsp.lastUpdatedStaffWH) }}
-            </div>
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            class="text-start"
-            cols="6"
-          >
-            <div style="font-size: 12px;">
-              Supervisor: {{ headerInsp.updateBySuperWH }}
-            </div>
-            <VDivider />
-            <div
-              v-if="headerInsp.lastUpdatedSuperWH"
-              style="font-size: 12px;"
+              Warehouse
+            </th>
+            <th
+              class="text-center cursor-pointer"
+              colspan="6"
             >
-              <VIcon icon="ri-calendar-schedule-fill" />{{ formatDate(headerInsp.lastUpdatedSuperWH) }}
-            </div>
-          </VCol>
-        </VRow>
-      </VCol>
-      <VCol cols="6">
-        <VRow>
-          <VCol
-            style="border: 1px solid black; font-size: 12px; font-weight: bolder;"
-            class="text-center"
-            cols="12"
-          >
-            Inspection
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            class="text-start"
-            cols="6"
-          >
-            <div style="font-size: 12px;">
-              Staff: {{ headerInsp.updateByStaffInsp }}
-            </div>
-            <VDivider />
-            <div         
-              v-if="headerInsp.lastUpdatedStaffInsp"
-              style="font-size: 12px;"
+              Inspection
+            </th>
+          </tr>
+          <tr>
+            <td colspan="3">
+              <span>Staff: {{ headerInsp.updateByStaffWH }}</span>
+            </td>
+            <td colspan="3">
+              <span>Supervisor: {{ headerInsp.updateBySuperWH }}</span>
+            </td>
+            <td colspan="3">
+              <span>Staff: {{ headerInsp.updateByStaffInsp }}</span>
+            </td>
+            <td colspan="3">
+              <span>Supervisor: {{ headerInsp.updateBySuperInsp }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td
+              style="min-width: 150px;"
+              colspan="3"
             >
-              <VIcon icon="ri-calendar-schedule-fill" />{{ formatDate(headerInsp.lastUpdatedStaffInsp) }}
-            </div>
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            class="text-start"
-            cols="6"
-          >
-            <div style="font-size: 12px;">
-              Supervisor: {{ headerInsp.updateBySuperInsp }}
-            </div>
-            <VDivider />
-            <div
-              v-if="headerInsp.lastUpdatedSuperInsp"
-              style="font-size: 12px;"
+              <div v-if="headerInsp.lastUpdatedStaffWH">
+                <VIcon icon="ri-calendar-schedule-fill" />
+                <span>{{ formatDate(headerInsp.lastUpdatedStaffWH) }}</span>
+              </div>
+            </td>
+            <td
+              style="min-width: 150px;"
+              colspan="3"
             >
-              <VIcon icon="ri-calendar-schedule-fill" />{{ formatDate(headerInsp.lastUpdatedSuperInsp) }}
-            </div>
-          </VCol>
-        </VRow>
+              <div v-if="headerInsp.lastUpdatedSuperWH">
+                <VIcon icon="ri-calendar-schedule-fill" /> 
+                <span>{{ formatDate(headerInsp.lastUpdatedSuperWH) }}</span>
+              </div>
+            </td>
+            <td
+              style="min-width: 150px;"
+              colspan="3"
+            >
+              <div v-if="headerInsp.lastUpdatedStaffInsp">
+                <VIcon icon="ri-calendar-schedule-fill" />
+                <span>{{ formatDate(headerInsp.lastUpdatedStaffInsp) }}</span>
+              </div>
+            </td>
+            <td
+              style="min-width: 150px;"
+              colspan="3"
+            >
+              <div v-if="headerInsp.lastUpdatedSuperInsp">
+                <VIcon icon="ri-calendar-schedule-fill" /> 
+                <span>{{ formatDate(headerInsp.lastUpdatedSuperInsp) }}</span>
+              </div>
+            </td>
+          </tr>
+        </table>
       </VCol>
     </VRow>
   </section>

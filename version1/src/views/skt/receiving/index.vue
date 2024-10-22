@@ -4068,7 +4068,7 @@ const dessertsTest = ref([
               <td
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
                 class="px-2"
-                style="min-width: 30px;  justify-content: start;"
+                style="min-width: 130px;  justify-content: start;"
               >
                 <span
                   style="font-size: 12px;"
@@ -4301,14 +4301,11 @@ const dessertsTest = ref([
   </section>
 
   <!-- Footer -->
-  <section
-    v-if="showSection"
-    class="fixed-bottom"
-  >
+  <section class="fixed-bottom">
     <VCard>
       <VCardText
         class="pa-1"
-        style="min-width: 100%;"
+        style="min-width: 500px;"
       >
         <VAlert
           color="green-lighten-3"
