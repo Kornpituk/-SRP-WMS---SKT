@@ -1522,7 +1522,7 @@ const saveDraftData = word => {
                 :readonly="frozeCheck"
                 density="compact"
                 :rules="[
-                  value => !!value.trim() || 'Actual is required.',
+                  value => !!value.trim() || 'Actual Check is required.',
                 ]"
                 
                 @input="(e) => handleInputNumberOnly(e)"
@@ -1573,7 +1573,7 @@ const saveDraftData = word => {
                 :readonly="frozeCheck"
                 density="compact"
                 :rules="[
-                  value => !!value.trim() || 'AnalyticalItems is required.',
+                  value => !!value.trim() || 'Analytical Items is required.',
                   value => value.length <= 44 || 'Must be 45 characters or less'
                 ]"
                 :maxlength="45"
@@ -1912,9 +1912,6 @@ const saveDraftData = word => {
                         style="border: none;"
                       />
                     </template>
-                    <div class="d-flex flex-column align-center">
-                      <span>{{ file.name }}</span>
-                    </div>
                   </VCardText>
                   <VCardActions>
                     <VBtn
@@ -1963,9 +1960,6 @@ const saveDraftData = word => {
                         style="border: none;"
                       />
                     </template>
-                    <div class="d-flex flex-column align-center">
-                      <span>{{ file.fileName }}</span>
-                    </div>
                   </VCardText>
                   <VCardActions>
                     <VBtn

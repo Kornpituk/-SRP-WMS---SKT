@@ -1881,7 +1881,7 @@ const dessertsTest = ref([
     </section>
 
     <!-- Btn Approve -->
-    <section class="mt-2">
+    <section class="mb-4 mt-2">
       <VCard>
         <VCardText class="pa-2 d-flex justify-space-between align-center">
           <VBtn
@@ -4301,7 +4301,7 @@ const dessertsTest = ref([
   </section>
 
   <!-- Footer -->
-  <section class="fixed-bottom">
+  <section class="mt-3">
     <VCard>
       <VCardText
         class="pa-1"
