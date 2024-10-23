@@ -748,6 +748,11 @@ const handleAcceptPackaging = async () => {
 
       textAlertDialogFunction('ACCEPT', true)
 
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        location.reload()
+      }, 300) // 10000 มิลลิวินาที = 10 วินาที
+
       // location.reload() // รีเฟรชหน้า
     } else {
       console.error('Failed to accept reject')
@@ -789,11 +794,16 @@ const handleRejectPackaging = async word => {
     console.log("result Packaing", packagingFormReject.success)
     if (result.success === true) {
       
-      console.log('Save lot reject successful')
-      alertLotErrorMessage.value.success = false
-      isDialogRejectVisible.value = false
+      // console.log('Save lot reject successful')
+      // alertLotErrorMessage.value.success = false
+      // isDialogRejectVisible.value = false
 
-      location.reload()
+      textAlertDialogFunction('REJECT', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        location.reload()
+      }, 300) // 10000 มิลลิวินาที = 10 วินาที
     } else {
       console.error('Failed to save lot reject')
       textAlertDialogFunction('REJECT', false)
@@ -1024,21 +1034,6 @@ const handleSaveDraftCoa = async () => {
         result.value -=1
         console.error('Failed to delete all coa')
         throw 'Failed to delete all coa'  
-      }
-    }
-
-    if(fileCoaNew.value){
-      await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
-
-      if (saveCoaForm) {
-        console.log('Save coa  successful')
-        result.value +=1
-
-      // return saveCoaForm
-      } else {
-        result.value -=1
-        console.error('Failed to save coa')
-        throw 'Failed to save coa'
       }
     }
   }
