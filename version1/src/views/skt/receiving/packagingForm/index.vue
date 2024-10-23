@@ -485,6 +485,8 @@ const limitTextInputLine4Details = event => {
   dataHeader.value.limConditionDetail = event.target.value
 }
 
+const wordForSubmit = ref('Word')
+
 // Call API
 //------------------------------------------- Gennterate
 
@@ -613,7 +615,7 @@ const saveDraftHeader = async () => {
     console.log('Save header details successful')
   } else {
     // isDialogSubmitFailedVisible.value = true
-    throw 'Failed to save header details'+result.success
+    throw 'Failed to save header details'+result.error
   }
   alertHeaderErrorMessage.value.success = false
   
@@ -744,10 +746,13 @@ const handleAcceptPackaging = async () => {
       alertLotErrorMessage.value.success = false
       isDialogRejectVisible.value = false
 
-      location.reload() // รีเฟรชหน้า
+      textAlertDialogFunction('ACCEPT', true)
+
+      // location.reload() // รีเฟรชหน้า
     } else {
       console.error('Failed to accept reject')
       isDialogRejectVisible.value = false
+      textAlertDialogFunction('ACCEPT', false)
       throw new Error('Failed to accept reject.')
     }
 
@@ -764,11 +769,19 @@ const handleAcceptPackaging = async () => {
 const commentReject = ref('')
 const { packagingFormReject, rejectPackagingForm } = useRejectPackagingFormController()
 
-const handleRejectPackaging = async () => {
+const handleRejectPackaging = async word => {
+
+  const coaLotSave = await submitButtonVisibleNew(word)
+
+  if(!coaLotSave){
+    throw 'error save lot alert'
+  }
 
   if(!commentReject.value){
     textAlertError.value.success = false
     textAlertError.value.comment = 'Please provide a comment to reject the packaging.'
+    isDialogVisibleStepSaveDraft.value = false
+    isDialogRejectVisible.value = true
     throw 'Please provide a comment to reject the packaging'
   }else{
     const result = await rejectPackagingForm(commentReject.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
@@ -783,11 +796,14 @@ const handleRejectPackaging = async () => {
       location.reload()
     } else {
       console.error('Failed to save lot reject')
+      textAlertDialogFunction('REJECT', false)
       throw 'Failed to save lot reject.'
     }
 
     // alertLotErrorMessage.value.success = false
   
+    // throw 'reject success!'
+    
     return true
   }
 
@@ -982,26 +998,14 @@ const handleSaveDraftCoa = async () => {
 
   console.log("trickerSubmit", trickerSubmit.value)
 
-  if(trickerSubmit.value){
-    console.log("trickerSubmit!++2", fileCoaNew.value, getFormCoa.value)
+  if(trickerSubmit.value && wordForSubmit.value !== 'REJECT'){
+    console.log("trickerSubmit!++2", fileCoaNew.value, getFormCoa.value, wordForSubmit.value)
     if (!fileCoaNew.value.length > 0 && !getFormCoa.value) {
       result.value -=1
       textAlertError.value.success = false
       textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
       throw 'Failed to save coa. Plase Upload COA ones.'
     }
-
-    // if(fileCoaNew.value < 1){
-    //   if( getFormCoa.value < 1){
-    //     result.value -=1
-    //     textAlertError.value.success = false
-    //     textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
-    //     console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
-    //     throw 'Failed To Save COA. Plase Upload COA Ones.'
-    //   }else{
-    //     console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
-    //   }
-    // }
 
     if(getFormCoa.value){
       result.value += 1
@@ -1135,12 +1139,27 @@ const loadindingSaveDatft3 = ref(false)
 const loadindingSaveDatftFailed3 = ref(false)
 const loadindingSaveDatftSeccess3 = ref(false)
 
-const wordForSubmit = ref('Word')
+
 
 const submitButtonVisibleNew = async word => {
   wordForSubmit.value = word
   isDialogVisibleStepSaveDraft.value = true
 
+  //------------------ Validate Comment Reject -----------------------------------
+  if(word === 'REJECT'){
+    if(!commentReject.value){
+      textAlertError.value.success = false
+      isDialogVisibleStepSaveDraft.value = false
+      isDialogRejectVisible.value = true
+      textAlertError.value.comment = 'Please provide a comment to reject the packaging.'
+      throw 'Please provide a comment to reject the packaging'
+    }
+  }else{
+    console.log('no function')
+  }
+  
+
+  //------------------ step -----------------------------------
   try {
     // Start Step 1
     loadindingSaveDatft1.value = true
@@ -1236,6 +1255,8 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
+  textAlertDialogFunction('SAVE DRAFT', true)
+
   if(trickerSubmit.value !== true){
     location.reload()
   }
@@ -1246,18 +1267,25 @@ const submitButtonVisibleNew = async word => {
   return true
 }
 
+//--------------------------- function --------------------------------------
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
 //-------------------------- Btn ----------------------------------------------------------------
 const saveDraft = () => {
   trickerSubmit.value = false
 }
 
-const successDialAlert = ref(false)
-
-const textDialog = () => {
-  wordForSubmit.value = 'SAVE DRAFT'
-  successDialAlert.value = false
-  isDialogVisibleAlertDialog.value = true
-  console.log("Test Dialog", wordForSubmit.value, isDialogVisibleAlertDialog.value)
+const reject = word => {
+  trickerSubmit.value = true
+  wordForSubmit.value = word
+  isDialogRejectVisible.value = false
+  handleRejectPackaging(word)
 }
 
 const submitForm = word => {
@@ -1272,7 +1300,7 @@ const saveDraftData = word => {
   trickerSubmit.value = false
   submitButtonVisibleNew()
   wordForSubmit.value = word
-  console.log('Lot :', testResult.value)
+  console.log('saveDraftData', trickerSubmit.value)
 }
 </script>
 
@@ -1282,30 +1310,6 @@ const saveDraftData = word => {
       <h2 class="text-center">
         Packaging Inspection Request Form
       </h2>
-    </VCol>
-  </VRow>
-
-  <!-- mvc -->
-  <VRow v-if="false">
-    <VCol cols="12">
-      <div>
-        <h4>Test Result (Mock Data):</h4>
-        <pre>{{ testResult }}</pre>
-      </div>
-
-      <div>
-        <h2>Packaging Form Header</h2>
-        <pre>{{ analyticalItemsData }}</pre>
-        <pre>{{ dataHeader }}</pre>
-
-        <!-- Display error message if there's an error -->
-        <div
-          v-if="errorMessage"
-          class="error-message"
-        >
-          <p>Error: {{ errorMessage }}</p>
-        </div>
-      </div>
     </VCol>
   </VRow>
 
@@ -2104,13 +2108,7 @@ const saveDraftData = word => {
   </section>
 
   <section>
-    alertDialog
     <div>
-      <!-- ปุ่มเปิด dialog -->
-      <VBtn @click="textDialog">
-        Open Authenticator Dialog
-      </VBtn>
-
       <!-- ใช้ AuthenticatorDialog component -->
       <AuthenticatorDialog
         :is-dialog-visible="isDialogVisibleAlertDialog"
@@ -2182,7 +2180,7 @@ const saveDraftData = word => {
         <VCardText class="d-flex justify-end flex-wrap gap-4">
           <VBtn
             color="error"
-            @click="handleRejectPackaging"
+            @click="reject('REJECT')"
           >
             Reject
           </VBtn>

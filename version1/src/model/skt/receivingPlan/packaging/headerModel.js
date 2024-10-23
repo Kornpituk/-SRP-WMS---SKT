@@ -28,10 +28,10 @@ const dataHeader = ref({
 
 export const createDraftBody = dataHeader => {
   return {
-    limConditionDetail: dataHeader.limConditionDetail,
-    note: dataHeader.note,
+    limConditionDetail: dataHeader.limConditionDetail || '', 
+    note: dataHeader.note || '',
     coAChecked: dataHeader.coAChecked,
-    actualCheck: parseInt(dataHeader.actualCheck, 10),
+    actualCheck: parseInt(dataHeader.actualCheck, 10) || '',
   }
 }
 

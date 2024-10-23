@@ -43,13 +43,6 @@ const closeDialog = () => {
     class="v-dialog-sm"
     @update:model-value="val => emit('update:isDialogVisible', val)"
   >
-    <!-- Dialog Activator -->
-    <template #activator="{ props }">
-      <VBtn v-bind="props">
-        Open Dialog
-      </VBtn>
-    </template>
-
     <!-- Dialog Content -->
     <VCard>
       <VCardText v-if="props.success" class="d-flex justify-center">
@@ -63,6 +56,12 @@ const closeDialog = () => {
           v-if="props.word === 'REJECT'"
           size="150"
           color="warning"
+          icon="ri-checkbox-circle-fill"
+        />
+        <VIcon
+          v-if="props.word === 'ACCEPT'"
+          size="150"
+          color="success"
           icon="ri-checkbox-circle-fill"
         />
       </VCardText>
