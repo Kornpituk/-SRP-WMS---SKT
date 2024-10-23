@@ -648,7 +648,7 @@ const getDisabledFollowStatusNRole = () => {
               </VCol>
               <VCol cols="12">
                 <div class="d-flex justify-center align-center pa-0">
-                  ISOPRO (IPA) 
+                  ISOPRO (IPA) BBB
                 </div>
               </VCol>
             </VRow>
