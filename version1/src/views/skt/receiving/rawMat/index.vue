@@ -1347,7 +1347,11 @@ const loadindingSaveDatft3 = ref(false)
 const loadindingSaveDatftFailed3 = ref(false)
 const loadindingSaveDatftSeccess3 = ref(false)
 
-// ri-check-line
+
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+
+const isDialogVisibleAlertDialog = ref(false)
 
 const countErr = ref(0)
 
@@ -1455,6 +1459,7 @@ const submitButtonVisibleNew = async word => {
   // isDialogVisibleStepSaveDraft.value = false
 
   if(trickerSubmit.value !== true){
+    textAlertDialogFunction(word, true)
     location.reload()
   }
   
@@ -1463,6 +1468,18 @@ const submitButtonVisibleNew = async word => {
   isDialogConfirmVisible.value = false
 
   return true
+}
+
+const handleFunctionAlertDialog = async () => {
+  try {
+    // รอให้ textAlertDialogFunction ทำงานเสร็จ
+    await textAlertDialogFunction('SUBMIT', true)
+
+    // เมื่อ textAlertDialogFunction ทำงานเสร็จแล้ว ก็ reload หน้าเว็บ
+    location.reload()
+  } catch (error) {
+    console.error('Error:', error)
+  }
 }
 
 const submitReceivingForm = async () => {
@@ -1497,12 +1514,24 @@ const submitReceivingForm = async () => {
       .then(response => {
         console.log('[products.value]!!: ', response.data)
 
-        location.reload()
-        isDialogSubmitSuccessVisible.value = true
-        isDialogConfirmVisible.value = false
+        // isDialogSubmitSuccessVisible.value = true
+        // isDialogConfirmVisible.value = false
+
+        // เรียกใช้ textAlertDialogFunction ก่อน
+        textAlertDialogFunction('SUBMIT', true)
+
+        // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+
+
+
+        setTimeout(() => {
+          location.reload()
+        }, 200) // 10000 มิลลิวินาที = 10 วินาที
+        
       })
       .catch(error => {
         // Handle errors
+        textAlertDialogFunction('SUBMIT', false)
         console.error('Error:', error)
         isDialogSubmitFailedVisible.value = true
       })
@@ -1831,6 +1860,14 @@ const isDialogSubmitSuccessVisible = ref(false)
 const isDialogTextAreaVisible = ref(false)
 const isDialogSubmitFailedVisible = ref(false)
 
+//--------------------------- function --------------------------------------
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
 
 const submitButton = word => {
   trickerSubmit.value = true
@@ -3693,6 +3730,19 @@ const getDisabledFollowStatusNRole = () => {
         style="font-size: 12px;"
       >For Inspection </span>
     </VCol>
+
+    <!-- Alert Dialog Success/Fiald new -->
+    <section>
+      <div>
+        <!-- ใช้ AuthenticatorDialog component -->
+        <AuthenticatorDialog
+          :is-dialog-visible="isDialogVisibleAlertDialog"
+          :word="wordForSubmit"
+          :success="successDialAlert"
+          @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+        />
+      </div>
+    </section>
 
     <!-- Dialog Step Save Draft -->
     <section style="font-size: 12px;">

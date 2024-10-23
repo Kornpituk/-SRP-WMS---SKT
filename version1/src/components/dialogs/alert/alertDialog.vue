@@ -64,6 +64,18 @@ const closeDialog = () => {
           color="success"
           icon="ri-checkbox-circle-fill"
         />
+        <VIcon
+          v-if="props.word === 'APPROVE'"
+          size="150"
+          color="success"
+          icon="ri-checkbox-circle-fill"
+        />
+        <VIcon
+          v-if="props.word === 'SUBMIT'"
+          size="150"
+          color="success"
+          icon="ri-checkbox-circle-fill"
+        />
       </VCardText>
       <VCardText v-if="!props.success" class="d-flex justify-center">
         <VIcon
@@ -74,8 +86,8 @@ const closeDialog = () => {
       </VCardText>
 
       <VCardText class="d-flex justify-center">
-        <span v-if="props.success" style="font-size: 22px; font-weight: bolder;">{{ props.word }} Successed.</span>
-        <span v-if="!props.success" style="font-size: 22px; font-weight: bolder;">{{ props.word }} Failded.</span>
+        <span v-if="props.success" style="font-size: 22px; font-weight: bolder;">{{ props.word }} Successful.</span>
+        <span v-if="!props.success" style="font-size: 22px; font-weight: bolder;">{{ props.word }} Failed.</span>
       </VCardText>
 
       <VCardText

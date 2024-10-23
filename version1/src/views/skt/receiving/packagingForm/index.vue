@@ -1139,8 +1139,6 @@ const loadindingSaveDatft3 = ref(false)
 const loadindingSaveDatftFailed3 = ref(false)
 const loadindingSaveDatftSeccess3 = ref(false)
 
-
-
 const submitButtonVisibleNew = async word => {
   wordForSubmit.value = word
   isDialogVisibleStepSaveDraft.value = true
@@ -2107,6 +2105,7 @@ const saveDraftData = word => {
     </VRow>
   </section>
 
+  <!-- Alert Dialog Success/Fiald new -->
   <section>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->

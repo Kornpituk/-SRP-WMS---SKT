@@ -660,12 +660,18 @@ const submitInspForm = async () => {
       console.log('[products.value]!!: ', response.data)
 
       // รีโหลดหน้าเมื่อส่งข้อมูลสำเร็จ
-      location.reload()
+      textAlertDialogFunction('SUBMIT', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      // setTimeout(() => {
+      //   location.reload()
+      // }, 300) // 10000 มิลลิวินาที = 10 วินาที
 
       return true
     } else {
       // ถ้าการตรวจสอบ submitButtonVisibleNew ไม่สำเร็จ แสดง error
       console.error('submitButtonVisibleNew failed, cannot submit')
+      textAlertDialogFunction('SUBMIT', true)
       
       return false
     }
@@ -684,8 +690,23 @@ const isDialogSubmitFailedVisible = ref(false)
 const commentReject = ref('')
 const commentBackToEdit = ref('')
 
+const textAlertError = ref({
+  success: false,
+
+  comment: '',
+  coa: '',
+})
+
 const rejectInsp = () => {
   console.log("StaertSSSSS!!")
+
+  if(!commentReject.value){
+    textAlertError.value.success = true
+    textAlertError.value.comment = 'Please provide a comment to reject the inspection.'
+    
+    return
+  }
+
   axiosIns.post(`${urlApi.value}/api/v1/Inspection/Reject/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
@@ -698,13 +719,21 @@ const rejectInsp = () => {
   },
   {})
     .then(response => {
-      console.log('[products.value]!!: ', response.data)
-      isDialogSubmitSuccessVisible.value = true
-      isDialogConfirmVisible.value = false
+      // console.log('[products.value]!!: ', response.data)
+      // isDialogSubmitSuccessVisible.value = true
+      // isDialogConfirmVisible.value = false
+
+      textAlertDialogFunction('REJECT', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        location.reload()
+      }, 300) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
     // Handle errors
+      textAlertDialogFunction('REJECT', false)
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true
     })
@@ -724,13 +753,19 @@ const approveInsp = () => {
   },
   {})
     .then(response => {
-      console.log('[products.value]!!: ', response.data)
-      isDialogSubmitSuccessVisible.value = true
       isDialogConfirmVisible.value = false
+
+      textAlertDialogFunction('ACCEPT', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        location.reload()
+      }, 300) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
     // Handle errors
+      textAlertDialogFunction('ACCEPT', false)
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true
     })
@@ -750,8 +785,7 @@ const approveReceivingPlant = () => {
       // isDialogSubmitSuccessVisible.value = true
       isDialogConfirmVisible.value = false
 
-      // รีเฟรชหน้าจอทั้งหมด
-      location.reload()
+      
     })
     .catch(error => {
       // Handle errors
@@ -937,6 +971,12 @@ const loadindingSaveDatftSeccess3 = ref(false)
 
 const wordForSubmit = ref('Word')
 
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+
+const isDialogVisibleAlertDialog = ref(false)
+
+
 const submitButtonVisibleNew = async word => {
   wordForSubmit.value = word
   isDialogVisibleStepSaveDraft.value = true
@@ -1035,7 +1075,13 @@ const submitButtonVisibleNew = async word => {
   // isDialogVisibleStepSaveDraft.value = false
 
   if(trickerSubmit.value !== true){
-    location.reload()
+
+    textAlertDialogFunction('SAVE DRAFT', true)
+
+    // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+    setTimeout(() => {
+      location.reload()
+    }, 300) // 10000 มิลลิวินาที = 10 วินาที
   }
 
   // isDialogSubmitSuccessVisible.value = true
@@ -1097,6 +1143,15 @@ const submitConfirm = () => {
 
   // รีเฟรชหน้าจอ
   location.reload()
+}
+
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+  console.log("textAlertDialogFunction Start!!")
 }
 
 //--------------------------- Status Check --------------------------
@@ -2559,7 +2614,10 @@ const getDisabledFollowStatusNRole = () => {
         style="border-top: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black;"
       >
         <div style="width: 100%; text-align: start;">
-          <span style="font-size: 12px; font-weight: bolder;" class="text-center">Comment:</span>
+          <span
+            style="font-size: 12px; font-weight: bolder;"
+            class="text-center"
+          >Comment:</span>
           <VTextarea
             v-if="statusId === 7 || statusId === 16"
             v-model="headerInsp.remarkReject"
@@ -2762,6 +2820,19 @@ const getDisabledFollowStatusNRole = () => {
       >
         Approve Reject
       </VBtn>
+    </div>
+  </section>
+
+  <!-- Alert Dialog Success/Fiald new -->
+  <section>
+    <div>
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
     </div>
   </section>
 
@@ -3069,6 +3140,14 @@ const getDisabledFollowStatusNRole = () => {
               <VIcon icon="ri-edit-line" />
             </template>
           </VTextarea>
+          <span
+            v-if="textAlertError.success && textAlertError.comment"
+            class="text-red"
+          >{{ textAlertError.comment }}</span>
+          <span
+            v-if="!commentReject"
+            class="text-red"
+          >Please provide a comment to reject the inspection.</span>
         </VCardText>
 
         <VCardText class="d-flex justify-end flex-wrap gap-4">

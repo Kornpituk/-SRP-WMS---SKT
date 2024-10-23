@@ -2,7 +2,7 @@
 <script setup>
 import axiosIns from '@axios'
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
-import { inject, defineProps, watchEffect } from 'vue'
+import { inject, defineProps, watchEffect, watch } from 'vue'
 
 const props = defineProps({
   Data: Array,
@@ -277,7 +277,7 @@ const getCurrentTabIndex = () => {
 
 // console.log('***Current Tab Index:', getCurrentTabIndex())
 
-const currentTab = ref(getCurrentTabIndex())
+const currentTab = ref()
 
 const isActive = ref(true)
 
@@ -347,9 +347,18 @@ watch(statusId.value, (newValue, oldValue) => {
 })
 
 // เรียกใช้ generatedJournalId เมื่อ component ถูกสร้างขึ้น
-onMounted(() => {
+watch(() => {
   generatedJournalId()
+  currentTab.value = getCurrentTabIndex()
+  console.log("Tabs", currentTab.value)
+  getDisabledTabs()
+  
 })
+
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+
+const isDialogVisibleAlertDialog = ref(false)
 
 //---------------------------------- Approve ------------------------------------
 const wordForSubmit = ref('')
@@ -357,6 +366,15 @@ const wordForSubmit = ref('')
 const isDialogConfirmVisible = ref(false)
 const isDialogSubmitSuccessVisible = ref(false)
 const isDialogSubmitFailedVisible = ref(false)
+
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+  console.log("textAlertDialogFunction Start!!")
+}
 
 const btnApprove = word => {
   isDialogConfirmVisible.value = true
@@ -379,16 +397,18 @@ const handleAcceptPackaging = word => {
   },
   {})
     .then(response => {
-      console.log('[products.value]!!: ', response.data)
-      window.location.reload()
-      isDialogSubmitSuccessVisible.value = true
-      isDialogConfirmVisible.value = false
+      textAlertDialogFunction('APPROVE', true)
 
-     
-    
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        location.reload()
+      }, 300) // 10000 มิลลิวินาที = 3 วินาที
+
     })
     .catch(error => {
     // Handle errors
+      textAlertDialogFunction('ACCEPT', false)
+
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true
     })
@@ -745,6 +765,19 @@ const handleAcceptPackaging = word => {
         </VCardAction>
       </VCard>
     </VDialog>
+  </section>
+
+  <!-- Alert Dialog Success/Fiald new -->
+  <section>
+    <div>
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
   </section>
 
   <VDivider />
