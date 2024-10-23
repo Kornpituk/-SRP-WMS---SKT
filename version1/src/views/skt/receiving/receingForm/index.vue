@@ -14,6 +14,9 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
+const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const receivedTypeId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+
 const a = ref('A')
 
 const currentTableWatchSesstion = ref(0)
@@ -259,7 +262,7 @@ const tabIndexConfig = {
 }
 
 const getDisabledTabs = () => {
-  const status = dataProps.value.statusId
+  const status = statusId.value
   const role = userRole.value
   
   // console.log('Status:', status)
@@ -270,8 +273,8 @@ const getDisabledTabs = () => {
 }
 
 const getCurrentTabIndex = () => {
-  const status = dataProps.value.statusId
-
+  const status = statusId.value
+  
   return tabIndexConfig[status] !== undefined ? tabIndexConfig[status] : 0
 }
 
@@ -283,9 +286,6 @@ const isActive = ref(true)
 
 //------------- journalId
 const responseGener = ref([])
-
-const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
-const receivedTypeId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 
 const generatedJournalId = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
@@ -343,6 +343,7 @@ const generated = () => {
 watch(statusId.value, (newValue, oldValue) => {
   if (newValue !== oldValue) {
     generated() // เรียกใช้ function generated เมื่อ statusId เปลี่ยน
+    location.reload()
   }
 })
 
@@ -547,14 +548,14 @@ const handleAcceptPackaging = word => {
       v-if="false"
       class="mx-2"
       style="min-height: 40px;"
-      :color="colorStatusWithId(dataProps.statusId).color"
+      :color="colorStatusWithId(statusId).color"
       variant="elevated"
       closable
     >
       <span
         class="text-wrap"
         style="font-size: 12px; text-transform: capitalize;"
-      >{{ dataProps.statusText }}</span>
+      > 'statusText' </span>
     </VChip>
     <VChip
       v-if="false"
