@@ -359,6 +359,12 @@ const getHearderPackagingForm = () => {
 //   getHearderPackagingForm()
 // })
 
+//--------------------------------- Component ---------------------------------------------
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+
+const isDialogVisibleAlertDialog = ref(false)
+
 //--------------------------------- MVC ----------------------------------------------------
 // Import composable ที่เราสร้างสำหรับ logic การจัดการไฟล์
 import { handleFilesOMvc, 
@@ -871,7 +877,6 @@ const getFileCoaByName = nameFiel => {
 
 getFileCoaByName('6aaf646f-d008-4e6a-aa46-75a17fc180b4.png')
 
-
 const testCoa = () => {
   console.log('Test Coa')
 }
@@ -1244,6 +1249,15 @@ const submitButtonVisibleNew = async word => {
 //-------------------------- Btn ----------------------------------------------------------------
 const saveDraft = () => {
   trickerSubmit.value = false
+}
+
+const successDialAlert = ref(false)
+
+const textDialog = () => {
+  wordForSubmit.value = 'SAVE DRAFT'
+  successDialAlert.value = false
+  isDialogVisibleAlertDialog.value = true
+  console.log("Test Dialog", wordForSubmit.value, isDialogVisibleAlertDialog.value)
 }
 
 const submitForm = word => {
@@ -1678,7 +1692,10 @@ const saveDraftData = word => {
   </VRow>
 
   <!-- Quality Evalution -->
-  <VRow class="mx-0" v-if="false">
+  <VRow
+    v-if="false"
+    class="mx-0"
+  >
     <VCol cols="12">
       <VRow>
         <VCol
@@ -2084,6 +2101,24 @@ const saveDraftData = word => {
         </table>
       </VCol>
     </VRow>
+  </section>
+
+  <section>
+    alertDialog
+    <div>
+      <!-- ปุ่มเปิด dialog -->
+      <VBtn @click="textDialog">
+        Open Authenticator Dialog
+      </VBtn>
+
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
   </section>
 
   <!-- Dialog Image -->
