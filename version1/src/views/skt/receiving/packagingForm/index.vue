@@ -504,6 +504,8 @@ watch(() => {
 //------------- journalId
 const responseGener = ref([])
 
+const loadingGenerated = ref(true)
+
 const generatedJournalId = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
     headers: {
@@ -526,6 +528,8 @@ const generatedJournalId = () => {
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
       }
+
+      loadingGenerated.value = false
     })
     .catch(error => {
       console.error('Error:', error)
@@ -1298,1272 +1302,1283 @@ const saveDraftData = word => {
 </script>
 
 <template>
-  <VRow>
-    <VCol cols="12">
-      <h2 class="text-center">
-        Packaging Inspection Request Form
-      </h2>
-    </VCol>
-  </VRow>
-
-  <VRow>
-    <VCol
-      class="text-center pa-2 mx-3"
-      style="max-width: 150px; border: 1px solid black; font-size: 12px; font-weight: bold;"
-      cols="2"
+  <div v-if="loadingGenerated" class="mt-1">
+    <VProgressLinear
+      height="20"
+      color="success"
+      indeterminate 
     >
-      CONFIDENTIAL
-    </VCol>
-  </VRow>
-
-  <!-- Header -->
-  <VRow>
-    <VCol
-      cols="12"
-      style="overflow-x: auto; white-space: nowrap;"
-    >
-      <table class="custom-table">
-        <tr>
-          <th
-            class=""
-            colspan="4"
-          />
-          <th
-            class=""
-            colspan="2"
-          >
-            SKT Name
-          </th>
-          <td
-            class="text-start"
-            colspan="3"
-          >
-            {{ dataHeader.productName }}
-          </td>
-          <th
-            rowspan="1"
-            colspan="2"
-            class=""
-          >
-            <div class="text-center">
-              <span>Raw Mat. Code</span>
-            </div>
-          </th>
-          <th
-            colspan="2"
-            class=""
-          >
-            Supplier Name
-          </th>
-          <td
-            colspan="3"
-            class="text-start"
-          >
-            {{ dataHeader.supplierName }}
-          </td>
-        </tr>
-        <tr>
-          <th
-            colspan="2"
-            class=""
-          >
-            Received Date
-          </th>
-          <td
-            colspan="2"
-            class=""
-          >
-            {{ formatDate(dataHeader.receivedDate) }}
-          </td>
-          <th
-            colspan="2"
-            class=""
-          >
-            Trade Name
-          </th>
-          <td
-            colspan="3"
-            class="text-start"
-          >
-            {{ dataHeader.tradeName }}
-          </td>
-          <td
-            colspan="2"
-            class="text-center"
-          >
-            {{ dataHeader.productId }}
-          </td>
-          <th colspan="2">
-            Manufacturer Name
-          </th>
-          <td
-            class="text-start"
-            colspan="3"
-          >
-            {{ dataHeader.makerName }}
-          </td>
-        </tr>
-        <tr>
-          <th colspan="7">
-            Certification of Analysis From Manufacturer
-          </th>
-          <td
-            class="text-center"
-            colspan="3"
-          >
-            <VRow>
-              <VCol cols="6">
-                <div class="demo-space-x">
-                  <VCheckbox
-                    v-model="dataHeader.coAChecked"
-                    label="Yes"
-                    readonly
-                    :checked="dataHeader.coAChecked"
-                  />
-                </div>
-              </VCol>
-              <VCol cols="6">
-                <div class="demo-space-x">
-                  <VCheckbox
-                    v-model="dataHeader.coAChecked"
-                    label="No"
-                    :value="false"
-                    readonly
-                  />
-                </div>
-              </VCol>
-            </VRow>
-          </td>
-        </tr>
-      </table>
-    </VCol>
-  </VRow>
-
-  <div>
-    <!-- แสดงข้อมูลใน props -->
-    <div
-      v-for="(item, index) in propsData"
-      :key="index"
-      class="bg-red"
-    >
-      {{ item }}
-    </div>
-
-    <div v-if="false">
-      {{ routeData }}
-    </div>
+      <span>Loading</span>
+    </VProgressLinear>
   </div>
+  <div v-if="!loadingGenerated">
+    <VRow>
+      <VCol cols="12">
+        <h2 class="text-center">
+          Packaging Inspection Request Form
+        </h2>
+      </VCol>
+    </VRow>
 
-  <!-- Analysis Item -->
-  <VRow>
-    <VCol
-      cols="12"
-      style="overflow-x: auto; white-space: nowrap;"
-    >
-      <!-- Table New MVC -->
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th
-              colspan="1"
-              rowspan="2"
-              class="text-center"
-            >
-              No.
-            </th>
-            <th
-              colspan="2"
-              rowspan="2"
-              class="text-center"
-            >
-              Analytical Items
-            </th>
-            <th
-              colspan="2"
-              rowspan="2"
-              class="text-center"
-            >
-              Checking Method
-            </th>
-            <th
-              colspan="2"
-              rowspan="2"
-              class="text-center"
-            >
-              Specification Ranges
-            </th>
-            <th
-              colspan="1"
-              class="text-center"
-            >
-              P/O NO.
-            </th>
-            <td
-              colspan="4"
-              class="text-center"
-            >
-              <span>{{ dataHeader.purchaseOrderNo }}</span>
-            </td>
-          </tr>
-          <tr>
-            <th
-              colspan="1"
-              class="text-center"
-            >
-              Amount (Piece)
-            </th>
-            <td
-              colspan="4"
-              class="text-center"
-            >
-              <span>{{ dataHeader.purchasingQuantityPcs }}</span>
-            </td>
-          </tr>
-          <tr>
-            <th colspan="7" />
-            <th
-              colspan="1"
-              class="text-center"
-            >
-              Actual Check
-            </th>
-            <th colspan="4">
-              <VTextField
-                v-model="dataHeader.actualCheck"
-                :readonly="frozeCheck"
-                density="compact"
-                :rules="[
-                  value => !!value.trim() || 'Actual Check is required.',
-                ]"
-                
-                @input="(e) => handleInputNumberOnly(e)"
-              >
-                <template
-                  v-if="!frozeCheck"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(item, index) in analyticalItemsData"
-            :key="index"
-          >
-            <td
-              colspan="1"
-              class="text-center"
-            >
-              {{ index+1 }}
-            </td>
-            <td colspan="2">
-              {{ item.analyticalItem }}
-            </td>
-            <td
-              class="text-center"
-              colspan="2"
-            >
-              {{ item.method }}
-            </td>
-            <td
-              class="text-center"
-              colspan="2"
-            >
-              {{ item.specRange }}
-            </td>
-            <td colspan="1" />
-            <td
-              Style="min-width: 200px;"
-              colspan="4"
-            >
-              <VTextField
-                v-model="item.actualAnalysis"
-                :readonly="frozeCheck"
-                density="compact"
-                :rules="[
-                  value => !!value.trim() || 'Analytical Items is required.',
-                  value => value.length <= 44 || 'Must be 45 characters or less'
-                ]"
-                :maxlength="45"
-              >
-                <template
-                  v-if="!frozeCheck"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </VCol>
+    <VRow>
+      <VCol
+        class="text-center pa-2 mx-3"
+        style="max-width: 150px; border: 1px solid black; font-size: 12px; font-weight: bold;"
+        cols="2"
+      >
+        CONFIDENTIAL
+      </VCol>
+    </VRow>
 
-    <!-- Image -->
-    <VCol cols="12">
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th>
-              <div>
-                <VCard @click="showDialogImageMutiNew(dataHeader.packagingImg)">
-                  <VImg
-                    :src="dataHeader.packagingImg"
-                    alt="Image Preview"
-                    style="height: 250px;"
-                  />
-                </VCard>
-              </div>
-            </th>
-          </tr>
-        </thead>
-      </table>
-    </VCol>
-  </VRow>
-
-  <!-- Note -->
-  <VRow style="font-size: 12px;">
-    <!-- Note -->
-    <VCol
-      cols="6"
-      class="text-decoration-underlined pb-2"
-    >
-      Note
-    </VCol>
-    <VCol
-      cols="6"
-      class="text-decoration-underlined pb-2 px-0"
-    >
-      Details of Limitation Condition
-    </VCol>
-    <VCol
-      cols="12"
-      class="py-0"
-    >
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th colspan="6">
-              <VTextarea
-                v-model="dataHeader.note"
-                :readonly="frozeCheck"
-                auto-grow
-                :rules="[
-                  v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
-                ]"
-                @input="limitTextInputLine4Note"
-              >
-                <template
-                  v-if="!frozeCheck"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextarea>
-            </th>
-            <th colspan="6">
-              <VTextarea
-                v-model="dataHeader.limConditionDetail"
-                :readonly="frozeCheck"
-                auto-grow
-                :rules="[
-                  v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
-                ]"
-                @input="limitTextInputLine4Details"
-              >
-                <template
-                  v-if="!frozeCheck"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextarea>
-            </th>
-          </tr>
-        </thead>
-      </table>
-    </VCol>
-  </VRow>
-
-  <!-- Quality Evalution -->
-  <VRow
-    v-if="false"
-    class="mx-0"
-  >
-    <VCol cols="12">
-      <VRow>
-        <VCol
-          class="px-0"
-          style="font-size: 12px;"
-          cols="12"
-        >
-          Quality Evaluation
-        </VCol>
-        <VCol
-          style="border: 1px solid black;"
-          cols="4"
-          class="d-flex align-center"
-        >
-          <VRow>
-            <VCol
-              cols="1"
-              class="d-flex align-center"
-              style="font-size: 12px; font-weight: bolder;"
-            >
-              Accept
-            </VCol>
-            <VCol
-              class="d-flex justify-center"
-              cols="10"
-            >
-              <VIcon
-                v-if="statusId === 17 || statusId === 15"
-                color="success"
-                size="60"
-                icon="ri-checkbox-circle-fill"
-              />
-            </VCol>
-          </VRow>
-        </VCol>
-        <VCol
-          style="border: 1px solid black;"
-          cols="4"
-          class="d-flex align-center"
-        >
-          <VRow>
-            <VCol
-              cols="1"
-              class="d-flex align-center"
-              style="font-size: 12px; font-weight: bolder;"
-            >
-              Reject
-            </VCol>
-            <VCol
-              class="d-flex justify-center"
-              cols="11"
-            >
-              <VIcon
-                v-if="statusId === 7 || statusId === 16"
-                color="red"
-                size="60"
-                icon="ri-close-circle-fill"
-              />
-            </VCol>
-          </VRow>
-        </VCol>
-        <VCol
-          style="border: 1px solid black;"
-          cols="4"
-          class="d-flex align-center"
-        >
-          <VRow>
-            <VCol
-              cols="2"
-              class="d-flex align-center"
-            >
-              <span style="font-size: 12px; font-weight: bolder;">Comment:</span>
-            </VCol>
-            <VCol cols="10">
-              <span
-                v-if="statusId === 7 || statusId === 16"
-                style=" white-space: normal; word-wrap: break-word;"
-              >
-                <VTextarea
-                  v-model="dataHeader.statusComments"
-                  readonly
-                />
-              </span>
-            </VCol>
-          </VRow>
-        </VCol>
-      </VRow>
-    </VCol>
-  </VRow>
-
-  <VRow class="pt-4 px-3">
-    <!-- Accept Section -->
-    <VCol
-      cols="1"
-      class="d-flex align-center py-0 justify-center"
-      style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
-    >
-      <span style="font-size: 12px; font-weight: bolder;">Accept</span>
-    </VCol>
-
-    <VCol
-      cols="3"
-      class="d-flex align-center justify-center py-0"
-      style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
-    >
-      <VIcon
-        v-if="statusId === 17 || statusId === 15"
-        color="success"
-        size="60"
-        icon="ri-checkbox-circle-fill"
-      />
-    </VCol>
-
-    <!-- Reject Section -->
-    <VCol
-      cols="1"
-      class="d-flex align-center justify-center py-0"
-      style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
-    >
-      <span style="font-size: 12px; font-weight: bolder;">Reject</span>
-    </VCol>
-
-    <VCol
-      cols="3"
-      class="d-flex align-center justify-center py-0"
-      style="border: 1px solid black;"
-    >
-      <VIcon
-        v-if="statusId === 7 || statusId === 16"
-        color="red"
-        size="60"
-        icon="ri-close-circle-fill"
-      />
-    </VCol>
-
-    <!-- Comment Section -->
-    <VCol
-      cols="4"
-      class="d-flex align-center py-2"
-      style="border-top: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black;"
-    >
-      <div style="width: 100%; text-align: start;">
-        <span
-          style="font-size: 12px; font-weight: bolder;"
-          class="text-center"
-        >Comment:</span>
-        <VTextarea
-          v-if="statusId === 7 || statusId === 16"
-          v-model="dataHeader.statusComments"
-          rows="2"
-          readonly
-          style="white-space: normal; word-wrap: break-word;"
-        />
-      </div>
-    </VCol>
-  </VRow>
-  
-  <!-- COA -->
-  <VRow style="font-size: 12px;">
-    <VCol cols="12">
-      <div class="mb-2">
-        COA
-      </div>
-      <Table class="custom-table">
-        <tr>
-          <th>
-            <VRow>
-              <VCol cols="12">
-                <VFileInput
-                  v-model="fileCoaNew"
-                  :disabled="frozeCheck"
-                  label="File Upload COA"
-                  accept="image/png, image/jpeg, image/bmp, application/pdf"
-                  placeholder="Upload your documents"
-                  multiple
-                  prepend-icon="mdi-paperclip"
-                />
-              </VCol>
-              <div v-if="errorMessageCOA">
-                {{ errorMessageCOA.message }}
-              </div>
-            </VRow>
-
-            <VBtn
-              v-if="false"
-              @click="testCoa"
-            >
-              Test Coa
-            </VBtn>
-
-            <!-- fILE Image New -->
-            <VRow
-              v-if="fileCoaNew.length > 0"
-              class="pa-2 d-flex justify-center text-center bg-green-lighten-5"
-            >
-              <VCol
-                v-for="(file, index) in fileCoaNew"
-                :key="index"
-                cols="12"
-                md="4"
-                lg="3"
-              >
-                <VCard>
-                  <VCardTitle class="d-flex justify-start">
-                    <VChip
-                      variant="elevated"
-                      color="success"
-                    >
-                      New
-                    </VChip>
-                  </VCardTitle>
-                  <VCardText>
-                    <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
-                    <template v-if="file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/bmp'">
-                      <VImg
-                        role="presentation"
-                        :alt="file.name"
-                        :src="getFileUrl(file)"
-                        height="150"
-                        contain
-                        @click="showDialogImageMuti(getFileUrl(file), file.name)"
-                      />
-                    </template>
-
-                    <!-- ตรวจสอบว่าถ้าเป็น PDF -->
-                    <template v-else-if="file.type === 'application/pdf'">
-                      <iframe
-                        :src="getFileUrl(file)"
-                        width="100%"
-                        height="150"
-                        style="border: none;"
-                      />
-                    </template>
-                  </VCardText>
-                  <VCardActions>
-                    <VBtn
-                      v-if="!frozeCheck"
-                      variant="flat"
-                      width="100%"
-                      color="error"
-                      @click="removeFileN(index)"
-                    >
-                      <VIcon>ri-delete-bin-5-fill</VIcon>
-                    </VBtn>
-                  </VCardActions>
-                </VCard>
-              </VCol>
-            </VRow>
-
-            <!-- fILE Image Old -->
-            <VRow class="pa-2 d-flex justify-center text-center">
-              <VCol
-                v-for="(file, index) in getFormCoa"
-                :key="index"
-                cols="12"
-                md="4"
-                lg="3"
-              >
-                <VCard>
-                  <VCardText>
-                    <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
-                    <template v-if="file.contentType === 'image/png' || file.contentType === 'image/jpeg' || file.contentType === 'image/bmp'">
-                      <VImg
-                        role="presentation"
-                        :alt="file.name"
-                        :src="file.fileUri"
-                        height="150"
-                        contain
-                        @click="showDialogImageMuti(file.fileUri, file.name)"
-                      />
-                    </template>
-
-                    <!-- ตรวจสอบว่าถ้าเป็น PDF -->
-                    <template v-else-if="file.contentType === 'application/pdf'">
-                      <iframe
-                        :src="'https://docs.google.com/viewer?url=' + file.fileUri + '&embedded=true'"
-                        width="100%"
-                        height="150"
-                        style="border: none;"
-                      />
-                    </template>
-                  </VCardText>
-                  <VCardActions>
-                    <VBtn
-                      v-if="!frozeCheck"
-                      variant="flat"
-                      width="100%"
-                      color="error"
-                      @click="removeFileO(index, file.journalID)"
-                    >
-                      <VIcon>ri-delete-bin-5-fill</VIcon>
-                    </VBtn>
-                  </VCardActions>
-                </VCard>
-              </VCol>
-            </VRow>
-
-            <div v-if="getFormCoa || fileCoaNew.length > 0">
-              <VCol
-                class="d-flex justify-end"
-                cols="12"
-              >
-                <VBtn
-                  v-if="!frozeCheck"
-                  color="red"
-                  @click="removeFileAll"
-                >
-                  <VIcon icon="ri-delete-bin-6-line" />
-                  Delete All COA
-                </VBtn>
-              </VCol>
-            </div>
-          </th>
-        </tr>
-      </Table>
-    </VCol> 
-  </VRow>
-
-  <VRow
-    v-if="false"
-    class="my-6"
-  >
-    <VCol cols="12">
-      <VRow>
-        <VCol
-          style="border: 1px solid black; font-size: 12px;"
-          class="text-cente"
-          cols="12"
-        >
-          Warehouse
-        </VCol>
-        <VCol
-          style="border: 1px solid black;"
-          class="text-start"
-          cols="6"
-        >
-          <div style="font-size: 12px;">
-            Staff:  {{ dataHeader.inspStaffUpdateBy }}
-          </div>
-          <VDivider />
-          <div style="font-size: 12px;">
-            <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
-          </div>
-        </VCol>
-        <VCol
-          style="border: 1px solid black;"
-          class="text-start"
-          cols="6"
-        >
-          <div style="font-size: 12px;">
-            Supervisor: {{ dataHeader.whUpdateBy }}
-          </div>
-          <VDivider />
-          <div style="font-size: 12px;">
-            <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
-          </div>
-        </VCol>
-      </VRow>
-    </VCol>
-  </VRow>
-
-  <section class="my-4">
+    <!-- Header -->
     <VRow>
       <VCol
         cols="12"
-        lg="12"
+        style="overflow-x: auto; white-space: nowrap;"
       >
         <table class="custom-table">
           <tr>
             <th
-              class="text-center cursor-pointer"
-              colspan="12"
+              class=""
+              colspan="4"
+            />
+            <th
+              class=""
+              colspan="2"
             >
-              Warehouse
+              SKT Name
             </th>
+            <td
+              class="text-start"
+              colspan="3"
+            >
+              {{ dataHeader.productName }}
+            </td>
+            <th
+              rowspan="1"
+              colspan="2"
+              class=""
+            >
+              <div class="text-center">
+                <span>Raw Mat. Code</span>
+              </div>
+            </th>
+            <th
+              colspan="2"
+              class=""
+            >
+              Supplier Name
+            </th>
+            <td
+              colspan="3"
+              class="text-start"
+            >
+              {{ dataHeader.supplierName }}
+            </td>
           </tr>
           <tr>
-            <td colspan="6">
-              <span>Staff: {{ dataHeader.inspStaffUpdateBy }}</span>
+            <th
+              colspan="2"
+              class=""
+            >
+              Received Date
+            </th>
+            <td
+              colspan="2"
+              class=""
+            >
+              {{ formatDate(dataHeader.receivedDate) }}
             </td>
-            <td colspan="6">
-              <span>Supervisor: {{ dataHeader.whUpdateBy }}</span>
+            <th
+              colspan="2"
+              class=""
+            >
+              Trade Name
+            </th>
+            <td
+              colspan="3"
+              class="text-start"
+            >
+              {{ dataHeader.tradeName }}
+            </td>
+            <td
+              colspan="2"
+              class="text-center"
+            >
+              {{ dataHeader.productId }}
+            </td>
+            <th colspan="2">
+              Manufacturer Name
+            </th>
+            <td
+              class="text-start"
+              colspan="3"
+            >
+              {{ dataHeader.makerName }}
             </td>
           </tr>
           <tr>
+            <th colspan="7">
+              Certification of Analysis From Manufacturer
+            </th>
             <td
-              style="min-width: 150px;"
-              colspan="6"
+              class="text-center"
+              colspan="3"
             >
-              <div v-if="dataHeader.inspStaffUpdateDate">
-                <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
-              </div>
-            </td>
-            <td
-              style="min-width: 150px;"
-              colspan="6"
-            >
-              <div v-if="dataHeader.whUpdateDate">
-                <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
-              </div>
+              <VRow>
+                <VCol cols="6">
+                  <div class="demo-space-x">
+                    <VCheckbox
+                      v-model="dataHeader.coAChecked"
+                      label="Yes"
+                      readonly
+                      :checked="dataHeader.coAChecked"
+                    />
+                  </div>
+                </VCol>
+                <VCol cols="6">
+                  <div class="demo-space-x">
+                    <VCheckbox
+                      v-model="dataHeader.coAChecked"
+                      label="No"
+                      :value="false"
+                      readonly
+                    />
+                  </div>
+                </VCol>
+              </VRow>
             </td>
           </tr>
         </table>
       </VCol>
     </VRow>
-  </section>
 
-  <!-- Alert Dialog Success/Fiald new -->
-  <section>
     <div>
-      <!-- ใช้ AuthenticatorDialog component -->
-      <AuthenticatorDialog
-        :is-dialog-visible="isDialogVisibleAlertDialog"
-        :word="wordForSubmit"
-        :success="successDialAlert"
-        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
-      />
-    </div>
-  </section>
+      <!-- แสดงข้อมูลใน props -->
+      <div
+        v-for="(item, index) in propsData"
+        :key="index"
+        class="bg-red"
+      >
+        {{ item }}
+      </div>
 
-  <!-- Dialog Image -->
-  <VDialog
-    v-model="isDialogVisibleImgFileMuti"
-    width="80%"
-  >
-    <!-- Dialog Content -->
-    <VCard>
-      <VCardTitle class="bg-primary">
-        <div class="d-flex justify-space-between">
-          COA
-          <VBtn
-            icon="mdi-close"
-            color="white"
-            size="small"
-            variant="tonal"
-            @click="isDialogVisibleImgFileMuti = false"
+      <div v-if="false">
+        {{ routeData }}
+      </div>
+    </div>
+
+    <!-- Analysis Item -->
+    <VRow>
+      <VCol
+        cols="12"
+        style="overflow-x: auto; white-space: nowrap;"
+      >
+        <!-- Table New MVC -->
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th
+                colspan="1"
+                rowspan="2"
+                class="text-center"
+              >
+                No.
+              </th>
+              <th
+                colspan="2"
+                rowspan="2"
+                class="text-center"
+              >
+                Analytical Items
+              </th>
+              <th
+                colspan="2"
+                rowspan="2"
+                class="text-center"
+              >
+                Checking Method
+              </th>
+              <th
+                colspan="2"
+                rowspan="2"
+                class="text-center"
+              >
+                Specification Ranges
+              </th>
+              <th
+                colspan="1"
+                class="text-center"
+              >
+                P/O NO.
+              </th>
+              <td
+                colspan="4"
+                class="text-center"
+              >
+                <span>{{ dataHeader.purchaseOrderNo }}</span>
+              </td>
+            </tr>
+            <tr>
+              <th
+                colspan="1"
+                class="text-center"
+              >
+                Amount (Piece)
+              </th>
+              <td
+                colspan="4"
+                class="text-center"
+              >
+                <span>{{ dataHeader.purchasingQuantityPcs }}</span>
+              </td>
+            </tr>
+            <tr>
+              <th colspan="7" />
+              <th
+                colspan="1"
+                class="text-center"
+              >
+                Actual Check
+              </th>
+              <th colspan="4">
+                <VTextField
+                  v-model="dataHeader.actualCheck"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => !!value.trim() || 'Actual Check is required.',
+                  ]"
+                
+                  @input="(e) => handleInputNumberOnly(e)"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(item, index) in analyticalItemsData"
+              :key="index"
+            >
+              <td
+                colspan="1"
+                class="text-center"
+              >
+                {{ index+1 }}
+              </td>
+              <td colspan="2">
+                {{ item.analyticalItem }}
+              </td>
+              <td
+                class="text-center"
+                colspan="2"
+              >
+                {{ item.method }}
+              </td>
+              <td
+                class="text-center"
+                colspan="2"
+              >
+                {{ item.specRange }}
+              </td>
+              <td colspan="1" />
+              <td
+                Style="min-width: 200px;"
+                colspan="4"
+              >
+                <VTextField
+                  v-model="item.actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => !!value.trim() || 'Analytical Items is required.',
+                    value => value.length <= 44 || 'Must be 45 characters or less'
+                  ]"
+                  :maxlength="45"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </VCol>
+
+      <!-- Image -->
+      <VCol cols="12">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>
+                <div>
+                  <VCard @click="showDialogImageMutiNew(dataHeader.packagingImg)">
+                    <VImg
+                      :src="dataHeader.packagingImg"
+                      alt="Image Preview"
+                      style="height: 250px;"
+                    />
+                  </VCard>
+                </div>
+              </th>
+            </tr>
+          </thead>
+        </table>
+      </VCol>
+    </VRow>
+
+    <!-- Note -->
+    <VRow style="font-size: 12px;">
+      <!-- Note -->
+      <VCol
+        cols="6"
+        class="text-decoration-underlined pb-2"
+      >
+        Note
+      </VCol>
+      <VCol
+        cols="6"
+        class="text-decoration-underlined pb-2 px-0"
+      >
+        Details of Limitation Condition
+      </VCol>
+      <VCol
+        cols="12"
+        class="py-0"
+      >
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th colspan="6">
+                <VTextarea
+                  v-model="dataHeader.note"
+                  :readonly="frozeCheck"
+                  auto-grow
+                  :rules="[
+                    v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
+                  ]"
+                  @input="limitTextInputLine4Note"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+              </th>
+              <th colspan="6">
+                <VTextarea
+                  v-model="dataHeader.limConditionDetail"
+                  :readonly="frozeCheck"
+                  auto-grow
+                  :rules="[
+                    v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
+                  ]"
+                  @input="limitTextInputLine4Details"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+              </th>
+            </tr>
+          </thead>
+        </table>
+      </VCol>
+    </VRow>
+
+    <!-- Quality Evalution -->
+    <VRow
+      v-if="false"
+      class="mx-0"
+    >
+      <VCol cols="12">
+        <VRow>
+          <VCol
+            class="px-0"
+            style="font-size: 12px;"
+            cols="12"
+          >
+            Quality Evaluation
+          </VCol>
+          <VCol
+            style="border: 1px solid black;"
+            cols="4"
+            class="d-flex align-center"
+          >
+            <VRow>
+              <VCol
+                cols="1"
+                class="d-flex align-center"
+                style="font-size: 12px; font-weight: bolder;"
+              >
+                Accept
+              </VCol>
+              <VCol
+                class="d-flex justify-center"
+                cols="10"
+              >
+                <VIcon
+                  v-if="statusId === 17 || statusId === 15"
+                  color="success"
+                  size="60"
+                  icon="ri-checkbox-circle-fill"
+                />
+              </VCol>
+            </VRow>
+          </VCol>
+          <VCol
+            style="border: 1px solid black;"
+            cols="4"
+            class="d-flex align-center"
+          >
+            <VRow>
+              <VCol
+                cols="1"
+                class="d-flex align-center"
+                style="font-size: 12px; font-weight: bolder;"
+              >
+                Reject
+              </VCol>
+              <VCol
+                class="d-flex justify-center"
+                cols="11"
+              >
+                <VIcon
+                  v-if="statusId === 7 || statusId === 16"
+                  color="red"
+                  size="60"
+                  icon="ri-close-circle-fill"
+                />
+              </VCol>
+            </VRow>
+          </VCol>
+          <VCol
+            style="border: 1px solid black;"
+            cols="4"
+            class="d-flex align-center"
+          >
+            <VRow>
+              <VCol
+                cols="2"
+                class="d-flex align-center"
+              >
+                <span style="font-size: 12px; font-weight: bolder;">Comment:</span>
+              </VCol>
+              <VCol cols="10">
+                <span
+                  v-if="statusId === 7 || statusId === 16"
+                  style=" white-space: normal; word-wrap: break-word;"
+                >
+                  <VTextarea
+                    v-model="dataHeader.statusComments"
+                    readonly
+                  />
+                </span>
+              </VCol>
+            </VRow>
+          </VCol>
+        </VRow>
+      </VCol>
+    </VRow>
+
+    <VRow class="pt-4 px-3">
+      <!-- Accept Section -->
+      <VCol
+        cols="1"
+        class="d-flex align-center py-0 justify-center"
+        style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+      >
+        <span style="font-size: 12px; font-weight: bolder;">Accept</span>
+      </VCol>
+
+      <VCol
+        cols="3"
+        class="d-flex align-center justify-center py-0"
+        style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+      >
+        <VIcon
+          v-if="statusId === 17 || statusId === 15"
+          color="success"
+          size="60"
+          icon="ri-checkbox-circle-fill"
+        />
+      </VCol>
+
+      <!-- Reject Section -->
+      <VCol
+        cols="1"
+        class="d-flex align-center justify-center py-0"
+        style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+      >
+        <span style="font-size: 12px; font-weight: bolder;">Reject</span>
+      </VCol>
+
+      <VCol
+        cols="3"
+        class="d-flex align-center justify-center py-0"
+        style="border: 1px solid black;"
+      >
+        <VIcon
+          v-if="statusId === 7 || statusId === 16"
+          color="red"
+          size="60"
+          icon="ri-close-circle-fill"
+        />
+      </VCol>
+
+      <!-- Comment Section -->
+      <VCol
+        cols="4"
+        class="d-flex align-center py-2"
+        style="border-top: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black;"
+      >
+        <div style="width: 100%; text-align: start;">
+          <span
+            style="font-size: 12px; font-weight: bolder;"
+            class="text-center"
+          >Comment:</span>
+          <VTextarea
+            v-if="statusId === 7 || statusId === 16"
+            v-model="dataHeader.statusComments"
+            rows="2"
+            readonly
+            style="white-space: normal; word-wrap: break-word;"
           />
         </div>
-      </VCardTitle>
+      </VCol>
+    </VRow>
+  
+    <!-- COA -->
+    <VRow style="font-size: 12px;">
+      <VCol cols="12">
+        <div class="mb-2">
+          COA
+        </div>
+        <Table class="custom-table">
+          <tr>
+            <th>
+              <VRow>
+                <VCol cols="12">
+                  <VFileInput
+                    v-model="fileCoaNew"
+                    :disabled="frozeCheck"
+                    label="File Upload COA"
+                    accept="image/png, image/jpeg, image/bmp, application/pdf"
+                    placeholder="Upload your documents"
+                    multiple
+                    prepend-icon="mdi-paperclip"
+                  />
+                </VCol>
+                <div v-if="errorMessageCOA">
+                  {{ errorMessageCOA.message }}
+                </div>
+              </VRow>
 
-      <VCardText>
-        <VImg
-          role="presentation"
-          :src="imgDialog"
-          max-width="100%"
-          max-height="600px"
-          contain
-        />
-      </VCardText>
-    </VCard>
-  </VDialog>
+              <VBtn
+                v-if="false"
+                @click="testCoa"
+              >
+                Test Coa
+              </VBtn>
 
-  <!-- Dialog Reject -->
-  <section style="font-size: 12px;">
-    <VDialog
-      v-model="isDialogRejectVisible"
-      width="500"
+              <!-- fILE Image New -->
+              <VRow
+                v-if="fileCoaNew.length > 0"
+                class="pa-2 d-flex justify-center text-center bg-green-lighten-5"
+              >
+                <VCol
+                  v-for="(file, index) in fileCoaNew"
+                  :key="index"
+                  cols="12"
+                  md="4"
+                  lg="3"
+                >
+                  <VCard>
+                    <VCardTitle class="d-flex justify-start">
+                      <VChip
+                        variant="elevated"
+                        color="success"
+                      >
+                        New
+                      </VChip>
+                    </VCardTitle>
+                    <VCardText>
+                      <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
+                      <template v-if="file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/bmp'">
+                        <VImg
+                          role="presentation"
+                          :alt="file.name"
+                          :src="getFileUrl(file)"
+                          height="150"
+                          contain
+                          @click="showDialogImageMuti(getFileUrl(file), file.name)"
+                        />
+                      </template>
+
+                      <!-- ตรวจสอบว่าถ้าเป็น PDF -->
+                      <template v-else-if="file.type === 'application/pdf'">
+                        <iframe
+                          :src="getFileUrl(file)"
+                          width="100%"
+                          height="150"
+                          style="border: none;"
+                        />
+                      </template>
+                    </VCardText>
+                    <VCardActions>
+                      <VBtn
+                        v-if="!frozeCheck"
+                        variant="flat"
+                        width="100%"
+                        color="error"
+                        @click="removeFileN(index)"
+                      >
+                        <VIcon>ri-delete-bin-5-fill</VIcon>
+                      </VBtn>
+                    </VCardActions>
+                  </VCard>
+                </VCol>
+              </VRow>
+
+              <!-- fILE Image Old -->
+              <VRow class="pa-2 d-flex justify-center text-center">
+                <VCol
+                  v-for="(file, index) in getFormCoa"
+                  :key="index"
+                  cols="12"
+                  md="4"
+                  lg="3"
+                >
+                  <VCard>
+                    <VCardText>
+                      <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
+                      <template v-if="file.contentType === 'image/png' || file.contentType === 'image/jpeg' || file.contentType === 'image/bmp'">
+                        <VImg
+                          role="presentation"
+                          :alt="file.name"
+                          :src="file.fileUri"
+                          height="150"
+                          contain
+                          @click="showDialogImageMuti(file.fileUri, file.name)"
+                        />
+                      </template>
+
+                      <!-- ตรวจสอบว่าถ้าเป็น PDF -->
+                      <template v-else-if="file.contentType === 'application/pdf'">
+                        <iframe
+                          :src="'https://docs.google.com/viewer?url=' + file.fileUri + '&embedded=true'"
+                          width="100%"
+                          height="150"
+                          style="border: none;"
+                        />
+                      </template>
+                    </VCardText>
+                    <VCardActions>
+                      <VBtn
+                        v-if="!frozeCheck"
+                        variant="flat"
+                        width="100%"
+                        color="error"
+                        @click="removeFileO(index, file.journalID)"
+                      >
+                        <VIcon>ri-delete-bin-5-fill</VIcon>
+                      </VBtn>
+                    </VCardActions>
+                  </VCard>
+                </VCol>
+              </VRow>
+
+              <div v-if="getFormCoa || fileCoaNew.length > 0">
+                <VCol
+                  class="d-flex justify-end"
+                  cols="12"
+                >
+                  <VBtn
+                    v-if="!frozeCheck"
+                    color="red"
+                    @click="removeFileAll"
+                  >
+                    <VIcon icon="ri-delete-bin-6-line" />
+                    Delete All COA
+                  </VBtn>
+                </VCol>
+              </div>
+            </th>
+          </tr>
+        </Table>
+      </VCol> 
+    </VRow>
+
+    <VRow
+      v-if="false"
+      class="my-6"
     >
-      <!-- Dialog Content -->
-      <VCard title="Comment">
-        <DialogCloseBtn
-          variant="text"
-          size="default"
-          @click="isDialogRejectVisible = false"
-        />
-
-        <VCardText>
-          <VTextarea v-model="commentReject">
-            <template #label>
-              <VIcon icon="ri-edit-line" />
-            </template>
-          </VTextarea>
-          <span
-            v-if="textAlertError.comment && !commentReject"
-            class="text-red"
-          >{{ textAlertError.comment }}</span>
-        </VCardText>
-
-        <VCardText class="d-flex justify-end flex-wrap gap-4">
-          <VBtn
-            color="error"
-            @click="reject('REJECT')"
+      <VCol cols="12">
+        <VRow>
+          <VCol
+            style="border: 1px solid black; font-size: 12px;"
+            class="text-cente"
+            cols="12"
           >
-            Reject
-          </VBtn>
-        </VCardText>
-      </VCard>
-    </VDialog>
-  </section>
+            Warehouse
+          </VCol>
+          <VCol
+            style="border: 1px solid black;"
+            class="text-start"
+            cols="6"
+          >
+            <div style="font-size: 12px;">
+              Staff:  {{ dataHeader.inspStaffUpdateBy }}
+            </div>
+            <VDivider />
+            <div style="font-size: 12px;">
+              <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
+            </div>
+          </VCol>
+          <VCol
+            style="border: 1px solid black;"
+            class="text-start"
+            cols="6"
+          >
+            <div style="font-size: 12px;">
+              Supervisor: {{ dataHeader.whUpdateBy }}
+            </div>
+            <VDivider />
+            <div style="font-size: 12px;">
+              <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
+            </div>
+          </VCol>
+        </VRow>
+      </VCol>
+    </VRow>
 
-  <!-- Dialog Step Save Draft -->
-  <section style="font-size: 12px;">
+    <section class="my-4">
+      <VRow>
+        <VCol
+          cols="12"
+          lg="12"
+        >
+          <table class="custom-table">
+            <tr>
+              <th
+                class="text-center cursor-pointer"
+                colspan="12"
+              >
+                Warehouse
+              </th>
+            </tr>
+            <tr>
+              <td colspan="6">
+                <span>Staff: {{ dataHeader.inspStaffUpdateBy }}</span>
+              </td>
+              <td colspan="6">
+                <span>Supervisor: {{ dataHeader.whUpdateBy }}</span>
+              </td>
+            </tr>
+            <tr>
+              <td
+                style="min-width: 150px;"
+                colspan="6"
+              >
+                <div v-if="dataHeader.inspStaffUpdateDate">
+                  <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
+                </div>
+              </td>
+              <td
+                style="min-width: 150px;"
+                colspan="6"
+              >
+                <div v-if="dataHeader.whUpdateDate">
+                  <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </VCol>
+      </VRow>
+    </section>
+
+    <!-- Alert Dialog Success/Fiald new -->
+    <section>
+      <div>
+        <!-- ใช้ AuthenticatorDialog component -->
+        <AuthenticatorDialog
+          :is-dialog-visible="isDialogVisibleAlertDialog"
+          :word="wordForSubmit"
+          :success="successDialAlert"
+          @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+        />
+      </div>
+    </section>
+
+    <!-- Dialog Image -->
     <VDialog
-      v-model="isDialogVisibleStepSaveDraft"
+      v-model="isDialogVisibleImgFileMuti"
       width="80%"
     >
       <!-- Dialog Content -->
-      <VCard
-        class="text-center"
-        :title="wordForSubmit"
-      >
-        <DialogCloseBtn
-          variant="text"
-          size="default"
-          @click="isDialogVisibleStepSaveDraft = false"
-        />
-        <VCardText class="pa-1">
-          <VRow>
-            <VCol
-              class="text-center d-flex flex-column align-center justify-center mx-auto"
-              cols="4"
-            >
-              <div>
-                <VProgressLinear
-                  v-if="loadindingSaveDatft1"
-                  indeterminate
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftSeccess1"
-                  model-value="100"
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftFailed1"
-                  model-value="0"
-                />
-                <VAvatar
-                  class="my-2"
-                  size="150"
-                  :color="colorStep1"
-                >
-                  <VIcon
-                    size="100"
-                    :icon="iconStep1"
-                  />
-                </VAvatar>
-              </div>
-              <div><span style="font-size: 12px;">Save Draft Header</span></div>
-            </VCol>
-            <VCol
-              class="text-center d-flex flex-column align-center justify-center mx-auto"
-              cols="4"
-            >
-              <div>
-                <VProgressLinear
-                  v-if="loadindingSaveDatft2"
-                  indeterminate
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftSeccess2"
-                  model-value="100"
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftFailed2"
-                  model-value="0"
-                />
-                <VAvatar
-                  class="my-2"
-                  size="150"
-                  :color="colorStep2"
-                >
-                  <VIcon
-                    size="100"
-                    :icon="iconStep2"
-                  />
-                </VAvatar>
-              </div>
-              <div><span style="font-size: 12px;">Save Draft Lot</span></div>
-            </VCol>
-            <VCol
-              class="text-center d-flex flex-column align-center justify-center mx-auto"
-              cols="4"
-            >
-              <div>
-                <VProgressLinear
-                  v-if="loadindingSaveDatft3"
-                  indeterminate
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftSeccess3"
-                  model-value="100"
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftFailed3"
-                  model-value="0"
-                />
-                <VAvatar
-                  class="my-2"
-                  size="150"
-                  :color="colorStep3"
-                >
-                  <VIcon
-                    size="100"
-                    :icon="iconStep3"
-                  />
-                </VAvatar>
-              </div>
-              <div><span style="font-size: 12px;">Save Draft COA</span></div>
-            </VCol>
-          </VRow>
+      <VCard>
+        <VCardTitle class="bg-primary">
+          <div class="d-flex justify-space-between">
+            COA
+            <VBtn
+              icon="mdi-close"
+              color="white"
+              size="small"
+              variant="tonal"
+              @click="isDialogVisibleImgFileMuti = false"
+            />
+          </div>
+        </VCardTitle>
+
+        <VCardText>
+          <VImg
+            role="presentation"
+            :src="imgDialog"
+            max-width="100%"
+            max-height="600px"
+            contain
+          />
         </VCardText>
-        <VCardText
-          v-if="alertErrorLot"
-          class="text-start"
+      </VCard>
+    </VDialog>
+
+    <!-- Dialog Reject -->
+    <section style="font-size: 12px;">
+      <VDialog
+        v-model="isDialogRejectVisible"
+        width="500"
+      >
+        <!-- Dialog Content -->
+        <VCard title="Comment">
+          <DialogCloseBtn
+            variant="text"
+            size="default"
+            @click="isDialogRejectVisible = false"
+          />
+
+          <VCardText>
+            <VTextarea v-model="commentReject">
+              <template #label>
+                <VIcon icon="ri-edit-line" />
+              </template>
+            </VTextarea>
+            <span
+              v-if="textAlertError.comment && !commentReject"
+              class="text-red"
+            >{{ textAlertError.comment }}</span>
+          </VCardText>
+
+          <VCardText class="d-flex justify-end flex-wrap gap-4">
+            <VBtn
+              color="error"
+              @click="reject('REJECT')"
+            >
+              Reject
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
+    </section>
+
+    <!-- Dialog Step Save Draft -->
+    <section style="font-size: 12px;">
+      <VDialog
+        v-model="isDialogVisibleStepSaveDraft"
+        width="80%"
+      >
+        <!-- Dialog Content -->
+        <VCard
+          class="text-center"
+          :title="wordForSubmit"
         >
-          <VDivider />
-          <div>
+          <DialogCloseBtn
+            variant="text"
+            size="default"
+            @click="isDialogVisibleStepSaveDraft = false"
+          />
+          <VCardText class="pa-1">
+            <VRow>
+              <VCol
+                class="text-center d-flex flex-column align-center justify-center mx-auto"
+                cols="4"
+              >
+                <div>
+                  <VProgressLinear
+                    v-if="loadindingSaveDatft1"
+                    indeterminate
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftSeccess1"
+                    model-value="100"
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftFailed1"
+                    model-value="0"
+                  />
+                  <VAvatar
+                    class="my-2"
+                    size="150"
+                    :color="colorStep1"
+                  >
+                    <VIcon
+                      size="100"
+                      :icon="iconStep1"
+                    />
+                  </VAvatar>
+                </div>
+                <div><span style="font-size: 12px;">Save Draft Header</span></div>
+              </VCol>
+              <VCol
+                class="text-center d-flex flex-column align-center justify-center mx-auto"
+                cols="4"
+              >
+                <div>
+                  <VProgressLinear
+                    v-if="loadindingSaveDatft2"
+                    indeterminate
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftSeccess2"
+                    model-value="100"
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftFailed2"
+                    model-value="0"
+                  />
+                  <VAvatar
+                    class="my-2"
+                    size="150"
+                    :color="colorStep2"
+                  >
+                    <VIcon
+                      size="100"
+                      :icon="iconStep2"
+                    />
+                  </VAvatar>
+                </div>
+                <div><span style="font-size: 12px;">Save Draft Lot</span></div>
+              </VCol>
+              <VCol
+                class="text-center d-flex flex-column align-center justify-center mx-auto"
+                cols="4"
+              >
+                <div>
+                  <VProgressLinear
+                    v-if="loadindingSaveDatft3"
+                    indeterminate
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftSeccess3"
+                    model-value="100"
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftFailed3"
+                    model-value="0"
+                  />
+                  <VAvatar
+                    class="my-2"
+                    size="150"
+                    :color="colorStep3"
+                  >
+                    <VIcon
+                      size="100"
+                      :icon="iconStep3"
+                    />
+                  </VAvatar>
+                </div>
+                <div><span style="font-size: 12px;">Save Draft COA</span></div>
+              </VCol>
+            </VRow>
+          </VCardText>
+          <VCardText
+            v-if="alertErrorLot"
+            class="text-start"
+          >
+            <VDivider />
+            <div>
+              <VAlert
+                title="Details Lot"
+                variant="outlined"
+                closable
+              >
+                <div
+                  v-for="(value, key) in alertErrorLot"
+                  :key="key"
+                >
+                  <span
+                    v-if="value"
+                    style="font-size: 14px;"
+                  >
+                    <VIcon
+                      color="error"
+                      icon="ri-error-warning-fill"
+                    />{{ key }}: {{ value }}
+                  </span>
+                  <span
+                    v-if="!value"
+                    style="font-size: 14px;"
+                  >
+                    <VIcon
+                      color="success"
+                      icon="ri-checkbox-circle-fill"
+                    />{{ key }} {{ value }}
+                  </span>
+                </div>
+              </VAlert>
+            </div>
+          </VCardText>
+
+          <!-- Header -->
+          <VCardText v-if="alertHeaderErrorMessage.success">
             <VAlert
-              title="Details Lot"
+              title="Verify The Accuracy Of The Header"
               variant="outlined"
               closable
+              class="text-start"
             >
-              <div
-                v-for="(value, key) in alertErrorLot"
-                :key="key"
+              <span
+                v-if="alertHeaderErrorMessage.actualCheck"
+                class="text-start"
+                style="font-size: 12px;"
+              >Actual Check :</span> <span
+                style="font-size: 12px;"
+                class="text-red"
+              >{{ alertHeaderErrorMessage.actualCheck }} </span>
+            </VAlert>
+          </VCardText>
+
+          <!-- Lot -->
+          <VCardText v-if="alertLotErrorMessage.success">
+            <VAlert
+              title="Verify The Accuracy Of The Lot"
+              variant="outlined"
+              closable
+              class="text-start"
+            >
+              <span
+                class="text-start"
+                style="font-size: 12px;"
               >
-                <span
-                  v-if="value"
-                  style="font-size: 14px;"
+                Actual Check Errors:
+              </span>
+    
+              <ul>
+                <!-- วนลูปเพื่อแสดงข้อผิดพลาดแต่ละอันใน actualAnalysis -->
+                <li 
+                  v-for="(errorMsg, key) in alertLotErrorMessage.actualAnalysis"
+                  :key="key"
+                  style="font-size: 12px;"
+                  class="text-red"
                 >
                   <VIcon
                     color="error"
                     icon="ri-error-warning-fill"
-                  />{{ key }}: {{ value }}
-                </span>
-                <span
-                  v-if="!value"
-                  style="font-size: 14px;"
-                >
-                  <VIcon
-                    color="success"
-                    icon="ri-checkbox-circle-fill"
-                  />{{ key }} {{ value }}
-                </span>
-              </div>
+                  />{{ key }}: {{ errorMsg }}
+                </li>
+              </ul>
             </VAlert>
-          </div>
-        </VCardText>
+          </VCardText>
 
-        <!-- Header -->
-        <VCardText v-if="alertHeaderErrorMessage.success">
-          <VAlert
-            title="Verify The Accuracy Of The Header"
-            variant="outlined"
-            closable
-            class="text-start"
-          >
-            <span
-              v-if="alertHeaderErrorMessage.actualCheck"
+          <!-- Coa -->
+          <VCardText v-if="!textAlertError.success && textAlertError.coa">
+            <VAlert
+              title="Verify The Accuracy Of The COA"
+              variant="outlined"
+              style="font-size: 12px;"
               class="text-start"
-              style="font-size: 12px;"
-            >Actual Check :</span> <span
-              style="font-size: 12px;"
-              class="text-red"
-            >{{ alertHeaderErrorMessage.actualCheck }} </span>
-          </VAlert>
-        </VCardText>
-
-        <!-- Lot -->
-        <VCardText v-if="alertLotErrorMessage.success">
-          <VAlert
-            title="Verify The Accuracy Of The Lot"
-            variant="outlined"
-            closable
-            class="text-start"
-          >
-            <span
-              class="text-start"
-              style="font-size: 12px;"
+              closable
             >
-              Actual Check Errors:
-            </span>
-    
-            <ul>
-              <!-- วนลูปเพื่อแสดงข้อผิดพลาดแต่ละอันใน actualAnalysis -->
-              <li 
-                v-for="(errorMsg, key) in alertLotErrorMessage.actualAnalysis"
-                :key="key"
-                style="font-size: 12px;"
-                class="text-red"
-              >
-                <VIcon
-                  color="error"
-                  icon="ri-error-warning-fill"
-                />{{ key }}: {{ errorMsg }}
-              </li>
-            </ul>
-          </VAlert>
-        </VCardText>
+              <span class="text-red"><VIcon
+                color="error"
+                icon="ri-error-warning-fill"
+              />{{ textAlertError.coa }}</span>
+            </VAlert>
+          </VCardText>
+        </VCard>
+      </VDialog>
+    </section>
 
-        <!-- Coa -->
-        <VCardText v-if="!textAlertError.success && textAlertError.coa">
-          <VAlert
-            title="Verify The Accuracy Of The COA"
-            variant="outlined"
-            style="font-size: 12px;"
-            class="text-start"
-            closable
-          >
-            <span class="text-red"><VIcon
+    <!-- Dialog Submit -->
+    <section>
+      <VDialog
+        v-model="isDialogConfirmVisible"
+        width="500"
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardText>
+            <div class="d-flex justify-center">
+              <VIcon
+                size="100"
+                color="warning"
+                icon="ri-question-line"
+              />
+            </div>
+            <div class="text-center">
+              <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
+                Transaction?</span>
+            </div>
+          </VCardText>
+
+          <VCardAction class="d-flex justify-space-between pa-4">
+            <VBtn
               color="error"
-              icon="ri-error-warning-fill"
-            />{{ textAlertError.coa }}</span>
-          </VAlert>
-        </VCardText>
-      </VCard>
-    </VDialog>
-  </section>
+              @click="isDialogConfirmVisible = false"
+            >
+              Cancel
+            </VBtn>
+            <VBtn
+              v-if="wordForSubmit === 'ACCEPT'"
+              color="green"
+              @click="handleAcceptPackaging"
+            >
+              {{ wordForSubmit }}
+            </VBtn>
+          </VCardAction>
+        </VCard>
+      </VDialog>
+    </section>
+    <!-- Dialog Submit Success -->
+    <section>
+      <VDialog
+        v-model="isDialogSubmitSuccessVisible"
+        width="500"
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardText>
+            <div class="d-flex justify-center">
+              <VIcon
+                size="100"
+                color="success"
+                icon="ri-checkbox-circle-line"
+              />
+            </div>
+            <div class="text-center">
+              <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
+            </div>
+          </VCardText>
 
-  <!-- Dialog Submit -->
-  <section>
-    <VDialog
-      v-model="isDialogConfirmVisible"
-      width="500"
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardText>
-          <div class="d-flex justify-center">
-            <VIcon
-              size="100"
-              color="warning"
-              icon="ri-question-line"
-            />
-          </div>
-          <div class="text-center">
-            <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
-              Transaction?</span>
-          </div>
-        </VCardText>
-
-        <VCardAction class="d-flex justify-space-between pa-4">
-          <VBtn
-            color="error"
-            @click="isDialogConfirmVisible = false"
+          <VCardAction
+            v-if="false"
+            class="d-flex justify-center pa-4"
           >
-            Cancel
-          </VBtn>
-          <VBtn
-            v-if="wordForSubmit === 'ACCEPT'"
-            color="green"
-            @click="handleAcceptPackaging"
-          >
-            {{ wordForSubmit }}
-          </VBtn>
-        </VCardAction>
-      </VCard>
-    </VDialog>
-  </section>
-  <!-- Dialog Submit Success -->
-  <section>
-    <VDialog
-      v-model="isDialogSubmitSuccessVisible"
-      width="500"
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardText>
-          <div class="d-flex justify-center">
-            <VIcon
-              size="100"
+            <VBtn
               color="success"
-              icon="ri-checkbox-circle-line"
-            />
-          </div>
-          <div class="text-center">
-            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
-          </div>
-        </VCardText>
+              @click="submitConfirm"
+            >
+              Continue
+            </VBtn>
+          </VCardAction>
+        </VCard>
+      </VDialog>
+    </section>
+    <!-- Dialog Submit Failed -->
+    <section>
+      <VDialog
+        v-model="isDialogSubmitFailedVisible"
+        width="500"
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardText>
+            <div class="d-flex justify-center">
+              <VIcon
+                size="100"
+                color="error"
+                icon="ri-error-warning-line"
+              />
+            </div>
+            <div class="text-center">
+              <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
+            </div>
+          </VCardText>
 
-        <VCardAction
-          v-if="false"
-          class="d-flex justify-center pa-4"
-        >
-          <VBtn
-            color="success"
-            @click="submitConfirm"
-          >
-            Continue
-          </VBtn>
-        </VCardAction>
-      </VCard>
-    </VDialog>
-  </section>
-  <!-- Dialog Submit Failed -->
-  <section>
-    <VDialog
-      v-model="isDialogSubmitFailedVisible"
-      width="500"
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardText>
-          <div class="d-flex justify-center">
-            <VIcon
-              size="100"
+          <VCardAction class="d-flex justify-center pa-4">
+            <VBtn
               color="error"
-              icon="ri-error-warning-line"
-            />
-          </div>
-          <div class="text-center">
-            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
-          </div>
-        </VCardText>
+              @click="submitFailed"
+            >
+              Continue
+            </VBtn>
+          </VCardAction>
+        </VCard>
+      </VDialog>
+    </section>
 
-        <VCardAction class="d-flex justify-center pa-4">
-          <VBtn
-            color="error"
-            @click="submitFailed"
-          >
-            Continue
-          </VBtn>
-        </VCardAction>
-      </VCard>
-    </VDialog>
-  </section>
-
-  <!-- Btn -->
-  <VRow v-if="statusId === 10 || statusId === 1">
-    <VCol cols="4" />
-    <VCol
-      cols="8"
-      class="d-flex justify-end"
-    >
-      <VBtn
-
-        height="100%"
-        width="150px"
-        color="warning"
-        @click="saveDraftData('SAVE DRAFT')"
+    <!-- Btn -->
+    <VRow v-if="statusId === 10 || statusId === 1">
+      <VCol cols="4" />
+      <VCol
+        cols="8"
+        class="d-flex justify-end"
       >
-        Save draft
-      </VBtn>
-      <VBtn
+        <VBtn
 
-        height="100%"
-        width="150px"
-        class="mx-2"
-        color="error"
-        @click="isDialogRejectVisible = true"
-      >
-        Reject
-      </VBtn>
-      <VBtn
-        height="4 0px"
-        width="150px"
-        @click="submitForm('ACCEPT')"
-      >
-        <VRow>
-          <VCol
-            class="py-2"
-            cols="12"
-          >
-            Accept
-          </VCol>
-        </VRow>
-      </VBtn>
+          height="100%"
+          width="150px"
+          color="warning"
+          @click="saveDraftData('SAVE DRAFT')"
+        >
+          Save draft
+        </VBtn>
+        <VBtn
 
-      <VBtn
-        v-if="false"
-        @click="handleSaveDraftCoa"
-      >
-        Save Coa
-      </VBtn>
-    </VCol>
-  </VRow>
+          height="100%"
+          width="150px"
+          class="mx-2"
+          color="error"
+          @click="isDialogRejectVisible = true"
+        >
+          Reject
+        </VBtn>
+        <VBtn
+          height="4 0px"
+          width="150px"
+          @click="submitForm('ACCEPT')"
+        >
+          <VRow>
+            <VCol
+              class="py-2"
+              cols="12"
+            >
+              Accept
+            </VCol>
+          </VRow>
+        </VBtn>
+
+        <VBtn
+          v-if="false"
+          @click="handleSaveDraftCoa"
+        >
+          Save Coa
+        </VBtn>
+      </VCol>
+    </VRow>
+  </div>
 </template>
 
 <style scoped>

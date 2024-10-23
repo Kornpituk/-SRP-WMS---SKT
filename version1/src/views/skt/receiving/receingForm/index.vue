@@ -277,7 +277,7 @@ const getCurrentTabIndex = () => {
 
 // console.log('***Current Tab Index:', getCurrentTabIndex())
 
-const currentTab = ref()
+const currentTab = ref(getCurrentTabIndex())
 
 const isActive = ref(true)
 
@@ -349,9 +349,7 @@ watch(statusId.value, (newValue, oldValue) => {
 // เรียกใช้ generatedJournalId เมื่อ component ถูกสร้างขึ้น
 watch(() => {
   generatedJournalId()
-  currentTab.value = getCurrentTabIndex()
   console.log("Tabs", currentTab.value)
-  getDisabledTabs()
   
 })
 
@@ -397,7 +395,7 @@ const handleAcceptPackaging = word => {
   },
   {})
     .then(response => {
-      textAlertDialogFunction('APPROVE', true)
+      textAlertDialogFunction('ACCEPT', true)
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
