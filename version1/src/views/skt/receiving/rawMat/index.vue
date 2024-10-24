@@ -1477,18 +1477,6 @@ const submitButtonVisibleNew = async word => {
   return true
 }
 
-const handleFunctionAlertDialog = async () => {
-  try {
-    // รอให้ textAlertDialogFunction ทำงานเสร็จ
-    await textAlertDialogFunction('SUBMIT', true)
-
-    // เมื่อ textAlertDialogFunction ทำงานเสร็จแล้ว ก็ reload หน้าเว็บ
-    location.reload()
-  } catch (error) {
-    console.error('Error:', error)
-  }
-}
-
 const submitReceivingForm = async () => {
   try {
     // เรียก submitButtonVisibleNew() และรอให้ทำงานเสร็จ
@@ -1524,13 +1512,16 @@ const submitReceivingForm = async () => {
         // isDialogSubmitSuccessVisible.value = true
         // isDialogConfirmVisible.value = false
 
-        // เรียกใช้ textAlertDialogFunction ก่อน
-        textAlertDialogFunction('SUBMIT', true)
+
+        // if(isSuccess){
+        //   textAlertDialogFunction('SUBMIT', true)
+        // }
+        
 
         // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
 
 
-
+        textAlertDialogFunction('SUBMIT', true)
         setTimeout(() => {
           location.reload()
         }, 200) // 10000 มิลลิวินาที = 10 วินาที
@@ -1545,6 +1536,8 @@ const submitReceivingForm = async () => {
   } catch (error) {
     // จับ error จากการทำงานของ submitButtonVisibleNew() หรือโค้ดอื่นๆ
     console.error('Error in submitButtonVisibleNew:', error)
+
+    textAlertDialogFunction('SUBMIT', false)
     isDialogSubmitFailedVisible.value = true
   }
 }
@@ -3753,7 +3746,7 @@ const getDisabledFollowStatusNRole = () => {
       </VCol>
 
       <!-- Alert Dialog Success/Fiald new -->
-      <section>
+      <section v-if="isDialogVisibleAlertDialog === true">
         <div>
           <!-- ใช้ AuthenticatorDialog component -->
           <AuthenticatorDialog

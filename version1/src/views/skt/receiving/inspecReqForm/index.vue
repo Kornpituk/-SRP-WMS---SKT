@@ -678,7 +678,7 @@ const submitInspForm = async () => {
     } else {
       // ถ้าการตรวจสอบ submitButtonVisibleNew ไม่สำเร็จ แสดง error
       console.error('submitButtonVisibleNew failed, cannot submit')
-      textAlertDialogFunction('SUBMIT', true)
+      textAlertDialogFunction('SUBMIT', false)
       
       return false
     }
