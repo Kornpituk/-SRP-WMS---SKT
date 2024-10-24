@@ -670,9 +670,9 @@ const submitInspForm = async () => {
       textAlertDialogFunction('SUBMIT', true)
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
-      // setTimeout(() => {
-      //   location.reload()
-      // }, 300) // 10000 มิลลิวินาที = 10 วินาที
+      setTimeout(() => {
+        location.reload()
+      }, 300) // 10000 มิลลิวินาที = 10 วินาที
 
       return true
     } else {

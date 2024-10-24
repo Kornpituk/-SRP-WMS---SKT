@@ -396,7 +396,7 @@ const handleAcceptPackaging = word => {
   },
   {})
     .then(response => {
-      textAlertDialogFunction('ACCEPT', true)
+      textAlertDialogFunction('APPROVE', true)
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
@@ -406,7 +406,7 @@ const handleAcceptPackaging = word => {
     })
     .catch(error => {
     // Handle errors
-      textAlertDialogFunction('ACCEPT', false)
+      textAlertDialogFunction('APPROVE', false)
 
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true

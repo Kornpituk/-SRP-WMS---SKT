@@ -1,6 +1,5 @@
 import { coaService } from '@/repository/skt/gobal/service'
 
-
 export const useGetCOAFormController = () => {
   const getCoaForm = ref(null)
   const errorMessageGetCoa = ref(null)

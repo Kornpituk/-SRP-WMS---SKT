@@ -922,7 +922,7 @@ const printLabel = ref(false)
 const printForm = ref(false)
 
 const selectedPrintLabel = ref([])
-
+const copiesPrintForm = ref(1)
 const isDialogVisibleAction = ref(false)
 
 const detailsReceiv = ref({
@@ -941,23 +941,25 @@ const detailsReceiv = ref({
   updatedBy: '',
 })
 
-
 const journalIDModel = ref('')
 const updateByReceivingPlan = ref('')
 const idStatusDialogAction = ref('')
+const poEtILogAction = ref('')
 
-const viewDetailsReceive = (index, journalID, updateBy, status, itemCode) => {
+const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlLogDetailJournalID) => {
   // console.log('isDialogVisibleAction **', index, journalID, updateBy, status, itemCode)
   journalIDModel.value = journalID
   updateByReceivingPlan.value = updateBy
   detailsReceiv.value = products.value[index-1]
   idStatusDialogAction.value = status
 
+  poEtILogAction.value = poEtlLogDetailJournalID
+
   // console.log('journalIDModel **', journalIDModel.value)
   // console.log('updateByReceivingPlan **', updateByReceivingPlan.value)
   // console.log('detailsReceiv **', detailsReceiv.value)
-  // console.log('filteredDetails **', filteredDetails.value)
   isDialogVisibleAction.value = true
+  console.log('detailsVisibleAction', poEtILogAction.value+ "="+ poEtlLogDetailJournalID)
   
 }
 
@@ -1004,15 +1006,97 @@ function getDisplayName(key) {
   return displayNames[key] || 'Unknown'
 }
 
-// Watcher เพื่อจำกัดทศนิยมให้ไม่เกินสองตำแหน่ง
-// watch(() => detailsReceiv.value.purchasingAmountKgs, newValue => {
-//   if (newValue && newValue.toString().includes('.')) {
-//     const decimalPart = newValue.toString().split('.')[1]
-//     if (decimalPart.length > 2) {
-//       detailsReceiv.value.purchasingAmountKgs = parseFloat(newValue).toFixed(2)
-//     }
-//   }
-// })
+//------------------------ Fuction Print Form --------------------------------
+
+import { usePrintReceivingFormService, usePrintInspectionFormService  } from '@/services/skt/global/gloBalService'
+
+const { errorMessageGenerateView, printReceivingFormService } = usePrintReceivingFormService()
+
+const { errorMessageInspection, printInspectionFormService } = usePrintInspectionFormService()
+
+const processingPrint = ref(false)
+
+const processingPrintForm1 = ref(false)
+const processingPrintForm2 = ref(false)
+const processingPrintForm3 = ref(false)
+
+const disabledCheckboxListRawM = () => {
+  // ถ้า idStatusDialogAction.value มีค่าเป็น 0, 1, 2 หรือ 3 จะคืนค่าเป็น true
+  return [0, 1, 2, 3].includes(idStatusDialogAction.value)
+}
+
+const disabledCheckboxListInsp = () => {
+  return !!(idStatusDialogAction.value === 0 || 
+  idStatusDialogAction.value === 1 || 
+  idStatusDialogAction.value === 2 || 
+  idStatusDialogAction.value === 3 ||
+  idStatusDialogAction.value === 4 ||
+  idStatusDialogAction.value === 5 )
+}
+
+const disabledCheckboxListPk = () => {
+  return !!(idStatusDialogAction.value === 0 || 
+  idStatusDialogAction.value === 1 || 
+  idStatusDialogAction.value === 2 || 
+  idStatusDialogAction.value === 3 ||
+  idStatusDialogAction.value === 4 ||
+  idStatusDialogAction.value === 5 ||
+  idStatusDialogAction.value === 10 )
+}
+
+const printFormAll = async () => {
+  // ตั้งค่าสถานะการประมวลผลให้เป็น true
+  processingPrint.value = true
+
+  const printPromises = selectedPrintLabel.value.map(async label => {
+    if (label === 'Receiving Form') {
+      processingPrintForm1.value = true // เริ่มพิมพ์
+      console.log('Printing Receiving Form...')
+
+      try {
+        return await printReceivingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) // คืนค่าผลลัพธ์
+      } finally {
+        processingPrintForm1.value = false // เสร็จสิ้นการพิมพ์
+      }
+    }
+    if (label === 'Inspection Request Form') {
+      processingPrintForm2.value = true // เริ่มพิมพ์
+      console.log('Printing Inspection Request Form...')
+
+      try {
+        return await printInspectionFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) 
+      } finally {
+        processingPrintForm2.value = false // เสร็จสิ้นการพิมพ์
+      }
+    }
+    if (label === 'Lorry Loading Check List') {
+      processingPrintForm3.value = true // เริ่มพิมพ์
+      console.log('Printing Lorry Loading Check List...')
+
+      try {
+        return printLorryLoadingChecklist()
+      } finally {
+        processingPrintForm3.value = false // เสร็จสิ้นการพิมพ์
+      }
+    }
+  })
+
+  // รอให้ฟังก์ชันทั้งหมดทำงานเสร็จ
+  try {
+    const results = await Promise.all(printPromises)
+
+    processingPrint.value = false
+    console.log('All forms printed:', results)
+  } catch (error) {
+    console.error('Error printing forms:', error)
+  }
+}
+
+const printReceivingForm = () => {
+  console.log('Printing Receiving Form...')
+
+  // การพิมพ์ฟอร์มสามารถใช้ window.print หรืออื่นๆ ตามต้องการ
+}
 
 //-------------------- Dialog Confirm Submit --------------------
 const isDialogConfirmVisible = ref(false)
@@ -2648,10 +2732,24 @@ const dessertsTest = ref([
                     ripple
                     :color="isHovering || printForm ? 'light-blue-lighten-4' : undefined"
                   >
-                    <VCardText class="d-flex justify-center">
+                    <VCardText class="d-flex justify-center pa-2">
+                      <VProgressCircular
+                        v-if="processingPrint"
+                        :size="105"
+                        :width="15"
+                        color="primary"
+                        indeterminate
+                      >
+                        <VIcon
+                          icon="ri-survey-line"
+                          size="60"
+                        />
+                      </VProgressCircular>
+
                       <VIcon
+                        v-if="!processingPrint"
                         icon="ri-survey-line"
-                        size="80"
+                        size="105"
                       />
                     </VCardText>
                     <VCardText class="text-center">
@@ -2676,34 +2774,57 @@ const dessertsTest = ref([
               <!-- Align VCheckbox items to the right -->
               <VCheckbox
                 v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListRawM()"
                 label="Receiving Form"
                 value="Receiving Form"
                 class="ms-auto"
-              />
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm1"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
               <VCheckbox
                 v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListInsp()"
                 label="Inspection Request Form"
                 value="Inspection Request Form"
                 class="ms-auto"
-              />
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm2"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
               <VCheckbox
                 v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListPk()"
                 label="Lorry Loading Check List"
                 value="Lorry Loading Check List"
                 class="ms-auto"
-              />
-              <VDivider class="my-4" />
-              <span>
-                <VTextField
-                  v-model="weight"
-                  label="Copies"
-                  type="number"
-                  density="compact"
-                  placeholder="0"
-                />
-              </span>
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm3"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox> 
               <div class="mt-4">
-                <VBtn style="width: 100%;">
+                <VBtn
+                  style="width: 100%;"
+                  @click="printFormAll"
+                >
                   Print
                 </VBtn>
               </div>
@@ -4211,7 +4332,7 @@ const dessertsTest = ref([
               >
                 <VBtn
                   color="info"
-                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode)"
+                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode, item.raw.poEtlLogDetailJournalID)"
                 >
                   <div style="font-size: 12px;">
                     Action
