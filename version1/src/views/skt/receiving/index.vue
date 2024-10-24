@@ -957,6 +957,8 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   detailsReceiv.value = products.value[index-1]
   idStatusDialogAction.value = status
 
+  selectedPrintLabel.value = []
+
   poEtILogAction.value = poEtlLogDetailJournalID
   findProductByJournalID(poEtlLogDetailJournalID)
   isDialogVisibleAction.value = true
@@ -2395,39 +2397,57 @@ const dessertsTest = ref([
             </tbody>
             <tbody style="font-size: 12px;">
               <tr>
-                <td style="font-weight: 500;">Item Code</td>
+                <td style="font-weight: 500;">
+                  Item Code
+                </td>
                 <td>{{ resultDetailsAvtion.itemCode }}</td>
               </tr>
               <tr>
-                <td style="font-weight: 500;">Item Name</td>
+                <td style="font-weight: 500;">
+                  Item Name
+                </td>
                 <td>{{ resultDetailsAvtion.itemName }}</td>
               </tr>
               <tr>
-                <td style="font-weight: 500;">Supplier Code</td>
+                <td style="font-weight: 500;">
+                  Supplier Code
+                </td>
                 <td>{{ resultDetailsAvtion.supplierId }}</td>
               </tr>
               <tr>
-                <td style="font-weight: 500;">Supplier Name</td>
+                <td style="font-weight: 500;">
+                  Supplier Name
+                </td>
                 <td>{{ resultDetailsAvtion.supplierName }}</td>
               </tr>
               <tr>
-                <td style="font-weight: 500;">Purchase Order No</td>
+                <td style="font-weight: 500;">
+                  Purchase Order No
+                </td>
                 <td>{{ resultDetailsAvtion.purchaseOrderNo }}</td>
               </tr>
               <tr>
-                <td style="font-weight: 500;">Delivery Date</td>
+                <td style="font-weight: 500;">
+                  Delivery Date
+                </td>
                 <td>{{ convertDate(resultDetailsAvtion.deliveryDate) }}</td>
               </tr>
               <tr>
-                <td style="font-weight: 500;">Expect Delivery Date</td>
+                <td style="font-weight: 500;">
+                  Expect Delivery Date
+                </td>
                 <td><span v-if="convertDate(resultDetailsAvtion.expectDeliveryDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.expectDeliveryDate) }}</span></td>
               </tr>
               <tr>
-                <td style="font-weight: 500;">Received Date</td>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
                 <td>{{ convertDate(resultDetailsAvtion.receivedDate) }}</td>
               </tr>
               <tr>
-                <td style="font-weight: 500;">Purchasing Qty</td>
+                <td style="font-weight: 500;">
+                  Purchasing Qty
+                </td>
                 <td>
                   <span style="text-transform: capitalize;">{{ resultDetailsAvtion.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
                 </td>
@@ -2586,83 +2606,116 @@ const dessertsTest = ref([
                   </VChip>
                 </td>
               </tr>
-              <tr
-                v-for="(value, key) in filteredDetails"
-                :key="key"
-              >
-                <th v-if="key !== 'statusText'">
-                  <template v-if="key !== 'statusText'">
-                    <span style="font-size: 12px; text-transform: capitalize;">{{ getDisplayName(key) }}</span>
-                  </template>
-                </th>
-                <td
-                  v-if="key !== 'statusText'"
-                  style="font-size: 12px;"
-                >
-                  <template v-if="key === 'itemCode' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'itemName' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'supplierId' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'supplierName' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'deliveryDate' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ convertDate(value) }}</span>
-                  </template>
-                  <template v-else-if="key === 'purchaseOrderNo' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'purchasingQuantityPcs'">
-                    <span
-                      v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && key !== 'statusText'"
-                      style="text-transform: capitalize;"
-                    >{{ detailsReceiv.purchasingQuantityPcs }}  <strong>PCS</strong></span>
-                    <VTextField
-                      v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
-                      v-model="detailsReceiv.purchasingQuantityPcs"
-                      label="Purchesing Qty"
-                      suffix="PCS"
-                      type="number"
-                      density="compact"
-                    />
-                  </template>
-                  <!-- Continue with other specific conditions... -->
-                  <template v-else-if="key === 'purchasingAmountKgs' && key !== 'statusText'">
-                    <span
-                      v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
-                      style="text-transform: capitalize;"
-                    >{{ detailsReceiv.purchasingAmountKgs }} <strong>Kgs</strong></span>
-                    <VTextField
-                      v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
-                      v-model="detailsReceiv.purchasingAmountKgs"
-                      label="Purchesing Amount"
-                      suffix="Kgs"
-                      type="number"
-                      density="compact"
-                      placeholder="2000"
-                      :step="0.01"
-                      pattern="^\d+(\.\d{1,2})?$"
-                    />
-                  </template>
-                  <template v-else-if="key === 'purchasingQuantityRcvdPcs' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ detailsReceiv.purchasingQuantityRcvdPcs }}  <strong>PCS</strong></span>
-                  </template>
-                  <template v-else-if="key === 'purchasingAmountRcvdKgs' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ detailsReceiv.purchasingAmountRcvdKgs }}  <strong>Kgs</strong></span>
-                  </template>
-                  <template v-else-if="key === 'updatedBy' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ detailsReceiv.updatedBy }}  <strong /></span>
-                  </template>
-                  <template v-else-if="key === 'updatedDate' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ convertDate(detailsReceiv.updatedDate) }}  <strong /></span>
-                  </template>
+            </tbody>
+            <tbody style="font-size: 12px;">
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Code
+                </td>
+                <td>{{ resultDetailsAvtion.itemCode }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Name
+                </td>
+                <td>{{ resultDetailsAvtion.itemName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Code
+                </td>
+                <td>{{ resultDetailsAvtion.supplierId }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Name
+                </td>
+                <td>{{ resultDetailsAvtion.supplierName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchase Order No
+                </td>
+                <td>{{ resultDetailsAvtion.purchaseOrderNo }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Delivery Date
+                </td>
+                <td>{{ convertDate(resultDetailsAvtion.deliveryDate) }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Expect Delivery Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.expectDeliveryDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.expectDeliveryDate) }}</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td>{{ convertDate(resultDetailsAvtion.receivedDate) }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchasing Qty
+                </td>
+                <td>
+                  <span style="text-transform: capitalize;">{{ resultDetailsAvtion.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
                 </td>
               </tr>
+              <tr>
+                <td>Purchasing Amount</td>
+                <td><span style="text-transform: capitalize;">{{ formatNumber(resultDetailsAvtion.purchasingAmountKgs).toLocaleString() }}  Kgs</span></td>
+              </tr>
+              <tr>
+                <td>Receiving Qty</td>
+                <td>{{ (resultDetailsAvtion.purchasingQuantityRcvdPcs).toLocaleString() }} PCS</td>
+              </tr>
+              <tr>
+                <td>Receiving Amount</td>
+                <td>{{ formatNumber(resultDetailsAvtion.purchasingAmountRcvdKgs).toLocaleString() }} Kgs</td>
+              </tr>
+              <tr>
+                <td>Updated Date</td>
+                <td>{{ convertDateTime(resultDetailsAvtion.updatedDate) }}</td>
+              </tr>
+              <tr>
+                <td>Updated By</td>
+                <td>{{ resultDetailsAvtion.updatedBy }}</td>
+              </tr>
+              <!-- เพิ่มข้อมูลเพิ่มเติมตามต้องการ -->
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
+                  style="text-transform: capitalize;"
+                >{{ formatNumber(detailsReceiv.purchasingAmountKgs) }} Kgs</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingAmountKgs"
+                  label="Purchesing Amount"
+                  suffix="Kgs"
+                  type="number"
+                  density="compact"
+                  placeholder="2000"
+                  :step="0.01"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+              </div>
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && key !== 'statusText'"
+                  style="text-transform: capitalize;"
+                >{{ detailsReceiv.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingQuantityPcs"
+                  label="Purchesing Qty"
+                  suffix="PCS"
+                  type="number"
+                  density="compact"
+                />
+              </div>
             </tbody>
           </VTable>
         </VCardText>
@@ -2840,6 +2893,7 @@ const dessertsTest = ref([
                 </template>
               </VCheckbox>
               <VCheckbox
+                v-if="false"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListPk()"
                 label="Lorry Loading Check List"
