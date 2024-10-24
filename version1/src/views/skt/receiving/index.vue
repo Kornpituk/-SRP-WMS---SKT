@@ -1022,11 +1022,11 @@ const processingPrintForm3 = ref(false)
 
 const disabledCheckboxListRawM = () => {
   // ถ้า idStatusDialogAction.value มีค่าเป็น 0, 1, 2 หรือ 3 จะคืนค่าเป็น true
-  return [0, 1, 2, 3].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 10].includes(idStatusDialogAction.value)
 }
 
 const disabledCheckboxListInsp = () => {
-  return [0, 1, 2, 3, 4, 5].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 4, 5, 10].includes(idStatusDialogAction.value)
 }
 
 const disabledCheckboxListPk = () => {
