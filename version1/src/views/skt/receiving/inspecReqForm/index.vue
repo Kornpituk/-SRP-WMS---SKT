@@ -2905,7 +2905,7 @@ const getDisabledFollowStatusNRole = () => {
                     />
                   </VAvatar>
                 </div>
-                <div><span style="font-size: 12px;">Save Draft Header</span></div>
+                <div><span style="font-size: 12px;">Save Header</span></div>
               </VCol>
               <VCol
                 class="text-center d-flex flex-column align-center justify-center mx-auto"
@@ -2937,21 +2937,18 @@ const getDisabledFollowStatusNRole = () => {
                     />
                   </VAvatar>
                 </div>
-                <div><span style="font-size: 12px;">Save Draft Lot</span></div>
+                <div><span style="font-size: 12px;">Save Lot</span></div>
               </VCol>
             </VRow>
           </VCardText>
 
-          <VCardText
-            v-if="emptyFields && wordForSubmit !== 'SAVE DRAFT'"
-            class="text-start"
-          >
+          <VCardText class="text-start">
             <VDivider />
             <div>
               <VAlert variant="outlined">
                 <VRow>
                   <VCol cols="6">
-                    Details Lot
+                    Verify and save
                   </VCol>
                   <VCol
                     cols="6"

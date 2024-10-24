@@ -291,7 +291,7 @@ const colorStatusWithId = id => {
   case 9:
     return { color: 'teal-lighten-4', message: 'teal' }
   case 10:
-    return { color: 'light-green-lighten-4', message: 'cycan' }
+    return { color: 'green-darken-3', message: 'cycan' }
   case 11:
     return { color: 'lime-lighten-4', message: 'cycan' }
   case 12:
@@ -1026,22 +1026,11 @@ const disabledCheckboxListRawM = () => {
 }
 
 const disabledCheckboxListInsp = () => {
-  return !!(idStatusDialogAction.value === 0 || 
-  idStatusDialogAction.value === 1 || 
-  idStatusDialogAction.value === 2 || 
-  idStatusDialogAction.value === 3 ||
-  idStatusDialogAction.value === 4 ||
-  idStatusDialogAction.value === 5 )
+  return [0, 1, 2, 3, 4, 5].includes(idStatusDialogAction.value)
 }
 
 const disabledCheckboxListPk = () => {
-  return !!(idStatusDialogAction.value === 0 || 
-  idStatusDialogAction.value === 1 || 
-  idStatusDialogAction.value === 2 || 
-  idStatusDialogAction.value === 3 ||
-  idStatusDialogAction.value === 4 ||
-  idStatusDialogAction.value === 5 ||
-  idStatusDialogAction.value === 10 )
+  return [0, 1, 2, 3, 4, 5, 10].includes(idStatusDialogAction.value)
 }
 
 const printFormAll = async () => {
@@ -2489,7 +2478,7 @@ const dessertsTest = ref([
               }, 
             }"
           >
-            {{ detailsReceiv.statusText }}
+            <span class="text-white">{{ detailsReceiv.statusText }}</span>
           </VBtn>
         </VCardText>
       </VCard>

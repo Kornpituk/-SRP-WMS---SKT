@@ -905,7 +905,7 @@ const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
 
     return true  // มีข้อผิดพลาด
   } else {
-    alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot -  Successed.`
+    alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot -  Completed.`
     alertErrorLot.value[`alertMakerLot${i}`].success = true
 
     return false
@@ -943,7 +943,7 @@ const validateAmount = (i, actualMakerLotNo, actualAmount) => {
     
     return true  // มีข้อผิดพลาด
   } else {
-    alertErrorLot.value[`alertAmountLot${i}`].msg  = `- Amount(Unit) - Successed.` // ไม่มีข้อผิดพลาด
+    alertErrorLot.value[`alertAmountLot${i}`].msg  = `- Amount(Unit) - Completed.` // ไม่มีข้อผิดพลาด
     alertErrorLot.value[`alertAmountLot${i}`].success = true
     
     return false // ไม่มีข้อผิดพลาด
@@ -1359,7 +1359,7 @@ const loadindingSaveDatftSeccess3 = ref(false)
 import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
 
 const isDialogVisibleAlertDialog = ref(false)
-
+const showOnlyErrors = ref(false)
 const countErr = ref(0)
 
 const testWord = word => {
@@ -1467,6 +1467,7 @@ const submitButtonVisibleNew = async word => {
 
   if(trickerSubmit.value !== true){
     textAlertDialogFunction(word, true)
+
     location.reload()
   }
   
@@ -3767,7 +3768,7 @@ const getDisabledFollowStatusNRole = () => {
           <!-- Dialog Content -->
           <VCard
             class="text-center"
-            title="Save Draft"
+            title="Save"
           >
             <VCardText class="pa-1">
               <VRow>
@@ -3801,7 +3802,7 @@ const getDisabledFollowStatusNRole = () => {
                       />
                     </VAvatar>
                   </div>
-                  <div><span style="font-size: 12px;">Save Draft Header</span></div>
+                  <div><span style="font-size: 12px;">Save Header</span></div>
                 </VCol>
                 <VCol
                   class="text-center d-flex flex-column align-center justify-center mx-auto"
@@ -3833,7 +3834,7 @@ const getDisabledFollowStatusNRole = () => {
                       />
                     </VAvatar>
                   </div>
-                  <div><span style="font-size: 12px;">Save Draft Lot</span></div>
+                  <div><span style="font-size: 12px;">Save Lot</span></div>
                 </VCol>
                 <VCol
                   class="text-center d-flex flex-column align-center justify-center mx-auto"
@@ -3865,7 +3866,7 @@ const getDisabledFollowStatusNRole = () => {
                       />
                     </VAvatar>
                   </div>
-                  <div><span style="font-size: 12px;">Save Draft COA</span></div>
+                  <div><span style="font-size: 12px;">Save COA</span></div>
                 </VCol>
               </VRow>
             </VCardText>
@@ -3893,10 +3894,23 @@ const getDisabledFollowStatusNRole = () => {
               <VDivider />
               <div>
                 <VAlert
-                  title="Verify the accuracy of the Lot"
                   variant="outlined"
                   closable
                 >
+                  <VRow>
+                    <VCol cols="6">
+                      Verify and save
+                    </VCol>
+                    <VCol
+                      class="d-flex justify-end"
+                      cols="6"
+                    >
+                      <VSwitch
+                        v-model="showOnlyErrors"
+                        :label="showOnlyErrors ? 'Show All Details' : 'Show Only Errors'"
+                      />
+                    </VCol>
+                  </VRow>
                   <div
                     v-for="(value, key, index) in alertErrorLot"
                     :key="index"
@@ -3912,7 +3926,7 @@ const getDisabledFollowStatusNRole = () => {
                       {{ value.msg }}
                     </span>
                     <span
-                      v-if="value.success"
+                      v-if="value.success  && showOnlyErrors"
                       style="font-size: 14px;"
                     >
                       <VIcon

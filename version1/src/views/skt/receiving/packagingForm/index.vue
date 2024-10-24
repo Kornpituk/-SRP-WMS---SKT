@@ -1255,7 +1255,12 @@ const submitButtonVisibleNew = async word => {
   textAlertDialogFunction('SAVE DRAFT', true)
 
   if(trickerSubmit.value !== true){
-    location.reload()
+    textAlertDialogFunction('SAVE DRAFT', true)
+
+    // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+    setTimeout(() => {
+      location.reload()
+    }, 300) // 10000 มิลลิวินาที = 10 วินาที
   }
 
   // isDialogSubmitSuccessVisible.value = true
@@ -2354,7 +2359,7 @@ const saveDraftData = word => {
           <!-- Header -->
           <VCardText v-if="alertHeaderErrorMessage.success">
             <VAlert
-              title="Verify The Accuracy Of The Header"
+              title="Verify and save Header"
               variant="outlined"
               closable
               class="text-start"
@@ -2373,7 +2378,7 @@ const saveDraftData = word => {
           <!-- Lot -->
           <VCardText v-if="alertLotErrorMessage.success">
             <VAlert
-              title="Verify The Accuracy Of The Lot"
+              title="Verify and save Lot"
               variant="outlined"
               closable
               class="text-start"
@@ -2405,7 +2410,7 @@ const saveDraftData = word => {
           <!-- Coa -->
           <VCardText v-if="!textAlertError.success && textAlertError.coa">
             <VAlert
-              title="Verify The Accuracy Of The COA"
+              title="Verify and save COA"
               variant="outlined"
               style="font-size: 12px;"
               class="text-start"

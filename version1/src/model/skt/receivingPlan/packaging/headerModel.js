@@ -31,7 +31,7 @@ export const createDraftBody = dataHeader => {
     limConditionDetail: dataHeader.limConditionDetail || '', 
     note: dataHeader.note || '',
     coAChecked: dataHeader.coAChecked,
-    actualCheck: parseInt(dataHeader.actualCheck, 10) || '',
+    actualCheck: parseInt(dataHeader.actualCheck, 10) || 0,
   }
 }
 
