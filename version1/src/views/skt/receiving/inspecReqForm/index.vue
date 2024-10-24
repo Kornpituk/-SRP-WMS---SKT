@@ -195,6 +195,9 @@ const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 const frozeCheck = ref(true)
+const poEiLog = ref()
+
+const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
 
 const generatedJournalId = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
@@ -214,6 +217,7 @@ const generatedJournalId = () => {
 
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
+        poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
         statusId.value = item.statusId // เก็บค่า statusId
         loadingGenerated2.value = false
       } else {
@@ -241,7 +245,7 @@ watch(() => {
 })
 
 //--------------- get header --------------------------------
-const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
+
 
 //------------- Header
 const getHearderInsp = () => {

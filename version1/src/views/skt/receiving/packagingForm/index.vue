@@ -524,6 +524,7 @@ const generatedJournalId = () => {
 
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
+        poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
         statusId.value = item.statusId // เก็บค่า statusId
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
@@ -1307,7 +1308,10 @@ const saveDraftData = word => {
 </script>
 
 <template>
-  <div v-if="loadingGenerated" class="mt-1">
+  <div
+    v-if="loadingGenerated"
+    class="mt-1"
+  >
     <VProgressLinear
       height="20"
       color="success"

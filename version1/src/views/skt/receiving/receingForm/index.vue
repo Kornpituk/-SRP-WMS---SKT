@@ -2,7 +2,7 @@
 <script setup>
 import axiosIns from '@axios'
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
-import { inject, defineProps, watchEffect, watch } from 'vue'
+import { inject, defineProps, watchEffect, watch, onMounted } from 'vue'
 
 const props = defineProps({
   Data: Array,
@@ -14,7 +14,7 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
-const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const statusId = ref(dataProps.value.statusId) // ตัวแปรสำหรับเก็บค่า statusId
 const receivedTypeId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 
 const a = ref('A')
@@ -129,6 +129,68 @@ watchEffect(() => {
   console.log(dataProps.value)
 })
 
+//------------- journalId
+const responseGener = ref([])
+
+const generatedJournalId = async () => {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+      console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
+
+      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+
+        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+
+        const dataIdPo = ref(responseGener.value[0])
+
+        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
+        statusId.value = dataIdPo.value.statusId // เก็บค่า statusId
+      } else {
+        console.error("ไม่มีข้อมูลใน responseGener")
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })
+}
+
+const generated = async () => {
+
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${dataProps.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+
+      // itemsManufacturer.value = response.data.data
+
+      console.log('[generatedReceivingForm]!!: ', response.data.data)
+
+    })
+    .catch(error => {
+      // Handle errors
+      console.error('Error:', error)
+    })
+}
+
+watch(() => {
+  generated()
+  generatedJournalId()
+})
+
 const tabs = [
   {
     title: 'R/M Receiving Form',
@@ -205,46 +267,6 @@ const tabDisablingConfig = {
   // Add more statuses and role combinations as needed
 }
 
-const tabConfig = {
-
-  /// Packaging = 1 , Raw Material Receiving 2, Lorry 3 , NUll 0
-
-  0: {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-  },
-  1: {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-  },
-  2: {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Draft R/M Inspection Form': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Inspection Approval': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Warehouse Rejection': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Partial-Receiving': {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-  },
-  'Draft Packaging Inspection Form': {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-  },
-
-  // Add more statuses and role combinations as needed
-}
-
 // Configuration to specify which tab index to show based on status
 const tabIndexConfig = {
   1: 0,  // Show tab index 1 for this status
@@ -262,97 +284,33 @@ const tabIndexConfig = {
 }
 
 const getDisabledTabs = () => {
-  const status = statusId.value
+
   const role = userRole.value
+
+  const status = ref(statusId.value)
+
+  console.log("status in getDisabledTabs", statusId.value)
   
   // console.log('Status:', status)
   // console.log('Role:', role)
   // console.log('Disabled Tabs:', tabDisablingConfig[status]?.[role])
   
-  return tabDisablingConfig[status]?.[role] || []
+  return tabDisablingConfig[status.value]?.[role] || []
 }
 
 const getCurrentTabIndex = () => {
-  const status = statusId.value
+  const status = ref(statusId.value)
   
-  return tabIndexConfig[status] !== undefined ? tabIndexConfig[status] : 0
+  return tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 99
 }
-
-// console.log('***Current Tab Index:', getCurrentTabIndex())
 
 const currentTab = ref(getCurrentTabIndex())
 
 const isActive = ref(true)
 
-//------------- journalId
-const responseGener = ref([])
 
-const generatedJournalId = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-      console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
 
-      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
 
-        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
-
-        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
-        statusId.value = item.statusId // เก็บค่า statusId
-      } else {
-        console.error("ไม่มีข้อมูลใน responseGener")
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error)
-    })
-}
-
-const generated = () => {
-
-  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${data.value.poEtlLogDetailJournalID}`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-
-      // itemsManufacturer.value = response.data.data
-
-      console.log('[generatedReceivingForm]!!: ', response.data.data)
-
-    })
-    .catch(error => {
-      // Handle errors
-      console.error('Error:', error)
-    })
-}
-
-// Watch ค่า statusId และเรียกใช้ generated ถ้ามีการเปลี่ยนแปลง
-watch(statusId.value, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    generated() // เรียกใช้ function generated เมื่อ statusId เปลี่ยน
-    location.reload()
-  }
-})
-
-// เรียกใช้ generatedJournalId เมื่อ component ถูกสร้างขึ้น
-watch(() => {
-  generatedJournalId()
-  console.log("Tabs", currentTab.value)
-  
-})
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
@@ -415,43 +373,6 @@ const handleAcceptPackaging = word => {
 </script>
 
 <template>
-  <div v-if="false">
-    <span />
-    <VAlert
-
-      border="top"
-      type="error"
-      variant="flat"
-      prominent
-    >
-      Failded To Loading Page, Plaease Back To Receving Plant.
-    </VAlert>
-  </div>
-  <VCard
-    v-if="false"
-    hover
-    style="position: fixed; min-width: 95%; opacity: 1 !important;"
-    elevation="6"
-  >
-    <VCardText>
-      <VTabs
-        v-model="currentTab"
-        grow
-      >
-        <VTab
-          v-for="(tab, index) in tabs"
-          :key="index"
-        >
-          <VIcon
-            v-if="false"
-            :icon="tab.icon"
-            size="40"
-          />
-          <span style="font-size: 22px; font-weight: bolder;">{{ tab.title }}</span>
-        </VTab>
-      </VTabs>
-    </VCardText>
-  </VCard>
   <div v-if="receivedTypeId === 2">
     <VTabs
       v-model="currentTab"
