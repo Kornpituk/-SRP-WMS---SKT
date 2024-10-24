@@ -463,6 +463,8 @@ const GetStockUpdate = () => {
 
       const data = response.data.datas
 
+      console.log("Product Data base", data)
+
       // Add No. field to each product
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
@@ -933,6 +935,8 @@ const detailsReceiv = ref({
   supplierId: '',
   supplierName: '',
   deliveryDate: '',
+  expectDeliveryDate: '',
+  receivedDate: '',
   purchasingQuantityPcs: '',
   purchasingAmountKgs: '',
   purchasingQuantityRcvdPcs: '',
@@ -955,9 +959,6 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
 
   poEtILogAction.value = poEtlLogDetailJournalID
 
-  // console.log('journalIDModel **', journalIDModel.value)
-  // console.log('updateByReceivingPlan **', updateByReceivingPlan.value)
-  // console.log('detailsReceiv **', detailsReceiv.value)
   isDialogVisibleAction.value = true
   console.log('detailsVisibleAction', poEtILogAction.value+ "="+ poEtlLogDetailJournalID)
   
@@ -971,6 +972,8 @@ const fieldsToShow = ['statusText',
   'supplierId',
   'supplierName',
   'deliveryDate',
+  'expectDeliveryDate',
+  'receivedDate',
   'purchaseOrderNo',
   'purchasingQuantityPcs',
   'purchasingAmountKgs',
@@ -993,6 +996,8 @@ function getDisplayName(key) {
     supplierId: 'Supplier Code',
     supplierName: 'Supplier Name',
     deliveryDate: 'Delivery Date',
+    expectDeliveryDate: 'Expect Delivery Date',
+    receivedDate: 'Received Date',
     purchaseOrderNo: 'Purchase Order No',
     purchasingQuantityPcs: 'Purchasing Qty',
     purchasingAmountKgs: 'Purchasing Amount',
@@ -2364,6 +2369,7 @@ const dessertsTest = ref([
               <tr
                 v-for="(value, key) in filteredDetails"
                 :key="key"
+                class="bg-green-lighten-4"
               >
                 <th v-if="key !== 'statusText'">
                   <template v-if="key !== 'statusText'">
@@ -2387,6 +2393,12 @@ const dessertsTest = ref([
                     <span style="text-transform: capitalize;">{{ value }}</span>
                   </template>
                   <template v-else-if="key === 'deliveryDate' && key !== 'statusText'">
+                    <span style="text-transform: capitalize;">{{ convertDate(value) }}</span>
+                  </template>
+                  <template v-else-if="key === 'expectDeliveryDate' && key !== 'statusText'">
+                    <span style="text-transform: capitalize;">{{ convertDate(value) }}</span>
+                  </template>
+                  <template v-else-if="key === 'receivedDate' && key !== 'statusText'">
                     <span style="text-transform: capitalize;">{{ convertDate(value) }}</span>
                   </template>
                   <template v-else-if="key === 'purchaseOrderNo' && key !== 'statusText'">
@@ -2435,6 +2447,36 @@ const dessertsTest = ref([
                   </template>
                   <template v-else-if="key === 'purchasingAmountRcvdKgs' && key !== 'statusText'">
                     <span style="text-transform: capitalize;">{{ formatNumber(detailsReceiv.purchasingAmountRcvdKgs) }}  Kgs</span>
+                  </template>
+                </td>
+              </tr>
+
+              <tr
+                v-for="key in fieldsToShow"
+                :key="key"
+              >
+                <th v-if="filteredDetails[key]">
+                  <span style="font-size: 12px;">{{ getDisplayName(key) }}</span>
+                </th>
+                <td
+                  v-if="filteredDetails[key]"
+                  style="font-size: 12px;"
+                >
+                  <!-- การแสดงผลสำหรับแต่ละฟิลด์ -->
+                  <template v-if="key === 'deliveryDate'">
+                    <span>{{ convertDate(filteredDetails[key]) }}</span>
+                  </template>
+                  <template v-else-if="key === 'receivedDate'">
+                    <span>{{ convertDate(filteredDetails[key]) }}</span>
+                  </template>
+                  <template v-else-if="key === 'expectDeliveryDate'">
+                    <span>{{ convertDate(filteredDetails[key]) }}</span>
+                  </template>
+                  <template v-else-if="key === 'updatedDate'">
+                    <span>{{ convertDateTime(filteredDetails[key]) }}</span>
+                  </template>
+                  <template v-else>
+                    <span>{{ filteredDetails[key] }}</span>
                   </template>
                 </td>
               </tr>

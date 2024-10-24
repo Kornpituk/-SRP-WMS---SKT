@@ -2250,7 +2250,7 @@ const saveDraftData = word => {
                     />
                   </VAvatar>
                 </div>
-                <div><span style="font-size: 12px;">Save Draft Header</span></div>
+                <div><span style="font-size: 12px;">Save and Verify</span></div>
               </VCol>
               <VCol
                 class="text-center d-flex flex-column align-center justify-center mx-auto"
@@ -2282,7 +2282,7 @@ const saveDraftData = word => {
                     />
                   </VAvatar>
                 </div>
-                <div><span style="font-size: 12px;">Save Draft Lot</span></div>
+                <div><span style="font-size: 12px;">Save and Verify</span></div>
               </VCol>
               <VCol
                 class="text-center d-flex flex-column align-center justify-center mx-auto"
@@ -2314,7 +2314,7 @@ const saveDraftData = word => {
                     />
                   </VAvatar>
                 </div>
-                <div><span style="font-size: 12px;">Save Draft COA</span></div>
+                <div><span style="font-size: 12px;">Save and Verify</span></div>
               </VCol>
             </VRow>
           </VCardText>

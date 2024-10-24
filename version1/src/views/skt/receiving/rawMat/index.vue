@@ -3899,7 +3899,7 @@ const getDisabledFollowStatusNRole = () => {
                 >
                   <VRow>
                     <VCol cols="6">
-                      Verify and save
+                      Save and Verify
                     </VCol>
                     <VCol
                       class="d-flex justify-end"
@@ -4173,7 +4173,6 @@ const getDisabledFollowStatusNRole = () => {
 
 .v-text-field >>> input {
   font-size: 12px;
-  text-transform: capitalize;
 }
 
 .v-field >>> input {

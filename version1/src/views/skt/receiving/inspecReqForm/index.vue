@@ -2948,7 +2948,7 @@ const getDisabledFollowStatusNRole = () => {
               <VAlert variant="outlined">
                 <VRow>
                   <VCol cols="6">
-                    Verify and save
+                    Save and Verify
                   </VCol>
                   <VCol
                     cols="6"
