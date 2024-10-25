@@ -1045,7 +1045,6 @@ const dataHeaders = [
 
 ///--------------------------------- 
 
-
 const printLabelForm = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)

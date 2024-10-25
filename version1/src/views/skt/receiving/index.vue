@@ -949,6 +949,8 @@ const journalIDModel = ref('')
 const updateByReceivingPlan = ref('')
 const idStatusDialogAction = ref('')
 const poEtILogAction = ref('')
+const receivingTypeAction = ref('')
+const lotAction = ref('')
 
 const checkCurrentTabBeforIn = status => {
   let tabIndex
@@ -980,14 +982,14 @@ const checkCurrentTabBeforIn = status => {
   return tabIndex
 }
 
-
-const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlLogDetailJournalID) => {
+const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlLogDetailJournalID, receivingType, lot) => {
   // console.log('isDialogVisibleAction **', index, journalID, updateBy, status, itemCode)
   journalIDModel.value = journalID
   updateByReceivingPlan.value = updateBy
   detailsReceiv.value = products.value[index-1]
   idStatusDialogAction.value = status
-
+  receivingTypeAction.value = receivingType
+  lotAction.value = lot
   sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(status))
 
   selectedPrintLabel.value = []
@@ -1061,7 +1063,6 @@ const findProductByJournalID = journalID => {
   }
 }
 
-
 if (resultDetailsAvtion.value) {
   // สามารถจัดการกับข้อมูลที่พบได้ที่นี่
   console.log('Product Details:', resultDetailsAvtion.value)
@@ -1069,13 +1070,172 @@ if (resultDetailsAvtion.value) {
   console.log('No matching product found')
 }
 
-console.log("resultDetailsAvtion:''", resultDetailsAvtion.value, poEtILogAction.value)
+const dataPrintlabel = ref([])
 
+//------------------------ Print Label------------------------------------------
+
+import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService  }  from '@/services/skt/global/gloBalService'
+
+const { printLabelFormViewResult, printLabelFormViewService } = useViewPrintLabelFormService()
+const processingPrintLabel = ref(false)
+
+const getPrintLabelView = lot => {
+  // console.log('searchByCategoryName: ',searchByCategoryName)
+  axiosIns.get(`${urlApi.value}/api/v1/PrintLabel/Label?lot=${lot}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${searchByWareHouseId.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  }, {})
+    .then(response => {
+
+      const data = response.data
+
+      dataPrintlabel.value = data
+      console.log("getPrintLabelView 55555+", data)
+    
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })
+
+  // const result = printLabelFormViewService(urlApi.value, searchByWareHouseId.value, accessTokenAtStore, lot)
+
+  // if(printLabelFormViewResult){
+  //   console.log('printLabelFormViewService Success')
+  // }
+
+}
+
+// ฟังก์ชันเตรียมข้อมูลเพื่อให้เหลือเฉพาะฟิลด์ที่ต้องการ
+const prepareDataForPrintLabel = originalData => {
+  const firstItem = originalData[0] // ดึงรายการแรก
+  
+  return {
+    copy: 1,  // ตั้งค่า copy เป็น 1
+    lot: firstItem.lot,  // ฟิลด์ lot
+    productId: firstItem.productId,  // ฟิลด์ productId
+    productName: firstItem.productName,  // ฟิลด์ productName
+    purchaseOrderNo: firstItem.purchaseOrderNo,  // ฟิลด์ purchaseOrderNo
+    receivedDate: firstItem.receivedDate,  // ฟิลด์ receivedDate
+  }
+}
+
+// เรียกใช้งานฟังก์ชันนี้ก่อนส่งข้อมูลใน API
+const savePrintLabel = async () => {
+  // ใช้ prepareDataForPrintLabel เพื่อจัดข้อมูลใน dataForPrintLabelSave
+  const body = prepareDataForPrintLabel(dataPrintlabel.value)
+
+  try {
+    const response = await axiosIns.post(
+      `${urlApi.value}/api/v1/PrintLabel/SaveToPrintLot`,
+      body,
+      {
+        headers: {
+          'accept': '*/*',
+          'x-location': `${searchByWareHouseId.value}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      },
+    )
+
+    // บันทึกข้อมูล response ที่ได้รับมา
+    dataPrintlabel.value = response.data
+    console.log("save Print Label success:", response.data)
+    
+    return { success: true, data: response.data } // คืนค่า success เพื่อเช็คในขั้นต่อไป
+  } catch (error) {
+    // กรณี error
+    progressLinearNoData.value = true
+    console.error('Error in savePrintLabel:', error)
+
+    return { success: false, error } // คืนค่า error สำหรับตรวจสอบกรณี error
+  }
+}
+
+const btnPrintLabelTest = () => {
+  savePrintLabel()
+}
+
+const printLabelSmallPdf = async () => {
+  try {
+    const response = await axiosIns.post(
+      `${urlApi.value}/api/v1/PrintLabel/Label/Small/Pdf`,
+      {},
+      {
+        headers: {
+          'accept': 'application/pdf', // รับไฟล์ PDF
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+        responseType: 'blob', // รับ response เป็น Blob
+      },
+    )
+  
+    if (response && response.data) {
+      console.log('Service Response print Label form:', response.data)
+  
+      // สร้าง Blob จาก response
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+      // สร้าง URL สำหรับ Blob
+      const blobUrl = URL.createObjectURL(blob)
+  
+      // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+      window.open(blobUrl)
+      processingPrintLabel.value = false
+
+  
+      return { success: true, data: blob }
+    } else {
+      processingPrintLabel.value = false
+      throw new Error('No data Genterate print Label form')
+    }
+  } catch (error) {
+    console.error('Error in printLabelView:', error)
+    throw new Error(`Failed to printLabelView for: ${error.response?.data?.message || error.message}`)
+  }
+}
+
+const btnPrintLabel = async () => {
+  processingPrintLabel.value = true
+  console.log('btnPrintLabel start!')
+  try {
+    // เรียกใช้ savePrintLabel ก่อน
+    console.log('savePrintLabel start!')
+
+    const resultSave =  await savePrintLabel()
+    if(!resultSave.success){
+      throw 'savePrintLabel'+resultSave
+    }
+
+    console.log('savePrintLabel end!')
+
+
+    console.log('printLabelSmallPdf start!')
+
+    const printResponse = await printLabelSmallPdf()
+
+    console.log('printLabelSmallPdf end!')
+
+    if (printResponse.success) {
+      console.log('Print label PDF successfully generated and displayed.')
+    } else {
+      processingPrintLabel.value = false
+      console.error('Error generating print label PDF.')
+    }
+  } catch (error) {
+    processingPrintLabel.value = false
+    console.error('Error in btnPrintLabel:', error)
+  }
+}
+
+//---------------------------- definde tabel
 
 
 //------------------------ Fuction Print Form --------------------------------
 
-import { usePrintReceivingFormService, usePrintInspectionFormService  } from '@/services/skt/global/gloBalService'
 
 const { errorMessageGenerateView, printReceivingFormService } = usePrintReceivingFormService()
 
@@ -1083,13 +1243,14 @@ const { errorMessageInspection, printInspectionFormService } = usePrintInspectio
 
 const processingPrint = ref(false)
 
+
 const processingPrintForm1 = ref(false)
 const processingPrintForm2 = ref(false)
 const processingPrintForm3 = ref(false)
 
 const disabledCheckboxListRawM = () => {
   // ถ้า idStatusDialogAction.value มีค่าเป็น 0, 1, 2 หรือ 3 จะคืนค่าเป็น true
-  return [0, 1, 2, 3, 10].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 7, 10, 15].includes(idStatusDialogAction.value)
 }
 
 const disabledCheckboxListInsp = () => {
@@ -1153,6 +1314,7 @@ const printReceivingForm = () => {
 
   // การพิมพ์ฟอร์มสามารถใช้ window.print หรืออื่นๆ ตามต้องการ
 }
+
 
 //-------------------- Dialog Confirm Submit --------------------
 const isDialogConfirmVisible = ref(false)
@@ -2031,7 +2193,7 @@ const dessertsTest = ref([
             @click="submitButton('Approve')"
           >
             Approve
-            {{selectedDataTables.length }}
+            {{ selectedDataTables.length }}
           </VBtn>
 
           <VBtn
@@ -2828,7 +2990,7 @@ const dessertsTest = ref([
           <VRow>
             <VCol
               cols="6"
-              @click="printLabel = true, printForm = false"
+              @click="printLabel = true, printForm = false, getPrintLabelView(lotAction)"
             >
               <VHover>
                 <template #default="{ isHovering, props }">
@@ -2839,7 +3001,20 @@ const dessertsTest = ref([
                     :color="isHovering || printLabel ? 'yellow-lighten-4' : undefined"
                   >
                     <VCardText class="d-flex justify-center">
+                      <VProgressCircular
+                        v-if="processingPrintLabel"
+                        :size="105"
+                        :width="15"
+                        color="primary"
+                        indeterminate
+                      >
+                        <VIcon
+                          icon="ri-price-tag-3-line"
+                          size="60"
+                        />
+                      </VProgressCircular>
                       <VIcon
+                        v-if="!processingPrintLabel"
                         icon="ri-price-tag-3-line"
                         size="80"
                       />
@@ -2904,6 +3079,7 @@ const dessertsTest = ref([
             <VCol cols="6">
               <!-- Align VCheckbox items to the right -->
               <VCheckbox
+                v-if="receivingTypeAction === 2"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListRawM()"
                 label="Receiving Form"
@@ -2920,6 +3096,7 @@ const dessertsTest = ref([
                 </template>
               </VCheckbox>
               <VCheckbox
+                v-if="receivingTypeAction === 2"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListInsp()"
                 label="Inspection Request Form"
@@ -2936,7 +3113,7 @@ const dessertsTest = ref([
                 </template>
               </VCheckbox>
               <VCheckbox
-                v-if="false"
+                v-if="receivingTypeAction === 1"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListPk()"
                 label="Lorry Loading Check List"
@@ -2957,7 +3134,7 @@ const dessertsTest = ref([
                   style="width: 100%;"
                   @click="printFormAll"
                 >
-                  Print
+                  Print{{ receivingTypeAction }}
                 </VBtn>
               </div>
             </VCol>
@@ -2965,11 +3142,16 @@ const dessertsTest = ref([
 
           <VRow v-if="printLabel">
             <VCol cols="6">
-              <span />
+              <div class="mt-4">
+                <VBtn
+                  style="width: 100%;"
+                  @click="btnPrintLabel"
+                >
+                  Print
+                </VBtn>
+              </div>
             </VCol>
-            <VCol cols="6">
-              <!-- Align VCheckbox items to the right -->
-            </VCol>
+            <VCol cols="6" />
           </VRow>
         </VCardText>
       </VCard>
@@ -4464,7 +4646,7 @@ const dessertsTest = ref([
               >
                 <VBtn
                   color="info"
-                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode, item.raw.poEtlLogDetailJournalID)"
+                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode, item.raw.poEtlLogDetailJournalID, item.raw.receiveTypeId, item.raw.batch)"
                 >
                   <div style="font-size: 12px;">
                     Action

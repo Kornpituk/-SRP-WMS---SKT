@@ -541,8 +541,6 @@ const generatedJournalId = () => {
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
       }
-
-      loadingGenerated.value = false
     })
     .catch(error => {
       console.error('Error:', error)
@@ -651,7 +649,6 @@ const dataLot = ref({
   needActualValue: false,
 })
 
-
 const analyticalItemsData = ref([])
 
 const { packagingFormLot, errorMessageLot, fetchPackagingFormLot } = useGetLotPackagingFormController()
@@ -719,6 +716,15 @@ watchEffect(() => {
       specRange: receivedData.specRange,
       needActualValue: receivedData.needActualValue,
     }
+
+    loadingGenerated.value = false
+  }else{
+  }
+
+  if(analyticalItemsData.value.length < 1 || dataHeader.value.length < 1){
+    
+    fetchPackagingFormHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+    fetchPackagingFormLot(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
   }
 
 })

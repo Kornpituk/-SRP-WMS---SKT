@@ -1,4 +1,4 @@
-import { coaService } from '@/repository/skt/gobal/service'
+import { coaService } from '@/repository/skt/global/service'
 
 export const useGetCOAFormController = () => {
   const getCoaForm = ref(null)

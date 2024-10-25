@@ -99,6 +99,74 @@ export const  globalService = {
       throw new Error(`Failed to printInspectionFormPDF for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
   },
+
+  async printLabelView(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken, lot) {
+    try {
+      const response = await axios.get(
+        `${urlApi}/api/v1/PrintLabel/Label?lot=${lot}`,
+        {},
+        {
+          headers: {
+            'accept': 'application/pdf', // รับไฟล์ PDF
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response print Label form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+        window.open(blobUrl)
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data Genterate print Label form')
+      }
+    } catch (error) {
+      console.error('Error in printLabelView:', error)
+      throw new Error(`Failed to printLabelView for Lot ${lot}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async printLabelView(urlApi, whereHouse, accessToken, lot) {
+    console.log('printLabelView Response print label View:', urlApi, whereHouse, accessToken, lot)
+    try {
+      const response = await axios.get(
+        `${urlApi}/api/v1/PrintLabel/Label?lot=${lot}`, {},
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      )
+
+      console.log('Print label Service try...', urlApi, whereHouse, accessToken, lot)
+  
+      if (response && response.data) {
+        console.log('Service Response print label View:', response.data.data)
+
+        console.log('Print label Service Response ...', response.data.data)
+          
+        return response.data.data
+      } else {
+        throw new Error('No data print label View from the server')
+      }
+    } catch (error) {
+      console.error('Error in printLabelView:', error)
+      throw new Error(`Failed to printLabelView for Lot ${lot}: ${error.response?.data?.message || error.message}`)
+    }
+  },
   
 }
   

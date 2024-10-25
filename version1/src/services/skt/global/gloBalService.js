@@ -114,3 +114,42 @@ export const usePrintInspectionFormService = () => {
     printInspectionFormService,
   }
 }
+
+export const useViewPrintLabelFormService = () => {
+  const printLabelFormViewResult = ref(null)
+  const errorMessagePrintLabelView = ref(null)
+  
+  const printLabelFormViewService = async (urlApi, whereHouse, accessToken, lot) => {
+    try {
+      errorMessagePrintLabelView.value = null
+      console.log('Print Inspection Form Service Starting...')
+  
+      const result = await globalService.printLabelView(urlApi, whereHouse, accessToken, lot)
+        
+      if (result) {
+        console.log('Print Inspection Form Service Complate:', result)
+          
+        printLabelFormViewResult.value = result
+  
+        return { success: true, data: result }
+      } else {
+        console.warn('Print Inspection Form Service Fialed')
+  
+        return { success: false, error: 'Print Inspection Form Service Fialed' }
+      }
+    } catch (error) {
+      console.error('Error in printLabelFormViewService:', error)
+      errorMessagePrintLabelView.value = error.message
+  
+      return { success: false, error: error.message }
+    }
+
+
+  }
+  
+  return {
+    printLabelFormViewResult,
+    errorMessagePrintLabelView,
+    printLabelFormViewService,
+  }
+}
