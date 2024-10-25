@@ -1484,7 +1484,7 @@ const getDisabledFollowStatusNRole = () => {
                 <!-- ตรวจสอบประเภทไฟล์ -->
                 <template v-if="item.fileUri.endsWith('.pdf')">
                   <iframe
-                    :src="item.fileUri"
+                    :src="'https://docs.google.com/viewer?url=' + item.fileUri + '&embedded=true'"
                     width="100%"
                     height="500px"
                   />
