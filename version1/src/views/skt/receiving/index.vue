@@ -2461,23 +2461,17 @@ const dessertsTest = ref([
                 </td>
                 <td>{{ resultDetailsAvtion.purchaseOrderNo }}</td>
               </tr>
-              <tr>
+              <tr v-if="!resultDetailsAvtion.expectDeliveryDate">
                 <td style="font-weight: 500;">
                   Delivery Date
                 </td>
                 <td>{{ convertDate(resultDetailsAvtion.deliveryDate) }}</td>
               </tr>
-              <tr>
+              <tr v-if="resultDetailsAvtion.expectDeliveryDate">
                 <td style="font-weight: 500;">
-                  Expect Delivery Date
+                  Delivery Date
                 </td>
                 <td><span v-if="convertDate(resultDetailsAvtion.expectDeliveryDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.expectDeliveryDate) }}</span></td>
-              </tr>
-              <tr>
-                <td style="font-weight: 500;">
-                  Received Date
-                </td>
-                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
               </tr>
               <tr>
                 <td style="font-weight: 500;">
@@ -2498,6 +2492,12 @@ const dessertsTest = ref([
               <tr>
                 <td>Receiving Amount</td>
                 <td>{{ formatNumber(resultDetailsAvtion.purchasingAmountRcvdKgs).toLocaleString() }} Kgs</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
               </tr>
               <tr>
                 <td>Updated Date</td>
@@ -2679,17 +2679,11 @@ const dessertsTest = ref([
                 </td>
                 <td>{{ convertDate(resultDetailsAvtion.deliveryDate) }}</td>
               </tr>
-              <tr>
+              <tr v-if="false">
                 <td style="font-weight: 500;">
                   Expect Delivery Date
                 </td>
                 <td><span v-if="convertDate(resultDetailsAvtion.expectDeliveryDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.expectDeliveryDate) }}</span></td>
-              </tr>
-              <tr>
-                <td style="font-weight: 500;">
-                  Received Date
-                </td>
-                <td>{{ convertDate(resultDetailsAvtion.receivedDate) }}</td>
               </tr>
               <tr>
                 <td style="font-weight: 500;">
@@ -2712,12 +2706,24 @@ const dessertsTest = ref([
                 <td>{{ formatNumber(resultDetailsAvtion.purchasingAmountRcvdKgs).toLocaleString() }} Kgs</td>
               </tr>
               <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
+              </tr>
+              <tr>
                 <td>Updated Date</td>
                 <td>{{ convertDateTime(resultDetailsAvtion.updatedDate) }}</td>
               </tr>
               <tr>
                 <td>Updated By</td>
                 <td>{{ resultDetailsAvtion.updatedBy }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
               </tr>
               <!-- เพิ่มข้อมูลเพิ่มเติมตามต้องการ -->
               <div v-if="false">

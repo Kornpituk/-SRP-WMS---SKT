@@ -600,7 +600,7 @@ const saveDraftHeader = async () => {
   // console.log('Start saveDraftHeader!!', bodyCheck.actualCheck)
 
   if(trickerSubmit.value){
-    if(!bodyCheck.actualCheck){
+    if(!bodyCheck.actualCheck || bodyCheck.actualCheck < 1){
       alertHeaderErrorMessage.value.success = true
 
       alertHeaderErrorMessage.value.actualCheck = "Actual Check is required. Please enter a value."
@@ -1568,6 +1568,7 @@ const saveDraftData = word => {
                   density="compact"
                   :rules="[
                     value => !!value.trim() || 'Actual Check is required.',
+                    value => value > 0 || 'Actual Check is required.',
                   ]"
                 
                   @input="(e) => handleInputNumberOnly(e)"
