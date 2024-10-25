@@ -167,6 +167,7 @@ export const  PackagingFormService = {
 //-- Header --------------------------------
 export const ReceivingFormService = {
   async getHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    console.log('get repo Packaging Form Header...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/Packaging/View/${poEtlLogDetailJournalID}`, {
         headers: {
@@ -175,15 +176,20 @@ export const ReceivingFormService = {
           Authorization: `Bearer ${accessToken}`,
         },
       })
+
+      console.log("response", response)
       
       if (response && response.data) {
+        console.log('success get repo Error If Packaging Form Header...')
         console.log('Service Response data Header:', response.data.data)
         
         return response.data.data
       } else {
+        console.log('Error repo Error If Packaging Form Header...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
+      console.log('Error repo Error Try Packaging Form Header...')
       console.error('Error in getHearderPackagingForm:', error)
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }

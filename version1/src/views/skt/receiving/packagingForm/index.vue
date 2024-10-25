@@ -524,7 +524,7 @@ const generatedJournalId = () => {
 
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
-        poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
+        // poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
         statusId.value = item.statusId // เก็บค่า statusId
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
@@ -846,6 +846,8 @@ const saveDraftLotDetails = async () => {
         alertLotErrorMessage.value.success = true // แสดงว่ามีข้อผิดพลาด
         // เก็บข้อความแยกตามลำดับไอเท็มที่มีปัญหา
         alertLotErrorMessage.value.actualAnalysis[`item_${index + 1}`] = `Actual Analysis is required for item ${index + 1}. Please enter a value.`
+      }else{
+        alertLotErrorMessage.value.success = false
       }
     })
 
@@ -1015,15 +1017,24 @@ const handleSaveDraftCoa = async () => {
 
   if(trickerSubmit.value && wordForSubmit.value !== 'REJECT'){
     console.log("trickerSubmit!++2", fileCoaNew.value, getFormCoa.value, wordForSubmit.value)
-    if (!fileCoaNew.value.length > 0 && !getFormCoa.value) {
-      result.value -=1
-      textAlertError.value.success = false
-      textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
-      throw 'Failed to save coa. Plase Upload COA ones.'
-    }
 
-    if(getFormCoa.value){
-      result.value += 1
+    // if (!fileCoaNew.value.length > 0 && !getFormCoa.value && !fileCoaNew.value.length > 0) {
+    //   result.value -=1
+    //   textAlertError.value.success = false
+    //   textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+    //   throw 'Failed to save coa. Plase Upload COA ones.'
+    // }
+
+    if(fileCoaNew.value < 1){
+      if( getFormCoa.value < 1){
+        result.value -=1
+        textAlertError.value.success = false
+        textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+        console.log("if", fileCoaNew.value.length, getFormCoa.value.length)
+        throw 'Failed To Save COA. Plase Upload COA Ones.'
+      }else{
+        console.log("Test", fileCoaNew.value.length, getFormCoa.value.length)
+      }
     }
 
     // console.log("!151551deleteAllStart", deleteAllStart.value)

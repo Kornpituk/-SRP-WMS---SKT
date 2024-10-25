@@ -129,8 +129,11 @@ watchEffect(() => {
   console.log(dataProps.value)
 })
 
+const countCurrentTab = ref(0)
+
 //------------- journalId
 const responseGener = ref([])
+const currentTabNew = ref(sessionStorage.getItem('currentTabReceivingForm'))
 
 const generatedJournalId = async () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
@@ -142,7 +145,7 @@ const generatedJournalId = async () => {
   },
   {})
     .then(response => {
-      console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
+      console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
 
       // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
       if (response.data && response.data.data && response.data.data.length > 0) {
@@ -150,46 +153,75 @@ const generatedJournalId = async () => {
 
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
-        const dataIdPo = ref(responseGener.value[0])
-
         receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
-        statusId.value = dataIdPo.value.statusId // เก็บค่า statusId
+        statusId.value = item.statusId
+
+        sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
+
+        currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
+
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
       }
+
     })
     .catch(error => {
       console.error('Error:', error)
     })
 }
 
-const generated = async () => {
-
-  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${dataProps.value.poEtlLogDetailJournalID}`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-
-      // itemsManufacturer.value = response.data.data
-
-      console.log('[generatedReceivingForm]!!: ', response.data.data)
-
-    })
-    .catch(error => {
-      // Handle errors
-      console.error('Error:', error)
-    })
-}
 
 watch(() => {
-  generated()
   generatedJournalId()
+  
 })
+
+const checkCurrentTabBeforIn = status => {
+  let tabIndex
+
+  switch (status) {
+  case 1:
+  case 3:
+  case 8:
+  case 10:
+  case 7:
+    tabIndex = 0 // สำหรับ status 1, 3, 8, 10 ให้แสดง tab index 0
+    break
+    
+  case 4:
+  case 5:
+  case 6:
+    tabIndex = 1 // สำหรับ status 4, 5, 6, 7 ให้แสดง tab index 1
+    break
+    
+  case 12:
+  case 13:
+    tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
+    break
+    
+  default:
+    tabIndex = 0 // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
+  }
+
+  return tabIndex
+}
+
+const updateCurrentTab = async () => {
+  // รอให้ generatedJournalId และ generated ทำงานเสร็จก่อน
+  await generatedJournalId()
+  await generated()
+
+  // จากนั้นค่อยอัปเดต currentTab ด้วยค่าใหม่จาก getCurrentTabIndex(
+}
+
+// เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
+updateCurrentTab()
+
+// Watch สำหรับตรวจสอบการเปลี่ยนแปลงของ statusId
+
+// watch(() => {
+//   console.log('Tabs:', currentTabNew.value)
+// })
 
 const tabs = [
   {
@@ -300,17 +332,18 @@ const getDisabledTabs = () => {
 
 const getCurrentTabIndex = () => {
   const status = ref(statusId.value)
+
+  // console.log("status in getCurrentTabIndex", statusId.value)
+  // console.log("getCurrentTabIndex  currentTab", tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0)
+  // countCurrentTab.value += 1
+  // console.log("Start getCurrentTabIndex", countCurrentTab.value)
   
-  return tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 99
+  return tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0
 }
 
-const currentTab = ref(getCurrentTabIndex())
+// เรียกใช้ฟังก์ชันนี้เพื่อให้เกิดการเปลี่ยนค่า currentTab หลังจากทุกอย่างเสร็จสิ้น
 
 const isActive = ref(true)
-
-
-
-
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
@@ -375,7 +408,7 @@ const handleAcceptPackaging = word => {
 <template>
   <div v-if="receivedTypeId === 2">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -394,7 +427,7 @@ const handleAcceptPackaging = word => {
   </div>
   <div v-if="receivedTypeId === 3">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -414,7 +447,7 @@ const handleAcceptPackaging = word => {
   </div>
   <div v-if="receivedTypeId === 1">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -506,7 +539,7 @@ const handleAcceptPackaging = word => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTab === index"
+        v-if="currentTabNew === index"
       />
     </div>
   </div>
@@ -518,7 +551,7 @@ const handleAcceptPackaging = word => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTab === index"
+        v-if="currentTabNew === index"
       />
     </div>
   </div>
@@ -530,7 +563,7 @@ const handleAcceptPackaging = word => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTab === index"
+        v-if="currentTabNew === index"
       />
     </div>
   </div>

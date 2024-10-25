@@ -950,6 +950,37 @@ const updateByReceivingPlan = ref('')
 const idStatusDialogAction = ref('')
 const poEtILogAction = ref('')
 
+const checkCurrentTabBeforIn = status => {
+  let tabIndex
+
+  switch (status) {
+  case 1:
+  case 3:
+  case 8:
+  case 10:
+    tabIndex = 0 // สำหรับ status 1, 3, 8, 10 ให้แสดง tab index 0
+    break
+    
+  case 4:
+  case 5:
+  case 6:
+  case 7:
+    tabIndex = 1 // สำหรับ status 4, 5, 6, 7 ให้แสดง tab index 1
+    break
+    
+  case 12:
+  case 13:
+    tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
+    break
+    
+  default:
+    tabIndex = 0 // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
+  }
+
+  return tabIndex
+}
+
+
 const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlLogDetailJournalID) => {
   // console.log('isDialogVisibleAction **', index, journalID, updateBy, status, itemCode)
   journalIDModel.value = journalID
@@ -957,11 +988,14 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   detailsReceiv.value = products.value[index-1]
   idStatusDialogAction.value = status
 
+  sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(status))
+
   selectedPrintLabel.value = []
 
   poEtILogAction.value = poEtlLogDetailJournalID
   findProductByJournalID(poEtlLogDetailJournalID)
   isDialogVisibleAction.value = true
+  
   
 }
 
@@ -2442,7 +2476,7 @@ const dessertsTest = ref([
                 <td style="font-weight: 500;">
                   Received Date
                 </td>
-                <td>{{ convertDate(resultDetailsAvtion.receivedDate) }}</td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
               </tr>
               <tr>
                 <td style="font-weight: 500;">

@@ -1386,10 +1386,25 @@ const getDisabledFollowStatusNRole = () => {
                   <VCard>
                     <VCarousel v-model="selectedImageIndex">
                       <VCarouselItem
-                        v-for="(image, index) in coaFiles"
+                        v-for="(file, index) in coaFiles"
                         :key="index"
-                        :src="image.fileUri"
-                      />
+                      >
+                        <div v-if="file.contentType === 'image/jpeg'">
+                          <img
+                            :src="file.fileUri"
+                            alt="Image"
+                          >
+                          img
+                        </div>
+                        <div v-else-if="file.contentType === 'application/pdf'">
+                          <iframe
+                            :src="file.fileUri"
+                            width="100%"
+                            height="500px"
+                          />
+                          pdf
+                        </div>
+                      </VCarouselItem>
                     </VCarousel>
 
                     <VCardActions>
@@ -1463,21 +1478,26 @@ const getDisabledFollowStatusNRole = () => {
             <VCarousel v-model="selectedImageIndex">
               <VCarouselItem
                 v-for="(item, i) in coaFiles"
-                :key="item"
+                :key="i"
                 :value="i"
-                :src="item.fileUri"
               >
-                <VSheet
-                  v-if="false"
-                  height="100%"
-                  tile
-                >
-                  <div class="d-flex fill-height justify-center align-center">
-                    <div class="text-h2">
-                      Slide {{ i + 1 }}
-                    </div>
-                  </div>
-                </VSheet>
+                <!-- ตรวจสอบประเภทไฟล์ -->
+                <template v-if="item.fileUri.endsWith('.pdf')">
+                  <iframe
+                    :src="item.fileUri"
+                    width="100%"
+                    height="500px"
+                  />
+                </template>
+    
+                <!-- แสดงรูปภาพถ้าไม่ใช่ PDF -->
+                <template v-else>
+                  <img
+                    :src="item.fileUri"
+                    alt="Image"
+                    style="width: 100%; height: auto;"
+                  >
+                </template>
               </VCarouselItem>
             </VCarousel>
           </div>
