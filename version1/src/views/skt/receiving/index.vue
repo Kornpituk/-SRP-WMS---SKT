@@ -1998,6 +1998,7 @@ const dessertsTest = ref([
                     md="4"
                   >
                     <VBtn
+                      disabled
                       density="compact"
                       class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                       color="warning"
