@@ -430,6 +430,7 @@ const detailsReceivingForm = () => {
 
 //------------- Header
 const getHearderReceivingForm = () => {
+  loadingGenerated1.value = true
   if (poEtlLogDetailJournalIDQueryParameters.value) {
     axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
       headers: {
@@ -480,14 +481,17 @@ const getHearderReceivingForm = () => {
         console.log('[*****Headers]]!!: ', data[0])
 
         console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
+        loadingGenerated1.value = false
 
       })
       .catch(error => {
         // Handle errors
+        loadingGenerated1.value = true
         console.error('Error:', error)
       })
   } else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    loadingGenerated1.value = true
   }
 
 }
@@ -495,6 +499,7 @@ const getHearderReceivingForm = () => {
 //--------------- Lot
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const getLotReceivingForm = () => {
+  loadingGenerated1.value = true
   if (poEtlLogDetailJournalIDQueryParameters.value) {
     axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/get-lot/${poEtlLogDetailJournalIDQueryParameters.value}`, {
       headers: {
@@ -524,10 +529,12 @@ const getLotReceivingForm = () => {
         purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
 
         console.log('[*****Headers Lot]]!!:', lotData[0])
+        loadingGenerated1.value = false
 
       })
       .catch(error => {
         // Handle errors
+        loadingGenerated1.value = true
         console.error('Error:', error)
       })
   }
@@ -3927,7 +3934,7 @@ const getDisabledFollowStatusNRole = () => {
                       {{ value.msg }}
                     </span>
                     <span
-                      v-if="value.success  && showOnlyErrors"
+                      v-if="value.success && showOnlyErrors"
                       style="font-size: 14px;"
                     >
                       <VIcon

@@ -495,9 +495,21 @@ watch(() => {
 
   fetchPackagingFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
+  if (packagingFormGenerate.value) {
+    console.info("%cgen post success", "color: green; font-weight: bold; font-size: 14px;")
+  } else {
+    console.info("%cgen post error", "color: red; font-weight: bold; font-size: 14px;", packagingFormGenerate.value)
+  }
+
   const { packagingFormGenerateView, errorMessageGenerateView, fetchPackagingViewFormGenerate } = useGeneratePackagingViewFormController()
 
   fetchPackagingViewFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
+
+  if (packagingFormGenerateView.value) {
+    console.info("%cgen get success", "color: green; font-weight: bold; font-size: 14px;")
+  } else {
+    console.info("%cgen get error", "color: red; font-weight: bold; font-size: 14px;", packagingFormGenerateView.value)
+  }
 })
 
 //------------------------------------------- generate view---
@@ -678,6 +690,9 @@ watchEffect(() => {
       statusComments: receivedData.statusComments,
       packagingImg: receivedData.packagingImg,
     }
+    loadingGenerated.value = false
+  }else{
+    loadingGenerated.value = true
   }
 
   if(dataHeader.value.coAChecked === true){

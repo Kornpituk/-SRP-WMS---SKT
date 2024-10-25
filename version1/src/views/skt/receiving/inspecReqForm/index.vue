@@ -249,6 +249,7 @@ watch(() => {
 
 //------------- Header
 const getHearderInsp = () => {
+  loadingGenerated1.value = true
   if(poEtlLogDetailJournalIDQueryParameters.value){
     axiosIns.get(`${urlApi.value}/api/v1/Inspection/View/${poEtlLogDetailJournalIDQueryParameters.value}`, {
       headers: {
@@ -296,13 +297,16 @@ const getHearderInsp = () => {
 
         // purchaseOrder.value = response.data[0]
         console.log('[*****Headers]]!!: ', data[0])
+        loadingGenerated1.value = false
     
       })
       .catch(error => {
         // Handle errors
+        loadingGenerated1.value = true
         console.error('Error:', error)
       })
   }else {
+    loadingGenerated1.value = true
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
   }
   
@@ -391,6 +395,7 @@ const formData = ref({
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const getAnalysistInsp = () => {
+  loadingGenerated1.value = true
   if(poEtlLogDetailJournalIDQueryParameters.value){
     axiosIns.get(`${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`, {
       headers: {
@@ -448,15 +453,17 @@ const getAnalysistInsp = () => {
         }
         console.log("***************55555555", analysisItems.value)
 
-        
+        loadingGenerated1.value = false
         
       })
       .catch(error => {
         // Handle errors
         console.error('Error:', error)
+        loadingGenerated1.value = true
       })
   }else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    loadingGenerated1.value = true
   }
   
 }

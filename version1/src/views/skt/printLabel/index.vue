@@ -80,7 +80,6 @@ const sortByQty = ref('')
 const sortByTags = ref('')
 const sortByNonTags = ref('')
 
-
 const toggleSortType = sortBy => {
   const sortRefs = { sortByCategory, sortByType, sortBySubType, sortByBarcode, sortByProductId, sortByProductName, sortByUnit, sortByQty, sortByTags, sortByNonTags }
 
@@ -1044,13 +1043,86 @@ const dataHeaders = [
   { title: 'Iron (%)', key: 'iron', align: 'end' },
 ]
 
+///--------------------------------- 
+
+
+const printLabelForm = () => {
+
+  // console.log('searchByCategoryName: ',searchByCategoryName)
+  axiosIns.get(`${urlApi.value}/api/v1/StockUpdatsdsde?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+    params: {
+      categoryId: searchByCategoryId.value,
+      typeId: searchByTypeId.value,
+      subTypeId: searchBySubTypeId.value,
+      barcode: searchByBarcode.value,
+      productId: searchByProductId.value,
+      productName: searchByProductName.value,
+      unitId: searchByUOMId.value,
+      zoneId: searchByZoneId.value,
+      areaId: searchByAreaId.value,
+      subAreaId: searchBySubAreaId.value,
+      serialNo: serialProductCode.value,
+
+      searchByCategory: searchByCategoryName.value,
+      searchByType: searchByTypeName.value,
+      searchBySubType: searchBySubTypeName.value,
+      searchByBarcode: searchByBarcodeName.value,
+      searchByProductId: searchByProductCodeName.value,
+      searchByProductName: searchByProductNameFilter.value,
+      searchByUnit: searchByUnitName.value,
+
+      'sortByCategory': sortByCategory.value,
+      'sortByType': sortByType.value,
+      'sortBySubType': sortBySubType.value,
+      'sortByBarcode': sortByBarcode.value,
+      'sortByProductId': sortByProductId.value,
+      'sortByProductName': sortByProductName.value,
+      'sortByUnit': sortByUnit.value,
+      'sortByQty': sortByQty.value,
+      'sortByTags': sortByTags.value,
+      'sortByNonTags': sortByNonTags.value,
+
+    // ... and so on with other parameters
+    },
+    headers: {
+      'accept': '*/*',
+      'x-location': `${searchByWareHouseId.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  }, {})
+    .then(response => {
+
+      products.value = response.data.items
+      totalCount.value = response.data.totalCount
+      currentPage.value = response.data.page
+      totalPage.value = response.data.totalPages
+      rowPerPage.value = response.data.perPage
+
+      console.log('[products.value]!!: ', products)
+      console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
+
+      // console.log('perPage: ',perPage)
+      // console.log('currentPage: ',currentPage)
+      // console.log('totalCount: ',totalCount)
+      // console.log('totalPages: ',totalPage)
+
+      // console.log('subTypeId',searchBySubTypeId.value)
+
+    
+    })
+    .catch(error => {
+    // Handle errors
+      console.error('Error:', error)
+    })
+
+}
+
 //---------------------- new rel table --------------------
 import { VDataTable } from 'vuetify/labs/VDataTable'
 </script>
 
 <template>
   <!-- Title Page -->
-
   <div>
     <VCard>
       <VCardTitle>

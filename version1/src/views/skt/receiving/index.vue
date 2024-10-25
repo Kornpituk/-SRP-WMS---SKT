@@ -469,7 +469,7 @@ const GetStockUpdate = () => {
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
 
-      const filteredData = data.filter(item => item.receiveTypeId !== 44)
+      const filteredData = data.filter(item => item.receiveTypeId !== 4)
 
       // Add No. field to each product (after filtering)
       products.value = filteredData.map((item, index) => ({
