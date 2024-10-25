@@ -2027,9 +2027,11 @@ const dessertsTest = ref([
         <VCardText class="pa-2 d-flex justify-space-between align-center">
           <VBtn
             style="font-size: 12px;"
+            :disabled="selectedDataTables.length < 1"
             @click="submitButton('Approve')"
           >
             Approve
+            {{selectedDataTables.length }}
           </VBtn>
 
           <VBtn
