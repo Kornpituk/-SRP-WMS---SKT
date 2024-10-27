@@ -1356,7 +1356,15 @@ const getDisabledFollowStatusNRole = () => {
                   <template v-if="index < limitedImages.length - 1">
                     <VCardText class="pa-1">
                       <VImg
+                        v-if="image.contentType === 'image/jpeg'"
                         :src="image.fileUri"
+                        aspect-ratio="1"
+                      />
+                      <iframe
+                        v-else-if="image.contentType === 'application/pdf'"
+                        :src="'https://docs.google.com/viewer?url=' +image.fileUri+'&embedded=true'"
+                        width="100%"
+                        height="500px"
                         aspect-ratio="1"
                       />
                     </VCardText>
@@ -1401,7 +1409,6 @@ const getDisabledFollowStatusNRole = () => {
                             :src="file.fileUri"
                             alt="Image"
                           >
-                          img
                         </div>
                         <div v-else-if="file.contentType === 'application/pdf'">
                           <iframe
@@ -1409,7 +1416,6 @@ const getDisabledFollowStatusNRole = () => {
                             width="100%"
                             height="500px"
                           />
-                          pdf
                         </div>
                       </VCarouselItem>
                     </VCarousel>
