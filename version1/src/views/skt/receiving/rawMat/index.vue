@@ -2070,11 +2070,12 @@ const getDisabledFollowStatusNRole = () => {
               Manufacturer Name
             </th>
             <td
-              class="text-center text-wrap"
+              class="text-start text-wrap"
               colspan="3"
               style="width: 400px;"
             >
               <VSelect
+                v-if="!readonlyAllInput()"
                 v-model="purchaseOrder.selectedMakerName"
                 :readonly="readonlyAllInput()"
                 :items="itemsManufacturer"
@@ -2102,6 +2103,8 @@ const getDisabledFollowStatusNRole = () => {
                   </div>
                 </template>
               </VSelect>
+
+              {{ purchaseOrder.selectedMakerName }}
             </td>
           </tr>
           <tr>
@@ -2677,7 +2680,7 @@ const getDisabledFollowStatusNRole = () => {
                   class="custom-date-time-picker"
                   :style="{ fontSize: '12px;' }"
                 />
-                <span v-if="readonlyAllInput()"><VIcon icon="ri-calendar-schedule-fill" />{{ purchaseOrder.expectDeliveryDate }}</span>
+                <span v-if="readonlyAllInput()">{{ purchaseOrder.expectDeliveryDate }}</span>
               </td>
               <th
                 class="text-center"
@@ -3648,7 +3651,7 @@ const getDisabledFollowStatusNRole = () => {
             <VImg
               role="presentation"
               :src="imgDialog"
-              height="80%"
+              height="600"
               contain
             />
           </VCardText>
@@ -3682,11 +3685,7 @@ const getDisabledFollowStatusNRole = () => {
               style="min-width: 150px;"
               colspan="6"
             >
-              <div v-if="dataHeaderReceving.updatedDate">
-                <VIcon
-                  class="mx-2"
-                  icon="ri-calendar-schedule-fill"
-                />{{
+              <div v-if="dataHeaderReceving.updatedDate">{{
                   formatDate(dataHeaderReceving.updatedDate)
                 }}
               </div>
@@ -3696,10 +3695,7 @@ const getDisabledFollowStatusNRole = () => {
               colspan="6"
             >
               <div v-if="dataHeaderReceving.approveRejectDate">
-                <VIcon
-                  class="mx-2"
-                  icon="ri-calendar-schedule-fill"
-                />{{
+                {{
                   formatDate(dataHeaderReceving.approveRejectDate) }}
               </div>
             </td>

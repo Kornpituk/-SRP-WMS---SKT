@@ -1482,11 +1482,15 @@ const getDisabledFollowStatusNRole = () => {
                 @click="model = Math.min(model + 1, 4)"
               />
             </div>
-            <VCarousel v-model="selectedImageIndex">
+            <VCarousel
+              v-model="selectedImageIndex"
+              show-arrows="hover"
+            >
               <VCarouselItem
                 v-for="(item, i) in coaFiles"
                 :key="i"
                 :value="i"
+                cover
               >
                 <!-- ตรวจสอบประเภทไฟล์ -->
                 <template v-if="item.fileUri.endsWith('.pdf')">
@@ -1499,11 +1503,10 @@ const getDisabledFollowStatusNRole = () => {
     
                 <!-- แสดงรูปภาพถ้าไม่ใช่ PDF -->
                 <template v-else>
-                  <img
+                  <VImg
                     :src="item.fileUri"
                     alt="Image"
-                    style="width: 100%; height: auto;"
-                  >
+                  />
                 </template>
               </VCarouselItem>
             </VCarousel>
