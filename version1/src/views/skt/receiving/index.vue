@@ -1205,10 +1205,10 @@ const btnPrintLabel = async () => {
     // เรียกใช้ savePrintLabel ก่อน
     console.log('savePrintLabel start!')
 
-    // const resultSave =  await savePrintLabel()
-    // if(!resultSave.success){
-    //   throw 'savePrintLabel'+resultSave
-    // }
+    const resultSave =  await savePrintLabel()
+    if(!resultSave.success){
+      throw 'savePrintLabel'+resultSave
+    }
 
     console.log('savePrintLabel end!')
 
