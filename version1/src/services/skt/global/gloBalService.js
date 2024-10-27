@@ -115,6 +115,47 @@ export const usePrintInspectionFormService = () => {
   }
 }
 
+export const usePrintPackagingFormService = () => {
+  const printPackagingFormResult = ref(null)
+  const errorMessagePackaging = ref(null)
+  
+  const printPackagingFormService = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessagePackaging.value = null
+      console.log('Print PackagingForm Form Service Starting...')
+  
+      const result = await globalService.printPackagingFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+        
+      if (result) {
+        console.log('Print PackagingForm Form Service Complate:', result)
+          
+        printPackagingFormResult.value = result
+  
+        return { success: true, data: result }
+      } else {
+        console.warn('Print Inspection Form Service Fialed')
+  
+        return { success: false, error: 'Print PackagingForm Form Service Fialed' }
+      }
+    } catch (error) {
+      console.error('Error in printPackagingFormService:', error)
+      errorMessagePackaging.value = error.message
+  
+      return { success: false, error: error.message }
+    }
+
+
+  }
+  
+  return {
+    printPackagingFormResult,
+    errorMessagePackaging,
+    printPackagingFormService,
+  }
+}
+
+//------------------------------------------------------------
+
 export const useViewPrintLabelFormService = () => {
   const printLabelFormViewResult = ref(null)
   const errorMessagePrintLabelView = ref(null)

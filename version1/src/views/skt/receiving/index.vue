@@ -1074,7 +1074,7 @@ const dataPrintlabel = ref([])
 
 //------------------------ Print Label------------------------------------------
 
-import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService  }  from '@/services/skt/global/gloBalService'
+import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService, usePrintPackagingFormService  }  from '@/services/skt/global/gloBalService'
 
 const { printLabelFormViewResult, printLabelFormViewService } = useViewPrintLabelFormService()
 const processingPrintLabel = ref(false)
@@ -1205,10 +1205,10 @@ const btnPrintLabel = async () => {
     // เรียกใช้ savePrintLabel ก่อน
     console.log('savePrintLabel start!')
 
-    const resultSave =  await savePrintLabel()
-    if(!resultSave.success){
-      throw 'savePrintLabel'+resultSave
-    }
+    // const resultSave =  await savePrintLabel()
+    // if(!resultSave.success){
+    //   throw 'savePrintLabel'+resultSave
+    // }
 
     console.log('savePrintLabel end!')
 
@@ -1240,6 +1240,8 @@ const btnPrintLabel = async () => {
 const { errorMessageGenerateView, printReceivingFormService } = usePrintReceivingFormService()
 
 const { errorMessageInspection, printInspectionFormService } = usePrintInspectionFormService()
+
+const { errorMessagePackaging, printPackagingFormService } = usePrintPackagingFormService()
 
 const processingPrint = ref(false)
 
@@ -1286,12 +1288,12 @@ const printFormAll = async () => {
         processingPrintForm2.value = false // เสร็จสิ้นการพิมพ์
       }
     }
-    if (label === 'Lorry Loading Check List') {
+    if (label === 'Packaging Inspection Request Form') {
       processingPrintForm3.value = true // เริ่มพิมพ์
-      console.log('Printing Lorry Loading Check List...')
+      console.log('Printing Packaging Inspection Request Form...')
 
       try {
-        return printLorryLoadingChecklist()
+        return await printPackagingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
       } finally {
         processingPrintForm3.value = false // เสร็จสิ้นการพิมพ์
       }
@@ -1314,6 +1316,15 @@ const printReceivingForm = () => {
 
   // การพิมพ์ฟอร์มสามารถใช้ window.print หรืออื่นๆ ตามต้องการ
 }
+
+const checkPersistent = computed(() => {
+  if (processingPrintLabel.value === true || processingPrint.value === true) {
+    return true
+  }
+  console.log("false")
+  
+  return false
+})
 
 
 //-------------------- Dialog Confirm Submit --------------------
@@ -2976,6 +2987,7 @@ const dessertsTest = ref([
     <VDialog
       v-model="isDialogVisibleActionPrintLabel"
       class="v-dialog-sm"
+      :persistent="checkPersistent"
     >
       <VCard
         class="text-center"
@@ -3116,8 +3128,8 @@ const dessertsTest = ref([
                 v-if="receivingTypeAction === 1"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListPk()"
-                label="Lorry Loading Check List"
-                value="Lorry Loading Check List"
+                label="Inspection Request Form"
+                value="Packaging Inspection Request Form"
                 class="ms-auto"
               >
                 <template #append>
@@ -3131,11 +3143,13 @@ const dessertsTest = ref([
               </VCheckbox> 
               <div class="mt-4">
                 <VBtn
+                  :disabled="checkPersistent"
                   style="width: 100%;"
                   @click="printFormAll"
                 >
-                  Print{{ receivingTypeAction }}
+                  Print
                 </VBtn>
+                {{ checkPersistent }}
               </div>
             </VCol>
           </VRow>
@@ -3145,6 +3159,7 @@ const dessertsTest = ref([
               <div class="mt-4">
                 <VBtn
                   style="width: 100%;"
+                  :disabled="checkPersistent"
                   @click="btnPrintLabel"
                 >
                   Print
