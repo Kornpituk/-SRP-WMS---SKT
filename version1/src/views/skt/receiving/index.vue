@@ -2204,7 +2204,6 @@ const dessertsTest = ref([
             @click="submitButton('Approve')"
           >
             Approve
-            {{ selectedDataTables.length }}
           </VBtn>
 
           <VBtn

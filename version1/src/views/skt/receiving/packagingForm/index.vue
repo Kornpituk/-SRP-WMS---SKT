@@ -742,7 +742,7 @@ const textAlertError = ref({
 const { packagingFormAccept, acceptPackagingForm } = useAcceptPackagingFormController()
 
 const handleAcceptPackaging = async () => {
-  isDialogConfirmVisible.value = false
+  
   try {
     wordForSubmit.value = "ACCEPT"
 
@@ -794,6 +794,12 @@ const handleAcceptPackaging = async () => {
     
     return false
   }
+}
+
+const btnAccept = () => {
+  isDialogConfirmVisible.value = false
+  trickerSubmit.value = true
+  handleAcceptPackaging()
 }
 
 //----------------- Reject
@@ -2495,7 +2501,7 @@ const saveDraftData = word => {
             <VBtn
               v-if="wordForSubmit === 'ACCEPT'"
               color="green"
-              @click="handleAcceptPackaging"
+              @click="btnAccept"
             >
               {{ wordForSubmit }}
             </VBtn>
