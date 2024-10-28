@@ -738,7 +738,7 @@ const textAlertError = ref({
   coa: '',
 })
 
-//----------------- Accept
+//----------------- Accept -------------------------------------------------------------------
 const { packagingFormAccept, acceptPackagingForm } = useAcceptPackagingFormController()
 
 const handleAcceptPackaging = async () => {
@@ -762,7 +762,7 @@ const handleAcceptPackaging = async () => {
       poEtlLogDetailJournalIDQueryParameters.value, 
       urlApi.value, 
       "Packaging", 
-      whereHouse, 
+      whereHouse.value, 
       accessTokenAtStore,
     )
 
