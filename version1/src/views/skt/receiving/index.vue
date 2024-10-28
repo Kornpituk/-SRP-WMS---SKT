@@ -519,14 +519,12 @@ const headers = [
     title: 'Status',
     key: 'statusText',
     align: "center",
-    class: 'pa-5',
     fixed: true,
   },
   {
     title: 'No.',
     key: 'no',
     align: "center",
-    
   },
   {
     title: 'Item Code',
@@ -576,8 +574,8 @@ const headers = [
   {
     title: 'Action',
     key: 'action',
-    class: 'pa-5',
-    fixed: true,
+    align: 'center',
+    class: 'sticky-right',
   },
 ]
 
@@ -3185,7 +3183,10 @@ const dessertsTest = ref([
 
           <VRow v-if="printLabel">
             <VCol cols="6">
-              <div v-if="!disabledBtnLebal()" class="mt-4">
+              <div
+                v-if="!disabledBtnLebal()"
+                class="mt-4"
+              >
                 <VBtn
                   style="width: 100%;"
                   :disabled="checkPersistent"
@@ -4500,6 +4501,16 @@ const dessertsTest = ref([
               @update:model-value="toggleSelect(internalItem)"
             />
           </template>
+          <!-- 
+            <template #column.action="{ column }">
+            <tr>
+            <th
+            >
+            {{ column.column }} action custom
+            </th>
+            </tr>
+            </template>
+          -->
           <template #item="{ item }">
             <tr>
               <td
@@ -4685,7 +4696,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="text-start px-2"
-                style="justify-content: center;"
+                style="position: sticky; z-index: 1; right: 0; justify-content: center;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <VBtn
@@ -4890,6 +4901,21 @@ const dessertsTest = ref([
 
 .inactive-row {
   background-color: lightcoral;
+}
+
+/* กำหนด CSS สำหรับคอลัมน์ที่ต้องการให้ sticky ด้านซ้าย */
+.pa-5 {
+  position: sticky;
+  z-index: 1;
+  background-color: white;
+  inset-inline-start: 0;
+}
+
+/* กำหนด CSS สำหรับคอลัมน์ Action ที่ต้องการให้ sticky ด้านขวา */
+.sticky-right {
+  position: sticky;
+  z-index: 1;
+  inset-inline-end: 0;
 }
 </style>
 
