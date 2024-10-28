@@ -1084,6 +1084,10 @@ const { printLabelFormViewResult, printLabelFormViewService } = useViewPrintLabe
 const processingPrintLabel = ref(false)
 const successGetPrintLabelView = ref(false)
 
+const disabledBtnLebal = () => {
+  return [0, 1, 2, 3, 4, 5, 7, 10, 16].includes(idStatusDialogAction.value)
+}
+
 const getPrintLabelView = async lot => {
   // console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/PrintLabel/Label?lot=${lot}`, {
@@ -1276,7 +1280,7 @@ const processingPrintForm3 = ref(false)
 
 const disabledCheckboxListRawM = () => {
   // ถ้า idStatusDialogAction.value มีค่าเป็น 0, 1, 2 หรือ 3 จะคืนค่าเป็น true
-  return [0, 1, 2, 3, 7, 10].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 10].includes(idStatusDialogAction.value)
 }
 
 const disabledCheckboxListInsp = () => {
@@ -1286,6 +1290,8 @@ const disabledCheckboxListInsp = () => {
 const disabledCheckboxListPk = () => {
   return [0, 1, 2, 3, 4, 5, 10].includes(idStatusDialogAction.value)
 }
+
+
 
 const printFormAll = async () => {
   // ตั้งค่าสถานะการประมวลผลให้เป็น true
@@ -3179,7 +3185,7 @@ const dessertsTest = ref([
 
           <VRow v-if="printLabel">
             <VCol cols="6">
-              <div class="mt-4">
+              <div v-if="!disabledBtnLebal()" class="mt-4">
                 <VBtn
                   style="width: 100%;"
                   :disabled="checkPersistent"

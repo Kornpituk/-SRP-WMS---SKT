@@ -1356,7 +1356,7 @@ const getDisabledFollowStatusNRole = () => {
                   <template v-if="index < limitedImages.length - 1">
                     <VCardText class="pa-1">
                       <VImg
-                        v-if="image.contentType === 'image/jpeg'"
+                        v-if="image.contentType === 'image/jpeg' || image.contentType === 'image/png'"
                         :src="image.fileUri"
                         aspect-ratio="1"
                       />
