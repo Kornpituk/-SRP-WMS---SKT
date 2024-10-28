@@ -308,6 +308,7 @@ const getHearderInsp = () => {
   }else {
     loadingGenerated1.value = true
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    location.reload()
   }
   
 }
@@ -454,15 +455,18 @@ const getAnalysistInsp = () => {
         console.log("***************55555555", analysisItems.value)
 
         loadingGenerated1.value = false
-        
+
+        // location.reload()
       })
       .catch(error => {
         // Handle errors
         console.error('Error:', error)
+        location.reload()
         loadingGenerated1.value = true
       })
   }else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    location.reload()
     loadingGenerated1.value = true
   }
   
@@ -867,14 +871,12 @@ const getCOAReceivingForm = () => {
         startTime.value = coaFiles.value.length
 
         console.log('[*****Headers COA]]!!: ', lotData)
+        loadingGenerated1.value = false
       })
       .catch(error => {
         console.error('Error:', error)
-        isLoading.value = false
+        loadingGenerated1.value = true
         checkBoxCOANo.value = true
-      })
-      .finally(() => {
-        loading.value = false
       })
   }
 }
