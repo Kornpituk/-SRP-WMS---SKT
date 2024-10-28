@@ -682,8 +682,8 @@ const submitInspForm = async () => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
-      }, 300) // 10000 มิลลิวินาที = 10 วินาที
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
 
       return true
     } else {
@@ -745,8 +745,8 @@ const rejectInsp = () => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
-      }, 300) // 10000 มิลลิวินาที = 10 วินาที
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
@@ -777,8 +777,8 @@ const approveInsp = () => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
-      }, 300) // 10000 มิลลิวินาที = 10 วินาที
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
@@ -2733,7 +2733,6 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="3"
               >
                 <div v-if="headerInsp.lastUpdatedStaffWH">
-                  <VIcon icon="ri-calendar-schedule-fill" />
                   <span>{{ formatDate(headerInsp.lastUpdatedStaffWH) }}</span>
                 </div>
               </td>
@@ -2742,7 +2741,6 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="3"
               >
                 <div v-if="headerInsp.lastUpdatedSuperWH">
-                  <VIcon icon="ri-calendar-schedule-fill" /> 
                   <span>{{ formatDate(headerInsp.lastUpdatedSuperWH) }}</span>
                 </div>
               </td>
@@ -2751,7 +2749,6 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="3"
               >
                 <div v-if="headerInsp.lastUpdatedStaffInsp">
-                  <VIcon icon="ri-calendar-schedule-fill" />
                   <span>{{ formatDate(headerInsp.lastUpdatedStaffInsp) }}</span>
                 </div>
               </td>
@@ -2760,7 +2757,6 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="3"
               >
                 <div v-if="headerInsp.lastUpdatedSuperInsp">
-                  <VIcon icon="ri-calendar-schedule-fill" /> 
                   <span>{{ formatDate(headerInsp.lastUpdatedSuperInsp) }}</span>
                 </div>
               </td>

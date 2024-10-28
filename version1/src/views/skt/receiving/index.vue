@@ -526,6 +526,7 @@ const headers = [
     title: 'No.',
     key: 'no',
     align: "center",
+    
   },
   {
     title: 'Item Code',
@@ -542,6 +543,7 @@ const headers = [
   {
     title: 'Supplier Code',
     key: 'supplierId',
+    
   },
   {
     title: 'Supplier Name',
@@ -574,6 +576,8 @@ const headers = [
   {
     title: 'Action',
     key: 'action',
+    class: 'pa-5',
+    fixed: true,
   },
 ]
 
@@ -1073,13 +1077,14 @@ if (resultDetailsAvtion.value) {
 const dataPrintlabel = ref([])
 
 //------------------------ Print Label------------------------------------------
-
+// const success = ref(false)
 import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService, usePrintPackagingFormService  }  from '@/services/skt/global/gloBalService'
 
 const { printLabelFormViewResult, printLabelFormViewService } = useViewPrintLabelFormService()
 const processingPrintLabel = ref(false)
+const successGetPrintLabelView = ref(false)
 
-const getPrintLabelView = lot => {
+const getPrintLabelView = async lot => {
   // console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/PrintLabel/Label?lot=${lot}`, {
     headers: {
@@ -1094,10 +1099,13 @@ const getPrintLabelView = lot => {
 
       dataPrintlabel.value = data
       console.log("getPrintLabelView 55555+", data)
-    
+      
+      successGetPrintLabelView.value = true
     })
     .catch(error => {
       console.error('Error:', error)
+      
+      successGetPrintLabelView.value = false
     })
 
   // const result = printLabelFormViewService(urlApi.value, searchByWareHouseId.value, accessTokenAtStore, lot)
@@ -1122,6 +1130,8 @@ const prepareDataForPrintLabel = originalData => {
   }
 }
 
+const successSavePrintLabel = ref(false)
+
 // เรียกใช้งานฟังก์ชันนี้ก่อนส่งข้อมูลใน API
 const savePrintLabel = async () => {
   // ใช้ prepareDataForPrintLabel เพื่อจัดข้อมูลใน dataForPrintLabelSave
@@ -1142,15 +1152,19 @@ const savePrintLabel = async () => {
 
     // บันทึกข้อมูล response ที่ได้รับมา
     dataPrintlabel.value = response.data
+
+    const data = response.data
+    const success = false
+
     console.log("save Print Label success:", response.data)
     
-    return { success: true, data: response.data } // คืนค่า success เพื่อเช็คในขั้นต่อไป
+    successSavePrintLabel.value = true
   } catch (error) {
     // กรณี error
     progressLinearNoData.value = true
     console.error('Error in savePrintLabel:', error)
 
-    return { success: false, error } // คืนค่า error สำหรับตรวจสอบกรณี error
+    successSavePrintLabel.value = false
   }
 }
 
@@ -1159,6 +1173,8 @@ const btnPrintLabelTest = () => {
 }
 
 const printLabelSmallPdf = async () => {
+  savePrintLabel()
+  
   try {
     const response = await axiosIns.post(
       `${urlApi.value}/api/v1/PrintLabel/Label/Small/Pdf`,
@@ -1200,14 +1216,22 @@ const printLabelSmallPdf = async () => {
 
 const btnPrintLabel = async () => {
   processingPrintLabel.value = true
+  
   console.log('btnPrintLabel start!')
   try {
     // เรียกใช้ savePrintLabel ก่อน
-    console.log('savePrintLabel start!')
+    console.log('get PrintLabel start!')
 
-    const resultSave =  await savePrintLabel()
-    if(!resultSave.success){
-      throw 'savePrintLabel'+resultSave
+    await getPrintLabelView(lotAction.value)
+    if(!successGetPrintLabelView.value){
+      throw 'get PrintLabel:'+successGetPrintLabelView.value
+    }
+
+    console.log('save PrintLabel start!')
+
+    await savePrintLabel()
+    if(!successSavePrintLabel.value){
+      throw 'save PrintLabel:'+successSavePrintLabel.value
     }
 
     console.log('savePrintLabel end!')
@@ -1252,7 +1276,7 @@ const processingPrintForm3 = ref(false)
 
 const disabledCheckboxListRawM = () => {
   // ถ้า idStatusDialogAction.value มีค่าเป็น 0, 1, 2 หรือ 3 จะคืนค่าเป็น true
-  return [0, 1, 2, 3, 7, 10, 15].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 7, 10].includes(idStatusDialogAction.value)
 }
 
 const disabledCheckboxListInsp = () => {
@@ -2993,6 +3017,7 @@ const dessertsTest = ref([
         title="Print"
       >
         <DialogCloseBtn
+          :disabled="checkPersistent"
           variant="text"
           size="default"
           @click="isDialogVisibleActionPrintLabel = false"
@@ -3148,7 +3173,6 @@ const dessertsTest = ref([
                 >
                   Print
                 </VBtn>
-                {{ checkPersistent }}
               </div>
             </VCol>
           </VRow>

@@ -391,7 +391,7 @@ const handleAcceptPackaging = word => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 300) // 10000 มิลลิวินาที = 3 วินาที
 
     })

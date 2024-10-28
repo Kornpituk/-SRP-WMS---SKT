@@ -776,7 +776,7 @@ const handleAcceptPackaging = async () => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 300) // 10000 มิลลิวินาที = 10 วินาที
 
       // location.reload() // รีเฟรชหน้า
@@ -834,7 +834,7 @@ const handleRejectPackaging = async word => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 300) // 10000 มิลลิวินาที = 10 วินาที
     } else {
       console.error('Failed to save lot reject')
@@ -864,22 +864,43 @@ const saveDraftLotDetails = async () => {
 
   const bodyCheck = analyticalItemsData.value
 
-  if(trickerSubmit.value){
-    //validate
+  // if(trickerSubmit.value){
+  //   //validate
+  //   bodyCheck.forEach((item, index) => {
+  //     console.log('Validate Lot')
+  //     if (!item.actualAnalysis || item.actualAnalysis === '') {
+  //       console.log('Validate Lot if')
+
+  //       // เก็บข้อความแยกตามลำดับไอเท็มที่มีปัญหา
+  //       alertLotErrorMessage.value.actualAnalysis[`item_${index + 1}`] = `Actual Analysis is required for item ${index + 1}. Please enter a value.`
+  //       alertLotErrorMessage.value.success = true // แสดงว่ามีข้อผิดพลาด
+  //     }else{
+  //       alertLotErrorMessage.value.success = false
+  //     }
+  //   })
+
+  //   // ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
+  //   if (alertLotErrorMessage.value.success) {
+  //     throw 'Actual Analysis validation failed. Please check the errors.'
+  //   }
+  // }
+
+  if (trickerSubmit.value) {
+    let hasError = false // ตั้งค่าสถานะข้อผิดพลาดเป็น `false`
+
+    // วนตรวจสอบแต่ละไอเท็ม
     bodyCheck.forEach((item, index) => {
       console.log('Validate Lot')
       if (!item.actualAnalysis || item.actualAnalysis === '') {
         console.log('Validate Lot if')
-        alertLotErrorMessage.value.success = true // แสดงว่ามีข้อผิดพลาด
-        // เก็บข้อความแยกตามลำดับไอเท็มที่มีปัญหา
+        hasError = true // ตั้งค่าสถานะข้อผิดพลาดเมื่อพบข้อผิดพลาด
+        alertLotErrorMessage.value.success = true
         alertLotErrorMessage.value.actualAnalysis[`item_${index + 1}`] = `Actual Analysis is required for item ${index + 1}. Please enter a value.`
-      }else{
-        alertLotErrorMessage.value.success = false
       }
     })
 
-    // ตรวจสอบว่ามีข้อผิดพลาดหรือไม่
-    if (alertLotErrorMessage.value.success) {
+    // ถ้ามีข้อผิดพลาดให้หยุดการทำงานและส่งข้อผิดพลาดออกมา
+    if (hasError) {
       throw 'Actual Analysis validation failed. Please check the errors.'
     }
   }
@@ -2145,7 +2166,7 @@ const saveDraftData = word => {
                 colspan="6"
               >
                 <div v-if="dataHeader.inspStaffUpdateDate">
-                  <VIcon icon="ri-calendar-schedule-fill" /><span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
+                  <span v-if="dataHeader.inspStaffUpdateDate">{{ formatDate(dataHeader.inspStaffUpdateDate) }}</span>
                 </div>
               </td>
               <td
@@ -2153,7 +2174,7 @@ const saveDraftData = word => {
                 colspan="6"
               >
                 <div v-if="dataHeader.whUpdateDate">
-                  <VIcon icon="ri-calendar-schedule-fill" /> <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
+                  <span v-if="dataHeader.whUpdateDate">{{ formatDate(dataHeader.whUpdateDate) }}</span>
                 </div>
               </td>
             </tr>

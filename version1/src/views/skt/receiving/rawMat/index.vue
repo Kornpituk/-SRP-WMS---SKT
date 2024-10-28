@@ -487,10 +487,12 @@ const getHearderReceivingForm = () => {
       .catch(error => {
         // Handle errors
         loadingGenerated1.value = true
+        location.reload()
         console.error('Error:', error)
       })
   } else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    location.reload()
     loadingGenerated1.value = true
   }
 
@@ -533,6 +535,8 @@ const getLotReceivingForm = () => {
 
       })
       .catch(error => {
+        location.reload()
+
         // Handle errors
         loadingGenerated1.value = true
         console.error('Error:', error)
@@ -1532,7 +1536,7 @@ const submitReceivingForm = async () => {
 
         textAlertDialogFunction('SUBMIT', true)
         setTimeout(() => {
-          location.reload()
+          window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
         }, 200) // 10000 มิลลิวินาที = 10 วินาที
         
       })
@@ -2104,7 +2108,7 @@ const getDisabledFollowStatusNRole = () => {
                 </template>
               </VSelect>
 
-              {{ purchaseOrder.selectedMakerName }}
+              <span v-if="readonlyAllInput()">{{ purchaseOrder.selectedMakerName }}</span>
             </td>
           </tr>
           <tr>
@@ -3685,7 +3689,8 @@ const getDisabledFollowStatusNRole = () => {
               style="min-width: 150px;"
               colspan="6"
             >
-              <div v-if="dataHeaderReceving.updatedDate">{{
+              <div v-if="dataHeaderReceving.updatedDate">
+                {{
                   formatDate(dataHeaderReceving.updatedDate)
                 }}
               </div>
