@@ -1,99 +1,31 @@
 <script setup>
-const vasss = ref('dd')
-
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
-import { watchEffect, computed } from 'vue'
+import { watchEffect, computed, watch } from 'vue'
+import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService';
 
-let varA = ref(0)
-const varB = ref(0)
-const varC = ref(0)
-const varD = ref(0)
-const varE = ref(0)
-const varF = ref(0)
-const resBpD = ref(0)
-const finalRes = ref(0)
+// let varA = ref(0)
+// const varB = ref(0)
+// const varC = ref('')
+const varD = ref('')
+// const varE = ref(0)
+// const varF = ref(0)
+// const resBpD = ref(0)
+// const finalRes = ref(0)
 
+const ipaItems = ref(ipaItemTemplate);
 
+const getValue = function (e) {
+  console.log(e.target);
+  console.log(ipaItems);
+}
 
-const ipaItems = [
-  {
-    "row": 1,
-    "col1": "<strong><u>ข้อควรระวัง</u><strong>",
-    "col2": [
-      ": หากมีงาน Hot work or Fire work ใกล้เคียง ให้แจ้งหัวหน้างานให้หยุดชั่วคราว",
-      ": ให้ ปิดโทรศัพท์ขณะ Loading EPICHLO",
-      ": หากมี EPICHLO หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ ห้ามใช้น้ำล้าง",
-      ": Check วาล์ว ปิด ประตูน้ำก่อนปฏิบัติงาน",
-      ": แจ้ง Leader Production เวลา Loading ว่าไม่ตรงกับเวลาการใช้ Pump 109D,S",
-      ": ในการผลิต Check ถังดับเพลิงประเภท เคมีแห้ง ว่าพร้อมใช้งาน"
-    ],
-    "col3": "",
-    "col4": {
-      type: "oknot",
-    },
-    "col5": ""
-  },
-  {
-    "row": 2,
-    "col1": "Document Check",
-    "col2": [
-      "จำนวนที่ระบุ ในใบส่งสินค้า",
-      "Level ที่อ่านได้จาก Tank 11V-109D,S ก่อนรับ",
-      "ตรวจสอบว่าปริมาณหลังจากรับไม่เกินความจุถัง",
-      "ตรวจสอบ ปริมาณ ใน DCS",
-      "Check Seal No.ที่รถส่งของ และ Line Vent ข้างบนแท็งค์"
-    ],
-    "col3": [
-      "ตามเอกสารใบส่ง",
-      "ต้องไม่เกิน 480 mm.",
-      "ต้องไม่เกิน 15,500 Litre",
-      "กดดูที่ถัง 11V-109D,S ต้องไม่เกิน 3,000 Litre.",
-      "Seal ล็อกวาล์วไม่ขาดตรงตามใบส่ง"
-    ],
-    "col4": {
-      type: "oknot",
-    },
-    "col5": ""
-  },
-  {
-    "row": 3,
-    "col1": "Document Check",
-    "col2": [
-      "จำนวนที่ระบุ ในใบส่งสินค้า",
-      "Level ที่อ่านได้จาก Tank 11V-109D,S ก่อนรับ",
-      "ตรวจสอบว่าปริมาณหลังจากรับไม่เกินความจุถัง",
-      "ตรวจสอบ ปริมาณ ใน DCS",
-      "Check Seal No.ที่รถส่งของ และ Line Vent ข้างบนแท็งค์"
-    ],
-    "col3": [
-      "ตามเอกสารใบส่ง",
-      "ต้องไม่เกิน 480 mm.",
-      "ต้องไม่เกิน 15,500 Litre",
-      "กดดูที่ถัง 11V-109D,S ต้องไม่เกิน 3,000 Litre.",
-      "Seal ล็อกวาล์วไม่ขาดตรงตามใบส่ง"
-    ],
-    "col4": {
-      type: "oknot",
-      html: `<VRadioGroup
-              inline
-            >
-              <VRadio
-                label="Yes"
-                :value="false"
-              />
-              <VRadio
-                label="No"  
-                :value="!false"
-              />
-            </VRadioGroup>`
-    },
-    "col5": ""
-  }
-]
+watch(ipaItems, (i) => {
+  console.log(i);
+});
 
-watchEffect(() => {
-  varA = ipaItems.length + 1
-})
+const debugChange = function (e) {
+  console.log(ipaItems.value[0].results);
+}
 
 </script>
 
@@ -120,7 +52,7 @@ watchEffect(() => {
         <VRow>
           <VCol style="border: 1px solid black;" cols="8">
             <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VTextField density="compact" variant="outlined" label=" By : " />
+              <VTextField density="compact" variant="outlined" label=" By : " v-model="varD" @change="debugChange" />
             </div>
           </VCol>
           <VCol style="border: 1px solid black;" cols="4">
@@ -186,56 +118,68 @@ watchEffect(() => {
               <td style="border: 1px solid black; text-align: center; padding: 10px;">
                 <h4> ผลการเช็ค</h4>
               </td>
-              <td style="border: 1px solid black; text-align: center; padding: 10px;" :rowspan="varA">
+              <td style="border: 1px solid black; text-align: center; padding: 10px;">
                 <Image :src="image01" cover :width="300" :height="300" />
                 <!-- <Image src="/image.jpg" alt="Image" width="250" preview /> -->
               </td>
             </tr>
 
-            <tr v-for="ipaitem in ipaItems" :key="ipaitem.row">
-              <td style="border: 1px solid black; text-align: center; padding: 10px;">
-                <div v-html=ipaitem.col1></div>
+            <tr v-for="(ipaitem, index) in ipaItems" :key="index">
+              <td style="border: 1px solid black; text-align: center;">
+                <div v-html=ipaitem.jobFlow></div>
               </td>
-
-              <td style="border: 1px solid black; text-align: center; padding: 10px;">
-                <div v-for="col2 in ipaitem.col2" class="d-flex justify-left">
-                  {{ col2 }}
+              <td style="border: 1px solid black; text-align: center; ">
+                <div v-for="practice in ipaitem.practice">
+                  <VLabel class="d-flex justify-left pa-md-2">{{ practice }}</VLabel>
                 </div>
               </td>
-              <td style="border: 1px solid black; text-align: center; padding: 10px;">
-                <div v-for=" col3 in ipaitem.col3" class="d-flex justify-center">
-                  {{ col3 }}
+              <td style="border: 1px solid black; text-align: center;">
+                <div v-for="condition in ipaitem.condition">
+                  <VLabel class="d-flex justify-center pa-md-2">{{ condition }}</VLabel>
                 </div>
               </td>
-              <td style=" border: 1px solid black; text-align: center; padding: 10px;">
-                <div v-if="ipaitem.col4.type === 'oknot'">
-                  <!-- <VRadioGroup v-model="showDigit" inline @update:modelValue="updateShowDigit"> -->
-                  <VRadioGroup inline class="d-flex justify-center">
-                    <VRadio label="Ok" :value="1" />
-                    <VRadio label="Not" :value="0" />
-                  </VRadioGroup>
+              <td style="border: 1px solid black;">
+                <div v-for=" (result, resIndex) in ipaitem.results" :key="resIndex">
+                  <div v-if="result.type === 'oknot'">
+                    <VRadioGroup inline class="d-flex justify-center" v-model="result.name">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
+                    </VRadioGroup>
+                  </div>
                 </div>
               </td>
             </tr>
-
-            <!-- <tr>
-              <td style="border: 1px solid black; text-align: center; padding: 10px;">
-                Job Flow
-              </td>
-              <td style="border: 1px solid black; text-align: center; padding: 10px;">
-                วิธีปฏิบัติ
-              </td>
-              <td style="border: 1px solid black; text-align: center; padding: 10px;">
-                Condition
-              </td>
-              <td style="border: 1px solid black; text-align: center; padding: 10px;">
-                ผลการเช็ค
-              </td>
-            </tr> -->
           </tbody>
         </VTable>
       </VCol>
     </VRow>
+    <div style="border: 1px solid black;">
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center"><u>สูตรคำนวน</u></VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center">หาเป็นลิตร = mm x 5.32 + 740.45</VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center">หาเป็น mm = Litre - 740.45 / 5.32</VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center">(B) = (A) / 0.78</VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <!-- <VLabel class="d-flex justify-center"> ={{ ipaItems[0].results[0].name }}/ 0.78</VLabel> -->
+        </VCol>
+      </VRow>
+    </div>
   </div>
 
 </template>
