@@ -308,7 +308,6 @@ const getHearderInsp = () => {
   }else {
     loadingGenerated1.value = true
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
-    location.reload()
   }
   
 }
@@ -461,12 +460,10 @@ const getAnalysistInsp = () => {
       .catch(error => {
         // Handle errors
         console.error('Error:', error)
-        location.reload()
         loadingGenerated1.value = true
       })
   }else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
-    location.reload()
     loadingGenerated1.value = true
   }
   

@@ -487,12 +487,10 @@ const getHearderReceivingForm = () => {
       .catch(error => {
         // Handle errors
         loadingGenerated1.value = true
-        location.reload()
         console.error('Error:', error)
       })
   } else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
-    location.reload()
     loadingGenerated1.value = true
   }
 
@@ -535,8 +533,6 @@ const getLotReceivingForm = () => {
 
       })
       .catch(error => {
-        location.reload()
-
         // Handle errors
         loadingGenerated1.value = true
         console.error('Error:', error)

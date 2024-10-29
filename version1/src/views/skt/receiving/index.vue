@@ -4696,7 +4696,7 @@ const dessertsTest = ref([
               </td>
               <td
                 class="text-start px-2"
-                style="position: sticky; z-index: 1; right: 0; justify-content: center;"
+                style="justify-content: center;"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <VBtn
