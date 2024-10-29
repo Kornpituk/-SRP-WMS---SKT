@@ -248,68 +248,65 @@ watch(() => {
 
 
 //------------- Header
-const getHearderInsp = () => {
+const getHearderInsp = async () => {
   loadingGenerated1.value = true
-  if(poEtlLogDetailJournalIDQueryParameters.value){
-    axiosIns.get(`${urlApi.value}/api/v1/Inspection/View/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`, 
-      },
-    },
-    {})
-      .then(response => {
 
-        const data = response.data.data
+  if (poEtlLogDetailJournalIDQueryParameters.value) {
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/Inspection/View/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-        //------- Headers --------------------------------
-        headerInsp.value.sktName = data[0].productName
-        headerInsp.value.sktId = data[0].sktLot
-        headerInsp.value.itemCode = data[0].productId
-        headerInsp.value.supplierName = data[0].supplierName
-        headerInsp.value.tradeNames = data[0].tradeName
-        headerInsp.value.ManufacturerName = data[0].makerName
+      const data = response.data.data
 
-        headerInsp.value.receivedDate = data[0].receivedDate
+      //------- Headers --------------------------------
+      headerInsp.value.sktName = data[0].productName
+      headerInsp.value.sktId = data[0].sktLot
+      headerInsp.value.itemCode = data[0].productId
+      headerInsp.value.supplierName = data[0].supplierName
+      headerInsp.value.tradeNames = data[0].tradeName
+      headerInsp.value.ManufacturerName = data[0].makerName
+      headerInsp.value.receivedDate = data[0].receivedDate
 
-        //--------- Footers --------------------------------
-        // Note Details Remarks:
-        headerInsp.value.remark = data[0].remark
-        headerInsp.value.note = data[0].note
-        headerInsp.value.details = data[0].limConditionDetail
-        headerInsp.value.remark = data[0].remark
+      //--------- Footers --------------------------------
+      headerInsp.value.remark = data[0].remark
+      headerInsp.value.note = data[0].note
+      headerInsp.value.details = data[0].limConditionDetail
+      headerInsp.value.remark = data[0].remark
 
-        // WH/IP
-        headerInsp.value.updateByStaffWH = data[0].whStaff
-        headerInsp.value.updateBySuperWH = data[0].whSupervisor
-        headerInsp.value.updateByStaffInsp = data[0].inspStaff
-        headerInsp.value.updateBySuperInsp = data[0].inspSupervisor
+      // WH/IP
+      headerInsp.value.updateByStaffWH = data[0].whStaff
+      headerInsp.value.updateBySuperWH = data[0].whSupervisor
+      headerInsp.value.updateByStaffInsp = data[0].inspStaff
+      headerInsp.value.updateBySuperInsp = data[0].inspSupervisor
 
-        // lastUpdated
-        headerInsp.value.lastUpdatedStaffWH = data[0].whStaffUpdatedDate
-        headerInsp.value.lastUpdatedSuperWH = data[0].whSupervisorDate
-        headerInsp.value.lastUpdatedStaffInsp = data[0].inspStaffUpdatedDate
-        headerInsp.value.lastUpdatedSuperInsp = data[0].inspSupervisorDate
+      // lastUpdated
+      headerInsp.value.lastUpdatedStaffWH = data[0].whStaffUpdatedDate
+      headerInsp.value.lastUpdatedSuperWH = data[0].whSupervisorDate
+      headerInsp.value.lastUpdatedStaffInsp = data[0].inspStaffUpdatedDate
+      headerInsp.value.lastUpdatedSuperInsp = data[0].inspSupervisorDate
 
-        // reject
-        headerInsp.value.remarkReject = data[0].statusComments
+      // reject
+      headerInsp.value.remarkReject = data[0].statusComments
 
-        // purchaseOrder.value = response.data[0]
-        console.log('[*****Headers]]!!: ', data[0])
-        loadingGenerated1.value = false
-    
-      })
-      .catch(error => {
-        // Handle errors
-        loadingGenerated1.value = true
-        console.error('Error:', error)
-      })
-  }else {
+      console.log('[*****Headers]]!!: ', data[0])
+    } catch (error) {
+      // Handle errors
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
+  } else {
     loadingGenerated1.value = true
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
   }
-  
 }
 
 const state = reactive({
@@ -394,79 +391,77 @@ const formData = ref({
 })
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const getAnalysistInsp = () => {
+const getAnalysistInsp = async () => {
   loadingGenerated1.value = true
-  if(poEtlLogDetailJournalIDQueryParameters.value){
-    axiosIns.get(`${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`, 
-      },
-    },
-    {})
-      .then(response => {
 
-        analysisItems.value = response.data.items
+  if (poEtlLogDetailJournalIDQueryParameters.value) {
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-        for (let i = 0; i < 5; i++) {
-          analysisItemsCode.value[`actualAmountUnits_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualAmountUnits`]
-          analysisItemsCode.value[`actualMakerLotNo_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualMakerLotNo`]
-          analysisItemsCode.value[`actualNetCountKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualNetCountKgs`]
-          analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualTotalQuantityKgs`]
-        }
+      analysisItems.value = response.data.items
 
-        // วนลูปผ่าน analysisItems.value
-        for (let i = 0; i < analysisItems.value.length; i++) {
-          const item = analysisItems.value[i]
-  
-          // เก็บค่าจาก analysisItems
-          analysisResults.value.push({
-            rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
-            typeID: item.typeID,
-            typeName: item.typeName,
-            analyticalItem: item.analyticalItem,
-            unit: item.unit,
-          })
+      for (let i = 0; i < 5; i++) {
+        analysisItemsCode.value[`actualAmountUnits_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualAmountUnits`]
+        analysisItemsCode.value[`actualMakerLotNo_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualMakerLotNo`]
+        analysisItemsCode.value[`actualNetCountKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualNetCountKgs`]
+        analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualTotalQuantityKgs`]
+      }
 
-          // ตรวจสอบว่า itemAnalyticals เป็นอาร์เรย์
-          if (Array.isArray(item.itemAnalyticals)) {
-            for (let j = 0; j < item.itemAnalyticals.length; j++) {
-              const analyticalItem = item.itemAnalyticals[j]
-      
-              // เก็บค่าจาก itemAnalyticals
-              analyticalItemsResults.value.push({
-                rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
-                actualAmountUnits: analyticalItem.actualAmountUnits,
-                actualAnalysis: analyticalItem.actualAnalysis,
-                actualMakerLotNo: analyticalItem.actualMakerLotNo,
-                actualNetCountKgs: analyticalItem.actualNetCountKgs,
-                actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
-                inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
-                lotID: analyticalItem.lotID,
-                okState: analyticalItem.okState,
+      // วนลูปผ่าน analysisItems.value
+      for (let i = 0; i < analysisItems.value.length; i++) {
+        const item = analysisItems.value[i]
 
-                // เพิ่มฟิลด์ที่ต้องการเก็บข้อมูลได้ที่นี่
-              })
-            }
+        // เก็บค่าจาก analysisItems
+        analysisResults.value.push({
+          rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
+          typeID: item.typeID,
+          typeName: item.typeName,
+          analyticalItem: item.analyticalItem,
+          unit: item.unit,
+        })
+
+        // ตรวจสอบว่า itemAnalyticals เป็นอาร์เรย์
+        if (Array.isArray(item.itemAnalyticals)) {
+          for (let j = 0; j < item.itemAnalyticals.length; j++) {
+            const analyticalItem = item.itemAnalyticals[j]
+
+            // เก็บค่าจาก itemAnalyticals
+            analyticalItemsResults.value.push({
+              rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
+              actualAmountUnits: analyticalItem.actualAmountUnits,
+              actualAnalysis: analyticalItem.actualAnalysis,
+              actualMakerLotNo: analyticalItem.actualMakerLotNo,
+              actualNetCountKgs: analyticalItem.actualNetCountKgs,
+              actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
+              inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+              lotID: analyticalItem.lotID,
+              okState: analyticalItem.okState,
+
+              // เพิ่มฟิลด์ที่ต้องการเก็บข้อมูลได้ที่นี่
+            })
           }
         }
-        console.log("***************55555555", analysisItems.value)
+      }
 
-        loadingGenerated1.value = false
-
-        // location.reload()
-      })
-      .catch(error => {
-        // Handle errors
-        console.error('Error:', error)
-        loadingGenerated1.value = true
-      })
-  }else {
+      console.log("***************55555555", analysisItems.value)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
+  } else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
     loadingGenerated1.value = true
   }
-  
 }
 
 const loadingGenerated1 = ref(true)
@@ -1792,6 +1787,13 @@ const getDisabledFollowStatusNRole = () => {
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
                     value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[0].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   density="compact"
                   :maxlength="45" 
@@ -1857,6 +1859,13 @@ const getDisabledFollowStatusNRole = () => {
                   density="compact"
                   :rules="[
                     value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[1].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45"
                 >
@@ -1918,7 +1927,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="frozeCheck"
                   density="compact"
                   :rules="[
-                    value => value.length <= 44 || 'Must be 45 characters or less'
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[2].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45" 
                 >
@@ -1980,7 +1996,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="frozeCheck"
                   density="compact"
                   :rules="[
-                    value => value.length <= 44 || 'Must be 45 characters or less'
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[3].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45" 
                 >
@@ -2042,7 +2065,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="frozeCheck"
                   density="compact"
                   :rules="[
-                    value => value.length <= 44 || 'Must be 45 characters or less'
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[4].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45" 
                 >
@@ -2173,7 +2203,14 @@ const getDisabledFollowStatusNRole = () => {
                   density="compact"
                   :readonly="frozeCheck"
                   :rules="[
-                    value => value.length <= 44 || 'Must be 45 characters or less'
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[0].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45" 
                 >
@@ -2234,7 +2271,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="frozeCheck"
                   density="compact"
                   :rules="[
-                    value => value.length <= 44 || 'Must be 45 characters or less'
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[1].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45" 
                 >
@@ -2295,7 +2339,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="frozeCheck"
                   density="compact"
                   :rules="[
-                    value => value.length <= 44 || 'Must be 45 characters or less'
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[2].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45" 
                 >
@@ -2356,7 +2407,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="frozeCheck"
                   density="compact"
                   :rules="[
-                    value => value.length <= 44 || 'Must be 45 characters or less'
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[3].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45" 
                 >
@@ -2416,7 +2474,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="frozeCheck"
                   density="compact"
                   :rules="[
-                    value => value.length <= 44 || 'Must be 45 characters or less'
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[4].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="45" 
                 >

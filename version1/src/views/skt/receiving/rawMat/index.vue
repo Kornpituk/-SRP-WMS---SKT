@@ -429,114 +429,107 @@ const detailsReceivingForm = () => {
 }
 
 //------------- Header
-const getHearderReceivingForm = () => {
+const getHearderReceivingForm = async () => {
   loadingGenerated1.value = true
+
   if (poEtlLogDetailJournalIDQueryParameters.value) {
-    axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    },
-    {})
-      .then(response => {
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-        const data = response.data.data
+      const data = response.data.data
 
-        dataHeaderReceving.value = data[0]
+      dataHeaderReceving.value = data[0]
 
-        // sktName.value = data[0].Lable
-        // rawMatCode.value = data[0].Lable
-        // SupplierName.value = data[0].Lable
-        // TradeName.value = data[0].Lable
-        // Manufacturer.value = data[0].Lable
-        purchaseOrder.value.journalID = data[0].journalID
+      purchaseOrder.value.journalID = data[0].journalID
+      UserNameAccoutWork.value = data[0].updatedBy
+      supplier.value = data[0].approveBy
 
-        UserNameAccoutWork.value = data[0].updatedBy
-        supplier.value = data[0].approveBy
+      purchaseOrder.value.receivedDate = formatDate(data[0].receivedDate)
+      purchaseOrder.value.expectDeliveryDate = formatDate(data[0].expectDeliveryDate)
+      purchaseOrder.value.invoiceNo = data[0].invoiceNo
 
-        purchaseOrder.value.receivedDate = formatDate(data[0].receivedDate)
-        purchaseOrder.value.expectDeliveryDate = formatDate(data[0].expectDeliveryDate)
-        purchaseOrder.value.invoiceNo = data[0].invoiceNo
+      purchaseOrder.value.isForHalalProduct = data[0].isForHalalProduct
+      purchaseOrder.value.isForRspoProduct = data[0].isForRspoProduct
+      purchaseOrder.value.noteText = data[0].noteText
 
-        purchaseOrder.value.isForHalalProduct = data[0].isForHalalProduct
-        purchaseOrder.value.isForRspoProduct = data[0].isForRspoProduct
-        purchaseOrder.value.noteText = data[0].noteText
+      purchaseOrder.value.selectedMakerName = data[0].selectedMakerName
+      Manufacturer.value = data[0].selectedMakerName
+      purchaseOrder.value.packagingTypeName = data[0].packagingTypeName
 
-        purchaseOrder.value.selectedMakerName = data[0].selectedMakerName
-        Manufacturer.value = data[0].selectedMakerName
-        purchaseOrder.value.packagingTypeName = data[0].packagingTypeName
+      poEtlLogDetailJournalID.value = data[0].poEtlLogDetailJournalID
+      purchaseOrder.value.storagePlaceNo = data[0].storagePlaceNo
+      purchaseOrder.value.receivedDate = data[0].receivedDate
 
-        poEtlLogDetailJournalID.value = data[0].poEtlLogDetailJournalID
-        purchaseOrder.value.storagePlaceNo = data[0].storagePlaceNo
+      //------------------------- DeliveryQueue ------------------------
+      deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
+      deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
 
-        purchaseOrder.value.receivedDate = data[0].receivedDate
-
-        //------------------------- DeliveryQueue ------------------------
-        deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
-        deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
-
-        // purchaseOrder.value = response.data[0]
-        console.log('[*****Headers]]!!: ', data[0])
-
-        console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
-        loadingGenerated1.value = false
-
-      })
-      .catch(error => {
-        // Handle errors
-        loadingGenerated1.value = true
-        console.error('Error:', error)
-      })
+      console.log('[*****Headers]]!!: ', data[0])
+      console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
   } else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
     loadingGenerated1.value = true
   }
-
 }
 
 //--------------- Lot
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const getLotReceivingForm = () => {
+const getLotReceivingForm = async () => {
   loadingGenerated1.value = true
   if (poEtlLogDetailJournalIDQueryParameters.value) {
-    axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/get-lot/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    })
-      .then(response => {
-        const lotData = response.data.data
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get-lot/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-        // แมพข้อมูลจาก API ลงใน purchaseOrder
-        lotData.forEach((lot, index) => {
-          const lotNumber = index + 1 // เริ่มจาก 1, 2, 3, ...
+      const lotData = response.data.data
 
-          // เก็บข้อมูลแต่ละ lot ใน purchaseOrder
-          purchaseOrder.value[`actualMakerLotNo_${lotNumber}`] = lot.actualMakerLotNo
-          purchaseOrder.value[`actualNetCountKgs_${lotNumber}`] = lot.actualNetCountKgs
-          purchaseOrder.value[`actualAmountUnits_${lotNumber}`] = lot.actualAmountUnits
-          purchaseOrder.value[`actualTotalQuantityKgs_${lotNumber}`] = lot.actualTotalQuantityKgs
-          purchaseOrder.value[`customManufacturerName_${lotNumber}`] = lot.customManufacturerName
-          purchaseOrder.value[`customLable_${lotNumber}`] = lot.customLable
-        })
+      // แมพข้อมูลจาก API ลงใน purchaseOrder
+      lotData.forEach((lot, index) => {
+        const lotNumber = index + 1 // เริ่มจาก 1, 2, 3, ...
 
-        NetCountPackage.value = lotData[0].actualNetCountKgs
-
-        purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
-
-        console.log('[*****Headers Lot]]!!:', lotData[0])
-        loadingGenerated1.value = false
-
+        // เก็บข้อมูลแต่ละ lot ใน purchaseOrder
+        purchaseOrder.value[`actualMakerLotNo_${lotNumber}`] = lot.actualMakerLotNo
+        purchaseOrder.value[`actualNetCountKgs_${lotNumber}`] = lot.actualNetCountKgs
+        purchaseOrder.value[`actualAmountUnits_${lotNumber}`] = lot.actualAmountUnits
+        purchaseOrder.value[`actualTotalQuantityKgs_${lotNumber}`] = lot.actualTotalQuantityKgs
+        purchaseOrder.value[`customManufacturerName_${lotNumber}`] = lot.customManufacturerName
+        purchaseOrder.value[`customLable_${lotNumber}`] = lot.customLable
       })
-      .catch(error => {
-        // Handle errors
-        loadingGenerated1.value = true
-        console.error('Error:', error)
-      })
+
+      NetCountPackage.value = lotData[0].actualNetCountKgs
+      purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
+
+      console.log('[*****Headers Lot]]!!:', lotData[0])
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
+  } else {
+    console.log('**poEtlLogDetailJournalIDQueryParameters is missing')
+    loadingGenerated1.value = true
   }
 }
 
@@ -588,43 +581,41 @@ watchEffect(() => {
   
 })
 
-const getCOAReceivingForm = () => {
+const getCOAReceivingForm = async () => {
   if (poEtlLogDetailJournalIDQueryParameters.value) {
     loading.value = true
-    axiosIns.get(
-      `${urlApi.value}/api/v1/ReceivingForm/get-coA/${poEtlLogDetailJournalIDQueryParameters.value}`,
-      {
-        headers: {
-          'accept': '*/*',
-          'x-location': `${whereHouse.value}`,
-          Authorization: `Bearer ${accessTokenAtStore}`,
-        },
-        onDownloadProgress: progressEvent => {
-          const { loaded, total } = progressEvent
-          if (total > 0) {
-            const percentCompleted = Math.round((loaded * 100) / total)
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get-coA/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+          onDownloadProgress: progressEvent => {
+            const { loaded, total } = progressEvent
+            if (total > 0) {
+              const percentCompleted = Math.round((loaded * 100) / total)
 
-            modelValue.value = percentCompleted
-            bufferValue.value = percentCompleted + 10 // Optional: Adjust buffer value if needed
-          } else {
-            // Handle the case where total is 0 or undefined
-            console.warn('Total size of file is not available')
-          }
+              modelValue.value = percentCompleted
+              bufferValue.value = percentCompleted + 10 // Optional: Adjust buffer value if needed
+            } else {
+              console.warn('Total size of file is not available')
+            }
+          },
         },
-      },
-    )
-      .then(response => {
-        const lotData = response.data.data
+      )
 
-        coaFiles.value = lotData
-        console.log('[*****Headers COA]]!!: ', lotData)
-      })
-      .catch(error => {
-        console.error('Error:', error)
-      })
-      .finally(() => {
-        loading.value = false
-      })
+      const lotData = response.data.data
+
+      coaFiles.value = lotData
+      console.log('[*****Headers COA]]!!: ', lotData)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loading.value = false
+    }
   }
 }
 
@@ -2202,7 +2193,14 @@ const getDisabledFollowStatusNRole = () => {
                   :style="{ width: '100%', minWidth: '150px', fontSize: '12px !important;' }"
                   :rules="[
                     value => !!value.trim() || 'Lot No.1 is required.',
-                    value => value.length <= 19 || 'Max 20 characters per line.'
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_1 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="20"
                   class="custom-text-field"
@@ -2240,7 +2238,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="readonlyAllInput()"
                   :style="{ width: '100%', minWidth: '150px' }"
                   :rules="[
-                    value => value.length <= 19 || 'Max 20 characters per line.'
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_2 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="20"
                   density="compact"
@@ -2279,7 +2284,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="readonlyAllInput()"
                   :style="{ width: '100%', minWidth: '150px' }"
                   :rules="[
-                    value => value.length <= 19 || 'Max 20 characters per line.'
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_3 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="20"
                   density="compact"
@@ -2318,7 +2330,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="readonlyAllInput()"
                   :style="{ width: '100%', minWidth: '150px' }"
                   :rules="[
-                    value => value.length <= 19 || 'Max 20 characters per line.'
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_4 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="20"
                   density="compact"
@@ -2357,7 +2376,14 @@ const getDisabledFollowStatusNRole = () => {
                   :readonly="readonlyAllInput()"
                   :style="{ width: '100%', minWidth: '150px' }"
                   :rules="[
-                    value => value.length <= 19 || 'Max 20 characters per line.'
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_4 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
                   ]"
                   :maxlength="20"
                   density="compact"
