@@ -2379,7 +2379,7 @@ const getDisabledFollowStatusNRole = () => {
                     value => value.length <= 19 || 'Max 20 characters per line.',
                     value => {
                       if (value && value[0] === ' ') {
-                        purchaseOrder.actualMakerLotNo_4 = null
+                        purchaseOrder.actualMakerLotNo_5 = null
                         return `can't be a space first.`
                       }
                       return true

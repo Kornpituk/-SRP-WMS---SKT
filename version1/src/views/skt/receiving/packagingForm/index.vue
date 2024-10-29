@@ -1667,8 +1667,16 @@ const saveDraftData = word => {
                   :readonly="frozeCheck"
                   density="compact"
                   :rules="[
+                    
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.actualAnalysis = null // ตั้งค่าเป็น null ถ้าตัวอักษรแรกเป็นช่องว่าง
+                        return `first can't be a space.` // ข้อความผิดพลาด
+                      }
+                      return true // ถ้าผ่านการตรวจสอบ
+                    },
                     value => !!value.trim() || 'Analytical Items is required.',
-                    value => value.length <= 44 || 'Must be 45 characters or less'
                   ]"
                   :maxlength="45"
                 >
