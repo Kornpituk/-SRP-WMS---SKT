@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref } from 'vue'
 
 
 export const ipaItemTemplate = [
@@ -11,32 +11,35 @@ export const ipaItemTemplate = [
       ": หากมี EPICHLO หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ ห้ามใช้น้ำล้าง",
       ": Check วาล์ว ปิด ประตูน้ำก่อนปฏิบัติงาน",
       ": แจ้ง Leader Production เวลา Loading ว่าไม่ตรงกับเวลาการใช้ Pump 109D,S",
-      ": ในการผลิต Check ถังดับเพลิงประเภท เคมีแห้ง ว่าพร้อมใช้งาน"
+      ": ในการผลิต Check ถังดับเพลิงประเภท เคมีแห้ง ว่าพร้อมใช้งาน",
     ],
     "condition": "",
     "results": [
       {
         type: "oknot",
         value: "",
-        fieldName: ""
+        fieldName: "",
       },
       {
         type: "oknot",
-        value: "CB02"
+        value: "CB02",
       },
       {
         type: "oknot",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "oknot",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "oknot",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "oknot",
-        value: ""
-      }
+        value: "",
+      },
     ],
   },
   {
@@ -47,37 +50,40 @@ export const ipaItemTemplate = [
       "2. Level ที่อ่านได้จาก Tank 11V-109A ก่อนรับ",
       "3. ตรวจสอบว่าปริมาณหลังจากรับไม่เกินความจุถัง",
       "4. ตรวจสอบ ปริมาณ ใน DCS",
-      "5. Check Seal No.ที่รถส่งของ และ แป้นในถัง lorry ว่าตรง 10,000 ลิตร หรือไม่"
+      "5. Check Seal No.ที่รถส่งของ และ แป้นในถัง lorry ว่าตรง 10,000 ลิตร หรือไม่",
     ],
     "condition": [
       "ตามเอกสารใบส่ง",
       "ต้องไม่เกิน 575 mm.",
       " ต้องไม่เกิน 15,800 Litre",
       "กดดูที่ถัง 11V-109A ต้องไม่เกิน 3790 Litre.",
-      "Seal ล็อกวาล์วไม่ขาดตรงตามใบส่ง"
+      "Seal ล็อกวาล์วไม่ขาดตรงตามใบส่ง",
     ],
     "results": [
       {
         type: "ab",
-        value: ""
+        value: "",
       },
       {
         type: "cd",
-        value: ""
+        value: "",
       },
       {
         type: "bd",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "litre",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "oknot",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "oknot",
-        value: ""
-      }
+        value: "",
+      },
     ],
   },
   {
@@ -89,7 +95,7 @@ export const ipaItemTemplate = [
       "3. ต่อสายกราวน์เรียบร้อย",
       "4. เก็บตัวอย่าง ส่ง INSP เรียบร้อย",
       "5. นำลูกกุญแจมาเปิดล็อกวาล์ว 11",
-      "6. Moisture เท่าไหร่"
+      "6. Moisture เท่าไหร่",
     ],
     "condition": [
       "รถต้องหยุดนิ่งสนิท",
@@ -97,30 +103,33 @@ export const ipaItemTemplate = [
       "ต่อสายกราวน์บริเวณที่โหลดเข้ากับรถ",
       "1 ขวดแก้วเล็กและ 1 ขวดแก้วใหญ่เล็กด้านบนรถ",
       "IPA กุญแจใช้รหัสล็อค",
-      "0.100 Max"
+      "0.100 Max",
     ],
     "results": [
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "oknot",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "oknot",
-        value: ""
-      }, {
+        value: "",
+      },
+      {
         type: "percen",
-        value: ""
-      }
+        value: "",
+      },
     ],
   },
   {
@@ -139,16 +148,16 @@ export const ipaItemTemplate = [
     "results": [
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "C",
-        value: ""
-      }
+        value: "",
+      },
 
     ],
   },
@@ -169,33 +178,33 @@ export const ipaItemTemplate = [
       "ใส่ให้ถูกวิธี",
       "ใช้เฉพาะตัวกรองสีดำ",
       "ใส่ทั้งเสื้อและกางเกงแล้ว",
-      ""
+      "",
     ],
     "results": [
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
-      }
+        value: "",
+      },
     ],
   },
   {
@@ -205,31 +214,31 @@ export const ipaItemTemplate = [
       "1. ต่อสายHose เข้ากับ Valve 11",
       "2. ต่อ Line Vent เข้ากับ Vent ของ Lorry และเปิด Valve 12",
       "3. เปิดวาล์วจาก Lorry",
-      "4. Check Leak สาย Hose, ข้อต่อวาล์ว ระหว่าง Valve 11 , 14"
+      "4. Check Leak สาย Hose, ข้อต่อวาล์ว ระหว่าง Valve 11 , 14",
     ],
     "condition": [
       "ต่อโดยตรงโดยไม่ผ่าน Pump รถ Lorry",
       "อย่าลืมเปิดวาล์ว 12",
       "No.14 Open (เปิด)",
-      "ต้องไม่รั่ว"
+      "ต้องไม่รั่ว",
     ],
     "results": [
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
-      }
+        value: "",
+      },
     ],
   },
   {
@@ -240,36 +249,36 @@ export const ipaItemTemplate = [
       "2. Start Pump เวลาเริ่ม",
       "3. Check pressure 11P-109A",
       "4. Check Ampmeter ของตัว Pump",
-      "5. Check ไฟที่หัว Pump"
+      "5. Check ไฟที่หัว Pump",
     ],
     "condition": [
       "วาล์ว 11 เปิด",
       "Actual Check",
       "ดูจาก pressure gauge ผ่าน Pump (0.2 - 0.45)",
       "ดูจากตู้ Control Pump 11P-109A (ไม่ต่ำกว่า 8 Amp)",
-      "ไฟต้องแสดงเป็นสีเขียวเท่านั้น"
+      "ไฟต้องแสดงเป็นสีเขียวเท่านั้น",
     ],
     "results": [
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "actualCheck",
-        value: ""
+        value: "",
       },
       {
         type: "mpa",
-        value: ""
+        value: "",
       },
       {
         type: "amp",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
-      }
+        value: "",
+      },
     ],
   },
   {
@@ -287,7 +296,7 @@ export const ipaItemTemplate = [
       "9. อ่าน Level ที่ถัง 11V-109A ทำการ Record",
       "10. Check level DCS ได้เท่าไหร่",
       "11. หลังจากโหลดเสร็จล็อกวาล์ว 11",
-      "12. ส่วนต่างระหว่าง (B + D) - F ="
+      "12. ส่วนต่างระหว่าง (B + D) - F =",
     ]
     ,
     "condition": [
@@ -302,57 +311,57 @@ export const ipaItemTemplate = [
       "Actual Check",
       "Actual Check",
       "กุญแจล็อครหัส",
-      "ต้องไม่ต่างกันมากจากการคำนวณ"
+      "ต้องไม่ต่างกันมากจากการคำนวณ",
     ],
     "results": [
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "actualCheck",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "percen",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "ef",
-        value: ""
+        value: "",
       },
       {
         type: "g",
-        value: ""
+        value: "",
       },
       {
         type: "oknot",
-        value: ""
+        value: "",
       },
       {
         type: "litre",
-        value: ""
+        value: "",
       },
     ],
-  }
+  },
 ]
