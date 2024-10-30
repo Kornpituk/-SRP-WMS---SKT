@@ -2117,7 +2117,7 @@ const dessertsTest = ref([
                 cols="12"
                 lg="4"
                 sm="6"
-                class="py-1"
+                class="py-2"
               >
                 <VTextField
                   v-model="productId"
@@ -2141,7 +2141,7 @@ const dessertsTest = ref([
                 cols="12"
                 lg="4"
                 sm="6"
-                class="py-1"
+                class="py-2"
               >
                 <VTextField
                   v-model="productName"
