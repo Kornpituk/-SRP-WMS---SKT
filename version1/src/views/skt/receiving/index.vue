@@ -84,6 +84,10 @@ const searchByProductId = ref(null)
 const searchByProductName = ref(null)
 const searchByUOMId = ref(null)
 
+watch(()=> {
+
+})
+
 const searchByWareHouseId = ref([whereHouse])
 
 const searchByZoneId = ref(null)
@@ -105,12 +109,73 @@ const testMoldelSearch = () => {
 }
 
 //------------------------ Model Name for search SKT ------------------------------
-const deliveryDateFrom = ref(null)
-const deliveryDateTo = ref(null)
-const productId = ref(null)
-const productName = ref(null)
-const supplierId = ref(null)
-const supplierName = ref(null)
+const deliveryDateFrom = ref(sessionStorage.getItem('deliveryDateFrom') || '')
+const deliveryDateTo = ref(sessionStorage.getItem('deliveryDateTo') || '')
+const productId = ref(sessionStorage.getItem('productId') || '')
+const productName = ref(sessionStorage.getItem('productName') || '')
+const supplierId = ref(sessionStorage.getItem('supplierId') || '')
+const supplierName = ref(sessionStorage.getItem('supplierName') || '')
+
+const fileterStatusInPAI = ref(sessionStorage.getItem('fileterStatusInPAI'))
+
+// ใช้ watch function เพื่ออัปเดต sessionStorage เมื่อแต่ละค่าถูกเปลี่ยนแปลง
+watch(deliveryDateFrom, newValue => {
+  sessionStorage.setItem('deliveryDateFrom', newValue)
+})
+watch(deliveryDateTo, newValue => {
+  sessionStorage.setItem('deliveryDateTo', newValue)
+})
+watch(productId, newValue => {
+  sessionStorage.setItem('productId', newValue)
+})
+watch(productName, newValue => {
+  sessionStorage.setItem('productName', newValue)
+})
+watch(supplierId, newValue => {
+  sessionStorage.setItem('supplierId', newValue)
+})
+watch(supplierName, newValue => {
+  sessionStorage.setItem('supplierName', newValue)
+})
+watch(fileterStatusInPAI, newValue => {
+  sessionStorage.setItem('fileterStatusInPAI', newValue)
+})
+
+onMounted(() => {
+  deliveryDateFrom.value = sessionStorage.getItem('deliveryDateFrom') || ''
+  deliveryDateTo.value = sessionStorage.getItem('deliveryDateTo') || ''
+  productId.value = sessionStorage.getItem('productId') || ''
+  productName.value = sessionStorage.getItem('productName') || ''
+  supplierId.value = sessionStorage.getItem('supplierId') || ''
+  supplierName.value = sessionStorage.getItem('supplierName') || ''
+  fileterStatusInPAI.value = sessionStorage.getItem('fileterStatusInPAI') || ''
+})
+
+// ดึงค่าจาก sessionStorage
+const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
+
+// ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
+const statusFilter = ref([])
+
+// ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
+const addStoredStatus = () => {
+  if (storedStatus) {
+    const newItems = storedStatus.split(',')
+
+    newItems.forEach(item => {
+      if (!statusFilter.value.includes(item.trim())) { // เช็คว่าค่าไม่มีใน array
+        statusFilter.value.push(item.trim()) // เพิ่มค่าใหม่เข้าไป
+      }
+    })
+
+    // อัปเดต sessionStorage
+    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value.join(','))
+    sessionStorage.setItem('statusFilter', statusFilter.value.join(','))
+  }
+}
+
+// เรียกใช้ฟังก์ชันเพื่อเพิ่มค่าใหม่
+addStoredStatus()
 
 //------------------------ Model Name for search ------------------------------
 const searchByCategoryName = ref(null)
@@ -139,9 +204,6 @@ const wareHouseItemsSearchById = ref([])
 const zoneItemsSearchById = ref([])
 const areaItemsSearchById = ref([])
 const subAreaItemsSearchById = ref([])
-
-const fileterStatusInPAI = ref('')
-const statusFilter = ref([])
 
 //----------------------  Variable for SortBy -------------------------------------
 const sortByCategory = ref('')
@@ -400,9 +462,6 @@ const colorStatusWithCheckBox = id => {
   }
 }
 
-watchEffect(() => {
-  console.log('statusFilter****++', statusFilter)
-})
 
 //--------------------------------- Convert Date To API ----------------------------------------------------------------
 
@@ -439,7 +498,16 @@ const GetStockUpdate = () => {
   } else {
     fileterStatusInPAI.value = statusFilter.value
   }
-  
+
+  const fileterStatusInApiStr = ref('')
+
+  if (typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null) {
+  // แปลงเป็น string
+    fileterStatusInApiStr.value = fileterStatusInPAI.value.join(',')
+  }else{
+    fileterStatusInApiStr.value = fileterStatusInPAI.value
+  }
+
   // console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/View?`, {
     params: {
@@ -449,7 +517,7 @@ const GetStockUpdate = () => {
       productName: productName.value,
       supplierId: supplierId.value,
       supplierName: supplierName.value,
-      statusName: fileterStatusInPAI.value,
+      statusName: fileterStatusInApiStr.value,
 
     // ... and so on with other parameters
     },
@@ -485,6 +553,8 @@ const GetStockUpdate = () => {
       // rowPerPage.value = response.data.perPage
 
       console.log('[products.value]!!: ', products.value)
+
+      console.log('[statusName.value Type]!!: ', typeof  fileterStatusInPAI.value)
 
       // console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
 
