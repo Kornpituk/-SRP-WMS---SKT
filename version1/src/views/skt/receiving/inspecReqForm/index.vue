@@ -2596,11 +2596,8 @@ const getDisabledFollowStatusNRole = () => {
     </section>
 
     <!-- Quality Evaluation -->
-    <section class="mt-7 px-3">
-      <VRow
-        v-if="false"
-        class="px-3"
-      >
+    <section class="mt-3 px-3">
+      <VRow>
         <VCol
           class="px-0"
           style="font-size: 12px;"
@@ -2608,86 +2605,6 @@ const getDisabledFollowStatusNRole = () => {
         >
           Quality Evaluation
         </VCol>
-        <VCol
-          style="border: 1px solid black;"
-          cols="4"
-          class="d-flex align-center"
-        >
-          <VRow>
-            <VCol
-              cols="1"
-              class="d-flex align-center"
-              style="font-size: 12px; font-weight: bolder;"
-            >
-              Accept
-            </VCol>
-            <VCol
-              class="d-flex justify-center"
-              cols="10"
-            >
-              <VIcon
-                v-if="statusId === 17 || statusId === 15"
-                color="success"
-                size="60"
-                icon="ri-checkbox-circle-fill"
-              />
-            </VCol>
-          </VRow>
-        </VCol>
-        <VCol
-          style="border: 1px solid black;"
-          cols="4"
-          class="d-flex align-center"
-        >
-          <VRow>
-            <VCol
-              cols="1"
-              class="d-flex align-center"
-              style="font-size: 12px; font-weight: bolder;"
-            >
-              Reject
-            </VCol>
-            <VCol
-              class="d-flex justify-center"
-              cols="11"
-            >
-              <VIcon
-                v-if="statusId === 7 || statusId === 16"
-                color="red"
-                size="60"
-                icon="ri-close-circle-fill"
-              />
-            </VCol>
-          </VRow>
-        </VCol>
-        <VCol
-          style="border: 1px solid black;"
-          cols="4"
-          class="d-flex align-center"
-        >
-          <VRow>
-            <VCol
-              cols="2"
-              class="d-flex align-center"
-            >
-              <span style="font-size: 12px; font-weight: bolder;">Comment:</span>
-            </VCol>
-            <VCol cols="10">
-              <span
-                v-if="statusId === 7 || statusId === 16"
-                style=" white-space: normal; word-wrap: break-word;"
-              >
-                <VTextarea
-                  v-model="headerInsp.remarkReject"
-                  readonly
-                />
-              </span>
-            </VCol>
-          </VRow>
-        </VCol>
-      </VRow>
-
-      <VRow>
         <!-- Accept Section -->
         <VCol
           cols="1"

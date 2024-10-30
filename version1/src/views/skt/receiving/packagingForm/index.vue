@@ -1875,6 +1875,13 @@ const saveDraftData = word => {
     </VRow>
 
     <VRow class="pt-4 px-3">
+      <VCol
+        class="px-0"
+        style="font-size: 12px;"
+        cols="12"
+      >
+        Quality Evaluation
+      </VCol>
       <!-- Accept Section -->
       <VCol
         cols="1"
