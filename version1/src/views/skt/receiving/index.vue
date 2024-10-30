@@ -115,8 +115,8 @@ const productId = ref(sessionStorage.getItem('productId') || '')
 const productName = ref(sessionStorage.getItem('productName') || '')
 const supplierId = ref(sessionStorage.getItem('supplierId') || '')
 const supplierName = ref(sessionStorage.getItem('supplierName') || '')
-
-const fileterStatusInPAI = ref(sessionStorage.getItem('fileterStatusInPAI'))
+const purchaseOrderNo = ref(sessionStorage.getItem('purchaseOrderNo') || '')
+const fileterStatusInPAI = ref(sessionStorage.getItem('fileterStatusInPAI') || '')
 
 // ใช้ watch function เพื่ออัปเดต sessionStorage เมื่อแต่ละค่าถูกเปลี่ยนแปลง
 watch(deliveryDateFrom, newValue => {
@@ -137,6 +137,9 @@ watch(supplierId, newValue => {
 watch(supplierName, newValue => {
   sessionStorage.setItem('supplierName', newValue)
 })
+watch(purchaseOrderNo, newValue => {
+  sessionStorage.setItem('purchaseOrderNo', newValue)
+})
 watch(fileterStatusInPAI, newValue => {
   sessionStorage.setItem('fileterStatusInPAI', newValue)
 })
@@ -149,6 +152,7 @@ onMounted(() => {
   supplierId.value = sessionStorage.getItem('supplierId') || ''
   supplierName.value = sessionStorage.getItem('supplierName') || ''
   fileterStatusInPAI.value = sessionStorage.getItem('fileterStatusInPAI') || ''
+  purchaseOrderNo.value = sessionStorage.getItem('purchaseOrderNo') || ''
 })
 
 // ดึงค่าจาก sessionStorage
@@ -159,7 +163,7 @@ const statusFilter = ref([])
 
 // ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
 const addStoredStatus = () => {
-  if (storedStatus) {
+  if (storedStatus && storedStatus !== null && storedStatus !== '') {
     const newItems = storedStatus.split(',')
 
     newItems.forEach(item => {
@@ -240,19 +244,20 @@ const serialProductCode = ref(null)
 //------------------------------- Function Get StockUpdate Need Enter Search -----------------
 
 const clearModel = () => {
-  deliveryDateFrom.value = null
-  deliveryDateTo.value = null
-  productId.value = null
-  productName.value = null
-  supplierId.value = null
-  supplierName.value = null
-  deliveryDateRange.value = null
-  searchByZoneId.value = null
-  searchByAreaId.value = null
-  searchBySubAreaId.value = null
-  serialProductCode.value = null
+  deliveryDateFrom.value = ''
+  deliveryDateTo.value = ''
+  productId.value = ''
+  productName.value = ''
+  supplierId.value = ''
+  supplierName.value = ''
+  deliveryDateRange.value = ''
+  searchByZoneId.value = ''
+  searchByAreaId.value = ''
+  searchBySubAreaId.value = ''
+  serialProductCode.value = ''
   fileterStatusInPAI.value = ''
   statusFilter.value = []
+  purchaseOrderNo.value = ''
 }
 
 const searchParams = {
@@ -517,7 +522,8 @@ const GetStockUpdate = () => {
       productName: productName.value,
       supplierId: supplierId.value,
       supplierName: supplierName.value,
-      statusName: fileterStatusInApiStr.value,
+      statusName: fileterStatusInApiStr.value || '',
+      purchaseOrderNo: purchaseOrderNo.value,
 
     // ... and so on with other parameters
     },
@@ -2182,13 +2188,12 @@ const dessertsTest = ref([
                 class="py-1"
               >
                 <VTextField
-                  v-model="supplierId"
-                  type="Supplier Code"
+                  v-model="purchaseOrderNo"
                   density="compact"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Supplier Code
+                      Po No.
                     </span>
                   </template>
                 </VTextField>
