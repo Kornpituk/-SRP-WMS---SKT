@@ -1741,6 +1741,7 @@ const saveDraftData = word => {
                 <VTextarea
                   v-model="dataHeader.note"
                   :readonly="frozeCheck"
+                  counter
                   auto-grow
                   :rules="[
                     v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
@@ -1759,6 +1760,7 @@ const saveDraftData = word => {
                 <VTextarea
                   v-model="dataHeader.limConditionDetail"
                   :readonly="frozeCheck"
+                  counter
                   auto-grow
                   :rules="[
                     v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
