@@ -2320,7 +2320,7 @@ const dessertsTest = ref([
           </VBtn>
 
           <VBtn
-            v-if="false"
+            v-if="true"
             :disabled="insetSwitch1 === 'issues'"
             style="font-size: 12px;"
             @click="testBtn"
@@ -4562,6 +4562,7 @@ const dessertsTest = ref([
           v-if="Array.isArray(products) && products.length > 0 && progressLinearNoData === false"
           v-model="selectedDataTables"
           show-select
+          fixed-header
           :headers="headers"
           :items="products"
           :items-per-page="10"
@@ -4611,9 +4612,9 @@ const dessertsTest = ref([
                 />
               </td>
               <td
-                class="text-center px-2"
+                class="fixed-header-sticky px-2"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-                style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
+                style="justify-content: center; padding-block: 2px !important;"
               >
                 <VChip
                   :color="colorStatusWithId2(item.raw.statusId).color"
@@ -4932,6 +4933,14 @@ const dessertsTest = ref([
   inset-block-end: 0;
   margin-block-end: 80px;
   max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */
+}
+
+.fixed-header-sticky {
+  position: sticky;
+  z-index: 1;
+  background-color: #f5f5f5;
+  inset-block-start: 0;
+  inset-inline-start: 40px;
 }
 
 .spinning {

@@ -244,10 +244,10 @@ export default [
   //   icon: { icon: 'ri-truck-fill' },
   //   to: 'skt-shipping',
   // },
-  // {
-  //   title: 'Print Label',
-  //   icon: { icon: 'ri-printer-fill' },
-  //   to: 'skt-printLabel',
-  // },
+  {
+    title: 'Print Label',
+    icon: { icon: 'ri-printer-fill' },
+    to: 'skt-printLabel',
+  },
 ]
   

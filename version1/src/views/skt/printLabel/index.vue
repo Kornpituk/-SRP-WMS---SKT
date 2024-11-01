@@ -1118,6 +1118,79 @@ const printLabelForm = () => {
 
 //---------------------- new rel table --------------------
 import { VDataTable } from 'vuetify/labs/VDataTable'
+
+//-------------------------- table data -------------------------------
+const headers = [
+  {
+    title: 'data-table-select',
+    key: 'data-table-select',
+    align: "center",
+    fixed: true,
+    readonly: true,
+  },
+  {
+    title: 'Status',
+    key: 'statusText',
+    align: "center",
+    fixed: true,
+  },
+  {
+    title: 'No.',
+    key: 'no',
+    align: "center",
+  },
+  {
+    title: 'Item Code',
+    key: 'itemCode',
+  },
+  {
+    title: 'Item Name',
+    key: 'itemName',
+  },
+  {
+    title: 'Trade Name',
+    key: 'concatTradename',
+  },
+  {
+    title: 'Supplier Code',
+    key: 'supplierId',
+    
+  },
+  {
+    title: 'Supplier Name',
+    key: 'supplierName',
+  },
+  {
+    title: 'P/O No.',
+    key: 'purchaseOrderNo',
+  },
+  {
+    title: 'Delivery Date',
+    key: 'deliveryDate',
+  },
+  {
+    title: 'Lot',
+    key: 'batch',
+  },
+  { title: 'PURC(Pcs)', align: 'end', key: 'purchasingQuantityPcs' },
+  { title: 'PURC(Kgs)', align: 'end', key: 'purchasingAmountKgs' },
+  { title: 'RCVD(Pcs)', align: 'end', key: 'purchasingQuantityRcvdPcs' },
+  { title: 'RCVD(Kgs)', align: 'end', key: 'purchasingAmountRcvdKgs' },
+  {
+    title: 'Updated By',
+    key: 'updatedBy',
+  },
+  {
+    title: 'Updated On',
+    key: 'updatedDate',
+  },
+  {
+    title: 'Action',
+    key: 'action',
+    align: 'center',
+    class: 'sticky-right',
+  },
+]
 </script>
 
 <template>
@@ -2438,6 +2511,271 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
       </VCardText>
     </VCard>
   </section>
+
+  <!-- table data -->
+  <section>
+    <VCard>
+      <CardText>
+        <VProgressLinear
+          v-if="progressLinearNoData"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="!products.length > 0 && progressLinearNoData === false"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data....</span>
+        </VProgressLinear>
+        <VDataTable
+          v-if="Array.isArray(products) && products.length > 0 && progressLinearNoData === false"
+          v-model="selectedDataTables"
+          show-select
+          fixed-header
+          :headers="headers"
+          :items="products"
+          :items-per-page="10"
+          item-selectable="selectable"
+          class="elevation-1"
+          :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
+          :item-class="row_classes" 
+        >
+          <template #header.data-table-select="{ allSelected, selectAll, someSelected }">
+            <VCheckboxBtn
+              :indeterminate="someSelected && !allSelected"
+              :model-value="allSelected"
+              color="primary"
+              @update:model-value="selectAll(!allSelected)"
+            />
+          </template>
+
+          <template #item.data-table-select="{ internalItem, isSelected, toggleSelect }">
+            <VCheckboxBtn
+              :model-value="isSelected(internalItem)"
+              color="primary"
+              @update:model-value="toggleSelect(internalItem)"
+            />
+          </template>
+          <!-- 
+            <template #column.action="{ column }">
+            <tr>
+            <th
+            >
+            {{ column.column }} action custom
+            </th>
+            </tr>
+            </template>
+          -->
+          <template #item="{ item }">
+            <tr>
+              <td
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                class="text-center px-2"
+                style="position: sticky; z-index: 1; left: 0;"
+              >
+                <VCheckboxBtn
+                  v-if="item.raw.statusId === 7 || item.raw.statusId === 15"
+                  v-model="selectedDataTables"
+                  :value="item.raw"
+                  @update:modelValue="(selected) => handleSelection(selected, item.raw)"
+                />
+              </td>
+              <td
+                class="fixed-header-sticky px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                style="justify-content: center; padding-block: 2px !important;"
+              >
+                <VChip
+                  :color="colorStatusWithId2(item.raw.statusId).color"
+                  class="font-weight-medium"
+                  style="min-height: 40px;"
+                  :style="{ color: colorStatusWithId(item.raw.statusId).message }"
+                >
+                  <span
+                    v-if="debugMode === false"
+                    style="font-size: 12px;"
+                    class="text-wrap"
+                  >{{ item.raw.statusText }}</span>
+                  <span
+                    v-if="debugMode === true"
+                    style="font-size: 12px;"
+                    class="text-wrap"
+                  >{{ debugMode }} {{ item.raw.statusText }}[{{ item.raw.poEtlLogDetailJournalID }}]({{ item.raw.receiveTypeName }})</span>
+                </VChip>
+              </td>
+              <td
+                class="px-2 text-center"
+                style="min-width: 30px;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span style="font-size: 12px;">{{ item.raw.no }}</span>
+              </td>
+              <td
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                class="px-2"
+                style="min-width: 130px;  justify-content: start;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.itemCode }}</span>
+              </td>
+              <td
+                class="px-2"
+                style="min-width: 300px; max-width: 350px;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.itemName.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              <td
+                class="px-2 "
+                style="min-width: 250px; max-width: 350px;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.concatTradename.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              <td
+                class="px-2 text-center"
+                style="min-width: 150px; justify-content: center;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.supplierId }}</span>
+              </td>
+              <td
+                class="px-2"
+                style="justify-content: start;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="max-width: 200px; font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.supplierName.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              <td
+                class="text-start px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                style="min-width: 100px;"
+              > 
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.purchaseOrderNo }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 150px;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class=""
+                >{{ convertDate(item.raw.deliveryDate) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.batch }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.purchasingQuantityPcs.toLocaleString()) }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ formatNumber(item.raw.purchasingAmountKgs) }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.purchasingQuantityRcvdPcs.toLocaleString()) }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ formatNumber(item.raw.purchasingAmountRcvdKgs) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 150px;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.updatedBy }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <span style="font-size: 12px;">{{ convertDate(item.raw.updatedDate) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="justify-content: center;"
+                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+              >
+                <VBtn
+                  color="info"
+                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode, item.raw.poEtlLogDetailJournalID, item.raw.receiveTypeId, item.raw.batch)"
+                >
+                  <div style="font-size: 12px;">
+                    Action
+                  </div>
+                </VBtn>
+              </td>
+            </tr>
+          </template>
+        </VDataTable>
+      </CardText>
+    </VCard>
+  </section>
+
 
   <section v-if="false">
     <VDataTable
