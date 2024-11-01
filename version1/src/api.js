@@ -24,5 +24,5 @@ const urlTestSRP =ref('https://skttest1webapi.easetrackwms.com')
 
 const urlEnv = ref(import.meta.env.VITE_API_URL)
 
-export const urlApi = urlSktDev
+export const urlApi = urlSkt
 
