@@ -553,7 +553,7 @@ const GetStockUpdate = () => {
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
 
-      const filteredData = data.filter(item => item.receiveTypeId !== 3)
+      const filteredData = data.filter(item => item.receiveTypeId !== 33333)
 
       // Add No. field to each product (after filtering)
       products.value = filteredData.map((item, index) => ({
@@ -2320,7 +2320,7 @@ const dessertsTest = ref([
           </VBtn>
 
           <VBtn
-            v-if="true"
+            v-if="false"
             :disabled="insetSwitch1 === 'issues'"
             style="font-size: 12px;"
             @click="testBtn"
@@ -4612,9 +4612,9 @@ const dessertsTest = ref([
                 />
               </td>
               <td
-                class="fixed-header-sticky px-2"
+                class="text-center px-2"
                 :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-                style="justify-content: center; padding-block: 2px !important;"
+                style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
               >
                 <VChip
                   :color="colorStatusWithId2(item.raw.statusId).color"
@@ -4933,14 +4933,6 @@ const dessertsTest = ref([
   inset-block-end: 0;
   margin-block-end: 80px;
   max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */
-}
-
-.fixed-header-sticky {
-  position: sticky;
-  z-index: 1;
-  background-color: #f5f5f5;
-  inset-block-start: 0;
-  inset-inline-start: 40px;
 }
 
 .spinning {
