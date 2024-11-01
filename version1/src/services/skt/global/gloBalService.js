@@ -208,9 +208,12 @@ export const useFetchPrintLabelData = () => {
         
       if (result) {
         console.log('Print Inspection Form Service Complete:', result)
-        printLabelFormViewResult.value = result
+        printLabelFormViewResult.value = result.map((item, index) => ({
+          ...item,
+          index: index + 1, // เริ่มนับจาก 1
+        }))
         
-        return { success: true, data: result }
+        return { success: true, data: printLabelFormViewResult.value }
       } else {
         console.warn('Print Inspection Form Service Failed')
         

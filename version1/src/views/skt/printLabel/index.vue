@@ -17,6 +17,16 @@ const products = ref([]) //---------------- variable for get All Product From X-
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
+//---------------- format
+function convertDate(dateString) {
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  
+  return `${day}/${month}/${year}`
+}
+
 const dataHeaders = [
   {
     title: 'Dessert (100g serving)',
@@ -112,45 +122,11 @@ import { useViewPrintLabelFormService, useFetchPrintLabelData }  from '@/service
 
 const { printLabelFormViewResult, errorMessagePrintLabelView, printLabelFormViewService } = useFetchPrintLabelData()
 
-const getPrintLabelView = async lot => {
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/PrintLabel`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${searchByWareHouseId.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    params: {
-      //... and so on with other parameters
-      lot: '',
-      productId: '',
-      productName: '',
-      purchaseOrderNo: '',
-      receivedDate: '',
-    },
-  }, {})
-    .then(response => {
+const dataPrintLabel = ref([])
+const selectedDataTables = ref([])
 
-      const data = response.data
-
-      dataPrintlabel.value = data
-      console.log("getPrintLabelView 55555+", data)
-      
-      successGetPrintLabelView.value = true
-    })
-    .catch(error => {
-      console.error('Error:', error)
-      
-      successGetPrintLabelView.value = false
-    })
-
-  // const result = printLabelFormViewService(urlApi.value, searchByWareHouseId.value, accessTokenAtStore, lot)
-
-  // if(printLabelFormViewResult){
-  //   console.log('printLabelFormViewService Success')
-  // }
-
-}
+//----------------------- Filter Status 
+const progressLinearNoData = ref(false)
 
 const paramsFetchDataPrintLabel = ref({
   lot: '',
@@ -164,12 +140,13 @@ const fetchData = async () => {
 
   const result = await printLabelFormViewService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
 
-  // if (result.success) {
-  //   dataPrintLabel.value = result.data
-  //   success.value = true
-  // } else {
-  //   success.value = false
-  // }
+  if (printLabelFormViewResult.value) {
+    dataPrintLabel.value = result.data
+    progressLinearNoData.value = true
+    console.log("printLabelFormViewService successfully view")
+  } else {
+    console.log("printLabelFormViewService failed view")
+  }
 }
 
 watchEffect(() => {
@@ -186,56 +163,58 @@ const headers = [
     readonly: true,
   },
   {
-    title: 'Status',
-    key: 'statusText',
-    align: "center",
-    fixed: true,
-  },
-  {
     title: 'No.',
     key: 'no',
     align: "center",
   },
   {
-    title: 'Item Code',
-    key: 'itemCode',
+    title: 'Lot',
+    key: 'lot',
   },
   {
-    title: 'Item Name',
-    key: 'itemName',
+    title: 'Barcode',
+    key: 'barcode',
   },
   {
-    title: 'Trade Name',
-    key: 'concatTradename',
+    title: 'Description',
+    key: 'lotDescription',
   },
   {
-    title: 'Supplier Code',
-    key: 'supplierId',
+    title: 'Received Date',
+    key: 'receivedDate',
     
   },
   {
-    title: 'Supplier Name',
-    key: 'supplierName',
+    title: 'Expired Date',
+    key: 'expiredDate',
   },
   {
-    title: 'P/O No.',
-    key: 'purchaseOrderNo',
+    title: 'Reminding Days',
+    key: 'remindingDays',
   },
   {
     title: 'Delivery Date',
     key: 'deliveryDate',
   },
   {
-    title: 'Lot',
-    key: 'batch',
+    title: 'P/O No',
+    key: 'purchaseOrderNo',
   },
-  { title: 'PURC(Pcs)', align: 'end', key: 'purchasingQuantityPcs' },
-  { title: 'PURC(Kgs)', align: 'end', key: 'purchasingAmountKgs' },
-  { title: 'RCVD(Pcs)', align: 'end', key: 'purchasingQuantityRcvdPcs' },
-  { title: 'RCVD(Kgs)', align: 'end', key: 'purchasingAmountRcvdKgs' },
   {
-    title: 'Updated By',
-    key: 'updatedBy',
+    title: 'Product No.',
+    key: 'productionCode',
+  },
+  {
+    title: 'Product Code',
+    key: 'productId',
+  },
+  {
+    title: 'Product Name',
+    key: 'productName',
+  },
+  {
+    title: 'Category',
+    key: 'category',
   },
   {
     title: 'Updated On',
@@ -735,7 +714,7 @@ const headers = [
   </div>
 
   <!-- ----------             Production plan                                ------------------------------------ -->
-  <section>
+  <section v-if="false">
     <VCard class="mt-6">
       <VTable
         id="myTable"
@@ -1574,7 +1553,7 @@ const headers = [
     <VCard>
       <CardText>
         <VProgressLinear
-          v-if="progressLinearNoData"
+          v-if="progressLinearNoData && !printLabelFormViewResult"
           height="20"
           color="secondary"
           class="elevation-1"
@@ -1582,7 +1561,7 @@ const headers = [
           <span>No Data....</span>
         </VProgressLinear>
         <VProgressLinear
-          v-if="!products.length > 0 && progressLinearNoData === false"
+          v-if="!printLabelFormViewResult && progressLinearNoData === false"
           height="20"
           indeterminate
           color="primary"
@@ -1591,12 +1570,12 @@ const headers = [
           <span>Loading Data....</span>
         </VProgressLinear>
         <VDataTable
-          v-if="Array.isArray(products) && products.length > 0 && progressLinearNoData === false"
+          v-if="progressLinearNoData && printLabelFormViewResult"
           v-model="selectedDataTables"
           show-select
           fixed-header
           :headers="headers"
-          :items="products"
+          :items="printLabelFormViewResult"
           :items-per-page="10"
           item-selectable="selectable"
           class="elevation-1"
@@ -1619,208 +1598,139 @@ const headers = [
               @update:model-value="toggleSelect(internalItem)"
             />
           </template>
-          <!-- 
-            <template #column.action="{ column }">
-            <tr>
-            <th
-            >
-            {{ column.column }} action custom
-            </th>
-            </tr>
-            </template>
-          -->
           <template #item="{ item }">
             <tr>
               <td
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
                 class="text-center px-2"
                 style="position: sticky; z-index: 1; left: 0;"
               >
                 <VCheckboxBtn
-                  v-if="item.raw.statusId === 7 || item.raw.statusId === 15"
                   v-model="selectedDataTables"
                   :value="item.raw"
-                  @update:modelValue="(selected) => handleSelection(selected, item.raw)"
                 />
-              </td>
-              <td
-                class="fixed-header-sticky px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-                style="justify-content: center; padding-block: 2px !important;"
-              >
-                <VChip
-                  :color="colorStatusWithId2(item.raw.statusId).color"
-                  class="font-weight-medium"
-                  style="min-height: 40px;"
-                  :style="{ color: colorStatusWithId(item.raw.statusId).message }"
-                >
-                  <span
-                    v-if="debugMode === false"
-                    style="font-size: 12px;"
-                    class="text-wrap"
-                  >{{ item.raw.statusText }}</span>
-                  <span
-                    v-if="debugMode === true"
-                    style="font-size: 12px;"
-                    class="text-wrap"
-                  >{{ debugMode }} {{ item.raw.statusText }}[{{ item.raw.poEtlLogDetailJournalID }}]({{ item.raw.receiveTypeName }})</span>
-                </VChip>
               </td>
               <td
                 class="px-2 text-center"
                 style="min-width: 30px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
-                <span style="font-size: 12px;">{{ item.raw.no }}</span>
+                <span style="font-size: 12px;">{{ item.raw.index }}</span>
               </td>
               <td
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                
                 class="px-2"
                 style="min-width: 130px;  justify-content: start;"
               >
                 <span
                   style="font-size: 12px;"
                   class="text-wrap"
-                >{{ item.raw.itemCode }}</span>
+                >{{ item.raw.lot }}</span>
               </td>
               <td
-                class="px-2"
-                style="min-width: 300px; max-width: 350px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-              >
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                  v-html="item.raw.itemName.replace(/\s/g, '&nbsp;')"
-                />
-              </td>
-              <td
-                class="px-2 "
-                style="min-width: 250px; max-width: 350px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-              >
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                  v-html="item.raw.concatTradename.replace(/\s/g, '&nbsp;')"
-                />
-              </td>
-              <td
-                class="px-2 text-center"
+                class="px-2 text-start"
                 style="min-width: 150px; justify-content: center;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
                   style="font-size: 12px;"
                   class="text-wrap"
-                >{{ item.raw.supplierId }}</span>
-              </td>
-              <td
-                class="px-2"
-                style="justify-content: start;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-              >
-                <span
-                  style="max-width: 200px; font-size: 12px;"
-                  class="text-wrap"
-                  v-html="item.raw.supplierName.replace(/\s/g, '&nbsp;')"
-                />
+                >{{ item.raw.barcode }}</span>
               </td>
               <td
                 class="text-start px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                
                 style="min-width: 100px;"
               > 
                 <span
                   style="font-size: 12px;"
                   class="text-wrap"
-                >{{ item.raw.purchaseOrderNo }}</span>
+                >{{ item.raw.lotDescription }}</span>
               </td>
               <td
                 class="text-center px-2"
                 style="min-width: 150px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
                   style="font-size: 12px;"
                   class=""
-                >{{ convertDate(item.raw.deliveryDate) }}</span>
+                >{{ convertDate(item.raw.receivedDate) }}</span>
+              </td>
+              <td class="text-start px-2">
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ convertDate(item.raw.expiredDate) }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.remindingDays) }}</span>
+              </td>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.deliveryDate) }}</span>
               </td>
               <td
                 class="text-start px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                style="min-width: 100px; justify-content: end;"
               >
                 <span
                   style="font-size: 12px;"
                   class="text-wrap"
-                >{{ item.raw.batch }}</span>
+                >{{ (item.raw.purchaseOrderNo) }}</span>
               </td>
               <td
                 class="text-end px-2"
-                style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                style="min-width: 140px; justify-content: start;"
               >
                 <span
                   style="font-size: 12px;"
                   class="text-wrap"
-                >{{ (item.raw.purchasingQuantityPcs.toLocaleString()) }}</span>
-              </td>
-              <td
-                class="text-end px-2"
-                style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-              >
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ formatNumber(item.raw.purchasingAmountKgs) }}</span>
-              </td>
-              <td
-                class="text-end px-2"
-                style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-              >
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ (item.raw.purchasingQuantityRcvdPcs.toLocaleString()) }}</span>
-              </td>
-              <td
-                class="text-end px-2"
-                style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
-              >
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ formatNumber(item.raw.purchasingAmountRcvdKgs) }}</span>
+                >{{ (item.raw.productionCode) }}</span>
               </td>
               <td
                 class="text-start px-2"
                 style="min-width: 150px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
                 <span
                   style="font-size: 12px;"
                   class="text-wrap"
-                >{{ item.raw.updatedBy }}</span>
+                >{{ item.raw.productId }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 130px;"
+              >
+              <span
+                  style="max-width: 200px; font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.productName.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 130px;"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
               </td>
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
-                <span style="font-size: 12px;">{{ convertDate(item.raw.updatedDate) }}</span>
+                <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
               </td>
               <td
                 class="text-start px-2"
                 style="justify-content: center;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
               >
-                <VBtn
-                  color="info"
-                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode, item.raw.poEtlLogDetailJournalID, item.raw.receiveTypeId, item.raw.batch)"
-                >
+                <VBtn color="info">
                   <div style="font-size: 12px;">
                     Action
                   </div>
