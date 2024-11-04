@@ -4563,6 +4563,7 @@ const dessertsTest = ref([
           v-model="selectedDataTables"
           show-select
           fixed-header
+          height="550"
           :headers="headers"
           :items="products"
           :items-per-page="10"
