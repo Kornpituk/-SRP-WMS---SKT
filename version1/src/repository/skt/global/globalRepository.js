@@ -137,11 +137,6 @@ export const  globalService = {
     }
   },
 
-
-
-
-
-
   //--------------------------------------------------- Label
 
   async printLabelView(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken, lot) {
@@ -211,6 +206,33 @@ export const  globalService = {
       throw new Error(`Failed to printLabelView for Lot ${lot}: ${error.response?.data?.message || error.message}`)
     }
   },
+
+
+  //-----
+  async getPrintLabel (urlApi, warehouseId, accessToken, params = {}) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/PrintLabel/Label`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': warehouseId,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          lot: params.lot || '',
+          productId: params.productId || '',
+          productName: params.productName || '',
+          purchaseOrderNo: params.purchaseOrderNo || '',
+          receivedDate: params.receivedDate || '',
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      throw new Error(`Failed to printLabelView ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+
   
 }
   

@@ -155,6 +155,16 @@ onMounted(() => {
   purchaseOrderNo.value = sessionStorage.getItem('purchaseOrderNo') || ''
 })
 
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === 'null'){
+    sessionStorage.setItem('fileterStatusInPAI', '')
+  }
+  if(sessionStorage.getItem('statusFilter') === 'null'){
+    sessionStorage.setItem('statusFilter', '')
+  }
+  console.log("statusFilter", sessionStorage.getItem('statusFilter'))
+})
+
 // ดึงค่าจาก sessionStorage
 const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
 
@@ -175,8 +185,8 @@ const addStoredStatus = () => {
     })
 
     // อัปเดต sessionStorage
-    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value.join(','))
-    sessionStorage.setItem('statusFilter', statusFilter.value.join(','))
+    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value.join(',') || '')
+    sessionStorage.setItem('statusFilter', statusFilter.value.join(',') || '')
   }
 }
 
@@ -554,7 +564,11 @@ const GetStockUpdate = () => {
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
 
+<<<<<<< HEAD
       const filteredData = data.filter(item => item.receiveTypeId !== 33)
+=======
+      const filteredData = data.filter(item => item.receiveTypeId !== 33333)
+>>>>>>> feature/table_receivingPlan_Gun
 
       // Add No. field to each product (after filtering)
       products.value = filteredData.map((item, index) => ({
@@ -4252,6 +4266,8 @@ const insetSwitch1 = ref('')
           v-if="Array.isArray(products) && products.length > 0 && progressLinearNoData === false"
           v-model="selectedDataTables"
           show-select
+          fixed-header
+          height="550"
           :headers="headers"
           :items="products"
           :items-per-page="10"

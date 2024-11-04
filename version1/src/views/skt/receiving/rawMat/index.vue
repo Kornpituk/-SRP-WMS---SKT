@@ -3419,6 +3419,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-model="purchaseOrder.noteText"
                 :readonly="readonlyAllInput()"
                 placeholder="Text"
+                counter
                 :rules="[
                   v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
                 ]" 
