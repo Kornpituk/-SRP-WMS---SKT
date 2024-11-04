@@ -15,7 +15,6 @@ const props = defineProps({
   Data: Array,
 })
 
-
 const switchLog = ref(false)
 
 watchEffect(() => {
@@ -199,6 +198,8 @@ const testPC = () => {
   console.log("Testing", purchaseOrder)
 }
 
+const checkGenerate = ref(0)
+
 const generatedReceivingForm = () => {
 
   axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate`, {}, {
@@ -218,6 +219,7 @@ const generatedReceivingForm = () => {
       // itemsManufacturer.value = response.data.data
 
       console.log('[*****generatedReceivingForm]!!: ', response.data)
+      loadingGenerated1.value = false
 
     })
     .catch(error => {
@@ -230,6 +232,9 @@ const generatedReceivingForm = () => {
 const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const typeReceivedId = ref(null)
+
+const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
 
 const generatedJournalId = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${data.value.poEtlLogDetailJournalID}`, {
@@ -249,7 +254,10 @@ const generatedJournalId = () => {
 
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
+        poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
         statusId.value = item.statusId // เก็บค่า statusId
+        typeReceivedId.value = item.receiveTypeId
+        loadingGenerated2.value = false
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
       }
@@ -269,13 +277,93 @@ const hidedAllIconInput = () => {
   return statusId.value === 3 || statusId.value === 1
 }
 
+watchEffect(() => {
+
+})
+
+const frozeCheck = ref(true)
+
+const loadingGenerated1 = ref(true)
+const loadingGenerated2 = ref(true)
+
 watch(() => {
   console.log('Gene 1')
   generatedJournalId()
   generatedReceivingForm()
+
+  if(statusId.value === 3 || statusId.value === 1){
+    frozeCheck.value = false
+  }
 })
 
+//--------------------- Input -----------------------------------------
+const maxLines = 4
+const maxCharsPerLine = 130
+
+const limitTextInputLine4 = event => {
+  const inputText = event.target.value
+  let lines = inputText.split('\n')
+  
+  const maxLines = 4
+  const maxCharsPerLine = 130
+
+  // ป้องกันไม่ให้พิมพ์เกิน 130 ตัวอักษรในแต่ละบรรทัด
+  for (let i = 0; i < lines.length; i++) {
+    while (lines[i].length > maxCharsPerLine) {
+      // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
+      let extraText = lines[i].slice(maxCharsPerLine)
+      lines[i] = lines[i].slice(0, maxCharsPerLine)
+      
+      if (i + 1 < maxLines) {
+        // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
+        lines.splice(i + 1, 0, extraText)
+      } else {
+        // ถ้าเกิน 4 บรรทัดแล้ว ให้ตัดส่วนที่เกินทิ้ง
+        break
+      }
+    }
+  }
+
+  // ป้องกันไม่ให้เกินจำนวนบรรทัดที่กำหนด
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+  }
+
+  // อัปเดตค่าใน textarea
+  event.target.value = lines.join('\n')
+  purchaseOrder.value.noteText = event.target.value
+}
+
+// const maxChars = 42
+
 //------------------- Generated Data --------------------------------
+//-------------------------- Generate ----------------------------------
+const generated = () => {
+
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${data.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+
+      // itemsManufacturer.value = response.data.data
+
+      console.log('[generatedReceivingForm]!!: ', response.data)
+
+    })
+    .catch(error => {
+    // Handle errors
+      console.error('Error:', error)
+    })
+}
+
+watch(() => {
+  generated()
+})
 
 //----------------- Function Clear When Maker Lot '' | undifined |----------------------------------------------------------------
 const resetDataRaeMatRequest = () => {
@@ -316,8 +404,6 @@ watch(
   resetDataRaeMatRequest,
 )
 
-const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
-
 const detailsReceivingForm = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/details`, {
     params: {
@@ -344,114 +430,114 @@ const detailsReceivingForm = () => {
 }
 
 //------------- Header
-const getHearderReceivingForm = () => {
+const getHearderReceivingForm = async () => {
+  loadingGenerated1.value = true
+
   if (poEtlLogDetailJournalIDQueryParameters.value) {
-    axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    },
-    {})
-      .then(response => {
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-        const data = response.data.data
+      const data = response.data.data
 
-        dataHeaderReceving.value = data[0]
+      dataHeaderReceving.value = data[0]
 
-        // sktName.value = data[0].Lable
-        // rawMatCode.value = data[0].Lable
-        // SupplierName.value = data[0].Lable
-        // TradeName.value = data[0].Lable
-        // Manufacturer.value = data[0].Lable
-        purchaseOrder.value.journalID = data[0].journalID
+      purchaseOrder.value.journalID = data[0].journalID
+      UserNameAccoutWork.value = data[0].updatedBy
+      supplier.value = data[0].approveBy
 
-        UserNameAccoutWork.value = data[0].updatedBy
-        supplier.value = data[0].approveBy
+      purchaseOrder.value.receivedDate = formatDate(data[0].receivedDate)
+      purchaseOrder.value.expectDeliveryDate = formatDate(data[0].expectDeliveryDate)
+      purchaseOrder.value.invoiceNo = data[0].invoiceNo
 
-        purchaseOrder.value.receivedDate = formatDate(data[0].receivedDate)
-        purchaseOrder.value.expectDeliveryDate = formatDate(data[0].expectDeliveryDate)
-        purchaseOrder.value.invoiceNo = data[0].invoiceNo
+      purchaseOrder.value.isForHalalProduct = data[0].isForHalalProduct
+      purchaseOrder.value.isForRspoProduct = data[0].isForRspoProduct
+      purchaseOrder.value.noteText = data[0].noteText
 
-        purchaseOrder.value.isForHalalProduct = data[0].isForHalalProduct
-        purchaseOrder.value.isForRspoProduct = data[0].isForRspoProduct
-        purchaseOrder.value.noteText = data[0].noteText
+      purchaseOrder.value.selectedMakerName = data[0].selectedMakerName
+      Manufacturer.value = data[0].selectedMakerName
+      purchaseOrder.value.packagingTypeName = data[0].packagingTypeName
 
-        purchaseOrder.value.selectedMakerName = data[0].selectedMakerName
-        Manufacturer.value = data[0].selectedMakerName
-        purchaseOrder.value.packagingTypeName = data[0].packagingTypeName
+      poEtlLogDetailJournalID.value = data[0].poEtlLogDetailJournalID
+      purchaseOrder.value.storagePlaceNo = data[0].storagePlaceNo
+      purchaseOrder.value.receivedDate = data[0].receivedDate
 
-        poEtlLogDetailJournalID.value = data[0].poEtlLogDetailJournalID
-        purchaseOrder.value.storagePlaceNo = data[0].storagePlaceNo
+      //------------------------- DeliveryQueue ------------------------
+      deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
+      deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
 
-        purchaseOrder.value.receivedDate = data[0].receivedDate
-
-        //------------------------- DeliveryQueue ------------------------
-        deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
-        deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
-
-        // purchaseOrder.value = response.data[0]
-        console.log('[*****Headers]]!!: ', data[0])
-
-        console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
-
-      })
-      .catch(error => {
-        // Handle errors
-        console.error('Error:', error)
-      })
+      console.log('[*****Headers]]!!: ', data[0])
+      console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
   } else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    loadingGenerated1.value = true
   }
-
 }
 
 //--------------- Lot
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const getLotReceivingForm = () => {
+const getLotReceivingForm = async () => {
+  loadingGenerated1.value = true
   if (poEtlLogDetailJournalIDQueryParameters.value) {
-    axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/get-lot/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    })
-      .then(response => {
-        const lotData = response.data.data
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get-lot/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-        // แมพข้อมูลจาก API ลงใน purchaseOrder
-        lotData.forEach((lot, index) => {
-          const lotNumber = index + 1 // เริ่มจาก 1, 2, 3, ...
+      const lotData = response.data.data
 
-          // เก็บข้อมูลแต่ละ lot ใน purchaseOrder
-          purchaseOrder.value[`actualMakerLotNo_${lotNumber}`] = lot.actualMakerLotNo
-          purchaseOrder.value[`actualNetCountKgs_${lotNumber}`] = lot.actualNetCountKgs
-          purchaseOrder.value[`actualAmountUnits_${lotNumber}`] = lot.actualAmountUnits
-          purchaseOrder.value[`actualTotalQuantityKgs_${lotNumber}`] = lot.actualTotalQuantityKgs
-          purchaseOrder.value[`customManufacturerName_${lotNumber}`] = lot.customManufacturerName
-          purchaseOrder.value[`customLable_${lotNumber}`] = lot.customLable
-        })
+      // แมพข้อมูลจาก API ลงใน purchaseOrder
+      lotData.forEach((lot, index) => {
+        const lotNumber = index + 1 // เริ่มจาก 1, 2, 3, ...
 
-        NetCountPackage.value = lotData[0].actualNetCountKgs
-
-        purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
-
-        console.log('[*****Headers Lot]]!!:', lotData[0])
-
+        // เก็บข้อมูลแต่ละ lot ใน purchaseOrder
+        purchaseOrder.value[`actualMakerLotNo_${lotNumber}`] = lot.actualMakerLotNo
+        purchaseOrder.value[`actualNetCountKgs_${lotNumber}`] = lot.actualNetCountKgs
+        purchaseOrder.value[`actualAmountUnits_${lotNumber}`] = lot.actualAmountUnits
+        purchaseOrder.value[`actualTotalQuantityKgs_${lotNumber}`] = lot.actualTotalQuantityKgs
+        purchaseOrder.value[`customManufacturerName_${lotNumber}`] = lot.customManufacturerName
+        purchaseOrder.value[`customLable_${lotNumber}`] = lot.customLable
       })
-      .catch(error => {
-        // Handle errors
-        console.error('Error:', error)
-      })
+
+      NetCountPackage.value = lotData[0].actualNetCountKgs
+      purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
+
+      console.log('[*****Headers Lot]]!!:', lotData[0])
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
+  } else {
+    console.log('**poEtlLogDetailJournalIDQueryParameters is missing')
+    loadingGenerated1.value = true
   }
 }
 
 import { useGetCOAFormController, 
   useDeleteCoaFormController, 
   useDeleteAllCoaFormController, 
-  useSaveCOAFormController } from '@/controllers/skt/receivingFrom/rawMat/controller'
+  useSaveCOAFormController } from '@/services/skt/receivingFrom/rawMat/controller'
 
 const coaFiles = ref([])
 
@@ -496,50 +582,47 @@ watchEffect(() => {
   
 })
 
-const getCOAReceivingForm = () => {
+const getCOAReceivingForm = async () => {
   if (poEtlLogDetailJournalIDQueryParameters.value) {
     loading.value = true
-    axiosIns.get(
-      `${urlApi.value}/api/v1/ReceivingForm/get-coA/${poEtlLogDetailJournalIDQueryParameters.value}`,
-      {
-        headers: {
-          'accept': '*/*',
-          'x-location': `${whereHouse.value}`,
-          Authorization: `Bearer ${accessTokenAtStore}`,
-        },
-        onDownloadProgress: progressEvent => {
-          const { loaded, total } = progressEvent
-          if (total > 0) {
-            const percentCompleted = Math.round((loaded * 100) / total)
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get-coA/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+          onDownloadProgress: progressEvent => {
+            const { loaded, total } = progressEvent
+            if (total > 0) {
+              const percentCompleted = Math.round((loaded * 100) / total)
 
-            modelValue.value = percentCompleted
-            bufferValue.value = percentCompleted + 10 // Optional: Adjust buffer value if needed
-          } else {
-            // Handle the case where total is 0 or undefined
-            console.warn('Total size of file is not available')
-          }
+              modelValue.value = percentCompleted
+              bufferValue.value = percentCompleted + 10 // Optional: Adjust buffer value if needed
+            } else {
+              console.warn('Total size of file is not available')
+            }
+          },
         },
-      },
-    )
-      .then(response => {
-        const lotData = response.data.data
+      )
 
-        coaFiles.value = lotData
-        console.log('[*****Headers COA]]!!: ', lotData)
-      })
-      .catch(error => {
-        console.error('Error:', error)
-      })
-      .finally(() => {
-        loading.value = false
-      })
+      const lotData = response.data.data
+
+      coaFiles.value = lotData
+      console.log('[*****Headers COA]]!!: ', lotData)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loading.value = false
+    }
   }
 }
 
 onBeforeUnmount(() => {
   clearInterval(interval.value)
 })
-
 
 watch(() => {
   console.log('Gene 2')
@@ -577,6 +660,38 @@ const saveReceivingForm = () => {
 }
 
 //--------------- save header --------------------------------
+const textAlertError = ref({
+  mgs: '',
+  success: false,
+
+  note: '',
+  coa: '',
+})
+
+const validateHeader = () => {
+  textAlertError.value.success = true
+  console.log("Start validateHeader!!++1")
+
+  let value = 'NaN'
+
+  if(purchaseOrder.value.actualMeanNetCountKgs  === value ){
+    textAlertError.value.mgs += 'Net Count Kgs failed.'
+    textAlertError.value.success = false
+  }
+
+  if(purchaseOrder.value.actualGrandAmountUnits === value){
+    textAlertError.value.mgs += 'Total Amount Units failed.'
+    textAlertError.value.success = false
+  }
+
+  if(purchaseOrder.value.actualGrandTotalQuantityKgs === value){
+    textAlertError.value.mgs += 'Total Quantity Kgs failed.'
+    textAlertError.value.success = false
+  }
+
+  return textAlertError.value.success
+}
+
 const saveHeaderReceivingForm = async () => {
   const body = {
     poEtlLogDetailJournalID: purchaseOrder.value.poEtlLogDetailJournalID,
@@ -586,14 +701,28 @@ const saveHeaderReceivingForm = async () => {
     invoiceNo: purchaseOrder.value.invoiceNo,
     expectDeliveryDate: purchaseOrder.value.expectDeliveryDate,
     customManufacturerName: purchaseOrder.value.customManufacturerName,
+    
     actualMeanNetCountKgs: purchaseOrder.value.actualMeanNetCountKgs,
     actualGrandAmountUnits: purchaseOrder.value.actualGrandAmountUnits,
     actualGrandTotalQuantityKgs: purchaseOrder.value.actualGrandTotalQuantityKgs,
+
     noteText: purchaseOrder.value.noteText,
     isForHalalProduct: purchaseOrder.value.isForHalalProduct,
     isForRspoProduct: purchaseOrder.value.isForRspoProduct,
     updatedBy: purchaseOrder.value.updatedBy,
   }
+
+  const validatedHeader = ref(validateHeader())
+
+  if(!validatedHeader.value){
+    throw 'Save header Failed'+textAlertError.value.msg
+  }
+
+  // if(!purchaseOrder.value.noteText){
+  //   textAlertError.value.success = false
+  //   textAlertError.value.note = "Request Note"
+  //   throw 'Save header Failed. request note.'
+  // }
 
   try {
     const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value.poEtlLogDetailJournalID}`, body, {
@@ -616,50 +745,168 @@ const saveHeaderReceivingForm = async () => {
 //--------------- save Lot --------------------------------
 
 const alertErrorLot = ref({
-  alertMakerLot1: null,
-  alertMakerLot2: null,
-  alertMakerLot3: null,
-  alertMakerLot4: null,
-  alertMakerLot5: null,
 
-  alertAmountLot1: null,
-  alertAmountLot2: null,
-  alertAmountLot3: null,
-  alertAmountLot4: null,
-  alertAmountLot5: null,
+  alertMakerLot1: {
+    index: 1,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot1: {
+    index: 1,
+    msg: '',
+    success: false,
+  },
+
+  alertMakerLot2: {
+    index: 2,
+    msg: '',
+    success: false,
+  },
+  alertAmountLot2: {
+    index: 2,
+    msg: '',
+    success: false,
+  },
+
+  alertMakerLot3: {
+    index: 3,
+    msg: '',
+    success: false,
+  },
+  alertAmountLot3: {
+    index: 3,
+    msg: '',
+    success: false,
+  },
+
+  alertMakerLot4: {
+    index: 4,
+    msg: '',
+    success: false,
+  },
+  alertAmountLot4: {
+    index: 4,
+    msg: '',
+    success: false,
+  },
+
+  alertMakerLot5: {
+    index: 5,
+    msg: '',
+    success: false,
+  },
+  alertAmountLot5: {
+    index: 5,
+    msg: '',
+    success: false,
+  },
 })
 
-const alertTextValidateInput = ({
-  alertTextActualMakerLotNo: '',
-  alertTextActualMakerLotNo_1: '',
-  alertTextActualMakerLotNo_2: '',
-  alertTextActualMakerLotNo_3: '',
-  alertTextActualMakerLotNo_4: '',
-  alertTextActualMakerLotNo_5: '',
+const alertErrorAmount = ref({
+
+  alertAmountLot1: {
+    index: 1,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot2: {
+    index: 2,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot3: {
+    index: 3,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot4: {
+    index: 4,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot5: {
+    index: 5,
+    msg: '',
+    success: false,
+  },
 })
 
 const validateLotNoInput = (actualAmountUnits, actualMakerLotNo, index) => {
   if(!actualMakerLotNo && actualAmountUnits){
-    alertTextValidateInput.value.alertTextValidateInput = `Lot No.${index} is required`
-    
-    return true
-  }else if(actualMakerLotNo && !actualAmountUnits){
-    alertTextValidateInput.value.alertTextValidateInput = `Lot No.${index} is required.`
-    
-    return true
+    return `Lot No.${index} is required.`
   }else{
-    return false
+    
+    return ''
   }
+}
+
+const validateAmountInput = (actualAmountUnits, actualMakerLotNo, index) => {
+  if(actualMakerLotNo && !actualAmountUnits){
+    return `Amount(Unit)${index} is required.`
+  }else{
+    return ''
+  }
+}
+
+const validateMissing = l => {
+  if(l === 1 && !purchaseOrder.value[`actualMakerLotNo_${l}`]){
+    return 0
+  }
+  if(!purchaseOrder.value[`actualMakerLotNo_${l}`]){
+
+    for (let i = l+1; i <= 5; i++) {
+
+      if(purchaseOrder.value[`actualMakerLotNo_${i}`] || purchaseOrder.value[`actualAmountUnits_${i}`]){
+        return 0
+      }
+    }
+
+    if(purchaseOrder.value[`actualAmountUnits_${l}`]){
+      return 0
+    }
+    
+    return -1
+  }
+
+  return 1
 }
 
 // ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Lot No.
 const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
-  if (!actualMakerLotNo && actualAmount) {
-    alertErrorLot.value[`alertMakerLot${i}`] = `The Lot No.${i} field cannot be left blank. Please enter the required information without leaving any spaces.`
+
+  const validate = ref(validateMissing(i))
+
+  console.log("validate++++3", validate.value)
+
+  if(validate.value === 0){
+    alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot - missing.`
+    alertErrorLot.value[`alertMakerLot${i}`].success = false
+
+    return true  // มีข้อผิดพลาด
+  }
+
+  // if(!actualMakerLotNo && !purchaseOrder.value[`actualMakerLotNo_${i+1}`] ){
+  //   alertErrorLot.value[`alertMakerLot${i}`].msg = The Lot No.${i} field missing.
+  //   alertErrorLot.value[`alertMakerLot${i}`].success = false
+
+  //   return true  // มีข้อผิดพลาด
+  // }
+
+
+
+  if (validate.value === 0 && actualAmount) {
+    alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot - Field cannot be left blank. Please enter the required information without leaving any spaces.`
+    alertErrorLot.value[`alertMakerLot${i}`].success = false
 
     return true  // มีข้อผิดพลาด
   } else {
-    alertErrorLot.value[`alertMakerLot${i}`] = null
+    alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot -  Completed.`
+    alertErrorLot.value[`alertMakerLot${i}`].success = true
 
     return false
   }
@@ -668,28 +915,37 @@ const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
 // ฟังก์ชันสำหรับตรวจสอบเงื่อนไข Amount(Unit)
 const validateAmount = (i, actualMakerLotNo, actualAmount) => {
   // เริ่มต้นข้อความแสดงข้อผิดพลาด
+
+  const validate = ref(validateMissing(i))
   let errorMessage = ''
 
-  // ตรวจสอบเงื่อนไขแรก
-  if (actualMakerLotNo && !actualAmount) {
-    errorMessage +=
-      `The Amount(Unit)${i} field cannot be left blank. Please enter the required information without leaving any spaces. `
+  if(validate.value === 0 || validate.value === 1){
+    
+    // ตรวจสอบเงื่อนไขแรก
+    if (!actualAmount) {
+      errorMessage +=
+      `- Amount(Unit) - field blank`
+    }
+
+    // ตรวจสอบเงื่อนไขที่สอง
+    else if (actualAmount < 1 && actualAmount !== null) {
+      errorMessage +=
+      `- Amount(Unit) - more than 1. `
+    }
   }
 
-  // ตรวจสอบเงื่อนไขที่สอง
-  if (actualAmount <= 0 && actualAmount !== null) {
-    errorMessage +=
-      `The Amount(Unit)${i}, Invalid input detected. Ensure the amount entered is not less than 1. `
-  }
+  // cnosole.log("errorMessage+++", errorMessage)
 
   // ถ้ามีข้อความข้อผิดพลาด
   if (errorMessage) {
-    alertErrorLot.value[`alertAmountLot${i}`] = errorMessage.trim() // ลบช่องว่างที่ไม่จำเป็น
-
+    alertErrorLot.value[`alertAmountLot${i}`].msg = errorMessage.trim() // ลบช่องว่างที่ไม่จำเป็น
+    alertErrorLot.value[`alertAmountLot${i}`].success = false
+    
     return true  // มีข้อผิดพลาด
   } else {
-    alertErrorLot.value[`alertAmountLot${i}`] = null // ไม่มีข้อผิดพลาด
-
+    alertErrorLot.value[`alertAmountLot${i}`].msg  = `- Amount(Unit) - Completed.` // ไม่มีข้อผิดพลาด
+    alertErrorLot.value[`alertAmountLot${i}`].success = true
+    
     return false // ไม่มีข้อผิดพลาด
   }
 }
@@ -782,6 +1038,16 @@ const removeFileN = index => {
     delete fileUrls.value[file.name] // ลบ URL จาก object
   }
   fileCoaNew.value.splice(index, 1) // ลบไฟล์จาก array
+
+  if(file){
+    if(file.length < 1){
+      fileCoaNew.value = []
+      console.log('clear fileCoaNew complet!')
+    }else{
+      console.log('Test length < 1')
+    }
+    
+  }
 }
 
 const removeFileO = (index, id) => {
@@ -795,6 +1061,7 @@ const removeFileO = (index, id) => {
   coaIdForDelete.value.push(id)
 
   getCoaForm.value.splice(index, 1) // ลบไฟล์จาก array
+  
 
 }
 
@@ -822,56 +1089,103 @@ const { resultDeleteAllCoa, errorMessageDeleteAllCoa, deleteAllCoaForm } = useDe
 //--- save draf
 const { saveCoaForm, errorMessageCOA, handleSaveDraftCoaForm } = useSaveCOAFormController()
 
+const wordForSubmit = ref('Word')
+const trickerSubmit = ref(false)
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const handleSaveDraftCoa = async () => {
-  if (!fileCoaNew.value.length > 0 && !getCoaForm.value.length > 0) {
-    alert('Please upload at least one file')
+  const result = ref(1)
+
+  // console.log("Start COA!!!!!")
+  // console.log("Start COA!!!!!", fileCoaNew.value)
+
+  if(trickerSubmit.value){
+    // if (fileCoaNew.value < 1 || getCoaForm.value < 1) {
+    // // alert('Please upload at least one file')
+    //   result.value -=1
+    //   textAlertError.value.success = false
+    //   textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+    //   console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
+    //   throw 'Failed To Save COA. Plase Upload COA Ones.'
+    // }else{
+    //   console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
+    // }
+
+    if(fileCoaNew.value < 1){
+      if( getCoaForm.value < 1){
+        result.value -=1
+        textAlertError.value.success = false
+        textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+        console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
+        throw 'Failed To Save COA. Plase Upload COA Ones.'
+      }else{
+        console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
+      }
+    }
     
-    throw 'Failed to save coa. Plase Upload COA ones.'
+  }else{
+    console.log("No tricker")
   }
+
+  if(getCoaForm.value){
+    console.log("getCoaForm Start++++")
+    result.value += 1
+  }
+
   if(deleteAllStart.value === true){
+    console.log("Delete All Start++++")
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success) {
       console.log('Delete all coa  successful', resultDeleteAllCoa.value.success)
+      result.value += 1
       
-      return resultDeleteAllCoa
+      
     } else {
+      result.value -=1
       console.error('Failed to delete all coa')
       throw 'Failed to save coa'
     }
   }
-  if(fileCoaNew.value.length > 0){
+
+  if(fileCoaNew.value){
     console.log("Upload Start++++")
     await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (saveCoaForm) {
-      console.log('Save coa  successful', saveCoaForm.value.success)
+      // console.log('Save coa  successful', saveCoaForm.value.success)
+      result.value += 1
       
-      return saveCoaForm
+      // return saveCoaForm
     } else {
+      result.value -=1
       console.error('Failed to save coa')
       throw 'Failed to save coa'
     }
   }
+
   if(coaIdForDelete.value.length > 0){
     console.log("delete by id Start++++")
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteByIdCoa.value.success === true) {
       console.log('Delete coa by id successful', resultDeleteByIdCoa.value.success)
+      result.value += 1
       
-      return resultDeleteByIdCoa
+      // return resultDeleteByIdCoa
     } else {
+      result.value -=1
       console.error('Failed to save coa')
       throw 'Failed to delete coa by id'
     }
-  }
-  if(getCoaForm.value.length > 0){
-    return getCoaForm.value
-  }
-  else {
-    throw 'Failed to handleSaveDraftCoa'
+    
   }
 
+  if(result.value <= 0) {
+    throw 'Failed to handleSaveDraftCoa'
+  }
+  console.log("Result COA", result.value)
   
+  return result
+
+  // throw 'success!'
 }
 
 // ฟังก์ชันเพื่อแปลง Base64 กลับเป็นไฟล์
@@ -995,9 +1309,6 @@ const deleteAllCIA = () => {
   files.value = []
 }
 
-
-const wordForSubmit = ref('Word')
-
 //------------- Dialog Step SaveDraf ----------------------------------------------------------------
 const iconsSteps = [
   {
@@ -1043,12 +1354,22 @@ const loadindingSaveDatft3 = ref(false)
 const loadindingSaveDatftFailed3 = ref(false)
 const loadindingSaveDatftSeccess3 = ref(false)
 
-// ri-check-line
 
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+
+const isDialogVisibleAlertDialog = ref(false)
+const showOnlyErrors = ref(false)
 const countErr = ref(0)
 
+const testWord = word => {
+  console.log('test word', word)
+}
+
 const submitButtonVisibleNew = async word => {
+  
   wordForSubmit.value = word
+  console.log("submit submitButtonVisibleNew1111", wordForSubmit.value, word)
   isDialogVisibleStepSaveDraft.value = true
 
   try { // Start Step 1
@@ -1144,9 +1465,14 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  // location.reload()
+  if(trickerSubmit.value !== true){
+    textAlertDialogFunction(word, true)
 
+    location.reload()
+  }
+  
   // isDialogSubmitSuccessVisible.value = true
+  console.log("%ctrickerSubmit Step", "color: yellow; font-weight: bold",  trickerSubmit.value)
   isDialogConfirmVisible.value = false
 
   return true
@@ -1155,6 +1481,11 @@ const submitButtonVisibleNew = async word => {
 const submitReceivingForm = async () => {
   try {
     // เรียก submitButtonVisibleNew() และรอให้ทำงานเสร็จ
+
+    trickerSubmit.value = true
+
+    console.log("%ctrickerSubmit Submit", "color: yellow; font-weight: bold", trickerSubmit.value)
+    
     const isSuccess = await submitButtonVisibleNew()
 
     // ถ้า submitButtonVisibleNew() ไม่สำเร็จ (สมมติว่ามันคืนค่า false เมื่อไม่สำเร็จ)
@@ -1167,6 +1498,8 @@ const submitReceivingForm = async () => {
     isDialogConfirmVisible.value = false
     console.log('Submit buttonVisible Start In')
 
+    // throw "Success"
+
     axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
       headers: {
         'accept': '*/*',
@@ -1176,18 +1509,36 @@ const submitReceivingForm = async () => {
     })
       .then(response => {
         console.log('[products.value]!!: ', response.data)
-        location.reload()
-        isDialogSubmitSuccessVisible.value = true
-        isDialogConfirmVisible.value = false
+
+        // isDialogSubmitSuccessVisible.value = true
+        // isDialogConfirmVisible.value = false
+
+
+        // if(isSuccess){
+        //   textAlertDialogFunction('SUBMIT', true)
+        // }
+        
+
+        // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+
+
+        textAlertDialogFunction('SUBMIT', true)
+        setTimeout(() => {
+          window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+        }, 200) // 10000 มิลลิวินาที = 10 วินาที
+        
       })
       .catch(error => {
         // Handle errors
+        textAlertDialogFunction('SUBMIT', false)
         console.error('Error:', error)
         isDialogSubmitFailedVisible.value = true
       })
   } catch (error) {
     // จับ error จากการทำงานของ submitButtonVisibleNew() หรือโค้ดอื่นๆ
     console.error('Error in submitButtonVisibleNew:', error)
+
+    textAlertDialogFunction('SUBMIT', false)
     isDialogSubmitFailedVisible.value = true
   }
 }
@@ -1307,6 +1658,7 @@ watchEffect(() => {
 
 // ฟังก์ชันสำหรับคำนวณค่า total
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const calculationPONew = () => {
   if (purchaseOrder.value) {
 
@@ -1332,11 +1684,11 @@ const calculationPONew = () => {
 
 
     //------------------- Total Qty By Columns ----------------
-    const totlaQty_1 = (purchaseOrder.value.actualNetCountKgs_1) * (purchaseOrder.value.actualAmountUnits_1)
-    const totlaQty_2 = (purchaseOrder.value.actualNetCountKgs_2) * (purchaseOrder.value.actualAmountUnits_2)
-    const totlaQty_3 = (purchaseOrder.value.actualNetCountKgs_3) * (purchaseOrder.value.actualAmountUnits_3)
-    const totlaQty_4 = (purchaseOrder.value.actualNetCountKgs_4) * (purchaseOrder.value.actualAmountUnits_4)
-    const totlaQty_5 = (purchaseOrder.value.actualNetCountKgs_5) * (purchaseOrder.value.actualAmountUnits_5)
+    const totlaQty_1 = (purchaseOrder.value.actualNetCountKgs_1) * (purchaseOrder.value.actualAmountUnits_1) || 0.00
+    const totlaQty_2 = (purchaseOrder.value.actualNetCountKgs_2) * (purchaseOrder.value.actualAmountUnits_2) || 0.00
+    const totlaQty_3 = (purchaseOrder.value.actualNetCountKgs_3) * (purchaseOrder.value.actualAmountUnits_3) || 0.00
+    const totlaQty_4 = (purchaseOrder.value.actualNetCountKgs_4) * (purchaseOrder.value.actualAmountUnits_4) || 0.00
+    const totlaQty_5 = (purchaseOrder.value.actualNetCountKgs_5) * (purchaseOrder.value.actualAmountUnits_5) || 0.00
 
     purchaseOrder.value.actualTotalQuantityKgs_1 = parseFloat(totlaQty_1).toFixed(2)
     purchaseOrder.value.actualTotalQuantityKgs_2 = parseFloat(totlaQty_2).toFixed(2)
@@ -1346,8 +1698,8 @@ const calculationPONew = () => {
 
     //---------------------- Total all
     purchaseOrder.value.actualMeanNetCountKgs = covertFloatFixedTwo(purchaseOrder.value.actualNetCountKgs_1) || 0
-    purchaseOrder.value.actualGrandAmountUnits = covertToInteger(totalAmount)
-    purchaseOrder.value.actualGrandTotalQuantityKgs = covertFloatFixedTwo(totlaQty_1 + totlaQty_2 + totlaQty_3 + totlaQty_4 + totlaQty_5)
+    purchaseOrder.value.actualGrandAmountUnits = covertToInteger(totalAmount) || 0.00
+    purchaseOrder.value.actualGrandTotalQuantityKgs = covertFloatFixedTwo(totlaQty_1 + totlaQty_2 + totlaQty_3 + totlaQty_4 + totlaQty_5) || 0.00
   }
 }
 
@@ -1399,22 +1751,21 @@ const handleInputNetCount = (e, actualNetCountKgs) => {
 const handleInputAmount = (e, AmountUnits) => {
   let value = e.target.value
 
+  // ตรวจสอบว่าเป็นตัวเลขจำนวนเต็มเท่านั้น (ไม่รวมทศนิยม)
+  const regex = /^[0-9]*$/
+
+  // หากไม่ตรงกับเงื่อนไขของ regex จะคืนค่าสุดท้ายที่ถูกต้อง
+  if (!regex.test(value)) {
+    value = value.replace(/\D/g, '') // ลบตัวอักษรที่ไม่ใช่ตัวเลขออก
+  }
+
   // จำกัดจำนวนหลักรวมไม่เกิน 8 หลัก
-  if (value.replace('.', '').length > 8) {
+  if (value.length > 8) {
     value = value.slice(0, 8) // ตัดค่าที่เกินออก
   }
 
-  // ตรวจสอบว่าเป็นตัวเลขที่มีทศนิยม 2 ตำแหน่ง
-  if (value && value.includes('.')) {
-    const [intPart, decimalPart] = value.split('.')
-    if (decimalPart.length > 2) {
-      purchaseOrder.value[AmountUnits] = `${intPart}`
-    } else {
-      purchaseOrder.value[AmountUnits] = value
-    }
-  } else {
-    purchaseOrder.value[AmountUnits] = value
-  }
+  // อัปเดตค่าใน purchaseOrder
+  purchaseOrder.value[AmountUnits] = value
 }
 
 // watchEffect จะเรียกใช้ calculateTotals ทุกครั้งที่ข้อมูลใน dataRaeMatRequest เปลี่ยนแปลง
@@ -1510,10 +1861,24 @@ const isDialogSubmitSuccessVisible = ref(false)
 const isDialogTextAreaVisible = ref(false)
 const isDialogSubmitFailedVisible = ref(false)
 
+//--------------------------- function --------------------------------------
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
 
 const submitButton = word => {
+  trickerSubmit.value = true
   isDialogConfirmVisible.value = true
   wordForSubmit.value = word
+}
+
+const saveDraftButton = word => {
+  trickerSubmit.value = false
+  submitButtonVisibleNew(word)
 }
 
 const areaTextRemarkButton = word => {
@@ -1589,7 +1954,7 @@ const getDisabledFollowStatusNRole = () => {
 
 <template>
   <section
-    v-if="debugMode === true"
+    v-if="false"
     class="mt-10"
   >
     {{ purchaseOrder }}
@@ -1607,1969 +1972,2198 @@ const getDisabledFollowStatusNRole = () => {
         Raw Material Receiving Form
       </div>
     </VCol>
+  </VRow>
 
-    <VCol
-      class="text-center mx-4"
-      style="border: 1px solid black; font-size: 12px; font-weight: bold;"
-      cols="2"
+  <div
+    v-if="loadingGenerated1 && loadingGenerated2"
+    class="mt-1"
+  >
+    <VProgressLinear
+      height="20"
+      color="success"
+      indeterminate 
     >
-      CONFIDENTIAL
-    </VCol>
+      <span>Loading</span>
+    </VProgressLinear>
+  </div>
 
-    <VCol
-      cols="12"
-      style="overflow-x: auto;"
-    >
-      <table class="custom-table">
-        <tr>
-          <th
-            class=""
-            colspan="2"
-          >
-            SKT Name
-          </th>
-          <td
-            class="text-start"
-            colspan="3"
-          >
-            {{ dataHeaderReceving.productName }}
-          </td>
-          <th
-            rowspan="1"
-            colspan="2"
-            class=""
-          >
-            <div class="text-center">
-              <span style="font-size: 12px;">Raw Mat. Code</span>
-            </div>
-          </th>
-          <th
-            colspan="2"
-            class=""
-          >
-            Supplier Name
-          </th>
-          <td
-            colspan="3"
-            class="text-start"
-          >
-            {{ dataHeaderReceving.supplierName }}
-          </td>
-        </tr>
-        <tr>
-          <th
-            colspan="2"
-            class=""
-          >
-            Trade Name
-          </th>
-          <td
-            colspan="3"
-            class="text-start"
-          >
-            {{ dataHeaderReceving.tradeName }}
-          </td>
-          <td
-            colspan="2"
-            class="text-center"
-          >
-            {{ dataHeaderReceving.productId }}
-          </td>
-          <th colspan="2">
-            Manufacturer Name
-          </th>
-          <td
-            class="text-center text-wrap"
-            colspan="3"
-            style="width: 400px;"
-          >
-            <VSelect
-              v-model="purchaseOrder.selectedMakerName"
-              :readonly="readonlyAllInput()"
-              :items="itemsManufacturer"
-              item-title="makerName"
-              item-value="productId"
-              label="Select"
-              persistent-hint
-              center-affix="true"
-              return-object
-              density="compact"
-              single-line
-              style="font-size: 12px;"
-            >
-              <template #selection="{ item }">
-                <div
-                  class="d-flex justify-center"
-                  style="width: 100%;"
-                >
-                  <span
-                    style="font-size: 12px;"
-                    class="text-center"
-                  >
-                    {{ item.title }}
-                  </span>
-                </div>
-              </template>
-            </VSelect>
-          </td>
-        </tr>
-        <tr>
-          <th colspan="2">
-            Received Date
-          </th>
-          <td
-            colspan="3"
-            class="text-start"
-          >
-            {{ formatDate(purchaseOrder.receivedDate) }}
-          </td>
-          <th
-            class="text-center"
-            colspan="2"
-          >
-            SKT LOT No.
-          </th>
-          <td
-            v-if="data.batch"
-            class="text-center"
-            colspan="3"
-          >
-            {{ dataHeaderReceving.sktLot }}
-          </td>
-        </tr>
-      </table>
-    </VCol>
+  <div v-if="!loadingGenerated1 && !loadingGenerated2">
+    <VRow>
+      <VCol
+        class="text-center pa-2 mx-3"
+        style="max-width: 150px; border: 1px solid black; font-size: 12px; font-weight: bold;"
+        cols="2"
+      >
+        CONFIDENTIAL
+      </VCol>
+    </VRow>
 
-    <section v-if="false">
-      <VBtn @click="testPC">
-        Test
-      </VBtn>
-    </section>
-
-    <!-- Purchasing Order -->
-    <VCol
-      cols="12"
-      style="overflow-x: auto; white-space: nowrap;"
-    >
-      <div style="overflow-x: auto;">
+    <VRow>
+      <VCol
+        cols="12"
+        style="overflow-x: auto;"
+      >
         <table class="custom-table">
           <tr>
             <th
-              class="text-start"
-              colspan="5"
+              class=""
+              colspan="2"
             >
-              <div>
-                Purchasing Order
+              SKT Name
+            </th>
+            <td
+              class="text-start"
+              colspan="3"
+            >
+              {{ dataHeaderReceving.productName }}
+            </td>
+            <th
+              rowspan="1"
+              colspan="2"
+              class=""
+            >
+              <div class="text-center">
+                <span style="font-size: 12px;">Raw Mat. Code</span>
               </div>
             </th>
             <th
-              class="text-center"
-              colspan="11"
+              colspan="2"
+              class=""
             >
-              <div>
-                Raw Material Receiving
-              </div>
+              Supplier Name
             </th>
-          </tr>
-          <!-- P/O -->
-          <tr class="text-center">
-            <th
+            <td
+              colspan="3"
               class="text-start"
-              colspan="1"
             >
-              P/O No.
-            </th>
-            <td
-              class="text-start"
-              colspan="2"
-            >
-              {{ data.purchaseOrderNo }}
-            </td>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              Maker Lot No.
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              1
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualMakerLotNo_1"
-                :readonly="readonlyAllInput()"
-                density="compact"
-                :style="{ width: '100%', minWidth: '150px', fontSize: '12px !important;' }"
-                :rules="[
-                  value => !!value.trim() || 'Lot No.1 is required.',
-                  value => value.length <= 20 || 'Must be 20 characters or less'
-                ]"
-                maxlegth="20"
-                class="custom-text-field"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon
-                    
-                    color="green"
-                    icon="ri-edit-line"
-                  />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              2
-            </th>
-            <td
-              class="text-center"
-              colspan="1"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualMakerLotNo_2"
-                :readonly="readonlyAllInput()"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less',
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon
-                    color="green"
-                    icon="ri-edit-line"
-                  />
-                </template>
-              </VTextField>
-              <span
-                v-if="validateLotNoInput(actualAmountUnits_2, actualMakerLotNo_2, 2)"
-                class="text-red"
-              >
-                {{ alertTextValidateInput.alertTextActualMakerLotNo }}
-              </span>
-            </td>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              3
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              <VTextField
-              
-                v-model="purchaseOrder.actualMakerLotNo_3"
-                :readonly="readonlyAllInput()"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="!purchaseOrder.actualMakerLotNo_3 ? [
-                  value => (purchaseOrder.actualAmountUnits_3 && value === '' ) || 'Lot No.3 is required.',
-                  value => value.length <= 20 || 'Must be 20 characters or less'
-                ] : []"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon
-                    color="green"
-                    icon="ri-edit-line"
-                  />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-              :disabled="purchaseOrder.actualMakerLotNo_4 === null || purchaseOrder.actualMakerLotNo_4 === undefined"
-            >
-              4
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualMakerLotNo_4"
-                :readonly="readonlyAllInput()"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="!purchaseOrder.actualMakerLotNo_4 ? [
-                  value => (purchaseOrder.actualAmountUnits_4 && value === null) || 'Lot No.4 is required.',
-                  value => value.length <= 20 || 'Must be 20 characters or less'
-                ] : []"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon
-                    color="green"
-                    icon="ri-edit-line"
-                  />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-              :disabled="!purchaseOrder.actualMakerLotNo_5 === null || purchaseOrder.actualMakerLotNo_5 === undefined"
-            >
-              5
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualMakerLotNo_5"
-                :readonly="readonlyAllInput()"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="! purchaseOrder.actualMakerLotNo_5 ?[
-                  value => (purchaseOrder.actualAmountUnits_5 && value === null) || 'Lot No.5 is required.',
-                  value => value.length <= 20 || 'Must be 20 characters or less'
-                ] : []"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon
-                    color="green"
-                    icon="ri-edit-line"
-                  />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              Total
-            </th>
-          </tr>
-          <!-- Invoice -->
-          <tr class="text-center">
-            <th
-              class="text-start"
-              colspan="1"
-            >
-              Invoice No.
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.invoiceNo"
-                :readonly="readonlyAllInput()"
-                density="compact"
-              />
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              Net Count.(Kg)
-            </th>
-
-            <td
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                
-                v-if="false"
-                v-model="purchaseOrder.actualNetCountKgs_1"
-                :style="{ width: '100%', minWidth: '150px' }"
-                density="compact"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
-                ]"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_1')"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-              <VTextField
-                v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_1"
-                v-model="purchaseOrder.actualNetCountKgs_1"
-                :style="{ width: '100%', minWidth: '150px' }"
-                density="compact"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
-
-                ]"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_1')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-
-              {{ purchaseOrder.actualNetCountKgs_1 }}
-            </td>
-
-            <td
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-if="false"
-                v-model="purchaseOrder.actualNetCountKgs_2"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
-
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_2')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-              <VTextField
-                v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_2"
-                v-model="purchaseOrder.actualNetCountKgs_2"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
-
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_2')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-              {{ purchaseOrder.actualNetCountKgs_2 }}
-            </td>
-
-            <td
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-if="false"
-                v-model="purchaseOrder.actualNetCountKgs_3"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
-
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_3')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-              <VTextField
-                v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_3"
-                v-model="purchaseOrder.actualNetCountKgs_3"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
-
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_3')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-              {{ purchaseOrder.actualNetCountKgs_3 }}
-            </td>
-            <td
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-if="false"
-                v-model="purchaseOrder.actualNetCountKgs_4"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
-
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_4')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-              <VTextField
-                v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_4"
-                v-model="purchaseOrder.actualNetCountKgs_4"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
-
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_4')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-              {{ purchaseOrder.actualNetCountKgs_4 }}
-            </td>
-            <td
-              colspan="2"
-              class="text-center"
-            >
-              <VTextField
-                v-if="false"
-                v-model="purchaseOrder.actualNetCountKgs_5"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
-
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_5')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
-                </template>
-              </VTextField>
-              <VTextField
-                v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_5"
-                v-model="purchaseOrder.actualNetCountKgs_5"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
-                  v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
-                    `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
-
-
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_5')"
-              >
-                <template #label>
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;" />
-                </template>
-              </VTextField>
-              {{ purchaseOrder.actualNetCountKgs_5 }}
-            </td>
-            <td
-              class="text-center"
-              colspan="2"
-              :style="{ width: '100%', minWidth: '150px' }"
-            >
-              <span class="px-2">{{ formatNumber(purchaseOrder.actualMeanNetCountKgs) }}</span>
+              {{ dataHeaderReceving.supplierName }}
             </td>
           </tr>
-          <!-- Expect Delivery -->
-          <tr class="text-center">
+          <tr>
             <th
+              colspan="2"
+              class=""
+            >
+              Trade Name
+            </th>
+            <td
+              colspan="3"
               class="text-start"
-              colspan="1"
             >
-              Expect Delivery Date
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <AppDateTimePicker
-                v-model="purchaseOrder.expectDeliveryDate"
-                density="compact"
-                :readonly="!readonlyAllInput()"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-                class="custom-date-time-picker"
-                :style="{ fontSize: '12px;' }"
-              />
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              Amount (Unit)
-            </th>
-
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualAmountUnits_1"
-                :readonly="readonlyAllInput()"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
-                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
-                ]"
-                density="compact"
-                style="font-size: 16px; text-align: end;"
-                @input="(e) => handleInputAmount(e, 'actualAmountUnits_1')"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
-                </template>
-              </VTextField>
-            </th>
-
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualAmountUnits_2"
-                :readonly="readonlyAllInput()"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
-                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputAmount(e, 'actualAmountUnits_2')"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
-                </template>
-              </VTextField>
-            </th>
-
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualAmountUnits_3"
-                :readonly="readonlyAllInput()"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
-                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputAmount(e, 'actualAmountUnits_3')"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualAmountUnits_4"
-                :readonly="readonlyAllInput()"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
-                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputAmount(e, 'actualAmountUnits_4')"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.actualAmountUnits_5"
-                :readonly="readonlyAllInput()"
-                :rules="[
-                  v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
-                  v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
-                ]"
-                density="compact"
-                style="font-size: 16px;"
-                @input="(e) => handleInputAmount(e, 'actualAmountUnits_5')"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-                <template #append-inner>
-                  <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
-                </template>
-              </VTextField>
-            </th>
-            <td
-              class="text-center"
-              colspan="2"
-              :style="{ width: '100%', minWidth: '150px' }"
-            >
-              <span class="px-2">{{ formatNumberToLocal(purchaseOrder.actualGrandAmountUnits) }} </span>
-            </td>
-          </tr>
-
-          <!-- Packaging -->
-          <tr class="text-center">
-            <th
-              class="text-center"
-              colspan="1"
-              rowspan="6"
-            >
-              Delivery Quantity
-            </th>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              Packing
-            </th>
-            <td
-              class="text-center"
-              colspan="1"
-            >
-              {{ purchaseOrder.packagingTypeName }}
-            </td>
-            <th
-              class="text-center"
-              colspan="2"
-              rowspan="3"
-            />
-
-            <td
-              class="text-start"
-              colspan="2"
-            >
-              <div>
-                <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_1) }}
-              </div>
-            </td>
-
-            <td
-              class="text-start"
-              colspan="2"
-            >
-              <div>
-                <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_2) }}
-              </div>
-            </td>
-
-            <td
-              class="text-start"
-              colspan="2"
-            >
-              <div>
-                <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_3) }}
-              </div>
+              {{ dataHeaderReceving.tradeName }}
             </td>
             <td
-              class="text-start"
               colspan="2"
+              class="text-center"
             >
-              <div>
-                <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_4) }}
-              </div>
+              {{ dataHeaderReceving.productId }}
             </td>
-            <td
-              class="text-start"
-              colspan="2"
-            >
-              <div>
-                <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_5) }}
-              </div>
-            </td>
-            <td
-              v-if="purchaseOrder.actualMakerLotNo_1 || purchaseOrder.actualMakerLotNo_2 || purchaseOrder.actualMakerLotNo_3 || purchaseOrder.actualMakerLotNo_4 || purchaseOrder.actualMakerLotNo_5"
-              class="text-center"
-              colspan="2"
-              :style="{ width: '100%', minWidth: '150px' }"
-            >
-              {{ formatNumber(purchaseOrder.actualGrandTotalQuantityKgs) }}
-            </td>
-          </tr>
-          <!-- Net Cont.(Kg) -->
-          <tr class="text-center">
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              Net Count.(Kg)
-            </th>
-            <td
-              class="text-center"
-              colspan="1"
-              style="min-width: 150px; max-width: 150px;"
-            >
-              <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
-                formatNumber(data.purchasingAmountKgs) }}</span>
-              <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
-            </td>
-            <th
-              :disabled="!purchaseOrder.actualMakerLotNo_1"
-              class="text-center"
-              colspan="2"
-            />
-            <th
-              :disabled="!purchaseOrder.actualMakerLotNo_2 === null || purchaseOrder.actualMakerLotNo_2 === undefined"
-              class="text-center"
-              colspan="2"
-            />
-
-            <th
-              :disabled="purchaseOrder.actualMakerLotNo_3 === null || purchaseOrder.actualMakerLotNo_3 === undefined"
-              class="text-center"
-              colspan="2"
-            />
-            <th
-              :disabled="!purchaseOrder.actualMakerLotNo_4 === null || purchaseOrder.actualMakerLotNo_4 === undefined"
-              class="text-center"
-              colspan="2"
-            />
-            <th
-              :disabled="!purchaseOrder.actualMakerLotNo_5 === null || purchaseOrder.actualMakerLotNo_5 === undefined"
-              class="text-center"
-              colspan="2"
-            />
-            <th
-              class="text-center"
-              colspan="2"
-            />
-          </tr>
-          <!--  Amount (Unit) -->
-          <tr class="text-center">
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              Amount (Unit)
-            </th>
-            <td
-              class="text-center"
-              colspan="1"
-              style="min-width: 150px; max-width: 150px;"
-            >
-              {{ formatNumberToLocal(data.purchasingQuantityPcs) }}
-            </td>
-            <th
-              :disabled="!purchaseOrder.actualMakerLotNo_1"
-              class="text-center"
-              colspan="2"
-            />
-            <th
-              :disabled="!purchaseOrder.actualMakerLotNo_2 === null || purchaseOrder.actualMakerLotNo_2 === undefined"
-              class="text-center"
-              colspan="2"
-            />
-
-            <th
-              :disabled="purchaseOrder.actualMakerLotNo_3 === null || purchaseOrder.actualMakerLotNo_3 === undefined"
-              class="text-center"
-              colspan="2"
-            />
-            <th
-              :disabled="!purchaseOrder.actualMakerLotNo_4 === null || purchaseOrder.actualMakerLotNo_4 === undefined"
-              class="text-center"
-              colspan="2"
-            />
-            <th
-              :disabled="!purchaseOrder.actualMakerLotNo_5 === null || purchaseOrder.actualMakerLotNo_5 === undefined"
-              class="text-center"
-              colspan="2"
-            />
-            <th
-              class="text-center"
-              colspan="2"
-            />
-          </tr>
-          <!-- Total Quantity -->
-          <tr class="text-center">
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              Total Quantity
-            </th>
-            <td
-              class="text-center"
-              colspan="1"
-              style="min-width: 150px; max-width: 150px;"
-            >
-              {{ formatNumber(data.purchasingAmountKgs) }}
-            </td>
-            <th
-              class="text-center"
-              colspan="2"
-            >
+            <th colspan="2">
               Manufacturer Name
             </th>
-            <th
-              class="text-center"
-              colspan="2"
+            <td
+              class="text-start text-wrap"
+              colspan="3"
+              style="width: 400px;"
             >
-              <VTextField
-                v-model="purchaseOrder.customManufacturerName_1"
+              <VSelect
+                v-if="!readonlyAllInput()"
+                v-model="purchaseOrder.selectedMakerName"
                 :readonly="readonlyAllInput()"
+                :items="itemsManufacturer"
+                item-title="makerName"
+                item-value="productId"
+                label="Select"
+                persistent-hint
+                center-affix="true"
+                return-object
                 density="compact"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
-                ]"
+                single-line
+                style="font-size: 12px;"
               >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
+                <template #selection="{ item }">
+                  <div
+                    class="d-flex justify-center"
+                    style="width: 100%;"
+                  >
+                    <span
+                      style="font-size: 12px;"
+                      class="text-center"
+                    >
+                      {{ item.title }}
+                    </span>
+                  </div>
                 </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customManufacturerName_2"
-                :readonly="readonlyAllInput()"
-                density="compact"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
+              </VSelect>
 
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customManufacturerName_3"
-                :readonly="readonlyAllInput()"
-                density="compact"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customManufacturerName_4"
-                :readonly="readonlyAllInput()"
-                density="compact"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customManufacturerName_5"
-                :readonly="readonlyAllInput()"
-                density="compact"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 250 || 'Must be 250 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            />
+              <span v-if="readonlyAllInput()">{{ purchaseOrder.selectedMakerName }}</span>
+            </td>
           </tr>
-          <!-- Label -->
-          <tr class="text-center">
-            <th
-              class="text-center"
-              colspan="1"
-            />
-            <th
-              class="text-center"
-              colspan="1"
-            />
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              Label / Warning Label
-            </th>
-            <th
-              disabled="purchaseOrder.actualMakerLotNo_1"
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customLable_1"
-                :readonly="readonlyAllInput()"
-                density="compact"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              disabled="!purchaseOrder.actualMakerLotNo_2"
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customLable_2"
-                density="compact"
-                :readonly="readonlyAllInput()"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-
-            <th
-              disabled="!purchaseOrder.actualMakerLotNo_3"
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customLable_3"
-                density="compact"
-                :readonly="readonlyAllInput()"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              disabled="!purchaseOrder.actualMakerLotNo_4"
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customLable_4"
-                density="compact"
-                :readonly="readonlyAllInput()"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              disabled="!purchaseOrder.actualMakerLotNo_5"
-              class="text-center"
-              colspan="2"
-            >
-              <VTextField
-                v-model="purchaseOrder.customLable_5"
-                density="compact"
-                :readonly="readonlyAllInput()"
-                style="font-size: 16px;"
-                :style="{ width: '100%', minWidth: '150px' }"
-                :rules="[
-                  value => value.length <= 100 || 'Must be 100 characters or less'
-                ]"
-              >
-                <template
-                  v-if="hidedAllIconInput"
-                  #label
-                >
-                  <VIcon icon="ri-edit-line" />
-                </template>
-              </VTextField>
-            </th>
-            <th
-              class="text-center"
-              colspan="2"
-            />
-          </tr>
-          <!-- Storage Place No. -->
-          <tr class="text-center">
-            <th
-              class="text-center"
-              colspan="1"
-            />
-            <th
-              class="text-center"
-              colspan="1"
-            />
-            <th
-              class="text-center"
-              colspan="2"
-            >
-              Storage Place No.
+          <tr>
+            <th colspan="2">
+              Received Date
             </th>
             <td
+              colspan="3"
               class="text-start"
-              colspan="10"
             >
-              {{ purchaseOrder.storagePlaceNo }}
+              {{ formatDate(purchaseOrder.receivedDate) }}
             </td>
             <th
-              disabled="purchaseOrder.actualMakerLotNo_2"
               class="text-center"
               colspan="2"
-            />
+            >
+              SKT LOT No.
+            </th>
+            <td
+              v-if="data.batch"
+              class="text-center"
+              colspan="3"
+            >
+              {{ dataHeaderReceving.sktLot }}
+            </td>
           </tr>
         </table>
-      </div>
-    </VCol>
+      </VCol>
 
-    <!-- Notes -->
-    <VCol cols="12">
-      <div
-        style="font-size: 12px;"
-        class="mb-2"
+      <section v-if="false">
+        <VBtn @click="testPC">
+          Test
+        </VBtn>
+      </section>
+
+      <!-- Purchasing Order -->
+      <VCol
+        cols="12"
+        style="overflow-x: auto; white-space: nowrap;"
       >
-        Notes
-      </div>
-      <Table class="custom-table">
-        <tr>
-          <th>
-            <VTextarea
-              v-model="purchaseOrder.noteText"
-              :readonly="readonlyAllInput()"
-              clearable
-              clear-icon="ri-close-line"
-              label="Enter Your Notes"
-              placeholder="Text"
-              :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
-            />
-          </th>
-        </tr>
-      </Table>
-    </VCol>
-
-    <!-- RM for Halal -->
-    <VCol cols="4">
-      <Table class="custom-table">
-        <tr>
-          <th>
-            <div class="demo-space-x">
-              <VCheckbox
-                v-model="purchaseOrder.isForHalalProduct"
-                :readonly="readonlyAllInput()"
+        <div style="overflow-x: auto;">
+          <table class="custom-table">
+            <tr>
+              <th
+                class="text-start"
+                colspan="5"
               >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    RM for Halal Product
-                  </span>
-                </template>
-              </VCheckbox>
-            </div>
-          </th>
-        </tr>
-      </Table>
-    </VCol>
-    <!-- RM for RSPO -->
-    <VCol cols="4">
-      <Table class="custom-table">
-        <tr>
-          <th>
-            <div class="demo-space-x">
-              <VCheckbox
-                v-model="purchaseOrder.isForRspoProduct"
-                :readonly="readonlyAllInput()"
+                <div>
+                  Purchasing Order
+                </div>
+              </th>
+              <th
+                class="text-center"
+                colspan="11"
               >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    RM for RSPO Product
-                  </span>
-                </template>
-              </VCheckbox>
-            </div>
-          </th>
-        </tr>
-      </Table>
-    </VCol>
+                <div>
+                  Raw Material Receiving
+                </div>
+              </th>
+            </tr>
+            <!-- P/O -->
+            <tr class="text-center">
+              <th
+                class="text-start"
+                colspan="1"
+              >
+                P/O No.
+              </th>
+              <td
+                class="text-start"
+                colspan="2"
+              >
+                {{ data.purchaseOrderNo }}
+              </td>
+              <th
+                class="text-center"
+                colspan="2"
+              >
+                Maker Lot No.
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                1
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                <VTextField
+                  v-model="purchaseOrder.actualMakerLotNo_1"
+                  :readonly="readonlyAllInput()"
+                  density="compact"
+                  :style="{ width: '100%', minWidth: '150px', fontSize: '12px !important;' }"
+                  :rules="[
+                    value => !!value.trim() || 'Lot No.1 is required.',
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_1 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="20"
+                  class="custom-text-field"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon
+                    
+                      color="green"
+                      icon="ri-edit-line"
+                    />
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1)"
+                  class="text-red"
+                >
+                  {{ validateLotNoInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) }}
+                </span>
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                2
+              </th>
+              <td
+                class="text-center"
+                colspan="1"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.actualMakerLotNo_2"
+                  :readonly="readonlyAllInput()"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_2 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="20"
+                  density="compact"
+                  style="font-size: 16px;"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon
+                      color="green"
+                      icon="ri-edit-line"
+                    />
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2)"
+                  class="text-red"
+                >
+                  {{ validateLotNoInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2) }}
+                </span>
+              </td>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                3
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.actualMakerLotNo_3"
+                  :readonly="readonlyAllInput()"
+                  :style="{ minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_3 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="20"
+                  density="compact"
+                  style="font-size: 16px;"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon
+                      color="green"
+                      icon="ri-edit-line"
+                    />
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3) !== ''"
+                  class="text-red"
+                >
+                  {{ validateLotNoInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3) }}
+                </span>
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+                :disabled="purchaseOrder.actualMakerLotNo_4 === null || purchaseOrder.actualMakerLotNo_4 === undefined"
+              >
+                4
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.actualMakerLotNo_4"
+                  :readonly="readonlyAllInput()"
+                  :style="{ minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_4 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="20"
+                  density="compact"
+                  style="font-size: 16px;"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon
+                      color="green"
+                      icon="ri-edit-line"
+                    />
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4) !== ''"
+                  class="text-red"
+                >
+                  {{ validateLotNoInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4) }}
+                </span>
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+                :disabled="!purchaseOrder.actualMakerLotNo_5 === null || purchaseOrder.actualMakerLotNo_5 === undefined"
+              >
+                5
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.actualMakerLotNo_5"
+                  :readonly="readonlyAllInput()"
+                  :style="{ minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 19 || 'Max 20 characters per line.',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        purchaseOrder.actualMakerLotNo_5 = null
+                        return `can't be a space first.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="20"
+                  density="compact"
+                  style="font-size: 16px;"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon
+                      color="green"
+                      icon="ri-edit-line"
+                    />
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateLotNoInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5) !== ''"
+                  class="text-red"
+                >
+                  {{ validateLotNoInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5) }}
+                </span>
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+              >
+                Total
+              </th>
+            </tr>
+            <!-- Invoice -->
+            <tr class="text-center">
+              <th
+                class="text-start"
+                colspan="1"
+              >
+                Invoice No.
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-model="purchaseOrder.invoiceNo"
+                  :readonly="readonlyAllInput()"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 9 || 'Max 10 characters per line.'
+                  ]"
+                  :maxlength="10"
+                />
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+              >
+                Net Count.(Kg)
+              </th>
 
-    
-    <!-- COA -->
-    <VCol cols="12">
-      <div
-        style="font-size: 12px;"
-        class="mb-2"
+              <td
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                
+                  v-if="false"
+                  v-model="purchaseOrder.actualNetCountKgs_1"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  density="compact"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
+                  ]"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_1')"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+                <VTextField
+                  v-if="false"
+                  v-model="purchaseOrder.actualNetCountKgs_1"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  density="compact"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
+
+                  ]"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_1')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+
+                {{ formatNumber(purchaseOrder.actualNetCountKgs_1) }}
+              </td>
+
+              <td
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-if="false"
+                  v-model="purchaseOrder.actualNetCountKgs_2"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
+
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_2')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+                <VTextField
+                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_2"
+                  v-model="purchaseOrder.actualNetCountKgs_2"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
+
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_2')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+                <span v-if="typeReceivedId === 2">{{ formatNumber(purchaseOrder.actualNetCountKgs_2) }}</span>
+              </td>
+
+              <td
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-if="false"
+                  v-model="purchaseOrder.actualNetCountKgs_3"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
+
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_3')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+                <VTextField
+                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_3"
+                  v-model="purchaseOrder.actualNetCountKgs_3"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
+
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_3')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+                <span v-if="typeReceivedId === 2">{{ formatNumber(purchaseOrder.actualNetCountKgs_3) }}</span>
+              </td>
+              <td
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-if="false"
+                  v-model="purchaseOrder.actualNetCountKgs_4"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
+
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_4')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+                <VTextField
+                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_4"
+                  v-model="purchaseOrder.actualNetCountKgs_4"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
+
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_4')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+                <span v-if="typeReceivedId === 2">{{ formatNumber(purchaseOrder.actualNetCountKgs_4) }}</span>
+              </td>
+              <td
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-if="false"
+                  v-model="purchaseOrder.actualNetCountKgs_5"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!dataHeaderReceving.packagingQtyKg || v == dataHeaderReceving.packagingQtyKg) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${dataHeaderReceving.packagingQtyKg} Kg`
+
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_5')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
+                  </template>
+                </VTextField>
+                <VTextField
+                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_5"
+                  v-model="purchaseOrder.actualNetCountKgs_5"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
+                    v => (!data.purchasingAmountKgs || v == data.purchasingAmountKgs) ||
+                      `ค่าที่กรอกต้องเท่ากับ ${data.purchasingAmountKgs} Kg`
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputNetCount(e, 'actualNetCountKgs_5')"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;" />
+                  </template>
+                </VTextField>
+                <span v-if="typeReceivedId === 2">{{ formatNumber(purchaseOrder.actualNetCountKgs_5) }}</span>
+              </td>
+              <td
+                class="text-center"
+                colspan="2"
+                :style="{ width: '100%', minWidth: '150px' }"
+              >
+                <span class="px-2">{{ formatNumber(purchaseOrder.actualMeanNetCountKgs) }}</span>
+              </td>
+            </tr>
+            <!-- Expect Delivery -->
+            <tr class="text-center">
+              <th
+                class="text-start"
+                colspan="1"
+              >
+                Expect Delivery Date
+              </th>
+              <td
+                class="text-center"
+                colspan="2"
+              >
+                <AppDateTimePicker
+                  v-if="!frozeCheck"
+                  v-model="purchaseOrder.expectDeliveryDate"
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                  class="custom-date-time-picker"
+                  :style="{ fontSize: '12px;' }"
+                />
+                <span v-if="readonlyAllInput()">{{ purchaseOrder.expectDeliveryDate }}</span>
+              </td>
+              <th
+                class="text-center"
+                colspan="2"
+              >
+                Amount (Unit)
+              </th>
+
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-model="purchaseOrder.actualAmountUnits_1"
+                  :readonly="readonlyAllInput()"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
+                  ]"
+                  density="compact"
+                  style="font-size: 16px; text-align: end;"
+                  @input="(e) => handleInputAmount(e, 'actualAmountUnits_1')"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) !== ''"
+                  class="text-red"
+                >
+                  {{ validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) }}
+                </span>
+              </th>
+
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.actualAmountUnits_2"
+                  :readonly="readonlyAllInput()"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputAmount(e, 'actualAmountUnits_2')"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateAmountInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2) !== ''"
+                  class="text-red"
+                >
+                  {{ validateAmountInput(purchaseOrder.actualAmountUnits_2, purchaseOrder.actualMakerLotNo_2, 2) }}
+                </span>
+              </th>
+
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.actualAmountUnits_3"
+                  :readonly="readonlyAllInput()"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputAmount(e, 'actualAmountUnits_3')"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateAmountInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3) !== ''"
+                  class="text-red"
+                >
+                  {{ validateAmountInput(purchaseOrder.actualAmountUnits_3, purchaseOrder.actualMakerLotNo_3, 3) }}
+                </span>
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.actualAmountUnits_4"
+                  :readonly="readonlyAllInput()"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputAmount(e, 'actualAmountUnits_4')"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateAmountInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4) !== ''"
+                  class="text-red"
+                >
+                  {{ validateAmountInput(purchaseOrder.actualAmountUnits_4, purchaseOrder.actualMakerLotNo_4, 4) }}
+                </span>
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.actualAmountUnits_5"
+                  :readonly="readonlyAllInput()"
+                  :rules="[
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
+                  ]"
+                  density="compact"
+                  style="font-size: 16px;"
+                  @input="(e) => handleInputAmount(e, 'actualAmountUnits_5')"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                  <template #append-inner>
+                    <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
+                  </template>
+                </VTextField>
+                <span
+                  v-if="validateAmountInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5) !== ''"
+                  class="text-red"
+                >
+                  {{ validateAmountInput(purchaseOrder.actualAmountUnits_5, purchaseOrder.actualMakerLotNo_5, 5) }}
+                </span>
+              </th>
+              <td
+                class="text-center"
+                colspan="2"
+                :style="{ width: '100%', minWidth: '150px' }"
+              >
+                <span class="px-2">{{ formatNumberToLocal(purchaseOrder.actualGrandAmountUnits) }} </span>
+              </td>
+            </tr>
+
+            <!-- Packaging -->
+            <tr class="text-center">
+              <th
+                class="text-center"
+                colspan="1"
+                rowspan="6"
+              >
+                Delivery Quantity
+              </th>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Packing
+              </th>
+              <td
+                class="text-center"
+                colspan="1"
+              >
+                {{ purchaseOrder.packagingTypeName }}
+              </td>
+              <th
+                class="text-center"
+                colspan="2"
+                rowspan="3"
+              />
+
+              <td
+                class="text-start"
+                colspan="2"
+              >
+                <div>
+                  <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_1) }}
+                </div>
+              </td>
+
+              <td
+                class="text-start"
+                colspan="2"
+              >
+                <div v-if="typeReceivedId === 2">
+                  <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_2) }}
+                </div>
+              </td>
+
+              <td
+                class="text-start"
+                colspan="2"
+              >
+                <div v-if="typeReceivedId === 2">
+                  <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_3) }}
+                </div>
+              </td>
+              <td
+                class="text-start"
+                colspan="2"
+              >
+                <div v-if="typeReceivedId === 2">
+                  <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_4) }}
+                </div>
+              </td>
+              <td
+                class="text-start"
+                colspan="2"
+              >
+                <div v-if="typeReceivedId === 2">
+                  <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_5) }}
+                </div>
+              </td>
+              <td
+                v-if="purchaseOrder.actualMakerLotNo_1 || purchaseOrder.actualMakerLotNo_2 || purchaseOrder.actualMakerLotNo_3 || purchaseOrder.actualMakerLotNo_4 || purchaseOrder.actualMakerLotNo_5"
+                class="text-center"
+                colspan="2"
+                :style="{ width: '100%', minWidth: '150px' }"
+              >
+                {{ formatNumber(purchaseOrder.actualGrandTotalQuantityKgs) }}
+              </td>
+            </tr>
+            <!-- Net Cont.(Kg) -->
+            <tr class="text-center">
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Net Count.(Kg)
+              </th>
+              <td
+                class="text-center"
+                colspan="1"
+                style="min-width: 150px; max-width: 150px;"
+              >
+                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
+                  formatNumber(data.purchasingAmountKgs) }}</span>
+                <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
+              </td>
+              <th
+                :disabled="!purchaseOrder.actualMakerLotNo_1"
+                class="text-center"
+                colspan="2"
+              />
+              <th
+                :disabled="!purchaseOrder.actualMakerLotNo_2 === null || purchaseOrder.actualMakerLotNo_2 === undefined"
+                class="text-center"
+                colspan="2"
+              />
+
+              <th
+                :disabled="purchaseOrder.actualMakerLotNo_3 === null || purchaseOrder.actualMakerLotNo_3 === undefined"
+                class="text-center"
+                colspan="2"
+              />
+              <th
+                :disabled="!purchaseOrder.actualMakerLotNo_4 === null || purchaseOrder.actualMakerLotNo_4 === undefined"
+                class="text-center"
+                colspan="2"
+              />
+              <th
+                :disabled="!purchaseOrder.actualMakerLotNo_5 === null || purchaseOrder.actualMakerLotNo_5 === undefined"
+                class="text-center"
+                colspan="2"
+              />
+              <th
+                class="text-center"
+                colspan="2"
+              />
+            </tr>
+            <!--  Amount (Unit) -->
+            <tr class="text-center">
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Amount (Unit)
+              </th>
+              <td
+                class="text-center"
+                colspan="1"
+                style="min-width: 150px; max-width: 150px;"
+              >
+                {{ formatNumberToLocal(data.purchasingQuantityPcs) }}
+              </td>
+              <th
+                :disabled="!purchaseOrder.actualMakerLotNo_1"
+                class="text-center"
+                colspan="2"
+              />
+              <th
+                :disabled="!purchaseOrder.actualMakerLotNo_2 === null || purchaseOrder.actualMakerLotNo_2 === undefined"
+                class="text-center"
+                colspan="2"
+              />
+
+              <th
+                :disabled="purchaseOrder.actualMakerLotNo_3 === null || purchaseOrder.actualMakerLotNo_3 === undefined"
+                class="text-center"
+                colspan="2"
+              />
+              <th
+                :disabled="!purchaseOrder.actualMakerLotNo_4 === null || purchaseOrder.actualMakerLotNo_4 === undefined"
+                class="text-center"
+                colspan="2"
+              />
+              <th
+                :disabled="!purchaseOrder.actualMakerLotNo_5 === null || purchaseOrder.actualMakerLotNo_5 === undefined"
+                class="text-center"
+                colspan="2"
+              />
+              <th
+                class="text-center"
+                colspan="2"
+              />
+            </tr>
+            <!-- Total Quantity -->
+            <tr class="text-center">
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Total Quantity
+              </th>
+              <td
+                class="text-center"
+                colspan="1"
+                style="min-width: 150px; max-width: 150px;"
+              >
+                {{ formatNumber(data.purchasingAmountKgs) }}
+              </td>
+              <th
+                class="text-center"
+                colspan="2"
+              >
+                Manufacturer Name
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-model="purchaseOrder.customManufacturerName_1"
+                  :readonly="readonlyAllInput()"
+                  density="compact"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 254 || 'Max 255 characters per line.'
+                  ]"
+                  :maxlength="255"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.customManufacturerName_2"
+                  :readonly="readonlyAllInput()"
+                  density="compact"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 254 || 'Max 255 characters per line.'
+                  ]"
+                  :maxlength="255"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.customManufacturerName_3"
+                  :readonly="readonlyAllInput()"
+                  density="compact"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 254 || 'Max 255 characters per line.'
+                  ]"
+                  :maxlength="255"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.customManufacturerName_4"
+                  :readonly="readonlyAllInput()"
+                  density="compact"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 254 || 'Max 255 characters per line.'
+                  ]"
+                  :maxlength="255"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+                :style="{ minWidth: '170px' }"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.customManufacturerName_5"
+                  :readonly="readonlyAllInput()"
+                  density="compact"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 254 || 'Max 255 characters per line.'
+                  ]"
+                  :maxlength="255"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+              />
+            </tr>
+            <!-- Label -->
+            <tr class="text-center">
+              <th
+                class="text-center"
+                colspan="1"
+              />
+              <th
+                class="text-center"
+                colspan="1"
+              />
+              <th
+                class="text-center"
+                colspan="2"
+              >
+                Label / Warning Label
+              </th>
+              <th
+                disabled="purchaseOrder.actualMakerLotNo_1"
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-model="purchaseOrder.customLable_1"
+                  :readonly="readonlyAllInput()"
+                  density="compact"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 99 || 'Max 100 characters per line.'
+                  ]"
+                  :maxlength="100"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+              <th
+                disabled="!purchaseOrder.actualMakerLotNo_2"
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.customLable_2"
+                  density="compact"
+                  :readonly="readonlyAllInput()"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 99 || 'Max 100 characters per line.'
+                  ]"
+                  :maxlength="100"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+
+              <th
+                disabled="!purchaseOrder.actualMakerLotNo_3"
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.customLable_3"
+                  density="compact"
+                  :readonly="readonlyAllInput()"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 99 || 'Max 100 characters per line.'
+                  ]"
+                  :maxlength="100"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+              <th
+                disabled="!purchaseOrder.actualMakerLotNo_4"
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.customLable_4"
+                  density="compact"
+                  :readonly="readonlyAllInput()"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 99 || 'Max 100 characters per line.'
+                  ]"
+                  :maxlength="100"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+              <th
+                disabled="!purchaseOrder.actualMakerLotNo_5"
+                class="text-center"
+                colspan="2"
+              >
+                <VTextField
+                  v-if="typeReceivedId === 2"
+                  v-model="purchaseOrder.customLable_5"
+                  density="compact"
+                  :readonly="readonlyAllInput()"
+                  style="font-size: 16px;"
+                  :style="{ width: '100%', minWidth: '150px' }"
+                  :rules="[
+                    value => value.length <= 99 || 'Max 100 characters per line.'
+                  ]"
+                  :maxlength="100"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+              </th>
+              <th
+                class="text-center"
+                colspan="2"
+              />
+            </tr>
+            <!-- Storage Place No. -->
+            <tr class="text-center">
+              <th
+                class="text-center"
+                colspan="1"
+              />
+              <th
+                class="text-center"
+                colspan="1"
+              />
+              <th
+                class="text-center"
+                colspan="2"
+              >
+                Storage Place No.
+              </th>
+              <td
+                class="text-start"
+                colspan="10"
+              >
+                {{ purchaseOrder.storagePlaceNo }}
+              </td>
+              <th
+                disabled="purchaseOrder.actualMakerLotNo_2"
+                class="text-center"
+                colspan="2"
+              />
+            </tr>
+          </table>
+        </div>
+      </VCol>
+
+      <!-- Notes -->
+      <VCol cols="12">
+        <div
+          style="font-size: 12px;"
+          class="mb-2"
+        >
+          Note
+        </div>
+        <Table class="custom-table">
+          <tr>
+            <th>
+              <VTextarea
+                v-model="purchaseOrder.noteText"
+                :readonly="readonlyAllInput()"
+                placeholder="Text"
+                :rules="[
+                  v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
+                ]" 
+                @input="limitTextInputLine4"
+              >
+                <template
+                  v-if="!frozeCheck"
+                  #label
+                >
+                  <VIcon
+                    color="green"
+                    icon="ri-edit-line"
+                  />
+                </template>
+              </VTextarea>
+              <span
+                v-if="textAlertError.note && !purchaseOrder.noteText"
+                class="text-red"
+              >{{ textAlertError.note }}</span>
+            </th>
+          </tr>
+        </Table>
+      </VCol>
+
+      <!-- RM for Halal -->
+      <VCol
+        v-if="purchaseOrder.isForHalalProduct"
+        cols="4"
       >
-        COA
-      </div>
-      <Table class="custom-table">
-        <tr>
-          <th>
-            <VRow>
-              <VCol cols="12">
-                <VFileInput
-                  v-model="fileCoaNew"
-                  accept="image/png, image/jpeg, image/bmp, application/pdf"
-                  prepend-icon="mdi-paperclip"
-                  multiple
-                  color="black"
+        <Table class="custom-table">
+          <tr>
+            <th>
+              <div class="demo-space-x">
+                <VCheckbox
+                  v-model="purchaseOrder.isForHalalProduct"
+                  :readonly="readonlyAllInput()"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      File Upload COA
+                      RM for Halal Product
                     </span>
                   </template>
-                </VFileInput>
-              </VCol>
-            </VRow>
-
-            <VBtn @click="testCoaNew">
-              TestNew
-            </VBtn>
-
-            <div class="demo-space-y">
-              <VProgressLinear
-                v-if="loading"
-                v-model="modelValue"
-                height="8"
-                :buffer-value="bufferValue"
-                indeterminate
-                color="primary"
-              >
-                <template #default>
-                  <div>Loading Image....</div>
-                </template>
-              </VProgressLinear>
-            </div>
-
-            <!-- Upload -->
-            <VRow
-              v-if="fileCoaNew.length"
-              class="pa-2 d-flex justify-center bg-green-lighten-5"
-            >
-              <VCol
-                v-for="(file, index) in fileCoaNew"
-                :key="index"
-                cols="12"
-                md="4"
-                lg="3"
-              >
-                <VCard>
-                  <VCardText style="min-height: 250px;">
-                    <VChip
-                      color="success"
-                      variant="elevated"
-                    >
-                      New
-                    </VChip>
-
-                    <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
-                    <template v-if="file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/bmp'">
-                      <VImg
-                        role="presentation"
-                        :alt="file.name"
-                        :src="getFileUrl(file)"
-                        height="150"
-                        contain
-                        @click="showDialogImageMuti(getFileUrl(file), file.name)"
-                      />
-                    </template>
-
-                    <!-- ตรวจสอบว่าถ้าเป็น PDF -->
-                    <template v-else-if="file.type === 'application/pdf'">
-                      <iframe
-                        :src="getFileUrl(file)"
-                        width="100%"
-                        height="150"
-                        style="border: none;"
-                      />
-                    </template>
-
-                    <div
-                      v-if="false"
-                      class="d-flex flex-column align-center"
-                    >
-                      <span>{{ file.name }}</span>
-                    </div>
-                  </VCardText>
-                  <VCardActions>
-                    <VBtn
-                      v-if="hidedAllIconInput"
-                      variant="flat"
-                      width="100%"
-                      color="error"
-                      @click="removeFileN(index)"
-                    >
-                      <VIcon>ri-delete-bin-5-fill</VIcon>
-                    </VBtn>
-                  </VCardActions>
-                </VCard>
-              </VCol>
-            </VRow>
-
-            <!-- o -->
-            <VRow
-              v-if="getCoaForm"
-              class="pa-2 d-flex justify-center"
-            >
-              <VCol
-                v-for="(file, index) in getCoaForm"
-                :key="index"
-                cols="12"
-                md="4"
-                lg="3"
-              >
-                <VCard>
-                  <VCardText>
-                    <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
-                    <template v-if="file.contentType === 'image/png' || file.contentType === 'image/jpeg' || file.contentType === 'image/bmp'">
-                      <VImg
-                        role="presentation"
-                        :alt="file.name"
-                        :src="file.fileUri"
-                        height="150"
-                        contain
-                        @click="showDialogImageMuti(file.fileUri, file.name)"
-                      />
-                    </template>
-
-                    <!-- ตรวจสอบว่าถ้าเป็น PDF -->
-                    <template v-else-if="file.contentType === 'application/pdf'">
-                      <iframe
-                        :src="'https://docs.google.com/viewer?url=' + file.fileUri + '&embedded=true'"
-                        width="100%"
-                        height="150"
-                        style="border: none;"
-                      />
-                    </template>
-                    <div
-                      v-if="false"
-                      class="d-flex flex-column align-center"
-                    >
-                      <span>{{ file.fileName }}</span>
-                    </div>
-                  </VCardText>
-
-                  <VCardActions>
-                    <VBtn
-                      v-if="hidedAllIconInput"
-                      variant="flat"
-                      width="100%"
-                      color="error"
-                      @click="removeFileO(index, file.journalID)"
-                    >
-                      <VIcon>ri-delete-bin-5-fill</VIcon>
-                    </VBtn>
-                  </VCardActions>
-                </VCard>
-              </VCol>
-            </VRow>
-
-            <div v-if="coaFiles.length || files.length">
-              <VCol
-                class="d-flex justify-end"
-                cols="12"
-              >
-                <VBtn
-                  v-if="hidedAllIconInput"
-                  color="red"
-                  @click="removeFileAll"
+                </VCheckbox>
+              </div>
+            </th>
+          </tr>
+        </Table>
+      </VCol>
+      <!-- RM for RSPO -->
+      <VCol
+        v-if="purchaseOrder.isForRspoProduct"
+        cols="4"
+      >
+        <Table class="custom-table">
+          <tr>
+            <th>
+              <div class="demo-space-x">
+                <VCheckbox
+                  v-model="purchaseOrder.isForRspoProduct"
+                  :readonly="readonlyAllInput()"
                 >
-                  <VIcon icon="ri-delete-bin-6-line" />
-                  Delete All COA
-                </VBtn>
-              </VCol>
-            </div>
-          </th>
-        </tr>
-      </Table>
-    </VCol>
-    <VDialog
-      v-model="isDialogVisibleImgFileMuti"
-      width="80%"
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardTitle class="bg-primary">
-          <div class="d-flex justify-space-between">
-            COA
-            <VBtn
-              icon="mdi-close"
-              color="white"
-              size="small"
-              variant="tonal"
-              @click="isDialogVisibleImgFileMuti = false"
-            />
-          </div>
-        </VCardTitle>
+                  <template #label>
+                    <span style="font-size: 12px;">
+                      RM for RSPO Product
+                    </span>
+                  </template>
+                </VCheckbox>
+              </div>
+            </th>
+          </tr>
+        </Table>
+      </VCol>
 
-        <VCardText>
-          <VImg
-            role="presentation"
-            :src="imgDialog"
-            height="80%"
-            contain
-          />
-        </VCardText>
-      </VCard>
-    </VDialog>
-
-    <!-- WareHouse -->
-    <VCol
-      cols="12"
-      lg="12"
-    >
-      <table class="custom-table">
-        <tr>
-          <th
-            class="text-center cursor-pointer"
-            colspan="12"
-          >
-            Warehouse
-          </th>
-        </tr>
-        <tr>
-          <td colspan="6">
-            <span>Staff: {{ UserNameAccoutWork }}</span>
-          </td>
-          <td colspan="6">
-            <span>Supervisor: {{ supplier }}</span>
-          </td>
-        </tr>
-        <tr>
-          <td
-            style="min-width: 150px;"
-            colspan="6"
-          >
-            <div v-if="dataHeaderReceving.updatedDate">
-              <VIcon
-                class="mx-2"
-                icon="ri-calendar-schedule-fill"
-                size="30"
-              />{{
-                formatDate(dataHeaderReceving.updatedDate)
-              }}
-            </div>
-          </td>
-          <td
-            style="min-width: 150px;"
-            colspan="6"
-          >
-            <div v-if="dataHeaderReceving.approveRejectDate">
-              <VIcon
-                class="mx-2"
-                icon="ri-calendar-schedule-fill"
-                size="30"
-              />{{
-                formatDate(dataHeaderReceving.approveRejectDate) }}
-            </div>
-          </td>
-        </tr>
-      </table>
-    </VCol>
-
-    <!-- BTN -->
-    <VCol
-      v-if="statusId === 3 || statusId === 1"
-      cols="12"
-      class="py-0"
-    >
-      <div class="py-0 d-flex justify-end">
-        <VBtn
-          v-if="getDisabledFollowStatusNRole()"
-          class="mx-4"
-          color="warning"
+      <!-- COA -->
+      <VCol cols="12">
+        <div
           style="font-size: 12px;"
-          @click="submitButtonVisibleNew('SAVE DRAFT')"
+          class="mb-2"
         >
-          SAVE DRAFT
-        </VBtn>
-        <VBtn
-          v-if="getDisabledFollowStatusNRole()"
-          color="green"
-          style="font-size: 12px;"
-          @click="submitButton('SUBMIT')"
-        >
-          SUBMIT
-        </VBtn>
-        <VBtn
-          v-if="false"
-          color="green"
-          style="font-size: 12px;"
-          @click="submitButton('APPROVE')"
-        >
-          Approve
-        </VBtn>
-      </div>
-    </VCol>
+          COA
+        </div>
+        <Table class="custom-table">
+          <tr>
+            <th>
+              <VRow>
+                <VCol cols="12">
+                  <VFileInput
+                    v-if="!frozeCheck"
+                    v-model="fileCoaNew"
+                    accept="image/png, image/jpeg, image/bmp, application/pdf"
+                    prepend-icon="mdi-paperclip"
+                    multiple
+                    color="black"
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">
+                        File Upload COA
+                      </span>
+                    </template>
+                  </VFileInput>
+                </VCol>
+              </VRow>
 
-    <VCol
-      v-if="statusId === 3 || statusId === 1"
-      class="text-end pb-4 pt-1"
-      cols="12"
-    >
-      <span
-        v-if="getDisabledFollowStatusNRole()"
-        class="px-1"
-        style="font-size: 12px;"
-      >For Inspection </span>
-    </VCol>
+              <VBtn
+                v-if="false"
+                @click="testCoaNew"
+              >
+                TestNew
+              </VBtn>
 
-    <!-- Dialog Step Save Draft -->
-    <section style="font-size: 12px;">
+              <div class="demo-space-y">
+                <VProgressLinear
+                  v-if="loading"
+                  v-model="modelValue"
+                  height="8"
+                  :buffer-value="bufferValue"
+                  indeterminate
+                  color="primary"
+                >
+                  <template #default>
+                    <div>Loading Image....</div>
+                  </template>
+                </VProgressLinear>
+              </div>
+
+              <!-- Upload -->
+              <VRow
+                v-if="fileCoaNew.length"
+                class="pa-2 d-flex justify-center bg-green-lighten-5"
+              >
+                <VCol
+                  v-for="(file, index) in fileCoaNew"
+                  :key="index"
+                  cols="12"
+                  md="4"
+                  lg="3"
+                >
+                  <VCard>
+                    <VCardText style="min-height: 250px;">
+                      <VChip
+                        color="success"
+                        variant="elevated"
+                      >
+                        New
+                      </VChip>
+
+                      <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
+                      <template v-if="file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/bmp'">
+                        <VImg
+                          role="presentation"
+                          :alt="file.name"
+                          :src="getFileUrl(file)"
+                          height="150"
+                          contain
+                          @click="showDialogImageMuti(getFileUrl(file), file.name)"
+                        />
+                      </template>
+
+                      <!-- ตรวจสอบว่าถ้าเป็น PDF -->
+                      <template v-else-if="file.type === 'application/pdf'">
+                        <iframe
+                          :src="getFileUrl(file)"
+                          width="100%"
+                          height="150"
+                          style="border: none;"
+                        />
+                      </template>
+
+                      <div
+                        v-if="false"
+                        class="d-flex flex-column align-center"
+                      >
+                        <span>{{ file.name }}</span>
+                      </div>
+                    </VCardText>
+                    <VCardActions>
+                      <VBtn
+                        v-if="!frozeCheck"
+                        variant="flat"
+                        width="100%"
+                        color="error"
+                        @click="removeFileN(index)"
+                      >
+                        <VIcon>ri-delete-bin-5-fill</VIcon>
+                      </VBtn>
+                    </VCardActions>
+                  </VCard>
+                </VCol>
+              </VRow>
+
+              <!-- o -->
+              <VRow
+                v-if="getCoaForm"
+                class="pa-2 d-flex justify-center"
+              >
+                <VCol
+                  v-for="(file, index) in getCoaForm"
+                  :key="index"
+                  cols="12"
+                  md="4"
+                  lg="3"
+                >
+                  <VCard>
+                    <VCardText>
+                      <!-- ตรวจสอบว่าถ้าเป็นรูปภาพ -->
+                      <template v-if="file.contentType === 'image/png' || file.contentType === 'image/jpeg' || file.contentType === 'image/bmp'">
+                        <VImg
+                          role="presentation"
+                          :alt="file.name"
+                          :src="file.fileUri"
+                          height="150"
+                          contain
+                          @click="showDialogImageMuti(file.fileUri, file.name)"
+                        />
+                      </template>
+
+                      <!-- ตรวจสอบว่าถ้าเป็น PDF -->
+                      <template v-else-if="file.contentType === 'application/pdf'">
+                        <iframe
+                          :src="'https://docs.google.com/viewer?url=' + file.fileUri + '&embedded=true'"
+                          width="100%"
+                          height="150"
+                          style="border: none;"
+                        />
+                      </template>
+                      <div
+                        v-if="false"
+                        class="d-flex flex-column align-center"
+                      >
+                        <span>{{ file.fileName }}</span>
+                      </div>
+                    </VCardText>
+
+                    <VCardActions>
+                      <VBtn
+                        v-if="!frozeCheck"
+                        variant="flat"
+                        width="100%"
+                        color="error"
+                        @click="removeFileO(index, file.journalID)"
+                      >
+                        <VIcon>ri-delete-bin-5-fill</VIcon>
+                      </VBtn>
+                    </VCardActions>
+                  </VCard>
+                </VCol>
+              </VRow>
+
+              <div v-if="coaFiles.length || fileCoaNew.length">
+                <VCol
+                  class="d-flex justify-end"
+                  cols="12"
+                >
+                  <VBtn
+                    v-if="!frozeCheck"
+                    color="red"
+                    @click="removeFileAll"
+                  >
+                    <VIcon icon="ri-delete-bin-6-line" />
+                    Delete All COA
+                  </VBtn>
+                </VCol>
+              </div>
+              <span
+                v-if="textAlertError.coa && !getCoaForm && trickerSubmit"
+                class="text-red"
+              >{{ textAlertError.coa }}</span>
+            </th>
+          </tr>
+        </Table>
+      </VCol>
       <VDialog
-        v-model="isDialogVisibleStepSaveDraft"
+        v-model="isDialogVisibleImgFileMuti"
         width="80%"
       >
         <!-- Dialog Content -->
-        <VCard
-          class="text-center"
-          title="Save Draft"
-        >
-          <VCardText class="pa-1">
-            <VRow>
-              <VCol
-                class="text-center d-flex flex-column align-center justify-center mx-auto"
-                cols="4"
-              >
-                <div>
-                  <VProgressLinear
-                    v-if="loadindingSaveDatft1"
-                    indeterminate
-                    color="primary"
-                  />
-                  <VProgressLinear
-                    v-if="loadindingSaveDatftSeccess1"
-                    model-value="100"
-                    color="primary"
-                  />
-                  <VProgressLinear
-                    v-if="loadindingSaveDatftFailed1"
-                    model-value="0"
-                  />
-                  <VAvatar
-                    class="my-2"
-                    size="150"
-                    :color="colorStep1"
-                  >
-                    <VIcon
-                      size="100"
-                      :icon="iconStep1"
-                    />
-                  </VAvatar>
-                </div>
-                <div><span style="font-size: 12px;">Save Draft Header</span></div>
-              </VCol>
-              <VCol
-                class="text-center d-flex flex-column align-center justify-center mx-auto"
-                cols="4"
-              >
-                <div>
-                  <VProgressLinear
-                    v-if="loadindingSaveDatft2"
-                    indeterminate
-                    color="primary"
-                  />
-                  <VProgressLinear
-                    v-if="loadindingSaveDatftSeccess2"
-                    model-value="100"
-                    color="primary"
-                  />
-                  <VProgressLinear
-                    v-if="loadindingSaveDatftFailed2"
-                    model-value="0"
-                  />
-                  <VAvatar
-                    class="my-2"
-                    size="150"
-                    :color="colorStep2"
-                  >
-                    <VIcon
-                      size="100"
-                      :icon="iconStep2"
-                    />
-                  </VAvatar>
-                </div>
-                <div><span style="font-size: 12px;">Save Draft Lot</span></div>
-              </VCol>
-              <VCol
-                class="text-center d-flex flex-column align-center justify-center mx-auto"
-                cols="4"
-              >
-                <div>
-                  <VProgressLinear
-                    v-if="loadindingSaveDatft3"
-                    indeterminate
-                    color="primary"
-                  />
-                  <VProgressLinear
-                    v-if="loadindingSaveDatftSeccess3"
-                    model-value="100"
-                    color="primary"
-                  />
-                  <VProgressLinear
-                    v-if="loadindingSaveDatftFailed3"
-                    model-value="0"
-                  />
-                  <VAvatar
-                    class="my-2"
-                    size="150"
-                    :color="colorStep3"
-                  >
-                    <VIcon
-                      size="100"
-                      :icon="iconStep3"
-                    />
-                  </VAvatar>
-                </div>
-                <div><span style="font-size: 12px;">Save Draft COA</span></div>
-              </VCol>
-            </VRow>
-          </VCardText>
-          <VCardText
-            v-if="alertErrorLot"
-            class="text-start"
-          >
-            <VDivider />
-            <div>
-              <VAlert
-                title="Details Lot"
-                variant="outlined"
-                closable
-              >
-                <div
-                  v-for="(value, key) in alertErrorLot"
-                  :key="key"
-                >
-                  <span
-                    v-if="value"
-                    style="font-size: 14px;"
-                  >
-                    <VIcon
-                      color="error"
-                      icon="ri-error-warning-fill"
-                    />{{ key }}: {{ value }}
-                  </span>
-                  <span
-                    v-if="!value"
-                    style="font-size: 14px;"
-                  >
-                    <VIcon
-                      color="success"
-                      icon="ri-checkbox-circle-fill"
-                    />{{ key }} {{ value }}
-                  </span>
-                </div>
-              </VAlert>
-            </div>
-          </VCardText>
-        </VCard>
-      </VDialog>
-    </section>
-
-    <!-- Dialog Submit -->
-    <section>
-      <VDialog
-        v-model="isDialogConfirmVisible"
-        width="500"
-      >
-        <!-- Dialog Content -->
         <VCard>
-          <VCardText>
-            <div class="d-flex justify-center">
-              <VIcon
-                size="100"
-                color="warning"
-                icon="ri-question-line"
+          <VCardTitle class="bg-primary">
+            <div class="d-flex justify-space-between">
+              COA
+              <VBtn
+                icon="mdi-close"
+                color="white"
+                size="small"
+                variant="tonal"
+                @click="isDialogVisibleImgFileMuti = false"
               />
             </div>
-            <div class="text-center">
-              <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
-                Transaction?</span>
-            </div>
-          </VCardText>
-
-          <VCardAction class="d-flex justify-space-between pa-4">
-            <VBtn
-              color="error"
-              @click="isDialogConfirmVisible = false"
-            >
-              Cancel
-            </VBtn>
-            <VBtn
-              v-if="wordForSubmit === 'SUBMIT'"
-              color="green"
-              @click="submitReceivingForm"
-            >
-              {{ wordForSubmit }}
-            </VBtn>
-          </VCardAction>
-        </VCard>
-      </VDialog>
-    </section>
-    <!-- Dialog Submit Success -->
-    <section>
-      <VDialog
-        v-model="isDialogSubmitSuccessVisible"
-        width="500"
-      >
-        <!-- Dialog Content -->
-        <VCard>
-          <VCardText>
-            <div class="d-flex justify-center">
-              <VIcon
-                size="100"
-                color="success"
-                icon="ri-checkbox-circle-line"
-              />
-            </div>
-            <div class="text-center">
-              <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
-            </div>
-          </VCardText>
-
-          <VCardAction
-            v-if="false"
-            class="d-flex justify-center pa-4"
-          >
-            <VBtn
-              color="success"
-              @click="submitConfirm"
-            >
-              Continue
-            </VBtn>
-          </VCardAction>
-        </VCard>
-      </VDialog>
-    </section>
-    <!-- Dialog Submit Failed -->
-    <section>
-      <VDialog
-        v-model="isDialogSubmitFailedVisible"
-        width="500"
-      >
-        <!-- Dialog Content -->
-        <VCard>
-          <VCardText>
-            <div class="d-flex justify-center">
-              <VIcon
-                size="100"
-                color="error"
-                icon="ri-error-warning-line"
-              />
-            </div>
-            <div class="text-center">
-              <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
-            </div>
-          </VCardText>
-
-          <VCardAction class="d-flex justify-center pa-4">
-            <VBtn
-              color="error"
-              @click="submitFailed"
-            >
-              Continue
-            </VBtn>
-          </VCardAction>
-        </VCard>
-      </VDialog>
-    </section>
-
-    <!-- Dialog Area Text Remark -->
-    <section>
-      <VDialog
-        v-model="isDialogTextAreaVisible"
-        width="500"
-      >
-        <!-- Dialog Content -->
-        <VCard :title="wordForSubmit">
-          <DialogCloseBtn
-            variant="text"
-            size="default"
-            :rules="[v => v.length <= 240 || 'Max 240 characters']"
-            @click="isDialogTextAreaVisible = false"
-          />
+          </VCardTitle>
 
           <VCardText>
-            <VTextarea
-              :label="`Remark ${wordForSubmit}`"
-              :placeholder="`Enter Remark ${wordForSubmit}`"
+            <VImg
+              role="presentation"
+              :src="imgDialog"
+              height="600"
+              contain
             />
           </VCardText>
-
-          <VCardText class="d-flex justify-end flex-wrap gap-4">
-            <VBtn
-              :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
-              @click="isDialogTextAreaVisible = false; isDialogVisibleAction = false"
-            >
-              {{ wordForSubmit }}
-            </VBtn>
-          </VCardText>
         </VCard>
       </VDialog>
-    </section>
-  </VRow>
+
+      <!-- WareHouse -->
+      <VCol
+        cols="12"
+        lg="12"
+      >
+        <table class="custom-table">
+          <tr>
+            <th
+              class="text-center cursor-pointer"
+              colspan="12"
+            >
+              Warehouse
+            </th>
+          </tr>
+          <tr>
+            <td colspan="6">
+              <span>Staff: {{ UserNameAccoutWork }}</span>
+            </td>
+            <td colspan="6">
+              <span>Supervisor: {{ supplier }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td
+              style="min-width: 150px;"
+              colspan="6"
+            >
+              <div v-if="dataHeaderReceving.updatedDate">
+                {{
+                  formatDate(dataHeaderReceving.updatedDate)
+                }}
+              </div>
+            </td>
+            <td
+              style="min-width: 150px;"
+              colspan="6"
+            >
+              <div v-if="dataHeaderReceving.approveRejectDate">
+                {{
+                  formatDate(dataHeaderReceving.approveRejectDate) }}
+              </div>
+            </td>
+          </tr>
+        </table>
+      </VCol>
+
+      <!-- BTN -->
+      <VCol
+        v-if="!frozeCheck"
+        cols="12"
+        class="py-0"
+      >
+        <div class="py-0 d-flex justify-end">
+          <VBtn
+            v-if="getDisabledFollowStatusNRole()"
+            class="mx-4"
+            color="warning"
+            style="font-size: 12px;"
+            @click="saveDraftButton('SAVE DRAFT')"
+          >
+            SAVE DRAFT
+          </VBtn>
+          <VBtn
+            v-if="getDisabledFollowStatusNRole()"
+            color="green"
+            style="font-size: 12px;"
+            @click="submitButton('SUBMIT')"
+          >
+            SUBMIT
+          </VBtn>
+          <VBtn
+            v-if="false"
+            color="green"
+            style="font-size: 12px;"
+            @click="submitButton('APPROVE')"
+          >
+            Approve
+          </VBtn>
+        </div>
+      </VCol>
+
+      <VCol
+        v-if="!frozeCheck"
+        class="text-end pb-4 pt-1"
+        cols="12"
+      >
+        <span
+          v-if="getDisabledFollowStatusNRole()"
+          class="px-1"
+          style="font-size: 12px;"
+        >For Inspection </span>
+      </VCol>
+
+      <!-- Alert Dialog Success/Fiald new -->
+      <section v-if="isDialogVisibleAlertDialog === true">
+        <div>
+          <!-- ใช้ AuthenticatorDialog component -->
+          <AuthenticatorDialog
+            :is-dialog-visible="isDialogVisibleAlertDialog"
+            :word="wordForSubmit"
+            :success="successDialAlert"
+            @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+          />
+        </div>
+      </section>
+
+      <!-- Dialog Step Save Draft -->
+      <section style="font-size: 12px;">
+        <VDialog
+          v-model="isDialogVisibleStepSaveDraft"
+          width="80%"
+        >
+          <!-- Dialog Content -->
+          <VCard
+            class="text-center"
+            title="Save"
+          >
+            <VCardText class="pa-1">
+              <VRow>
+                <VCol
+                  class="text-center d-flex flex-column align-center justify-center mx-auto"
+                  cols="4"
+                >
+                  <div>
+                    <VProgressLinear
+                      v-if="loadindingSaveDatft1"
+                      indeterminate
+                      color="primary"
+                    />
+                    <VProgressLinear
+                      v-if="loadindingSaveDatftSeccess1"
+                      model-value="100"
+                      color="primary"
+                    />
+                    <VProgressLinear
+                      v-if="loadindingSaveDatftFailed1"
+                      model-value="0"
+                    />
+                    <VAvatar
+                      class="my-2"
+                      size="150"
+                      :color="colorStep1"
+                    >
+                      <VIcon
+                        size="100"
+                        :icon="iconStep1"
+                      />
+                    </VAvatar>
+                  </div>
+                  <div><span style="font-size: 12px;">Save Header</span></div>
+                </VCol>
+                <VCol
+                  class="text-center d-flex flex-column align-center justify-center mx-auto"
+                  cols="4"
+                >
+                  <div>
+                    <VProgressLinear
+                      v-if="loadindingSaveDatft2"
+                      indeterminate
+                      color="primary"
+                    />
+                    <VProgressLinear
+                      v-if="loadindingSaveDatftSeccess2"
+                      model-value="100"
+                      color="primary"
+                    />
+                    <VProgressLinear
+                      v-if="loadindingSaveDatftFailed2"
+                      model-value="0"
+                    />
+                    <VAvatar
+                      class="my-2"
+                      size="150"
+                      :color="colorStep2"
+                    >
+                      <VIcon
+                        size="100"
+                        :icon="iconStep2"
+                      />
+                    </VAvatar>
+                  </div>
+                  <div><span style="font-size: 12px;">Save Lot</span></div>
+                </VCol>
+                <VCol
+                  class="text-center d-flex flex-column align-center justify-center mx-auto"
+                  cols="4"
+                >
+                  <div>
+                    <VProgressLinear
+                      v-if="loadindingSaveDatft3"
+                      indeterminate
+                      color="primary"
+                    />
+                    <VProgressLinear
+                      v-if="loadindingSaveDatftSeccess3"
+                      model-value="100"
+                      color="primary"
+                    />
+                    <VProgressLinear
+                      v-if="loadindingSaveDatftFailed3"
+                      model-value="0"
+                    />
+                    <VAvatar
+                      class="my-2"
+                      size="150"
+                      :color="colorStep3"
+                    >
+                      <VIcon
+                        size="100"
+                        :icon="iconStep3"
+                      />
+                    </VAvatar>
+                  </div>
+                  <div><span style="font-size: 12px;">Save COA</span></div>
+                </VCol>
+              </VRow>
+            </VCardText>
+            <VCardText />
+            <!-- Header -->
+            <VCardText v-if="!textAlertError.success && textAlertError.note">
+              <VAlert 
+                title="Verify The Accuracy Of The Header"
+                variant="outlined"
+                closable
+                class="text-start"
+              >
+                <span
+                  v-if="false"
+                  class="text-start"
+                >Header Validated :</span> <span class="text-red">{{ textAlertError.mgs }} </span>
+                <span class="text-start">Alert Note :</span> <span class="text-red">{{ textAlertError.note }} </span>
+              </VAlert>
+            </VCardText>
+            <!-- Lot -->
+            <VCardText
+              v-if="alertErrorLot && textAlertError.success"
+              class="text-start"
+            >
+              <VDivider />
+              <div>
+                <VAlert
+                  variant="outlined"
+                  closable
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      Save and Verify
+                    </VCol>
+                    <VCol
+                      class="d-flex justify-end"
+                      cols="6"
+                    >
+                      <VSwitch
+                        v-model="showOnlyErrors"
+                        :label="showOnlyErrors ? 'Show All Details' : 'Show Only Errors'"
+                      />
+                    </VCol>
+                  </VRow>
+                  <div
+                    v-for="(value, key, index) in alertErrorLot"
+                    :key="index"
+                  >
+                    <span
+                      v-if="!value.success"
+                      style="font-size: 14px;"
+                    >
+                      <VIcon
+                        color="error"
+                        icon="ri-error-warning-fill"
+                      />Lot No.{{ value.index }} 
+                      {{ value.msg }}
+                    </span>
+                    <span
+                      v-if="value.success && showOnlyErrors"
+                      style="font-size: 14px;"
+                    >
+                      <VIcon
+                        color="success"
+                        icon="ri-checkbox-circle-fill"
+                      />Lot No.{{ value.index }}
+                      {{ value.msg }}
+                    </span>
+                  </div>
+                </VAlert>
+              </div>
+            </VCardText>
+            <!-- Coa -->
+            <VCardText v-if="!textAlertError.success && textAlertError.coa && !textAlertError.note">
+              <VAlert 
+                title="Verify The Accuracy Of The COA"
+                variant="outlined"
+                closable
+                class="text-start"
+              >
+                <span class="text-start">Alert COA :</span> <span class="text-red">{{ textAlertError.coa }} </span>
+              </VAlert>
+            </VCardText>
+          </VCard>
+        </VDialog>
+      </section>
+
+      <!-- Dialog Submit -->
+      <section>
+        <VDialog
+          v-model="isDialogConfirmVisible"
+          width="500"
+        >
+          <!-- Dialog Content -->
+          <VCard>
+            <VCardText>
+              <div class="d-flex justify-center">
+                <VIcon
+                  size="100"
+                  color="warning"
+                  icon="ri-question-line"
+                />
+              </div>
+              <div class="text-center">
+                <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
+                  Transaction?</span>
+              </div>
+            </VCardText>
+
+            <VCardAction class="d-flex justify-space-between pa-4">
+              <VBtn
+                color="error"
+                @click="isDialogConfirmVisible = false"
+              >
+                Cancel
+              </VBtn>
+              <VBtn
+                v-if="wordForSubmit === 'SUBMIT'"
+                color="green"
+                @click="submitReceivingForm"
+              >
+                {{ wordForSubmit }}
+              </VBtn>
+            </VCardAction>
+          </VCard>
+        </VDialog>
+      </section>
+      <!-- Dialog Submit Success -->
+      <section>
+        <VDialog
+          v-model="isDialogSubmitSuccessVisible"
+          width="500"
+        >
+          <!-- Dialog Content -->
+          <VCard>
+            <VCardText>
+              <div class="d-flex justify-center">
+                <VIcon
+                  size="100"
+                  color="success"
+                  icon="ri-checkbox-circle-line"
+                />
+              </div>
+              <div class="text-center">
+                <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
+              </div>
+            </VCardText>
+
+            <VCardAction
+              v-if="false"
+              class="d-flex justify-center pa-4"
+            >
+              <VBtn
+                color="success"
+                @click="submitConfirm"
+              >
+                Continue
+              </VBtn>
+            </VCardAction>
+          </VCard>
+        </VDialog>
+      </section>
+      <!-- Dialog Submit Failed -->
+      <section>
+        <VDialog
+          v-model="isDialogSubmitFailedVisible"
+          width="500"
+        >
+          <!-- Dialog Content -->
+          <VCard>
+            <VCardText>
+              <div class="d-flex justify-center">
+                <VIcon
+                  size="100"
+                  color="error"
+                  icon="ri-error-warning-line"
+                />
+              </div>
+              <div class="text-center">
+                <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
+              </div>
+            </VCardText>
+
+            <VCardAction class="d-flex justify-center pa-4">
+              <VBtn
+                color="error"
+                @click="submitFailed"
+              >
+                Continue
+              </VBtn>
+            </VCardAction>
+          </VCard>
+        </VDialog>
+      </section>
+
+      <!-- Dialog Area Text Remark -->
+      <section>
+        <VDialog
+          v-model="isDialogTextAreaVisible"
+          width="500"
+        >
+          <!-- Dialog Content -->
+          <VCard :title="wordForSubmit">
+            <DialogCloseBtn
+              variant="text"
+              size="default"
+              :rules="[v => v.length <= 240 || 'Max 240 characters']"
+              @click="isDialogTextAreaVisible = false"
+            />
+
+            <VCardText>
+              <VTextarea
+                :label="`Remark ${wordForSubmit}`"
+                :placeholder="`Enter Remark ${wordForSubmit}`"
+              />
+            </VCardText>
+
+            <VCardText class="d-flex justify-end flex-wrap gap-4">
+              <VBtn
+                :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
+                @click="isDialogTextAreaVisible = false; isDialogVisibleAction = false"
+              >
+                {{ wordForSubmit }}
+              </VBtn>
+            </VCardText>
+          </VCard>
+        </VDialog>
+      </section>
+    </VRow>
+  </div>
 </template>
 
 <style scoped>
@@ -3646,7 +4240,6 @@ const getDisabledFollowStatusNRole = () => {
 
 .v-text-field >>> input {
   font-size: 12px;
-  text-transform: capitalize;
 }
 
 .v-field >>> input {

@@ -1,5 +1,4 @@
-import { coaService } from '@/services/skt/gobal/service'
-
+import { coaService } from '@/repository/skt/global/service'
 
 export const useGetCOAFormController = () => {
   const getCoaForm = ref(null)
@@ -10,7 +9,7 @@ export const useGetCOAFormController = () => {
       errorMessageGetCoa.value = null
       console.log('Fetching Form COA...')
   
-      const result = await coaService.GetCOAForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+      const result = await gobalService.fetchGenerateView(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
         
       if (result) {
         console.log('data COA Controller:', result)

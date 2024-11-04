@@ -1,4 +1,4 @@
-import { uploadFiles, fetchMockData, saveMockDataToAPI, parseData  } from '@/services/skt/receivingPlan/packaging/services'
+import { uploadFiles, fetchMockData, saveMockDataToAPI, parseData  } from '@/repository/skt/receivingPlan/packaging/services'
 
 import { FileModel, dataHeaderModel } from '@/model/skt/receivingPlan/packaging/model'
 
@@ -64,7 +64,6 @@ export function submitData(data) {
   // Example: return this.$http.post('your-api-endpoint', payload);
 }
 
-
 // receivingModel.js
 export const ReceivingModel = {
   getReceivingData(poEtlLogDetailJournalID) {
@@ -85,7 +84,7 @@ import { ReceivingFormService,
   GetCOAService, PackagingFormService, 
   saveDraftPackagingFormHeader, saveDraftLotItemsBatch,
   SaveCOAService,
-} from '@/services/skt/receivingPlan/packaging/services'
+} from '@/repository/skt/receivingPlan/packaging/services'
 
 //----- Generate ----------------------------
 export const useGeneratePackagingFormController = () => {
@@ -118,16 +117,53 @@ export const useGeneratePackagingFormController = () => {
   }
 }
 
+export const useGeneratePackagingViewFormController = () => {
+  const packagingFormGenerateView = ref(null)
+  const errorMessageGenerateView = ref(null)
+
+  const fetchPackagingViewFormGenerate = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageGenerateView.value = null
+      console.log('Fetching Packaging Form Generate view...')
+
+      const result = await PackagingFormService.generatePackagingIdForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Packaging data Generate view Controller:', result)
+        
+        packagingFormGenerateView.value = result
+
+        return { success: true, data: result }
+      } else {
+        console.warn('No data returned from the API')
+
+        return { success: false, error: 'No data returned from the API /Packaging/View.' }
+      }
+    } catch (error) {
+      console.error('Error in fetchPackagingViewFormGenerate:', error)
+      errorMessageGenerateView.value = error.message
+
+      return { success: false, error: error.message }
+    }
+  }
+
+  return {
+    packagingFormGenerateView,
+    errorMessageGenerateView,
+    fetchPackagingViewFormGenerate,
+  }
+}
+
 export const useAcceptPackagingFormController = () => {
   const packagingFormAccept = ref(null)
   const errorMessageAccept = ref(null)
 
-  const acceptPackagingForm = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+  const acceptPackagingForm = async (poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
     try {
       errorMessageAccept.value = null
       console.log('accept Packaging Form...')
 
-      const result = await PackagingFormService.acceptPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      const result = await PackagingFormService.acceptPackagingForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
       if (result) {
         console.log('Packaging data Accept Controller:', result)
@@ -154,25 +190,33 @@ export const useRejectPackagingFormController = () => {
   const packagingFormReject = ref(null)
   const errorMessageReject = ref(null)
 
-  const rejectPackagingForm = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+  const rejectPackagingForm = async (comment, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
     try {
       errorMessageReject.value = null
       console.log('Reject Packaging Form...')
 
-      const comment = createModelReject(dataHeader)
+      // const comment = createModelReject(dataHeader)
 
 
-      const result = await PackagingFormService.rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      const result = await PackagingFormService.rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
       if (result) {
         console.log('Packaging data Reject Controller:', result)
-        packagingFormReject.value = result
+        packagingFormReject.value = result.success
+        console.log('Packaging data Reject Controller packagingFormReject:', packagingFormReject.value)
+        
+        return { data: result, success: true  }
       } else {
         console.warn('No data returned from the API')
+        console.error('Failed to Reject:', result)
+        
+        return { success: false, error: 'Failed to Reject.' }
       }
     } catch (error) {
       console.error('Error in rejectPackagingForm:', error)
       errorMessageReject.value = error.message
+      
+      return { success: false, error: error.message }
     }
   }
 
@@ -215,17 +259,53 @@ export const useReceivingFormController = () => {
   }
 }
 
-export const handleSaveDraft = async (poEtlLogDetailJournalID, dataHeader, urlApi, whereHouse, accessTokenAtStore) => {
-  // ตรวจสอบค่าว่างใน dataHeader
-  if (!dataHeader.limConditionDetail || !dataHeader.coAChecked || !dataHeader.note || !dataHeader.limConditionDetail) {
-    return { success: false, error: 'Required fields are missing.' }
+export const handleSaveDraft = async (poEtlLogDetailJournalID, dataHeader, urlApi,
+  whereHouse, accessTokenAtStore,
+) => {
+  try {
+    // ตรวจสอบค่าว่างใน dataHeader
+    // if (
+    //   !dataHeader.limConditionDetail ||
+    //   !dataHeader.coAChecked ||
+    //   !dataHeader.note ||
+    //   !dataHeader.limConditionDetail
+    // ) {
+    //   return { success: false, error: 'Required fields are missing.'+poEtlLogDetailJournalID, dataHeader, urlApi,
+    //     whereHouse, accessTokenAtStore }
+    // }
+
+    // แสดงผลข้อมูลก่อนส่งเพื่อช่วยในการ debug
+    
+
+    // สร้างข้อมูล body สำหรับการบันทึก
+    const body = createDraftBody(dataHeader)
+
+    // เรียกใช้ฟังก์ชันบันทึกและรอผลลัพธ์
+    const result = await saveDraftPackagingFormHeader(
+      poEtlLogDetailJournalID,
+      body,
+      urlApi,
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    // ตรวจสอบผลลัพธ์การบันทึก
+    if (result?.success) {
+      console.log('Draft saved successfully:', result)
+      
+      return { success: true, data: result }
+    } else {
+      console.error('Failed to save draft:', result)
+      
+      return { success: false, error: 'Failed to save draft.' }
+    }
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+    console.error('Error occurred while saving draft:', error)
+    
+    return { success: false, error: error.message }
   }
-
-  const body = createDraftBody(dataHeader)
-  
-  return await saveDraftPackagingFormHeader(poEtlLogDetailJournalID, body, urlApi, whereHouse, accessTokenAtStore)
 }
-
 
 //--- lot --------------------------------
 export const useGetLotPackagingFormController = () => {
@@ -260,33 +340,45 @@ export const useGetLotPackagingFormController = () => {
 
 import { createDraftLot, createLotItem  } from '@/model/skt/receivingPlan/packaging/lotDataModel'
 
-// export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
-//   const body = createDraftLot(dataLot)
-  
-//   return await saveDraftPackagingFormHeader(body, urlApi, whereHouse, accessTokenAtStore)
-// }
-
 export const handleSaveDraftLot = async (dataLot, urlApi, whereHouse, accessTokenAtStore) => {
   try {
-    // วนลูปผ่านรายการข้อมูลใน dataLot
+    // ตรวจสอบว่า dataLot มีข้อมูลที่ต้องการหรือไม่
+    if (!dataLot || dataLot.length === 0) {
+      throw new Error('No data provided for saving draft lot')
+    }
+
+    // สร้าง body ข้อมูลสำหรับส่งไปยัง API
+    const body = createDraftLot(dataLot)
+
+    // เก็บผลลัพธ์สำหรับแต่ละ item
+    const results = []
+    let allSuccess = true
+
     for (const item of dataLot) {
       // เรียกใช้ service เพื่อส่งข้อมูลทีละตัว
       const result = await saveDraftLotItemsBatch(item, urlApi, whereHouse, accessTokenAtStore)
 
-      console.log('Success:', result) // แสดงผลลัพธ์ที่ได้
-      
-      return result
+      // เก็บผลลัพธ์สำหรับแต่ละ item
+      results.push(result)
+
+      // ตรวจสอบว่ามีการบันทึกสำเร็จหรือไม่
+      if (!result?.success) {
+        allSuccess = false // ถ้าส่งไม่สำเร็จ แสดงว่าไม่สมบูรณ์
+      }
     }
 
-    // แสดง dialog เมื่อสำเร็จ
-    // isDialogSubmitSuccessVisible.value = true
+    // ตรวจสอบผลลัพธ์
+    if (allSuccess) {
+      return { success: true, data: results }
+    } else {
+      throw new Error('Failed to save one or more draft lots')
+    }
   } catch (error) {
-    // แสดง dialog เมื่อมีข้อผิดพลาด
-    // isDialogSubmitFailedVisible.value = true
-    console.error('Error saving draft lot:', error)
+    console.error('Error in handleSaveDraftLot:', error.message)
+
+    return { success: false, error: error.message }
   }
 }
-
 
 //--- COA --------------------------------
 export const useGetCOAPackagingFormController = () => {
@@ -408,7 +500,6 @@ export const useDeleteAllCoaFormController = () => {
     deleteAllCoaForm,
   }
 }
-
 
 export const useSaveCOAFormController = () => {
   const saveCoaForm = ref(null) // เก็บข้อมูล response ของการบันทึก

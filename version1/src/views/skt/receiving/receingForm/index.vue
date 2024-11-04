@@ -2,7 +2,7 @@
 <script setup>
 import axiosIns from '@axios'
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
-import { inject, defineProps, watchEffect } from 'vue'
+import { inject, defineProps, watchEffect, watch, onMounted } from 'vue'
 
 const props = defineProps({
   Data: Array,
@@ -13,6 +13,9 @@ const whereHouse = ref(localStorage.getItem('whereHouseName'))
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const dataProps = ref(JSON.parse(route.query.Data || '[]'))
+
+const statusId = ref(dataProps.value.statusId) // ตัวแปรสำหรับเก็บค่า statusId
+const receivedTypeId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 
 const a = ref('A')
 
@@ -126,6 +129,100 @@ watchEffect(() => {
   console.log(dataProps.value)
 })
 
+const countCurrentTab = ref(0)
+
+//------------- journalId
+const responseGener = ref([])
+const currentTabNew = ref(sessionStorage.getItem('currentTabReceivingForm'))
+
+const generatedJournalId = async () => {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+      console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+
+      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+
+        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+
+        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
+        statusId.value = item.statusId
+
+        sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
+
+        currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
+
+      } else {
+        console.error("ไม่มีข้อมูลใน responseGener")
+      }
+
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })
+}
+
+
+watch(() => {
+  generatedJournalId()
+  
+})
+
+const checkCurrentTabBeforIn = status => {
+  let tabIndex
+
+  switch (status) {
+  case 1:
+  case 3:
+  case 8:
+  case 10:
+  case 7:
+    tabIndex = 0 // สำหรับ status 1, 3, 8, 10 ให้แสดง tab index 0
+    break
+    
+  case 4:
+  case 5:
+  case 6:
+    tabIndex = 1 // สำหรับ status 4, 5, 6, 7 ให้แสดง tab index 1
+    break
+    
+  case 12:
+  case 13:
+    tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
+    break
+    
+  default:
+    tabIndex = 0 // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
+  }
+
+  return tabIndex
+}
+
+const updateCurrentTab = async () => {
+  // รอให้ generatedJournalId และ generated ทำงานเสร็จก่อน
+  await generatedJournalId()
+  await generated()
+
+  // จากนั้นค่อยอัปเดต currentTab ด้วยค่าใหม่จาก getCurrentTabIndex(
+}
+
+// เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
+updateCurrentTab()
+
+// Watch สำหรับตรวจสอบการเปลี่ยนแปลงของ statusId
+
+// watch(() => {
+//   console.log('Tabs:', currentTabNew.value)
+// })
+
 const tabs = [
   {
     title: 'R/M Receiving Form',
@@ -202,46 +299,6 @@ const tabDisablingConfig = {
   // Add more statuses and role combinations as needed
 }
 
-const tabConfig = {
-
-  /// Packaging = 1 , Raw Material Receiving 2, Lorry 3 , NUll 0
-
-  0: {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-  },
-  1: {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-  },
-  2: {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Draft R/M Inspection Form': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Inspection Approval': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Warehouse Rejection': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Partial-Receiving': {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-  },
-  'Draft Packaging Inspection Form': {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-  },
-
-  // Add more statuses and role combinations as needed
-}
-
 // Configuration to specify which tab index to show based on status
 const tabIndexConfig = {
   1: 0,  // Show tab index 1 for this status
@@ -259,109 +316,99 @@ const tabIndexConfig = {
 }
 
 const getDisabledTabs = () => {
-  const status = dataProps.value.statusId
+
   const role = userRole.value
+
+  const status = ref(statusId.value)
+
+  console.log("status in getDisabledTabs", statusId.value)
   
   // console.log('Status:', status)
   // console.log('Role:', role)
   // console.log('Disabled Tabs:', tabDisablingConfig[status]?.[role])
   
-  return tabDisablingConfig[status]?.[role] || []
+  return tabDisablingConfig[status.value]?.[role] || []
 }
 
 const getCurrentTabIndex = () => {
-  const status = dataProps.value.statusId
+  const status = ref(statusId.value)
 
-  return tabIndexConfig[status] !== undefined ? tabIndexConfig[status] : 0
+  // console.log("status in getCurrentTabIndex", statusId.value)
+  // console.log("getCurrentTabIndex  currentTab", tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0)
+  // countCurrentTab.value += 1
+  // console.log("Start getCurrentTabIndex", countCurrentTab.value)
+  
+  return tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0
 }
 
-// console.log('***Current Tab Index:', getCurrentTabIndex())
-
-const currentTab = ref(getCurrentTabIndex())
+// เรียกใช้ฟังก์ชันนี้เพื่อให้เกิดการเปลี่ยนค่า currentTab หลังจากทุกอย่างเสร็จสิ้น
 
 const isActive = ref(true)
 
-//------------- journalId
-const responseGener = ref([])
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
 
-const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
-const receivedTypeId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const isDialogVisibleAlertDialog = ref(false)
 
-const generatedJournalId = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
+//---------------------------------- Approve ------------------------------------
+const wordForSubmit = ref('')
+
+const isDialogConfirmVisible = ref(false)
+const isDialogSubmitSuccessVisible = ref(false)
+const isDialogSubmitFailedVisible = ref(false)
+
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+  console.log("textAlertDialogFunction Start!!")
+}
+
+const btnApprove = word => {
+  isDialogConfirmVisible.value = true
+  console.log("word")
+  wordForSubmit.value = word
+
+}
+
+const handleAcceptPackaging = word => {
+  console.log("StaertSSSSS!!")
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/whapproval/${dataProps.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
       Authorization: `Bearer ${accessTokenAtStore}`, 
     },
+    params: {
+      stockId: whereHouse.value,
+    },
   },
   {})
     .then(response => {
-      console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
+      textAlertDialogFunction('APPROVE', true)
 
-      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 300) // 10000 มิลลิวินาที = 3 วินาที
 
-        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
-
-        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
-        statusId.value = item.statusId // เก็บค่า statusId
-      } else {
-        console.error("ไม่มีข้อมูลใน responseGener")
-      }
     })
     .catch(error => {
+    // Handle errors
+      textAlertDialogFunction('APPROVE', false)
+
       console.error('Error:', error)
+      isDialogSubmitFailedVisible.value = true
     })
 }
-
-watchEffect(() => {
-  generatedJournalId()
-})
 </script>
 
 <template>
-  <div v-if="false">
-    <span />
-    <VAlert
-
-      border="top"
-      type="error"
-      variant="flat"
-      prominent
-    >
-      Failded To Loading Page, Plaease Back To Receving Plant.
-    </VAlert>
-  </div>
-  <VCard
-    v-if="false"
-    hover
-    style="position: fixed; min-width: 95%; opacity: 1 !important;"
-    elevation="6"
-  >
-    <VCardText>
-      <VTabs
-        v-model="currentTab"
-        grow
-      >
-        <VTab
-          v-for="(tab, index) in tabs"
-          :key="index"
-        >
-          <VIcon
-            v-if="false"
-            :icon="tab.icon"
-            size="40"
-          />
-          <span style="font-size: 22px; font-weight: bolder;">{{ tab.title }}</span>
-        </VTab>
-      </VTabs>
-    </VCardText>
-  </VCard>
   <div v-if="receivedTypeId === 2">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -380,7 +427,7 @@ watchEffect(() => {
   </div>
   <div v-if="receivedTypeId === 3">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -400,7 +447,7 @@ watchEffect(() => {
   </div>
   <div v-if="receivedTypeId === 1">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -455,14 +502,14 @@ watchEffect(() => {
       v-if="false"
       class="mx-2"
       style="min-height: 40px;"
-      :color="colorStatusWithId(dataProps.statusId).color"
+      :color="colorStatusWithId(statusId).color"
       variant="elevated"
       closable
     >
       <span
         class="text-wrap"
         style="font-size: 12px; text-transform: capitalize;"
-      >{{ dataProps.statusText }}</span>
+      > 'statusText' </span>
     </VChip>
     <VChip
       v-if="false"
@@ -492,7 +539,7 @@ watchEffect(() => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTab === index"
+        v-if="currentTabNew === index"
       />
     </div>
   </div>
@@ -504,11 +551,11 @@ watchEffect(() => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTab === index"
+        v-if="currentTabNew === index"
       />
     </div>
   </div>
-  <div v-if=" receivedTypeId === 1">
+  <div v-if="receivedTypeId === 1">
     <div
       v-for="(tab, index) in tabs2"
       :key="index"
@@ -516,12 +563,175 @@ watchEffect(() => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTab === index"
+        v-if="currentTabNew === index"
       />
     </div>
   </div>
 
-  
-  
+  <div
+    v-if="statusId === 7 || statusId === 15"
+    style="position: fixed;
+          display: flex;
+          box-sizing: border-box;
+          justify-content: start;
+          padding: 8px;
+          inset-block-end: 0;
+          margin-block-end: 30px;
+          margin-inline-start: -8px;"
+    class="d-flex justify-start"
+  >
+    <VBtn
+      style="min-width: 320px;"
+      class="mb-2"
+      @click="btnApprove('APPROVE')"
+    >
+      Approve
+    </VBtn>
+  </div>
+
+  <section v-if="false">
+    <VRow
+      style="position: fixed;
+          display: flex;
+          justify-content: start;
+          padding: 8px;
+          inset-block-end: 0;
+          margin-block-end: 20px;
+          margin-inline-start: -8px;"
+      class="d-flex justify-start"
+    >
+      <VCol cols="12">
+        <VBtn
+          width="100%"
+          class="mb-2"
+          @click="btnApprove('APPROVE')"
+        >
+          Approve
+        </VBtn>
+      </VCol>
+    </VRow>
+  </section>
+
+  <!-- Dialog Submit -->
+  <section>
+    <VDialog
+      v-model="isDialogConfirmVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="warning"
+              icon="ri-question-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
+              Transaction?</span>
+          </div>
+        </VCardText>
+
+        <VCardAction class="d-flex justify-space-between pa-4">
+          <VBtn
+            color="error"
+            @click="isDialogConfirmVisible = false"
+          >
+            Cancel
+          </VBtn>
+          <VBtn
+            v-if="wordForSubmit === 'APPROVE'"
+            color="green"
+            @click="handleAcceptPackaging"
+          >
+            {{ wordForSubmit }}
+          </VBtn>
+        </VCardAction>
+      </VCard>
+    </VDialog>
+  </section>
+  <!-- Dialog Submit Success -->
+  <section>
+    <VDialog
+      v-model="isDialogSubmitSuccessVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="success"
+              icon="ri-checkbox-circle-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
+          </div>
+        </VCardText>
+
+        <VCardAction
+          v-if="false"
+          class="d-flex justify-center pa-4"
+        >
+          <VBtn
+            color="success"
+            @click="submitConfirm"
+          >
+            Continue
+          </VBtn>
+        </VCardAction>
+      </VCard>
+    </VDialog>
+  </section>
+  <!-- Dialog Submit Failed -->
+  <section>
+    <VDialog
+      v-model="isDialogSubmitFailedVisible"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="error"
+              icon="ri-error-warning-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
+          </div>
+        </VCardText>
+
+        <VCardAction class="d-flex justify-center pa-4">
+          <VBtn
+            color="error"
+            @click="submitFailed"
+          >
+            Continue
+          </VBtn>
+        </VCardAction>
+      </VCard>
+    </VDialog>
+  </section>
+
+  <!-- Alert Dialog Success/Fiald new -->
+  <section>
+    <div>
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+  </section>
+
   <VDivider />
 </template>

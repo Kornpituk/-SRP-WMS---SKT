@@ -222,11 +222,11 @@ export default [
 
   // { heading: 'SKT' },
 
-  {
-    title: 'Stock Update',
-    icon: { icon: 'ri-store-3-line' },
-    to: 'skt-stockUpdate',
-  },
+  // {
+  //   title: 'Stock Update',
+  //   icon: { icon: 'ri-store-3-line' },
+  //   to: 'skt-stockUpdate',
+  // },
   {
     title: 'Receiving Plan',
     icon: { icon: 'ri-inbox-archive-fill' },

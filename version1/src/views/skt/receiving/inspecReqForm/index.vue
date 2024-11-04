@@ -48,6 +48,78 @@ watchEffect(() => {
   }
 })
 
+//-------------------------------------- Validate input --------------------------------
+const maxLines = 4
+const maxCharsPerLine = 130
+
+const limitTextInputLine4Note = event => {
+  const inputText = event.target.value
+  let lines = inputText.split('\n')
+  
+  const maxLines = 4
+  const maxCharsPerLine = 130
+
+  // ป้องกันไม่ให้พิมพ์เกิน 130 ตัวอักษรในแต่ละบรรทัด
+  for (let i = 0; i < lines.length; i++) {
+    while (lines[i].length > maxCharsPerLine) {
+      // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
+      let extraText = lines[i].slice(maxCharsPerLine)
+      lines[i] = lines[i].slice(0, maxCharsPerLine)
+      
+      if (i + 1 < maxLines) {
+        // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
+        lines.splice(i + 1, 0, extraText)
+      } else {
+        // ถ้าเกิน 4 บรรทัดแล้ว ให้ตัดส่วนที่เกินทิ้ง
+        break
+      }
+    }
+  }
+
+  // ป้องกันไม่ให้เกินจำนวนบรรทัดที่กำหนด
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+  }
+
+  // อัปเดตค่าใน textarea
+  event.target.value = lines.join('\n')
+  headerInsp.value.note = event.target.value
+}
+
+const limitTextInputLine4Details = event => {
+  const inputText = event.target.value
+  let lines = inputText.split('\n')
+  
+  const maxLines = 4
+  const maxCharsPerLine = 130
+
+  // ป้องกันไม่ให้พิมพ์เกิน 130 ตัวอักษรในแต่ละบรรทัด
+  for (let i = 0; i < lines.length; i++) {
+    while (lines[i].length > maxCharsPerLine) {
+      // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
+      let extraText = lines[i].slice(maxCharsPerLine)
+      lines[i] = lines[i].slice(0, maxCharsPerLine)
+      
+      if (i + 1 < maxLines) {
+        // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
+        lines.splice(i + 1, 0, extraText)
+      } else {
+        // ถ้าเกิน 4 บรรทัดแล้ว ให้ตัดส่วนที่เกินทิ้ง
+        break
+      }
+    }
+  }
+
+  // ป้องกันไม่ให้เกินจำนวนบรรทัดที่กำหนด
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines)
+  }
+
+  // อัปเดตค่าใน textarea
+  event.target.value = lines.join('\n')
+  headerInsp.value.details = event.target.value
+}
+
 //------------------------------------ Purchest Item --------------------------------
 const headerInsp =ref({
   sktName: dataProps.value.itemName,
@@ -80,12 +152,21 @@ const analysistInsp = ref({
 
 })
 
+import { useGetCOAFormController } from '@/utilities/utilities'
+
+//--------------------------- convert----------------------------
+const { formatNumber } = useGetCOAFormController()
+
+const covertFloatFixedTwo = convert => {
+  return formatNumber(convert)
+}
+
 //--------------------------- API --------------------------------
 
 //-------------- Generate---------------------------------------
 const generatedInsp = () => {
 
-  axiosIns.post(`${urlApi.value}/api/v1/Inspection/generate/${data.value.poEtlLogDetailJournalID}`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/Inspection/Generate/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -98,6 +179,7 @@ const generatedInsp = () => {
       // itemsManufacturer.value = response.data.data
 
       console.log('[generatedReceivingForm]!!: ', response.data)
+      loadingGenerated1.value = false
 
     })
     .catch(error => {
@@ -112,6 +194,10 @@ const dataPO = ref('')
 const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const frozeCheck = ref(true)
+const poEiLog = ref()
+
+const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
 
 const generatedJournalId = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
@@ -131,7 +217,9 @@ const generatedJournalId = () => {
 
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
+        poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
         statusId.value = item.statusId // เก็บค่า statusId
+        loadingGenerated2.value = false
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
       }
@@ -141,73 +229,84 @@ const generatedJournalId = () => {
     })
 }
 
+// watchEffect(() => {
+//   if(statusId.value === 4 || statusId.value === 5){
+//     frozeCheck.value = false
+//   }
+// })
+
 watch(() => {
   generatedInsp()
   generatedJournalId()
+
+  if(statusId.value === 4 || statusId.value === 5){
+    frozeCheck.value = false
+  }
 })
 
 //--------------- get header --------------------------------
-const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
+
 
 //------------- Header
-const getHearderInsp = () => {
-  if(poEtlLogDetailJournalIDQueryParameters.value){
-    axiosIns.get(`${urlApi.value}/api/v1/Inspection/View/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`, 
-      },
-    },
-    {})
-      .then(response => {
+const getHearderInsp = async () => {
+  loadingGenerated1.value = true
 
-        const data = response.data.data
+  if (poEtlLogDetailJournalIDQueryParameters.value) {
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/Inspection/View/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-        //------- Headers --------------------------------
-        headerInsp.value.sktName = data[0].productName
-        headerInsp.value.sktId = data[0].sktLot
-        headerInsp.value.itemCode = data[0].productId
-        headerInsp.value.supplierName = data[0].supplierName
-        headerInsp.value.tradeNames = data[0].tradeName
-        headerInsp.value.ManufacturerName = data[0].makerName
+      const data = response.data.data
 
-        headerInsp.value.receivedDate = data[0].receivedDate
+      //------- Headers --------------------------------
+      headerInsp.value.sktName = data[0].productName
+      headerInsp.value.sktId = data[0].sktLot
+      headerInsp.value.itemCode = data[0].productId
+      headerInsp.value.supplierName = data[0].supplierName
+      headerInsp.value.tradeNames = data[0].tradeName
+      headerInsp.value.ManufacturerName = data[0].makerName
+      headerInsp.value.receivedDate = data[0].receivedDate
 
-        //--------- Footers --------------------------------
-        // Note Details Remarks:
-        headerInsp.value.remark = data[0].remark
-        headerInsp.value.note = data[0].note
-        headerInsp.value.details = data[0].limConditionDetail
-        headerInsp.value.remark = data[0].remark
+      //--------- Footers --------------------------------
+      headerInsp.value.remark = data[0].remark
+      headerInsp.value.note = data[0].note
+      headerInsp.value.details = data[0].limConditionDetail
+      headerInsp.value.remark = data[0].remark
 
-        // WH/IP
-        headerInsp.value.updateByStaffWH = data[0].whStaff
-        headerInsp.value.updateBySuperWH = data[0].whSupervisor
-        headerInsp.value.updateByStaffInsp = data[0].inspStaff
-        headerInsp.value.updateBySuperInsp = data[0].inspSupervisor
+      // WH/IP
+      headerInsp.value.updateByStaffWH = data[0].whStaff
+      headerInsp.value.updateBySuperWH = data[0].whSupervisor
+      headerInsp.value.updateByStaffInsp = data[0].inspStaff
+      headerInsp.value.updateBySuperInsp = data[0].inspSupervisor
 
-        // lastUpdated
-        headerInsp.value.lastUpdatedStaffWH = data[0].whStaffUpdatedDate
-        headerInsp.value.lastUpdatedSuperWH = data[0].whSupervisorDate
-        headerInsp.value.lastUpdatedStaffInsp = data[0].inspStaffUpdatedDate
-        headerInsp.value.lastUpdatedSuperInsp = data[0].inspSupervisorDate
+      // lastUpdated
+      headerInsp.value.lastUpdatedStaffWH = data[0].whStaffUpdatedDate
+      headerInsp.value.lastUpdatedSuperWH = data[0].whSupervisorDate
+      headerInsp.value.lastUpdatedStaffInsp = data[0].inspStaffUpdatedDate
+      headerInsp.value.lastUpdatedSuperInsp = data[0].inspSupervisorDate
 
-        // reject
-        headerInsp.value.remarkReject = data[0].statusComments
+      // reject
+      headerInsp.value.remarkReject = data[0].statusComments
 
-        // purchaseOrder.value = response.data[0]
-        console.log('[*****Headers]]!!: ', data[0])
-    
-      })
-      .catch(error => {
-        // Handle errors
-        console.error('Error:', error)
-      })
-  }else {
+      console.log('[*****Headers]]!!: ', data[0])
+    } catch (error) {
+      // Handle errors
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
+  } else {
+    loadingGenerated1.value = true
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
   }
-  
 }
 
 const state = reactive({
@@ -292,74 +391,81 @@ const formData = ref({
 })
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const getAnalysistInsp = () => {
-  if(poEtlLogDetailJournalIDQueryParameters.value){
-    axiosIns.get(`${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`, 
-      },
-    },
-    {})
-      .then(response => {
+const getAnalysistInsp = async () => {
+  loadingGenerated1.value = true
 
-        analysisItems.value = response.data.items
+  if (poEtlLogDetailJournalIDQueryParameters.value) {
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-        for (let i = 0; i < 5; i++) {
-          analysisItemsCode.value[`actualAmountUnits_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualAmountUnits`]
-          analysisItemsCode.value[`actualMakerLotNo_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualMakerLotNo`]
-          analysisItemsCode.value[`actualNetCountKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualNetCountKgs`]
-          analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualTotalQuantityKgs`]
-        }
+      analysisItems.value = response.data.items
 
-        // วนลูปผ่าน analysisItems.value
-        for (let i = 0; i < analysisItems.value.length; i++) {
-          const item = analysisItems.value[i]
-  
-          // เก็บค่าจาก analysisItems
-          analysisResults.value.push({
-            rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
-            typeID: item.typeID,
-            typeName: item.typeName,
-            analyticalItem: item.analyticalItem,
-            unit: item.unit,
-          })
+      for (let i = 0; i < 5; i++) {
+        analysisItemsCode.value[`actualAmountUnits_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualAmountUnits`]
+        analysisItemsCode.value[`actualMakerLotNo_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualMakerLotNo`]
+        analysisItemsCode.value[`actualNetCountKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualNetCountKgs`]
+        analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualTotalQuantityKgs`]
+      }
 
-          // ตรวจสอบว่า itemAnalyticals เป็นอาร์เรย์
-          if (Array.isArray(item.itemAnalyticals)) {
-            for (let j = 0; j < item.itemAnalyticals.length; j++) {
-              const analyticalItem = item.itemAnalyticals[j]
-      
-              // เก็บค่าจาก itemAnalyticals
-              analyticalItemsResults.value.push({
-                rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
-                actualAmountUnits: analyticalItem.actualAmountUnits,
-                actualAnalysis: analyticalItem.actualAnalysis,
-                actualMakerLotNo: analyticalItem.actualMakerLotNo,
-                actualNetCountKgs: analyticalItem.actualNetCountKgs,
-                actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
-                inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
-                lotID: analyticalItem.lotID,
-                okState: analyticalItem.okState,
+      // วนลูปผ่าน analysisItems.value
+      for (let i = 0; i < analysisItems.value.length; i++) {
+        const item = analysisItems.value[i]
 
-                // เพิ่มฟิลด์ที่ต้องการเก็บข้อมูลได้ที่นี่
-              })
-            }
+        // เก็บค่าจาก analysisItems
+        analysisResults.value.push({
+          rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
+          typeID: item.typeID,
+          typeName: item.typeName,
+          analyticalItem: item.analyticalItem,
+          unit: item.unit,
+        })
+
+        // ตรวจสอบว่า itemAnalyticals เป็นอาร์เรย์
+        if (Array.isArray(item.itemAnalyticals)) {
+          for (let j = 0; j < item.itemAnalyticals.length; j++) {
+            const analyticalItem = item.itemAnalyticals[j]
+
+            // เก็บค่าจาก itemAnalyticals
+            analyticalItemsResults.value.push({
+              rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
+              actualAmountUnits: analyticalItem.actualAmountUnits,
+              actualAnalysis: analyticalItem.actualAnalysis,
+              actualMakerLotNo: analyticalItem.actualMakerLotNo,
+              actualNetCountKgs: analyticalItem.actualNetCountKgs,
+              actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
+              inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+              lotID: analyticalItem.lotID,
+              okState: analyticalItem.okState,
+
+              // เพิ่มฟิลด์ที่ต้องการเก็บข้อมูลได้ที่นี่
+            })
           }
         }
-        console.log("***************55555555", analysisItems.value)
-        
-      })
-      .catch(error => {
-        // Handle errors
-        console.error('Error:', error)
-      })
-  }else {
+      }
+
+      console.log("***************55555555", analysisItems.value)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
+  } else {
     console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    loadingGenerated1.value = true
   }
-  
 }
+
+const loadingGenerated1 = ref(true)
+const loadingGenerated2 = ref(true)
 
 watch(() => {
   getHearderInsp()
@@ -384,6 +490,7 @@ const saveHeaderInspect = async () => {
 
     // console.log('[products.value]!!: ', response.data)
     // isDialogSubmitSuccessVisible.value = true
+    return true
   } catch (error) {
     // Handle errors
     isDialogSubmitFailedVisible.value = true
@@ -398,31 +505,40 @@ const emptyFields = ref([])
 const showOnlyErrors = ref(false) // ตั้งเป็น true เพื่อแสดงเฉพาะค่า error
 
 watchEffect(() => {
-  for (let i = 0; i < analysisItems.value.length; i++) {
-    console.log('Test', analysisItems.value[i])
-  }
+  // for (let i = 0; i < analysisItems.value.length; i++) {
+  //   console.log('Test', analysisItems.value[i])
+  // }
 })
+
+const textAlertErrorOkState = ref('')
 
 const checkOkState = (item, typeId, indexAnalysis) => {
   // ตรวจสอบว่ามีค่าใน itemAnalyticals ก่อนที่จะเข้าถึง
   if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis) {
     const analyticalItem = item.itemAnalyticals[indexAnalysis]
     if (analyticalItem.okState != null) {
+      textAlertErrorOkState.value = 'Analysis result OK/NOT is required!'
+      
       return !item.needActualValue &&
              item.typeID === typeId &&
              analyticalItem.okState === -1
 
       // ตรวจสอบ okState เท่ากับ -1
+      
     }
   }
   
   return false
 }
 
+const textAlertErrorAnalysitItem = ref('')
+
 const checkAnalysitItem = (item, typeId, indexAnalysis) => {
   // ตรวจสอบว่ามีค่าใน itemAnalyticals ก่อนที่จะเข้าถึง
   if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis) {
     const analyticalItem = item.itemAnalyticals[indexAnalysis]
+
+    textAlertErrorAnalysitItem.value = 'Analysis result Text is required!'
     
     return item.needActualValue &&
              item.typeID === typeId &&
@@ -445,9 +561,9 @@ const checkEmptyFields = () => {
         okState: analyticalItem.okState,
       }
 
-      const indexLabelFiled = `${itemIndex + 1}. ${item.analyticalItem} maker Lot ${analyticalIndex + 1} !`
+      const indexLabelFiled = `No.${itemIndex + 1} - Lot ${analyticalIndex + 1}`
 
-      const indexLabelSuccessed =  `${itemIndex + 1}. ${item.analyticalItem} maker Lot ${analyticalIndex + 1} !`
+      const indexLabelSuccessed =  `${itemIndex + 1} - Lot ${analyticalIndex + 1}`
       const needActualCheck = item.needActualValue
 
       // ตรวจสอบว่าต้องเช็ค actualAnalysis หรือ okState ตามค่า needActualValue
@@ -485,16 +601,20 @@ const saveLotInspect = async () => {
   emptyFields.value = checkEmptyFields()
 
   // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
-  const hasErrors = emptyFields.value.some(field => field.isEmpty)
+  
+  const hasErrors = ref(null)
+  if(trickerSubmit.value === true){
+    hasErrors.value = emptyFields.value.some(field => field.isEmpty)
+  }
   
   // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
-  if (hasErrors) {
+  if (hasErrors.value) {
     console.log('Cannot proceed: There are errors in the fields.')
 
     // แสดง dialog แจ้งเตือนถ้าจำเป็น
-    isDialogSubmitFailedVisible.value = true
+    // isDialogSubmitFailedVisible.value = true
     
-    return // หยุดการทำงาน
+    throw "Cannot proceed: There are errors in the fields."
   }
 
   try {
@@ -523,46 +643,84 @@ const saveLotInspect = async () => {
 
     // แสดง dialog เมื่อสำเร็จ
     // isDialogSubmitSuccessVisible.value = true
+    return true
   } catch (error) {
     // แสดง dialog เมื่อมีข้อผิดพลาด
-    isDialogSubmitFailedVisible.value = true
+    // isDialogSubmitFailedVisible.value = true
     console.error('Error:', error)
   }
 }
 
 //--------------- Submit --------------------------------
-const submitInspForm = () => {
-  saveHeaderInspect()
-  saveLotInspect()
-  axiosIns.post(`${urlApi.value}/api/v1/Inspection/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
+
+const trickerSubmit = ref(false)
+
+const submitInspForm = async () => {
+  try {
+    // รอให้ submitButtonVisibleNew ทำงานและตรวจสอบว่ามันสำเร็จโดยไม่มี error
+    const submitVisibleResult = await submitButtonVisibleNew()
+
+    // ตรวจสอบว่า submitButtonVisibleNew สำเร็จ (ไม่เป็น null หรือ false)
+    if (submitVisibleResult) {
+      // ส่งข้อมูลไปยัง API เมื่อ submitButtonVisibleNew สำเร็จ
+      const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': `${whereHouse.value}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      })
+
       console.log('[products.value]!!: ', response.data)
-      isDialogSubmitSuccessVisible.value = true
-      isDialogConfirmVisible.value = false
-    
-    })
-    .catch(error => {
-    // Handle errors
-      console.error('Error:', error)
-      isDialogSubmitFailedVisible.value = true
-    })
+
+      // รีโหลดหน้าเมื่อส่งข้อมูลสำเร็จ
+      textAlertDialogFunction('SUBMIT', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+
+      return true
+    } else {
+      // ถ้าการตรวจสอบ submitButtonVisibleNew ไม่สำเร็จ แสดง error
+      console.error('submitButtonVisibleNew failed, cannot submit')
+      textAlertDialogFunction('SUBMIT', false)
+      
+      return false
+    }
+  } catch (error) {
+    // จัดการ error
+    console.error('Error:', error)
+
+    // isDialogSubmitFailedVisible.value = true
+    return false
+  }
 }
 
 //-------- Fuction Cancel --------------------------------
-// const isDialogSubmitFailedVisible = ref(false)
+const isDialogSubmitFailedVisible = ref(false)
 
 const commentReject = ref('')
 const commentBackToEdit = ref('')
 
+const textAlertError = ref({
+  success: false,
+
+  comment: '',
+  coa: '',
+})
+
 const rejectInsp = () => {
   console.log("StaertSSSSS!!")
+
+  if(!commentReject.value){
+    textAlertError.value.success = true
+    textAlertError.value.comment = 'Please provide a comment to reject the inspection.'
+    
+    return
+  }
+
   axiosIns.post(`${urlApi.value}/api/v1/Inspection/Reject/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
@@ -575,13 +733,21 @@ const rejectInsp = () => {
   },
   {})
     .then(response => {
-      console.log('[products.value]!!: ', response.data)
-      isDialogSubmitSuccessVisible.value = true
-      isDialogConfirmVisible.value = false
+      // console.log('[products.value]!!: ', response.data)
+      // isDialogSubmitSuccessVisible.value = true
+      // isDialogConfirmVisible.value = false
+
+      textAlertDialogFunction('REJECT', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
     // Handle errors
+      textAlertDialogFunction('REJECT', false)
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true
     })
@@ -601,13 +767,19 @@ const approveInsp = () => {
   },
   {})
     .then(response => {
-      console.log('[products.value]!!: ', response.data)
-      isDialogSubmitSuccessVisible.value = true
       isDialogConfirmVisible.value = false
+
+      textAlertDialogFunction('ACCEPT', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
     // Handle errors
+      textAlertDialogFunction('ACCEPT', false)
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true
     })
@@ -627,8 +799,7 @@ const approveReceivingPlant = () => {
       // isDialogSubmitSuccessVisible.value = true
       isDialogConfirmVisible.value = false
 
-      // รีเฟรชหน้าจอทั้งหมด
-      location.reload()
+      
     })
     .catch(error => {
       // Handle errors
@@ -692,14 +863,12 @@ const getCOAReceivingForm = () => {
         startTime.value = coaFiles.value.length
 
         console.log('[*****Headers COA]]!!: ', lotData)
+        loadingGenerated1.value = false
       })
       .catch(error => {
         console.error('Error:', error)
-        isLoading.value = false
+        loadingGenerated1.value = true
         checkBoxCOANo.value = true
-      })
-      .finally(() => {
-        loading.value = false
       })
   }
 }
@@ -707,6 +876,7 @@ const getCOAReceivingForm = () => {
 onMounted(() => {
   getCOAReceivingForm() // เรียกใช้ฟังก์ชันเพื่อโหลดข้อมูลจาก API
 })
+
 
 //----------------- COA ---------------------------------------------
 const  colors = [
@@ -814,6 +984,12 @@ const loadindingSaveDatftSeccess3 = ref(false)
 
 const wordForSubmit = ref('Word')
 
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+
+const isDialogVisibleAlertDialog = ref(false)
+
+
 const submitButtonVisibleNew = async word => {
   wordForSubmit.value = word
   isDialogVisibleStepSaveDraft.value = true
@@ -911,7 +1087,15 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  location.reload()
+  if(trickerSubmit.value !== true){
+
+    textAlertDialogFunction('SAVE DRAFT', true)
+
+    // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+    setTimeout(() => {
+      location.reload()
+    }, 300) // 10000 มิลลิวินาที = 10 วินาที
+  }
 
   // isDialogSubmitSuccessVisible.value = true
   isDialogConfirmVisible.value = false
@@ -926,8 +1110,8 @@ const submitButton = word => {
 }
 
 const saveDraftButton = word => {
-  saveHeaderInspect()
-  saveLotInspect()
+  trickerSubmit.value = false
+  submitButtonVisibleNew(word)
   wordForSubmit.value = word
 }
 
@@ -942,6 +1126,7 @@ const areaTextRemarkButton = word => {
 }
 
 const submitButtonVisible = word => {
+  trickerSubmit.value = true
   wordForSubmit.value = word
   isDialogConfirmVisible.value = true
 }
@@ -971,6 +1156,15 @@ const submitConfirm = () => {
 
   // รีเฟรชหน้าจอ
   location.reload()
+}
+
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+  console.log("textAlertDialogFunction Start!!")
 }
 
 //--------------------------- Status Check --------------------------
@@ -1028,1806 +1222,1990 @@ const getDisabledFollowStatusNRole = () => {
     </span>
   </div>
 
-  <div v-if="false">
-    {{ analysisItemsCode }}
-  </div>
-
-  <VRow>
-    <VCol cols="3">
-      <div
-        class="my-4 pa-2 text-center"
-        style="border: 1px solid black; font-size: 12px; font-weight: bold;"
-      >
-        CONFIDENTIAL
-      </div>
-    </VCol>
-  </VRow>
-
-  <div style="overflow-x: auto; white-space: nowrap;">
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th colspan="4" />
-          <th
-            colspan="1"
-            class="text-start"
-          >
-            SKT Name
-          </th>
-          <td colspan="2">
-            {{ headerInsp.sktName }}
-          </td>
-          <th
-            colspan="1"
-            class="text-center"
-          >
-            Raw Mat. Code
-          </th>
-          <th colspan="2">
-            Supplier Name
-          </th>
-          <td colspan="2">
-            <div>{{ headerInsp.supplierName }}</div>
-          </td>
-        </tr>
-        <tr>
-          <th colspan="2">
-            Received Date 
-          </th>
-          <td colspan="2">
-            {{ formatDate(headerInsp.receivedDate) }}
-          </td>
-          <th
-            colspan="1"
-            class="text-start"
-          >
-            Trade Name
-          </th>
-          <td colspan="2">
-            {{ headerInsp.tradeNames }}
-          </td>
-          <td
-            colspan="1"
-            class="text-center"
-          >
-            {{ headerInsp.itemCode }}
-          </td>
-          <th colspan="2">
-            Manufacturer Name
-          </th>
-          <td colspan="2">
-            {{ headerInsp.ManufacturerName }}
-          </td>
-        </tr>
-        <tr>
-          <th colspan="5">
-            Certificate Of Analysis From Manufacturer
-          </th>
-          <td colspan="3">
-            <VRow>
-              <VCol cols="6">
-                <VCheckbox
-                  v-model="checkBoxCOAYes"
-                  
-                  readonly
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Yes</span>
-                  </template>
-                </VCheckbox>
-              </VCol>
-              <VCol cols="6">
-                <VCheckbox
-                  v-model="checkBoxCOANo"
-                  readonly
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">No</span>
-                  </template>
-                </VCheckbox>
-              </VCol>
-            </VRow>
-          </td>
-          <td colspan="4">
-            <div class="card-stack-container cursor-pointer">
-              <!-- แสดงการ์ดที่ซ้อนกัน -->
-              <VCard
-                v-for="(image, index) in limitedImages"
-                :key="index"
-                :elevation="5"
-                class="card"
-                :style="{ zIndex: index, transform: `translate(${index * 30}px, ${index * 0}px)` }"
-                @click="openDialog(index)"
-              >
-                <!-- แสดงภาพหรือจำนวนรูปทั้งหมดในการ์ดสุดท้าย -->
-                <template v-if="index < limitedImages.length - 1">
-                  <VCardText class="pa-1">
-                    <VImg
-                      :src="'data:image/png;base64,'+image.coAFile"
-                      aspect-ratio="1"
-                    />
-                  </VCardText>
-                </template>
-                
-                <template v-else>
-                  <VCardText class="bg-primary">
-                    <VRow class="d-flex justify-center align-center">
-                      <VCol
-                        class="pa-0 d-flex justify-center align-center"
-                        cols="12"
-                      >
-                        <VIcon
-                          size="35"
-                          icon="ri-gallery-line"
-                        />
-                      </VCol>
-                      <VCol
-                        class="pa-0 d-flex justify-center align-center"
-                        cols="12"
-                      >
-                        <span>{{ coaFiles.length }}+</span>
-                      </VCol>
-                    </VRow>
-                  </VCardText>
-                </template>
-              </VCard>
-
-              <!-- Modal สำหรับแสดงรูปทั้งหมด -->
-              <VDialog
-                v-model="showAllImages"
-                width="80%"
-              >
-                <VCard>
-                  <VCarousel v-model="selectedImageIndex">
-                    <VCarouselItem
-                      v-for="(image, index) in coaFiles"
-                      :key="index"
-                      :src="'data:image/png;base64,'+image.coAFile"
-                    />
-                  </VCarousel>
-
-                  <VCardActions>
-                    <VBtn
-                      color="primary"
-                      @click="showAllImages = false"
-                    >
-                      ปิด
-                    </VBtn>
-                  </VCardActions>
-                </VCard>
-              </VDialog>
-
-              <VProgressCircular
-                v-if="isLoading"
-                :size="50"
-                :width="3"
-                color="primary"
-                indeterminate
-                class="progress-circular"
-              >
-                <span>Loading.....</span>
-              </VProgressCircular>
-            </div>
-          </td>
-        </tr>
-      </thead>
-    </table>
-  </div>
-
-  <!-- Dialog COA -->
-  <VDialog
-    v-model="isDialogVisibleCOA"
-    width="80%"
+  <div
+    v-if="loadingGenerated1 && loadingGenerated2"
+    class="mt-1"
   >
-    <!-- Dialog Content -->
-    <VCard>
-      <VCardTitle class="bg-primary d-flex justify-space-between align-center">
-        <span>COA</span>
-        <VBtn
-          color="white"
-          variant="tonal"
-          icon="ri-close-fill"
-          @click="isDialogVisibleCOA = false"
-        />
-      </VCardTitle>
-
-      <VCardText class="pa-0">
-        <VImg
-          v-if="false"
-          :src="srcImagCOA"
-        />
-        <div class="pa-0">
-          <div class="d-flex justify-space-around align-center py-1">
-            <VBtn
-              v-if="false"
-              icon="mdi-minus"
-              variant="text"
-              size="30px"
-              @click="model = Math.max(model - 1, 0)"
-            />
-            {{ selectedImageIndex+1 }}
-            <VBtn
-              v-if="false"
-              icon="mdi-plus"
-              size="30px"
-              variant="text"
-              @click="model = Math.min(model + 1, 4)"
-            />
-          </div>
-          <VCarousel v-model="selectedImageIndex">
-            <VCarouselItem
-              v-for="(item, i) in coaFiles"
-              :key="item"
-              :value="i"
-              :src="'data:image/png;base64,'+ item.coAFile"
-            >
-              <VSheet
-                v-if="false"
-                height="100%"
-                tile
-              >
-                <div class="d-flex fill-height justify-center align-center">
-                  <div class="text-h2">
-                    Slide {{ i + 1 }}
-                  </div>
-                </div>
-              </VSheet>
-            </VCarouselItem>
-          </VCarousel>
-        </div>
-      </VCardText>
-    </VCard>
-  </VDialog>
-
-  <section>
-    <VBtn @click="textValue">
-      Test
-    </VBtn>
-  </section>
-
-  <!-- Raw Material Inspection Request Form -->
-  <VRow class="mt-4">
-    <VCol
-      class="px-0"
-      cols="12"
+    <VProgressLinear
+      height="20"
+      color="success"
+      indeterminate 
     >
-      <div style="overflow-x: auto; white-space: nowrap;">
-        <table class="custom-table">
-          <!-- Sanyo Lot No. -->
-          <tr>
-            <th
-              class="text-center"
-              rowspan="3"
-              colspan="1"
-            >
-              No.
-            </th>
-            <th
-              class="text-center"
-              rowspan="3"
-              colspan="2"
-            >
-              Analytical Items
-            </th>
-            <th
-              class="text-center"
-              rowspan="3"
-              colspan="2"
-            >
-              Unit
-            </th>
-            <th
-              class="text-center"
-              rowspan="3"
-              colspan="2"
-            >
-              Analytical  Method No.
-            </th>
-            <th
-              class="text-center"
-              rowspan="3"
-              colspan="2"
-            >
-              Specification Ranges
-            </th>
-            <th
-              class="text-center "
-              colspan="1"
-            >
-              Sanyo Lot No.
-            </th>
-            <td
-              colspan="5"
-              class="text-center"
-            >
-              {{ headerInsp.sktId }}
-            </td>
-          </tr>
-          <!-- Maker Lot No. -->
-          <tr>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              Maker Lot No.
-            </th>
-            <td
-              class="text-center"
-              colspan="1"
-            >
-              <div class="d-flex justify-center align-center">
-                <span>1 : {{ analysisItemsCode.actualMakerLotNo_0 }}</span>
-              </div>
-            </td>
-            <td colspan="1">
-              <div class="d-flex justify-center align-center">
-                <span>2 : {{ analysisItemsCode.actualMakerLotNo_1 }}</span>
-              </div>
-            </td>
-            <td colspan="1">
-              <div class="d-flex justify-center align-center">
-                <span>3 : {{ analysisItemsCode.actualMakerLotNo_2 }}</span>
-              </div>
-            </td>
-            <td colspan="1">
-              <div class="d-flex justify-center align-center">
-                <span>4 : {{ analysisItemsCode.actualMakerLotNo_3 }}</span>
-              </div>
-            </td>
-            <td colspan="1">
-              <div class="d-flex justify-center align-center">
-                <span>5 : {{ analysisItemsCode.actualMakerLotNo_4 }}</span>
-              </div>
-            </td>
-          </tr>
-          <!-- Net Count.x Amount -->
-          <tr>
-            <th
-              class="text-center"
-              colspan="1"
-            >
-              Net Count.x Amount
-            </th>
-            <td
-              v-for="i = 1 in 5"
-              :key="i"
-              class="text-center"
-              colspan="1"
-              style="min-width: 160px; max-width: 160px;"
-            >
-              <span>{{ formatNumberToLocal(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
-            </td>
-          </tr>
+      <span>Loading</span>
+    </VProgressLinear>
+  </div>
 
-          <!-- Actual Analysis -->
+  <div v-if="!loadingGenerated1 && !loadingGenerated2">
+    <div v-if="false">
+      {{ analysisItemsCode }}
+    </div>
+
+    <VRow>
+      <VCol cols="2">
+        <div
+          class="my-4 pa-2 text-center"
+          style="max-width: 150px; border: 1px solid black; font-size: 12px; font-weight: bold;"
+        >
+          CONFIDENTIAL
+        </div>
+      </VCol>
+    </VRow>
+
+    <div style="overflow-x: auto; white-space: nowrap;">
+      <table class="custom-table">
+        <thead>
           <tr>
+            <th colspan="4" />
             <th
-              class="text-center"
-              colspan="9"
-            />
-            <th
-              class="text-center"
               colspan="1"
+              class="text-start"
             >
-              Actual Analysis
+              SKT Name
             </th>
+            <td colspan="2">
+              {{ headerInsp.sktName }}
+            </td>
+            <th
+              colspan="1"
+              class="text-center"
+            >
+              Raw Mat. Code
+            </th>
+            <th colspan="2">
+              Supplier Name
+            </th>
+            <td colspan="2">
+              <div>{{ headerInsp.supplierName }}</div>
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2">
+              Received Date 
+            </th>
+            <td colspan="2">
+              {{ formatDate(headerInsp.receivedDate) }}
+            </td>
+            <th
+              colspan="1"
+              class="text-start"
+            >
+              Trade Name
+            </th>
+            <td colspan="2">
+              {{ headerInsp.tradeNames }}
+            </td>
             <td
+              colspan="1"
+              class="text-center"
+            >
+              {{ headerInsp.itemCode }}
+            </td>
+            <th colspan="2">
+              Manufacturer Name
+            </th>
+            <td colspan="2">
+              {{ headerInsp.ManufacturerName }}
+            </td>
+          </tr>
+          <tr>
+            <th colspan="5">
+              Certificate Of Analysis From Manufacturer
+            </th>
+            <td colspan="3">
+              <VRow>
+                <VCol cols="6">
+                  <VCheckbox
+                    v-model="checkBoxCOAYes"
+                  
+                    readonly
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Yes</span>
+                    </template>
+                  </VCheckbox>
+                </VCol>
+                <VCol cols="6">
+                  <VCheckbox
+                    v-model="checkBoxCOANo"
+                    readonly
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">No</span>
+                    </template>
+                  </VCheckbox>
+                </VCol>
+              </VRow>
+            </td>
+            <td colspan="4">
+              <div class="card-stack-container cursor-pointer">
+                <!-- แสดงการ์ดที่ซ้อนกัน -->
+                <VCard
+                  v-for="(image, index) in limitedImages"
+                  :key="index"
+                  :elevation="5"
+                  class="card"
+                  :style="{ zIndex: index, transform: `translate(${index * 30}px, ${index * 0}px)` }"
+                  @click="openDialog(index)"
+                >
+                  <!-- แสดงภาพหรือจำนวนรูปทั้งหมดในการ์ดสุดท้าย -->
+                  <template v-if="index < limitedImages.length - 1">
+                    <VCardText class="pa-1">
+                      <VImg
+                        v-if="image.contentType === 'image/jpeg' || image.contentType === 'image/png'"
+                        :src="image.fileUri"
+                        aspect-ratio="1"
+                      />
+                      <iframe
+                        v-else-if="image.contentType === 'application/pdf'"
+                        :src="'https://docs.google.com/viewer?url=' +image.fileUri+'&embedded=true'"
+                        width="100%"
+                        height="500px"
+                        aspect-ratio="1"
+                      />
+                    </VCardText>
+                  </template>
+                
+                  <template v-else>
+                    <VCardText class="bg-primary">
+                      <VRow class="d-flex justify-center align-center">
+                        <VCol
+                          class="pa-0 d-flex justify-center align-center"
+                          cols="12"
+                        >
+                          <VIcon
+                            size="35"
+                            icon="ri-gallery-line"
+                          />
+                        </VCol>
+                        <VCol
+                          class="pa-0 d-flex justify-center align-center"
+                          cols="12"
+                        >
+                          <span>{{ coaFiles.length }}+</span>
+                        </VCol>
+                      </VRow>
+                    </VCardText>
+                  </template>
+                </VCard>
+
+                <!-- Modal สำหรับแสดงรูปทั้งหมด -->
+                <VDialog
+                  v-model="showAllImages"
+                  width="80%"
+                >
+                  <VCard>
+                    <VCarousel v-model="selectedImageIndex">
+                      <VCarouselItem
+                        v-for="(file, index) in coaFiles"
+                        :key="index"
+                      >
+                        <div v-if="file.contentType === 'image/jpeg'">
+                          <img
+                            :src="file.fileUri"
+                            alt="Image"
+                          >
+                        </div>
+                        <div v-else-if="file.contentType === 'application/pdf'">
+                          <iframe
+                            :src="file.fileUri"
+                            width="100%"
+                            height="500px"
+                          />
+                        </div>
+                      </VCarouselItem>
+                    </VCarousel>
+
+                    <VCardActions>
+                      <VBtn
+                        color="primary"
+                        @click="showAllImages = false"
+                      >
+                        ปิด
+                      </VBtn>
+                    </VCardActions>
+                  </VCard>
+                </VDialog>
+
+                <VProgressCircular
+                  v-if="isLoading"
+                  :size="50"
+                  :width="3"
+                  color="primary"
+                  indeterminate
+                  class="progress-circular"
+                >
+                  <span>Loading.....</span>
+                </VProgressCircular>
+              </div>
+            </td>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <!-- Dialog COA -->
+    <VDialog
+      v-model="isDialogVisibleCOA"
+      width="80%"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardTitle class="bg-primary d-flex justify-space-between align-center">
+          <span>COA</span>
+          <VBtn
+            color="white"
+            variant="tonal"
+            icon="ri-close-fill"
+            @click="isDialogVisibleCOA = false"
+          />
+        </VCardTitle>
+
+        <VCardText class="pa-0">
+          <VImg
+            v-if="false"
+            :src="srcImagCOA"
+          />
+          <div class="pa-0">
+            <div class="d-flex justify-space-around align-center py-1">
+              <VBtn
+                v-if="false"
+                icon="mdi-minus"
+                variant="text"
+                size="30px"
+                @click="model = Math.max(model - 1, 0)"
+              />
+              {{ selectedImageIndex+1 }}
+              <VBtn
+                v-if="false"
+                icon="mdi-plus"
+                size="30px"
+                variant="text"
+                @click="model = Math.min(model + 1, 4)"
+              />
+            </div>
+            <VCarousel
+              v-model="selectedImageIndex"
+              show-arrows="hover"
+            >
+              <VCarouselItem
+                v-for="(item, i) in coaFiles"
+                :key="i"
+                :value="i"
+                cover
+              >
+                <!-- ตรวจสอบประเภทไฟล์ -->
+                <template v-if="item.fileUri.endsWith('.pdf')">
+                  <iframe
+                    :src="'https://docs.google.com/viewer?url=' + item.fileUri + '&embedded=true'"
+                    width="100%"
+                    height="500px"
+                  />
+                </template>
+    
+                <!-- แสดงรูปภาพถ้าไม่ใช่ PDF -->
+                <template v-else>
+                  <VImg
+                    :src="item.fileUri"
+                    alt="Image"
+                  />
+                </template>
+              </VCarouselItem>
+            </VCarousel>
+          </div>
+        </VCardText>
+      </VCard>
+    </VDialog>
+
+    <section v-if="false">
+      <VBtn @click="textValue">
+        Test
+      </VBtn>
+    </section>
+
+    <!-- Raw Material Inspection Request Form -->
+    <VRow class="mt-4">
+      <VCol
+        class=""
+        cols="12"
+      >
+        <div style="overflow-x: auto; white-space: nowrap;">
+          <table class="custom-table">
+            <!-- Sanyo Lot No. -->
+            <tr>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="1"
+              >
+                No.
+              </th>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="2"
+              >
+                Analytical Items
+              </th>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="2"
+              >
+                Unit
+              </th>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="2"
+              >
+                Analytical  Method No.
+              </th>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="2"
+              >
+                Specification Ranges
+              </th>
+              <th
+                class="text-center "
+                colspan="1"
+              >
+                Sanyo Lot No.
+              </th>
+              <td
+                colspan="5"
+                class="text-center"
+              >
+                {{ headerInsp.sktId }}
+              </td>
+            </tr>
+            <!-- Maker Lot No. -->
+            <tr>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Maker Lot No.
+              </th>
+              <td
+                class="text-center"
+                colspan="1"
+              >
+                <div class="d-flex justify-center align-center">
+                  <span>1 : {{ analysisItemsCode.actualMakerLotNo_0 }}</span>
+                </div>
+              </td>
+              <td colspan="1">
+                <div class="d-flex justify-center align-center">
+                  <span>2 : {{ analysisItemsCode.actualMakerLotNo_1 }}</span>
+                </div>
+              </td>
+              <td colspan="1">
+                <div class="d-flex justify-center align-center">
+                  <span>3 : {{ analysisItemsCode.actualMakerLotNo_2 }}</span>
+                </div>
+              </td>
+              <td colspan="1">
+                <div class="d-flex justify-center align-center">
+                  <span>4 : {{ analysisItemsCode.actualMakerLotNo_3 }}</span>
+                </div>
+              </td>
+              <td colspan="1">
+                <div class="d-flex justify-center align-center">
+                  <span>5 : {{ analysisItemsCode.actualMakerLotNo_4 }}</span>
+                </div>
+              </td>
+            </tr>
+            <!-- Net Count.x Amount -->
+            <tr>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Net Count.x Amount
+              </th>
+              <td
+                v-for="i = 1 in 5"
+                :key="i"
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span>{{ covertFloatFixedTwo(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
+              </td>
+            </tr>
+
+            <!-- Actual Analysis -->
+            <tr>
+              <th
+                class="text-center"
+                colspan="9"
+              />
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Actual Analysis
+              </th>
+              <td
              
-              class="text-center"
-              colspan="1"
-              style="min-width: 160px; max-width: 160px;"
-            >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_0) }}</span>
-            </td>
-            <td
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_0) }}</span>
+              </td>
+              <td
               
-              class="text-center"
-              colspan="1"
-              style="min-width: 160px; max-width: 160px;"
-            >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_1) }}</span>
-            </td>
-            <td
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_1) }}</span>
+              </td>
+              <td
               
-              class="text-center"
-              colspan="1"
-              style="min-width: 160px; max-width: 160px;"
-            >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_2) }}</span>
-            </td>
-            <td
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_2) }}</span>
+              </td>
+              <td
              
-              class="text-center"
-              colspan="1"
-              style="min-width: 160px; max-width: 160px;"
-            >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_3) }}</span>
-            </td>
-            <td 
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_3) }}</span>
+              </td>
+              <td 
               
-              class="text-center"
-              colspan="1"
-              style="min-width: 160px; max-width: 160px;"
-            >
-              <span><VIcon icon="ri-functions" />: {{ formatNumberToLocal(analysisItemsCode.actualTotalQuantityKgs_4) }}</span>
-            </td>
-          </tr>
-
-          <!-- AnalysisItems -->
-          <tr
-            v-for="(item , index) in analysisItems"
-            :key="index"
-            class=""
-          >
-            <td
-              v-if="item.typeID === 1"
-              :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
-              class="text-center"
-              colspan="1"
-            >
-              <span>{{ item.sqnText }}</span>
-            </td>
-
-            <td
-              v-if="item.typeID === 1"
-              colspan="2"
-            >
-              <span>{{ item.analyticalItem }}</span>
-            </td>
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="2"
-            >
-              <span>{{ item.unit }}</span>
-            </td>
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="2"
-            >
-              <span>{{ item.methodCode }}</span>
-            </td>
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="2"
-            >
-              <span>{{ item.specRange }}</span>
-            </td>
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="1"
-            >
-              <span>{{ item.actualAnalysis }}</span>
-            </td>
-
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
-                v-model="item.itemAnalyticals[0].okState"
-                :mandatory="false"
-                :rules="[
-                  v => v !== -1 || 'Actual value is required!',
-                ]"
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
               >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_4) }}</span>
+              </td>
+            </tr>
 
-              <span
-                v-if="checkOkState(item, item.typeID, 0)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
-                v-model="item.itemAnalyticals[0].actualAnalysis"
-                :rules="[
-                  value => value !== '' || !value || 'Actual value is required!',
-                  value => value.length <= 20 || 'Must be 20 characters or less',
-                ]"
-                density="compact"
-              />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 0)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
-                v-model="item.itemAnalyticals[1].okState"
-                :mandatory="false"
-              >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              
-              <span
-                v-if="checkOkState(item, item.typeID, 1)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
-                v-model="item.itemAnalyticals[1].actualAnalysis"
-                density="compact"
-                :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
-                ]"
-              />
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 1)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
-                v-model="item.itemAnalyticals[2].okState"
-                :mandatory="false"
-              >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              <span
-                v-if="checkOkState(item, item.typeID, 2)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
-                v-model="item.itemAnalyticals[2].actualAnalysis"
-                density="compact"
-                :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
-                ]"
-              />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 2)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
-                v-model="item.itemAnalyticals[3].okState"
-                :mandatory="false"
-              >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              <span
-                v-if="checkOkState(item, item.typeID, 3)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
-                v-model="item.itemAnalyticals[3].actualAnalysis"
-                density="compact"
-                :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
-                ]"
-              />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 3)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-
-            <td
-              v-if="item.typeID === 1"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
-                v-model="item.itemAnalyticals[4].okState"
-                :mandatory="false"
-              >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              <span
-                v-if="checkOkState(item, item.typeID, 4)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
-                v-model="item.itemAnalyticals[4].actualAnalysis"
-                density="compact"
-                :rules="[
-                  value => value.length <= 20 || 'Must be 20 characters or less'
-                ]"
-              />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 4)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-          </tr>
-          
-          <!-- Reference -->
-          <tr class="">
-            <td
-              class="text-center"
-              colspan="1"
-            />
-            <th
-              class="text-start text-decoration-underline"
-              colspan="14"
-            >
-              Reference
-            </th>
-          </tr>
-
-          <div v-if="false">
+            <!-- AnalysisItems -->
             <tr
-              v-for="(item , index) in Reference"
+              v-for="(item , index) in analysisItems"
+              :key="index"
+              class=""
+            >
+              <td
+                v-if="item.typeID === 1"
+                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
+                class="text-center"
+                colspan="1"
+              >
+                <span>{{ item.sqnText }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                colspan="2"
+              >
+                <span>{{ item.analyticalItem }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="2"
+              >
+                <span>{{ item.unit }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="2"
+              >
+                <span>{{ item.methodCode }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="2"
+              >
+                <span>{{ item.specRange }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+              >
+                <span>{{ item.actualAnalysis }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
+                  v-model="item.itemAnalyticals[0].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                  :rules="[
+                    v => v !== -1 || 'Actual value is required!',
+                  ]"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 0)"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
+                  v-model="item.itemAnalyticals[0].actualAnalysis"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[0].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  density="compact"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 0)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
+                  v-model="item.itemAnalyticals[1].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+              
+                <span
+                  v-if="checkOkState(item, item.typeID, 1)"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
+                  v-model="item.itemAnalyticals[1].actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[1].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 1)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
+                  v-model="item.itemAnalyticals[2].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 2)"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
+                  v-model="item.itemAnalyticals[2].actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[2].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 2)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
+                  v-model="item.itemAnalyticals[3].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 3)"
+                  class="text-red"
+                >Analysis result Ok/Not is required!</span>
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
+                  v-model="item.itemAnalyticals[3].actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[3].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 3)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
+                  v-model="item.itemAnalyticals[4].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 4)"
+                  class="text-red"
+                >Analysis result Ok/Not is required!</span>
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
+                  v-model="item.itemAnalyticals[4].actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[4].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 4)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+            </tr>
+          
+            <!-- Reference -->
+            <tr class="">
+              <td
+                class="text-center"
+                colspan="1"
+              />
+              <th
+                class="text-start text-decoration-underline"
+                colspan="14"
+              >
+                Reference
+              </th>
+            </tr>
+
+            <tr
+              v-for="(item , index) in analysisItems"
               :key="index"
             >
               <td
-                :class="{ 'bg-primary': !item.aa, 'bg-primary': item.aa }"
+                v-if="item.typeID === 2"
+                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
                 class="text-center"
                 colspan="1"
               >
-                {{ index + 1 }}
+                <span>{{ item.sqnText }}</span>
               </td>
+            
               <td
+                v-if="item.typeID === 2"
                 colspan="2"
                 style="text-transform: capitalize;"
               >
-                {{ item.analysisItems }}
+                <span>{{ item.analyticalItem }}</span>
               </td>
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="2"
                 style="text-transform: capitalize;"
               >
-                {{ item.unit }}
+                <span>{{ item.unit }}</span>
               </td>
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="2"
                 style="text-transform: capitalize;"
               >
-                {{ item.analysisMethodNo }}
+                <span>{{ item.methodCode }}</span>
               </td>
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="2"
                 style="text-transform: capitalize;"
               >
-                {{ item.specificationRanges }}
+                <span>{{ item.specRange }}</span>
               </td>
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="1"
                 style="text-transform: capitalize;"
               >
-                {{ item.actualAnalysis }}
+                <span>{{ item.actualAnalysis }}</span>
               </td>
 
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="1"
               >
-                <VTextField density="compact" />
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
+                  v-model="item.itemAnalyticals[0].okState"
+                  :mandatory="false"
+                  :readonly="frozeCheck"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 0)"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
+                  v-model="item.itemAnalyticals[0].actualAnalysis"
+                  density="compact"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[0].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 0)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
               </td>
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="1"
               >
-                <VTextField density="compact" />
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
+                  v-model="item.itemAnalyticals[1].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 1)"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
+                  v-model="item.itemAnalyticals[1].actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[1].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 1)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
               </td>
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="1"
               >
-                <VTextField density="compact" />
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
+                  v-model="item.itemAnalyticals[2].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 2)"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
+                  v-model="item.itemAnalyticals[2].actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[2].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 2)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
               </td>
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="1"
               >
-                <VTextField density="compact" />
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
+                  v-model="item.itemAnalyticals[3].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 3)"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
+                  v-model="item.itemAnalyticals[3].actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[3].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 3)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
               </td>
               <td
+                v-if="item.typeID === 2"
                 class="text-center"
                 colspan="1"
               >
-                <VTextField density="compact" />
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
+                  v-model="item.itemAnalyticals[4].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            OK
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            NOT
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 4)"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+                <VTextField
+                  v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
+                  v-model="item.itemAnalyticals[4].actualAnalysis"
+                  :readonly="frozeCheck"
+                  density="compact"
+                  :rules="[
+                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => {
+                      if (value && value[0] === ' ') {
+                        item.itemAnalyticals[4].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                  :maxlength="45" 
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 4)"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
               </td>
             </tr>
-          </div>
 
-          <tr
-            v-for="(item , index) in analysisItems"
-            :key="index"
-          >
-            <td
-              v-if="item.typeID === 2"
-              :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
-              class="text-center"
-              colspan="1"
-            >
-              <span>{{ item.sqnText }}</span>
-            </td>
-            
-            <td
-              v-if="item.typeID === 2"
-              colspan="2"
-              style="text-transform: capitalize;"
-            >
-              <span>{{ item.analyticalItem }}</span>
-            </td>
-            <td
-              v-if="item.typeID === 2"
-              class="text-center"
-              colspan="2"
-              style="text-transform: capitalize;"
-            >
-              <span>{{ item.unit }}</span>
-            </td>
-            <td
-              v-if="item.typeID === 2"
-              class="text-center"
-              colspan="2"
-              style="text-transform: capitalize;"
-            >
-              <span>{{ item.methodCode }}</span>
-            </td>
-            <td
-              v-if="item.typeID === 2"
-              class="text-center"
-              colspan="2"
-              style="text-transform: capitalize;"
-            >
-              <span>{{ item.specRange }}</span>
-            </td>
-            <td
-              v-if="item.typeID === 2"
-              class="text-center"
-              colspan="1"
-              style="text-transform: capitalize;"
-            >
-              <span>{{ item.actualAnalysis }}</span>
-            </td>
-
-            <td
-              v-if="!item.needActualValue && item.typeID === 2"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
-                v-model="item.itemAnalyticals[0].okState"
-                :mandatory="false"
-              >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              <span
-                v-if="checkOkState(item, item.typeID, 0)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
-                v-model="item.itemAnalyticals[0].actualAnalysis"
-                density="compact"
+            <!-- Reference Item -->
+            <tr>
+              <td
+                class="text-center"
+                colspan="1"
               />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 0)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-            <td
-              v-if="!item.needActualValue && item.typeID === 2"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
-                v-model="item.itemAnalyticals[1].okState"
-                :mandatory="false"
+              <td
+                class="text-start"
+                colspan="14"
               >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              <span
-                v-if="checkOkState(item, item.typeID, 1)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
-                v-model="item.itemAnalyticals[1].actualAnalysis"
-                density="compact"
-              />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 1)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-            <td
-              v-if="!item.needActualValue && item.typeID === 2"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
-                v-model="item.itemAnalyticals[2].okState"
-                :mandatory="false"
-              >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              <span
-                v-if="checkOkState(item, item.typeID, 2)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
-                v-model="item.itemAnalyticals[2].actualAnalysis"
-                density="compact"
-              />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 2)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-            <td
-              v-if="!item.needActualValue && item.typeID === 2"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
-                v-model="item.itemAnalyticals[3].okState"
-                :mandatory="false"
-              >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              <span
-                v-if="checkOkState(item, item.typeID, 3)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
-                v-model="item.itemAnalyticals[3].actualAnalysis"
-                density="compact"
-              />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 3)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-            <td
-              v-if="!item.needActualValue && item.typeID === 2"
-              class="text-center"
-              colspan="1"
-            >
-              <VRadioGroup
-                v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
-                v-model="item.itemAnalyticals[4].okState"
-                :mandatory="false"
-              >
-                <VRow>
-                  <VCol cols="6">
-                    <VRadio :value="1">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          OK
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                  <VCol cols="6">
-                    <VRadio :value="0">
-                      <template #label>
-                        <div style="font-size: 12px;">
-                          NOT
-                        </div>
-                      </template>
-                    </VRadio>
-                  </VCol>
-                </VRow>
-              </VRadioGroup>
-
-              <span
-                v-if="checkOkState(item, item.typeID, 4)"
-                class="text-red"
-              >Analysis result Not/ON is required!</span>
-
-              <VTextField
-                v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
-                v-model="item.itemAnalyticals[2].actualAnalysis"
-                density="compact"
-              /><VTextField
-                v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
-                v-model="item.itemAnalyticals[4].actualAnalysis"
-                density="compact"
-              />
-
-              <span
-                v-if="checkAnalysitItem(item, item.typeID, 4)"
-                class="text-red"
-              >Actual value Text is required!</span>
-            </td>
-          </tr>
-
-          <!-- Reference Item -->
-          <tr>
-            <td
-              class="text-center"
-              colspan="1"
-            />
-            <td
-              class="text-start"
-              colspan="14"
-            >
-              <div class="d-flex align-center">
-                <VIcon
-                  color="primary"
-                  icon="ri-circle-fill"
-                /> = After Arrival Of Raw Material, We Have To Actually Analyze Every Lot.
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </VCol>
-  </VRow>
-
-  <!-- Note / Details -->
-  <section>
-    <VRow
-      style="font-size: 12px;"
-      class="mb-1"
-    >
-      <VCol cols="12">
-        <span
-          class=""
-          style="font-size: 12px;"
-        >Remark: {{ headerInsp.remark }}</span>
-      </VCol>
-      <VCol cols="6">
-        Notes
-      </VCol>
-      <VCol cols="6">
-        Details of Limitation Condition
-      </VCol>
-    </VRow>
-
-    <table class="custom-table">
-      <tbody>
-        <tr>
-          <td>
-            <VTextarea
-              v-model="headerInsp.note"
-              auto-grow
-              :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
-            >
-              <template #label>
-                <span style="font-size: 12px;">Enter Your Notes                </span>
-              </template>
-            </VTextarea>
-          </td>
-          <td>
-            <VTextarea
-              v-model="headerInsp.details"
-              auto-grow
-              :rules="[v => v.length <= 1000 || 'Max 1000 characters']"
-            >
-              <template #label>
-                <span style="font-size: 12px;">Enter Your Details</span>
-              </template>
-            </VTextarea>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- Quality Evaluation -->
-  <section class="mt-5">
-    <VRow>
-      <VCol class="px-0" style="font-size: 12px;" cols="12">Quality Evaluation</VCol>
-      <VCol
-        style="border: 1px solid black;"
-        cols="4"
-        class="d-flex align-center"
-      >
-        <VRow>
-          <VCol
-            cols="1"
-            class="d-flex align-center"
-            style="font-size: 12px; font-weight: bolder;"
-          >
-            Accept
-          </VCol>
-          <VCol
-            class="d-flex justify-center"
-            cols="10"
-          >
-            <VIcon
-              v-if="statusId === 17 || statusId === 15"
-              color="success"
-              size="60"
-              icon="ri-checkbox-circle-fill"
-            />
-          </VCol>
-        </VRow>
-      </VCol>
-      <VCol
-        style="border: 1px solid black;"
-        cols="4"
-        class="d-flex align-center"
-      >
-        <VRow >
-          <VCol
-            cols="1"
-            class="d-flex align-center"
-            style="font-size: 12px; font-weight: bolder;"
-          >
-            Reject
-          </VCol>
-          <VCol
-            class="d-flex justify-center"
-            cols="11"
-          >
-            <VIcon
-              v-if="statusId === 7 || statusId === 16"
-              color="red"
-              size="60"
-              icon="ri-close-circle-fill"
-            />
-          </VCol>
-        </VRow>
-      </VCol>
-      <VCol
-        style="border: 1px solid black;"
-        cols="4"
-        class="d-flex align-center"
-      >
-        <span style="font-size: 12px; font-weight: bolder;">Comment:</span>	&nbsp;	&nbsp;
-        <span v-if="statusId === 7 || statusId === 16">{{ headerInsp.remarkReject }}</span>
-      </VCol>
-    </VRow>
-  </section>
-  
-  <!-- WareHouse / Inspection -->
-  <section>
-    <!-- WareHouse / Inspection -->
-    <VRow class="mt-6">
-      <VCol cols="6">
-        <VRow>
-          <VCol
-            style="border: 1px solid black; font-size: 12px;"
-            class="text-center"
-            cols="12"
-          >
-            Warehouse
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            class="text-start"
-            cols="6"
-          >
-            <div style="font-size: 12px;">
-              Staff: {{ headerInsp.updateByStaffWH }}
-            </div>
-            <VDivider />
-            <div
-              v-if="headerInsp.lastUpdatedStaffWH"
-              style="font-size: 12px;"
-            >
-              <VIcon icon="ri-calendar-schedule-fill" />{{ formatDate(headerInsp.lastUpdatedStaffWH) }}
-            </div>
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            class="text-start"
-            cols="6"
-          >
-            <div style="font-size: 12px;">
-              Supervisor: {{ headerInsp.updateBySuperWH }}
-            </div>
-            <VDivider />
-            <div
-              v-if="headerInsp.lastUpdatedSuperWH"
-              style="font-size: 12px;"
-            >
-              <VIcon icon="ri-calendar-schedule-fill" />{{ formatDate(headerInsp.lastUpdatedSuperWH) }}
-            </div>
-          </VCol>
-        </VRow>
-      </VCol>
-      <VCol cols="6">
-        <VRow>
-          <VCol
-            style="border: 1px solid black; font-size: 12px;"
-            class="text-center"
-            cols="12"
-          >
-            Inspection
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            class="text-start"
-            cols="6"
-          >
-            <div style="font-size: 12px;">
-              Staff: {{ headerInsp.updateByStaffInsp }}
-            </div>
-            <VDivider />
-            <div
-              v-if="headerInsp.lastUpdatedStaffInsp"
-              style="font-size: 12px;"
-            >
-              <VIcon icon="ri-calendar-schedule-fill" />{{ formatDate(headerInsp.lastUpdatedStaffInsp) }}
-            </div>
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            class="text-start"
-            cols="6"
-          >
-            <div style="font-size: 12px;">
-              Supervisor: {{ headerInsp.updateBySuperInsp }}
-            </div>
-            <VDivider />
-            <div
-              v-if="headerInsp.lastUpdatedSuperInsp"
-              style="font-size: 12px;"
-            >
-              <VIcon icon="ri-calendar-schedule-fill" />{{ formatDate(headerInsp.lastUpdatedSuperInsp) }}
-            </div>
-          </VCol>
-        </VRow>
-      </VCol>
-    </VRow>
-  </section>
-
-  <!-- BTN -->
-  <section
-    v-if="statusId === 4 || statusId === 5"
-    cols="12"
-    class="my-4"
-  >
-    <div class="d-flex justify-end">
-      <VBtn
-        class="mx-4"
-        color="warning"
-        style="font-size: 12px;"
-        @click="submitButtonVisibleNew('SAVE DRAFT')"
-      >
-        SAVE DRAFT
-      </VBtn>
-      <VBtn
-        color="green"
-        style="font-size: 12px;"
-        @click="submitButtonVisible('SUBMIT')"
-      >
-        SUBMIT
-      </VBtn>
-    </div>
-  </section>
-
-  <!-- Btn Approve , Reject, Back to edit -->
-  <section
-    v-if="statusId !== null && statusId === 6"
-    class="mt-6"
-  >
-    <div
-      style="font-size: 12px;"
-      class="d-flex justify-end px-0"
-    >
-      <VBtn
-        v-if="false"
-        class=""
-        color="info"
-        style="font-size: 12px;"
-        @click="areaTextRemarkButton('Back To Edit')"
-      >
-        Back To Edit
-      </VBtn>
-      <VBtn
-        class="mx-2"
-        color="error"
-        style="font-size: 12px;"
-        @click="areaTextRemarkButton('Reject')"
-      >
-        Reject
-      </VBtn>
-      <VBtn
-        color="green"
-        style="font-size: 12px;"
-        @click="approvetButtonVisible('ACCEPT')"
-      >
-        Accept
-      </VBtn>
-    </div>
-  </section>
-
-  <!-- Btn Approval -->
-  <section
-    v-if="statusId === 7 || statusId === 15"
-    class="mt-6"
-  >
-    <div
-      style="font-size: 12px;"
-      class="d-flex justify-end px-0"
-    >
-      <VBtn
-        v-if="false"
-        class=""
-        color="info"
-        style="font-size: 12px;"
-        @click="areaTextRemarkButton('Back To Edit')"
-      >
-        Back To Edit
-      </VBtn>
-      <VBtn
-        v-if="statusId === 7"
-        class="mx-2"
-        color="error"
-        style="font-size: 12px;"
-        @click="areaTextRemarkButton('APPROVE REJECT')"
-      >
-        Approve Reject
-      </VBtn>
-      <VBtn
-        v-if="statusId === 15"
-        color="green"
-        style="font-size: 12px;"
-        @click="approvetButtonVisible('APPROVE')"
-      >
-        Approve
-      </VBtn>
-    </div>
-  </section>
-
-  <section
-    v-if="responseGener && responseGener.statusId === '7' && roleAccount === 'admin'"
-    cols="12"
-  >
-    <div class="py-3 d-flex justify-end">
-      <VBtn
-        class="mx-2"
-        color="error"
-        @click="areaTextRemarkButton('Reject')"
-      >
-        Approve Reject
-      </VBtn>
-    </div>
-  </section>
-
-  <!-- Dialog Step Save Draft -->
-  <section style="font-size: 12px;">
-    <VDialog
-      v-model="isDialogVisibleStepSaveDraft"
-      width="90%"
-    >
-      <!-- Dialog Content -->
-      <VCard
-        class="text-center"
-        title="Save Draft"
-      >
-        <VCardText class="pa-1">
-          <VRow>
-            <VCol
-              class="text-center d-flex flex-column align-center justify-center mx-auto"
-              cols="4"
-            >
-              <div>
-                <VProgressLinear
-                  v-if="loadindingSaveDatft1"
-                  indeterminate
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftSeccess1"
-                  model-value="100"
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftFailed1"
-                  model-value="0"
-                />
-                <VAvatar
-                  class="my-2"
-                  size="150"
-                  :color="colorStep1"
-                >
+                <div class="d-flex align-center">
                   <VIcon
-                    size="100"
-                    :icon="iconStep1"
-                  />
-                </VAvatar>
-              </div>
-              <div><span style="font-size: 12px;">Save Draft Header</span></div>
-            </VCol>
-            <VCol
-              class="text-center d-flex flex-column align-center justify-center mx-auto"
-              cols="4"
-            >
-              <div>
-                <VProgressLinear
-                  v-if="loadindingSaveDatft2"
-                  indeterminate
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftSeccess2"
-                  model-value="100"
-                  color="primary"
-                />
-                <VProgressLinear
-                  v-if="loadindingSaveDatftFailed2"
-                  model-value="0"
-                />
-                <VAvatar
-                  class="my-2"
-                  size="150"
-                  :color="colorStep2"
-                >
-                  <VIcon
-                    size="100"
-                    :icon="iconStep2"
-                  />
-                </VAvatar>
-              </div>
-              <div><span style="font-size: 12px;">Save Draft Lot</span></div>
-            </VCol>
-          </VRow>
-        </VCardText>
+                    color="primary"
+                    icon="ri-circle-fill"
+                  /> = After arrival of raw material, we have to actually analyze every lot.
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </VCol>
+    </VRow>
 
-        <VCardText
-          v-if="emptyFields"
-          class="text-start"
+    <!-- Note / Details -->
+    <section>
+      <VRow
+        style="font-size: 12px;"
+        class="mb-1"
+      >
+        <VCol cols="12 ">
+          <span
+            class=""
+            style="font-size: 12px;"
+          >Remark: {{ headerInsp.remark }}</span>
+        </VCol>
+        <VCol cols="6 ">
+          Note
+        </VCol>
+        <VCol
+          cols="6 "
+          class="px-0"
         >
-          <VDivider />
-          <div>
-            <VAlert variant="outlined">
-              <VRow>
-                <VCol cols="6">
-                  Details Lot
-                </VCol>
-                <VCol
-                  cols="6"
-                  class="d-flex justify-end"
-                >
-                  <VSwitch
-                    v-model="showOnlyErrors"
-                    :label="showOnlyErrors ? 'Show All Details' : 'Show Only Errors'"
-                  />
-                </VCol>
-                <VCol
-                  v-for="(field, index) in filteredFields"
-                  :key="index"
-                  cols="4"
-                >
-                  <div :style="{ backgroundColor: field.isEmpty ? '#FBE9E7' : '#E8F5E9', borderRadius: '10px', }">
-                    <span
-                      v-if="field.isEmpty"
-                      style="font-size: 14px;"
+          Details of Limitation Condition
+        </VCol>
+
+        <VCol
+          cols="12"
+          class="py-0"
+        >
+          <table class="custom-table">
+            <tbody>
+              <tr>
+                <td colspan="6">
+                  <VTextarea
+                    v-model="headerInsp.note"
+                    :readonly="frozeCheck"
+                    auto-grow
+                    :rules="[
+                      v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
+                    ]" 
+                    @input="limitTextInputLine4Note" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
                     >
-                      <VIcon
-                        color="error"
-                        icon="ri-error-warning-fill"
-                      />
-                      <span>{{ field.indexLabelFiled }}: Failed </span>
-                      <div>
-                        <span v-if="!field.body.actualAnalysis && field.needActualCheck">Free text: {{ field.body.actualAnalysis }}  Please ensure that the field is filled. <br></span>
-                        <span v-else-if="field.body.okState === -1 && !field.needActualCheck">Checkbox: Please ensure that the field is filled. <br></span>
-                      </div>
-                    </span>
-                    <span
-                      v-else
-                      style="font-size: 14px;"
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextarea>
+                </td>
+                <td colspan="6">
+                  <VTextarea
+                    v-model="headerInsp.details"
+                    :readonly="frozeCheck"
+                    auto-grow
+                    :rules="[
+                      v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
+                    ]" 
+                    @input="limitTextInputLine4Details"
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
                     >
-                      <VIcon
-                        color="success"
-                        icon="ri-checkbox-circle-fill"
-                      />
-                      {{ field.indexLabelSuccessed }}: Successed
-                      <div>
-                        <span v-if="field.body.actualAnalysis && field.needActualCheck">Free text: {{ field.body.actualAnalysis }} <br></span>
-                        <span v-else-if="field.body.okState !== -1 && !field.needActualCheck">Checkbox: <span v-if="field.body.okState === 0">NOT</span> <span v-if="field.body.okState === 1">OK</span> <br></span>
-                      </div>
-                    </span>
-                  </div>
-                </VCol>
-              </VRow>
-            </VAlert>
-          </div>
-        </VCardText>
-      </VCard>
-    </VDialog>
-  </section>
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextarea>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </VCol>
+      </VRow>
+    </section>
 
-  <!-- Dialog Submit -->
-  <section>
-    <VDialog
-      v-model="isDialogConfirmVisible"
-      width="500"
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardText>
-          <div class="d-flex justify-center">
-            <VIcon
-              size="100"
-              color="warning"
-              icon="ri-question-line"
+    <!-- Quality Evaluation -->
+    <section class="mt-3 px-3">
+      <VRow>
+        <VCol
+          class="px-0"
+          style="font-size: 12px;"
+          cols="12"
+        >
+          Quality Evaluation
+        </VCol>
+        <!-- Accept Section -->
+        <VCol
+          cols="1"
+          class="d-flex align-center py-0 justify-center"
+          style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+        >
+          <span style="font-size: 12px; font-weight: bolder;">Accept</span>
+        </VCol>
+
+        <VCol
+          cols="3"
+          class="d-flex align-center justify-center py-0"
+          style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+        >
+          <VIcon
+            v-if="statusId === 17 || statusId === 15"
+            color="success"
+            size="60"
+            icon="ri-checkbox-circle-fill"
+          />
+        </VCol>
+
+        <!-- Reject Section -->
+        <VCol
+          cols="1"
+          class="d-flex align-center justify-center py-0"
+          style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
+        >
+          <span style="font-size: 12px; font-weight: bolder;">Reject</span>
+        </VCol>
+
+        <VCol
+          cols="3"
+          class="d-flex align-center justify-center py-0"
+          style="border: 1px solid black;"
+        >
+          <VIcon
+            v-if="statusId === 7 || statusId === 16"
+            color="red"
+            size="60"
+            icon="ri-close-circle-fill"
+          />
+        </VCol>
+
+        <!-- Comment Section -->
+        <VCol
+          cols="4"
+          class="d-flex align-center py-2"
+          style="border-top: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black;"
+        >
+          <div style="width: 100%; text-align: start;">
+            <span
+              style="font-size: 12px; font-weight: bolder;"
+              class="text-center"
+            >Comment:</span>
+            <VTextarea
+              v-if="statusId === 7 || statusId === 16"
+              v-model="headerInsp.remarkReject"
+              rows="2"
+              readonly
+              style="white-space: normal; word-wrap: break-word;"
             />
           </div>
-          <div class="text-center">
-            <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }} Transaction?</span>
-          </div>
-        </VCardText>
+        </VCol>
+      </VRow>
+    </section>
+  
+    <!-- WareHouse / Inspection -->
+    <section class="my-4">
+      <VRow>
+        <VCol
+          cols="12"
+          lg="12"
+        >
+          <table class="custom-table">
+            <tr>
+              <th
+                class="text-center cursor-pointer"
+                colspan="6"
+              >
+                Warehouse
+              </th>
+              <th
+                class="text-center cursor-pointer"
+                colspan="6"
+              >
+                Inspection
+              </th>
+            </tr>
+            <tr>
+              <td colspan="3">
+                <span>Staff: {{ headerInsp.updateByStaffWH }}</span>
+              </td>
+              <td colspan="3">
+                <span>Supervisor: {{ headerInsp.updateBySuperWH }}</span>
+              </td>
+              <td colspan="3">
+                <span>Staff: {{ headerInsp.updateByStaffInsp }}</span>
+              </td>
+              <td colspan="3">
+                <span>Supervisor: {{ headerInsp.updateBySuperInsp }}</span>
+              </td>
+            </tr>
+            <tr>
+              <td
+                style="min-width: 150px;"
+                colspan="3"
+              >
+                <div v-if="headerInsp.lastUpdatedStaffWH">
+                  <span>{{ formatDate(headerInsp.lastUpdatedStaffWH) }}</span>
+                </div>
+              </td>
+              <td
+                style="min-width: 150px;"
+                colspan="3"
+              >
+                <div v-if="headerInsp.lastUpdatedSuperWH">
+                  <span>{{ formatDate(headerInsp.lastUpdatedSuperWH) }}</span>
+                </div>
+              </td>
+              <td
+                style="min-width: 150px;"
+                colspan="3"
+              >
+                <div v-if="headerInsp.lastUpdatedStaffInsp">
+                  <span>{{ formatDate(headerInsp.lastUpdatedStaffInsp) }}</span>
+                </div>
+              </td>
+              <td
+                style="min-width: 150px;"
+                colspan="3"
+              >
+                <div v-if="headerInsp.lastUpdatedSuperInsp">
+                  <span>{{ formatDate(headerInsp.lastUpdatedSuperInsp) }}</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </VCol>
+      </VRow>
+    </section>
 
-        <VCardAction class="d-flex justify-space-between pa-4">
-          <VBtn
-            color="error"
-            @click="isDialogConfirmVisible = false"
-          >
-            Cancel
-          </VBtn>
-          <VBtn
-            v-if="wordForSubmit === 'SUBMIT'"
-            color="green"
-            @click="submitInspForm"
-          >
-            {{ wordForSubmit }}
-          </VBtn>
-          <VBtn
-            v-if="['APPROVE'].includes(wordForSubmit)"
-            color="success"
-            @click="approveReceivingPlant"
-          >
-            {{ wordForSubmit }}
-          </VBtn>
-          <VBtn
-            v-if="['ACCEPT'].includes(wordForSubmit)"
-            color="success"
-            @click="approveInsp"
-          >
-            {{ wordForSubmit }}
-          </VBtn>
-          <VBtn
-            v-if="['APPROVE REJECT'].includes(wordForSubmit)"
-            color="warning"
-            @click="approveReceivingPlant"
-          >
-            {{ wordForSubmit }}
-          </VBtn>
-        </VCardAction>
-      </VCard>
-    </VDialog>
-  </section>
-  <!-- Dialog Submit Success -->
-  <section>
-    <VDialog
-      v-model="isDialogSubmitSuccessVisible"
-      width="500"
+    <!-- BTN -->
+    <section
+      v-if="statusId === 4 || statusId === 5"
+      cols="12"
+      class="my-4"
     >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardText>
-          <div class="d-flex justify-center">
-            <VIcon
-              size="100"
-              color="success"
-              icon="ri-checkbox-circle-line"
-            />
-          </div>
-          <div class="text-center">
-            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
-          </div>
-        </VCardText>
+      <div class="d-flex justify-end">
+        <VBtn
+          class="mx-4"
+          color="warning"
+          style="font-size: 12px;"
+          @click="saveDraftButton('SAVE DRAFT')"
+        >
+          SAVE DRAFT
+        </VBtn>
+        <VBtn
+          color="green"
+          style="font-size: 12px;"
+          @click="submitButtonVisible('SUBMIT')"
+        >
+          SUBMIT
+        </VBtn>
+      </div>
+    </section>
 
-        <VCardAction class="d-flex justify-center pa-4">
-          <VBtn
-            color="success"
-            @click="completeSubmit"
-          >
-            Continue
-          </VBtn>
-        </VCardAction>
-      </VCard>
-    </VDialog>
-  </section>
-  <!-- Dialog Submit Failed -->
-  <section>
-    <VDialog
-      v-model="isDialogSubmitFailedVisible"
-      width="500"
+    <!-- Btn Approve , Reject, Back to edit -->
+    <section
+      v-if="statusId !== null && statusId === 6"
+      class="mt-6"
     >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardText>
-          <div class="d-flex justify-center">
-            <VIcon
-              size="100"
-              color="error"
-              icon="ri-error-warning-line"
-            />
-          </div>
-          <div class="text-center">
-            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
-          </div>
-        </VCardText>
+      <div
+        style="font-size: 12px;"
+        class="d-flex justify-end px-0"
+      >
+        <VBtn
+          v-if="false"
+          class=""
+          color="info"
+          style="font-size: 12px;"
+          @click="areaTextRemarkButton('Back To Edit')"
+        >
+          Back To Edit
+        </VBtn>
+        <VBtn
+          class="mx-2"
+          color="error"
+          style="font-size: 12px;"
+          @click="areaTextRemarkButton('REJECT')"
+        >
+          Reject
+        </VBtn>
+        <VBtn
+          color="green"
+          style="font-size: 12px;"
+          @click="approvetButtonVisible('ACCEPT')"
+        >
+          Accept
+        </VBtn>
+      </div>
+    </section>
 
-        <VCardAction class="d-flex justify-center pa-4">
-          <VBtn
-            color="error"
-            @click="isDialogSubmitFailedVisible = false"
-          >
-            Continue
-          </VBtn>
-        </VCardAction>
-      </VCard>
-    </VDialog>
-  </section>
-
-  <!-- Dialog Area Text Remark -->
-  <section>
-    <VDialog
-      v-model="isDialogTextAreaVisible"
-      width="500"
+    <!-- Btn Approval -->
+    <section
+      v-if="false"
+      class="mt-6"
     >
-      <!-- Dialog Content -->
-      <VCard :title="wordForSubmit">
-        <DialogCloseBtn
-          variant="text"
-          size="default"
-          @click="isDialogTextAreaVisible = false"
+      <div
+        style="font-size: 12px;"
+        class="d-flex justify-end px-0"
+      >
+        <VBtn
+          v-if="false"
+          class=""
+          color="info"
+          style="font-size: 12px;"
+          @click="areaTextRemarkButton('Back To Edit')"
+        >
+          Back To Edit
+        </VBtn>
+        <VBtn
+          v-if="statusId === 7"
+          class="mx-2"
+          color="error"
+          style="font-size: 12px;"
+          @click="areaTextRemarkButton('APPROVE REJECT')"
+        >
+          Approve Reject
+        </VBtn>
+        <VBtn
+          v-if="statusId === 15"
+          color="green"
+          style="font-size: 12px;"
+          @click="approvetButtonVisible('APPROVE')"
+        >
+          Approve
+        </VBtn>
+      </div>
+    </section>
+
+    <section
+      v-if="responseGener && responseGener.statusId === '7' && roleAccount === 'admin'"
+      cols="12"
+    >
+      <div class="py-3 d-flex justify-end">
+        <VBtn
+          class="mx-2"
+          color="error"
+          @click="areaTextRemarkButton('Reject')"
+        >
+          Approve Reject
+        </VBtn>
+      </div>
+    </section>
+
+    <!-- Alert Dialog Success/Fiald new -->
+    <section>
+      <div>
+        <!-- ใช้ AuthenticatorDialog component -->
+        <AuthenticatorDialog
+          :is-dialog-visible="isDialogVisibleAlertDialog"
+          :word="wordForSubmit"
+          :success="successDialAlert"
+          @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
         />
+      </div>
+    </section>
 
-        <VCardText>
-          <VTextarea
-            v-if="wordForSubmit === 'Back To Edit'"
-            v-model="commentBackToEdit"
-            :label="`Remark ${wordForSubmit}`"
-            :placeholder="`Enter Remark ${wordForSubmit}`"
+    <!-- Dialog Step Save Draft -->
+    <section style="font-size: 12px;">
+      <VDialog
+        v-model="isDialogVisibleStepSaveDraft"
+        width="90%"
+      >
+        <!-- Dialog Content -->
+        <VCard
+          class="text-center"
+          :title="wordForSubmit"
+        >
+          <DialogCloseBtn
+            variant="text"
+            size="default"
+            @click="isDialogVisibleStepSaveDraft = false"
           />
-          <VTextarea
-            v-if="wordForSubmit === 'Reject'"
-            v-model="commentReject"
-            :label="`Remark ${wordForSubmit}`"
-            :placeholder="`Enter Remark ${wordForSubmit}`"
-          />
-        </VCardText>
+          <VCardText class="pa-1">
+            <VRow>
+              <VCol
+                class="text-center d-flex flex-column align-center justify-center mx-auto"
+                cols="4"
+              >
+                <div>
+                  <VProgressLinear
+                    v-if="loadindingSaveDatft1"
+                    indeterminate
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftSeccess1"
+                    model-value="100"
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftFailed1"
+                    model-value="0"
+                  />
+                  <VAvatar
+                    class="my-2"
+                    size="150"
+                    :color="colorStep1"
+                  >
+                    <VIcon
+                      size="100"
+                      :icon="iconStep1"
+                    />
+                  </VAvatar>
+                </div>
+                <div><span style="font-size: 12px;">Save Header</span></div>
+              </VCol>
+              <VCol
+                class="text-center d-flex flex-column align-center justify-center mx-auto"
+                cols="4"
+              >
+                <div>
+                  <VProgressLinear
+                    v-if="loadindingSaveDatft2"
+                    indeterminate
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftSeccess2"
+                    model-value="100"
+                    color="primary"
+                  />
+                  <VProgressLinear
+                    v-if="loadindingSaveDatftFailed2"
+                    model-value="0"
+                  />
+                  <VAvatar
+                    class="my-2"
+                    size="150"
+                    :color="colorStep2"
+                  >
+                    <VIcon
+                      size="100"
+                      :icon="iconStep2"
+                    />
+                  </VAvatar>
+                </div>
+                <div><span style="font-size: 12px;">Save Lot</span></div>
+              </VCol>
+            </VRow>
+          </VCardText>
 
-        <VCardText class="d-flex justify-end flex-wrap gap-4">
-          <VBtn
-            v-if="wordForSubmit === 'Back To Edit'"
-            :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
-            @click="backToEditReceivingPlan"
-          >
-            Back To Edit
-          </VBtn>
-          <VBtn
-            v-if="wordForSubmit === 'Reject'"
-            :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
-            @click="rejectInsp"
-          >
-            Reject
-          </VBtn>
-        </VCardText>
-      </VCard>
-    </VDialog>
-  </section>
+          <VCardText class="text-start">
+            <VDivider />
+            <div>
+              <VAlert variant="outlined">
+                <VRow>
+                  <VCol cols="6">
+                    Save and Verify
+                  </VCol>
+                  <VCol
+                    cols="6"
+                    class="d-flex justify-end"
+                  >
+                    <VSwitch
+                      v-model="showOnlyErrors"
+                      :label="showOnlyErrors ? 'Show All Details' : 'Show Only Errors'"
+                    />
+                  </VCol>
+                  <VCol
+                    v-for="(field, index) in filteredFields"
+                    :key="index"
+                    cols="4"
+                  >
+                    <div :style="{ backgroundColor: field.isEmpty ? '#FBE9E7' : '#E8F5E9', borderRadius: '10px', }">
+                      <span
+                        v-if="field.isEmpty"
+                        style="font-size: 14px;"
+                      >
+                        <VIcon
+                          color="error"
+                          icon="ri-error-warning-fill"
+                        />
+                        <span>{{ field.indexLabelFiled }} - </span>
+                        <span v-if="!field.body.actualAnalysis && field.needActualCheck">Analysis result is required! <br></span>
+                        <span v-else-if="field.body.okState === -1 && !field.needActualCheck">Analysis result is required! <br></span>
+
+                      </span>
+                      <span
+                        v-else
+                        style="font-size: 14px;"
+                      >
+                        <VIcon
+                          color="success"
+                          icon="ri-checkbox-circle-fill"
+                        />
+                        {{ field.indexLabelSuccessed }}: Successed
+                        <div v-if="false">
+                          <span v-if="field.body.actualAnalysis && field.needActualCheck">Free text: {{ field.body.actualAnalysis }} <br></span>
+                          <span v-else-if="field.body.okState !== -1 && !field.needActualCheck">Checkbox: <span v-if="field.body.okState === 0">NOT</span> <span v-if="field.body.okState === 1">OK</span> <br></span>
+                        </div>
+                      </span>
+                    </div>
+                  </VCol>
+                </VRow>
+              </VAlert>
+            </div>
+          </VCardText>
+        </VCard>
+      </VDialog>
+    </section>
+
+    <!-- Dialog Submit -->
+    <section>
+      <VDialog
+        v-model="isDialogConfirmVisible"
+        width="500"
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardText>
+            <div class="d-flex justify-center">
+              <VIcon
+                size="100"
+                color="warning"
+                icon="ri-question-line"
+              />
+            </div>
+            <div class="text-center">
+              <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }} Transaction?</span>
+            </div>
+          </VCardText>
+
+          <VCardAction class="d-flex justify-space-between pa-4">
+            <VBtn
+              color="error"
+              @click="isDialogConfirmVisible = false"
+            >
+              Cancel
+            </VBtn>
+            <VBtn
+              v-if="wordForSubmit === 'SUBMIT'"
+              color="green"
+              @click="submitInspForm"
+            >
+              {{ wordForSubmit }}
+            </VBtn>
+            <VBtn
+              v-if="['APPROVE'].includes(wordForSubmit)"
+              color="success"
+              @click="approveReceivingPlant"
+            >
+              {{ wordForSubmit }}
+            </VBtn>
+            <VBtn
+              v-if="['ACCEPT'].includes(wordForSubmit)"
+              color="success"
+              @click="approveInsp"
+            >
+              {{ wordForSubmit }}
+            </VBtn>
+            <VBtn
+              v-if="['APPROVE REJECT'].includes(wordForSubmit)"
+              color="warning"
+              @click="approveReceivingPlant"
+            >
+              {{ wordForSubmit }}
+            </VBtn>
+          </VCardAction>
+        </VCard>
+      </VDialog>
+    </section>
+    <!-- Dialog Submit Success -->
+    <section>
+      <VDialog
+        v-model="isDialogSubmitSuccessVisible"
+        width="500"
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardText>
+            <div class="d-flex justify-center">
+              <VIcon
+                size="100"
+                color="success"
+                icon="ri-checkbox-circle-line"
+              />
+            </div>
+            <div class="text-center">
+              <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
+            </div>
+          </VCardText>
+
+          <VCardAction class="d-flex justify-center pa-4">
+            <VBtn
+              color="success"
+              @click="completeSubmit"
+            >
+              Continue
+            </VBtn>
+          </VCardAction>
+        </VCard>
+      </VDialog>
+    </section>
+    <!-- Dialog Submit Failed -->
+    <section>
+      <VDialog
+        v-model="isDialogSubmitFailedVisible"
+        width="500"
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardText>
+            <div class="d-flex justify-center">
+              <VIcon
+                size="100"
+                color="error"
+                icon="ri-error-warning-line"
+              />
+            </div>
+            <div class="text-center">
+              <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Failed</span>
+            </div>
+          </VCardText>
+
+          <VCardAction class="d-flex justify-center pa-4">
+            <VBtn
+              color="error"
+              @click="isDialogSubmitFailedVisible = false"
+            >
+              Continue
+            </VBtn>
+          </VCardAction>
+        </VCard>
+      </VDialog>
+    </section>
+
+    <!-- Dialog Area Text Remark -->
+    <section>
+      <VDialog
+        v-model="isDialogTextAreaVisible"
+        width="500"
+      >
+        <!-- Dialog Content -->
+        <VCard title="Comment">
+          <DialogCloseBtn
+            variant="text"
+            size="default"
+            @click="isDialogTextAreaVisible = false"
+          />
+
+          <VCardText>
+            <VTextarea
+              v-if="wordForSubmit === 'Back To Edit'"
+              v-model="commentBackToEdit"
+            >
+              <template #label>
+                <VIcon icon="ri-edit-line" />
+              </template>
+            </VTextarea>
+            <VTextarea
+              v-if="wordForSubmit === 'REJECT'"
+              v-model="commentReject"
+            >
+              <template #label>
+                <VIcon icon="ri-edit-line" />
+              </template>
+            </VTextarea>
+            <span
+              v-if="textAlertError.success && textAlertError.comment"
+              class="text-red"
+            >{{ textAlertError.comment }}</span>
+            <span
+              v-if="!commentReject"
+              class="text-red"
+            >Please provide a comment to reject the inspection.</span>
+          </VCardText>
+
+          <VCardText class="d-flex justify-end flex-wrap gap-4">
+            <VBtn
+              v-if="wordForSubmit === 'Back To Edit'"
+              :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'REJECT' ? 'error' : 'default')"
+              @click="backToEditReceivingPlan"
+            >
+              Back To Edit
+            </VBtn>
+            <VBtn
+              v-if="wordForSubmit === 'REJECT'"
+              :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'REJECT' ? 'error' : 'default')"
+              @click="rejectInsp"
+            >
+              Reject
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
+    </section>
+  </div>
 </template>
 
 <style>
