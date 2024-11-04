@@ -139,7 +139,7 @@ export const  globalService = {
 
   //--------------------------------------------------- Label
 
-  async printLabelView(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken, lot) {
+  async printLabelView(urlApi, whereHouse, accessToken, lot) {
     try {
       const response = await axios.get(
         `${urlApi}/api/v1/PrintLabel/Label?lot=${lot}`,
@@ -232,6 +232,64 @@ export const  globalService = {
     }
   },
 
+  async saveToPrintLotByBarcode (urlApi, warehouseId, accessToken, barcode) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/PrintLabel/SaveToPrintLot/byBarcode`, barcode, {
+        headers: {
+          'accept': '*/*',
+          'x-location': warehouseId,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (response && response.data) {
+        console.log('Service Response save to print Barcode form:', response.data)
+        
+        return { success: true, data: response.data }
+      } else {
+        throw new Error('No data Genterate print Barcode form')
+      }
+    } catch (error) {
+      throw new Error(`Failed to saveToPrintLotByBarcode ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async printLabelBarcode(urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(
+        `${urlApi}/api/v1/PrintLabel/Label/Small/Pdf`,
+        {},
+        {
+          headers: {
+            'accept': 'application/pdf', // รับไฟล์ PDF
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response print Label form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+        window.open(blobUrl)
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data Genterate print Label form')
+      }
+    } catch (error) {
+      console.error('Error in printLabelBarcode:', error)
+      throw new Error(`Failed to printLabelBarcode for Lot ${lot}: ${error.response?.data?.message || error.message}`)
+    }
+  },
 
   
 }

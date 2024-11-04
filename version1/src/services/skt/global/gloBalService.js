@@ -234,4 +234,83 @@ export const useFetchPrintLabelData = () => {
   }
 }
 
+export const useSavePrintBarcodeFormService = () => {
+  const saveToPrintLabelFormBarcodeResult = ref(null)
+  const errorMessageSaveToPrintLabelBarcode = ref(null)
+  
+  const saveToPrintLabelFormBarcodeService = async (urlApi, whereHouse, accessToken, barcode) => {
+    try {
+      errorMessageSaveToPrintLabelBarcode.value = null
+      console.log('Save To Print Barcode Form Service Starting...')
+  
+      const result = await globalService.saveToPrintLotByBarcode(urlApi, whereHouse, accessToken, barcode)
+        
+      if (result) {
+        console.log('Save To Print Barcode Form Service Complate:', result)
+          
+        saveToPrintLabelFormBarcodeResult.value = result
+  
+        return { success: true, data: result }
+      } else {
+        console.warn('Save To Print Barcode Form Service Fialed')
+  
+        return { success: false, error: 'Save To Print Barcode Form Service Fialed' }
+      }
+    } catch (error) {
+      console.error('Error in saveToPrintLabelFormBarcodeService:', error)
+      errorMessageSaveToPrintLabelBarcode.value = error.message
+  
+      return { success: false, error: error.message }
+    }
+
+
+  }
+  
+  return {
+    saveToPrintLabelFormBarcodeResult,
+    errorMessageSaveToPrintLabelBarcode,
+    saveToPrintLabelFormBarcodeService,
+  }
+}
+
+export const usePrintLabelBarcodeFormService = () => {
+  const printLabelBarcodeFormViewResult = ref(null)
+  const errorMessagePrintLabelBarcode = ref(null)
+  
+  const printLabelFormBarcodeService = async (urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessagePrintLabelBarcode.value = null
+      console.log('Print Barcode Form Service Starting...')
+  
+      const result = await globalService.printLabelBarcode(urlApi, whereHouse, accessToken)
+        
+      if (result) {
+        console.log('Print Barcode Form Service Complate:', result)
+          
+        printLabelBarcodeFormViewResult.value = result
+  
+        return { success: true, data: result }
+      } else {
+        console.warn('Print Barcode Form Service Fialed')
+  
+        return { success: false, error: 'Print Barcode Form Service Fialed' }
+      }
+    } catch (error) {
+      console.error('Error in printLabelFormBarcodeService:', error)
+      errorMessagePrintLabelBarcode.value = error.message
+  
+      return { success: false, error: error.message }
+    }
+
+
+  }
+  
+  return {
+    printLabelBarcodeFormViewResult,
+    errorMessagePrintLabelBarcode,
+    printLabelFormBarcodeService,
+  }
+}
+
+
 

@@ -564,11 +564,7 @@ const GetStockUpdate = () => {
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
 
-<<<<<<< HEAD
       const filteredData = data.filter(item => item.receiveTypeId !== 33)
-=======
-      const filteredData = data.filter(item => item.receiveTypeId !== 33333)
->>>>>>> feature/table_receivingPlan_Gun
 
       // Add No. field to each product (after filtering)
       products.value = filteredData.map((item, index) => ({

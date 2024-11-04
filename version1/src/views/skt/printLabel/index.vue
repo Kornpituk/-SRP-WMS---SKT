@@ -14,6 +14,8 @@ const whereHouseSelectedItem = ref(whereHouse)
 
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
 
+const panel = ref(['filter']) //---------------- variable for
+
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
@@ -40,6 +42,14 @@ const dataHeaders = [
   { title: 'Protein (g)', key: 'protein', align: 'end' },
   { title: 'Iron (%)', key: 'iron', align: 'end' },
 ]
+
+const formatNumber = value => {
+  if (value !== null && value !== undefined) {
+    return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+  
+  return '0.00'
+}
 
 ///--------------------------------- 
 
@@ -118,16 +128,32 @@ const printLabelForm = () => {
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
 //----------------------------- api ------------------------------
-import { useViewPrintLabelFormService, useFetchPrintLabelData }  from '@/services/skt/global/gloBalService'
+import { usePrintLabelBarcodeFormService, useFetchPrintLabelData, useSavePrintBarcodeFormService }  from '@/services/skt/global/gloBalService'
 
 const { printLabelFormViewResult, errorMessagePrintLabelView, printLabelFormViewService } = useFetchPrintLabelData()
 
 const dataPrintLabel = ref([])
 const selectedDataTables = ref([])
+const isDialogPrintLabelVisible = ref(false)
+
+const itemsTypeLabel = ref([
+  {
+    title: 'Raw Mat Label',
+  },
+  {
+    title: 'Semi Label',
+  },
+  {
+    title: 'Product Label',
+  },
+])
+
+const typePrintLabel = ref('Semi Label')
 
 //----------------------- Filter Status 
 const progressLinearNoData = ref(false)
 
+//------------------------- Get Label ------------------------
 const paramsFetchDataPrintLabel = ref({
   lot: '',
   productId: '',
@@ -153,7 +179,51 @@ watchEffect(() => {
   fetchData()
 })
 
+//------------------------- Print Label ------------------------
+//------------------------- Print Label By Barcode ------------------------
+
 //-------------------------- table data -------------------------------
+
+const { saveToPrintLabelFormBarcodeResult, saveToPrintLabelFormBarcodeService } = useSavePrintBarcodeFormService()
+const { printLabelBarcodeFormViewResult, printLabelFormBarcodeService } = usePrintLabelBarcodeFormService()
+
+const isLoadingPrintLabel = ref(false)
+
+const printLabel = async () => {
+  console.log("12355", typePrintLabel.value)
+  if(typePrintLabel.value === 'Raw Mat Label'){
+    console.log('Raw Mat Label print start .....')
+
+    const barcode = ref({})
+
+    // await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
+  }
+  if(typePrintLabel.value === 'Semi Label'){
+    console.log('Semi Label print start .....')
+
+    const barcodes = selectedDataTables.value.map(item => item.barcode)
+
+    console.log('Semi Label print start .....', barcodes)
+
+    isLoadingPrintLabel.value = true
+    await saveToPrintLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, barcodes)
+    if(saveToPrintLabelFormBarcodeResult.value){
+      await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore)
+      isLoadingPrintLabel.value = false
+      if(printLabelBarcodeFormViewResult.value){
+        console.log('print label by barcode success', printLabelBarcodeFormViewResult)
+        isLoadingPrintLabel.value = false
+      }
+    }else {
+      isLoadingPrintLabel.value = false
+      throw 'Could not save to print label form'
+    }
+  }
+  if(typePrintLabel.value === 'Product Label'){
+    console.log('Product Label print start .....')
+  }
+}
+
 const headers = [
   {
     title: 'data-table-select',
@@ -201,15 +271,15 @@ const headers = [
     key: 'purchaseOrderNo',
   },
   {
-    title: 'Product No.',
+    title: 'Item No.',
     key: 'productionCode',
   },
   {
-    title: 'Product Code',
+    title: 'Item Code',
     key: 'productId',
   },
   {
-    title: 'Product Name',
+    title: 'Item Name',
     key: 'productName',
   },
   {
@@ -221,10 +291,12 @@ const headers = [
     key: 'updatedDate',
   },
   {
-    title: 'Action',
-    key: 'action',
-    align: 'center',
-    class: 'sticky-right',
+    title: 'PURC(PCS)',
+    key: 'qtyPcs',
+  },
+  {
+    title: 'PURC(KGS)',
+    key: 'qtyKgs',
   },
 ]
 </script>
@@ -283,160 +355,210 @@ const headers = [
       <VExpansionPanels
         v-model="panel"
         multiple
+        class="pa-2"
       >
-        <VExpansionPanel value="filter">
-          <VExpansionPanelText>
-            <VForm @submit.prevent="submitSearchButton">
-              <!-- Barcode | Product code | Product Name | Button Export -->
-              <VRow>
-                <!-- 👉 Select Product code -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
+        <VExpansionPanel
+          class="px-1"
+          value="filter"
+        >
+          <VExpansionPanelText class="px-1">
+            <VRow class="px-1">
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-2"
+              >
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.lot"
+                  density="compact"
+                  height="20px"
+                  class="py-0"
                 >
-                  <VTextField
-                    v-model="searchByProductId"
-                    :label="$t('Lot Number')"
-                    type="Lot Number"
-                    density="compact"
-                  />
-                </VCol>
-                <!-- 👉 Select Product code -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VTextField
-                    v-model="searchByProductId"
-                    :label="$t('Product Code')"
-                    type="Product Code"
-                    density="compact"
-                  />
-                </VCol>
-
-                <!-- 👉 Select Product Name -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VTextField
-                    v-model="searchByProductName"
-                    :label="$t('Product Name')"
-                    type="Product Name"
-                    density="compact"
-                  />
-                </VCol>
-
-                <!-- 👉 Select Product Name -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VueDatePicker
-                    v-if="false"
-                    v-model="dateDeliveryFilter"
-                    range
-                    :enable-time-picker="false"
-                  />
-                  <AppDateTimePicker
-                    v-model="date"
-                    label="Received Date"
-                    prepend-inner-icon="ri-calendar-schedule-fill"
-                    placeholder="Select date"
-                    density="compact"
-                    :config="{ dateFormat: 'd/m/Y' }"
-                  />
-                </VCol>
-
-
-                <!-- 👉 Select Product Name -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VTextField
-                    v-model="searchByProductName"
-                    :label="$t('Purchase Order NO.')"
-                    type="Purchase Order NO."
-                    density="compact"
-                  />
-                </VCol>
-
-
-                <!-- 👉 Button Search and Export -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1 d-flex"
-                >
-                  <VRow>
-                    <VCol cols="4">
-                      <VBtn
-                        height="100%"
-                        width="100%"
-                        color="primary"
-                        density="compact"
-                       
-                        @click="clearModel"
-                      >
-                        {{ $t('Search') }}
-                      </VBtn>
-                    </VCol>
-                    <VCol cols="4">
-                      <VBtn
-                        color="red"
-                        height="100%"
-                        width="100%"
-                        density="compact"
-                        @click="clearModel"
-                      >
-                        {{ $t('Clear') }}
-                      </VBtn>
-                    </VCol>
-                    <VCol
-                      v-if="false"
-                      cols="4"
+                  <template #label>
+                    <span
+                      class="d-flex align-center"
+                      style="font-size: 12px;"
                     >
-                      <VBtn
-                        height="100%"
-                        width="100%"
-                        color="primary"
-                        density="compact"
-                       
-                        @click="clearModel"
+                      Lot
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+
+              <!-- 👉 Select Product code -->
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-2"
+              >
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.productId"
+                  density="compact"
+                  height="20px"
+                  class="py-0"
+                >
+                  <template #label>
+                    <span
+                      class="d-flex align-center"
+                      style="font-size: 12px;"
+                    >
+                      Item Code
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+
+              <!-- 👉 Select Product Name -->
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-2"
+              >
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.productName"
+                  density="compact"
+                  height="20px"
+                  class="py-0"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">
+                      Item Name
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              >
+                <AppDateTimePicker
+                  v-model="paramsFetchDataPrintLabel.receivedDate"
+                  placeholder="Select Date"
+                  density="compact"
+                  :config="{ mode: 'range',dateFormat: 'd/m/Y' }"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  class="custom-date-time-picker"
+                >
+                  <template #label>
+                    <span>Delivery Date</span>
+                  </template>
+                </AppDateTimePicker>
+              </VCol>
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              >
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.purchaseOrderNo"
+                  density="compact"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">
+                      Po No.
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              >
+                <VTextField
+                  v-model="supplierName"
+                  :label="$t('Supplier Name')"
+                  type="Supplier Name"
+                  density="compact"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">
+                      Supplier Name
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+
+              <!-- 👉 Button Search and Export -->
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              />
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              />
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              >
+                <VRow>
+                  <VCol
+                    cols="4"
+                    md="4"
+                  >
+                    <VBtn
+                      height="100%"
+                      width="100%"
+                      color="green"
+                      density="compact"
+                      class="mx-0"
+                      style="font-size: 12px;"
+                      @click="searchFilter"
+                    >
+                      {{ $t('Search') }}
+                    </VBtn>
+                  </VCol>
+                  <VCol
+                    cols="4"
+                    md="4"
+                  >
+                    <VBtn
+                      color="red"
+                      height="100%"
+                      width="100%"
+                      density="compact"
+                      style="font-size: 12px;"
+                      @click="clearModel"
+                    >
+                      {{ $t('Clear') }}
+                    </VBtn>
+                  </VCol>
+                  <VCol
+                    cols="4"
+                    md="4"
+                  >
+                    <VBtn
+                      density="compact"
+                      class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
+                      color="warning"
+                      style="width: 100%; height: 40px;"
+                      @click="isDialogPrintLabelVisible = true"
+                    >
+                      <img
+                        src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
+                        style="width: 27px;"
+                        class="custom-small-img"
                       >
-                        {{ $t('Search') }}
-                      </VBtn>
-                    </VCol>
-                    <VCol cols="4">
-                      <VBtn
-                        height="100%"
-                        width="100%"
-                        color="warning"
-                        density="compact"
-                        prepend-icon="ri-printer-fill"
-                        class="mx-0"
-                        
-                        @click="isDialogPrintLabelVisible = true"
-                      >
-                        {{ $t('Print') }}
-                      </VBtn>
-                    </VCol>
-                  </VRow>
-                </VCol>
-              </VRow>
-            </VForm>
+                      <span style="font-size: 12px;">{{ $t('Export file') }}</span>
+                    </VBtn>
+                  </VCol>
+                </VRow>
+              </VCol>
+            </VRow>
           </VExpansionPanelText>
         </VExpansionPanel>
       </VExpansionPanels>
@@ -582,6 +704,7 @@ const headers = [
     <VDialog
       v-model="isDialogPrintLabelVisible"
       width="50%"
+      :persistent="isLoadingPrintLabel"
     >
       <!-- Dialog Content -->
       <VCard>
@@ -598,12 +721,13 @@ const headers = [
         </VCardTitle>
 
         <VCardText>
-          <div class="mb-4">
+          <div class="">
             <VSelect
               v-model="typePrintLabel"
               :items="itemsTypeLabel"
               label="Density"
               density="compact"
+              item-value="title"
               placeholder="Type Label"
             />
           </div>
@@ -668,7 +792,10 @@ const headers = [
               </VListItem>
             </VList>
           </div>
-          <div class="d-flex justify-spance-between align-center">
+          <div
+            v-if="false"
+            class="d-flex justify-spance-between align-center"
+          >
             <VRow>
               <VCol
                 cols="6"
@@ -701,12 +828,27 @@ const headers = [
         <VCardText class="d-flex justify-end flex-wrap gap-4">
           <VBtn
             color="warning"
+            style="height: 60px;"
             @click="printLabel"
           >
             <VIcon
+              v-if="!isLoadingPrintLabel"
               size="30"
               icon="ri-printer-fill"
             />
+            <VProgressCircular
+              v-if="isLoadingPrintLabel"
+              :rotate="360"
+              indeterminate
+              :size="50"
+              :width="6"
+              color="primary"
+            >
+              <VIcon
+                size="30"
+                icon="ri-printer-fill"
+              />
+            </VProgressCircular>
           </VBtn>
         </VCardText>
       </VCard>
@@ -1706,10 +1848,10 @@ const headers = [
               </td>
               <td
                 class="text-start px-2"
-                style="min-width: 130px;"
+                style="min-width: 200px;"
               >
-              <span
-                  style="max-width: 200px; font-size: 12px;"
+                <span
+                  style="font-size: 12px;"
                   class="text-wrap"
                   v-html="item.raw.productName.replace(/\s/g, '&nbsp;')"
                 />
@@ -1727,6 +1869,19 @@ const headers = [
                 <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
               </td>
               <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.qtyPcs).toLocaleString() }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+              >
+                <span style="font-size: 12px;">{{ formatNumber(item.raw.qtyKgs) }}</span>
+              </td>
+              <td
+                v-if="false"
                 class="text-start px-2"
                 style="justify-content: center;"
               >
@@ -1742,7 +1897,6 @@ const headers = [
       </CardText>
     </VCard>
   </section>
-
 
   <section v-if="false">
     <VDataTable
