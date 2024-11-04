@@ -15,7 +15,6 @@ const props = defineProps({
   Data: Array,
 })
 
-
 const switchLog = ref(false)
 
 watchEffect(() => {
@@ -233,6 +232,7 @@ const generatedReceivingForm = () => {
 const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const typeReceivedId = ref(null)
 
 const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
 
@@ -256,6 +256,7 @@ const generatedJournalId = () => {
 
         poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
         statusId.value = item.statusId // เก็บค่า statusId
+        typeReceivedId.value = item.receiveTypeId
         loadingGenerated2.value = false
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
@@ -2232,8 +2233,10 @@ const getDisabledFollowStatusNRole = () => {
               <td
                 class="text-center"
                 colspan="1"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.actualMakerLotNo_2"
                   :readonly="readonlyAllInput()"
                   :style="{ width: '100%', minWidth: '150px' }"
@@ -2277,12 +2280,13 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="1"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
-              
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.actualMakerLotNo_3"
                   :readonly="readonlyAllInput()"
-                  :style="{ width: '100%', minWidth: '150px' }"
+                  :style="{ minWidth: '150px' }"
                   :rules="[
                     value => value.length <= 19 || 'Max 20 characters per line.',
                     value => {
@@ -2324,11 +2328,13 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="1"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.actualMakerLotNo_4"
                   :readonly="readonlyAllInput()"
-                  :style="{ width: '100%', minWidth: '150px' }"
+                  :style="{ minWidth: '150px' }"
                   :rules="[
                     value => value.length <= 19 || 'Max 20 characters per line.',
                     value => {
@@ -2370,11 +2376,13 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="1"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.actualMakerLotNo_5"
                   :readonly="readonlyAllInput()"
-                  :style="{ width: '100%', minWidth: '150px' }"
+                  :style="{ minWidth: '150px' }"
                   :rules="[
                     value => value.length <= 19 || 'Max 20 characters per line.',
                     value => {
@@ -2470,7 +2478,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_1"
+                  v-if="false"
                   v-model="purchaseOrder.actualNetCountKgs_1"
                   :style="{ width: '100%', minWidth: '150px' }"
                   density="compact"
@@ -2537,7 +2545,7 @@ const getDisabledFollowStatusNRole = () => {
                     <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                   </template>
                 </VTextField>
-                {{ formatNumber(purchaseOrder.actualNetCountKgs_2) }}
+                <span v-if="typeReceivedId === 2">{{ formatNumber(purchaseOrder.actualNetCountKgs_2) }}</span>
               </td>
 
               <td
@@ -2584,7 +2592,7 @@ const getDisabledFollowStatusNRole = () => {
                     <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                   </template>
                 </VTextField>
-                {{ formatNumber(purchaseOrder.actualNetCountKgs_3) }}
+                <span v-if="typeReceivedId === 2">{{ formatNumber(purchaseOrder.actualNetCountKgs_3) }}</span>
               </td>
               <td
                 class="text-center"
@@ -2630,7 +2638,7 @@ const getDisabledFollowStatusNRole = () => {
                     <span style="font-size: 12px; padding-block-start: 2px;">Kg</span>
                   </template>
                 </VTextField>
-                {{ formatNumber(purchaseOrder.actualNetCountKgs_4) }}
+                <span v-if="typeReceivedId === 2">{{ formatNumber(purchaseOrder.actualNetCountKgs_4) }}</span>
               </td>
               <td
                 colspan="2"
@@ -2675,7 +2683,7 @@ const getDisabledFollowStatusNRole = () => {
                     <span style="font-size: 12px; padding-block-start: 2px;" />
                   </template>
                 </VTextField>
-                {{ formatNumber(purchaseOrder.actualNetCountKgs_5) }}
+                <span v-if="typeReceivedId === 2">{{ formatNumber(purchaseOrder.actualNetCountKgs_5) }}</span>
               </td>
               <td
                 class="text-center"
@@ -2718,6 +2726,7 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
                   v-model="purchaseOrder.actualAmountUnits_1"
@@ -2751,8 +2760,10 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.actualAmountUnits_2"
                   :readonly="readonlyAllInput()"
                   :rules="[
@@ -2784,8 +2795,10 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.actualAmountUnits_3"
                   :readonly="readonlyAllInput()"
                   :rules="[
@@ -2816,8 +2829,10 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.actualAmountUnits_4"
                   :readonly="readonlyAllInput()"
                   :rules="[
@@ -2848,8 +2863,10 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.actualAmountUnits_5"
                   :readonly="readonlyAllInput()"
                   :rules="[
@@ -2926,7 +2943,7 @@ const getDisabledFollowStatusNRole = () => {
                 class="text-start"
                 colspan="2"
               >
-                <div>
+                <div v-if="typeReceivedId === 2">
                   <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_2) }}
                 </div>
               </td>
@@ -2935,7 +2952,7 @@ const getDisabledFollowStatusNRole = () => {
                 class="text-start"
                 colspan="2"
               >
-                <div>
+                <div v-if="typeReceivedId === 2">
                   <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_3) }}
                 </div>
               </td>
@@ -2943,7 +2960,7 @@ const getDisabledFollowStatusNRole = () => {
                 class="text-start"
                 colspan="2"
               >
-                <div>
+                <div v-if="typeReceivedId === 2">
                   <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_4) }}
                 </div>
               </td>
@@ -2951,7 +2968,7 @@ const getDisabledFollowStatusNRole = () => {
                 class="text-start"
                 colspan="2"
               >
-                <div>
+                <div v-if="typeReceivedId === 2">
                   <VIcon icon="ri-functions" />{{ formatNumber(purchaseOrder.actualTotalQuantityKgs_5) }}
                 </div>
               </td>
@@ -3082,6 +3099,7 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
                   v-model="purchaseOrder.customManufacturerName_1"
@@ -3105,8 +3123,10 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.customManufacturerName_2"
                   :readonly="readonlyAllInput()"
                   density="compact"
@@ -3129,8 +3149,10 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.customManufacturerName_3"
                   :readonly="readonlyAllInput()"
                   density="compact"
@@ -3152,8 +3174,10 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.customManufacturerName_4"
                   :readonly="readonlyAllInput()"
                   density="compact"
@@ -3175,8 +3199,10 @@ const getDisabledFollowStatusNRole = () => {
               <th
                 class="text-center"
                 colspan="2"
+                :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.customManufacturerName_5"
                   :readonly="readonlyAllInput()"
                   density="compact"
@@ -3246,6 +3272,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="2"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.customLable_2"
                   density="compact"
                   :readonly="readonlyAllInput()"
@@ -3271,6 +3298,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="2"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.customLable_3"
                   density="compact"
                   :readonly="readonlyAllInput()"
@@ -3295,6 +3323,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="2"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.customLable_4"
                   density="compact"
                   :readonly="readonlyAllInput()"
@@ -3319,6 +3348,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="2"
               >
                 <VTextField
+                  v-if="typeReceivedId === 2"
                   v-model="purchaseOrder.customLable_5"
                   density="compact"
                   :readonly="readonlyAllInput()"
@@ -3414,7 +3444,10 @@ const getDisabledFollowStatusNRole = () => {
       </VCol>
 
       <!-- RM for Halal -->
-      <VCol cols="4">
+      <VCol
+        v-if="purchaseOrder.isForHalalProduct"
+        cols="4"
+      >
         <Table class="custom-table">
           <tr>
             <th>
@@ -3435,7 +3468,10 @@ const getDisabledFollowStatusNRole = () => {
         </Table>
       </VCol>
       <!-- RM for RSPO -->
-      <VCol cols="4">
+      <VCol
+        v-if="purchaseOrder.isForRspoProduct"
+        cols="4"
+      >
         <Table class="custom-table">
           <tr>
             <th>

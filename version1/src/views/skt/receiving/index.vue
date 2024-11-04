@@ -161,6 +161,8 @@ const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
 // ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
 const statusFilter = ref([])
 
+
+
 // ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
 const addStoredStatus = () => {
   if (storedStatus && storedStatus !== null && storedStatus !== '') {
@@ -177,6 +179,15 @@ const addStoredStatus = () => {
     sessionStorage.setItem('statusFilter', statusFilter.value.join(','))
   }
 }
+
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+    sessionStorage.setItem('fileterStatusInPAI', '')
+  }
+  if(sessionStorage.getItem('statusFilter') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+    sessionStorage.setItem('statusFilter', '')
+  }
+})
 
 // เรียกใช้ฟังก์ชันเพื่อเพิ่มค่าใหม่
 addStoredStatus()
@@ -543,7 +554,7 @@ const GetStockUpdate = () => {
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
 
-      const filteredData = data.filter(item => item.receiveTypeId !== 3)
+      const filteredData = data.filter(item => item.receiveTypeId !== 33)
 
       // Add No. field to each product (after filtering)
       products.value = filteredData.map((item, index) => ({
