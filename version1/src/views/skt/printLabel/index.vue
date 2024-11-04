@@ -138,13 +138,16 @@ const isDialogPrintLabelVisible = ref(false)
 
 const itemsTypeLabel = ref([
   {
-    title: 'Raw Mat Label',
+    title: 'Raw Material Label',
+    value: 'Raw Mat Label',
   },
   {
     title: 'Semi Label',
+    value: 'Semi Label',
   },
   {
     title: 'Product Label',
+    value: 'Product Label',
   },
 ])
 
@@ -188,6 +191,7 @@ const { saveToPrintLabelFormBarcodeResult, saveToPrintLabelFormBarcodeService } 
 const { printLabelBarcodeFormViewResult, printLabelFormBarcodeService } = usePrintLabelBarcodeFormService()
 
 const isLoadingPrintLabel = ref(false)
+const successPrintLabel = ref(null)
 
 const printLabel = async () => {
   console.log("12355", typePrintLabel.value)
@@ -206,6 +210,7 @@ const printLabel = async () => {
     console.log('Semi Label print start .....', barcodes)
 
     isLoadingPrintLabel.value = true
+    successPrintLabel.value = null
     await saveToPrintLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, barcodes)
     if(saveToPrintLabelFormBarcodeResult.value){
       await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore)
@@ -213,9 +218,13 @@ const printLabel = async () => {
       if(printLabelBarcodeFormViewResult.value){
         console.log('print label by barcode success', printLabelBarcodeFormViewResult)
         isLoadingPrintLabel.value = false
+        successPrintLabel.value = true
+      }else {
+        successPrintLabel.value = false
       }
     }else {
       isLoadingPrintLabel.value = false
+      successPrintLabel.value = false
       throw 'Could not save to print label form'
     }
   }
@@ -716,7 +725,7 @@ const headers = [
 
         <VCardTitle>
           <div class="text-center">
-            <span>Type Label</span>
+            <span>Type of Label</span>
           </div>
         </VCardTitle>
 
@@ -725,34 +734,11 @@ const headers = [
             <VSelect
               v-model="typePrintLabel"
               :items="itemsTypeLabel"
-              label="Density"
+              label="Type"
               density="compact"
-              item-value="title"
+              item-value="value"
               placeholder="Type Label"
             />
-          </div>
-          <div v-if="false">
-            <VRadioGroup
-              v-model="typePrintLabel"
-              inline
-              class="d-flex justify-center"
-            >
-              <VRadio
-                label="Raw Mat Label"
-                value="Raw Mat Label"
-                class="mx-6"
-              />
-              <VRadio
-                label="Print Label S"
-                value="PrintLabelS"
-                class="mx-6"
-              />
-              <VRadio
-                label="Print Label S"
-                value="PrintLabelS"
-                class="mx-6"
-              />
-            </VRadioGroup>
           </div>
 
           <div
@@ -825,27 +811,51 @@ const headers = [
           </div>
         </VCardText>
 
-        <VCardText class="d-flex justify-end flex-wrap gap-4">
+        <VCardText class="d-flex justify-end align-center flex-wrap gap-4">
+          <VAlert
+            v-if="successPrintLabel"
+            border="end"
+            border-color="success"
+            variant="tonal"
+            closable
+            class="pa-2"
+          >
+            <div class="d-flex justify-start align-center">
+              <VIcon
+                icon="ri-checkbox-circle-line"
+                class="mx-4"
+              />Print Completed.
+            </div>
+          </VAlert>
+          <VAlert
+            v-if="successPrintLabel === false"
+            border="end"
+            border-color="error"
+            variant="tonal"
+            closable
+          >
+            Print Failed.
+          </VAlert>
           <VBtn
             color="warning"
-            style="height: 60px;"
+            style="width: 100%; height: 50px;"
             @click="printLabel"
           >
             <VIcon
               v-if="!isLoadingPrintLabel"
-              size="30"
+              size="20"
               icon="ri-printer-fill"
             />
             <VProgressCircular
               v-if="isLoadingPrintLabel"
               :rotate="360"
               indeterminate
-              :size="50"
+              :size="40"
               :width="6"
               color="primary"
             >
               <VIcon
-                size="30"
+                size="20"
                 icon="ri-printer-fill"
               />
             </VProgressCircular>
