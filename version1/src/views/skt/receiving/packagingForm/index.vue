@@ -410,6 +410,7 @@ const dataHeader = ref({
   isAccept: false,
   isReject: false,
   statusComments: "",
+  pcsPerSticker: "",
   packagingImg: null,
 })
 
@@ -686,6 +687,7 @@ watchEffect(() => {
       isReject: receivedData.isReject,
       statusComments: receivedData.statusComments,
       packagingImg: receivedData.packagingImg,
+      pcsPerSticker: receivedData.pcsPerSticker,
     }
     loadingGenerated.value = false
   }else{
@@ -1795,6 +1797,7 @@ const saveDraftData = word => {
           </VCol>
           <VCol cols="10">
             <VTextField
+              v-model="dataHeader.pcsPerSticker"
               suffix="PCS"
               type="number"
               density="compact"
