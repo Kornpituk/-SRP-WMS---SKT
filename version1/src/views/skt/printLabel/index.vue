@@ -247,6 +247,10 @@ const headers = [
     align: "center",
   },
   {
+    title: 'Category',
+    key: 'category',
+  },
+  {
     title: 'Lot',
     key: 'lot',
   },
@@ -255,7 +259,7 @@ const headers = [
     key: 'barcode',
   },
   {
-    title: 'Description',
+    title: 'NO/RCVD(PCS)',
     key: 'lotDescription',
   },
   {
@@ -264,24 +268,8 @@ const headers = [
     
   },
   {
-    title: 'Expired Date',
-    key: 'expiredDate',
-  },
-  {
-    title: 'Reminding Days',
-    key: 'remindingDays',
-  },
-  {
-    title: 'Delivery Date',
-    key: 'deliveryDate',
-  },
-  {
     title: 'P/O No',
     key: 'purchaseOrderNo',
-  },
-  {
-    title: 'Item No.',
-    key: 'productionCode',
   },
   {
     title: 'Item Code',
@@ -291,10 +279,7 @@ const headers = [
     title: 'Item Name',
     key: 'productName',
   },
-  {
-    title: 'Category',
-    key: 'category',
-  },
+  
   {
     title: 'Updated On',
     key: 'updatedDate',
@@ -308,6 +293,8 @@ const headers = [
     key: 'qtyKgs',
   },
 ]
+
+const dataTableGroupBy = [{ key: 'lot' }]
 </script>
 
 <template>
@@ -1725,7 +1712,6 @@ const headers = [
           v-if="progressLinearNoData && printLabelFormViewResult"
           v-model="selectedDataTables"
           show-select
-          fixed-header
           :headers="headers"
           :items="printLabelFormViewResult"
           :items-per-page="10"
@@ -1733,7 +1719,25 @@ const headers = [
           class="elevation-1"
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
           :item-class="row_classes" 
+          :group-by="dataTableGroupBy"
         >
+          <template #data-table-group="{ props, item, count }">
+            <td>
+              <VBtn
+                v-bind="props"
+                variant="text"
+                density="comfortable"
+              >
+                <VIcon
+                  class="flip-in-rtl"
+                  :icon="ri-arrow-down-s-line"
+                />
+              </VBtn>
+
+              <span>Lot: {{ item.value }}</span>
+              <span>({{ count }})</span>
+            </td>
+          </template>
           <template #header.data-table-select="{ allSelected, selectAll, someSelected }">
             <VCheckboxBtn
               :indeterminate="someSelected && !allSelected"
@@ -1766,6 +1770,12 @@ const headers = [
                 style="min-width: 30px;"
               >
                 <span style="font-size: 12px;">{{ item.raw.index }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 130px;"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
               </td>
               <td
                 
@@ -1805,13 +1815,17 @@ const headers = [
                   class=""
                 >{{ convertDate(item.raw.receivedDate) }}</span>
               </td>
-              <td class="text-start px-2">
+              <td
+                v-if="false"
+                class="text-start px-2"
+              >
                 <span
                   style="font-size: 12px;"
                   class="text-wrap"
                 >{{ convertDate(item.raw.expiredDate) }}</span>
               </td>
               <td
+                v-if="false"
                 class="text-end px-2"
                 style="justify-content: end;"
               >
@@ -1821,6 +1835,7 @@ const headers = [
                 >{{ (item.raw.remindingDays) }}</span>
               </td>
               <td
+                v-if="false"
                 class="text-end px-2"
                 style="justify-content: end;"
               >
@@ -1839,6 +1854,7 @@ const headers = [
                 >{{ (item.raw.purchaseOrderNo) }}</span>
               </td>
               <td
+                v-if="false"
                 class="text-end px-2"
                 style="min-width: 140px; justify-content: start;"
               >
@@ -1866,12 +1882,7 @@ const headers = [
                   v-html="item.raw.productName.replace(/\s/g, '&nbsp;')"
                 />
               </td>
-              <td
-                class="text-start px-2"
-                style="min-width: 130px;"
-              >
-                <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
-              </td>
+              
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
