@@ -1781,102 +1781,41 @@ const saveDraftData = word => {
       </VCol>
     </VRow>
 
-    <!-- Quality Evalution -->
-    <VRow
-      v-if="false"
-      class="mx-0"
-    >
-      <VCol cols="12">
+    <VRow class="px-3 pt-4">
+      <VCol
+        cols="6"
+        style="border: 1px solid black; font-size: 12px;"
+      >
         <VRow>
           <VCol
-            class="px-0"
-            style="font-size: 12px;"
-            cols="12"
-          >
-            Quality Evaluation
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            cols="4"
+            cols="2"
             class="d-flex align-center"
           >
-            <VRow>
-              <VCol
-                cols="1"
-                class="d-flex align-center"
-                style="font-size: 12px; font-weight: bolder;"
-              >
-                Accept
-              </VCol>
-              <VCol
-                class="d-flex justify-center"
-                cols="10"
-              >
-                <VIcon
-                  v-if="statusId === 17 || statusId === 15"
-                  color="success"
-                  size="60"
-                  icon="ri-checkbox-circle-fill"
-                />
-              </VCol>
-            </VRow>
+            <span>Label 1 :</span>
           </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            cols="4"
-            class="d-flex align-center"
-          >
-            <VRow>
-              <VCol
-                cols="1"
-                class="d-flex align-center"
-                style="font-size: 12px; font-weight: bolder;"
+          <VCol cols="10">
+            <VTextField
+              suffix="PCS"
+              type="number"
+              density="compact"
+            >
+              <template
+                v-if="!frozeCheck"
+                #label
               >
-                Reject
-              </VCol>
-              <VCol
-                class="d-flex justify-center"
-                cols="11"
-              >
-                <VIcon
-                  v-if="statusId === 7 || statusId === 16"
-                  color="red"
-                  size="60"
-                  icon="ri-close-circle-fill"
-                />
-              </VCol>
-            </VRow>
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            cols="4"
-            class="d-flex align-center"
-          >
-            <VRow>
-              <VCol
-                cols="2"
-                class="d-flex align-center"
-              >
-                <span style="font-size: 12px; font-weight: bolder;">Comment:</span>
-              </VCol>
-              <VCol cols="10">
-                <span
-                  v-if="statusId === 7 || statusId === 16"
-                  style=" white-space: normal; word-wrap: break-word;"
-                >
-                  <VTextarea
-                    v-model="dataHeader.statusComments"
-                    readonly
-                  />
-                </span>
-              </VCol>
-            </VRow>
+                <VIcon icon="ri-edit-line" />
+              </template>
+              <template #suffix>
+                <span>PCS</span>
+              </template>
+            </VTextField>
           </VCol>
         </VRow>
       </VCol>
     </VRow>
 
-    <VRow class="pt-4 px-3">
+    <!-- Quality Evalution -->
+    <VRow class="pt-0 px-3">
       <VCol
         class="px-0"
         style="font-size: 12px;"
@@ -2111,6 +2050,7 @@ const saveDraftData = word => {
       </VCol> 
     </VRow>
 
+    <!-- Warehouse -->
     <VRow
       v-if="false"
       class="my-6"
