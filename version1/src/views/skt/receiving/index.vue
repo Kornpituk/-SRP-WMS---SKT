@@ -4318,7 +4318,6 @@ const insetSwitch1 = ref('')
           v-model="selectedDataTables"
           show-select
           fixed-header
-          :height="tableDataHeight"
           :headers="headers"
           :items="products"
           :items-per-page="tableDataPerpage"
