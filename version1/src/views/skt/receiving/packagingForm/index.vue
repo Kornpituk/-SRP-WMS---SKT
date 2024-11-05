@@ -1783,7 +1783,7 @@ const saveDraftData = word => {
 
     <VRow class="px-3 pt-4">
       <VCol
-        cols="6"
+        cols="4"
         style="border: 1px solid black; font-size: 12px;"
       >
         <VRow>
