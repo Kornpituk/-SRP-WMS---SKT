@@ -488,6 +488,21 @@ const colorStatusWithCheckBox = id => {
   }
 }
 
+const dataTableColor = ref('#DCEDC8')
+const dataTableNummberedToggle = ref(null)
+
+const dataTableCliclHighlightIsToggle = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle.value = null
+  } else if (dataTableNummberedToggle.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle.value = no
+  }
+
+  console.log("dataTableNummberedToggle.value:", dataTableNummberedToggle.value, "no:", no)
+}
 
 //--------------------------------- Convert Date To API ----------------------------------------------------------------
 
@@ -677,6 +692,40 @@ const headers = [
 ]
 
 const customSortIcon = ref('mdi-swap-vertical')
+
+const tableDataPerpage = ref(10)
+const tableDataHeight = ref(550)
+
+onMounted(() => {
+  // โหลดค่าเริ่มต้นจาก sessionStorage ถ้ามี
+  const savedItemsPerPage = sessionStorage.getItem('itemsPerPage')
+
+  tableDataPerpage.value = savedItemsPerPage ? parseInt(savedItemsPerPage, 10) : 10 // ค่าเริ่มต้นเป็น 10 ถ้าไม่มีใน session
+
+  // switch (tableDataPerpage.value) {
+  // case 10:
+  //   tableDataHeight.value = 550
+  //   break
+  // case 25:
+  //   tableDataHeight.value = 700
+  //   break
+  // case 50:
+  //   tableDataHeight.value = 850
+  //   break
+  // case 100:
+  //   tableDataHeight.value = 850
+  //   break
+  // default:
+  //   tableDataHeight.value = 550
+  // }
+})
+
+
+const updateItemsPerPage = newItemsPerPage => {
+  // อัปเดตค่าใน sessionStorage เมื่อมีการเปลี่ยนแปลง
+  sessionStorage.setItem('itemsPerPage', newItemsPerPage)
+  tableDataPerpage.value = newItemsPerPage
+}
 
 //----------------------------------- Function Reset search Key word ---------------
 const resetSearchKey = () => {
@@ -4263,14 +4312,15 @@ const insetSwitch1 = ref('')
           v-model="selectedDataTables"
           show-select
           fixed-header
-          height="550"
+          :height="tableDataHeight"
           :headers="headers"
           :items="products"
-          :items-per-page="10"
+          :items-per-page="tableDataPerpage"
           item-selectable="selectable"
           class="elevation-1"
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
-          :item-class="row_classes" 
+          :item-class="row_classes"
+          @update:items-per-page="updateItemsPerPage"
         >
           <template #header.data-table-select="{ allSelected, selectAll, someSelected }">
             <VCheckboxBtn
@@ -4301,7 +4351,13 @@ const insetSwitch1 = ref('')
           <template #item="{ item }">
             <tr>
               <td
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
                 class="text-center px-2"
                 style="position: sticky; z-index: 1; left: 0;"
               >
@@ -4314,7 +4370,13 @@ const insetSwitch1 = ref('')
               </td>
               <td
                 class="text-center px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
                 style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
               >
                 <VChip
@@ -4338,12 +4400,24 @@ const insetSwitch1 = ref('')
               <td
                 class="px-2 text-center"
                 style="min-width: 30px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span style="font-size: 12px;">{{ item.raw.no }}</span>
               </td>
               <td
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
                 class="px-2"
                 style="min-width: 130px;  justify-content: start;"
               >
@@ -4355,7 +4429,13 @@ const insetSwitch1 = ref('')
               <td
                 class="px-2"
                 style="min-width: 300px; max-width: 350px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4366,7 +4446,13 @@ const insetSwitch1 = ref('')
               <td
                 class="px-2 "
                 style="min-width: 250px; max-width: 350px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4377,7 +4463,13 @@ const insetSwitch1 = ref('')
               <td
                 class="px-2 text-center"
                 style="min-width: 150px; justify-content: center;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4387,7 +4479,13 @@ const insetSwitch1 = ref('')
               <td
                 class="px-2"
                 style="justify-content: start;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="max-width: 200px; font-size: 12px;"
@@ -4397,7 +4495,13 @@ const insetSwitch1 = ref('')
               </td>
               <td
                 class="text-start px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
                 style="min-width: 100px;"
               > 
                 <span
@@ -4408,7 +4512,13 @@ const insetSwitch1 = ref('')
               <td
                 class="text-center px-2"
                 style="min-width: 150px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4417,7 +4527,13 @@ const insetSwitch1 = ref('')
               </td>
               <td
                 class="text-start px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4427,7 +4543,13 @@ const insetSwitch1 = ref('')
               <td
                 class="text-end px-2"
                 style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4437,7 +4559,13 @@ const insetSwitch1 = ref('')
               <td
                 class="text-end px-2"
                 style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4447,7 +4575,13 @@ const insetSwitch1 = ref('')
               <td
                 class="text-end px-2"
                 style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4457,7 +4591,13 @@ const insetSwitch1 = ref('')
               <td
                 class="text-end px-2"
                 style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4467,7 +4607,13 @@ const insetSwitch1 = ref('')
               <td
                 class="text-start px-2"
                 style="min-width: 150px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4477,14 +4623,26 @@ const insetSwitch1 = ref('')
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span style="font-size: 12px;">{{ convertDate(item.raw.updatedDate) }}</span>
               </td>
               <td
                 class="text-start px-2"
                 style="justify-content: center;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VBtn
                   color="info"
