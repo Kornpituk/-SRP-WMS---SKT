@@ -488,7 +488,9 @@ const colorStatusWithCheckBox = id => {
   }
 }
 
-const dataTableColor = ref('#DCEDC8')
+// const dataTableColor = ref('#F1F8E9')
+
+const dataTableColor = ref('#E0F7FA')
 const dataTableNummberedToggle = ref(null)
 
 const dataTableCliclHighlightIsToggle = no => {
@@ -4357,9 +4359,9 @@ const insetSwitch1 = ref('')
                     isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
                     ''
                 }"
-                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
                 class="text-center px-2"
                 style="position: sticky; z-index: 1; left: 0;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
                   v-if="item.raw.statusId === 7 || item.raw.statusId === 15"
@@ -4376,8 +4378,8 @@ const insetSwitch1 = ref('')
                     isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
                     ''
                 }"
-                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
                 style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VChip
                   :color="colorStatusWithId2(item.raw.statusId).color"
@@ -4417,9 +4419,9 @@ const insetSwitch1 = ref('')
                     isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
                     ''
                 }"
-                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
                 class="px-2"
                 style="min-width: 130px;  justify-content: start;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4501,8 +4503,8 @@ const insetSwitch1 = ref('')
                     isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
                     ''
                 }"
-                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
                 style="min-width: 100px;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               > 
                 <span
                   style="font-size: 12px;"
