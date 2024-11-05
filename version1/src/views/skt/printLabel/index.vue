@@ -242,9 +242,11 @@ const headers = [
     readonly: true,
   },
   {
-    title: 'No.',
-    key: 'no',
+    title: 'Lot',
+    key: 'data-table-group',
     align: "center",
+    fixed: true,
+    readonly: true,
   },
   {
     title: 'Category',
@@ -281,7 +283,7 @@ const headers = [
   },
   
   {
-    title: 'Updated On',
+    title: 'Location',
     key: 'updatedDate',
   },
   {
@@ -295,6 +297,32 @@ const headers = [
 ]
 
 const dataTableGroupBy = [{ key: 'lot' }]
+
+//------------------- Highlighter --------------------------------
+
+const selectedItemIdForColotRow = ref(null)
+
+watch(() => {
+  console.log('selected', selectedDataTables.value)
+})
+
+const isSelected = (item, type) => {
+  if(type === 1){
+    return selectedDataTables.value.some(
+      selectedItem => selectedItem.lot === item,
+    )
+  }
+
+  if(type === 2){
+    return selectedDataTables.value.some(
+      selectedItem => selectedItem.barcode === item,
+    )
+  }
+
+  
+}
+
+const dataTableColor = ref('#E0F7FA')
 </script>
 
 <template>
@@ -1722,7 +1750,14 @@ const dataTableGroupBy = [{ key: 'lot' }]
           :group-by="dataTableGroupBy"
         >
           <template #data-table-group="{ props, item, count }">
-            <td>
+            <td
+              :style="{ 
+                backgroundColor: 
+                  isSelected(item.value, 1) ? dataTableColor : 
+                  ''
+              }"
+              style="position: sticky; z-index: 1; left: 20px; min-width: 200px;"
+            >
               <VBtn
                 v-bind="props"
                 variant="text"
@@ -1730,35 +1765,23 @@ const dataTableGroupBy = [{ key: 'lot' }]
               >
                 <VIcon
                   class="flip-in-rtl"
-                  :icon="ri-arrow-down-s-line"
+                  icon="ri-arrow-down-s-line"
                 />
               </VBtn>
-
-              <span>Lot: {{ item.value }}</span>
-              <span>({{ count }})</span>
+              <span style="font-size: 12px;">{{ item.value }}</span>
+              <span style="font-size: 12px;">({{ count }})</span>
             </td>
-          </template>
-          <template #header.data-table-select="{ allSelected, selectAll, someSelected }">
-            <VCheckboxBtn
-              :indeterminate="someSelected && !allSelected"
-              :model-value="allSelected"
-              color="primary"
-              @update:model-value="selectAll(!allSelected)"
-            />
-          </template>
-
-          <template #item.data-table-select="{ internalItem, isSelected, toggleSelect }">
-            <VCheckboxBtn
-              :model-value="isSelected(internalItem)"
-              color="primary"
-              @update:model-value="toggleSelect(internalItem)"
-            />
           </template>
           <template #item="{ item }">
             <tr>
               <td
-                class="text-center px-2"
+                class="text-center"
                 style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <VCheckboxBtn
                   v-model="selectedDataTables"
@@ -1766,21 +1789,34 @@ const dataTableGroupBy = [{ key: 'lot' }]
                 />
               </td>
               <td
-                class="px-2 text-center"
-                style="min-width: 30px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+                class="text-center px-2"
               >
-                <span style="font-size: 12px;">{{ item.raw.index }}</span>
+                {{ item.raw.productionCode }}
               </td>
               <td
                 class="text-start px-2"
-                style="min-width: 130px;"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
               </td>
               <td
-                
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
                 class="px-2"
-                style="min-width: 130px;  justify-content: start;"
+                style="min-width: 100px;  justify-content: start;"
               >
                 <span
                   style="font-size: 12px;"
@@ -1789,7 +1825,12 @@ const dataTableGroupBy = [{ key: 'lot' }]
               </td>
               <td
                 class="px-2 text-start"
-                style="min-width: 150px; justify-content: center;"
+                style="min-width: 100px; justify-content: center;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1797,18 +1838,24 @@ const dataTableGroupBy = [{ key: 'lot' }]
                 >{{ item.raw.barcode }}</span>
               </td>
               <td
-                class="text-start px-2"
-                
+                class="text-center px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
                 style="min-width: 100px;"
               > 
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ item.raw.lotDescription }}</span>
+                <span style="font-size: 12px;">{{ item.raw.lotDescription }}</span>
               </td>
               <td
                 class="text-center px-2"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1818,6 +1865,11 @@ const dataTableGroupBy = [{ key: 'lot' }]
               <td
                 v-if="false"
                 class="text-start px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1847,6 +1899,11 @@ const dataTableGroupBy = [{ key: 'lot' }]
               <td
                 class="text-start px-2"
                 style="min-width: 100px; justify-content: end;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1865,7 +1922,12 @@ const dataTableGroupBy = [{ key: 'lot' }]
               </td>
               <td
                 class="text-start px-2"
-                style="min-width: 150px;"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1875,6 +1937,11 @@ const dataTableGroupBy = [{ key: 'lot' }]
               <td
                 class="text-start px-2"
                 style="min-width: 200px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1886,18 +1953,33 @@ const dataTableGroupBy = [{ key: 'lot' }]
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
               </td>
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span style="font-size: 12px;">{{ (item.raw.qtyPcs).toLocaleString() }}</span>
               </td>
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span style="font-size: 12px;">{{ formatNumber(item.raw.qtyKgs) }}</span>
               </td>
@@ -1918,34 +2000,6 @@ const dataTableGroupBy = [{ key: 'lot' }]
       </CardText>
     </VCard>
   </section>
-
-  <section v-if="false">
-    <VDataTable
-      v-columns-resizable
-      :headers="dataHeaders"
-      :items="dataMockTestRel"
-      class="elevation-1"
-      resizable
-    >
-      <template #column="{ column }">
-        <div class="resizable-column">
-          {{ column.text }}
-          <div class="resize-handle" />
-        </div>
-      </template>
-    </VDataTable>
-  </section>
-
-  <VContainer v-if="false">
-    <VDataTable
-      :headers="dataHeaders"
-      :items="dataMockTestRel"
-    >
-      <template #item.name="{ item }">
-        <span v-resizable>{{ item.name }}</span>
-      </template>
-    </VDataTable>
-  </VContainer>
 </template>
 
 <style lang="scss">
