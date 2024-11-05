@@ -1366,6 +1366,8 @@ const printLabelSmallPdf = async () => {
   }
 }
 
+///test commit
+
 const btnPrintLabel = async () => {
   processingPrintLabel.value = true
   
@@ -4727,6 +4729,7 @@ const insetSwitch1 = ref('')
       </div>
     </div>
   </section> 
+
 
   <section v-if="false">
     <VDataTable
