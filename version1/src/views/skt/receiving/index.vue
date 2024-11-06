@@ -697,7 +697,7 @@ const headers = [
 
 const customSortIcon = ref('mdi-swap-vertical')
 
-const tableDataPerpage = ref(10)
+const tableDataPerpage = ref(15)
 const tableDataHeight = ref(550)
 
 onMounted(() => {
@@ -4320,6 +4320,7 @@ const insetSwitch1 = ref('')
           fixed-header
           :headers="headers"
           :items="products"
+          height="550"
           :items-per-page="tableDataPerpage"
           item-selectable="selectable"
           class="elevation-1"
