@@ -155,6 +155,16 @@ onMounted(() => {
   purchaseOrderNo.value = sessionStorage.getItem('purchaseOrderNo') || ''
 })
 
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === 'null'){
+    sessionStorage.setItem('fileterStatusInPAI', '')
+  }
+  if(sessionStorage.getItem('statusFilter') === 'null'){
+    sessionStorage.setItem('statusFilter', '')
+  }
+  console.log("statusFilter", sessionStorage.getItem('statusFilter'))
+})
+
 // ดึงค่าจาก sessionStorage
 const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
 
@@ -173,8 +183,8 @@ const addStoredStatus = () => {
     })
 
     // อัปเดต sessionStorage
-    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value.join(','))
-    sessionStorage.setItem('statusFilter', statusFilter.value.join(','))
+    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value.join(',') || '')
+    sessionStorage.setItem('statusFilter', statusFilter.value.join(',') || '')
   }
 }
 

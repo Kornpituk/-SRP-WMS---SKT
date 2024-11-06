@@ -2557,6 +2557,7 @@ const getDisabledFollowStatusNRole = () => {
                   <VTextarea
                     v-model="headerInsp.note"
                     :readonly="frozeCheck"
+                    counter
                     auto-grow
                     :rules="[
                       v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
@@ -2575,6 +2576,7 @@ const getDisabledFollowStatusNRole = () => {
                   <VTextarea
                     v-model="headerInsp.details"
                     :readonly="frozeCheck"
+                    counter
                     auto-grow
                     :rules="[
                       v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
