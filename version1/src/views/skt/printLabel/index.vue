@@ -1814,7 +1814,7 @@ const dataTableColor = ref('#E0F7FA')
   </section>
 
   <!-- table data -->
-  <section v-if="false">
+  <section>
     <VCard>
       <CardText>
         <VProgressLinear
@@ -2102,137 +2102,6 @@ const dataTableColor = ref('#E0F7FA')
         </VDataTable>
       </CardText>
     </VCard>
-  </section>
-
-  <section>
-    <VCard>
-      <CardText>
-        <VDataTable
-          v-if="printLabelFormViewResult"
-          :headers="headers"
-          :items="printLabelFormViewResult"
-          :items-per-page="5"
-          class="text-no-wrap"
-          show-expand
-          expand-on-click
-          item-key="raw.barcode"
-        >
-          <template #item="{ item, isExpanded, expand }">
-            <tr @click="expand(!isExpanded)">
-              <!-- Checkbox column -->
-              <td
-                class="text-center"
-                style="position: sticky; z-index: 1; left: 0;"
-                :style="{ 
-                  backgroundColor: 
-                    isSelected(item.raw.barcode, 2) ? dataTableColor : ''
-                }"
-              >
-                <VCheckboxBtn
-                  v-model="selectedDataTables"
-                  :value="item.raw"
-                />
-              </td>
-              <!-- Other columns -->
-              <td
-                class="text-start px-2"
-                style="min-width: 120px;"
-                :style="{ 
-                  backgroundColor: 
-                    isSelected(item.raw.barcode, 2) ? dataTableColor : ''
-                }"
-              >
-                <span style="font-size: 12px;">{{ item.raw.category }}</span>
-              </td>
-              <td
-                class="px-2"
-                style="min-width: 100px; justify-content: start;"
-                :style="{ 
-                  backgroundColor: 
-                    isSelected(item.raw.barcode, 2) ? dataTableColor : ''
-                }"
-              >
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ item.raw.lot }}</span>
-              </td>
-              <td
-                class="px-2 text-start"
-                style="min-width: 100px; justify-content: center;"
-                :style="{ 
-                  backgroundColor: 
-                    isSelected(item.raw.barcode, 2) ? dataTableColor : ''
-                }"
-              >
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ item.raw.barcode }}</span>
-              </td>
-              <td
-                class="text-center px-2"
-                style="min-width: 100px;"
-                :style="{ 
-                  backgroundColor: 
-                    isSelected(item.raw.barcode, 2) ? dataTableColor : ''
-                }"
-              > 
-                <span style="font-size: 12px;">{{ item.raw.lotDescription }}</span>
-              </td>
-              <td
-                class="text-center px-2"
-                style="min-width: 150px;"
-                :style="{ 
-                  backgroundColor: 
-                    isSelected(item.raw.barcode, 2) ? dataTableColor : ''
-                }"
-              >
-                <span style="font-size: 12px;">{{ convertDate(item.raw.receivedDate) }}</span>
-              </td>
-            </tr>
-          </template>
-        </VDataTable>
-      </CardText>
-    </VCard>
-  </section>
-
-  <section>
-    <VDataTable
-      v-model:expanded="expanded"
-      :headers="dessertHeaders"
-      :items="desserts"
-      item-value="name"
-      show-expand
-    >
-      <template #top>
-        <VToolbar flat>
-          <VToolbarTitle>Expandable Table</VToolbarTitle>
-        </VToolbar>
-      </template>
-      <!-- Customize each row's cells -->
-      <!-- Customize each row's cells -->
-      <template #item="{ item, columns, isExpanded, expand }">
-        <tr @click="expand(!isExpanded)">
-          <td 
-            v-for="(column, index) in columns" 
-            :key="index"
-            class="custom-cell"
-            :class="[column.key]"
-            :style="{ color: column.key === 'calories' && item.raw.calories > 400 ? 'red' : 'inherit' }"
-          >
-            {{ item[column.key] }}
-          </td>
-        </tr>
-      </template>
-      <template #expanded-row="{ columns, item }">
-        <tr>
-          <td :colspan="columns.length">
-            More info about {{ item.name }}
-          </td>
-        </tr>
-      </template>
-    </VDataTable>
   </section>
 </template>
 
