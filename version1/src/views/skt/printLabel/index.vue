@@ -12,6 +12,8 @@ import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
 
+// conmot reeails
+
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
 
 const panel = ref(['filter']) //---------------- variable for
