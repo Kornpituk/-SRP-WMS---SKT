@@ -549,9 +549,12 @@ const dataTableColor = ref('#E0F7FA')
                   density="compact"
                   item-title="name"
                   item-value="value"
-                  placeholder="All"
                   clearable
-                />
+                >
+                  <template #label>
+                    <span>Categories</span>
+                  </template>
+                </VSelect>
               </VCol>
 
               <!-- 👉 Select Product code -->
@@ -606,7 +609,7 @@ const dataTableColor = ref('#E0F7FA')
               >
                 <AppDateTimePicker
                   v-model="paramsFetchDataPrintLabel.receivedDate"
-                  placeholder="Receiving Date"
+                  placeholder="Received Date"
                   density="compact"
                   :config="{ dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"
