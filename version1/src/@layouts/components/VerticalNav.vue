@@ -36,7 +36,7 @@ const props = defineProps({
 import { urlApi } from '@/api'
 // eslint-disable-next-line regex/invalid
 import axios from 'axios'
-import { watchEffect } from 'vue'
+import { watch, watchEffect } from 'vue'
 
 const logoCompanyApi = ref('')
 
@@ -54,6 +54,10 @@ const getInfoCompany = () => {
 const refNav = ref()
 const { width: windowWidth } = useWindowSize()
 const isHovered = useElementHover(refNav)
+
+watch(()=> {
+  console.log("isHovered", typeof isHovered, useElementHover(false))
+})
 
 provide(injectionKeyIsVerticalNavHovered, isHovered)
 
@@ -319,3 +323,4 @@ watchEffect(() => {
   }
 }
 </style>
+ 

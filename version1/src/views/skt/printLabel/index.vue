@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watchEffect } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -12,163 +12,53 @@ import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
 
+// conmot reeails
+
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
+
+const panel = ref(['filter']) //---------------- variable for
 
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
-const perPage = ref(10)
-const page = ref(0)
-const totalCount = ref(0)
+//---------------- format
+function convertDate(dateString) {
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  
+  return `${day}/${month}/${year}`
+}
 
-const rowPerPage = ref(10)
-const currentPage = ref(1)
-const totalPage = ref(1)
+const dataHeaders = [
+  {
+    title: 'Dessert (100g serving)',
+    align: 'start',
+    sortable: false,
+    key: 'name',
+  },
+  { title: 'Calories', key: 'calories', align: 'end' },
+  { title: 'Fat (g)', key: 'fat', align: 'end' },
+  { title: 'Carbs (g)', key: 'carbs', align: 'end' },
+  { title: 'Protein (g)', key: 'protein', align: 'end' },
+  { title: 'Iron (%)', key: 'iron', align: 'end' },
+]
 
-//------------------- Model ID For search ------------------------------------
-const searchByCategoryId = ref(null)
-const searchByTypeId = ref(null)
-const searchBySubTypeId = ref(null)
-const searchByBarcode = ref(null)
-const searchByProductId = ref(null)
-const searchByProductName = ref(null)
-const searchByUOMId = ref(null)
-
-const searchByWareHouseId = ref([whereHouse])
-
-const searchByZoneId = ref(null)
-const searchByAreaId = ref(null)
-const searchBySubAreaId = ref(null)
-
-//------------------------ Model Name for search ------------------------------
-const searchByCategoryName = ref(null)
-const searchByTypeName = ref(null)
-const searchBySubTypeName = ref(null)
-const searchByBarcodeName = ref(null)
-const searchByProductCodeName = ref(null)
-const searchByProductNameFilter = ref(null)
-const searchByUnitName = ref(null)
-
-//----- Search Filter Icon Header Table[Product Category, Group, Sub Group, Barcode, Product Category Code, Product Name]
-const menuCategory= ref( false)
-const menuGroup = ref( false)
-const menuSubGroup = ref( false)
-const menuBarcode = ref( false)
-const menuProductCode = ref( false)
-const menuProductName = ref( false)
-const menuUoM = ref( false)
-
-//------------------------ item ID for search ------------------------------
-const itemsSearchByCategoryId = ref([])
-const typeItemsSearchById = ref([])
-const subTypeItemsSearchById = ref([])
-const itemsSearchByUOMId = ref([])
-const wareHouseItemsSearchById = ref([])
-const zoneItemsSearchById = ref([])
-const areaItemsSearchById = ref([])
-const subAreaItemsSearchById = ref([])
-
-//----------------------  Variable for SortBy -------------------------------------
-const sortByCategory = ref('')
-const sortByType = ref('')
-const sortBySubType = ref('')
-const sortByBarcode = ref('')
-const sortByProductId = ref('')
-const sortByProductName = ref('')
-const sortByUnit = ref('')
-const sortByQty = ref('')
-const sortByTags = ref('')
-const sortByNonTags = ref('')
-
-
-const toggleSortType = sortBy => {
-  const sortRefs = { sortByCategory, sortByType, sortBySubType, sortByBarcode, sortByProductId, sortByProductName, sortByUnit, sortByQty, sortByTags, sortByNonTags }
-
-  for (const key in sortRefs) {
-    if (key === sortBy) {
-      sortRefs[key].value = sortRefs[key].value === 'asc' ? 'desc' : 'asc'
-    } else {
-      sortRefs[key].value = '' // ล้างค่าที่ไม่เกี่ยวข้อง
-    }
-
-    // console.log("Sort type:",sortRefs[key],'Key',[key])
+const formatNumber = value => {
+  if (value !== null && value !== undefined) {
+    return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
-
-  // console.log("Sort type:",sortRefs[key],'Key',[key])
+  
+  return '0.00'
 }
 
-const router = useRouter()
+///--------------------------------- 
 
-const serialProductCode = ref(null)
-
-//------------------------------- Function Get StockUpdate Need Enter Search -----------------
-
-const clearModel = () => {
-  searchByCategoryId.value = null
-  searchByTypeId.value = null
-  searchBySubTypeId.value = null
-  searchByBarcode.value = null
-  searchByProductId.value = null
-  searchByProductName.value = null
-  searchByUOMId.value = null
-  searchByZoneId.value = null
-  searchByAreaId.value = null
-  searchBySubAreaId.value = null
-  serialProductCode.value = null
-}
-
-const searchParams = {
-  searchByCategoryId,
-  searchByTypeId,
-  searchBySubTypeId,
-  searchByBarcode,
-  searchByProductId,
-  searchByProductName,
-  searchByUOMId,
-  searchByZoneId,
-  searchByAreaId,
-  searchBySubAreaId,
-  serialProductCode,
-
-  searchByCategoryName,
-  searchByTypeName,
-  searchBySubTypeName,
-  searchByBarcodeName,
-  searchByProductCodeName,
-  searchByProductNameFilter,
-  searchByUnitName,
-}
-
-const sortParams = {
-  sortByCategory,
-  sortByType,
-  sortBySubType,
-  sortByBarcode,
-  sortByProductId,
-  sortByProductName,
-  sortByUnit,
-  sortByQty,
-  sortByTags,
-  sortByNonTags,
-}
-
-// Clear function to reset all values
-const clearValuesNeo = () => {
-  // Reset search parameters
-  for (const key in searchParams) {
-    searchParams[key].value = null
-  }
-
-  // Reset sort parameters
-  for (const key in sortParams) {
-    sortParams[key].value = null
-  }
-}
-
-const GetStockUpdate = () => {
+const printLabelForm = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+  axiosIns.get(`${urlApi.value}/api/v1/StockUpdatsdsde?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
     params: {
       categoryId: searchByCategoryId.value,
       typeId: searchByTypeId.value,
@@ -201,7 +91,7 @@ const GetStockUpdate = () => {
       'sortByTags': sortByTags.value,
       'sortByNonTags': sortByNonTags.value,
 
-      // ... and so on with other parameters
+    // ... and so on with other parameters
     },
     headers: {
       'accept': '*/*',
@@ -227,734 +117,263 @@ const GetStockUpdate = () => {
 
       // console.log('subTypeId',searchBySubTypeId.value)
 
-      
-    })
-    .catch(error => {
-      // Handle errors
-      console.error('Error:', error)
-    })
-  
-}
-
-//----------------------------------- Function Reset search Key word ---------------
-const resetSearchKey = () => {
-  searchByCategoryName.value = ('')
-  searchByTypeName.value = ('')
-  searchBySubTypeName.value = ('')
-  searchByBarcodeName.value = ('')
-  searchByProductCodeName.value = ('')
-  searchByProductNameFilter.value = ('')
-  searchByUnitName.value = ('')
-}
-
-//------------------------------- Function Get StockUpdate Auto Search -----------------
-
-watch(GetStockUpdate)
-
-//--------------------------------------- Function Pagination --------------------------------------------
-// 👉 watching current page
-watch(() => {
-  if (currentPage.value > totalPage.value)
-    currentPage.value = totalPage.value
-})
-
-// 👉 Computing pagination data
-const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
-
-  // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
-  // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
-  // console.log('products.value.length: ',products.value.length)
-  
-  return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
-})
-
-// SECTION Checkbox toggle
-const selectedRows = ref([])
-
-//----------------------------------- End Function Pagination -----------------------------------------------
-
-///--------------------------------------- FetchItems for Search Box ----------------------------------------------
-
-const fetchItemsSearchBy = nameSearch => {
-  return axiosIns.get(`${urlApi.value}/api/v1/Product/${nameSearch}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }).then(response => {
-    return response.data
-  }).catch(error => {
-    console.error('Error:', error)
     
-    return null
-  })
-}
-
-fetchItemsSearchBy('categories').then(data => {
-  itemsSearchByCategoryId.value = data
-})
-
-function customFilter(item, queryText, itemText) {
-  const textOne = itemText.title.toLowerCase()
-  const textTwo = itemText.value.toLowerCase()
-  const searchText = queryText.toLocaleLowerCase()
-  
-  return textOne.includes(searchText) || textTwo.includes(searchText)
-}
-
-const submitSearchButton = () => {
-  GetStockUpdate()
-}
-
-//--------------------------------------- FetchItems for Search WareHouse  ----------------------------------------
-
-const fetchItemsWareHouse = () => {
-  axiosIns.get(`${urlApi.value}/api/Auth/GetLocation`, {
-    headers: {
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      wareHouseItemsSearchById.value = response.data
     })
     .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
+    // Handle errors
       console.error('Error:', error)
     })
 
 }
 
-watch(fetchItemsWareHouse)
+//---------------------- new rel table --------------------
+import { VDataTable } from 'vuetify/labs/VDataTable'
 
-//--------------------------------------- FetchItems for Search  Unit  ----------------------------------------
+//----------------------------- api ------------------------------
+import { usePrintLabelBarcodeFormService, useFetchPrintLabelData, useSavePrintBarcodeFormService }  from '@/services/skt/global/gloBalService'
 
-const getItemsProductUnit = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/`+searchByCategoryId.value+'/Unit', {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
+const { printLabelFormViewResult, errorMessagePrintLabelView, printLabelFormViewService } = useFetchPrintLabelData()
 
-      itemsSearchByUOMId.value = response.data
+const dataPrintLabel = ref([])
+const selectedDataTables = ref([])
+const isDialogPrintLabelVisible = ref(false)
 
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('itemsSearchByUOMId.value At index',itemsSearchByUOMId.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductUnit)
-
-//--------------------------------------- FetchItems for Search  Type(Group) ----------------------------------------
-
-const getItemsProductType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/Types`, {
-    params: {
-      'CategoryId': searchByCategoryId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      typeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductType)
-
-//--------------------------------------- FetchItems for Search Sub Type(Sub Group) ----------------------------------------
-
-const getItemsProductSubType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/SubTypes/All`, {
-    params: {
-      'TypeId': searchByTypeId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subTypeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductSubType)
-
-//--------------------------------------- FetchItems for Search  Zone  ----------------------------------------
-
-const getItemLocalZone = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/zone/all`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      zoneItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('zoneItemsSearchById At index',zoneItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watch(getItemLocalZone)
-
-//--------------------------------------- FetchItems for Search  Area ----------------------------------------
-
-const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}api/v1/Locations/area/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      areaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemLocalArea)
-
-//--------------------------------------- FetchItems for Search Sub Area ----------------------------------------
-
-const getItemLocalSubArea = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/subArea/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-      'areaCode': searchByAreaId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subAreaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemLocalSubArea)
-
-// -------------------------------------- Export Bar Excel - --------------------------------
-
-const stockUpdateExcel = () => {
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    responseType: 'blob', // ให้เซิร์ฟเวอร์รีเทิร์น blob สำหรับไฟล์ Excel
-  })
-    .then(response => {
-      // สร้าง URL ของไฟล์ Excel จาก binary data
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-
-      const currentDate = new Date() // สร้างวัตถุ Date ปัจจุบัน
-      const year = currentDate.getFullYear() // ดึงปีปัจจุบัน
-      let fileYear
-      const threshold = 2500 // กำหนดจุดแบ่ง พ.ศ. กับ ค.ศ.
-
-      if (year > threshold) {
-        // พ.ศ. เปลี่ยนเป็น ค.ศ.
-        fileYear = year - 543
-      } else {
-        // ค.ศ.
-        fileYear = year
-      }
-
-      const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
-
-      const fileName = `stock_update_Tag_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
-
-      // สร้างลิงก์สำหรับดาวน์โหลดไฟล์ Excel
-      const link = document.createElement('a')
-
-      link.href = url
-      link.setAttribute('download', fileName) // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
-      document.body.appendChild(link)
-      link.click()
-
-      // ลบ URL หลังจากดาวน์โหลดเสร็จเรียบร้อยแล้ว
-      window.URL.revokeObjectURL(url)
-    })
-    .catch(error => {
-      // จัดการข้อผิดพลาด
-      console.error('Error:', error)
-    })
-}
-
-//-------------------------- format decimal -------------------
-
-const formatDecimal = decimal => {
-  const configsShowDigit = localStorage.getItem('configsShowDigit')
-  if (configsShowDigit == 'true') {
-    return Math.ceil(decimal)
-  } else {
-    return decimal
-  }
-}
-
-/// ----------------------- check config Barcode / Tag ----------------
-const nameUser = localStorage.getItem('userCheck')
-
-const checkConfigUser = nameUser => {
-  if (nameUser == 'Chutimon') {
-    return false
-  } else if (nameUser == 'Tamma'){
-    return true
-  } else {
-    return true
-  }
-}
-
-checkConfigUser(nameUser)
-
-//------------------------ Dialog Image ----------------------------
-const isDialogImageVisible = ref(false)
-const urlImage = ref('')
-const nameImage = ref('')
-
-const checkRFID = ref ('')
-
-watchEffect(() =>{
-  const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
-  if(checkRFIDUpdate.value === 'true'){
-    console.log('RFID Check True:'+ checkRFIDUpdate.value)
-    checkRFID.value = true
-  } else if (checkRFIDUpdate.value === 'false') {
-    console.log('RFID Check False:'+ checkRFIDUpdate.value)
-    checkRFID.value = false
-  }
-})
-
-const nameProductDialog = ref('')
-const qtyProductDialog = ref('')
-const unitProductDialog = ref('')
-const barcodeProductDialog = ref('')
-
-const codeProduct = ref('')
-const nameProduct = ref('')
-const imgProduct = ref('')
-const barcodeProduct = ref('')
-const categoriesProduct = ref('')
-const groupProduct = ref('')
-const groupSupProduct = ref('')
-const totalProduct = ref('')
-const unitNameProduct = ref('')
-const detailsProduct = ref('')
-
-const showDialogImage = (code, name, img, barcode, categories, group, groupSup, total, unitName, details) => {
-  codeProduct.value = code
-  nameProduct.value = name
-  imgProduct.value = img
-  barcodeProduct.value = barcode
-  categoriesProduct.value = categories
-  groupProduct.value = group
-  groupSupProduct.value = groupSup
-  totalProduct.value = total
-  unitNameProduct.value = unitName
-  detailsProduct.value = details
-  isDialogImageVisible.value = true
-  console.log('showImageFunction!!')
-}
-
-const showExpansionDialog = ref(false)
-
-//---------------------------- check Status ---------------------------------
-
-const colorStatus = ref('grey')
-const bgStatus = ref('bg-grey')
-
-
-const checkColorTextStatus = status => {
-  if(status === 'Received'){
-    return 'bg-green-lighten-4'
-  }else if(status === 'Waiting for Receive') {
-    return 'bg-yellow-lighten-4' 
-  }
-}
-
-const checkColorBgStatus = status => {
-  if(status === 'Received'){
-    return 'text-green'
-  }else if(status === 'Waiting for Receive') {
-    return 'text-warning' 
-  }
-}
-
-//------------------------------------------ Mock Data --------------------------------
-
-const date = ref(new Date())
-
-
-// In case of a range picker, you'll receive [Date, Date]
-const format = date => {
-  const day = date.getDate()
-  const month = date.getMonth() + 1
-  const year = date.getFullYear()
-
-  return `${day}/${month}/${year}`
-}
-
-const formatDate = date => {
-  const d = new Date(date)
-  const day = d.getDate().toString().padStart(2, '0')
-  const month = (d.getMonth() + 1).toString().padStart(2, '0')
-  const year = d.getFullYear()
-
-  return `${day}/${month}/${year}`
-}
-
-function getRandomDate(start) {
-  const startDate = new Date(start)
-  const endDate = new Date() // Set the end date to the current date
-  const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime())
-  const randomDate = new Date(randomTime)
-  
-  const year = randomDate.getFullYear()
-  const month = String(randomDate.getMonth() + 1).padStart(2, '0') // Months are zero-based
-  const day = String(randomDate.getDate()).padStart(2, '0')
-  
-  return `${day}/${month}/${year}`
-}
-
-
-
-const toDayDate = format(new Date())
-const toDayDatePFinished = ref('NaN')
-
-const mockData = ref([
+const itemsTypeLabel = ref([
   {
-    checkBox: false,
-    lot: "LT12345",
-    barcode: "123456789012",
-    description: "Product A Description",
-    productionDate: getRandomDate('2023-01-01'),
-    expiryDate: getRandomDate('2023-01-01'),
-    remainingDays: 340,
-    purchaseOrderNo: "PO123456",
-    productionNo: "PRD123456",
-    productId: "PID12345",
-    productName: "Product A",
-    qty: "10",
-    uom: "Kg",
-    productCategory: "Category A",
-    remarks: "No remarks",
+    title: 'Raw Material Label',
+    value: 'Raw Mat Label',
   },
   {
-    checkBox: false,
-    lot: "LT12346",
-    barcode: "123456789013",
-    description: "Product B Description",
-    productionDate: getRandomDate('2023-01-01'),
-    expiryDate: getRandomDate('2023-01-01'),
-    remainingDays: 365,
-    purchaseOrderNo: "PO123457",
-    productionNo: "PRD123457",
-    productId: "PID12346",
-    productName: "Product B",
-    qty: "10",
-    uom: "Kg",
-    productCategory: "Category B",
-    remarks: "Handle with care",
+    title: 'Semi Label',
+    value: 'Semi Label',
   },
   {
-    checkBox: false,
-    lot: "LT12347",
-    barcode: "123456789014",
-    description: "Product C Description",
-    productionDate: getRandomDate('2023-01-01'),
-    expiryDate: getRandomDate('2023-01-01'),
-    remainingDays: 380,
-    purchaseOrderNo: "PO123458",
-    productionNo: "PRD123458",
-    productId: "PID12347",
-    productName: "Product C",
-    qty: "10",
-    uom: "Kg",
-    productCategory: "Category C",
-    remarks: "Keep refrigerated",
-  },
-  {
-    checkBox: false,
-    lot: "LT12348",
-    barcode: "123456789015",
-    description: "Product D Description",
-    productionDate: getRandomDate('2023-01-01'),
-    expiryDate: getRandomDate('2023-01-01'),
-    remainingDays: 400,
-    purchaseOrderNo: "PO123459",
-    productionNo: "PRD123459",
-    productId: "PID12348",
-    productName: "Product D",
-    qty: "10",
-    uom: "Kg",
-    productCategory: "Category D",
-    remarks: "Store in a cool, dry place",
-  },
-  {
-    checkBox: false,
-    lot: "LT12349",
-    barcode: "123456789016",
-    description: "Product E Description",
-    productionDate: getRandomDate('2023-01-01'),
-    expiryDate: getRandomDate('2023-01-01'),
-    remainingDays: 420,
-    purchaseOrderNo: "PO123460",
-    productionNo: "PRD123460",
-    productId: "PID12349",
-    productName: "Product E",
-    qty: "10",
-    uom: "Kg",
-    productCategory: "Category E",
-    remarks: "No remarks",
+    title: 'Product Label',
+    value: 'Product Label',
   },
 ])
 
-//--------- Check All 
-const checkBoxAll = ref(false)
+const typePrintLabel = ref('Semi Label')
+
+//----------------------- Filter Status 
+const progressLinearNoData = ref(false)
+
+//------------------------- Get Label ------------------------
+
+const itemsCategoriesOld = ['Packaging', 'Raw material', 'Lorry']
+
+const itemsCategories = [
+  { name: 'Packaging', value: 'Packaging' },
+  { name: 'Raw material', value: 'Raw material' },
+  { name: 'Lorry', value: 'Lorry' },
+  { name: 'All', value: '' },
+]
+
+const paramsFetchDataPrintLabel = ref({
+  lot: '',
+  productId: '',
+  productName: '',
+  purchaseOrderNo: '',
+  receivedDate: '',
+  category: '',
+})
+
+const clearModel = () => {
+  paramsFetchDataPrintLabel.value.lot = ''
+  paramsFetchDataPrintLabel.value.productId = ''
+  paramsFetchDataPrintLabel.value.productName = ''
+  paramsFetchDataPrintLabel.value.purchaseOrderNo = ''
+  paramsFetchDataPrintLabel.value.receivedDate = ''
+  paramsFetchDataPrintLabel.value.category = ''
+}
+
+const fetchData = async () => {
+
+  const result = await printLabelFormViewService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
+
+  if (printLabelFormViewResult.value) {
+    dataPrintLabel.value = result.data
+    progressLinearNoData.value = true
+    console.log("printLabelFormViewService successfully view")
+  } else {
+    console.log("printLabelFormViewService failed view")
+  }
+}
 
 watchEffect(() => {
-  mockData.value.forEach(item => {
-    item.checkBox = checkBoxAll.value
+  fetchData()
+})
+
+const groupDataByLot = data => {
+  let previousLot = null
+  const groupedData = []
+
+  data.forEach(item => {
+    // ถ้า lot เดิมเหมือนกับแถวปัจจุบัน
+    console.log("start ForEach")
+    if (item.lot === previousLot) {
+      // เพิ่ม barcode และ lotDescription ไปยังรายการล่าสุดใน groupedData
+      groupedData[groupedData.length - 1].items.push({
+        barcode: item.barcode,
+        lotDescription: item.lotDescription,
+      })
+    } else {
+      // ถ้า lot ไม่เหมือน ให้สร้างรายการใหม่
+      groupedData.push({
+        lot: item.lot,
+        category: item.category,
+        items: [{ barcode: item.barcode, lotDescription: item.lotDescription }],
+      })
+      previousLot = item.lot // ตั้ง lot เป็นแถวปัจจุบันสำหรับการเปรียบเทียบครั้งต่อไป
+    }
   })
-})
 
-//----------- Print Label And Select Type ---------------
-
-const isDialogPrintLabelVisible = ref(false)
-const typePrintLabel = ref('Raw Mat Label')
-
-//---------------------------- Add Mock Data --------------------------------
-const isDialogAddVisible = ref(false)
-
-const selectedItemNamePD = ref(null)
-
-// computed property to extract product names
-const productNamesMockItems = computed(() => mockData.value.map(item => item.productName))
-
-//---------------------------- Function Add Data Crate --------------------------------
-
-const findProductCode = productName => {
-  const product = mockData.value.find(item => item.productName === productName)
-  
-  return product ? product.productCode : ''
+  return data
 }
 
+const dataFilterPrintLabel = [{ key: 'lot' }]
 
-const productCode = ref('')
 
-const productNames = computed(() => {
-  return mockData.value.map(item => item.productName)
-})
 
-const findProductByName = productName => {
-  return mockData.value.find(item => item.productName === productName) || {}
-}
 
-const productionPlan = ref([])
-const selectedItem = ref(null)
+//------------------------- Print Label ------------------------
+//------------------------- Print Label By Barcode ------------------------
 
-const addProductToPlan = productName => {
-  console.log('addProductToPlan Start!!!')
+//-------------------------- table data -------------------------------
 
-  const product = findProductByName(productName)
+const { saveToPrintLabelFormBarcodeResult, saveToPrintLabelFormBarcodeService } = useSavePrintBarcodeFormService()
+const { printLabelBarcodeFormViewResult, printLabelFormBarcodeService } = usePrintLabelBarcodeFormService()
 
-  productionPlan.value.push({ ...product })
-}
+const isLoadingPrintLabel = ref(false)
+const successPrintLabel = ref(null)
 
-watch(selectedItem, newValue => {
-  if (newValue) {
-    const product = findProductByName(newValue)
-    if (product) {
-      // productionPlan.value.push({ ...product })
-      const formattedProducingDate = formatDate(product.producingDate) // แปลงเป็น string ตาม format ที่ต้องการ
+const printLabel = async () => {
+  console.log("12355", typePrintLabel.value)
+  if(typePrintLabel.value === 'Raw Mat Label'){
+    console.log('Raw Mat Label print start .....')
 
-      productionPlan.value.push({ ...product, producingDate: formattedProducingDate })
+    const barcode = ref({})
+
+    // await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
+  }
+  if(typePrintLabel.value === 'Semi Label'){
+    console.log('Semi Label print start .....')
+
+    const barcodes = selectedDataTables.value.map(item => item.barcode)
+
+    console.log('Semi Label print start .....', barcodes)
+
+    isLoadingPrintLabel.value = true
+    successPrintLabel.value = null
+    await saveToPrintLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, barcodes)
+    if(saveToPrintLabelFormBarcodeResult.value){
+      await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore)
+      isLoadingPrintLabel.value = false
+      if(printLabelBarcodeFormViewResult.value){
+        console.log('print label by barcode success', printLabelBarcodeFormViewResult)
+        isLoadingPrintLabel.value = false
+        successPrintLabel.value = true
+      }else {
+        successPrintLabel.value = false
+      }
+    }else {
+      isLoadingPrintLabel.value = false
+      successPrintLabel.value = false
+      throw 'Could not save to print label form'
     }
   }
-})
-
-watchEffect(() => {
-  console.log('productionPlan', productionPlan.value)
-})
-
-const calculatedFinishedDate = item => {
-  if (!item.producingDate) return ''
-  const dateSupervisor = new Date(item.producingDate)
-
-  dateSupervisor.setDate(dateSupervisor.getDate() + 3)
-
-  item.finishedDate = format(dateSupervisor) // Update item.finishedDate here
-  
-  return format(dateSupervisor) // Format as YYYY-MM-DD
-}
-
-const cancelProduct = index => {
-  productionPlan.value.splice(index, 1) ; ''
-}
-
-const viewAllData = () => {
-  console.log('ALl Data Date', productionPlan.value)
-}
-
-const selectedDateInput = ref(toDayDate)
-const rules = [v => v.length <= 150 || 'Max 25 characters']
-
-//---------------------------------
-
-const items = [
-  'Programming',
-  'Design',
-  'Vue',
-  'Vuetify',
-]
-
-const itemsTypeLabel = [
-  'Raw Mat Label',
-  'Semi Label',
-  'Product Label',
-]
-
-///------------------------------------------------------------------------------
-
-const panel = ref(['filter'])
-
-const all = () => {
-  panel.value = ['filter']
-}
-
-const none = () => {
-  panel.value = []
-}
-
-//---------------------------------- Date Picker --------------------------------
-//------- Date Picker Filter --------------------------------
-const dateDeliveryFilter = ref()
-
-// For demo purposes assign range from the current date
-onMounted(() => {
-  const startDate = new Date()
-  const endDate = new Date(new Date().setDate(startDate.getDate() + 7))
-
-  dateDeliveryFilter.value = [startDate, endDate]
-})
-
-
-//----------------------------------------------
-const fileInput = ref(null)
-
-// Function to programmatically trigger a click on the file input
-const triggerFileInput = () => {
-  if (fileInput.value) {
-    fileInput.value.click()
+  if(typePrintLabel.value === 'Product Label'){
+    console.log('Product Label print start .....')
   }
 }
 
-const previewFiles = event => {
-  const files = event.target.files
+const dataTableExpanded = ref([])
 
-  console.log('Selected files:', files)
-}
+const headers = [
+  {
+    title: 'data-table-select',
+    key: 'data-table-select',
+    align: "center",
+    fixed: true,
+    readonly: true,
+  },
+  {
+    title: 'Category',
+    key: 'category',
+  },
+  {
+    title: 'Lot',
+    key: 'lot',
+  },
+  {
+    title: 'Barcode',
+    key: 'barcode',
+  },
+  {
+    title: 'NO/RCVD(PCS)',
+    key: 'lotDescription',
+  },
+  {
+    title: 'Received Date',
+    key: 'receivedDate',
+    
+  },
+  {
+    title: 'P/O No',
+    key: 'purchaseOrderNo',
+  },
+  {
+    title: 'Item Code',
+    key: 'productId',
+  },
+  {
+    title: 'Item Name',
+    key: 'productName',
+  },
+  
+  {
+    title: 'Location',
+    key: 'updatedDate',
+  },
+  {
+    title: 'PURC(PCS)',
+    key: 'qtyPcs',
+  },
+  {
+    title: 'PURC(KGS)',
+    key: 'qtyKgs',
+  },
+]
 
-const dataMockTestRel = [
+const dataTableGroupBy = [
+  { key: 'lot' },
+]
+
+const expanded = ref([])
+
+const dessertHeaders = [
+  {
+    title: 'Dessert (100g serving)',
+    align: 'start',
+    sortable: false,
+    key: 'name',
+  },
+  { title: 'Calories', key: 'calories' },
+  { title: 'Fat (g)', key: 'fat' },
+  { title: 'Carbs (g)', key: 'carbs' },
+  { title: 'Protein (g)', key: 'protein' },
+  { title: 'Iron (%)', key: 'iron' },
+  { title: '', key: 'data-table-expand' },
+]
+
+const desserts = [
   {
     name: 'Frozen Yogurt',
     calories: 159,
     fat: 6.0,
     carbs: 24,
     protein: 4.0,
-    iron: '1%',
+    iron: 1,
   },
   {
     name: 'Ice cream sandwich',
@@ -962,7 +381,7 @@ const dataMockTestRel = [
     fat: 9.0,
     carbs: 37,
     protein: 4.3,
-    iron: '1%',
+    iron: 1,
   },
   {
     name: 'Eclair',
@@ -970,7 +389,7 @@ const dataMockTestRel = [
     fat: 16.0,
     carbs: 23,
     protein: 6.0,
-    iron: '7%',
+    iron: 7,
   },
   {
     name: 'Cupcake',
@@ -978,7 +397,7 @@ const dataMockTestRel = [
     fat: 3.7,
     carbs: 67,
     protein: 4.3,
-    iron: '8%',
+    iron: 8,
   },
   {
     name: 'Gingerbread',
@@ -986,7 +405,7 @@ const dataMockTestRel = [
     fat: 16.0,
     carbs: 49,
     protein: 3.9,
-    iron: '16%',
+    iron: 16,
   },
   {
     name: 'Jelly bean',
@@ -994,7 +413,7 @@ const dataMockTestRel = [
     fat: 0.0,
     carbs: 94,
     protein: 0.0,
-    iron: '0%',
+    iron: 0,
   },
   {
     name: 'Lollipop',
@@ -1002,7 +421,7 @@ const dataMockTestRel = [
     fat: 0.2,
     carbs: 98,
     protein: 0,
-    iron: '2%',
+    iron: 2,
   },
   {
     name: 'Honeycomb',
@@ -1010,7 +429,7 @@ const dataMockTestRel = [
     fat: 3.2,
     carbs: 87,
     protein: 6.5,
-    iron: '45%',
+    iron: 45,
   },
   {
     name: 'Donut',
@@ -1018,7 +437,7 @@ const dataMockTestRel = [
     fat: 25.0,
     carbs: 51,
     protein: 4.9,
-    iron: '22%',
+    iron: 22,
   },
   {
     name: 'KitKat',
@@ -1026,31 +445,39 @@ const dataMockTestRel = [
     fat: 26.0,
     carbs: 65,
     protein: 7,
-    iron: '6%',
+    iron: 6,
   },
 ]
 
-const dataHeaders = [
-  {
-    title: 'Dessert (100g serving)',
-    align: 'start',
-    sortable: false,
-    key: 'name',
-  },
-  { title: 'Calories', key: 'calories', align: 'end' },
-  { title: 'Fat (g)', key: 'fat', align: 'end' },
-  { title: 'Carbs (g)', key: 'carbs', align: 'end' },
-  { title: 'Protein (g)', key: 'protein', align: 'end' },
-  { title: 'Iron (%)', key: 'iron', align: 'end' },
-]
+//------------------- Highlighter --------------------------------
 
-//---------------------- new rel table --------------------
-import { VDataTable } from 'vuetify/labs/VDataTable'
+const selectedItemIdForColotRow = ref(null)
+
+watch(() => {
+  console.log('selected', selectedDataTables.value)
+})
+
+const isSelected = (item, type) => {
+  if(type === 1){
+    return selectedDataTables.value.some(
+      selectedItem => selectedItem.lot === item,
+    )
+  }
+
+  if(type === 2){
+    return selectedDataTables.value.some(
+      selectedItem => selectedItem.barcode === item,
+    )
+  }
+
+  
+}
+
+const dataTableColor = ref('#E0F7FA')
 </script>
 
 <template>
   <!-- Title Page -->
-
   <div>
     <VCard>
       <VCardTitle>
@@ -1098,165 +525,211 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
     </VCard>
   </div>
 
+  <!-- Filter -->
   <section>
     <div>
       <VExpansionPanels
         v-model="panel"
         multiple
+        class="pa-2"
       >
-        <VExpansionPanel value="filter">
-          <VExpansionPanelText>
-            <VForm @submit.prevent="submitSearchButton">
-              <!-- Barcode | Product code | Product Name | Button Export -->
-              <VRow>
-                <!-- 👉 Select Product code -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
+        <VExpansionPanel
+          class="px-1"
+          value="filter"
+        >
+          <VExpansionPanelText class="px-1">
+            <VRow class="px-1">
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-2"
+              >
+                <VSelect
+                  v-model="paramsFetchDataPrintLabel.category"
+                  :items="itemsCategories"
+                  density="compact"
+                  item-title="name"
+                  item-value="value"
+                  clearable
                 >
-                  <VTextField
-                    v-model="searchByProductId"
-                    :label="$t('Lot Number')"
-                    type="Lot Number"
-                    density="compact"
-                  />
-                </VCol>
-                <!-- 👉 Select Product code -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
+                  <template #label>
+                    <span>Categories</span>
+                  </template>
+                </VSelect>
+              </VCol>
+
+              <!-- 👉 Select Product code -->
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-2"
+              >
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.productId"
+                  density="compact"
+                  height="20px"
+                  class="py-0"
                 >
-                  <VTextField
-                    v-model="searchByProductId"
-                    :label="$t('Product Code')"
-                    type="Product Code"
-                    density="compact"
-                  />
-                </VCol>
-
-                <!-- 👉 Select Product Name -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VTextField
-                    v-model="searchByProductName"
-                    :label="$t('Product Name')"
-                    type="Product Name"
-                    density="compact"
-                  />
-                </VCol>
-
-                <!-- 👉 Select Product Name -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VueDatePicker
-                    v-if="false"
-                    v-model="dateDeliveryFilter"
-                    range
-                    :enable-time-picker="false"
-                  />
-                  <AppDateTimePicker
-                    v-model="date"
-                    label="Received Date"
-                    prepend-inner-icon="ri-calendar-schedule-fill"
-                    placeholder="Select date"
-                    density="compact"
-                    :config="{ dateFormat: 'd/m/Y' }"
-                  />
-                </VCol>
-
-
-                <!-- 👉 Select Product Name -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VTextField
-                    v-model="searchByProductName"
-                    :label="$t('Purchase Order NO.')"
-                    type="Purchase Order NO."
-                    density="compact"
-                  />
-                </VCol>
-
-
-                <!-- 👉 Button Search and Export -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1 d-flex"
-                >
-                  <VRow>
-                    <VCol cols="4">
-                      <VBtn
-                        height="100%"
-                        width="100%"
-                        color="primary"
-                        density="compact"
-                       
-                        @click="clearModel"
-                      >
-                        {{ $t('Search') }}
-                      </VBtn>
-                    </VCol>
-                    <VCol cols="4">
-                      <VBtn
-                        color="red"
-                        height="100%"
-                        width="100%"
-                        density="compact"
-                        @click="clearModel"
-                      >
-                        {{ $t('Clear') }}
-                      </VBtn>
-                    </VCol>
-                    <VCol
-                      v-if="false"
-                      cols="4"
+                  <template #label>
+                    <span
+                      class="d-flex align-center"
+                      style="font-size: 12px;"
                     >
-                      <VBtn
-                        height="100%"
-                        width="100%"
-                        color="primary"
-                        density="compact"
-                       
-                        @click="clearModel"
+                      Item Code
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+
+              <!-- 👉 Select Product Name -->
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-2"
+              >
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.productName"
+                  density="compact"
+                  height="20px"
+                  class="py-0"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">
+                      Item Name
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              >
+                <AppDateTimePicker
+                  v-model="paramsFetchDataPrintLabel.receivedDate"
+                  placeholder="Received Date"
+                  density="compact"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  class="custom-date-time-picker"
+                >
+                  <template #label>
+                    <span>Received Date</span>
+                  </template>
+                </AppDateTimePicker>
+              </VCol>
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              >
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.purchaseOrderNo"
+                  density="compact"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">
+                      Po No.
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              >
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.lot"
+                  density="compact"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">
+                      Lot
+                    </span>
+                  </template>
+                </VTextField>
+              </VCol>
+
+              <!-- 👉 Button Search and Export -->
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              />
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              />
+              <VCol
+                cols="12"
+                lg="4"
+                sm="6"
+                class="py-1"
+              >
+                <VRow>
+                  <VCol
+                    cols="4"
+                    md="4"
+                  >
+                    <VBtn
+                      height="100%"
+                      width="100%"
+                      color="green"
+                      density="compact"
+                      class="mx-0"
+                      style="font-size: 12px;"
+                      @click="searchFilter"
+                    >
+                      {{ $t('Search') }}
+                    </VBtn>
+                  </VCol>
+                  <VCol
+                    cols="4"
+                    md="4"
+                  >
+                    <VBtn
+                      color="red"
+                      height="100%"
+                      width="100%"
+                      density="compact"
+                      style="font-size: 12px;"
+                      @click="clearModel"
+                    >
+                      {{ $t('Clear') }}
+                    </VBtn>
+                  </VCol>
+                  <VCol
+                    cols="4"
+                    md="4"
+                  >
+                    <VBtn
+                      density="compact"
+                      class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
+                      color="warning"
+                      style="width: 100%; height: 40px;"
+                      @click="isDialogPrintLabelVisible = true"
+                    >
+                      <img
+                        src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
+                        style="width: 27px;"
+                        class="custom-small-img"
                       >
-                        {{ $t('Search') }}
-                      </VBtn>
-                    </VCol>
-                    <VCol cols="4">
-                      <VBtn
-                        height="100%"
-                        width="100%"
-                        color="warning"
-                        density="compact"
-                        prepend-icon="ri-printer-fill"
-                        class="mx-0"
-                        
-                        @click="isDialogPrintLabelVisible = true"
-                      >
-                        {{ $t('Print') }}
-                      </VBtn>
-                    </VCol>
-                  </VRow>
-                </VCol>
-              </VRow>
-            </VForm>
+                      <span style="font-size: 12px;">{{ $t('Export file') }}</span>
+                    </VBtn>
+                  </VCol>
+                </VRow>
+              </VCol>
+            </VRow>
           </VExpansionPanelText>
         </VExpansionPanel>
       </VExpansionPanels>
@@ -1402,6 +875,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
     <VDialog
       v-model="isDialogPrintLabelVisible"
       width="50%"
+      :persistent="isLoadingPrintLabel"
     >
       <!-- Dialog Content -->
       <VCard>
@@ -1413,42 +887,20 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 
         <VCardTitle>
           <div class="text-center">
-            <span>Type Label</span>
+            <span>Type of Label</span>
           </div>
         </VCardTitle>
 
         <VCardText>
-          <div class="mb-4">
+          <div class="">
             <VSelect
               v-model="typePrintLabel"
               :items="itemsTypeLabel"
-              label="Density"
+              label="Type"
               density="compact"
+              item-value="value"
               placeholder="Type Label"
             />
-          </div>
-          <div v-if="false">
-            <VRadioGroup
-              v-model="typePrintLabel"
-              inline
-              class="d-flex justify-center"
-            >
-              <VRadio
-                label="Raw Mat Label"
-                value="Raw Mat Label"
-                class="mx-6"
-              />
-              <VRadio
-                label="Print Label S"
-                value="PrintLabelS"
-                class="mx-6"
-              />
-              <VRadio
-                label="Print Label S"
-                value="PrintLabelS"
-                class="mx-6"
-              />
-            </VRadioGroup>
           </div>
 
           <div
@@ -1488,7 +940,10 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
               </VListItem>
             </VList>
           </div>
-          <div class="d-flex justify-spance-between align-center">
+          <div
+            v-if="false"
+            class="d-flex justify-spance-between align-center"
+          >
             <VRow>
               <VCol
                 cols="6"
@@ -1518,15 +973,54 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
           </div>
         </VCardText>
 
-        <VCardText class="d-flex justify-end flex-wrap gap-4">
+        <VCardText class="d-flex justify-end align-center flex-wrap gap-4">
+          <VAlert
+            v-if="successPrintLabel"
+            border="end"
+            border-color="success"
+            variant="tonal"
+            closable
+            class="pa-2"
+          >
+            <div class="d-flex justify-start align-center">
+              <VIcon
+                icon="ri-checkbox-circle-line"
+                class="mx-4"
+              />Print Completed.
+            </div>
+          </VAlert>
+          <VAlert
+            v-if="successPrintLabel === false"
+            border="end"
+            border-color="error"
+            variant="tonal"
+            closable
+          >
+            Print Failed.
+          </VAlert>
           <VBtn
             color="warning"
+            style="width: 100%; height: 50px;"
             @click="printLabel"
           >
             <VIcon
-              size="30"
+              v-if="!isLoadingPrintLabel"
+              size="20"
               icon="ri-printer-fill"
             />
+            <VProgressCircular
+              v-if="isLoadingPrintLabel"
+              :rotate="360"
+              indeterminate
+              :size="40"
+              :width="6"
+              color="primary"
+            >
+              <VIcon
+                size="20"
+                icon="ri-printer-fill"
+              />
+            </VProgressCircular>
           </VBtn>
         </VCardText>
       </VCard>
@@ -1534,7 +1028,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
   </div>
 
   <!-- ----------             Production plan                                ------------------------------------ -->
-  <section>
+  <section v-if="false">
     <VCard class="mt-6">
       <VTable
         id="myTable"
@@ -2368,33 +1862,558 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
     </VCard>
   </section>
 
-  <section v-if="false">
-    <VDataTable
-      v-columns-resizable
-      :headers="dataHeaders"
-      :items="dataMockTestRel"
-      class="elevation-1"
-      resizable
-    >
-      <template #column="{ column }">
-        <div class="resizable-column">
-          {{ column.text }}
-          <div class="resize-handle" />
-        </div>
-      </template>
-    </VDataTable>
+  <!-- table data group by -->
+  <section v-if="true">
+    <VCard>
+      <CardText>
+        <VProgressLinear
+          v-if="progressLinearNoData && !printLabelFormViewResult"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="!printLabelFormViewResult && progressLinearNoData === false"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data....</span>
+        </VProgressLinear>
+        <VDataTable
+          v-if="progressLinearNoData && printLabelFormViewResult"
+          v-model="selectedDataTables"
+          show-select
+          :group-by="dataFilterPrintLabel"
+          :headers="headers"
+          :items="printLabelFormViewResult"
+          :items-per-page="10"
+          item-selectable="selectable"
+          class="elevation-1"
+          :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
+          :item-class="row_classes" 
+        >
+          <template #data-table-group="{ props, item, count }">
+            <td
+              :style="{ 
+                backgroundColor: 
+                  isSelected(item.value, 1) ? dataTableColor : 
+                  ''
+              }"
+              style="position: sticky; z-index: 1; left: 20px; min-width: 200px;"
+            >
+              <VBtn
+                v-bind="props"
+                variant="text"
+                density="comfortable"
+              >
+                <VIcon
+                  class="flip-in-rtl"
+                  icon="ri-arrow-down-s-line"
+                />
+              </VBtn>
+              <span style="font-size: 12px;">{{ item.value }} {{ items }}</span>
+              <span style="font-size: 12px;">({{ count }})</span>
+            </td>
+          </template>
+
+          <template #item="{ item }">
+            <tr>
+              <td
+                class="text-center"
+                style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <VCheckboxBtn
+                  v-model="selectedDataTables"
+                  :value="item.raw"
+                />
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
+              </td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+                class="px-2"
+                style="min-width: 100px;  justify-content: start;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.lot }}</span>
+              </td>
+              <td
+                class="px-2 text-start"
+                style="min-width: 100px; justify-content: center;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.barcode }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+                style="min-width: 100px;"
+              > 
+                <span style="font-size: 12px;">{{ item.raw.lotDescription }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class=""
+                >{{ convertDate(item.raw.receivedDate) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-start px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ convertDate(item.raw.expiredDate) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.remindingDays) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.deliveryDate) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 100px; justify-content: end;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.purchaseOrderNo) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="min-width: 140px; justify-content: start;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.productionCode) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.productId }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 200px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.productName.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.qtyPcs).toLocaleString() }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ formatNumber(item.raw.qtyKgs) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-start px-2"
+                style="justify-content: center;"
+              >
+                <VBtn color="info">
+                  <div style="font-size: 12px;">
+                    Action
+                  </div>
+                </VBtn>
+              </td>
+            </tr>
+          </template>
+        </VDataTable>
+      </CardText>
+    </VCard>
   </section>
 
-  <VContainer v-if="false">
-    <VDataTable
-      :headers="dataHeaders"
-      :items="dataMockTestRel"
-    >
-      <template #item.name="{ item }">
-        <span v-resizable>{{ item.name }}</span>
-      </template>
-    </VDataTable>
-  </VContainer>
+  <!-- table data -->
+  <section v-if="false">
+    <VCard>
+      <CardText>
+        <VProgressLinear
+          v-if="progressLinearNoData && !printLabelFormViewResult"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="!printLabelFormViewResult && progressLinearNoData === false"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data....</span>
+        </VProgressLinear>
+        <VDataTable
+          v-if="progressLinearNoData && printLabelFormViewResult"
+          v-model="selectedDataTables"
+          show-select
+          :headers="headers"
+          :items="printLabelFormViewResult"
+          :items-per-page="10"
+          item-selectable="selectable"
+          class="elevation-1"
+          :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
+          :item-class="row_classes" 
+        >
+          <template #data-table-group="{ props, item, count, items }">
+            <td
+              :style="{ 
+                backgroundColor: 
+                  isSelected(item.value, 1) ? dataTableColor : 
+                  ''
+              }"
+              style="position: sticky; z-index: 1; left: 20px; min-width: 200px;"
+            >
+              <VBtn
+                v-bind="props"
+                variant="text"
+                density="comfortable"
+              >
+                <VIcon
+                  class="flip-in-rtl"
+                  icon="ri-arrow-down-s-line"
+                />
+              </VBtn>
+              <span style="font-size: 12px;">{{ item.value }} {{ items }}</span>
+              <span style="font-size: 12px;">({{ count }})</span>
+            </td>
+          </template>
+
+          <template #item="{ item }">
+            <tr>
+              <td
+                class="text-center"
+                style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <VCheckboxBtn
+                  v-model="selectedDataTables"
+                  :value="item.raw"
+                />
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
+              </td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+                class="px-2"
+                style="min-width: 100px;  justify-content: start;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.lot }}</span>
+              </td>
+              <td
+                class="px-2 text-start"
+                style="min-width: 100px; justify-content: center;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.barcode }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+                style="min-width: 100px;"
+              > 
+                <span style="font-size: 12px;">{{ item.raw.lotDescription }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class=""
+                >{{ convertDate(item.raw.receivedDate) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-start px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ convertDate(item.raw.expiredDate) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.remindingDays) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.deliveryDate) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 100px; justify-content: end;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.purchaseOrderNo) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="min-width: 140px; justify-content: start;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.productionCode) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.productId }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 200px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.productName.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.qtyPcs).toLocaleString() }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ formatNumber(item.raw.qtyKgs) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-start px-2"
+                style="justify-content: center;"
+              >
+                <VBtn color="info">
+                  <div style="font-size: 12px;">
+                    Action
+                  </div>
+                </VBtn>
+              </td>
+            </tr>
+          </template>
+        </VDataTable>
+      </CardText>
+    </VCard>
+  </section>
 </template>
 
 <style lang="scss">

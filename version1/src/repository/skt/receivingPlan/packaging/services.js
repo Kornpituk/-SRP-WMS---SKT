@@ -60,7 +60,7 @@ export const parseData = data => {
 
 //----------------------------------------------- Real -------------------------------- -
 //----------- Genter ----------------------------
-export const PackagingFormService = {
+export const  PackagingFormService = {
   async generatePackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
     try {
       const response = await axios.post(`${urlApi}/api/v1/Packaging/Generate/${poEtlLogDetailJournalID}`, {}, {
@@ -84,9 +84,32 @@ export const PackagingFormService = {
     }
   },
 
-  async acceptPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+  async generatePackagingIdForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/Packaging/Accept/${poEtlLogDetailJournalID}`, {}, {
+      const response = await axios.get(`${urlApi}/api/v1/Packaging/View/${poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data Genterate View:', response.data.data)
+        
+        return response.data.data
+      } else {
+        throw new Error('No data Genterate View from the server')
+      }
+    } catch (error) {
+      console.error('Error in generatePackagingIdForm:', error)
+      throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async acceptPackagingForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/Accept/${poEtlLogDetailJournalID}`, {}, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -105,11 +128,19 @@ export const PackagingFormService = {
       console.error('Error in generatePackagingForm:', error)
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
+
+    console.log("acceptPackagingForm serviece", poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
   },
 
-  async rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+  async rejectPackagingForm(comment, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+    const body = {
+      statusComments: comment,
+    }
+
+    // console.log("rejectPackagingForm serviece", body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
+
     try {
-      const response = await axios.post(`${urlApi}/api/v1/Packaging/Reject/${poEtlLogDetailJournalID}`, comment, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/Reject/${poEtlLogDetailJournalID}`, body, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -118,9 +149,9 @@ export const PackagingFormService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data Reject:', response.data.data)
+        console.log('Service Response data Reject:', response.data.messageResult)
         
-        return response.data.data
+        return { data: response.data.messageResult, success: true }
       } else {
         throw new Error('No data received from the server')
       }
@@ -136,6 +167,7 @@ export const PackagingFormService = {
 //-- Header --------------------------------
 export const ReceivingFormService = {
   async getHearderPackagingForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+    console.log('get repo Packaging Form Header...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/Packaging/View/${poEtlLogDetailJournalID}`, {
         headers: {
@@ -144,15 +176,20 @@ export const ReceivingFormService = {
           Authorization: `Bearer ${accessToken}`,
         },
       })
+
+      console.log("response", response)
       
       if (response && response.data) {
+        console.log('success get repo Error If Packaging Form Header...')
         console.log('Service Response data Header:', response.data.data)
         
         return response.data.data
       } else {
+        console.log('Error repo Error If Packaging Form Header...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
+      console.log('Error repo Error Try Packaging Form Header...')
       console.error('Error in getHearderPackagingForm:', error)
       throw new Error(`Failed to fetch header for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
@@ -258,7 +295,7 @@ const saveSingleLotDetail = async (item, url, warehouse, token) => {
 export const saveDraftLotItemsBatch = async (item, urlApi, whereHouse, accessTokenAtStore) => {
   const body = {
     inspReqLotJournalId: item.pkgInspReqFormAnalyticalItemsJournalId,
-    actualAnalysis: item.sqnText,
+    actualAnalysis: item.actualAnalysis,
     okState: 0,
 
     // อื่นๆ

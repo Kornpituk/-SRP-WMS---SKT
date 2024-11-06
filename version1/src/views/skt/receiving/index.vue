@@ -40,6 +40,28 @@ const toggleDebugMode = () => {
   debugMode.value = !debugMode.value
 }
 
+//-------------------------------------- Defined Version --------------------------------
+const buildDate = process.env.BUILD_DATE
+
+const showSection = ref(false)
+
+const handleScroll = () => {
+  // เช็คว่าผู้ใช้เลื่อนถึงด้านล่างสุดหรือไม่
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+    showSection.value = true
+  } else {
+    showSection.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
 
 // Get access token from localStorage in another page
@@ -62,6 +84,10 @@ const searchByProductId = ref(null)
 const searchByProductName = ref(null)
 const searchByUOMId = ref(null)
 
+watch(()=> {
+
+})
+
 const searchByWareHouseId = ref([whereHouse])
 
 const searchByZoneId = ref(null)
@@ -83,12 +109,98 @@ const testMoldelSearch = () => {
 }
 
 //------------------------ Model Name for search SKT ------------------------------
-const deliveryDateFrom = ref(null)
-const deliveryDateTo = ref(null)
-const productId = ref(null)
-const productName = ref(null)
-const supplierId = ref(null)
-const supplierName = ref(null)
+const deliveryDateFrom = ref(sessionStorage.getItem('deliveryDateFrom') || '')
+const deliveryDateTo = ref(sessionStorage.getItem('deliveryDateTo') || '')
+const productId = ref(sessionStorage.getItem('productId') || '')
+const productName = ref(sessionStorage.getItem('productName') || '')
+const supplierId = ref(sessionStorage.getItem('supplierId') || '')
+const supplierName = ref(sessionStorage.getItem('supplierName') || '')
+const purchaseOrderNo = ref(sessionStorage.getItem('purchaseOrderNo') || '')
+const fileterStatusInPAI = ref(sessionStorage.getItem('fileterStatusInPAI') || '')
+
+// ใช้ watch function เพื่ออัปเดต sessionStorage เมื่อแต่ละค่าถูกเปลี่ยนแปลง
+watch(deliveryDateFrom, newValue => {
+  sessionStorage.setItem('deliveryDateFrom', newValue)
+})
+watch(deliveryDateTo, newValue => {
+  sessionStorage.setItem('deliveryDateTo', newValue)
+})
+watch(productId, newValue => {
+  sessionStorage.setItem('productId', newValue)
+})
+watch(productName, newValue => {
+  sessionStorage.setItem('productName', newValue)
+})
+watch(supplierId, newValue => {
+  sessionStorage.setItem('supplierId', newValue)
+})
+watch(supplierName, newValue => {
+  sessionStorage.setItem('supplierName', newValue)
+})
+watch(purchaseOrderNo, newValue => {
+  sessionStorage.setItem('purchaseOrderNo', newValue)
+})
+watch(fileterStatusInPAI, newValue => {
+  sessionStorage.setItem('fileterStatusInPAI', newValue)
+})
+
+onMounted(() => {
+  deliveryDateFrom.value = sessionStorage.getItem('deliveryDateFrom') || ''
+  deliveryDateTo.value = sessionStorage.getItem('deliveryDateTo') || ''
+  productId.value = sessionStorage.getItem('productId') || ''
+  productName.value = sessionStorage.getItem('productName') || ''
+  supplierId.value = sessionStorage.getItem('supplierId') || ''
+  supplierName.value = sessionStorage.getItem('supplierName') || ''
+  fileterStatusInPAI.value = sessionStorage.getItem('fileterStatusInPAI') || ''
+  purchaseOrderNo.value = sessionStorage.getItem('purchaseOrderNo') || ''
+})
+
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === 'null'){
+    sessionStorage.setItem('fileterStatusInPAI', '')
+  }
+  if(sessionStorage.getItem('statusFilter') === 'null'){
+    sessionStorage.setItem('statusFilter', '')
+  }
+  console.log("statusFilter", sessionStorage.getItem('statusFilter'))
+})
+
+// ดึงค่าจาก sessionStorage
+const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
+
+// ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
+const statusFilter = ref([])
+
+
+
+// ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
+const addStoredStatus = () => {
+  if (storedStatus && storedStatus !== null && storedStatus !== '') {
+    const newItems = storedStatus.split(',')
+
+    newItems.forEach(item => {
+      if (!statusFilter.value.includes(item.trim())) { // เช็คว่าค่าไม่มีใน array
+        statusFilter.value.push(item.trim()) // เพิ่มค่าใหม่เข้าไป
+      }
+    })
+
+    // อัปเดต sessionStorage
+    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value.join(',') || '')
+    sessionStorage.setItem('statusFilter', statusFilter.value.join(',') || '')
+  }
+}
+
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+    sessionStorage.setItem('fileterStatusInPAI', '')
+  }
+  if(sessionStorage.getItem('statusFilter') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+    sessionStorage.setItem('statusFilter', '')
+  }
+})
+
+// เรียกใช้ฟังก์ชันเพื่อเพิ่มค่าใหม่
+addStoredStatus()
 
 //------------------------ Model Name for search ------------------------------
 const searchByCategoryName = ref(null)
@@ -117,9 +229,6 @@ const wareHouseItemsSearchById = ref([])
 const zoneItemsSearchById = ref([])
 const areaItemsSearchById = ref([])
 const subAreaItemsSearchById = ref([])
-
-const fileterStatusInPAI = ref('')
-const statusFilter = ref([])
 
 //----------------------  Variable for SortBy -------------------------------------
 const sortByCategory = ref('')
@@ -156,19 +265,20 @@ const serialProductCode = ref(null)
 //------------------------------- Function Get StockUpdate Need Enter Search -----------------
 
 const clearModel = () => {
-  deliveryDateFrom.value = null
-  deliveryDateTo.value = null
-  productId.value = null
-  productName.value = null
-  supplierId.value = null
-  supplierName.value = null
-  deliveryDateRange.value = null
-  searchByZoneId.value = null
-  searchByAreaId.value = null
-  searchBySubAreaId.value = null
-  serialProductCode.value = null
+  deliveryDateFrom.value = ''
+  deliveryDateTo.value = ''
+  productId.value = ''
+  productName.value = ''
+  supplierId.value = ''
+  supplierName.value = ''
+  deliveryDateRange.value = ''
+  searchByZoneId.value = ''
+  searchByAreaId.value = ''
+  searchBySubAreaId.value = ''
+  serialProductCode.value = ''
   fileterStatusInPAI.value = ''
   statusFilter.value = []
+  purchaseOrderNo.value = ''
 }
 
 const searchParams = {
@@ -269,7 +379,7 @@ const colorStatusWithId = id => {
   case 9:
     return { color: 'teal-lighten-4', message: 'teal' }
   case 10:
-    return { color: 'light-green-lighten-4', message: 'cycan' }
+    return { color: 'green-darken-3', message: 'cycan' }
   case 11:
     return { color: 'lime-lighten-4', message: 'cycan' }
   case 12:
@@ -378,9 +488,25 @@ const colorStatusWithCheckBox = id => {
   }
 }
 
-watchEffect(() => {
-  console.log('statusFilter****++', statusFilter)
-})
+//test branches
+
+// const dataTableColor = ref('#F1F8E9')
+
+const dataTableColor = ref('#E0F7FA')
+const dataTableNummberedToggle = ref(null)
+
+const dataTableCliclHighlightIsToggle = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle.value = null
+  } else if (dataTableNummberedToggle.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle.value = no
+  }
+
+  console.log("dataTableNummberedToggle.value:", dataTableNummberedToggle.value, "no:", no)
+}
 
 //--------------------------------- Convert Date To API ----------------------------------------------------------------
 
@@ -417,7 +543,16 @@ const GetStockUpdate = () => {
   } else {
     fileterStatusInPAI.value = statusFilter.value
   }
-  
+
+  const fileterStatusInApiStr = ref('')
+
+  if (typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null) {
+  // แปลงเป็น string
+    fileterStatusInApiStr.value = fileterStatusInPAI.value.join(',')
+  }else{
+    fileterStatusInApiStr.value = fileterStatusInPAI.value
+  }
+
   // console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/View?`, {
     params: {
@@ -427,7 +562,8 @@ const GetStockUpdate = () => {
       productName: productName.value,
       supplierId: supplierId.value,
       supplierName: supplierName.value,
-      statusName: fileterStatusInPAI.value,
+      statusName: fileterStatusInApiStr.value || '',
+      purchaseOrderNo: purchaseOrderNo.value,
 
     // ... and so on with other parameters
     },
@@ -441,11 +577,13 @@ const GetStockUpdate = () => {
 
       const data = response.data.datas
 
+      console.log("Product Data base", data)
+
       // Add No. field to each product
       // Filter out items where receiveTypeId is 1
       // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
 
-      const filteredData = data.filter(item => item.receiveTypeId !== 44)
+      const filteredData = data.filter(item => item.receiveTypeId !== 33)
 
       // Add No. field to each product (after filtering)
       products.value = filteredData.map((item, index) => ({
@@ -461,6 +599,8 @@ const GetStockUpdate = () => {
       // rowPerPage.value = response.data.perPage
 
       console.log('[products.value]!!: ', products.value)
+
+      console.log('[statusName.value Type]!!: ', typeof  fileterStatusInPAI.value)
 
       // console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
 
@@ -495,7 +635,6 @@ const headers = [
     title: 'Status',
     key: 'statusText',
     align: "center",
-    class: 'pa-5',
     fixed: true,
   },
   {
@@ -518,6 +657,7 @@ const headers = [
   {
     title: 'Supplier Code',
     key: 'supplierId',
+    
   },
   {
     title: 'Supplier Name',
@@ -550,10 +690,46 @@ const headers = [
   {
     title: 'Action',
     key: 'action',
+    align: 'center',
+    class: 'sticky-right',
   },
 ]
 
 const customSortIcon = ref('mdi-swap-vertical')
+
+const tableDataPerpage = ref(15)
+const tableDataHeight = ref(550)
+
+onMounted(() => {
+  // โหลดค่าเริ่มต้นจาก sessionStorage ถ้ามี
+  const savedItemsPerPage = sessionStorage.getItem('itemsPerPage')
+
+  tableDataPerpage.value = savedItemsPerPage ? parseInt(savedItemsPerPage, 10) : 10 // ค่าเริ่มต้นเป็น 10 ถ้าไม่มีใน session
+
+  // switch (tableDataPerpage.value) {
+  // case 10:
+  //   tableDataHeight.value = 550
+  //   break
+  // case 25:
+  //   tableDataHeight.value = 700
+  //   break
+  // case 50:
+  //   tableDataHeight.value = 850
+  //   break
+  // case 100:
+  //   tableDataHeight.value = 850
+  //   break
+  // default:
+  //   tableDataHeight.value = 550
+  // }
+})
+
+
+const updateItemsPerPage = newItemsPerPage => {
+  // อัปเดตค่าใน sessionStorage เมื่อมีการเปลี่ยนแปลง
+  sessionStorage.setItem('itemsPerPage', newItemsPerPage)
+  tableDataPerpage.value = newItemsPerPage
+}
 
 //----------------------------------- Function Reset search Key word ---------------
 const resetSearchKey = () => {
@@ -900,17 +1076,19 @@ const printLabel = ref(false)
 const printForm = ref(false)
 
 const selectedPrintLabel = ref([])
-
+const copiesPrintForm = ref(1)
 const isDialogVisibleAction = ref(false)
 
 const detailsReceiv = ref({
   statusText: '',
-  purchaseOrderNo: '',
   itemCode: '',
   itemName: '',
   supplierId: '',
   supplierName: '',
+  purchaseOrderNo: '',
   deliveryDate: '',
+  expectDeliveryDate: '',
+  receivedDate: '',
   purchasingQuantityPcs: '',
   purchasingAmountKgs: '',
   purchasingQuantityRcvdPcs: '',
@@ -919,35 +1097,71 @@ const detailsReceiv = ref({
   updatedBy: '',
 })
 
-
 const journalIDModel = ref('')
 const updateByReceivingPlan = ref('')
 const idStatusDialogAction = ref('')
+const poEtILogAction = ref('')
+const receivingTypeAction = ref('')
+const lotAction = ref('')
 
-const viewDetailsReceive = (index, journalID, updateBy, status, itemCode) => {
+const checkCurrentTabBeforIn = status => {
+  let tabIndex
+
+  switch (status) {
+  case 1:
+  case 3:
+  case 8:
+  case 10:
+    tabIndex = 0 // สำหรับ status 1, 3, 8, 10 ให้แสดง tab index 0
+    break
+    
+  case 4:
+  case 5:
+  case 6:
+  case 7:
+    tabIndex = 1 // สำหรับ status 4, 5, 6, 7 ให้แสดง tab index 1
+    break
+    
+  case 12:
+  case 13:
+    tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
+    break
+    
+  default:
+    tabIndex = 0 // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
+  }
+
+  return tabIndex
+}
+
+const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlLogDetailJournalID, receivingType, lot) => {
   // console.log('isDialogVisibleAction **', index, journalID, updateBy, status, itemCode)
   journalIDModel.value = journalID
   updateByReceivingPlan.value = updateBy
   detailsReceiv.value = products.value[index-1]
   idStatusDialogAction.value = status
+  receivingTypeAction.value = receivingType
+  lotAction.value = lot
+  sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(status))
 
-  // console.log('journalIDModel **', journalIDModel.value)
-  // console.log('updateByReceivingPlan **', updateByReceivingPlan.value)
-  // console.log('detailsReceiv **', detailsReceiv.value)
-  // console.log('filteredDetails **', filteredDetails.value)
+  selectedPrintLabel.value = []
+
+  poEtILogAction.value = poEtlLogDetailJournalID
+  findProductByJournalID(poEtlLogDetailJournalID)
   isDialogVisibleAction.value = true
+  
   
 }
 
 const fieldsToShow = ['statusText', 
-  'purchaseOrderNo',
-  'statusText',
   'itemCode',
   'itemName',
   'supplierId',
   'supplierName',
-  'deliveryDate',
   'purchaseOrderNo',
+  'deliveryDate',
+  'expectDeliveryDate',
+  'receivedDate',
   'purchasingQuantityPcs',
   'purchasingAmountKgs',
   'purchasingQuantityRcvdPcs',
@@ -968,8 +1182,10 @@ function getDisplayName(key) {
     itemName: 'Item Name',
     supplierId: 'Supplier Code',
     supplierName: 'Supplier Name',
-    deliveryDate: 'Delivery Date',
     purchaseOrderNo: 'Purchase Order No',
+    deliveryDate: 'Delivery Date',
+    expectDeliveryDate: 'Expect Delivery Date',
+    receivedDate: 'Received Date',
     purchasingQuantityPcs: 'Purchasing Qty',
     purchasingAmountKgs: 'Purchasing Amount',
     purchasingQuantityRcvdPcs: 'Receiving Qty',
@@ -982,15 +1198,314 @@ function getDisplayName(key) {
   return displayNames[key] || 'Unknown'
 }
 
-// Watcher เพื่อจำกัดทศนิยมให้ไม่เกินสองตำแหน่ง
-// watch(() => detailsReceiv.value.purchasingAmountKgs, newValue => {
-//   if (newValue && newValue.toString().includes('.')) {
-//     const decimalPart = newValue.toString().split('.')[1]
-//     if (decimalPart.length > 2) {
-//       detailsReceiv.value.purchasingAmountKgs = parseFloat(newValue).toFixed(2)
-//     }
-//   }
-// })
+const resultDetailsAvtion = ref(null)
+
+const findProductByJournalID = journalID => {
+  const foundProduct = products.value.find(product => product.poEtlLogDetailJournalID === journalID)
+  
+  if (foundProduct) {
+    console.log('Found Product:', foundProduct)
+    resultDetailsAvtion.value = foundProduct
+    
+    return foundProduct
+  } else {
+    console.log('No product found with poEtlLogDetailJournalID:', journalID)
+    
+    return null
+  }
+}
+
+if (resultDetailsAvtion.value) {
+  // สามารถจัดการกับข้อมูลที่พบได้ที่นี่
+  console.log('Product Details:', resultDetailsAvtion.value)
+} else {
+  console.log('No matching product found')
+}
+
+const dataPrintlabel = ref([])
+
+//------------------------ Print Label------------------------------------------
+// const success = ref(false)
+import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService, usePrintPackagingFormService  }  from '@/services/skt/global/gloBalService'
+
+const { printLabelFormViewResult, printLabelFormViewService } = useViewPrintLabelFormService()
+const processingPrintLabel = ref(false)
+const successGetPrintLabelView = ref(false)
+
+const disabledBtnLebal = () => {
+  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16].includes(idStatusDialogAction.value)
+}
+
+const getPrintLabelView = async lot => {
+  // console.log('searchByCategoryName: ',searchByCategoryName)
+  axiosIns.get(`${urlApi.value}/api/v1/PrintLabel/Label?lot=${lot}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${searchByWareHouseId.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  }, {})
+    .then(response => {
+
+      const data = response.data
+
+      dataPrintlabel.value = data
+      console.log("getPrintLabelView 55555+", data)
+      
+      successGetPrintLabelView.value = true
+    })
+    .catch(error => {
+      console.error('Error:', error)
+      
+      successGetPrintLabelView.value = false
+    })
+
+  // const result = printLabelFormViewService(urlApi.value, searchByWareHouseId.value, accessTokenAtStore, lot)
+
+  // if(printLabelFormViewResult){
+  //   console.log('printLabelFormViewService Success')
+  // }
+
+}
+
+// ฟังก์ชันเตรียมข้อมูลเพื่อให้เหลือเฉพาะฟิลด์ที่ต้องการ
+const prepareDataForPrintLabel = originalData => {
+  const firstItem = originalData[0] // ดึงรายการแรก
+  
+  return {
+    copy: 1,  // ตั้งค่า copy เป็น 1
+    lot: firstItem.lot,  // ฟิลด์ lot
+    productId: firstItem.productId,  // ฟิลด์ productId
+    productName: firstItem.productName,  // ฟิลด์ productName
+    purchaseOrderNo: firstItem.purchaseOrderNo,  // ฟิลด์ purchaseOrderNo
+    receivedDate: firstItem.receivedDate,  // ฟิลด์ receivedDate
+  }
+}
+
+const successSavePrintLabel = ref(false)
+
+// เรียกใช้งานฟังก์ชันนี้ก่อนส่งข้อมูลใน API
+const savePrintLabel = async () => {
+  // ใช้ prepareDataForPrintLabel เพื่อจัดข้อมูลใน dataForPrintLabelSave
+  const body = prepareDataForPrintLabel(dataPrintlabel.value)
+
+  try {
+    const response = await axiosIns.post(
+      `${urlApi.value}/api/v1/PrintLabel/SaveToPrintLot`,
+      body,
+      {
+        headers: {
+          'accept': '*/*',
+          'x-location': `${searchByWareHouseId.value}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      },
+    )
+
+    // บันทึกข้อมูล response ที่ได้รับมา
+    dataPrintlabel.value = response.data
+
+    const data = response.data
+    const success = false
+
+    console.log("save Print Label success:", response.data)
+    
+    successSavePrintLabel.value = true
+  } catch (error) {
+    // กรณี error
+    progressLinearNoData.value = true
+    console.error('Error in savePrintLabel:', error)
+
+    successSavePrintLabel.value = false
+  }
+}
+
+const btnPrintLabelTest = () => {
+  savePrintLabel()
+}
+
+const printLabelSmallPdf = async () => {
+  savePrintLabel()
+  
+  try {
+    const response = await axiosIns.post(
+      `${urlApi.value}/api/v1/PrintLabel/Label/Small/Pdf`,
+      {},
+      {
+        headers: {
+          'accept': 'application/pdf', // รับไฟล์ PDF
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+        responseType: 'blob', // รับ response เป็น Blob
+      },
+    )
+  
+    if (response && response.data) {
+      console.log('Service Response print Label form:', response.data)
+  
+      // สร้าง Blob จาก response
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+      // สร้าง URL สำหรับ Blob
+      const blobUrl = URL.createObjectURL(blob)
+  
+      // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+      window.open(blobUrl)
+      processingPrintLabel.value = false
+
+  
+      return { success: true, data: blob }
+    } else {
+      processingPrintLabel.value = false
+      throw new Error('No data Genterate print Label form')
+    }
+  } catch (error) {
+    console.error('Error in printLabelView:', error)
+    throw new Error(`Failed to printLabelView for: ${error.response?.data?.message || error.message}`)
+  }
+}
+
+///test commit
+
+const btnPrintLabel = async () => {
+  processingPrintLabel.value = true
+  
+  console.log('btnPrintLabel start!')
+  try {
+    // เรียกใช้ savePrintLabel ก่อน
+    console.log('get PrintLabel start!')
+
+    await getPrintLabelView(lotAction.value)
+    if(!successGetPrintLabelView.value){
+      throw 'get PrintLabel:'+successGetPrintLabelView.value
+    }
+
+    console.log('save PrintLabel start!')
+
+    await savePrintLabel()
+    if(!successSavePrintLabel.value){
+      throw 'save PrintLabel:'+successSavePrintLabel.value
+    }
+
+    console.log('savePrintLabel end!')
+
+
+    console.log('printLabelSmallPdf start!')
+
+    const printResponse = await printLabelSmallPdf()
+
+    console.log('printLabelSmallPdf end!')
+
+    if (printResponse.success) {
+      console.log('Print label PDF successfully generated and displayed.')
+    } else {
+      processingPrintLabel.value = false
+      console.error('Error generating print label PDF.')
+    }
+  } catch (error) {
+    processingPrintLabel.value = false
+    console.error('Error in btnPrintLabel:', error)
+  }
+}
+
+//---------------------------- definde tabel
+
+
+//------------------------ Fuction Print Form --------------------------------
+
+
+const { errorMessageGenerateView, printReceivingFormService } = usePrintReceivingFormService()
+
+const { errorMessageInspection, printInspectionFormService } = usePrintInspectionFormService()
+
+const { errorMessagePackaging, printPackagingFormService } = usePrintPackagingFormService()
+
+const processingPrint = ref(false)
+
+
+const processingPrintForm1 = ref(false)
+const processingPrintForm2 = ref(false)
+const processingPrintForm3 = ref(false)
+
+const disabledCheckboxListRawM = () => {
+  // ถ้า idStatusDialogAction.value มีค่าเป็น 0, 1, 2 หรือ 3 จะคืนค่าเป็น true
+  return [0, 1, 2, 3, 10].includes(idStatusDialogAction.value)
+}
+
+const disabledCheckboxListInsp = () => {
+  return [0, 1, 2, 3, 4, 5, 10].includes(idStatusDialogAction.value)
+}
+
+const disabledCheckboxListPk = () => {
+  return [0, 1, 2, 3, 4, 5, 10].includes(idStatusDialogAction.value)
+}
+
+
+
+const printFormAll = async () => {
+  // ตั้งค่าสถานะการประมวลผลให้เป็น true
+  processingPrint.value = true
+
+  const printPromises = selectedPrintLabel.value.map(async label => {
+    if (label === 'Receiving Form') {
+      processingPrintForm1.value = true // เริ่มพิมพ์
+      console.log('Printing Receiving Form...')
+
+      try {
+        return await printReceivingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) // คืนค่าผลลัพธ์
+      } finally {
+        processingPrintForm1.value = false // เสร็จสิ้นการพิมพ์
+      }
+    }
+    if (label === 'Inspection Request Form') {
+      processingPrintForm2.value = true // เริ่มพิมพ์
+      console.log('Printing Inspection Request Form...')
+
+      try {
+        return await printInspectionFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) 
+      } finally {
+        processingPrintForm2.value = false // เสร็จสิ้นการพิมพ์
+      }
+    }
+    if (label === 'Packaging Inspection Request Form') {
+      processingPrintForm3.value = true // เริ่มพิมพ์
+      console.log('Printing Packaging Inspection Request Form...')
+
+      try {
+        return await printPackagingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
+      } finally {
+        processingPrintForm3.value = false // เสร็จสิ้นการพิมพ์
+      }
+    }
+  })
+
+  // รอให้ฟังก์ชันทั้งหมดทำงานเสร็จ
+  try {
+    const results = await Promise.all(printPromises)
+
+    processingPrint.value = false
+    console.log('All forms printed:', results)
+  } catch (error) {
+    console.error('Error printing forms:', error)
+  }
+}
+
+const printReceivingForm = () => {
+  console.log('Printing Receiving Form...')
+
+  // การพิมพ์ฟอร์มสามารถใช้ window.print หรืออื่นๆ ตามต้องการ
+}
+
+const checkPersistent = computed(() => {
+  if (processingPrintLabel.value === true || processingPrint.value === true) {
+    return true
+  }
+  console.log("false")
+  
+  return false
+})
+
 
 //-------------------- Dialog Confirm Submit --------------------
 const isDialogConfirmVisible = ref(false)
@@ -1097,158 +1612,6 @@ const row_classes = item => {
 const testBtn = () => {
   console.log('selectedDataTables', selectedDataTables.value)
 }
-
-//----------------- ธำหะ ------------------------
-const rowSelect = idx => {
-  console.dir(idx)
-  this.selectedRow = idx
-}
-
-const selectedRow = ref(null)
-
-const  remove = key => {
-  this.headers = this.headers.filter(header => header.key !== key)
-}
-
-const headers2 = [
-  {
-    title: 'Dessert (100g serving)',
-    align: 'start',
-    sortable: false,
-    key: 'name',
-  },
-  { title: 'Calories', key: 'calories' },
-  { title: 'Fat (g)', key: 'fat' },
-  { title: 'Carbs (g)', key: 'carbs' },
-  { title: 'Protein (g)', key: 'protein' },
-  { title: 'Iron (%)', key: 'iron' },
-]
-
-const desserts2 = [
-  {
-    name: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    protein: 4.0,
-    iron: '1%',
-  },
-  {
-    name: 'Ice cream sandwich',
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    protein: 4.3,
-    iron: '1%',
-  },
-  {
-    name: 'Eclair',
-    calories: 262,
-    fat: 16.0,
-    carbs: 23,
-    protein: 6.0,
-    iron: '7%',
-  },
-  {
-    name: 'Cupcake',
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3,
-    iron: '8%',
-  },
-  {
-    name: 'Gingerbread',
-    calories: 356,
-    fat: 16.0,
-    carbs: 49,
-    protein: 3.9,
-    iron: '16%',
-  },
-  {
-    name: 'Jelly bean',
-    calories: 375,
-    fat: 0.0,
-    carbs: 94,
-    protein: 0.0,
-    iron: '0%',
-  },
-  {
-    name: 'Lollipop',
-    calories: 392,
-    fat: 0.2,
-    carbs: 98,
-    protein: 0,
-    iron: '2%',
-  },
-  {
-    name: 'Honeycomb',
-    calories: 408,
-    fat: 3.2,
-    carbs: 87,
-    protein: 6.5,
-    iron: '45%',
-  },
-  {
-    name: 'Donut',
-    calories: 452,
-    fat: 25.0,
-    carbs: 51,
-    protein: 4.9,
-    iron: '22%',
-  },
-  {
-    name: 'KitKat',
-    calories: 518,
-    fat: 26.0,
-    carbs: 65,
-    protein: 7,
-    iron: '6%',
-  },
-]
-
-const desserts3 = [
-  {
-    id: 1,
-    name: 'T-Shirt',
-    size: 'M',
-    color: 'Red',
-    price: 19.99,
-    quantity: 10,
-  },
-  {
-    id: 2,
-    name: 'Jeans',
-    size: '32',
-    color: 'Blue',
-    price: 49.99,
-    quantity: 5,
-  },
-  {
-    id: 3,
-    name: 'Sweater',
-    size: 'L',
-    color: 'Green',
-    price: 29.99,
-    quantity: 7,
-  },
-  {
-    id: 4,
-    name: 'Jacket',
-    size: 'XL',
-    color: 'Black',
-    price: 89.99,
-    quantity: 3,
-  },
-  {
-    id: 5,
-    name: 'Socks',
-    size: 'One Size',
-    color: 'White',
-    price: 9.99,
-    quantity: 20,
-  },
-]
 
 //-------- Fuction Cancel --------------------------------
 const isDialogSubmitFailedVisible = ref(false)
@@ -1388,59 +1751,6 @@ const showDialogItemDetails = code => {
   itemCodeDialogDetails.value = code
 }
 
-const itemDetailsMockData = [
-  {
-    no: 1,
-    itemCode: 'IC001',
-    itemName: 'Item One',
-    tradeName: 'Trade One',
-    lot: 'PC2311000B',
-    qty: 100,
-    uom: 'Bigbag',
-    cNo: 'C001',
-  },
-  {
-    no: 2,
-    itemCode: 'IC002',
-    itemName: 'Item Two',
-    tradeName: 'Trade Two',
-    lot: 'PC2311001B',
-    qty: 150,
-    uom: 'Bottle',
-    cNo: 'C002',
-  },
-  {
-    no: 3,
-    itemCode: 'IC003',
-    itemName: 'Item Three',
-    tradeName: 'Trade Three',
-    lot: 'PC2311002B',
-    qty: 200,
-    uom: 'Can',
-    cNo: 'C003',
-  },
-  {
-    no: 4,
-    itemCode: 'IC004',
-    itemName: 'Item Four',
-    tradeName: 'Trade Four',
-    lot: 'PC2311003B',
-    qty: 250,
-    uom: 'Drum',
-    cNo: 'C004',
-  },
-  {
-    no: 5,
-    itemCode: 'IC005',
-    itemName: 'Item Five',
-    tradeName: 'Trade Five',
-    lot: 'PC2311004B',
-    qty: 300,
-    uom: 'IBC',
-    cNo: 'C005',
-  },
-]
-
 //-------------------------------------------- Bottom Refesh --------------------------------
 const refeshPage = () => {
   isSpinning.value = true
@@ -1458,112 +1768,6 @@ const isSpinning = ref(false)
 const insetSwitch1 = ref('')
 
 //---------------------- Test Mock-
-
-const headersTest = ref([
-  {
-    title: 'Dessert (100g serving)',
-    align: 'start',
-    key: 'name',
-  },
-  { title: 'Calories', align: 'end', key: 'calories' },
-  { title: 'Fat (g)', align: 'end', key: 'fat' },
-  { title: 'Carbs (g)', align: 'end', key: 'carbs' },
-  { title: 'Protein (g)', align: 'end', key: 'protein' },
-  { title: 'Iron (%)', align: 'end', key: 'iron' },
-])
-
-const dessertsTest = ref([
-  {
-    name: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    protein: 4.0,
-    iron: 1,
-    selectable: false,
-  },
-  {
-    name: 'Ice cream sandwich',
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    protein: 4.3,
-    iron: 1,
-    selectable: true,
-  },
-  {
-    name: 'Eclair',
-    calories: 262,
-    fat: 16.0,
-    carbs: 23,
-    protein: 6.0,
-    iron: 7,
-    selectable: true,
-  },
-  {
-    name: 'Cupcake',
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3,
-    iron: 8,
-    selectable: false,
-  },
-  {
-    name: 'Gingerbread',
-    calories: 356,
-    fat: 16.0,
-    carbs: 49,
-    protein: 3.9,
-    iron: 16,
-    selectable: true,
-  },
-  {
-    name: 'Jelly bean',
-    calories: 375,
-    fat: 0.0,
-    carbs: 94,
-    protein: 0.0,
-    iron: 0,
-    selectable: true,
-  },
-  {
-    name: 'Lollipop',
-    calories: 392,
-    fat: 0.2,
-    carbs: 98,
-    protein: 0,
-    iron: 2,
-    selectable: true,
-  },
-  {
-    name: 'Honeycomb',
-    calories: 408,
-    fat: 3.2,
-    carbs: 87,
-    protein: 6.5,
-    iron: 45,
-    selectable: false,
-  },
-  {
-    name: 'Donut',
-    calories: 452,
-    fat: 25.0,
-    carbs: 51,
-    protein: 4.9,
-    iron: 22,
-    selectable: true,
-  },
-  {
-    name: 'KitKat',
-    calories: 518,
-    fat: 26.0,
-    carbs: 65,
-    protein: 7,
-    iron: 6,
-    selectable: true,
-  },
-])
 </script>
 
 <template>
@@ -1684,7 +1888,7 @@ const dessertsTest = ref([
                 cols="12"
                 lg="4"
                 sm="6"
-                class="py-1"
+                class="py-2"
               >
                 <VTextField
                   v-model="productId"
@@ -1708,7 +1912,7 @@ const dessertsTest = ref([
                 cols="12"
                 lg="4"
                 sm="6"
-                class="py-1"
+                class="py-2"
               >
                 <VTextField
                   v-model="productName"
@@ -1749,13 +1953,12 @@ const dessertsTest = ref([
                 class="py-1"
               >
                 <VTextField
-                  v-model="supplierId"
-                  type="Supplier Code"
+                  v-model="purchaseOrderNo"
                   density="compact"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Supplier Code
+                      Po No.
                     </span>
                   </template>
                 </VTextField>
@@ -1836,6 +2039,7 @@ const dessertsTest = ref([
                     md="4"
                   >
                     <VBtn
+                      disabled
                       density="compact"
                       class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                       color="warning"
@@ -1859,18 +2063,19 @@ const dessertsTest = ref([
     </section>
 
     <!-- Btn Approve -->
-    <section class="mt-2">
+    <section class="mb-4 mt-2">
       <VCard>
         <VCardText class="pa-2 d-flex justify-space-between align-center">
           <VBtn
             style="font-size: 12px;"
+            :disabled="selectedDataTables.length < 1"
             @click="submitButton('Approve')"
           >
             Approve
           </VBtn>
 
           <VBtn
-            v-if="true"
+            v-if="false"
             :disabled="insetSwitch1 === 'issues'"
             style="font-size: 12px;"
             @click="testBtn"
@@ -2257,7 +2462,7 @@ const dessertsTest = ref([
             <tbody>
               <tr>
                 <th><span style="font-size: 12px; text-transform: capitalize;">{{ getDisplayName('statusText') }}</span></th>
-                <td>
+                <td class="px-2">
                   <VChip :color="colorStatusWithId2(idStatusDialogAction).color">
                     <span
                       :style="{ color: colorStatusWithId(idStatusDialogAction).message }"
@@ -2266,83 +2471,116 @@ const dessertsTest = ref([
                   </VChip>
                 </td>
               </tr>
-              <tr
-                v-for="(value, key) in filteredDetails"
-                :key="key"
-              >
-                <th v-if="key !== 'statusText'">
-                  <template v-if="key !== 'statusText'">
-                    <span style="font-size: 12px; text-transform: capitalize;">{{ getDisplayName(key) }}</span>
-                  </template>
-                </th>
-                <td
-                  v-if="key !== 'statusText'"
-                  style="font-size: 12px;"
-                >
-                  <template v-if="key === 'itemCode' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'itemName' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'supplierId' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'supplierName' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'deliveryDate' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ convertDate(value) }}</span>
-                  </template>
-                  <template v-else-if="key === 'purchaseOrderNo' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'updatedBy' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ detailsReceiv.updatedBy }} </span>
-                  </template>
-                  <template v-else-if="key === 'updatedDate' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ convertDateTime(detailsReceiv.updatedDate) }} </span>
-                  </template>
-                  <template v-else-if="key === 'purchasingQuantityPcs'">
-                    <span
-                      v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && key !== 'statusText'"
-                      style="text-transform: capitalize;"
-                    >{{ detailsReceiv.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
-                    <VTextField
-                      v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
-                      v-model="detailsReceiv.purchasingQuantityPcs"
-                      label="Purchesing Qty"
-                      suffix="PCS"
-                      type="number"
-                      density="compact"
-                    />
-                  </template>
-                  <!-- Continue with other specific conditions... -->
-                  <template v-else-if="key === 'purchasingAmountKgs' && key !== 'statusText'">
-                    <span
-                      v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
-                      style="text-transform: capitalize;"
-                    >{{ formatNumber(detailsReceiv.purchasingAmountKgs) }} Kgs</span>
-                    <VTextField
-                      v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
-                      v-model="detailsReceiv.purchasingAmountKgs"
-                      label="Purchesing Amount"
-                      suffix="Kgs"
-                      type="number"
-                      density="compact"
-                      placeholder="2000"
-                      :step="0.01"
-                      pattern="^\d+(\.\d{1,2})?$"
-                    />
-                  </template>
-                  <template v-else-if="key === 'purchasingQuantityRcvdPcs' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ detailsReceiv.purchasingQuantityRcvdPcs.toLocaleString() }}  PCS</span>
-                  </template>
-                  <template v-else-if="key === 'purchasingAmountRcvdKgs' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ formatNumber(detailsReceiv.purchasingAmountRcvdKgs) }}  Kgs</span>
-                  </template>
+            </tbody>
+            <tbody style="font-size: 12px;">
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Code
+                </td>
+                <td>{{ resultDetailsAvtion.itemCode }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Name
+                </td>
+                <td>{{ resultDetailsAvtion.itemName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Code
+                </td>
+                <td>{{ resultDetailsAvtion.supplierId }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Name
+                </td>
+                <td>{{ resultDetailsAvtion.supplierName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchase Order No
+                </td>
+                <td>{{ resultDetailsAvtion.purchaseOrderNo }}</td>
+              </tr>
+              <tr v-if="!resultDetailsAvtion.expectDeliveryDate">
+                <td style="font-weight: 500;">
+                  Delivery Date
+                </td>
+                <td>{{ convertDate(resultDetailsAvtion.deliveryDate) }}</td>
+              </tr>
+              <tr v-if="resultDetailsAvtion.expectDeliveryDate">
+                <td style="font-weight: 500;">
+                  Delivery Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.expectDeliveryDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.expectDeliveryDate) }}</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchasing Qty
+                </td>
+                <td>
+                  <span style="text-transform: capitalize;">{{ resultDetailsAvtion.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
                 </td>
               </tr>
+              <tr>
+                <td>Purchasing Amount</td>
+                <td><span style="text-transform: capitalize;">{{ formatNumber(resultDetailsAvtion.purchasingAmountKgs).toLocaleString() }}  Kgs</span></td>
+              </tr>
+              <tr>
+                <td>Receiving Qty</td>
+                <td>{{ (resultDetailsAvtion.purchasingQuantityRcvdPcs).toLocaleString() }} PCS</td>
+              </tr>
+              <tr>
+                <td>Receiving Amount</td>
+                <td>{{ formatNumber(resultDetailsAvtion.purchasingAmountRcvdKgs).toLocaleString() }} Kgs</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
+              </tr>
+              <tr>
+                <td>Updated Date</td>
+                <td>{{ convertDateTime(resultDetailsAvtion.updatedDate) }}</td>
+              </tr>
+              <tr>
+                <td>Updated By</td>
+                <td>{{ resultDetailsAvtion.updatedBy }}</td>
+              </tr>
+              <!-- เพิ่มข้อมูลเพิ่มเติมตามต้องการ -->
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
+                  style="text-transform: capitalize;"
+                >{{ formatNumber(detailsReceiv.purchasingAmountKgs) }} Kgs</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingAmountKgs"
+                  label="Purchesing Amount"
+                  suffix="Kgs"
+                  type="number"
+                  density="compact"
+                  placeholder="2000"
+                  :step="0.01"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+              </div>
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && key !== 'statusText'"
+                  style="text-transform: capitalize;"
+                >{{ detailsReceiv.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingQuantityPcs"
+                  label="Purchesing Qty"
+                  suffix="PCS"
+                  type="number"
+                  density="compact"
+                />
+              </div>
             </tbody>
           </VTable>
         </VCardText>
@@ -2383,7 +2621,7 @@ const dessertsTest = ref([
               }, 
             }"
           >
-            {{ detailsReceiv.statusText }}
+            <span class="text-white">{{ detailsReceiv.statusText }}</span>
           </VBtn>
         </VCardText>
       </VCard>
@@ -2445,83 +2683,122 @@ const dessertsTest = ref([
                   </VChip>
                 </td>
               </tr>
-              <tr
-                v-for="(value, key) in filteredDetails"
-                :key="key"
-              >
-                <th v-if="key !== 'statusText'">
-                  <template v-if="key !== 'statusText'">
-                    <span style="font-size: 12px; text-transform: capitalize;">{{ getDisplayName(key) }}</span>
-                  </template>
-                </th>
-                <td
-                  v-if="key !== 'statusText'"
-                  style="font-size: 12px;"
-                >
-                  <template v-if="key === 'itemCode' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'itemName' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'supplierId' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'supplierName' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'deliveryDate' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ convertDate(value) }}</span>
-                  </template>
-                  <template v-else-if="key === 'purchaseOrderNo' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ value }}</span>
-                  </template>
-                  <template v-else-if="key === 'purchasingQuantityPcs'">
-                    <span
-                      v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && key !== 'statusText'"
-                      style="text-transform: capitalize;"
-                    >{{ detailsReceiv.purchasingQuantityPcs }}  <strong>PCS</strong></span>
-                    <VTextField
-                      v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
-                      v-model="detailsReceiv.purchasingQuantityPcs"
-                      label="Purchesing Qty"
-                      suffix="PCS"
-                      type="number"
-                      density="compact"
-                    />
-                  </template>
-                  <!-- Continue with other specific conditions... -->
-                  <template v-else-if="key === 'purchasingAmountKgs' && key !== 'statusText'">
-                    <span
-                      v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
-                      style="text-transform: capitalize;"
-                    >{{ detailsReceiv.purchasingAmountKgs }} <strong>Kgs</strong></span>
-                    <VTextField
-                      v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
-                      v-model="detailsReceiv.purchasingAmountKgs"
-                      label="Purchesing Amount"
-                      suffix="Kgs"
-                      type="number"
-                      density="compact"
-                      placeholder="2000"
-                      :step="0.01"
-                      pattern="^\d+(\.\d{1,2})?$"
-                    />
-                  </template>
-                  <template v-else-if="key === 'purchasingQuantityRcvdPcs' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ detailsReceiv.purchasingQuantityRcvdPcs }}  <strong>PCS</strong></span>
-                  </template>
-                  <template v-else-if="key === 'purchasingAmountRcvdKgs' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ detailsReceiv.purchasingAmountRcvdKgs }}  <strong>Kgs</strong></span>
-                  </template>
-                  <template v-else-if="key === 'updatedBy' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ detailsReceiv.updatedBy }}  <strong /></span>
-                  </template>
-                  <template v-else-if="key === 'updatedDate' && key !== 'statusText'">
-                    <span style="text-transform: capitalize;">{{ convertDate(detailsReceiv.updatedDate) }}  <strong /></span>
-                  </template>
+            </tbody>
+            <tbody style="font-size: 12px;">
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Code
+                </td>
+                <td>{{ resultDetailsAvtion.itemCode }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Name
+                </td>
+                <td>{{ resultDetailsAvtion.itemName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Code
+                </td>
+                <td>{{ resultDetailsAvtion.supplierId }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Name
+                </td>
+                <td>{{ resultDetailsAvtion.supplierName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchase Order No
+                </td>
+                <td>{{ resultDetailsAvtion.purchaseOrderNo }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Delivery Date
+                </td>
+                <td>{{ convertDate(resultDetailsAvtion.deliveryDate) }}</td>
+              </tr>
+              <tr v-if="false">
+                <td style="font-weight: 500;">
+                  Expect Delivery Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.expectDeliveryDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.expectDeliveryDate) }}</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchasing Qty
+                </td>
+                <td>
+                  <span style="text-transform: capitalize;">{{ resultDetailsAvtion.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
                 </td>
               </tr>
+              <tr>
+                <td>Purchasing Amount</td>
+                <td><span style="text-transform: capitalize;">{{ formatNumber(resultDetailsAvtion.purchasingAmountKgs).toLocaleString() }}  Kgs</span></td>
+              </tr>
+              <tr>
+                <td>Receiving Qty</td>
+                <td>{{ (resultDetailsAvtion.purchasingQuantityRcvdPcs).toLocaleString() }} PCS</td>
+              </tr>
+              <tr>
+                <td>Receiving Amount</td>
+                <td>{{ formatNumber(resultDetailsAvtion.purchasingAmountRcvdKgs).toLocaleString() }} Kgs</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
+              </tr>
+              <tr>
+                <td>Updated Date</td>
+                <td>{{ convertDateTime(resultDetailsAvtion.updatedDate) }}</td>
+              </tr>
+              <tr>
+                <td>Updated By</td>
+                <td>{{ resultDetailsAvtion.updatedBy }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
+              </tr>
+              <!-- เพิ่มข้อมูลเพิ่มเติมตามต้องการ -->
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
+                  style="text-transform: capitalize;"
+                >{{ formatNumber(detailsReceiv.purchasingAmountKgs) }} Kgs</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingAmountKgs"
+                  label="Purchesing Amount"
+                  suffix="Kgs"
+                  type="number"
+                  density="compact"
+                  placeholder="2000"
+                  :step="0.01"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+              </div>
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && key !== 'statusText'"
+                  style="text-transform: capitalize;"
+                >{{ detailsReceiv.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingQuantityPcs"
+                  label="Purchesing Qty"
+                  suffix="PCS"
+                  type="number"
+                  density="compact"
+                />
+              </div>
             </tbody>
           </VTable>
         </VCardText>
@@ -2577,12 +2854,14 @@ const dessertsTest = ref([
     <VDialog
       v-model="isDialogVisibleActionPrintLabel"
       class="v-dialog-sm"
+      :persistent="checkPersistent"
     >
       <VCard
         class="text-center"
         title="Print"
       >
         <DialogCloseBtn
+          :disabled="checkPersistent"
           variant="text"
           size="default"
           @click="isDialogVisibleActionPrintLabel = false"
@@ -2591,7 +2870,7 @@ const dessertsTest = ref([
           <VRow>
             <VCol
               cols="6"
-              @click="printLabel = true, printForm = false"
+              @click="printLabel = true, printForm = false, getPrintLabelView(lotAction)"
             >
               <VHover>
                 <template #default="{ isHovering, props }">
@@ -2602,7 +2881,20 @@ const dessertsTest = ref([
                     :color="isHovering || printLabel ? 'yellow-lighten-4' : undefined"
                   >
                     <VCardText class="d-flex justify-center">
+                      <VProgressCircular
+                        v-if="processingPrintLabel"
+                        :size="105"
+                        :width="15"
+                        color="primary"
+                        indeterminate
+                      >
+                        <VIcon
+                          icon="ri-price-tag-3-line"
+                          size="60"
+                        />
+                      </VProgressCircular>
                       <VIcon
+                        v-if="!processingPrintLabel"
                         icon="ri-price-tag-3-line"
                         size="80"
                       />
@@ -2626,10 +2918,24 @@ const dessertsTest = ref([
                     ripple
                     :color="isHovering || printForm ? 'light-blue-lighten-4' : undefined"
                   >
-                    <VCardText class="d-flex justify-center">
+                    <VCardText class="d-flex justify-center pa-2">
+                      <VProgressCircular
+                        v-if="processingPrint"
+                        :size="105"
+                        :width="15"
+                        color="primary"
+                        indeterminate
+                      >
+                        <VIcon
+                          icon="ri-survey-line"
+                          size="60"
+                        />
+                      </VProgressCircular>
+
                       <VIcon
+                        v-if="!processingPrint"
                         icon="ri-survey-line"
-                        size="80"
+                        size="105"
                       />
                     </VCardText>
                     <VCardText class="text-center">
@@ -2653,35 +2959,62 @@ const dessertsTest = ref([
             <VCol cols="6">
               <!-- Align VCheckbox items to the right -->
               <VCheckbox
+                v-if="receivingTypeAction === 2"
                 v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListRawM()"
                 label="Receiving Form"
                 value="Receiving Form"
                 class="ms-auto"
-              />
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm1"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
               <VCheckbox
+                v-if="receivingTypeAction === 2"
                 v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListInsp()"
                 label="Inspection Request Form"
                 value="Inspection Request Form"
                 class="ms-auto"
-              />
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm2"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
               <VCheckbox
+                v-if="receivingTypeAction === 1"
                 v-model="selectedPrintLabel"
-                label="Lorry Loading Check List"
-                value="Lorry Loading Check List"
+                :disabled="disabledCheckboxListPk()"
+                label="Inspection Request Form"
+                value="Packaging Inspection Request Form"
                 class="ms-auto"
-              />
-              <VDivider class="my-4" />
-              <span>
-                <VTextField
-                  v-model="weight"
-                  label="Copies"
-                  type="number"
-                  density="compact"
-                  placeholder="0"
-                />
-              </span>
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm3"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox> 
               <div class="mt-4">
-                <VBtn style="width: 100%;">
+                <VBtn
+                  :disabled="checkPersistent"
+                  style="width: 100%;"
+                  @click="printFormAll"
+                >
                   Print
                 </VBtn>
               </div>
@@ -2690,11 +3023,20 @@ const dessertsTest = ref([
 
           <VRow v-if="printLabel">
             <VCol cols="6">
-              <span />
+              <div
+                v-if="!disabledBtnLebal()"
+                class="mt-4"
+              >
+                <VBtn
+                  style="width: 100%;"
+                  :disabled="checkPersistent"
+                  @click="btnPrintLabel"
+                >
+                  Print
+                </VBtn>
+              </div>
             </VCol>
-            <VCol cols="6">
-              <!-- Align VCheckbox items to the right -->
-            </VCol>
+            <VCol cols="6" />
           </VRow>
         </VCardText>
       </VCard>
@@ -3975,36 +4317,39 @@ const dessertsTest = ref([
           v-if="Array.isArray(products) && products.length > 0 && progressLinearNoData === false"
           v-model="selectedDataTables"
           show-select
+          fixed-header
           :headers="headers"
           :items="products"
-          :items-per-page="10"
+          height="550"
+          :items-per-page="tableDataPerpage"
           item-selectable="selectable"
           class="elevation-1"
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
-          :item-class="row_classes" 
+          :item-class="row_classes"
+          @update:items-per-page="updateItemsPerPage"
         >
-          <template #header.data-table-select="{ allSelected, selectAll, someSelected }">
-            <VCheckboxBtn
-              :indeterminate="someSelected && !allSelected"
-              :model-value="allSelected"
-              color="primary"
-              @update:model-value="selectAll(!allSelected)"
-            />
-          </template>
-
-          <template #item.data-table-select="{ internalItem, isSelected, toggleSelect }">
-            <VCheckboxBtn
-              :model-value="isSelected(internalItem)"
-              color="primary"
-              @update:model-value="toggleSelect(internalItem)"
-            />
-          </template>
+          <!-- 
+            <template #column.action="{ column }">
+            <tr>
+            <th
+            >
+            {{ column.column }} action custom
+            </th>
+            </tr>
+            </template>
+          -->
           <template #item="{ item }">
             <tr>
               <td
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
                 class="text-center px-2"
                 style="position: sticky; z-index: 1; left: 0;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
                   v-if="item.raw.statusId === 7 || item.raw.statusId === 15"
@@ -4015,8 +4360,14 @@ const dessertsTest = ref([
               </td>
               <td
                 class="text-center px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
                 style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VChip
                   :color="colorStatusWithId2(item.raw.statusId).color"
@@ -4039,14 +4390,26 @@ const dessertsTest = ref([
               <td
                 class="px-2 text-center"
                 style="min-width: 30px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span style="font-size: 12px;">{{ item.raw.no }}</span>
               </td>
               <td
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
                 class="px-2"
-                style="min-width: 30px;  justify-content: start;"
+                style="min-width: 130px;  justify-content: start;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4055,8 +4418,14 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2"
-                style="max-width: 300px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                style="min-width: 300px; max-width: 350px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4066,19 +4435,31 @@ const dessertsTest = ref([
               </td>
               <td
                 class="px-2 "
-                style="width: 100%; min-width: 250px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                style="min-width: 250px; max-width: 350px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
-                  style="max-width: 200px; font-size: 12px;"
+                  style="font-size: 12px;"
                   class="text-wrap"
                   v-html="item.raw.concatTradename.replace(/\s/g, '&nbsp;')"
                 />
               </td>
               <td
-                class="px-2"
-                style="min-width: 150px; justify-content: start;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                class="px-2 text-center"
+                style="min-width: 150px; justify-content: center;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4088,7 +4469,13 @@ const dessertsTest = ref([
               <td
                 class="px-2"
                 style="justify-content: start;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="max-width: 200px; font-size: 12px;"
@@ -4098,8 +4485,14 @@ const dessertsTest = ref([
               </td>
               <td
                 class="text-start px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
                 style="min-width: 100px;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               > 
                 <span
                   style="font-size: 12px;"
@@ -4109,7 +4502,13 @@ const dessertsTest = ref([
               <td
                 class="text-center px-2"
                 style="min-width: 150px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4118,7 +4517,13 @@ const dessertsTest = ref([
               </td>
               <td
                 class="text-start px-2"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4128,7 +4533,13 @@ const dessertsTest = ref([
               <td
                 class="text-end px-2"
                 style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4138,7 +4549,13 @@ const dessertsTest = ref([
               <td
                 class="text-end px-2"
                 style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4148,7 +4565,13 @@ const dessertsTest = ref([
               <td
                 class="text-end px-2"
                 style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4158,7 +4581,13 @@ const dessertsTest = ref([
               <td
                 class="text-end px-2"
                 style="justify-content: end;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4168,7 +4597,13 @@ const dessertsTest = ref([
               <td
                 class="text-start px-2"
                 style="min-width: 150px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span
                   style="font-size: 12px;"
@@ -4178,18 +4613,30 @@ const dessertsTest = ref([
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span style="font-size: 12px;">{{ convertDate(item.raw.updatedDate) }}</span>
               </td>
               <td
                 class="text-start px-2"
                 style="justify-content: center;"
-                :style="{ backgroundColor: isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : '' }"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VBtn
                   color="info"
-                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode)"
+                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode, item.raw.poEtlLogDetailJournalID, item.raw.receiveTypeId, item.raw.batch)"
                 >
                   <div style="font-size: 12px;">
                     Action
@@ -4267,6 +4714,7 @@ const dessertsTest = ref([
     </div>
   </section> 
 
+
   <section v-if="false">
     <VDataTable
       :headers="headersTest"
@@ -4279,19 +4727,18 @@ const dessertsTest = ref([
   </section>
 
   <!-- Footer -->
-  <section
-    v-if="true"
-    section
-    class="fixed-bottom"
-  >
+  <section class="mt-3">
     <VCard>
-      <VCardText class="pa-1">
+      <VCardText
+        class="pa-1"
+        style="min-width: 500px;"
+      >
         <VAlert
           color="green-lighten-3"
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.3(Last Updated 12/09/2024) {{ products.length }} Rows of Data 
+          Version : 2.4(Last Updated 21/10/2024 ) {{ products.length }} Rows of Data 
         </VAlert>
       </VCardText>
     </VCard>
@@ -4322,15 +4769,16 @@ const dessertsTest = ref([
   inset-block-start: 5%; /* Position it at the top of the viewport */
 }
 
-.table-fix {
-  inset-block-start: 10%;
-}
-
 .fixed-bottom {
   position: fixed;
-  justify-content: center;
-  inline-size: 95%;
+  display: flex;
+  box-sizing: border-box;
+  justify-content: start;
+  padding: 2px;
+  inline-size: 105vw;
   inset-block-end: 0;
+  margin-block-end: 80px;
+  max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */
 }
 
 .spinning {
@@ -4385,6 +4833,21 @@ const dessertsTest = ref([
 
 .inactive-row {
   background-color: lightcoral;
+}
+
+/* กำหนด CSS สำหรับคอลัมน์ที่ต้องการให้ sticky ด้านซ้าย */
+.pa-5 {
+  position: sticky;
+  z-index: 1;
+  background-color: white;
+  inset-inline-start: 0;
+}
+
+/* กำหนด CSS สำหรับคอลัมน์ Action ที่ต้องการให้ sticky ด้านขวา */
+.sticky-right {
+  position: sticky;
+  z-index: 1;
+  inset-inline-end: 0;
 }
 </style>
 

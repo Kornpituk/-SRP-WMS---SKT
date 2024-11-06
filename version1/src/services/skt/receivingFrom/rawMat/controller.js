@@ -1,4 +1,4 @@
-import { coaService } from '@/services/skt/receivingPlan/rawMat/service'
+import { coaService } from '@/repository/skt/receivingPlan/rawMat/service'
 
 
 export const useGetCOAFormController = () => {
@@ -20,7 +20,7 @@ export const useGetCOAFormController = () => {
       }
     } catch (error) {
       console.error('Error in fetchCoaForm:', error)
-      errorMessageGetCoa.value = error.message
+      errorMessageGetCoa.value = error.messag
     }
   }
   
