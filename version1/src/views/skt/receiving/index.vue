@@ -697,7 +697,7 @@ const headers = [
 
 const customSortIcon = ref('mdi-swap-vertical')
 
-const tableDataPerpage = ref(10)
+const tableDataPerpage = ref(15)
 const tableDataHeight = ref(550)
 
 onMounted(() => {
@@ -4320,6 +4320,7 @@ const insetSwitch1 = ref('')
           fixed-header
           :headers="headers"
           :items="products"
+          height="550"
           :items-per-page="tableDataPerpage"
           item-selectable="selectable"
           class="elevation-1"
@@ -4327,22 +4328,6 @@ const insetSwitch1 = ref('')
           :item-class="row_classes"
           @update:items-per-page="updateItemsPerPage"
         >
-          <template #header.data-table-select="{ allSelected, selectAll, someSelected }">
-            <VCheckboxBtn
-              :indeterminate="someSelected && !allSelected"
-              :model-value="allSelected"
-              color="primary"
-              @update:model-value="selectAll(!allSelected)"
-            />
-          </template>
-
-          <template #item.data-table-select="{ internalItem, isSelected, toggleSelect }">
-            <VCheckboxBtn
-              :model-value="isSelected(internalItem)"
-              color="primary"
-              @update:model-value="toggleSelect(internalItem)"
-            />
-          </template>
           <!-- 
             <template #column.action="{ column }">
             <tr>
@@ -4782,10 +4767,6 @@ const insetSwitch1 = ref('')
   z-index: 1000; /* Ensure it's on top of other content */
   inline-size: 92%; /* Set the width to 95% of the viewport width */
   inset-block-start: 5%; /* Position it at the top of the viewport */
-}
-
-.table-fix {
-  inset-block-start: 10%;
 }
 
 .fixed-bottom {

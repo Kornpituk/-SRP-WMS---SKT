@@ -233,6 +233,8 @@ const printLabel = async () => {
   }
 }
 
+const dataTableExpanded = ref([])
+
 const headers = [
   {
     title: 'data-table-select',
@@ -242,9 +244,12 @@ const headers = [
     readonly: true,
   },
   {
-    title: 'No.',
-    key: 'no',
-    align: "center",
+    title: '',
+    key: 'data-table-expand',
+  },
+  {
+    title: 'Category',
+    key: 'category',
   },
   {
     title: 'Lot',
@@ -255,7 +260,7 @@ const headers = [
     key: 'barcode',
   },
   {
-    title: 'Description',
+    title: 'NO/RCVD(PCS)',
     key: 'lotDescription',
   },
   {
@@ -264,24 +269,8 @@ const headers = [
     
   },
   {
-    title: 'Expired Date',
-    key: 'expiredDate',
-  },
-  {
-    title: 'Reminding Days',
-    key: 'remindingDays',
-  },
-  {
-    title: 'Delivery Date',
-    key: 'deliveryDate',
-  },
-  {
     title: 'P/O No',
     key: 'purchaseOrderNo',
-  },
-  {
-    title: 'Item No.',
-    key: 'productionCode',
   },
   {
     title: 'Item Code',
@@ -291,12 +280,9 @@ const headers = [
     title: 'Item Name',
     key: 'productName',
   },
+  
   {
-    title: 'Category',
-    key: 'category',
-  },
-  {
-    title: 'Updated On',
+    title: 'Location',
     key: 'updatedDate',
   },
   {
@@ -308,6 +294,133 @@ const headers = [
     key: 'qtyKgs',
   },
 ]
+
+const dataTableGroupBy = [{ key: 'lot' }]
+const expanded = ref([])
+
+const dessertHeaders = [
+  {
+    title: 'Dessert (100g serving)',
+    align: 'start',
+    sortable: false,
+    key: 'name',
+  },
+  { title: 'Calories', key: 'calories' },
+  { title: 'Fat (g)', key: 'fat' },
+  { title: 'Carbs (g)', key: 'carbs' },
+  { title: 'Protein (g)', key: 'protein' },
+  { title: 'Iron (%)', key: 'iron' },
+  { title: '', key: 'data-table-expand' },
+]
+
+const desserts = [
+  {
+    name: 'Frozen Yogurt',
+    calories: 159,
+    fat: 6.0,
+    carbs: 24,
+    protein: 4.0,
+    iron: 1,
+  },
+  {
+    name: 'Ice cream sandwich',
+    calories: 237,
+    fat: 9.0,
+    carbs: 37,
+    protein: 4.3,
+    iron: 1,
+  },
+  {
+    name: 'Eclair',
+    calories: 262,
+    fat: 16.0,
+    carbs: 23,
+    protein: 6.0,
+    iron: 7,
+  },
+  {
+    name: 'Cupcake',
+    calories: 305,
+    fat: 3.7,
+    carbs: 67,
+    protein: 4.3,
+    iron: 8,
+  },
+  {
+    name: 'Gingerbread',
+    calories: 356,
+    fat: 16.0,
+    carbs: 49,
+    protein: 3.9,
+    iron: 16,
+  },
+  {
+    name: 'Jelly bean',
+    calories: 375,
+    fat: 0.0,
+    carbs: 94,
+    protein: 0.0,
+    iron: 0,
+  },
+  {
+    name: 'Lollipop',
+    calories: 392,
+    fat: 0.2,
+    carbs: 98,
+    protein: 0,
+    iron: 2,
+  },
+  {
+    name: 'Honeycomb',
+    calories: 408,
+    fat: 3.2,
+    carbs: 87,
+    protein: 6.5,
+    iron: 45,
+  },
+  {
+    name: 'Donut',
+    calories: 452,
+    fat: 25.0,
+    carbs: 51,
+    protein: 4.9,
+    iron: 22,
+  },
+  {
+    name: 'KitKat',
+    calories: 518,
+    fat: 26.0,
+    carbs: 65,
+    protein: 7,
+    iron: 6,
+  },
+]
+
+//------------------- Highlighter --------------------------------
+
+const selectedItemIdForColotRow = ref(null)
+
+watch(() => {
+  console.log('selected', selectedDataTables.value)
+})
+
+const isSelected = (item, type) => {
+  if(type === 1){
+    return selectedDataTables.value.some(
+      selectedItem => selectedItem.lot === item,
+    )
+  }
+
+  if(type === 2){
+    return selectedDataTables.value.some(
+      selectedItem => selectedItem.barcode === item,
+    )
+  }
+
+  
+}
+
+const dataTableColor = ref('#E0F7FA')
 </script>
 
 <template>
@@ -1725,7 +1838,6 @@ const headers = [
           v-if="progressLinearNoData && printLabelFormViewResult"
           v-model="selectedDataTables"
           show-select
-          fixed-header
           :headers="headers"
           :items="printLabelFormViewResult"
           :items-per-page="10"
@@ -1733,28 +1845,46 @@ const headers = [
           class="elevation-1"
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
           :item-class="row_classes" 
+          :group-by="dataTableGroupBy"
         >
-          <template #header.data-table-select="{ allSelected, selectAll, someSelected }">
-            <VCheckboxBtn
-              :indeterminate="someSelected && !allSelected"
-              :model-value="allSelected"
-              color="primary"
-              @update:model-value="selectAll(!allSelected)"
-            />
+          <template #data-table-group="{ props, item, count }">
+            <td
+              :style="{ 
+                backgroundColor: 
+                  isSelected(item.value, 1) ? dataTableColor : 
+                  ''
+              }"
+              style="position: sticky; z-index: 1; left: 20px; min-width: 200px;"
+            >
+              <VBtn
+                v-bind="props"
+                variant="text"
+                density="comfortable"
+              >
+                <VIcon
+                  class="flip-in-rtl"
+                  icon="ri-arrow-down-s-line"
+                />
+              </VBtn>
+              <span style="font-size: 12px;">{{ item.value }}</span>
+              <span style="font-size: 12px;">({{ count }})</span>
+            </td>
           </template>
 
-          <template #item.data-table-select="{ internalItem, isSelected, toggleSelect }">
-            <VCheckboxBtn
-              :model-value="isSelected(internalItem)"
-              color="primary"
-              @update:model-value="toggleSelect(internalItem)"
-            />
-          </template>
+
+
+
+
           <template #item="{ item }">
             <tr>
               <td
-                class="text-center px-2"
+                class="text-center"
                 style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <VCheckboxBtn
                   v-model="selectedDataTables"
@@ -1762,15 +1892,34 @@ const headers = [
                 />
               </td>
               <td
-                class="px-2 text-center"
-                style="min-width: 30px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+                class="text-center px-2"
               >
-                <span style="font-size: 12px;">{{ item.raw.index }}</span>
+                {{ item.raw.productionCode }}
               </td>
               <td
-                
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
+              </td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
                 class="px-2"
-                style="min-width: 130px;  justify-content: start;"
+                style="min-width: 100px;  justify-content: start;"
               >
                 <span
                   style="font-size: 12px;"
@@ -1779,7 +1928,12 @@ const headers = [
               </td>
               <td
                 class="px-2 text-start"
-                style="min-width: 150px; justify-content: center;"
+                style="min-width: 100px; justify-content: center;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1787,31 +1941,46 @@ const headers = [
                 >{{ item.raw.barcode }}</span>
               </td>
               <td
-                class="text-start px-2"
-                
+                class="text-center px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
                 style="min-width: 100px;"
               > 
-                <span
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ item.raw.lotDescription }}</span>
+                <span style="font-size: 12px;">{{ item.raw.lotDescription }}</span>
               </td>
               <td
                 class="text-center px-2"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
                   class=""
                 >{{ convertDate(item.raw.receivedDate) }}</span>
               </td>
-              <td class="text-start px-2">
+              <td
+                v-if="false"
+                class="text-start px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
                 <span
                   style="font-size: 12px;"
                   class="text-wrap"
                 >{{ convertDate(item.raw.expiredDate) }}</span>
               </td>
               <td
+                v-if="false"
                 class="text-end px-2"
                 style="justify-content: end;"
               >
@@ -1821,6 +1990,7 @@ const headers = [
                 >{{ (item.raw.remindingDays) }}</span>
               </td>
               <td
+                v-if="false"
                 class="text-end px-2"
                 style="justify-content: end;"
               >
@@ -1832,6 +2002,11 @@ const headers = [
               <td
                 class="text-start px-2"
                 style="min-width: 100px; justify-content: end;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1839,6 +2014,7 @@ const headers = [
                 >{{ (item.raw.purchaseOrderNo) }}</span>
               </td>
               <td
+                v-if="false"
                 class="text-end px-2"
                 style="min-width: 140px; justify-content: start;"
               >
@@ -1849,7 +2025,12 @@ const headers = [
               </td>
               <td
                 class="text-start px-2"
-                style="min-width: 150px;"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1859,6 +2040,11 @@ const headers = [
               <td
                 class="text-start px-2"
                 style="min-width: 200px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span
                   style="font-size: 12px;"
@@ -1866,27 +2052,37 @@ const headers = [
                   v-html="item.raw.productName.replace(/\s/g, '&nbsp;')"
                 />
               </td>
-              <td
-                class="text-start px-2"
-                style="min-width: 130px;"
-              >
-                <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
-              </td>
+              
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
               </td>
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span style="font-size: 12px;">{{ (item.raw.qtyPcs).toLocaleString() }}</span>
               </td>
               <td
                 class="text-center px-2"
                 style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
               >
                 <span style="font-size: 12px;">{{ formatNumber(item.raw.qtyKgs) }}</span>
               </td>
@@ -1907,34 +2103,6 @@ const headers = [
       </CardText>
     </VCard>
   </section>
-
-  <section v-if="false">
-    <VDataTable
-      v-columns-resizable
-      :headers="dataHeaders"
-      :items="dataMockTestRel"
-      class="elevation-1"
-      resizable
-    >
-      <template #column="{ column }">
-        <div class="resizable-column">
-          {{ column.text }}
-          <div class="resize-handle" />
-        </div>
-      </template>
-    </VDataTable>
-  </section>
-
-  <VContainer v-if="false">
-    <VDataTable
-      :headers="dataHeaders"
-      :items="dataMockTestRel"
-    >
-      <template #item.name="{ item }">
-        <span v-resizable>{{ item.name }}</span>
-      </template>
-    </VDataTable>
-  </VContainer>
 </template>
 
 <style lang="scss">
