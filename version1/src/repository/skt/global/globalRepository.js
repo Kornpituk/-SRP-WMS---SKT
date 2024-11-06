@@ -223,6 +223,7 @@ export const  globalService = {
           productName: params.productName || '',
           purchaseOrderNo: params.purchaseOrderNo || '',
           receivedDate: params.receivedDate || '',
+          category: params.category || '',
         },
       })
 

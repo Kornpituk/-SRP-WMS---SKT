@@ -222,6 +222,7 @@ export const useFetchPrintLabelData = () => {
     } catch (error) {
       console.error('Error in printLabelFormViewService:', error)
       errorMessagePrintLabelView.value = error.message
+      printLabelFormViewResult.value = []
       
       return { success: false, data: null, error: error.message }
     }

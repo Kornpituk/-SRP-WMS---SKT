@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watchEffect } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -157,13 +157,33 @@ const typePrintLabel = ref('Semi Label')
 const progressLinearNoData = ref(false)
 
 //------------------------- Get Label ------------------------
+
+const itemsCategoriesOld = ['Packaging', 'Raw material', 'Lorry']
+
+const itemsCategories = [
+  { name: 'Packaging', value: 'Packaging' },
+  { name: 'Raw material', value: 'Raw material' },
+  { name: 'Lorry', value: 'Lorry' },
+  { name: 'All', value: '' },
+]
+
 const paramsFetchDataPrintLabel = ref({
   lot: '',
   productId: '',
   productName: '',
   purchaseOrderNo: '',
   receivedDate: '',
+  category: '',
 })
+
+const clearModel = () => {
+  paramsFetchDataPrintLabel.value.lot = ''
+  paramsFetchDataPrintLabel.value.productId = ''
+  paramsFetchDataPrintLabel.value.productName = ''
+  paramsFetchDataPrintLabel.value.purchaseOrderNo = ''
+  paramsFetchDataPrintLabel.value.receivedDate = ''
+  paramsFetchDataPrintLabel.value.category = ''
+}
 
 const fetchData = async () => {
 
@@ -181,6 +201,38 @@ const fetchData = async () => {
 watchEffect(() => {
   fetchData()
 })
+
+const groupDataByLot = data => {
+  let previousLot = null
+  const groupedData = []
+
+  data.forEach(item => {
+    // ถ้า lot เดิมเหมือนกับแถวปัจจุบัน
+    console.log("start ForEach")
+    if (item.lot === previousLot) {
+      // เพิ่ม barcode และ lotDescription ไปยังรายการล่าสุดใน groupedData
+      groupedData[groupedData.length - 1].items.push({
+        barcode: item.barcode,
+        lotDescription: item.lotDescription,
+      })
+    } else {
+      // ถ้า lot ไม่เหมือน ให้สร้างรายการใหม่
+      groupedData.push({
+        lot: item.lot,
+        category: item.category,
+        items: [{ barcode: item.barcode, lotDescription: item.lotDescription }],
+      })
+      previousLot = item.lot // ตั้ง lot เป็นแถวปัจจุบันสำหรับการเปรียบเทียบครั้งต่อไป
+    }
+  })
+
+  return data
+}
+
+const dataFilterPrintLabel = [{ key: 'lot' }]
+
+
+
 
 //------------------------- Print Label ------------------------
 //------------------------- Print Label By Barcode ------------------------
@@ -244,10 +296,6 @@ const headers = [
     readonly: true,
   },
   {
-    title: '',
-    key: 'data-table-expand',
-  },
-  {
     title: 'Category',
     key: 'category',
   },
@@ -295,7 +343,10 @@ const headers = [
   },
 ]
 
-const dataTableGroupBy = [{ key: 'lot' }]
+const dataTableGroupBy = [
+  { key: 'lot' },
+]
+
 const expanded = ref([])
 
 const dessertHeaders = [
@@ -472,6 +523,7 @@ const dataTableColor = ref('#E0F7FA')
     </VCard>
   </div>
 
+  <!-- Filter -->
   <section>
     <div>
       <VExpansionPanels
@@ -491,21 +543,15 @@ const dataTableColor = ref('#E0F7FA')
                 sm="6"
                 class="py-2"
               >
-                <VTextField
-                  v-model="paramsFetchDataPrintLabel.lot"
+                <VSelect
+                  v-model="paramsFetchDataPrintLabel.category"
+                  :items="itemsCategories"
                   density="compact"
-                  height="20px"
-                  class="py-0"
-                >
-                  <template #label>
-                    <span
-                      class="d-flex align-center"
-                      style="font-size: 12px;"
-                    >
-                      Lot
-                    </span>
-                  </template>
-                </VTextField>
+                  item-title="name"
+                  item-value="value"
+                  placeholder="All"
+                  clearable
+                />
               </VCol>
 
               <!-- 👉 Select Product code -->
@@ -560,14 +606,14 @@ const dataTableColor = ref('#E0F7FA')
               >
                 <AppDateTimePicker
                   v-model="paramsFetchDataPrintLabel.receivedDate"
-                  placeholder="Select Date"
+                  placeholder="Receiving Date"
                   density="compact"
-                  :config="{ mode: 'range',dateFormat: 'd/m/Y' }"
+                  :config="{ dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   class="custom-date-time-picker"
                 >
                   <template #label>
-                    <span>Delivery Date</span>
+                    <span>Received Date</span>
                   </template>
                 </AppDateTimePicker>
               </VCol>
@@ -595,14 +641,12 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-1"
               >
                 <VTextField
-                  v-model="supplierName"
-                  :label="$t('Supplier Name')"
-                  type="Supplier Name"
+                  v-model="paramsFetchDataPrintLabel.lot"
                   density="compact"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Supplier Name
+                      Lot
                     </span>
                   </template>
                 </VTextField>
@@ -1813,8 +1857,285 @@ const dataTableColor = ref('#E0F7FA')
     </VCard>
   </section>
 
+  <!-- table data group by -->
+  <section v-if="true">
+    <VCard>
+      <CardText>
+        <VProgressLinear
+          v-if="progressLinearNoData && !printLabelFormViewResult"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="!printLabelFormViewResult && progressLinearNoData === false"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data....</span>
+        </VProgressLinear>
+        <VDataTable
+          v-if="progressLinearNoData && printLabelFormViewResult"
+          v-model="selectedDataTables"
+          show-select
+          :group-by="dataFilterPrintLabel"
+          :headers="headers"
+          :items="printLabelFormViewResult"
+          :items-per-page="10"
+          item-selectable="selectable"
+          class="elevation-1"
+          :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
+          :item-class="row_classes" 
+        >
+          <template #data-table-group="{ props, item, count }">
+            <td
+              :style="{ 
+                backgroundColor: 
+                  isSelected(item.value, 1) ? dataTableColor : 
+                  ''
+              }"
+              style="position: sticky; z-index: 1; left: 20px; min-width: 200px;"
+            >
+              <VBtn
+                v-bind="props"
+                variant="text"
+                density="comfortable"
+              >
+                <VIcon
+                  class="flip-in-rtl"
+                  icon="ri-arrow-down-s-line"
+                />
+              </VBtn>
+              <span style="font-size: 12px;">{{ item.value }} {{ items }}</span>
+              <span style="font-size: 12px;">({{ count }})</span>
+            </td>
+          </template>
+
+          <template #item="{ item }">
+            <tr>
+              <td
+                class="text-center"
+                style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <VCheckboxBtn
+                  v-model="selectedDataTables"
+                  :value="item.raw"
+                />
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.category) }}</span>
+              </td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+                class="px-2"
+                style="min-width: 100px;  justify-content: start;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.lot }}</span>
+              </td>
+              <td
+                class="px-2 text-start"
+                style="min-width: 100px; justify-content: center;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.barcode }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+                style="min-width: 100px;"
+              > 
+                <span style="font-size: 12px;">{{ item.raw.lotDescription }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class=""
+                >{{ convertDate(item.raw.receivedDate) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-start px-2"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ convertDate(item.raw.expiredDate) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.remindingDays) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.deliveryDate) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 100px; justify-content: end;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.purchaseOrderNo) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-end px-2"
+                style="min-width: 140px; justify-content: start;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.productionCode) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ item.raw.productId }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 200px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                  v-html="item.raw.productName.replace(/\s/g, '&nbsp;')"
+                />
+              </td>
+              
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ (item.raw.qtyPcs).toLocaleString() }}</span>
+              </td>
+              <td
+                class="text-center px-2"
+                style="min-width: 130px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span style="font-size: 12px;">{{ formatNumber(item.raw.qtyKgs) }}</span>
+              </td>
+              <td
+                v-if="false"
+                class="text-start px-2"
+                style="justify-content: center;"
+              >
+                <VBtn color="info">
+                  <div style="font-size: 12px;">
+                    Action
+                  </div>
+                </VBtn>
+              </td>
+            </tr>
+          </template>
+        </VDataTable>
+      </CardText>
+    </VCard>
+  </section>
+
   <!-- table data -->
-  <section>
+  <section v-if="false">
     <VCard>
       <CardText>
         <VProgressLinear
@@ -1845,9 +2166,8 @@ const dataTableColor = ref('#E0F7FA')
           class="elevation-1"
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
           :item-class="row_classes" 
-          :group-by="dataTableGroupBy"
         >
-          <template #data-table-group="{ props, item, count }">
+          <template #data-table-group="{ props, item, count, items }">
             <td
               :style="{ 
                 backgroundColor: 
@@ -1866,14 +2186,10 @@ const dataTableColor = ref('#E0F7FA')
                   icon="ri-arrow-down-s-line"
                 />
               </VBtn>
-              <span style="font-size: 12px;">{{ item.value }}</span>
+              <span style="font-size: 12px;">{{ item.value }} {{ items }}</span>
               <span style="font-size: 12px;">({{ count }})</span>
             </td>
           </template>
-
-
-
-
 
           <template #item="{ item }">
             <tr>
@@ -1890,16 +2206,6 @@ const dataTableColor = ref('#E0F7FA')
                   v-model="selectedDataTables"
                   :value="item.raw"
                 />
-              </td>
-              <td
-                :style="{ 
-                  backgroundColor: 
-                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
-                    ''
-                }"
-                class="text-center px-2"
-              >
-                {{ item.raw.productionCode }}
               </td>
               <td
                 class="text-start px-2"
