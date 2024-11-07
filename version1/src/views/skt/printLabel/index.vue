@@ -382,6 +382,83 @@ const eXprtreeNode = () => {
   console.log('eXprtreeNode', selectedDataTables.value)
 }
 
+const headersNewEx = [
+  { title: '', key: 'data-table-expand' },
+  {
+    title: 'No.',
+    key: 'no',
+  },
+  {
+    title: 'Category',
+    key: 'category',
+  },
+  {
+    title: 'Lot',
+    key: 'lot',
+  },
+  {
+    title: 'Lot QTY',
+    key: 'lotQty',
+  },
+  {
+    title: 'RCVD Date',
+    key: 'receivedDate',
+    
+  },
+  {
+    title: 'P/O No',
+    key: 'purchaseOrderNo',
+  },
+  {
+    title: 'Item Code',
+    key: 'productId',
+  },
+  {
+    title: 'Item Name',
+    key: 'productName',
+  },
+  
+  {
+    title: 'Location',
+    key: 'locationName',
+  },
+  {
+    title: 'RCVD(PCS)',
+    key: 'qtyPcs',
+  },
+  {
+    title: 'RCVD(KGS)',
+    key: 'qtyKgs',
+  },
+  {
+    title: 'Update By',
+    key: 'updatedBy',
+  },
+  {
+    title: 'Update Date',
+    key: 'updatedDate',
+  },
+]
+
+const headersSubNewEx = [
+  {
+    title: 'Barcode',
+    key: 'barcode',
+  },
+  {
+    title: 'NO/RCVD(PCS)',
+    key: 'lotDescription',
+  },
+  {
+    title: 'Item Code',
+    key: 'productId',
+  },
+  {
+    title: 'Item Name',
+    key: 'productName',
+  },
+]
+
 const dessertHeaders = [
   { title: '', key: 'data-table-expand' },
   {
@@ -437,6 +514,22 @@ const desserts = [
         protein: 54,
         barcode: '00000000118003',
       },
+      {
+        name: 'WRC',
+        calories: 157,
+        fat: 6.2,
+        carbs: 24,
+        protein: 54,
+        barcode: '00000000118004',
+      },
+      {
+        name: 'JLK',
+        calories: 157,
+        fat: 6.2,
+        carbs: 24,
+        protein: 54,
+        barcode: '00000000118005',
+      },
     ],
   },
   {
@@ -452,6 +545,14 @@ const desserts = [
         carbs: 37,
         protein: 54,
         barcode: '1N241028098001',
+      },
+      {
+        name: 'UER',
+        calories: 237,
+        fat: 9.0,
+        carbs: 37,
+        protein: 54,
+        barcode: '1N241028098003',
       },
     ],
   },
@@ -1987,7 +2088,7 @@ const dataTableColor = ref('#E0F7FA')
                   :value="item.raw"
                 />
               </td>
-              <td></td>
+              <td />
               <td
                 class="text-start px-2"
                 style="min-width: 120px;"
@@ -2501,7 +2602,7 @@ const dataTableColor = ref('#E0F7FA')
         <VDataTable
           v-model:expanded="expanded"
           v-model="selectedDataTables"
-          :headers="dessertHeaders"
+          :headers="headersNewEx"
           :items="desserts"
           :items-per-page="5"
           class="text-no-wrap"
@@ -2514,9 +2615,9 @@ const dataTableColor = ref('#E0F7FA')
           <template #expanded-row="{ item }">
             <tr>
               <th
-                class="px-0"
                 v-for="(headerSub, index) in headerSubtitle"
                 :key="index"
+                class="px-0"
               >
                 {{ headerSub.title }}
               </th>
@@ -2590,7 +2691,7 @@ const dataTableColor = ref('#E0F7FA')
           <template #item.name="{ item}">
             <tr>
               <td>
-                <span class="text-capitalize">{{ item.raw.name }}</span>
+                <span class="text-capitalize">{{ item.raw.name }}: {{ item.raw.sources.length }}</span>
               </td>
             </tr>
           </template>
