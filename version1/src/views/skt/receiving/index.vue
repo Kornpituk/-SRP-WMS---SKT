@@ -684,7 +684,7 @@ const headers = [
     key: 'updatedBy',
   },
   {
-    title: 'Updated On',
+    title: 'Updated Date',
     key: 'updatedDate',
   },
   {
@@ -1958,7 +1958,7 @@ const insetSwitch1 = ref('')
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Po No.
+                      P/O No.
                     </span>
                   </template>
                 </VTextField>
@@ -4611,8 +4611,8 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.updatedBy }}</span>
               </td>
               <td
-                class="text-center px-2"
-                style="min-width: 130px;"
+                class="text-center"
+                style="min-width: 150px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 

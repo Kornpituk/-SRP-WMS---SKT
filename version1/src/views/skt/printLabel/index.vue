@@ -755,12 +755,11 @@ const dataTableColor = ref('#E0F7FA')
                       style="width: 100%; height: 40px;"
                       @click="isDialogPrintLabelVisible = true"
                     >
-                      <img
-                        src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
+                      <VIcon
                         style="width: 27px;"
-                        class="custom-small-img"
-                      >
-                      <span style="font-size: 12px;">{{ $t('Export file') }}</span>
+                        icon="ri-printer-fill"
+                      />
+                      <span style="font-size: 12px;">{{ $t('Print') }}</span>
                     </VBtn>
                   </VCol>
                 </VRow>
