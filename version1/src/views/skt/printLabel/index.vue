@@ -298,12 +298,20 @@ const headers = [
     readonly: true,
   },
   {
+    title: 'No.',
+    key: 'no',
+  },
+  {
     title: 'Category',
     key: 'category',
   },
   {
     title: 'Lot',
     key: 'lot',
+  },
+  {
+    title: 'Lot QTY',
+    key: 'lotQty',
   },
   {
     title: 'Barcode',
