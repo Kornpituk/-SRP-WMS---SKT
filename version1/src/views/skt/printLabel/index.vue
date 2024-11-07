@@ -314,7 +314,7 @@ const headers = [
     key: 'lotDescription',
   },
   {
-    title: 'Received Date',
+    title: 'RCVD Date',
     key: 'receivedDate',
     
   },
@@ -336,11 +336,11 @@ const headers = [
     key: 'locationName',
   },
   {
-    title: 'PURC(PCS)',
+    title: 'RCVD(PCS)',
     key: 'qtyPcs',
   },
   {
-    title: 'PURC(KGS)',
+    title: 'RCVD(KGS)',
     key: 'qtyKgs',
   },
   {
