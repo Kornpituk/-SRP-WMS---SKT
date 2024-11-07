@@ -678,7 +678,7 @@ const dataTableColor = ref('#E0F7FA')
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Po No.
+                      P/O No.
                     </span>
                   </template>
                 </VTextField>
