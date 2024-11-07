@@ -333,7 +333,7 @@ const headers = [
   
   {
     title: 'Location',
-    key: 'updatedDate',
+    key: 'locationName',
   },
   {
     title: 'PURC(PCS)',
@@ -342,6 +342,14 @@ const headers = [
   {
     title: 'PURC(KGS)',
     key: 'qtyKgs',
+  },
+  {
+    title: 'Update By',
+    key: 'updatedBy',
+  },
+  {
+    title: 'Update Date',
+    key: 'updatedDate',
   },
 ]
 
@@ -1971,6 +1979,7 @@ const dataTableColor = ref('#E0F7FA')
                   :value="item.raw"
                 />
               </td>
+              <td></td>
               <td
                 class="text-start px-2"
                 style="min-width: 120px;"
@@ -2124,15 +2133,15 @@ const dataTableColor = ref('#E0F7FA')
               </td>
               
               <td
-                class="text-center px-2"
-                style="min-width: 130px;"
+                class="text-start px-2"
+                style="min-width: 180px;"
                 :style="{ 
                   backgroundColor: 
                     isSelected(item.raw.barcode, 2) ? dataTableColor : 
                     ''
                 }"
               >
-                <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
+                <span style="font-size: 12px;">{{ (item.raw.locationName) }}</span>
               </td>
               <td
                 class="text-center px-2"
@@ -2155,6 +2164,34 @@ const dataTableColor = ref('#E0F7FA')
                 }"
               >
                 <span style="font-size: 12px;">{{ formatNumber(item.raw.qtyKgs) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.updatedBy) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 140px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ convertDate(item.raw.updatedDate) }}</span>
               </td>
               <td
                 v-if="false"
@@ -2469,6 +2506,7 @@ const dataTableColor = ref('#E0F7FA')
           <template #expanded-row="{ item }">
             <tr>
               <th
+                class="px-0"
                 v-for="(headerSub, index) in headerSubtitle"
                 :key="index"
               >
@@ -2477,7 +2515,7 @@ const dataTableColor = ref('#E0F7FA')
             </tr>
             <tr>
               <td />
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.name + '-checkbox-' + index"
@@ -2488,51 +2526,51 @@ const dataTableColor = ref('#E0F7FA')
                   />
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.name +index"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                   class="d-flex align-center"
                 >
                   {{ sub.name }}
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.calories + index"
                   class="d-flex align-center"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
                   {{ sub.calories }}
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.fat + index"
                   class="d-flex align-center"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
                   {{ sub.fat }}
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.carbs + index"
                   class="d-flex align-center"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
                   {{ sub.carbs }}
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.protein + index"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                   class="d-flex align-center"
                 >
                   {{ sub.protein }}
