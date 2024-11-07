@@ -130,7 +130,7 @@ const printLabelForm = () => {
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
 //----------------------------- api ------------------------------
-import { usePrintLabelBarcodeFormService, useFetchPrintLabelData, useSavePrintBarcodeFormService }  from '@/services/skt/global/gloBalService'
+import { useFetchPrintLabelData, usePrintLabelBarcodeFormService, useSavePrintBarcodeFormService } from '@/services/skt/global/gloBalService'
 
 const { printLabelFormViewResult, errorMessagePrintLabelView, printLabelFormViewService } = useFetchPrintLabelData()
 
@@ -351,7 +351,23 @@ const dataTableGroupBy = [
 
 const expanded = ref([])
 
+const updateSelectedData = sub => {
+  // Add to selectedDataTables if selected, remove if deselected
+  if (sub.selected) {
+    selectedDataTables.value.push(sub)
+  } else {
+    const index = selectedDataTables.value.findIndex(item => item.name === sub.name)
+    if (index !== -1) selectedDataTables.value.splice(index, 1)
+  }
+}
+
+
+const eXprtreeNode = () => {
+  console.log('eXprtreeNode', selectedDataTables.value)
+}
+
 const dessertHeaders = [
+  { title: '', key: 'data-table-expand' },
   {
     title: 'Dessert (100g serving)',
     align: 'start',
@@ -361,9 +377,17 @@ const dessertHeaders = [
   { title: 'Calories', key: 'calories' },
   { title: 'Fat (g)', key: 'fat' },
   { title: 'Carbs (g)', key: 'carbs' },
-  { title: 'Protein (g)', key: 'protein' },
-  { title: 'Iron (%)', key: 'iron' },
-  { title: '', key: 'data-table-expand' },
+  
+]
+
+const headerSubtitle = [
+  { title: '' },
+  { title: '', key: 'checkbox' },
+  { title: 'name', key: 'name' },
+  { title: 'calories', key: 'calories' },
+  { title: 'fat', key: 'fat' },
+  { title: 'carbs', key: 'carbs' },
+  { title: 'protein', key: 'protein' },
 ]
 
 const desserts = [
@@ -372,82 +396,89 @@ const desserts = [
     calories: 159,
     fat: 6.0,
     carbs: 24,
-    protein: 4.0,
-    iron: 1,
+    sources: [
+      {
+        name: 'USDA',
+        calories: 167,
+        fat: 5.2,
+        carbs: 25,
+        protein: 54,
+      },
+      {
+        name: 'BLS',
+        calories: 143,
+        fat: 7.1,
+        carbs: 22,
+        protein: 54,
+      },
+      {
+        name: 'SLV',
+        calories: 157,
+        fat: 6.2,
+        carbs: 24,
+        protein: 54,
+      },
+    ],
   },
   {
     name: 'Ice cream sandwich',
     calories: 237,
     fat: 9.0,
     carbs: 37,
-    protein: 4.3,
-    iron: 1,
+    sources: [
+      {
+        name: 'USDA',
+        calories: 237,
+        fat: 9.0,
+        carbs: 37,
+        protein: 54,
+      },
+    ],
   },
   {
     name: 'Eclair',
     calories: 262,
     fat: 16.0,
     carbs: 23,
-    protein: 6.0,
-    iron: 7,
-  },
-  {
-    name: 'Cupcake',
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3,
-    iron: 8,
-  },
-  {
-    name: 'Gingerbread',
-    calories: 356,
-    fat: 16.0,
-    carbs: 49,
-    protein: 3.9,
-    iron: 16,
-  },
-  {
-    name: 'Jelly bean',
-    calories: 375,
-    fat: 0.0,
-    carbs: 94,
-    protein: 0.0,
-    iron: 0,
-  },
-  {
-    name: 'Lollipop',
-    calories: 392,
-    fat: 0.2,
-    carbs: 98,
-    protein: 0,
-    iron: 2,
-  },
-  {
-    name: 'Honeycomb',
-    calories: 408,
-    fat: 3.2,
-    carbs: 87,
-    protein: 6.5,
-    iron: 45,
-  },
-  {
-    name: 'Donut',
-    calories: 452,
-    fat: 25.0,
-    carbs: 51,
-    protein: 4.9,
-    iron: 22,
-  },
-  {
-    name: 'KitKat',
-    calories: 518,
-    fat: 26.0,
-    carbs: 65,
-    protein: 7,
-    iron: 6,
+    sources: [
+      {
+        name: 'USDA2',
+        calories: 262,
+        fat: 16.0,
+        carbs: 23,
+        protein: 54,
+      },
+    ],
   },
 ]
+
+const resolveStatusVariant = status => {
+  if (status === 1)
+    return {
+      color: 'primary',
+      text: 'Current',
+    }
+  else if (status === 2)
+    return {
+      color: 'success',
+      text: 'Professional',
+    }
+  else if (status === 3)
+    return {
+      color: 'error',
+      text: 'Rejected',
+    }
+  else if (status === 4)
+    return {
+      color: 'warning',
+      text: 'Resigned',
+    }
+  else
+    return {
+      color: 'info',
+      text: 'Applied',
+    }
+}
 
 //------------------- Highlighter --------------------------------
 
@@ -2412,6 +2443,112 @@ const dataTableColor = ref('#E0F7FA')
           </template>
         </VDataTable>
       </CardText>
+    </VCard>
+  </section>
+
+  <section>
+    <VCard>
+      <VCardText>
+        <VDataTable
+          v-model:expanded="expanded"
+          v-model="selectedDataTables"
+          :headers="dessertHeaders"
+          :items="desserts"
+          :items-per-page="5"
+          class="text-no-wrap"
+          expand-on-click
+          show-expand
+          show-select
+        >
+          <!-- Expanded Row Data -->
+          <!-- Expanded Row Data -->
+          <template #expanded-row="{ item }">
+            <tr>
+              <th
+                v-for="(headerSub, index) in headerSubtitle"
+                :key="index"
+              >
+                {{ headerSub.title }}
+              </th>
+            </tr>
+            <tr>
+              <td />
+              <td>
+                <div
+                  v-for="(sub, index) in item.raw.sources"
+                  :key="sub.name + '-checkbox-' + index"
+                >
+                  <VCheckbox
+                    v-model="sub.selected" 
+                    @change="updateSelectedData(sub)" 
+                  />
+                </div>
+              </td>
+              <td>
+                <div
+                  v-for="(sub, index) in item.raw.sources"
+                  :key="sub.name +index"
+                  style="height: 36px;"
+                  class="d-flex align-center"
+                >
+                  {{ sub.name }}
+                </div>
+              </td>
+              <td>
+                <div
+                  v-for="(sub, index) in item.raw.sources"
+                  :key="sub.calories + index"
+                  class="d-flex align-center"
+                  style="height: 36px;"
+                >
+                  {{ sub.calories }}
+                </div>
+              </td>
+              <td>
+                <div
+                  v-for="(sub, index) in item.raw.sources"
+                  :key="sub.fat + index"
+                  class="d-flex align-center"
+                  style="height: 36px;"
+                >
+                  {{ sub.fat }}
+                </div>
+              </td>
+              <td>
+                <div
+                  v-for="(sub, index) in item.raw.sources"
+                  :key="sub.carbs + index"
+                  class="d-flex align-center"
+                  style="height: 36px;"
+                >
+                  {{ sub.carbs }}
+                </div>
+              </td>
+              <td>
+                <div
+                  v-for="(sub, index) in item.raw.sources"
+                  :key="sub.protein + index"
+                  style="height: 36px;"
+                  class="d-flex align-center"
+                >
+                  {{ sub.protein }}
+                </div>
+              </td>
+            </tr>
+          </template>
+
+          <template #item.name="{ item}">
+            <tr>
+              <td>
+                <span class="text-capitalize">{{ item.raw.name }}</span>
+              </td>
+            </tr>
+          </template>
+        </VDataTable>
+        <VBtn @click="eXprtreeNode">
+          EXprtreeNode
+        </VBtn>
+      </VCardText>
     </VCard>
   </section>
 </template>
