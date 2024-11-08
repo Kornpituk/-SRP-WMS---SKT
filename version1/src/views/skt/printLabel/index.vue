@@ -475,12 +475,20 @@ const dessertHeaders = [
 
 const headerSubtitle = [
   { title: '' },
+  { title: '' },
+  { title: '' },
+  { title: '' },
   { title: '', key: 'checkbox' },
-  { title: 'name', key: 'name' },
-  { title: 'calories', key: 'calories' },
-  { title: 'fat', key: 'fat' },
-  { title: 'carbs', key: 'carbs' },
-  { title: 'protein', key: 'protein' },
+  { title: 'Item Code', key: 'name' },
+  { title: 'Item Name', key: 'calories' },
+  { title: 'Lot', key: 'fat' },
+  { title: 'Barcode', key: 'carbs' },
+  { title: 'NO/RCVD(PCS)', key: 'protein' },
+  { title: '' },
+  { title: '' },
+  { title: '' },
+  { title: '' },
+  { title: '' },
 ]
 
 const desserts = [
@@ -2600,10 +2608,11 @@ const dataTableColor = ref('#E0F7FA')
     <VCard>
       <VCardText>
         <VDataTable
+          v-if="printLabelFormViewResult"
           v-model:expanded="expanded"
           v-model="selectedDataTables"
           :headers="headersNewEx"
-          :items="desserts"
+          :items="printLabelFormViewResult"
           :items-per-page="5"
           class="text-no-wrap"
           expand-on-click
@@ -2623,6 +2632,7 @@ const dataTableColor = ref('#E0F7FA')
               </th>
             </tr>
             <tr>
+              <td />
               <td />
               <td class="px-0">
                 <div
@@ -2692,6 +2702,13 @@ const dataTableColor = ref('#E0F7FA')
             <tr>
               <td>
                 <span class="text-capitalize">{{ item.raw.name }}: {{ item.raw.sources.length }}</span>
+              </td>
+            </tr>
+          </template>
+          <template #item.lotQty="{ item}">
+            <tr>
+              <td>
+                <span class="text-capitalize">{{ item.raw.length }}</span>
               </td>
             </tr>
           </template>
