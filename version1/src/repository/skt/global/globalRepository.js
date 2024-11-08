@@ -292,6 +292,60 @@ export const  globalService = {
     }
   },
 
+  async printExportExcel(urlApi, whereHouse, accessToken, params = {}) {
+    try {
+      const response = await axios.get(
+        `${urlApi}/api/v1/ReceivingPlan/Summary/ReceivingExpire/Detail`,
+        {
+          headers: {
+            'accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            deliveryDateFrom: params.deliveryDateFrom,
+            deliveryDateTo: params.deliveryDateTo,
+            productId: params.productId,
+            productName: params.productName,
+            supplierId: params.supplierId,
+            supplierName: params.supplierName,
+            purchaseOrderNo: params.purchaseOrderNo,
+            statusName: params.statusName,
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response export Excel form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // สร้างลิงก์สำหรับดาวน์โหลดไฟล์
+        const link = document.createElement('a')
+
+        link.href = blobUrl
+        link.download = 'exported_file.xlsx' // ตั้งชื่อไฟล์ที่ต้องการให้ดาวน์โหลด
+        document.body.appendChild(link)
+        link.click()
+  
+        // ลบลิงก์ออกหลังการดาวน์โหลด
+        document.body.removeChild(link)
+        URL.revokeObjectURL(blobUrl) // ปิด URL Blob
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data generated for export Excel form')
+      }
+    } catch (error) {
+      console.error('Error in export excel:', error)
+      throw new Error(`Failed to export Excel file: ${error.response?.data?.message || error.message}`)
+    }
+  },
   
 }
   

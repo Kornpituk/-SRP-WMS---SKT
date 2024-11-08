@@ -118,6 +118,35 @@ const supplierName = ref(sessionStorage.getItem('supplierName') || '')
 const purchaseOrderNo = ref(sessionStorage.getItem('purchaseOrderNo') || '')
 const fileterStatusInPAI = ref(sessionStorage.getItem('fileterStatusInPAI') || '')
 
+const disBtnExoport = ref(true)
+
+const validateFields = () => {
+  const fields = {
+    deliveryDateFrom: deliveryDateFrom.value,
+    deliveryDateTo: deliveryDateTo.value,
+    productId: productId.value,
+    productName: productName.value,
+    supplierId: supplierId.value,
+    supplierName: supplierName.value,
+    purchaseOrderNo: purchaseOrderNo.value,
+    statusName: fileterStatusInPAI.value,
+  }
+
+  // ตรวจสอบว่ามีฟิลด์ใดที่ไม่ใช่ค่าว่างอย่างน้อย 1 ค่า
+  const hasValue = Object.values(fields).some(value => value !== '' && value.length !== 0)
+
+  if (!hasValue) {
+    disBtnExoport.value = true
+    
+    return false // คืนค่า false ถ้าไม่มีฟิลด์ไหนที่มีค่า
+  } else {
+    disBtnExoport.value = false
+    console.log("filter Validate", fields)
+    
+    return true // คืนค่า true ถ้ามีข้อมูลในฟิลด์อย่างน้อย 1 ฟิลด์
+  }
+}
+
 // ใช้ watch function เพื่ออัปเดต sessionStorage เมื่อแต่ละค่าถูกเปลี่ยนแปลง
 watch(deliveryDateFrom, newValue => {
   sessionStorage.setItem('deliveryDateFrom', newValue)
@@ -162,7 +191,8 @@ watch(() => {
   if(sessionStorage.getItem('statusFilter') === 'null'){
     sessionStorage.setItem('statusFilter', '')
   }
-  console.log("statusFilter", sessionStorage.getItem('statusFilter'))
+
+  validateFields()
 })
 
 // ดึงค่าจาก sessionStorage
@@ -170,8 +200,6 @@ const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
 
 // ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
 const statusFilter = ref([])
-
-
 
 // ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
 const addStoredStatus = () => {
@@ -1226,7 +1254,7 @@ const dataPrintlabel = ref([])
 
 //------------------------ Print Label------------------------------------------
 // const success = ref(false)
-import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService, usePrintPackagingFormService  }  from '@/services/skt/global/gloBalService'
+import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService, usePrintPackagingFormService, usePrintExportExcelService  }  from '@/services/skt/global/gloBalService'
 
 const { printLabelFormViewResult, printLabelFormViewService } = useViewPrintLabelFormService()
 const processingPrintLabel = ref(false)
@@ -1441,8 +1469,6 @@ const disabledCheckboxListPk = () => {
   return [0, 1, 2, 3, 4, 5, 10].includes(idStatusDialogAction.value)
 }
 
-
-
 const printFormAll = async () => {
   // ตั้งค่าสถานะการประมวลผลให้เป็น true
   processingPrint.value = true
@@ -1506,6 +1532,82 @@ const checkPersistent = computed(() => {
   return false
 })
 
+//-------------------- print Excel---------------------------------
+const { printExportExcelResult, printExportExcelService } = usePrintExportExcelService()
+
+const loadingPrintExportExcel = ref(true)
+
+const printExportExcelFunction = async () => {
+  loadingPrintExportExcel.value = true
+  if (deliveryDateRange.value) {
+    const [fromDate, toDate] = deliveryDateRange.value.split(" to ")
+    if(deliveryDateRange.value === '' || deliveryDateRange.value === null || deliveryDateRange.value === undefined){
+      deliveryDateFrom.value = ''
+
+      deliveryDateTo.value = ''
+    }
+
+    deliveryDateFrom.value = fromDate
+
+    deliveryDateTo.value = toDate
+  }else {
+    deliveryDateFrom.value = ''
+
+    deliveryDateTo.value = ''
+  }
+  
+
+  if(statusFilter.value === 'All'){
+    fileterStatusInPAI.value = ''
+  } else {
+    fileterStatusInPAI.value = statusFilter.value
+  }
+  
+
+  const fileterStatusInApiStr = ref('')
+
+  if (typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null) {
+  // แปลงเป็น string
+    fileterStatusInApiStr.value = fileterStatusInPAI.value.join(',')
+  }else{
+    fileterStatusInApiStr.value = fileterStatusInPAI.value
+  }
+  
+  // กำหนดค่า params
+  const params = {
+    deliveryDateFrom: deliveryDateFrom.value,
+    deliveryDateTo: deliveryDateTo.value,
+    productId: productId.value,
+    productName: productName.value,
+    supplierId: supplierId.value,
+    supplierName: supplierName.value,
+    statusName: fileterStatusInApiStr.value || '',
+    purchaseOrderNo: purchaseOrderNo.value,
+  }
+
+  // ตรวจสอบว่ามีค่าที่ไม่ว่างอย่างน้อยหนึ่งค่าใน params
+  const filledParamsCount = Object.values(params).filter(value => value !== null && value !== '').length
+
+  if (filledParamsCount < 1) {
+    console.warn('กรุณากรอกข้อมูลอย่างน้อย 1 ค่าในฟิลด์ที่จำเป็น')
+    loadingPrintExportExcel.value = false
+    
+    return
+  }
+  
+
+  try {
+    // รอให้ printExportExcel ทำงานและได้ผลลัพธ์กลับมา
+    await printExportExcelService(urlApi.value, whereHouse, accessTokenAtStore, params)
+    console.log('Staet Export!')
+    console.log('การส่งออก Excel เสร็จสมบูรณ์')
+    loadingPrintExportExcel.value = true
+  } catch (error) {
+    loadingPrintExportExcel.value = true
+    console.error('เกิดข้อผิดพลาดในการส่งออก Excel:', error)
+  }
+  loadingPrintExportExcel.value = true
+}
 
 //-------------------- Dialog Confirm Submit --------------------
 const isDialogConfirmVisible = ref(false)
@@ -1856,8 +1958,6 @@ const insetSwitch1 = ref('')
                   :items="itemStatus"
                   item-title="statusText"
                   item-value="statusText"
-                  clearable
-                  clear-icon="ri-close-line"
                   density="compact"
                 >
                   <template #label>
@@ -2039,18 +2139,31 @@ const insetSwitch1 = ref('')
                     md="4"
                   >
                     <VBtn
-                      disabled
+                      :disabled="disBtnExoport"
                       density="compact"
                       class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                       color="warning"
                       style="width: 100%; height: 40px;"
-                      @click="stockUpdateExcel"
+                      @click="printExportExcelFunction"
                     >
                       <img
+                        v-if="loadingPrintExportExcel"
                         src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
                         style="width: 27px;"
                         class="custom-small-img"
                       >
+
+                      <VProgressCircular
+                        v-if="!loadingPrintExportExcel"
+                        indeterminate
+                        color="success"
+                      >
+                        <img
+                          src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
+                          style="width: 18px;"
+                          class="custom-small-img"
+                        >
+                      </VProgressCircular>
                       <span style="font-size: 12px;">{{ $t('Export file') }}</span>
                     </VBtn>
                   </VCol>
