@@ -3,14 +3,7 @@ import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import { watchEffect, computed, watch } from 'vue'
 import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService';
 
-// let varA = ref(0)
-// const varB = ref(0)
-// const varC = ref('')
 const varD = ref('')
-// const varE = ref(0)
-// const varF = ref(0)
-// const resBpD = ref(0)
-// const finalRes = ref(0)
 
 const ipaItems = ref(ipaItemTemplate);
 
@@ -19,7 +12,8 @@ const getValue = function (e) {
   console.log(ipaItems);
 }
 
-watchEffect(ipaItemTemplate[0].result.field, (i) => {
+watch(varD, (i) => {
+  console.log("AAA");
   console.log(ipaItems);
 });
 
@@ -50,7 +44,7 @@ const debugChange = function (e) {
         <VRow>
           <VCol style="border: 1px solid black;" cols="8">
             <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VTextField density="compact" variant="outlined" label=" By : " v-model="varD" @change="debugChange" />
+              <VTextField density="compact" variant="outlined" label=" By : " v-model="varD" />
             </div>
           </VCol>
           <VCol style="border: 1px solid black;" cols="4">
@@ -131,7 +125,7 @@ const debugChange = function (e) {
               </td>
               <td style="border-left: 1px solid black; width: 450px;">
                 <div v-if="section.result.type === 'oknot'">
-                  <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field">
+                  <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value">
                     <VRadio label="Ok" value="1" />
                     <VRadio label="Not" value="0" />
                   </VRadioGroup>
@@ -143,7 +137,7 @@ const debugChange = function (e) {
                     </VLabel>
                     <VCol>
                       <VTextField density="compact" variant="outlined" label="" type="number"
-                        v-model="section.result.field.a" />
+                        v-model="section.result.field[0].value" />
                     </VCol>
                     <VLabel>
                       Kg.
@@ -152,7 +146,8 @@ const debugChange = function (e) {
                       (B)
                     </VLabel>
                     <VCol>
-                      <VTextField density="compact" variant="outlined" label="" v-model="section.result.field.b" />
+                      <VTextField density="compact" variant="outlined" label=""
+                        v-model="section.result.field[1].value" />
                     </VCol>
                     <VLabel>
                       Litre
@@ -166,7 +161,7 @@ const debugChange = function (e) {
                     </VLabel>
                     <VCol>
                       <VTextField density="compact" variant="outlined" label="" type="number"
-                        v-model="section.result.field.c" />
+                        v-model="section.result.field[0].value" />
                     </VCol>
                     <VLabel>
                       mm.
@@ -175,7 +170,8 @@ const debugChange = function (e) {
                       (D)
                     </VLabel>
                     <VCol>
-                      <VTextField density="compact" variant="outlined" label="" v-model="section.result.field.d" />
+                      <VTextField density="compact" variant="outlined" label=""
+                        v-model="section.result.field[1].value" />
                     </VCol>
                     <VLabel>
                       Litre
@@ -333,7 +329,7 @@ const debugChange = function (e) {
                     <VCol>
                       <VTextField density="compact" variant="outlined" label="" type="number"
                         v-model="section.result.field.g" />
-                    </VCol>        
+                    </VCol>
                     <VLabel>
                       Litre
                     </VLabel>
@@ -344,14 +340,14 @@ const debugChange = function (e) {
                     <VCol>
                       <VTextField density="compact" variant="outlined" label="" type="number"
                         v-model="section.result.field.litre" />
-                    </VCol>        
+                    </VCol>
                     <VLabel>
                       Litre
                     </VLabel>
                     <VCol>
                       <VTextField density="compact" variant="outlined" label="" type="number"
                         v-model="section.result.field.kg" />
-                    </VCol>        
+                    </VCol>
                     <VLabel>
                       Kg.
                     </VLabel>
