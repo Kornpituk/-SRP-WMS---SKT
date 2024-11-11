@@ -136,6 +136,8 @@ const countCurrentTab = ref(0)
 //------------- journalId
 const responseGener = ref([])
 const currentTabNew = ref(sessionStorage.getItem('currentTabReceivingForm'))
+const trickerLorryLoadind = ref(false)
+const isDialogVisibleSelecrLorry = ref(true)
 
 const generatedJournalId = async () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
@@ -174,11 +176,23 @@ const generatedJournalId = async () => {
 
 watch(() => {
   generatedJournalId()
-  
 })
 
-const checkSelectLorry = ref(1)
-const isDialogVisibleSelecrLorry = ref(true)
+const checkSelectLorry = ref([
+  {
+    lorryInfoKey: "10",
+    title: "EKI-A TANK (11V-110)",
+    lorryFilename: "Lorry loading EKI-A (11V-110).pdf",
+  },
+  {
+    lorryInfoKey: "13",
+    title: "EKI-A TANK (11V-432)",
+    lorryFilename: "Lorry loading EKI-A (11V-432).pdf",
+  },
+],
+)
+
+
 const resultSelectLorry = ref([])
 
 watch(() => {
@@ -236,21 +250,19 @@ const updateCurrentTab = async () => {
 updateCurrentTab()
 
 const checkSelectLorryLoadingForItem = () => {
-  let lorryIndex
-
-  switch (checkSelectLorry){
-  case 1:
-    lorryIndex = LorryLoadingCal
-    break
-  case 2:
-    lorryIndex = LorryLoadingCal2
-    break
-
-  default:
-    lorryIndex = null // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
-
-    return lorryIndex
-
+  if(checkSelectLorry.value){
+    console.log("Checking",  checkSelectLorry.value.length)
+    if(checkSelectLorry.value.length === 2){
+      trickerLorryLoadind.value = false
+      console.log("Checking in 2",  checkSelectLorry.value.length, trickerLorryLoadind.value)
+      
+      return null
+    }else if(checkSelectLorry.value.length === 1){
+      trickerLorryLoadind.value = true
+      console.log("Checking in 1",  checkSelectLorry.value.length, trickerLorryLoadind.value)
+      
+      return LorryLoadingCal
+    }
   }
 }
 
@@ -588,7 +600,7 @@ const handleAcceptPackaging = word => {
     </div>
   </div>
   <div v-if="receivedTypeId === 3">
-    <div v-if="checkSelectLorry === 1">
+    <div v-if="currentTabNew === 2 && trickerLorryLoadind === false">
       <VDialog
         v-model="isDialogVisibleSelecrLorry"
         width="500"
@@ -607,7 +619,7 @@ const handleAcceptPackaging = word => {
                     Lorry Key
                   </th>
                   <th class="bg-grey-lighten-3">
-                    Title
+                    Lorry Name
                   </th>
                   <th class="bg-grey-lighten-3 text-center">
                     Action
@@ -615,21 +627,16 @@ const handleAcceptPackaging = word => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>10</td>
-                  <td>EKI-A TANK (11V-110)</td>
-                  <td class="text-center">
-                    <VBtn
-                      color="info"
-                      @click="btnSelectLorry('LORRY LOADING', 'EKI-A TANK (11V-110)')"
-                    >
-                      Action
-                    </VBtn>
+                <tr
+                  v-for="(itemLorry, index) in checkSelectLorry"
+                  :key="index"
+                >
+                  <td>
+                    {{ itemLorry.lorryInfoKey }}
                   </td>
-                </tr>
-                <tr>
-                  <td>13</td>
-                  <td>EKI-A TANK (11V-432)</td>
+                  <td>
+                    {{ itemLorry.title }}
+                  </td>
                   <td class="text-center">
                     <VBtn
                       color="info"
@@ -654,17 +661,6 @@ const handleAcceptPackaging = word => {
         </VCard>
       </VDialog>
       <div
-        v-for="(tab, index) in tabs3"
-        :key="index"
-        class="mt-20"
-      >
-        <Component
-          :is="tab.component"
-          v-if="currentTabNew === index"
-        />
-      </div>
-      <div
-        v-if="currentTabNew === 2"
         class=" d-flex align-center justify-center mt-4"
         @click="isDialogVisibleSelecrLorry = true"
       >
@@ -678,6 +674,16 @@ const handleAcceptPackaging = word => {
           </template>
         </VBtn>
       </div>
+    </div>
+    <div
+      v-for="(tab, index) in tabs3"
+      :key="index"
+      class="mt-20"
+    >
+      <Component
+        :is="tab.component"
+        v-if="currentTabNew === index"
+      />
     </div>
   </div>
   <div v-if="receivedTypeId === 1">
