@@ -663,8 +663,20 @@ const handleAcceptPackaging = word => {
           v-if="currentTabNew === index"
         />
       </div>
-      <div v-if="currentTabNew === 2" @click="isDialogVisibleSelecrLorry = true" class=" d-flex align-center justify-center mt-4">
-        <VBtn>Select Lorry Loading</VBtn>
+      <div
+        v-if="currentTabNew === 2"
+        class=" d-flex align-center justify-center mt-4"
+        @click="isDialogVisibleSelecrLorry = true"
+      >
+        <VBtn
+          append-icon="ri-file-list-line"
+          variant="outlined"
+        >
+          Select Lorry LOADING
+          <template #append>
+            <VIcon size="30" />
+          </template>
+        </VBtn>
       </div>
     </div>
   </div>
