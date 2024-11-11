@@ -1151,10 +1151,11 @@ const checkCurrentTabBeforIn = status => {
     break
     
   case 12:
+  case 14:
   case 13:
     tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
     break
-    
+
   default:
     tabIndex = 0 // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
   }
@@ -1171,6 +1172,8 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   receivingTypeAction.value = receivingType
   lotAction.value = lot
   sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(status))
+
+  console.log("checkCurrentTabBeforIn(status)", checkCurrentTabBeforIn(status))
 
   selectedPrintLabel.value = []
 
@@ -1442,7 +1445,6 @@ const btnPrintLabel = async () => {
 
 //------------------------ Fuction Print Form --------------------------------
 
-
 const { errorMessageGenerateView, printReceivingFormService } = usePrintReceivingFormService()
 
 const { errorMessageInspection, printInspectionFormService } = usePrintInspectionFormService()
@@ -1450,7 +1452,6 @@ const { errorMessageInspection, printInspectionFormService } = usePrintInspectio
 const { errorMessagePackaging, printPackagingFormService } = usePrintPackagingFormService()
 
 const processingPrint = ref(false)
-
 
 const processingPrintForm1 = ref(false)
 const processingPrintForm2 = ref(false)
@@ -1629,7 +1630,6 @@ const completeSubmit = () => {
   isDialogSubmitSuccessVisible.value = false
   isDialogConfirmVisible.value = false
 }
-
 
 //-------------------------------------- Sub Fuction --------------------------------
 //-------- Fuction Action --------------------------------
@@ -1939,7 +1939,7 @@ const insetSwitch1 = ref('')
       <VExpansionPanels
         v-model="panel"
         multiple
-        class="pa-2"
+        class="pa-0"
       >
         <VExpansionPanel
           class="px-1"

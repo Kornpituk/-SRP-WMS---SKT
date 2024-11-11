@@ -25,6 +25,8 @@ import RawMatForm from '../rawMat/index.vue'
 import LorryLoadingCal from '../lorryForm/flow/index.vue' 
 import RawMatInspec from '../inspecReqForm/index.vue'
 import PackagingInspec from '../packagingForm/index.vue'
+import PackagingInspec2 from '../packagingForm/index.vue'
+import PackagingInspec3 from '../packagingForm/index.vue'
 
 const checkStatus = status => {
   switch (status) {
@@ -170,10 +172,19 @@ const generatedJournalId = async () => {
     })
 }
 
-
 watch(() => {
   generatedJournalId()
   
+})
+
+const checkSelectLorry = ref(1)
+const isDialogVisibleSelecrLorry = ref(true)
+const resultSelectLorry = ref([])
+
+watch(() => {
+  if(checkSelectLorry.value === 0){
+    isDialogVisibleSelecrLorry.value = true
+  }
 })
 
 const checkCurrentTabBeforIn = status => {
@@ -196,6 +207,7 @@ const checkCurrentTabBeforIn = status => {
     
   case 12:
   case 13:
+  case 14:
     tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
     break
     
@@ -205,6 +217,12 @@ const checkCurrentTabBeforIn = status => {
 
   return tabIndex
 }
+
+const itemsLorrySelect = [
+  'N PAN 30',
+  'SANNIX KC-703  TANK ',
+  'TELA (AMMONIA TANK   11V - 511 )',
+]
 
 const updateCurrentTab = async () => {
   // รอให้ generatedJournalId และ generated ทำงานเสร็จก่อน
@@ -217,11 +235,24 @@ const updateCurrentTab = async () => {
 // เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
 updateCurrentTab()
 
-// Watch สำหรับตรวจสอบการเปลี่ยนแปลงของ statusId
+const checkSelectLorryLoadingForItem = () => {
+  let lorryIndex
 
-// watch(() => {
-//   console.log('Tabs:', currentTabNew.value)
-// })
+  switch (checkSelectLorry){
+  case 1:
+    lorryIndex = LorryLoadingCal
+    break
+  case 2:
+    lorryIndex = LorryLoadingCal2
+    break
+
+  default:
+    lorryIndex = null // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
+
+    return lorryIndex
+
+  }
+}
 
 const tabs = [
   {
@@ -249,7 +280,7 @@ const tabs3 = [
   },
   {
     title: 'Lorry Loading Check List',
-    component: LorryLoadingCal,
+    component: checkSelectLorryLoadingForItem(),
     icon: 'ri-instance-fill',
   },
 ]
@@ -311,6 +342,7 @@ const tabIndexConfig = {
   10: 0,
   12: 2,
   13: 2,
+  14: 2,
 
   // Add more statuses and indices as needed
 }
@@ -368,10 +400,22 @@ const textAlertDialogFunction = (word, success) => {
 
 const btnApprove = word => {
   isDialogConfirmVisible.value = true
-  console.log("word")
   wordForSubmit.value = word
 
 }
+
+const btnSelectLorry = (word, lorry) => {
+  isDialogConfirmVisible.value = true
+  wordForSubmit.value = word
+  resultSelectLorry.value = lorry
+
+}
+
+const handleSelectLorryLoading = word => {
+  isDialogConfirmVisible.value = false
+  isDialogSubmitSuccessVisible.value = true
+}
+
 
 const handleAcceptPackaging = word => {
   console.log("StaertSSSSS!!")
@@ -543,16 +587,85 @@ const handleAcceptPackaging = word => {
       />
     </div>
   </div>
-  <div v-if=" receivedTypeId === 3">
-    <div
-      v-for="(tab, index) in tabs3"
-      :key="index"
-      class="mt-20"
-    >
-      <Component
-        :is="tab.component"
-        v-if="currentTabNew === index"
-      />
+  <div v-if="receivedTypeId === 3">
+    <div v-if="checkSelectLorry === 1">
+      <VDialog
+        v-model="isDialogVisibleSelecrLorry"
+        width="500"
+        persistent
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardTitle class="text-center">
+            <span>Select Lorry Loading</span>
+          </VCardTitle>
+          <VCardText>
+            <VTable>
+              <thead>
+                <tr>
+                  <th class="bg-grey-lighten-3">
+                    Lorry Key
+                  </th>
+                  <th class="bg-grey-lighten-3">
+                    Title
+                  </th>
+                  <th class="bg-grey-lighten-3 text-center">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>10</td>
+                  <td>EKI-A TANK (11V-110)</td>
+                  <td class="text-center">
+                    <VBtn
+                      color="info"
+                      @click="btnSelectLorry('LORRY LOADING', 'EKI-A TANK (11V-110)')"
+                    >
+                      Action
+                    </VBtn>
+                  </td>
+                </tr>
+                <tr>
+                  <td>13</td>
+                  <td>EKI-A TANK (11V-432)</td>
+                  <td class="text-center">
+                    <VBtn
+                      color="info"
+                      @click="btnSelectLorry('LORRY LOADING', 'EKI-A TANK (11V-432)')"
+                    >
+                      Action
+                    </VBtn>
+                  </td>
+                </tr>
+              </tbody>
+            </VTable>
+          </VCardText>
+
+          <VCardText class="d-flex justify-center flex-wrap gap-4">
+            <VBtn
+              color="error"
+              @click="isDialogVisibleSelecrLorry = false"
+            >
+              close
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
+      <div
+        v-for="(tab, index) in tabs3"
+        :key="index"
+        class="mt-20"
+      >
+        <Component
+          :is="tab.component"
+          v-if="currentTabNew === index"
+        />
+      </div>
+      <div v-if="currentTabNew === 2" @click="isDialogVisibleSelecrLorry = true" class=" d-flex align-center justify-center mt-4">
+        <VBtn>Select Lorry Loading</VBtn>
+      </div>
     </div>
   </div>
   <div v-if="receivedTypeId === 1">
@@ -568,6 +681,7 @@ const handleAcceptPackaging = word => {
     </div>
   </div>
 
+  <!-- Approval Btn --> 
   <div
     v-if="statusId === 7 || statusId === 15"
     style="position: fixed;
@@ -628,7 +742,17 @@ const handleAcceptPackaging = word => {
               icon="ri-question-line"
             />
           </div>
-          <div class="text-center">
+          <div
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            class="text-center"
+          >
+            <span style="font-size: 22px; font-weight: bolder;">Would you like to selcet {{ wordForSubmit }}
+              from {{ resultSelectLorry }}?</span>
+          </div>
+          <div
+            v-else
+            class="text-center"
+          >
             <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
               Transaction?</span>
           </div>
@@ -641,12 +765,20 @@ const handleAcceptPackaging = word => {
           >
             Cancel
           </VBtn>
+          
           <VBtn
             v-if="wordForSubmit === 'APPROVE'"
             color="green"
             @click="handleAcceptPackaging"
           >
             {{ wordForSubmit }}
+          </VBtn>
+          <VBtn
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            color="green"
+            @click="handleSelectLorryLoading"
+          >
+            Confirm
           </VBtn>
         </VCardAction>
       </VCard>
@@ -656,7 +788,7 @@ const handleAcceptPackaging = word => {
   <section>
     <VDialog
       v-model="isDialogSubmitSuccessVisible"
-      width="500"
+      width="700"
     >
       <!-- Dialog Content -->
       <VCard>
@@ -668,7 +800,16 @@ const handleAcceptPackaging = word => {
               icon="ri-checkbox-circle-line"
             />
           </div>
-          <div class="text-center">
+          <div
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            class="text-center"
+          >
+            <span style="font-size: 22px; font-weight: bolder;">Select form {{ resultSelectLorry }} Success</span>
+          </div>
+          <div
+            v-else
+            class="text-center"
+          >
             <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
           </div>
         </VCardText>
@@ -732,6 +873,4 @@ const handleAcceptPackaging = word => {
       />
     </div>
   </section>
-
-  <VDivider />
 </template>
