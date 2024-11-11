@@ -1,5 +1,81 @@
 import { ref } from 'vue';
 
+
+export const ipaRequestData = {
+  "RmLorryLoadingFormJournalId": 0,
+  "ProductId": "",
+  "ProductName": "",
+  "LoadedDate": null,
+  "PurchaseOrderNo": null,
+  "WHStaff": "",
+  "WHStaffUpdatedDate": null,
+  "WHLeader": "",
+  "WHLeaderDate": null,
+  "WHSupervisor": "",
+  "WHSupervisorDate": null,
+  "L0101010001": "",
+  "L0101020001": "",
+  "L0101030001": "",
+  "L0101040001": "",
+  "L0101050001": "",
+  "L0101060001": "",
+  "L0102010101": "",
+  "L0102010102": "",
+  "L0102020101": "",
+  "L0102020102": "",
+  "L0102030101": "",
+  "L0102030102": "",
+  "L0102040101": "",
+  "L0102040102": "",
+  "L0102050101": "",
+  "L0103010101": "",
+  "L0103020101": "",
+  "L0103030101": "",
+  "L0103040101": "",
+  "L0103050101": "",
+  "L0103060101": "",
+  "L0103060102": "",
+  "L0104010101": "",
+  "L0104020101": "",
+  "L0104030101": "",
+  "L0104030102": "",
+  "L0105010101": "",
+  "L0105020101": "",
+  "L0105030101": "",
+  "L0106010101": "",
+  "L0106020101": "",
+  "L0106030101": "",
+  "L0106040101": "",
+  "L0106050101": "",
+  "L0106060101": "",
+  "L0107010101": "",
+  "L0107020101": "",
+  "L0107030101": "",
+  "L0107040101": "",
+  "L0108010101": "",
+  "L0108020101": "",
+  "L0108030101": "",
+  "L0108030102": "",
+  "L0108040101": "",
+  "L0108040102": "",
+  "L0108050101": "",
+  "L0109010101": "",
+  "L0109020101": "",
+  "L0109030101": "",
+  "L0109040101": "",
+  "L0109050101": "",
+  "L0109060101": "",
+  "L0109060102": "",
+  "L0109070101": "",
+  "L0109080101": "",
+  "L0109090101": "",
+  "L0109090102": "",
+  "L0109100101": "",
+  "L0109110101": "",
+  "L0109120101": "",
+  "L0109120102": ""
+}
+
 export const ipaItemTemplate = [
   // ข้อควรระวัง
   {
@@ -182,6 +258,10 @@ export const ipaItemTemplate = [
         {
           "name": "L0102050101", // litre
           "value:": ""
+        },
+        {
+          "name": "L0102050101", // litre
+          "value:": ""
         }
       ]
     }
@@ -193,7 +273,7 @@ export const ipaItemTemplate = [
     "practice": "1. หยุดรถและดับเครื่องเรียบร้อย",
     "condition": "รถต้องหยุดนิ่งสนิท",
     "result": {
-      "type": "ok",
+      "type": "oknot",
       "field": [
         {
           "name": "L0103010101", // oknot
@@ -208,7 +288,7 @@ export const ipaItemTemplate = [
     "practice": "2. เอาหมอนรองล้อรถเรียบร้อย",
     "condition": "รองล้อรถทั้งด้านหน้าและด้านหลัง",
     "result": {
-      "type": "ok",
+      "type": "oknot",
       "field": [
         {
           "name": "L0103020101", // oknot
@@ -223,7 +303,7 @@ export const ipaItemTemplate = [
     "practice": "3. ต่อสายกราวน์เรียบร้อย",
     "condition": "ต่อสายกราวน์บริเวณที่โหลดเข้ากับรถ",
     "result": {
-      "type": "ok",
+      "type": "oknot",
       "field": [
         {
           "name": "L0103030101", // oknot
@@ -238,7 +318,7 @@ export const ipaItemTemplate = [
     "practice": "4. เก็บตัวอย่าง ส่ง INSP เรียบร้อย",
     "condition": "1 ขวดแก้วเล็กและ 1 ขวดแก้วใหญ่เล็กด้านบนรถ",
     "result": {
-      "type": "ok",
+      "type": "oknot",
       "field": [
         {
           "name": "L0103040101", // oknot
@@ -253,7 +333,7 @@ export const ipaItemTemplate = [
     "practice": "5. นำลูกกุญแจมาเปิดล็อกวาล์ว 11",
     "condition": "IPA กุญแจใช้รหัสล็อค",
     "result": {
-      "type": "ok",
+      "type": "oknot",
       "field": [
         {
           "name": "L0103050101", // oknot
@@ -268,7 +348,7 @@ export const ipaItemTemplate = [
     "practice": "6. Moisture เท่าไหร่",
     "condition": "0.100 Max",
     "result": {
-      "type": "ok",
+      "type": "oknot",
       "field": [
         {
           "name": "L0103060101", // percen
@@ -556,6 +636,10 @@ export const ipaItemTemplate = [
         {
           "name": "L0108020101", // 1
           "value:": ""
+        },
+        {
+          "name": "L0108020101", // 1
+          "value:": ""
         }
       ]
     }
@@ -650,6 +734,10 @@ export const ipaItemTemplate = [
     "result": {
       "type": "actualCheck",
       "field": [
+        {
+          "name": "L0109030101", // 1
+          "value:": ""
+        },
         {
           "name": "L0109030101", // 1
           "value:": ""
