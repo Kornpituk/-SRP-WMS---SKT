@@ -28,6 +28,66 @@ import PackagingInspec from '../packagingForm/index.vue'
 import PackagingInspec2 from '../packagingForm/index.vue'
 import PackagingInspec3 from '../packagingForm/index.vue'
 
+//---------------- Import Lorry -------------------------------
+//--- A1
+import LorryLoadingA1IPA from '@/views/skt/receiving/lorryForm/a1/IPA.vue'
+import LorryLoadingA1EA11V1098C from '@/views/skt/receiving/lorryForm/a1/EA11V-1098C.vue'
+import LorryLoadingA1EPICHLO from '@/views/skt/receiving/lorryForm/a1/EPICHLO.vue'
+
+//--- A2
+import LorryLoadingA2SKTV144 from '@/views/skt/receiving/lorryForm/a2/SKTV-144.vue'
+import LorryLoadingA2SKTV145 from '@/views/skt/receiving/lorryForm/a2/SKTV-145.vue'
+
+//--- B1
+import LorryLoadingB1KARAMU from '@/views/skt/receiving/lorryForm/b1/KARAMU.vue'
+
+//--- C1
+import LorryLoadingC1AKUMARU from '@/views/skt/receiving/lorryForm/c1/AKUMARU.vue'
+
+//--- C2
+import LorryLoadingC2EKIAA111 from '@/views/skt/receiving/lorryForm/c2/EKIAA-111.vue'
+import LorryLoadingC2HAKU from '@/views/skt/receiving/lorryForm/c2/HAKU.vue'
+
+//--- C3
+import LorryLoadingC3DieselOil from '@/views/skt/receiving/lorryForm/c3/DieselOil.vue'
+
+//--- C4
+import LorryLoadingC4EKIAV432 from '@/views/skt/receiving/lorryForm/c4/EKIAV-432.vue'
+import LorryLoadingC4TELA from '@/views/skt/receiving/lorryForm/c4/TELA.vue'
+
+//--- C5
+import LorryLoadingC4NPAN30 from '@/views/skt/receiving/lorryForm/c5/NPAN30.vue'
+
+//--- C6
+import LorryLoadingC5SANNIX from '@/views/skt/receiving/lorryForm/c6/SANNIX.vue'
+
+const LorryComponents = {
+  '1': () => "IPA", //----- A1
+  '2': () => import('@/views/skt/receiving/lorryForm/a1/EA11V-1098C.vue'), //----- A1
+  '3': () => import('@/views/skt/receiving/lorryForm/a1/EPICHLO.vue'), //----- A1
+
+  '4': () => import('@/views/skt/receiving/lorryForm/a2/SKTV-144.vue'), //----- A2
+  '5': () => import('@/views/skt/receiving/lorryForm/a2/SKTV-145.vue'), //----- A2
+
+  '6': () => import('@/views/skt/receiving/lorryForm/b1/KARAMU.vue'), //----- B1
+
+  '7': () => import('@/views/skt/receiving/lorryForm/c1/AKUMARU.vue'), //----- C1
+
+  '9': () => import('@/views/skt/receiving/lorryForm/c2/HAKU.vue'), //----- C2
+  '10': () => import('@/views/skt/receiving/lorryForm/c2/EKIAA-111.vue'), //----- C2
+
+  '11': () => import('@/views/skt/receiving/lorryForm/c3/DieselOil.vue'), //----- C3
+
+  '12': () => import('@/views/skt/receiving/lorryForm/c4/TELA.vue'), //----- C4
+  '13': () => import('@/views/skt/receiving/lorryForm/c4/EKIAV-432.vue'), //----- C4
+
+  '15': () => import('@/views/skt/receiving/lorryForm/c5/NPAN30.vue'), //----- C5
+
+  '16': () => import('@/views/skt/receiving/lorryForm/c6/SANNIX.vue'), //----- C6
+
+  // Add other mappings as needed...
+}
+
 const checkStatus = status => {
   switch (status) {
   case 'Cancel':
@@ -184,14 +244,14 @@ const checkSelectLorry = ref([
     title: "EKI-A TANK (11V-110)",
     lorryFilename: "Lorry loading EKI-A (11V-110).pdf",
   },
-  {
-    lorryInfoKey: "13",
-    title: "EKI-A TANK (11V-432)",
-    lorryFilename: "Lorry loading EKI-A (11V-432).pdf",
-  },
+
+  // {
+  //   lorryInfoKey: "13",
+  //   title: "EKI-A TANK (11V-432)",
+  //   lorryFilename: "Lorry loading EKI-A (11V-432).pdf",
+  // },
 ],
 )
-
 
 const resultSelectLorry = ref([])
 
@@ -249,19 +309,53 @@ const updateCurrentTab = async () => {
 // เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
 updateCurrentTab()
 
+const matchingLorryInfoWithComponent = lorryInfoKey => {
+  switch (lorryInfoKey) {
+  case '1':
+    return LorryLoadingA1IPA
+  case '2':
+    return LorryLoadingA1EA11V1098C
+  case '3':
+    return LorryLoadingA1EPICHLO
+  case '4':
+    return LorryLoadingA2SKTV144
+  case '5':
+    return LorryLoadingA2SKTV145
+  case '6':
+    return LorryLoadingB1KARAMU
+  case '7':
+    return LorryLoadingC1AKUMARU
+  case '9':
+    return LorryLoadingC2HAKU
+  case '10':
+    return LorryLoadingC2EKIAA111
+  case '11':
+    return LorryLoadingC3DieselOil
+  case '12':
+    return LorryLoadingC4TELA
+  case '13':
+    return LorryLoadingC4EKIAV432
+  case '15':
+    return LorryLoadingC5NPAN30
+  case '16':
+    return LorryLoadingC6SANNIX
+  default:
+    console.warn(`No component found for key: ${lorryInfoKey}`)
+    
+    return null
+  }
+}
+
 const checkSelectLorryLoadingForItem = () => {
   if(checkSelectLorry.value){
-    console.log("Checking",  checkSelectLorry.value.length)
     if(checkSelectLorry.value.length === 2){
       trickerLorryLoadind.value = false
-      console.log("Checking in 2",  checkSelectLorry.value.length, trickerLorryLoadind.value)
       
       return null
     }else if(checkSelectLorry.value.length === 1){
       trickerLorryLoadind.value = true
-      console.log("Checking in 1",  checkSelectLorry.value.length, trickerLorryLoadind.value)
       
-      return LorryLoadingCal
+      return matchingLorryInfoWithComponent(checkSelectLorry.value[0].lorryInfoKey)
     }
   }
 }
