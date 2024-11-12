@@ -970,6 +970,7 @@ const findProductByName = productName => {
 
 const productionPlan = ref([])
 const selectedItem = ref(null)
+const selectedDataTables = ref([])
 
 const addProductToPlantrue = () => {
   if (selectedItem.value) {
@@ -1111,8 +1112,16 @@ const headers = [
 
 const headersDataTable = [
   {
+    title: 'data-table-select',
+    key: 'data-table-select',
+    align: "center",
+    fixed: true,
+    readonly: true,
+  },
+  {
     title: 'Status',
     key: 'status',
+    fixed: true,
   },
   {
     title: 'No.',
@@ -1666,7 +1675,7 @@ const headersDataTable = [
 
   <div
     v-if="RoleAccount === 'User'"
-    class="mt-2"
+    class="my-2"
   >
     <VCard>
       <VCardText class="pa-2">
@@ -1674,7 +1683,14 @@ const headersDataTable = [
           <span style="font-size: 12px;">Add Batch</span>
         </VBtn>
         <VBtn
-          class="mx-4"
+          color="error"
+          class="mx-2"
+          @click="addBatch = false"
+        >
+          <span style="font-size: 12px;">Cancel Batch</span>
+        </VBtn>
+        <VBtn
+          class="mx-2"
           color="warning"
           @click="viewAllData"
         >
@@ -1685,7 +1701,7 @@ const headersDataTable = [
         </VBtn>
         <VBtn
           color="info"
-          class="mx-4"
+          class="mx-2"
           @click="addEmptyRowToPlan"
         >
           <span style="font-size: 12px;">Add Item</span>
@@ -1729,8 +1745,11 @@ const headersDataTable = [
   </div>
 
   <!-- ----------             Production plan                                ------------------------------------ -->
-  <section>
-    <VCard v-if="false" class="mt-4">
+  <section v-if="addBatch">
+    <VCard
+      v-if="false"
+      class="mt-4"
+    >
       <VTable class=" table-header-bg rounded-0">
         <!-- 👉 table head -->
         <thead class="text-no-wrap">
@@ -2605,16 +2624,30 @@ const headersDataTable = [
     <VCard>
       <VCardText>
         <VDataTable
-          v-if="addBatch"
           v-model:page="currentPageDataTable"
+          v-model="selectedDataTables"
           :headers="headersDataTable"
           :items="productionPlan"
           :items-per-page="5"
+          show-select
           class="text-no-wrap"
         >
           <template #item="{ item }">
             <tr style="font-size: 14px;">
-              <td class="text-start">
+              <td
+                class="text-center px-2"
+                style="position: sticky; z-index: 1; left: 0;"
+              >
+                <VCheckboxBtn
+                  v-model="selectedDataTables"
+                  :value="item.raw"
+                  @update:modelValue="(selected) => handleSelection(selected, item.raw)"
+                />
+              </td>
+              <td
+                style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
+                class="text-start"
+              >
                 <span v-if="item.raw.status === 'Aprove'">
                   <VChip color="success">{{ item.raw.status }}</VChip>
                 </span>
