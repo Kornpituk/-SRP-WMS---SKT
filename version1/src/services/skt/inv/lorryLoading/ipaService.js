@@ -13,10 +13,10 @@ export const ipaRequestData = {
   "WHLeaderDate": null,
   "WHSupervisor": "",
   "WHSupervisorDate": null,
-  "L0101010001": "",
-  "L0101020001": "",
-  "L0101030001": "",
-  "L0101040001": "",
+  "L0101010001": "1",
+  "L0101020001": "1",
+  "L0101030001": "1",
+  "L0101040001": "1",
   "L0101050001": "",
   "L0101060001": "",
   "L0102010101": "",
@@ -199,11 +199,11 @@ export const ipaItemTemplate = [
       "type": "cd",
       "field": [
         {
-          "name": "L0102020101", // A
+          "name": "L0102020101", // C
           "value:": ""
         },
         {
-          "name": "L0102020102", // B
+          "name": "L0102020102", // D
           "value:": ""
         }
       ]

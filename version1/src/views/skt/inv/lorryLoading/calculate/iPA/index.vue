@@ -3,31 +3,42 @@ import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import { watchEffect, computed, watch, ref } from 'vue'
 import { ipaItemTemplate, ipaRequestData } from '@/services/skt/inv/lorryLoading/ipaService';
 
-const varD = ref('0')
+var ipaItems = reactive(ipaItemTemplate);
 
-var ipaItems = ref(ipaItemTemplate);
-
-const getValue = function (e) {
-  console.log(e.target);
-  console.log(ipaItems);
-}
-
-watch(varD, (i) => {
-
-});
+var aVariable = ref(ipaItems[6].result.field[0]);
+var bVariable = ref(ipaItems[6].result.field[1]);
+var cVariable = ref(ipaItems[7].result.field[0]);
+var dVariable = ref(ipaItems[7].result.field[1]);
+var bdVariable = ref(ipaItems[8].result.field[0]);
+// var eVariable = ref(ipaItems[8].result.field[0]);
+// var eVariable = ref(ipaItems[8].result.field[0]);
 
 onMounted(() => {
-
-  for (var i of ipaItems.value) {
+  for (var i of ipaItems) {
     for (var f of i.result.field) {
       f.value = ipaRequestData[f.name];
     }
   }
 })
 
-const debugChange = function (e) {
-  console.log(ipaItemTemplate);
+
+
+function aChangeValue(e) {
+  // aValue = e.target.value;
+  // ipaItems.value[6].result.field[1].value = 999;
 }
+
+watch(ipaItems[6].result.field[0], async (x) => {
+  let b = x.value / (0.78);
+  ipaItems[6].result.field[1].value = b;
+});
+
+watch(ipaItems[7].result.field[0], async (x) => {
+  let d = (x.value * 5.32) + 740.45;
+  ipaItems[7].result.field[1].value = d;
+  ipaItems[8].result.field[0].value = ipaItems[6].result.field[1].value + ipaItems[7].result.field[1].value;
+
+});
 
 
 </script>
@@ -53,50 +64,12 @@ const debugChange = function (e) {
         <VRow>
           <VCol style="border: 1px solid black;" cols="8">
             <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VTextField density="compact" variant="outlined" label=" By : " v-model="varD" />
+              <VTextField density="compact" variant="outlined" label=" By : " v-model="aValue" />
             </div>
           </VCol>
           <VCol style="border: 1px solid black;" cols="4">
             <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
               <VTextField density="compact" variant="outlined" label="Issued Date :" />
-            </div>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol style="border: 1px solid black;" cols="8">
-            <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VTextField density="compact" variant="outlined" label="Date" />
-            </div>
-          </VCol>
-          <VCol style="border: 1px solid black;" cols="2">
-            <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VLabel for="customizer-navbar-blur" class="text-high-emphasis">
-                Leader
-              </VLabel>
-            </div>
-          </VCol>
-          <VCol style="border: 1px solid black;" cols="2">
-            <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VLabel for="customizer-navbar-blur" class="text-high-emphasis">
-                Supervisor
-              </VLabel>
-            </div>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol style="border: 1px solid black;" cols="8">
-            <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VTextField density="compact" variant="outlined" label=" P/O no." />
-            </div>
-          </VCol>
-          <VCol style="border: 1px solid black;" cols="2">
-            <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VTextField density="compact" variant="outlined" label="" />
-            </div>
-          </VCol>
-          <VCol style="border: 1px solid black;" cols="2">
-            <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
-              <VTextField density="compact" variant="outlined" label="" />
             </div>
           </VCol>
         </VRow>
@@ -393,7 +366,32 @@ const debugChange = function (e) {
       </VRow>
       <VRow>
         <VCol>
-          <!-- <VLabel class="d-flex justify-center"> ={{ ipaItems[0].results[0].name }}/ 0.78</VLabel> -->
+          <VLabel class="d-flex justify-center"> = {{ aVariable.value }} /0.78</VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center"> = {{ bVariable.value }} Litre</VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center"> (D) - ((C) X 5.32) + 740.45</VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center"> = ({{ cVariable.value }}X 5.32 ) + 740.45</VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center"> = {{ dVariable.value }}Litre</VLabel>
+        </VCol>
+      </VRow>
+      <VRow>
+        <VCol>
+          <VLabel class="d-flex justify-center"> Density IPA = 0.78</VLabel>
         </VCol>
       </VRow>
     </div>
