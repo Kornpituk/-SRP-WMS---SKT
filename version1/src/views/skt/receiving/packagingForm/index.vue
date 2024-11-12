@@ -622,6 +622,13 @@ const saveDraftHeader = async () => {
     
       throw 'dataHeader invalid'
     }
+
+    if(bodyCheck.pcsPerSticker === 0 || !bodyCheck.pcsPerSticker || bodyCheck.pcsPerSticker === '0'){
+      alertHeaderErrorMessage.value.success = true
+
+      alertHeaderErrorMessage.value.actualCheck = "Label 1(below note) is required. Please enter a value."
+      throw 'Label 1 invalid'
+    }
   }
 
   const result = await handleSaveDraft(poEtlLogDetailJournalIDQueryParameters.value, dataHeader.value, urlApi.value, whereHouse.value, accessTokenAtStore)
@@ -735,7 +742,6 @@ watchEffect(() => {
 
 const textAlertError = ref({
   success: true,
-
   comment: '',
   coa: '',
 })
@@ -747,6 +753,8 @@ const handleAcceptPackaging = async () => {
   
   try {
     wordForSubmit.value = "ACCEPT"
+    trickerSubmit.value = true
+
 
     // รอให้ submitButtonVisibleNew() ทำงานเสร็จ
     const handeSaveDraf = await submitButtonVisibleNew()
@@ -779,7 +787,7 @@ const handleAcceptPackaging = async () => {
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
         window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-      }, 300) // 10000 มิลลิวินาที = 10 วินาที
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
 
       // location.reload() // รีเฟรชหน้า
     } else {
@@ -1801,6 +1809,9 @@ const saveDraftData = word => {
               suffix="PCS"
               type="number"
               density="compact"
+              :rules="[
+                v => v > 0 || 'Label is required!',
+              ]"
             >
               <template
                 v-if="!frozeCheck"
@@ -2392,7 +2403,7 @@ const saveDraftData = word => {
                 v-if="alertHeaderErrorMessage.actualCheck"
                 class="text-start"
                 style="font-size: 12px;"
-              >Actual Check :</span> <span
+              >Header Check :</span> <span
                 style="font-size: 12px;"
                 class="text-red"
               >{{ alertHeaderErrorMessage.actualCheck }} </span>

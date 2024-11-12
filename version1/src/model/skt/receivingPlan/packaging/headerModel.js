@@ -32,7 +32,7 @@ export const createDraftBody = dataHeader => {
     note: dataHeader.note || '',
     coAChecked: dataHeader.coAChecked,
     actualCheck: parseInt(dataHeader.actualCheck, 10) || 0,
-    pcsPerSticker: dataHeader.pcsPerSticker || 0,
+    pcsPerSticker: dataHeader.pcsPerSticker || 1,
   }
 }
 

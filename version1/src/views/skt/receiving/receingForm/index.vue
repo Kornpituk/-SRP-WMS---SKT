@@ -25,6 +25,68 @@ import RawMatForm from '../rawMat/index.vue'
 import LorryLoadingCal from '../lorryForm/flow/index.vue' 
 import RawMatInspec from '../inspecReqForm/index.vue'
 import PackagingInspec from '../packagingForm/index.vue'
+import PackagingInspec2 from '../packagingForm/index.vue'
+import PackagingInspec3 from '../packagingForm/index.vue'
+
+//---------------- Import Lorry -------------------------------
+//--- A1
+import LorryLoadingA1IPA from '@/views/skt/receiving/lorryForm/a1/IPA.vue'
+import LorryLoadingA1EA11V1098C from '@/views/skt/receiving/lorryForm/a1/EA11V-1098C.vue'
+import LorryLoadingA1EPICHLO from '@/views/skt/receiving/lorryForm/a1/EPICHLO.vue'
+
+//--- A2
+import LorryLoadingA2SKTV144 from '@/views/skt/receiving/lorryForm/a2/SKTV-144.vue'
+import LorryLoadingA2SKTV145 from '@/views/skt/receiving/lorryForm/a2/SKTV-145.vue'
+
+//--- B1
+import LorryLoadingB1KARAMU from '@/views/skt/receiving/lorryForm/b1/KARAMU.vue'
+
+//--- C1
+import LorryLoadingC1AKUMARU from '@/views/skt/receiving/lorryForm/c1/AKUMARU.vue'
+
+//--- C2
+import LorryLoadingC2EKIAA111 from '@/views/skt/receiving/lorryForm/c2/EKIAA-111.vue'
+import LorryLoadingC2HAKU from '@/views/skt/receiving/lorryForm/c2/HAKU.vue'
+
+//--- C3
+import LorryLoadingC3DieselOil from '@/views/skt/receiving/lorryForm/c3/DieselOil.vue'
+
+//--- C4
+import LorryLoadingC4EKIAV432 from '@/views/skt/receiving/lorryForm/c4/EKIAV-432.vue'
+import LorryLoadingC4TELA from '@/views/skt/receiving/lorryForm/c4/TELA.vue'
+
+//--- C5
+import LorryLoadingC4NPAN30 from '@/views/skt/receiving/lorryForm/c5/NPAN30.vue'
+
+//--- C6
+import LorryLoadingC5SANNIX from '@/views/skt/receiving/lorryForm/c6/SANNIX.vue'
+
+const LorryComponents = {
+  '1': () => "IPA", //----- A1
+  '2': () => import('@/views/skt/receiving/lorryForm/a1/EA11V-1098C.vue'), //----- A1
+  '3': () => import('@/views/skt/receiving/lorryForm/a1/EPICHLO.vue'), //----- A1
+
+  '4': () => import('@/views/skt/receiving/lorryForm/a2/SKTV-144.vue'), //----- A2
+  '5': () => import('@/views/skt/receiving/lorryForm/a2/SKTV-145.vue'), //----- A2
+
+  '6': () => import('@/views/skt/receiving/lorryForm/b1/KARAMU.vue'), //----- B1
+
+  '7': () => import('@/views/skt/receiving/lorryForm/c1/AKUMARU.vue'), //----- C1
+
+  '9': () => import('@/views/skt/receiving/lorryForm/c2/HAKU.vue'), //----- C2
+  '10': () => import('@/views/skt/receiving/lorryForm/c2/EKIAA-111.vue'), //----- C2
+
+  '11': () => import('@/views/skt/receiving/lorryForm/c3/DieselOil.vue'), //----- C3
+
+  '12': () => import('@/views/skt/receiving/lorryForm/c4/TELA.vue'), //----- C4
+  '13': () => import('@/views/skt/receiving/lorryForm/c4/EKIAV-432.vue'), //----- C4
+
+  '15': () => import('@/views/skt/receiving/lorryForm/c5/NPAN30.vue'), //----- C5
+
+  '16': () => import('@/views/skt/receiving/lorryForm/c6/SANNIX.vue'), //----- C6
+
+  // Add other mappings as needed...
+}
 
 const checkStatus = status => {
   switch (status) {
@@ -134,6 +196,8 @@ const countCurrentTab = ref(0)
 //------------- journalId
 const responseGener = ref([])
 const currentTabNew = ref(sessionStorage.getItem('currentTabReceivingForm'))
+const trickerLorryLoadind = ref(false)
+const isDialogVisibleSelecrLorry = ref(true)
 
 const generatedJournalId = async () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
@@ -170,10 +234,31 @@ const generatedJournalId = async () => {
     })
 }
 
-
 watch(() => {
   generatedJournalId()
-  
+})
+
+const checkSelectLorry = ref([
+  {
+    lorryInfoKey: "10",
+    title: "EKI-A TANK (11V-110)",
+    lorryFilename: "Lorry loading EKI-A (11V-110).pdf",
+  },
+
+  // {
+  //   lorryInfoKey: "13",
+  //   title: "EKI-A TANK (11V-432)",
+  //   lorryFilename: "Lorry loading EKI-A (11V-432).pdf",
+  // },
+],
+)
+
+const resultSelectLorry = ref([])
+
+watch(() => {
+  if(checkSelectLorry.value === 0){
+    isDialogVisibleSelecrLorry.value = true
+  }
 })
 
 const checkCurrentTabBeforIn = status => {
@@ -196,6 +281,7 @@ const checkCurrentTabBeforIn = status => {
     
   case 12:
   case 13:
+  case 14:
     tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
     break
     
@@ -205,6 +291,12 @@ const checkCurrentTabBeforIn = status => {
 
   return tabIndex
 }
+
+const itemsLorrySelect = [
+  'N PAN 30',
+  'SANNIX KC-703  TANK ',
+  'TELA (AMMONIA TANK   11V - 511 )',
+]
 
 const updateCurrentTab = async () => {
   // รอให้ generatedJournalId และ generated ทำงานเสร็จก่อน
@@ -217,11 +309,56 @@ const updateCurrentTab = async () => {
 // เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
 updateCurrentTab()
 
-// Watch สำหรับตรวจสอบการเปลี่ยนแปลงของ statusId
+const matchingLorryInfoWithComponent = lorryInfoKey => {
+  switch (lorryInfoKey) {
+  case '1':
+    return LorryLoadingA1IPA
+  case '2':
+    return LorryLoadingA1EA11V1098C
+  case '3':
+    return LorryLoadingA1EPICHLO
+  case '4':
+    return LorryLoadingA2SKTV144
+  case '5':
+    return LorryLoadingA2SKTV145
+  case '6':
+    return LorryLoadingB1KARAMU
+  case '7':
+    return LorryLoadingC1AKUMARU
+  case '9':
+    return LorryLoadingC2HAKU
+  case '10':
+    return LorryLoadingC2EKIAA111
+  case '11':
+    return LorryLoadingC3DieselOil
+  case '12':
+    return LorryLoadingC4TELA
+  case '13':
+    return LorryLoadingC4EKIAV432
+  case '15':
+    return LorryLoadingC5NPAN30
+  case '16':
+    return LorryLoadingC6SANNIX
+  default:
+    console.warn(`No component found for key: ${lorryInfoKey}`)
+    
+    return null
+  }
+}
 
-// watch(() => {
-//   console.log('Tabs:', currentTabNew.value)
-// })
+const checkSelectLorryLoadingForItem = () => {
+  if(checkSelectLorry.value){
+    if(checkSelectLorry.value.length === 2){
+      trickerLorryLoadind.value = false
+      
+      return null
+    }else if(checkSelectLorry.value.length === 1){
+      trickerLorryLoadind.value = true
+      
+      return matchingLorryInfoWithComponent(checkSelectLorry.value[0].lorryInfoKey)
+    }
+  }
+}
 
 const tabs = [
   {
@@ -249,7 +386,7 @@ const tabs3 = [
   },
   {
     title: 'Lorry Loading Check List',
-    component: LorryLoadingCal,
+    component: checkSelectLorryLoadingForItem(),
     icon: 'ri-instance-fill',
   },
 ]
@@ -311,6 +448,7 @@ const tabIndexConfig = {
   10: 0,
   12: 2,
   13: 2,
+  14: 2,
 
   // Add more statuses and indices as needed
 }
@@ -368,10 +506,22 @@ const textAlertDialogFunction = (word, success) => {
 
 const btnApprove = word => {
   isDialogConfirmVisible.value = true
-  console.log("word")
   wordForSubmit.value = word
 
 }
+
+const btnSelectLorry = (word, lorry) => {
+  isDialogConfirmVisible.value = true
+  wordForSubmit.value = word
+  resultSelectLorry.value = lorry
+
+}
+
+const handleSelectLorryLoading = word => {
+  isDialogConfirmVisible.value = false
+  isDialogSubmitSuccessVisible.value = true
+}
+
 
 const handleAcceptPackaging = word => {
   console.log("StaertSSSSS!!")
@@ -543,7 +693,82 @@ const handleAcceptPackaging = word => {
       />
     </div>
   </div>
-  <div v-if=" receivedTypeId === 3">
+  <div v-if="receivedTypeId === 3">
+    <div v-if="currentTabNew === 2 && trickerLorryLoadind === false">
+      <VDialog
+        v-model="isDialogVisibleSelecrLorry"
+        width="500"
+        persistent
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardTitle class="text-center">
+            <span>Select Lorry Loading</span>
+          </VCardTitle>
+          <VCardText>
+            <VTable>
+              <thead>
+                <tr>
+                  <th class="bg-grey-lighten-3">
+                    Lorry Key
+                  </th>
+                  <th class="bg-grey-lighten-3">
+                    Lorry Name
+                  </th>
+                  <th class="bg-grey-lighten-3 text-center">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(itemLorry, index) in checkSelectLorry"
+                  :key="index"
+                >
+                  <td>
+                    {{ itemLorry.lorryInfoKey }}
+                  </td>
+                  <td>
+                    {{ itemLorry.title }}
+                  </td>
+                  <td class="text-center">
+                    <VBtn
+                      color="info"
+                      @click="btnSelectLorry('LORRY LOADING', 'EKI-A TANK (11V-432)')"
+                    >
+                      Action
+                    </VBtn>
+                  </td>
+                </tr>
+              </tbody>
+            </VTable>
+          </VCardText>
+
+          <VCardText class="d-flex justify-center flex-wrap gap-4">
+            <VBtn
+              color="error"
+              @click="isDialogVisibleSelecrLorry = false"
+            >
+              close
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
+      <div
+        class=" d-flex align-center justify-center mt-4"
+        @click="isDialogVisibleSelecrLorry = true"
+      >
+        <VBtn
+          append-icon="ri-file-list-line"
+          variant="outlined"
+        >
+          Select Lorry LOADING
+          <template #append>
+            <VIcon size="30" />
+          </template>
+        </VBtn>
+      </div>
+    </div>
     <div
       v-for="(tab, index) in tabs3"
       :key="index"
@@ -568,6 +793,7 @@ const handleAcceptPackaging = word => {
     </div>
   </div>
 
+  <!-- Approval Btn --> 
   <div
     v-if="statusId === 7 || statusId === 15"
     style="position: fixed;
@@ -628,7 +854,17 @@ const handleAcceptPackaging = word => {
               icon="ri-question-line"
             />
           </div>
-          <div class="text-center">
+          <div
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            class="text-center"
+          >
+            <span style="font-size: 22px; font-weight: bolder;">Would you like to selcet {{ wordForSubmit }}
+              from {{ resultSelectLorry }}?</span>
+          </div>
+          <div
+            v-else
+            class="text-center"
+          >
             <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
               Transaction?</span>
           </div>
@@ -641,12 +877,20 @@ const handleAcceptPackaging = word => {
           >
             Cancel
           </VBtn>
+          
           <VBtn
             v-if="wordForSubmit === 'APPROVE'"
             color="green"
             @click="handleAcceptPackaging"
           >
             {{ wordForSubmit }}
+          </VBtn>
+          <VBtn
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            color="green"
+            @click="handleSelectLorryLoading"
+          >
+            Confirm
           </VBtn>
         </VCardAction>
       </VCard>
@@ -656,7 +900,7 @@ const handleAcceptPackaging = word => {
   <section>
     <VDialog
       v-model="isDialogSubmitSuccessVisible"
-      width="500"
+      width="700"
     >
       <!-- Dialog Content -->
       <VCard>
@@ -668,7 +912,16 @@ const handleAcceptPackaging = word => {
               icon="ri-checkbox-circle-line"
             />
           </div>
-          <div class="text-center">
+          <div
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            class="text-center"
+          >
+            <span style="font-size: 22px; font-weight: bolder;">Select form {{ resultSelectLorry }} Success</span>
+          </div>
+          <div
+            v-else
+            class="text-center"
+          >
             <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
           </div>
         </VCardText>
@@ -732,6 +985,4 @@ const handleAcceptPackaging = word => {
       />
     </div>
   </section>
-
-  <VDivider />
 </template>

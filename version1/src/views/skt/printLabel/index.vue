@@ -298,12 +298,20 @@ const headers = [
     readonly: true,
   },
   {
+    title: 'No.',
+    key: 'no',
+  },
+  {
     title: 'Category',
     key: 'category',
   },
   {
     title: 'Lot',
     key: 'lot',
+  },
+  {
+    title: 'Lot QTY',
+    key: 'lotQty',
   },
   {
     title: 'Barcode',
@@ -314,7 +322,7 @@ const headers = [
     key: 'lotDescription',
   },
   {
-    title: 'Received Date',
+    title: 'RCVD Date',
     key: 'receivedDate',
     
   },
@@ -333,15 +341,23 @@ const headers = [
   
   {
     title: 'Location',
-    key: 'updatedDate',
+    key: 'locationName',
   },
   {
-    title: 'PURC(PCS)',
+    title: 'RCVD(PCS)',
     key: 'qtyPcs',
   },
   {
-    title: 'PURC(KGS)',
+    title: 'RCVD(KGS)',
     key: 'qtyKgs',
+  },
+  {
+    title: 'Update By',
+    key: 'updatedBy',
+  },
+  {
+    title: 'Update Date',
+    key: 'updatedDate',
   },
 ]
 
@@ -366,6 +382,83 @@ const eXprtreeNode = () => {
   console.log('eXprtreeNode', selectedDataTables.value)
 }
 
+const headersNewEx = [
+  { title: '', key: 'data-table-expand' },
+  {
+    title: 'No.',
+    key: 'no',
+  },
+  {
+    title: 'Category',
+    key: 'category',
+  },
+  {
+    title: 'Lot',
+    key: 'lot',
+  },
+  {
+    title: 'Lot QTY',
+    key: 'lotQty',
+  },
+  {
+    title: 'RCVD Date',
+    key: 'receivedDate',
+    
+  },
+  {
+    title: 'P/O No',
+    key: 'purchaseOrderNo',
+  },
+  {
+    title: 'Item Code',
+    key: 'productId',
+  },
+  {
+    title: 'Item Name',
+    key: 'productName',
+  },
+  
+  {
+    title: 'Location',
+    key: 'locationName',
+  },
+  {
+    title: 'RCVD(PCS)',
+    key: 'qtyPcs',
+  },
+  {
+    title: 'RCVD(KGS)',
+    key: 'qtyKgs',
+  },
+  {
+    title: 'Update By',
+    key: 'updatedBy',
+  },
+  {
+    title: 'Update Date',
+    key: 'updatedDate',
+  },
+]
+
+const headersSubNewEx = [
+  {
+    title: 'Barcode',
+    key: 'barcode',
+  },
+  {
+    title: 'NO/RCVD(PCS)',
+    key: 'lotDescription',
+  },
+  {
+    title: 'Item Code',
+    key: 'productId',
+  },
+  {
+    title: 'Item Name',
+    key: 'productName',
+  },
+]
+
 const dessertHeaders = [
   { title: '', key: 'data-table-expand' },
   {
@@ -382,12 +475,20 @@ const dessertHeaders = [
 
 const headerSubtitle = [
   { title: '' },
+  { title: '' },
+  { title: '' },
+  { title: '' },
   { title: '', key: 'checkbox' },
-  { title: 'name', key: 'name' },
-  { title: 'calories', key: 'calories' },
-  { title: 'fat', key: 'fat' },
-  { title: 'carbs', key: 'carbs' },
-  { title: 'protein', key: 'protein' },
+  { title: 'Item Code', key: 'name' },
+  { title: 'Item Name', key: 'calories' },
+  { title: 'Lot', key: 'fat' },
+  { title: 'Barcode', key: 'carbs' },
+  { title: 'NO/RCVD(PCS)', key: 'protein' },
+  { title: '' },
+  { title: '' },
+  { title: '' },
+  { title: '' },
+  { title: '' },
 ]
 
 const desserts = [
@@ -403,6 +504,7 @@ const desserts = [
         fat: 5.2,
         carbs: 25,
         protein: 54,
+        barcode: '00000000118001',
       },
       {
         name: 'BLS',
@@ -410,6 +512,7 @@ const desserts = [
         fat: 7.1,
         carbs: 22,
         protein: 54,
+        barcode: '00000000118002',
       },
       {
         name: 'SLV',
@@ -417,6 +520,23 @@ const desserts = [
         fat: 6.2,
         carbs: 24,
         protein: 54,
+        barcode: '00000000118003',
+      },
+      {
+        name: 'WRC',
+        calories: 157,
+        fat: 6.2,
+        carbs: 24,
+        protein: 54,
+        barcode: '00000000118004',
+      },
+      {
+        name: 'JLK',
+        calories: 157,
+        fat: 6.2,
+        carbs: 24,
+        protein: 54,
+        barcode: '00000000118005',
       },
     ],
   },
@@ -432,6 +552,15 @@ const desserts = [
         fat: 9.0,
         carbs: 37,
         protein: 54,
+        barcode: '1N241028098001',
+      },
+      {
+        name: 'UER',
+        calories: 237,
+        fat: 9.0,
+        carbs: 37,
+        protein: 54,
+        barcode: '1N241028098003',
       },
     ],
   },
@@ -447,6 +576,7 @@ const desserts = [
         fat: 16.0,
         carbs: 23,
         protein: 54,
+        barcode: '1N241028098002',
       },
     ],
   },
@@ -665,7 +795,7 @@ const dataTableColor = ref('#E0F7FA')
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Po No.
+                      P/O No.
                     </span>
                   </template>
                 </VTextField>
@@ -750,12 +880,11 @@ const dataTableColor = ref('#E0F7FA')
                       style="width: 100%; height: 40px;"
                       @click="isDialogPrintLabelVisible = true"
                     >
-                      <img
-                        src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
+                      <VIcon
                         style="width: 27px;"
-                        class="custom-small-img"
-                      >
-                      <span style="font-size: 12px;">{{ $t('Export file') }}</span>
+                        icon="ri-printer-fill"
+                      />
+                      <span style="font-size: 12px;">{{ $t('Print') }}</span>
                     </VBtn>
                   </VCol>
                 </VRow>
@@ -1967,6 +2096,7 @@ const dataTableColor = ref('#E0F7FA')
                   :value="item.raw"
                 />
               </td>
+              <td />
               <td
                 class="text-start px-2"
                 style="min-width: 120px;"
@@ -2120,15 +2250,15 @@ const dataTableColor = ref('#E0F7FA')
               </td>
               
               <td
-                class="text-center px-2"
-                style="min-width: 130px;"
+                class="text-start px-2"
+                style="min-width: 180px;"
                 :style="{ 
                   backgroundColor: 
                     isSelected(item.raw.barcode, 2) ? dataTableColor : 
                     ''
                 }"
               >
-                <span style="font-size: 12px;">{{ (item.raw.updatedDate) }}</span>
+                <span style="font-size: 12px;">{{ (item.raw.locationName) }}</span>
               </td>
               <td
                 class="text-center px-2"
@@ -2151,6 +2281,34 @@ const dataTableColor = ref('#E0F7FA')
                 }"
               >
                 <span style="font-size: 12px;">{{ formatNumber(item.raw.qtyKgs) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 120px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ (item.raw.updatedBy) }}</span>
+              </td>
+              <td
+                class="text-start px-2"
+                style="min-width: 140px;"
+                :style="{ 
+                  backgroundColor: 
+                    isSelected(item.raw.barcode, 2) ? dataTableColor : 
+                    ''
+                }"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ convertDate(item.raw.updatedDate) }}</span>
               </td>
               <td
                 v-if="false"
@@ -2450,10 +2608,11 @@ const dataTableColor = ref('#E0F7FA')
     <VCard>
       <VCardText>
         <VDataTable
+          v-if="printLabelFormViewResult"
           v-model:expanded="expanded"
           v-model="selectedDataTables"
-          :headers="dessertHeaders"
-          :items="desserts"
+          :headers="headersNewEx"
+          :items="printLabelFormViewResult"
           :items-per-page="5"
           class="text-no-wrap"
           expand-on-click
@@ -2467,13 +2626,15 @@ const dataTableColor = ref('#E0F7FA')
               <th
                 v-for="(headerSub, index) in headerSubtitle"
                 :key="index"
+                class="px-0"
               >
                 {{ headerSub.title }}
               </th>
             </tr>
             <tr>
               <td />
-              <td>
+              <td />
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.name + '-checkbox-' + index"
@@ -2484,51 +2645,51 @@ const dataTableColor = ref('#E0F7FA')
                   />
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.name +index"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                   class="d-flex align-center"
                 >
                   {{ sub.name }}
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.calories + index"
                   class="d-flex align-center"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
                   {{ sub.calories }}
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.fat + index"
                   class="d-flex align-center"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
                   {{ sub.fat }}
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.carbs + index"
                   class="d-flex align-center"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
                   {{ sub.carbs }}
                 </div>
               </td>
-              <td>
+              <td class="px-0">
                 <div
                   v-for="(sub, index) in item.raw.sources"
                   :key="sub.protein + index"
-                  style="height: 36px;"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                   class="d-flex align-center"
                 >
                   {{ sub.protein }}
@@ -2540,7 +2701,14 @@ const dataTableColor = ref('#E0F7FA')
           <template #item.name="{ item}">
             <tr>
               <td>
-                <span class="text-capitalize">{{ item.raw.name }}</span>
+                <span class="text-capitalize">{{ item.raw.name }}: {{ item.raw.sources.length }}</span>
+              </td>
+            </tr>
+          </template>
+          <template #item.lotQty="{ item}">
+            <tr>
+              <td>
+                <span class="text-capitalize">{{ item.raw.length }}</span>
               </td>
             </tr>
           </template>
