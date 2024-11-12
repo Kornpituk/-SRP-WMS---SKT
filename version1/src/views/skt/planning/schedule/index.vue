@@ -8,6 +8,8 @@ import { ref, watchEffect } from 'vue'
 
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
+import { VDataTable } from 'vuetify/labs/VDataTable'
+
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
@@ -741,7 +743,6 @@ const submitProductionPlan = index => {
   isDialogSubmitSuccessVisible.value = true
 }
 
-
 const defaultStatus = ref('Working')
 
 function getRandomDate(start, end) {
@@ -982,9 +983,14 @@ const addProductToPlantrue = () => {
   }
 }
 
+const countItemProduction = ref(1)
+
+
 // ฟังก์ชันสำหรับเพิ่มแถวว่างใน productionPlan
 const addEmptyRowToPlan = () => {
+  
   productionPlan.value.push({
+    no: countItemProduction.value,
     productName: '',
     producingDate: '',
 
@@ -1002,7 +1008,9 @@ const addEmptyRowToPlan = () => {
     byWho: '',
     statusDate: '',
     status: 'Working',
+    updateDate: '',
   })
+  countItemProduction.value+= 1
 }
 
 // Watch สำหรับอัพเดทข้อมูลเมื่อเลือกชื่อสินค้า
@@ -1027,7 +1035,6 @@ watch(productionPlan, newPlan => {
 }, { deep: true })
 
 // ฟังก์ชันสำหรับอัพเดทข้อมูลเมื่อเลือกชื่อสินค้า
-
 
 const cancelProduct = index => {
   productionPlan.value.splice(index, 1) ; ''
@@ -1055,8 +1062,123 @@ const items = [
 ]
 
 ///------------------------------------------------------------------------------
-
 const panel = ref(['filter'])
+
+const addBatch = ref(false)
+
+const currentPageDataTable = ref(1)
+
+const refeshPage = () => {
+  isSpinning.value = true
+  setTimeout(() => {
+    isSpinning.value = false
+  }, 10*1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+  location.reload()
+}
+
+const isSpinning = ref(false)
+
+const headers = [
+  {
+    title: 'ID',
+    key: 'id',
+  },
+  {
+    title: 'ID',
+    key: 'id',
+  },
+  {
+    title: 'NAME',
+    key: 'fullName',
+  },
+  {
+    title: 'EMAIL',
+    key: 'email',
+  },
+  {
+    title: 'DATE',
+    key: 'startDate',
+  },
+  {
+    title: 'EXPERIENCE',
+    key: 'experience',
+  },
+  {
+    title: 'AGE',
+    key: 'age',
+  },
+]
+
+const headersDataTable = [
+  {
+    title: 'Status',
+    key: 'status',
+  },
+  {
+    title: 'No.',
+    key: 'no',
+  },
+  {
+    title: 'Input Date',
+    key: 'inputDate',
+  },
+  {
+    title: 'Plants',
+    key: 'plants',
+  },
+  {
+    title: 'Reactor',
+    key: 'reactor',
+  },
+  {
+    title: 'Item Code',
+    key: 'productCode',
+  },
+  {
+    title: 'Item Name',
+    key: 'productName',
+  },
+  {
+    title: 'Qty(Kg.)',
+    key: 'quantity',
+  },
+  {
+    title: 'UOM(Packaging)',
+    key: 'uom',
+  },
+  {
+    title: 'Packaging Type',
+    key: 'packagingType',
+  },
+  {
+    title: 'Lot Number',
+    key: 'lotNumber',
+  },
+  {
+    title: 'Producing Date',
+    key: 'producingDate',
+  },
+  {
+    title: 'Finished Date',
+    key: 'finishedDate',
+  },
+  {
+    title: 'Remark',
+    key: 'remark',
+  },
+  {
+    title: 'Update By',
+    key: 'byWho',
+  },
+  {
+    title: 'Update Date',
+    key: 'updateDate',
+  },
+  {
+    title: 'Action',
+    key: 'Action',
+  },
+]
 </script>
 
 <template>
@@ -1165,7 +1287,11 @@ const panel = ref(['filter'])
                     :label="$t('Lot Number')"
                     type="Product Name"
                     density="compact"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Lot Number</span>
+                    </template>
+                  </VTextField>
                 </VCol>
                 <VCol
                   cols="12"
@@ -1178,7 +1304,11 @@ const panel = ref(['filter'])
                     :items="items"
                     density="compact"
                     placeholder="Select State"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Status</span>
+                    </template>
+                  </VAutocomplete> 
                 </VCol>
                 <VCol
                   cols="12"
@@ -1191,7 +1321,11 @@ const panel = ref(['filter'])
                     :label="$t('Product Name')"
                     type="Product Name"
                     density="compact"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Product Name</span>
+                    </template>
+                  </VTextField>
                 </VCol>
 
                 <!-- 👉 Button Search and Export -->
@@ -1212,7 +1346,7 @@ const panel = ref(['filter'])
                       
                         @click="isDialogPrintLabelVisible = true"
                       >
-                        {{ $t('Search') }}
+                        <span style="font-size: 12px;">{{ $t('Search') }}</span>
                       </VBtn>
                     </VCol>
                     <VCol cols="4">
@@ -1223,7 +1357,7 @@ const panel = ref(['filter'])
                         density="compact"
                         @click="clearModel"
                       >
-                        {{ $t('Clear') }}
+                        <span style="font-size: 12px;">{{ $t('Clear') }}</span>
                       </VBtn>
                     </VCol>
                     <VCol
@@ -1242,7 +1376,7 @@ const panel = ref(['filter'])
                           style="width: 27px;"
                           class="custom-small-img"
                         >
-                        <span style="font-size: 14px;">{{ $t('Export file') }}</span>
+                        <span style="font-size: 12px;">{{ $t('Export file') }}</span>
                       </VBtn>
                     </VCol>
                   </VRow>
@@ -1532,18 +1666,43 @@ const panel = ref(['filter'])
 
   <div
     v-if="RoleAccount === 'User'"
-    class="mt-4"
+    class="mt-2"
   >
-    <VBtn @click="viewAllData">
-      Approve
-    </VBtn>
-    <VBtn
-      color="warning"
-      class="mx-4"
-      @click="addEmptyRowToPlan"
-    >
-      Add Plan
-    </VBtn>
+    <VCard>
+      <VCardText class="pa-2">
+        <VBtn @click="addBatch = true">
+          <span style="font-size: 12px;">Add Batch</span>
+        </VBtn>
+        <VBtn
+          class="mx-4"
+          color="warning"
+          @click="viewAllData"
+        >
+          <span style="font-size: 12px;">Save Draft</span>
+        </VBtn>
+        <VBtn @click="viewAllData">
+          <span style="font-size: 12px;">Approve</span>
+        </VBtn>
+        <VBtn
+          color="info"
+          class="mx-4"
+          @click="addEmptyRowToPlan"
+        >
+          <span style="font-size: 12px;">Add Item</span>
+        </VBtn>
+        <VBtn
+          icon
+          size="small"
+          @click="refeshPage"
+        >
+          <VIcon
+            size="20"
+            icon="ri-restart-line"
+            :class="{ spinning: isSpinning }"
+          />
+        </VBtn>
+      </VCardText>
+    </VCard>
   </div>
 
   <div
@@ -1571,7 +1730,7 @@ const panel = ref(['filter'])
 
   <!-- ----------             Production plan                                ------------------------------------ -->
   <section>
-    <VCard class="mt-4">
+    <VCard v-if="false" class="mt-4">
       <VTable class=" table-header-bg rounded-0">
         <!-- 👉 table head -->
         <thead class="text-no-wrap">
@@ -1580,20 +1739,20 @@ const panel = ref(['filter'])
               scope="row"
               class="text-center px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('No.') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('No.') }}</span>
             </th>
             <th
               scope="row"
               class="text-start "
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Status') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Status') }}</span>
             </th>
             <th
               scope="row"
               class="text-center"
               style="padding-inline: 50px;"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Input Date') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Input Date') }}</span>
               <VIcon
                 color="primary"
                 icon="mdi-pan-vertical"
@@ -1605,7 +1764,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-center px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Plants') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Plants') }}</span>
               <VMenu
                 v-if="false"
                 v-model="menuUoM"
@@ -1673,7 +1832,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-center px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Reactor') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Reactor') }}</span>
               <VMenu
                 v-if="false"
                 v-model="menuUoM"
@@ -1741,7 +1900,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-start px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Product code') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Product code') }}</span>
               <VMenu
                 v-if="false"
                 v-model="menuUoM"
@@ -1809,7 +1968,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-start px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Product name') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Product name') }}</span>
               <VMenu
                 v-if="false"
                 v-model="menuUoM"
@@ -1877,7 +2036,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-start px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Qty. (Kg)') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Qty. (Kg)') }}</span>
               <VIcon
                 color="primary"
                 icon="mdi-pan-vertical"
@@ -1889,7 +2048,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-start px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('UOM (Packaging)') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('UOM (Packaging)') }}</span>
               <VIcon
                 color="primary"
                 icon="mdi-pan-vertical"
@@ -1901,7 +2060,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-start px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Packaging type') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Packaging type') }}</span>
               <VMenu
                 v-if="false"
                 v-model="menuUoM"
@@ -1969,7 +2128,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-start px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Lot number') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Lot number') }}</span>
               <VMenu
                 v-if="false"
                 v-model="menuUoM"
@@ -2037,7 +2196,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-start"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Producing date') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Producing date') }}</span>
               <VIcon
                 color="primary"
                 icon="mdi-pan-vertical"
@@ -2049,7 +2208,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-start px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Finished date') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Finished date') }}</span>
               <VIcon
                 color="primary"
                 icon="mdi-pan-vertical"
@@ -2062,14 +2221,14 @@ const panel = ref(['filter'])
               class="text-start"
               style="padding-inline: 100px;"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Remark') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Remark') }}</span>
             </th>
             
             <th
               scope="row"
               class="text-start "
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Update By') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Update By') }}</span>
               <VMenu
                 v-model="menuUoM"
                 :close-on-content-click="false"
@@ -2136,7 +2295,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-center px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Update On') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Update On') }}</span>
               <VIcon
                 color="primary"
                 icon="mdi-pan-vertical"
@@ -2148,7 +2307,7 @@ const panel = ref(['filter'])
               scope="row"
               class="text-center px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Action') }}</span>
+              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Action') }}</span>
             </th>
           </tr>
         </thead>
@@ -2182,12 +2341,14 @@ const panel = ref(['filter'])
             <td>
               <AppDateTimePicker
                 v-model="item.inputDate"
-                label="Input Date"
-                placeholder="Input date"
                 density="compact"
                 prepend-inner-icon="ri-calendar-schedule-fill"
                 :config="{ dateFormat: 'd/m/Y' }"
-              />
+              >
+                <template #label>
+                  <span>Input Data</span>
+                </template>
+              </AppDateTimePicker>
             </td>
             <td>
               <VCombobox
@@ -2439,20 +2600,289 @@ const panel = ref(['filter'])
         </div>
       </VCardText>
     </VCard>
+
+    <!-- VData table -->
+    <VCard>
+      <VCardText>
+        <VDataTable
+          v-if="addBatch"
+          v-model:page="currentPageDataTable"
+          :headers="headersDataTable"
+          :items="productionPlan"
+          :items-per-page="5"
+          class="text-no-wrap"
+        >
+          <template #item="{ item }">
+            <tr style="font-size: 14px;">
+              <td class="text-start">
+                <span v-if="item.raw.status === 'Aprove'">
+                  <VChip color="success">{{ item.raw.status }}</VChip>
+                </span>
+                <span v-if="item.raw.status === 'Submit'">
+                  <VChip color="success">{{ item.raw.status }}</VChip>
+                </span>
+                <span v-else-if="item.raw.status === 'Back to Edit'">
+                  <VChip color="warning">{{ item.raw.status }}</VChip>
+                </span>
+                <span v-else-if="item.raw.status === 'Working'">
+                  <VChip color="info">{{ item.raw.status }}</VChip>
+                </span>
+                <span v-else-if="item.raw.status === 'Save Draft'">
+                  <VChip color="warning">{{ item.raw.status }}</VChip>
+                </span>
+                <span v-else-if="item.raw.status === 'Reject'">
+                  <VChip color="error">{{ item.raw.status }}</VChip>
+                </span>
+              </td>
+              <td>{{ item.raw.no }}</td>
+              <td>
+                <AppDateTimePicker
+                  v-model="item.raw.inputDate"
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                >
+                  <template #label>
+                    <span>Input Data</span>
+                  </template>
+                </AppDateTimePicker>
+              </td>
+              <td>
+                <VCombobox
+                  v-model="item.raw.plants"
+                  :readonly="item.raw.status === 'Submit'"
+                  :items="productNamesMockItems"
+                  placeholder="deployment"
+                  density="compact"
+                  label="Plants Type"
+                  style="width: 150px;"
+                />
+              </td>
+              <td>{{ item.raw.reactor }}</td>
+              <td>
+                <VCombobox
+                  v-model="item.raw.productCode"
+                  :items="productNamesMockItems"
+                  placeholder="deployment"
+                  density="compact"
+                  label="Plants Code"
+                  style="width: 150px;"
+                  :readonly="item.raw.status === 'Submit'"
+                />
+              </td>
+              <td>
+                <VCombobox
+                  v-model="item.raw.productName"
+                  :items="productNamesMockItems"
+                  placeholder="deployment"
+                  density="compact"
+                  label="Plants Name"
+                  style="width: 150px;"
+                  :readonly="item.raw.status === 'Submit'"
+                />
+              </td>
+              <td
+                class="px-1"
+                style="min-width: 150px;"
+              >
+                <VTextField
+                  v-model="item.raw.quantity"
+                  label="Qty."
+                  type="number"
+                  placeholder="Select UOM"
+                  style="min-width: 100px;"
+                  density="compact"
+                  :readonly="item.raw.status === 'Submit'"
+                />
+              </td>
+              <td
+                class="px-1"
+                style="min-width: 150px;"
+              >
+                <VSelect
+                  v-model="item.raw.uom"
+                  density="compact"
+                  :items="items"
+                  label="UOM"
+                  placeholder="Select UOM"
+                  eager
+                  :readonly="item.raw.status === 'Submit'"
+                />
+              </td>
+              <td
+                class="px-1"
+                style="min-width: 150px;"
+              >
+                <VCombobox
+                  v-model="item.raw.packagingType"
+                  :items="productNamesMockItems"
+                  placeholder="deployment"
+                  density="compact"
+                  label="Packaging Type"
+                  :readonly="item.raw.status === 'Submit'"
+                />
+              </td>
+              <td
+                class="px-1"
+                style="min-width: 150px;"
+              >
+                <VTextField
+                  v-model="item.raw.lotNumber"
+                  density="compact"
+                  style="min-width: 150px;"
+                  :readonly="item.raw.status === 'Submit'"
+                />
+              </td>
+              <td
+                class="px-1"
+                style="min-width: 150px;"
+              >
+                <AppDateTimePicker
+                  v-model="item.raw.producingDate"
+                  label="Producing Date"
+                  placeholder="Producing date"
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+              </td>
+              <td
+                class="px-1"
+                style="min-width: 150px;"
+              >
+                <AppDateTimePicker
+                  v-model="item.raw.finishedDate"
+                  label="Finished Date"
+                  placeholder="Finished date"
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+              </td>
+              <td>
+                <VTextarea
+                  v-model="item.raw.remark"
+                  style="min-width: 200px;"
+                  class="pa-2"
+                  label="Remark"
+                  :rules="rules"
+                  rows="2"
+                  clearable
+                  placeholder="Placeholder Text"
+                  :readonly="item.raw.status === 'Submit'"
+                />
+              </td>
+              <td>
+                <VTextField
+                  v-model="item.raw.byWho"
+                  density="compact"
+                  style="min-width: 150px;"
+                  :readonly="item.raw.status === 'Submit'"
+                />
+              </td>
+              <td>
+                {{ item.raw.statusDate }}
+              </td>
+              <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'"> 
+                <VBtn
+                  color="warning"
+                  @click="changeStatusProductPlanSaveDraft(index)"
+                >
+                  Save Draft
+                </VBtn>
+                <VBtn
+                  v-if="RoleAccount === 'Manager'"
+                  color="red"
+                  class="mx-2"
+                  @click="rejectProduction(index)"
+                >
+                  Reject
+                </VBtn>
+                <VBtn
+                  v-if="RoleAccount !== 'Manager'"
+                  color="red"
+                  class="mx-2"
+                  @click="cancelProduct(index)"
+                >
+                  Cancel
+                </VBtn>
+                <VBtn
+                  v-if="RoleAccount !== 'Manager'"
+                  class="mx-2"
+                  color="green"
+                  @click="changeStatusProductPlanSubmit(index)"
+                >
+                  Submit
+                </VBtn>
+                <VBtn
+                  v-if="RoleAccount === 'Manager'"
+                  class="mx-2"
+                  color="green"
+                  @click="changeStatusProductPlanSubmit(index)"
+                >
+                  Approve
+                </VBtn>
+             
+              
+                <VBtn
+                  color="warning"
+                  prepend-icon="ri-printer-fill"
+                >
+                  {{ $t('Print') }}
+                </VBtn>
+              </td>
+              <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'"> 
+                <VBtn
+                  color="grey"
+                  disabled
+                  @click="changeStatusProductPlanSaveDraft(index)"
+                >
+                  Save Draft
+                </VBtn>
+                <VBtn
+                  color="grey"
+                  disabled
+                  class="mx-2"
+                  @click="cancelProduct(index)"
+                >
+                  Cancel
+                </VBtn>
+                <VBtn
+                  class="mx-2"
+                  color="grey"
+                  disabled
+                  @click="changeStatusProductPlanSubmit(index)"
+                >
+                  Submit
+                </VBtn>
+              
+                <VBtn
+                  color="warning"
+                  prepend-icon="ri-printer-fill"
+                >
+                  {{ $t('Print') }}
+                </VBtn>
+              </td>
+            </tr>
+          </template>
+        </VDataTable>
+      </VCardText>
+    </VCard>
   </section>
 
   <!-- Footer -->
-  <section
-    section
-    class="fixed-bottom"
-  >
+  <section class="mt-3">
     <VCard>
-      <VCardText>
+      <VCardText
+        class="pa-1"
+        style="min-width: 500px;"
+      >
         <VAlert
-          color="red-lighten-3"
-          style="font-size: 20px;"
+          color="green-lighten-3"
+          style="font-size: 12px;"
+          class="pa-1"
         >
-          Version : 2.1(Dated 01/08/2024)
+          Version : 2.5(Last Updated 11/11/2024 ) {{ products.length }} Rows of Data 
         </VAlert>
       </VCardText>
     </VCard>
@@ -2478,6 +2908,10 @@ const panel = ref(['filter'])
   justify-content: center;
   inline-size: 95%;
   inset-block-end: 0;
+}
+
+.spinning {
+  animation: spin 0.5s linear infinite;
 }
 </style>
 

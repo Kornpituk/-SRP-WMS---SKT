@@ -233,12 +233,13 @@ export default [
     to: 'skt-receiving',
   },
 
-  // {
-  //   title: 'Production Plan',
-  //   icon: { icon: 'ri-calendar-schedule-fill' },
-  //   to: 'skt-planning-schedule',
+  {
+    title: 'Production Plan',
+    icon: { icon: 'ri-calendar-schedule-fill' },
+    to: 'skt-planning-schedule',
 
-  // },
+  },
+
   // {
   //   title: 'Shipment Plan',
   //   icon: { icon: 'ri-truck-fill' },

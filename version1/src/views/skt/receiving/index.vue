@@ -4827,7 +4827,6 @@ const insetSwitch1 = ref('')
     </div>
   </section> 
 
-
   <section v-if="false">
     <VDataTable
       :headers="headersTest"
@@ -4851,7 +4850,7 @@ const insetSwitch1 = ref('')
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.4(Last Updated 21/10/2024 ) {{ products.length }} Rows of Data 
+          Version : 2.(Last Updated 11/11/2024 ) {{ products.length }} Rows of Data 
         </VAlert>
       </VCardText>
     </VCard>
