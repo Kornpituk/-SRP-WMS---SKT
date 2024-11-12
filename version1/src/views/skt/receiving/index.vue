@@ -1536,7 +1536,7 @@ const checkPersistent = computed(() => {
 //-------------------- print Excel---------------------------------
 const { printExportExcelResult, printExportExcelService } = usePrintExportExcelService()
 
-const loadingPrintExportExcel = ref(true)
+const loadingPrintExportExcel = ref(false)
 
 const printExportExcelFunction = async () => {
   loadingPrintExportExcel.value = true
@@ -1602,12 +1602,12 @@ const printExportExcelFunction = async () => {
     await printExportExcelService(urlApi.value, whereHouse, accessTokenAtStore, params)
     console.log('Staet Export!')
     console.log('การส่งออก Excel เสร็จสมบูรณ์')
-    loadingPrintExportExcel.value = true
+    loadingPrintExportExcel.value = false
   } catch (error) {
-    loadingPrintExportExcel.value = true
+    loadingPrintExportExcel.value = false
     console.error('เกิดข้อผิดพลาดในการส่งออก Excel:', error)
   }
-  loadingPrintExportExcel.value = true
+  loadingPrintExportExcel.value = false
 }
 
 //-------------------- Dialog Confirm Submit --------------------
@@ -2147,14 +2147,14 @@ const insetSwitch1 = ref('')
                       @click="printExportExcelFunction"
                     >
                       <img
-                        v-if="loadingPrintExportExcel"
+                        v-if="!loadingPrintExportExcel"
                         src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
                         style="width: 27px;"
                         class="custom-small-img"
                       >
 
                       <VProgressCircular
-                        v-if="!loadingPrintExportExcel"
+                        v-if="loadingPrintExportExcel"
                         indeterminate
                         color="success"
                       >

@@ -245,11 +245,11 @@ const checkSelectLorry = ref([
     lorryFilename: "Lorry loading EKI-A (11V-110).pdf",
   },
 
-  // {
-  //   lorryInfoKey: "13",
-  //   title: "EKI-A TANK (11V-432)",
-  //   lorryFilename: "Lorry loading EKI-A (11V-432).pdf",
-  // },
+  {
+    lorryInfoKey: "13",
+    title: "EKI-A TANK (11V-432)",
+    lorryFilename: "Lorry loading EKI-A (11V-432).pdf",
+  },
 ],
 )
 
