@@ -200,6 +200,7 @@ const trickerLorryLoadind = ref(false)
 const isDialogVisibleSelecrLorry = ref(true)
 
 const generatedJournalId = async () => {
+  console.log("generatedJournalId")
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
@@ -220,9 +221,13 @@ const generatedJournalId = async () => {
         receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
         statusId.value = item.statusId
 
+        checkSelectLorry.value = item.lorryInfos
+
         sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
 
         currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
+
+        console.log("lorryInfos", checkSelectLorry.value)
 
       } else {
         console.error("ไม่มีข้อมูลใน responseGener")
@@ -458,8 +463,6 @@ const getDisabledTabs = () => {
   const role = userRole.value
 
   const status = ref(statusId.value)
-
-  console.log("status in getDisabledTabs", statusId.value)
   
   // console.log('Status:', status)
   // console.log('Role:', role)
@@ -471,11 +474,6 @@ const getDisabledTabs = () => {
 const getCurrentTabIndex = () => {
   const status = ref(statusId.value)
 
-  // console.log("status in getCurrentTabIndex", statusId.value)
-  // console.log("getCurrentTabIndex  currentTab", tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0)
-  // countCurrentTab.value += 1
-  // console.log("Start getCurrentTabIndex", countCurrentTab.value)
-  
   return tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0
 }
 
@@ -734,7 +732,7 @@ const handleAcceptPackaging = word => {
                   <td class="text-center">
                     <VBtn
                       color="info"
-                      @click="btnSelectLorry('LORRY LOADING', 'EKI-A TANK (11V-432)')"
+                      @click="btnSelectLorry('LORRY LOADING', itemLorry.title)"
                     >
                       Action
                     </VBtn>
