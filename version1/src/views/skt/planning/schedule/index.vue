@@ -19,676 +19,6 @@ const products = ref([]) //---------------- variable for get All Product From X-
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
-const perPage = ref(10)
-const page = ref(0)
-const totalCount = ref(0)
-
-const rowPerPage = ref(10)
-const currentPage = ref(1)
-const totalPage = ref(1)
-
-//------------------- Model ID For search ------------------------------------
-const searchByCategoryId = ref(null)
-const searchByTypeId = ref(null)
-const searchBySubTypeId = ref(null)
-const searchByBarcode = ref(null)
-const searchByProductId = ref(null)
-const searchByProductName = ref(null)
-const searchByUOMId = ref(null)
-
-const searchByWareHouseId = ref([whereHouse])
-
-const searchByZoneId = ref(null)
-const searchByAreaId = ref(null)
-const searchBySubAreaId = ref(null)
-
-//------------------------ Model Name for search ------------------------------
-const searchByCategoryName = ref(null)
-const searchByTypeName = ref(null)
-const searchBySubTypeName = ref(null)
-const searchByBarcodeName = ref(null)
-const searchByProductCodeName = ref(null)
-const searchByProductNameFilter = ref(null)
-const searchByUnitName = ref(null)
-
-//----- Search Filter Icon Header Table[Product Category, Group, Sub Group, Barcode, Product Category Code, Product Name]
-const menuCategory= ref( false)
-const menuGroup = ref( false)
-const menuSubGroup = ref( false)
-const menuBarcode = ref( false)
-const menuProductCode = ref( false)
-const menuProductName = ref( false)
-const menuUoM = ref( false)
-
-//------------------------ item ID for search ------------------------------
-const itemsSearchByCategoryId = ref([])
-const typeItemsSearchById = ref([])
-const subTypeItemsSearchById = ref([])
-const itemsSearchByUOMId = ref([])
-const wareHouseItemsSearchById = ref([])
-const zoneItemsSearchById = ref([])
-const areaItemsSearchById = ref([])
-const subAreaItemsSearchById = ref([])
-
-//----------------------  Variable for SortBy -------------------------------------
-const sortByCategory = ref('')
-const sortByType = ref('')
-const sortBySubType = ref('')
-const sortByBarcode = ref('')
-const sortByProductId = ref('')
-const sortByProductName = ref('')
-const sortByUnit = ref('')
-const sortByQty = ref('')
-const sortByTags = ref('')
-const sortByNonTags = ref('')
-
-
-const toggleSortType = sortBy => {
-  const sortRefs = { sortByCategory, sortByType, sortBySubType, sortByBarcode, sortByProductId, sortByProductName, sortByUnit, sortByQty, sortByTags, sortByNonTags }
-
-  for (const key in sortRefs) {
-    if (key === sortBy) {
-      sortRefs[key].value = sortRefs[key].value === 'asc' ? 'desc' : 'asc'
-    } else {
-      sortRefs[key].value = '' // ล้างค่าที่ไม่เกี่ยวข้อง
-    }
-
-    // console.log("Sort type:",sortRefs[key],'Key',[key])
-  }
-
-  // console.log("Sort type:",sortRefs[key],'Key',[key])
-}
-
-const router = useRouter()
-
-const serialProductCode = ref(null)
-
-//------------------------------- Function Get StockUpdate Need Enter Search -----------------
-
-const clearModel = () => {
-  searchByCategoryId.value = null
-  searchByTypeId.value = null
-  searchBySubTypeId.value = null
-  searchByBarcode.value = null
-  searchByProductId.value = null
-  searchByProductName.value = null
-  searchByUOMId.value = null
-  searchByZoneId.value = null
-  searchByAreaId.value = null
-  searchBySubAreaId.value = null
-  serialProductCode.value = null
-}
-
-const searchParams = {
-  searchByCategoryId,
-  searchByTypeId,
-  searchBySubTypeId,
-  searchByBarcode,
-  searchByProductId,
-  searchByProductName,
-  searchByUOMId,
-  searchByZoneId,
-  searchByAreaId,
-  searchBySubAreaId,
-  serialProductCode,
-
-  searchByCategoryName,
-  searchByTypeName,
-  searchBySubTypeName,
-  searchByBarcodeName,
-  searchByProductCodeName,
-  searchByProductNameFilter,
-  searchByUnitName,
-}
-
-const sortParams = {
-  sortByCategory,
-  sortByType,
-  sortBySubType,
-  sortByBarcode,
-  sortByProductId,
-  sortByProductName,
-  sortByUnit,
-  sortByQty,
-  sortByTags,
-  sortByNonTags,
-}
-
-// Clear function to reset all values
-const clearValuesNeo = () => {
-  // Reset search parameters
-  for (const key in searchParams) {
-    searchParams[key].value = null
-  }
-
-  // Reset sort parameters
-  for (const key in sortParams) {
-    sortParams[key].value = null
-  }
-}
-
-const GetStockUpdate = () => {
-
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
-    params: {
-      categoryId: searchByCategoryId.value,
-      typeId: searchByTypeId.value,
-      subTypeId: searchBySubTypeId.value,
-      barcode: searchByBarcode.value,
-      productId: searchByProductId.value,
-      productName: searchByProductName.value,
-      unitId: searchByUOMId.value,
-      zoneId: searchByZoneId.value,
-      areaId: searchByAreaId.value,
-      subAreaId: searchBySubAreaId.value,
-      serialNo: serialProductCode.value,
-
-      searchByCategory: searchByCategoryName.value,
-      searchByType: searchByTypeName.value,
-      searchBySubType: searchBySubTypeName.value,
-      searchByBarcode: searchByBarcodeName.value,
-      searchByProductId: searchByProductCodeName.value,
-      searchByProductName: searchByProductNameFilter.value,
-      searchByUnit: searchByUnitName.value,
-
-      'sortByCategory': sortByCategory.value,
-      'sortByType': sortByType.value,
-      'sortBySubType': sortBySubType.value,
-      'sortByBarcode': sortByBarcode.value,
-      'sortByProductId': sortByProductId.value,
-      'sortByProductName': sortByProductName.value,
-      'sortByUnit': sortByUnit.value,
-      'sortByQty': sortByQty.value,
-      'sortByTags': sortByTags.value,
-      'sortByNonTags': sortByNonTags.value,
-
-      // ... and so on with other parameters
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${searchByWareHouseId.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }, {})
-    .then(response => {
-
-      products.value = response.data.items
-      totalCount.value = response.data.totalCount
-      currentPage.value = response.data.page
-      totalPage.value = response.data.totalPages
-      rowPerPage.value = response.data.perPage
-
-      console.log('[products.value]!!: ', products)
-      console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
-
-      // console.log('perPage: ',perPage)
-      // console.log('currentPage: ',currentPage)
-      // console.log('totalCount: ',totalCount)
-      // console.log('totalPages: ',totalPage)
-
-      // console.log('subTypeId',searchBySubTypeId.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      console.error('Error:', error)
-    })
-  
-}
-
-//----------------------------------- Function Reset search Key word ---------------
-const resetSearchKey = () => {
-  searchByCategoryName.value = ('')
-  searchByTypeName.value = ('')
-  searchBySubTypeName.value = ('')
-  searchByBarcodeName.value = ('')
-  searchByProductCodeName.value = ('')
-  searchByProductNameFilter.value = ('')
-  searchByUnitName.value = ('')
-}
-
-//------------------------------- Function Get StockUpdate Auto Search -----------------
-
-watch(GetStockUpdate)
-
-//--------------------------------------- Function Pagination --------------------------------------------
-// 👉 watching current page
-watch(() => {
-  if (currentPage.value > totalPage.value)
-    currentPage.value = totalPage.value
-})
-
-// 👉 Computing pagination data
-const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
-
-  // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
-  // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
-  // console.log('products.value.length: ',products.value.length)
-  
-  return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
-})
-
-// SECTION Checkbox toggle
-const selectedRows = ref([])
-
-//----------------------------------- End Function Pagination -----------------------------------------------
-
-///--------------------------------------- FetchItems for Search Box ----------------------------------------------
-
-const fetchItemsSearchBy = nameSearch => {
-  return axiosIns.get(`${urlApi.value}/api/v1/Product/${nameSearch}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }).then(response => {
-    return response.data
-  }).catch(error => {
-    console.error('Error:', error)
-    
-    return null
-  })
-}
-
-fetchItemsSearchBy('categories').then(data => {
-  itemsSearchByCategoryId.value = data
-})
-
-function customFilter(item, queryText, itemText) {
-  const textOne = itemText.title.toLowerCase()
-  const textTwo = itemText.value.toLowerCase()
-  const searchText = queryText.toLocaleLowerCase()
-  
-  return textOne.includes(searchText) || textTwo.includes(searchText)
-}
-
-const submitSearchButton = () => {
-  GetStockUpdate()
-}
-
-//--------------------------------------- FetchItems for Search WareHouse  ----------------------------------------
-
-const fetchItemsWareHouse = () => {
-  axiosIns.get(`${urlApi.value}/api/Auth/GetLocation`, {
-    headers: {
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      wareHouseItemsSearchById.value = response.data
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-}
-
-watch(fetchItemsWareHouse)
-
-//--------------------------------------- FetchItems for Search  Unit  ----------------------------------------
-
-const getItemsProductUnit = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/`+searchByCategoryId.value+'/Unit', {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      itemsSearchByUOMId.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('itemsSearchByUOMId.value At index',itemsSearchByUOMId.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductUnit)
-
-//--------------------------------------- FetchItems for Search  Type(Group) ----------------------------------------
-
-const getItemsProductType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/Types`, {
-    params: {
-      'CategoryId': searchByCategoryId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      typeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductType)
-
-//--------------------------------------- FetchItems for Search Sub Type(Sub Group) ----------------------------------------
-
-const getItemsProductSubType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/SubTypes/All`, {
-    params: {
-      'TypeId': searchByTypeId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subTypeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductSubType)
-
-//--------------------------------------- FetchItems for Search  Zone  ----------------------------------------
-
-const getItemLocalZone = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/zone/all`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      zoneItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('zoneItemsSearchById At index',zoneItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watch(getItemLocalZone)
-
-//--------------------------------------- FetchItems for Search  Area ----------------------------------------
-
-const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}api/v1/Locations/area/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      areaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemLocalArea)
-
-//--------------------------------------- FetchItems for Search Sub Area ----------------------------------------
-
-const getItemLocalSubArea = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/subArea/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-      'areaCode': searchByAreaId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subAreaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemLocalSubArea)
-
-// -------------------------------------- Export Bar Excel - --------------------------------
-
-const stockUpdateExcel = () => {
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    responseType: 'blob', // ให้เซิร์ฟเวอร์รีเทิร์น blob สำหรับไฟล์ Excel
-  })
-    .then(response => {
-      // สร้าง URL ของไฟล์ Excel จาก binary data
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-
-      const currentDate = new Date() // สร้างวัตถุ Date ปัจจุบัน
-      const year = currentDate.getFullYear() // ดึงปีปัจจุบัน
-      let fileYear
-      const threshold = 2500 // กำหนดจุดแบ่ง พ.ศ. กับ ค.ศ.
-
-      if (year > threshold) {
-        // พ.ศ. เปลี่ยนเป็น ค.ศ.
-        fileYear = year - 543
-      } else {
-        // ค.ศ.
-        fileYear = year
-      }
-
-      const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
-
-      const fileName = `stock_update_Tag_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
-
-      // สร้างลิงก์สำหรับดาวน์โหลดไฟล์ Excel
-      const link = document.createElement('a')
-
-      link.href = url
-      link.setAttribute('download', fileName) // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
-      document.body.appendChild(link)
-      link.click()
-
-      // ลบ URL หลังจากดาวน์โหลดเสร็จเรียบร้อยแล้ว
-      window.URL.revokeObjectURL(url)
-    })
-    .catch(error => {
-      // จัดการข้อผิดพลาด
-      console.error('Error:', error)
-    })
-}
-
-//-------------------------- format decimal -------------------
-
-const formatDecimal = decimal => {
-  const configsShowDigit = localStorage.getItem('configsShowDigit')
-  if (configsShowDigit == 'true') {
-    return Math.ceil(decimal)
-  } else {
-    return decimal
-  }
-}
-
-/// ----------------------- check config Barcode / Tag ----------------
-const nameUser = localStorage.getItem('userCheck')
-
-const checkConfigUser = nameUser => {
-  if (nameUser == 'Chutimon') {
-    return false
-  } else if (nameUser == 'Tamma'){
-    return true
-  } else {
-    return true
-  }
-}
-
-checkConfigUser(nameUser)
-
-//------------------------ Dialog Image ----------------------------
-const isDialogImageVisible = ref(false)
-const urlImage = ref('')
-const nameImage = ref('')
-
-const checkRFID = ref ('')
-
-watchEffect(() =>{
-  const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
-  if(checkRFIDUpdate.value === 'true'){
-    console.log('RFID Check True:'+ checkRFIDUpdate.value)
-    checkRFID.value = true
-  } else if (checkRFIDUpdate.value === 'false') {
-    console.log('RFID Check False:'+ checkRFIDUpdate.value)
-    checkRFID.value = false
-  }
-})
-
-const nameProductDialog = ref('')
-const qtyProductDialog = ref('')
-const unitProductDialog = ref('')
-const barcodeProductDialog = ref('')
-
-const codeProduct = ref('')
-const nameProduct = ref('')
-const imgProduct = ref('')
-const barcodeProduct = ref('')
-const categoriesProduct = ref('')
-const groupProduct = ref('')
-const groupSupProduct = ref('')
-const totalProduct = ref('')
-const unitNameProduct = ref('')
-const detailsProduct = ref('')
-
-const showDialogImage = (code, name, img, barcode, categories, group, groupSup, total, unitName, details) => {
-  codeProduct.value = code
-  nameProduct.value = name
-  imgProduct.value = img
-  barcodeProduct.value = barcode
-  categoriesProduct.value = categories
-  groupProduct.value = group
-  groupSupProduct.value = groupSup
-  totalProduct.value = total
-  unitNameProduct.value = unitName
-  detailsProduct.value = details
-  isDialogImageVisible.value = true
-  console.log('showImageFunction!!')
-}
-
-const showExpansionDialog = ref(false)
-
-//------------------------ Dialog Reject ----------------------------
-
-const isDialogRejectVisible = ref(false)
-const indexReject = ref('')
-
-const rejectProduction = index => {
-  isDialogRejectVisible.value = true
-  indexReject.value = index
-}
-
-//--------------------------- Dialog Submit -------------------------------
-const isDialogSubmitVisible = ref(false)
-const isDialogSubmitSuccessVisible = ref(false)
-const isDialogSubmitFailedVisible = ref(false)
-
-//---------------------------- check Status ---------------------------------
-
-const colorStatus = ref('grey')
-const bgStatus = ref('bg-grey')
-
-
-const checkColorTextStatus = status => {
-  if(status === 'Received'){
-    return 'bg-green-lighten-4'
-  }else if(status === 'Waiting for Receive') {
-    return 'bg-yellow-lighten-4' 
-  }
-}
-
-const checkColorBgStatus = status => {
-  if(status === 'Received'){
-    return 'text-green'
-  }else if(status === 'Waiting for Receive') {
-    return 'text-warning' 
-  }
-}
-
 //------------------------------------------ Data --------------------------------
 
 const date = ref(new Date())
@@ -762,9 +92,11 @@ const toDayDate = format(new Date())
 const toDayDatePFinished = ref('NaN')
 
 //------------------------------------------ Mock Data --------------------------------
+const countItemProduction = ref(1)
 
 const mockData = ref([
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant A",
@@ -784,6 +116,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant B",
@@ -803,6 +136,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant C",
@@ -822,6 +156,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant D",
@@ -841,6 +176,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant E",
@@ -860,6 +196,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant F",
@@ -879,6 +216,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant G",
@@ -898,6 +236,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant H",
@@ -917,6 +256,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant I",
@@ -936,6 +276,7 @@ const mockData = ref([
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
   {
+    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant J",
@@ -983,9 +324,6 @@ const addProductToPlantrue = () => {
     isDialogAddVisible.value = false
   }
 }
-
-const countItemProduction = ref(1)
-
 
 // ฟังก์ชันสำหรับเพิ่มแถวว่างใน productionPlan
 const addEmptyRowToPlan = () => {
