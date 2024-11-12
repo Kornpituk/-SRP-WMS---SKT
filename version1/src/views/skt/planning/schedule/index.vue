@@ -1188,6 +1188,70 @@ const headersDataTable = [
     key: 'Action',
   },
 ]
+
+//--------------------- Menu
+import avatar1 from '@images/avatars/avatar-1.png'
+
+const menuDataTable = ref(false)
+
+const itemsActionDataTable = [
+  {
+    title: 'Save Draft',
+    value: 'Save Draft',
+    icon: 'ri-save-3-line',
+  },
+  {
+    title: 'Delete Item',
+    value: 'Delete Item',
+    icon: 'ri-delete-bin-5-line',
+  },
+  {
+    title: 'Submit',
+    value: 'Submit',
+    icon: 'ri-upload-2-line',
+  },
+  {
+    title: 'Print',
+    value: 'Print',
+    icon: 'ri-printer-line',
+  },
+]
+
+const handleAction = action => {
+  switch (action) {
+  case 'Save Draft':
+    saveDraft()
+    break
+  case 'Delete Item':
+    deleteItem()
+    break
+  case 'Submit':
+    submit()
+    break
+  case 'Print':
+    print()
+    break
+  default:
+    console.warn('Action not defined:', action)
+  }
+}
+
+// ตัวอย่างฟังก์ชันของแต่ละ action
+const saveDraft = () => {
+  console.log('Draft saved')
+}
+
+const deleteItem = () => {
+  console.log('Item deleted')
+}
+
+const submit = () => {
+  console.log('Submitted')
+}
+
+const print = () => {
+  console.log('Printed')
+}
 </script>
 
 <template>
@@ -2817,52 +2881,74 @@ const headersDataTable = [
                 {{ item.raw.statusDate }}
               </td>
               <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'"> 
-                <VBtn
-                  color="warning"
-                  @click="changeStatusProductPlanSaveDraft(index)"
-                >
-                  Save Draft
-                </VBtn>
-                <VBtn
-                  v-if="RoleAccount === 'Manager'"
-                  color="red"
-                  class="mx-2"
-                  @click="rejectProduction(index)"
-                >
-                  Reject
-                </VBtn>
-                <VBtn
-                  v-if="RoleAccount !== 'Manager'"
-                  color="red"
-                  class="mx-2"
-                  @click="cancelProduct(index)"
-                >
-                  Cancel
-                </VBtn>
-                <VBtn
-                  v-if="RoleAccount !== 'Manager'"
-                  class="mx-2"
-                  color="green"
-                  @click="changeStatusProductPlanSubmit(index)"
-                >
-                  Submit
-                </VBtn>
-                <VBtn
-                  v-if="RoleAccount === 'Manager'"
-                  class="mx-2"
-                  color="green"
-                  @click="changeStatusProductPlanSubmit(index)"
-                >
-                  Approve
-                </VBtn>
-             
-              
-                <VBtn
-                  color="warning"
-                  prepend-icon="ri-printer-fill"
-                >
-                  {{ $t('Print') }}
-                </VBtn>
+                <div class="d-flex justify-center">
+                  <VMenu transition="scale-transition">
+                    <template #activator="{ props }">
+                      <VIcon
+                        v-bind="props"
+                        icon="ri-more-2-fill"
+                      />
+                    </template>
+                    <VList>
+                      <VListItem
+                        v-for="(itemAction, index) in itemsActionDataTable"
+                        :key="index"
+                        @click="handleAction(itemAction.value)"
+                      >
+                        {{ itemAction.title }}
+                        <template #prepend>
+                          <VIcon :icon="itemAction.icon" />
+                        </template>
+                      </VListItem>
+                    </VList>
+                  </VMenu>
+                </div>
+                <div v-if="false">
+                  <VBtn
+                    color="warning"
+                    @click="changeStatusProductPlanSaveDraft(index)"
+                  >
+                    Save Draft
+                  </VBtn>
+                  <VBtn
+                    v-if="RoleAccount === 'Manager'"
+                    color="red"
+                    class="mx-2"
+                    @click="rejectProduction(index)"
+                  >
+                    Reject
+                  </VBtn>
+                  <VBtn
+                    v-if="RoleAccount !== 'Manager'"
+                    color="red"
+                    class="mx-2"
+                    @click="cancelProduct(index)"
+                  >
+                    Cancel
+                  </VBtn>
+                  <VBtn
+                    v-if="RoleAccount !== 'Manager'"
+                    class="mx-2"
+                    color="green"
+                    @click="changeStatusProductPlanSubmit(index)"
+                  >
+                    Submit
+                  </VBtn>
+                  <VBtn
+                    v-if="RoleAccount === 'Manager'"
+                    class="mx-2"
+                    color="green"
+                    @click="changeStatusProductPlanSubmit(index)"
+                  >
+                    Approve
+                  </VBtn>
+                  <VBtn
+                    color="warning"
+                    prepend-icon="ri-printer-fill"
+                  >
+                    {{ $t('Print') }}
+                  </VBtn>
+                </div>
               </td>
               <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'"> 
                 <VBtn
