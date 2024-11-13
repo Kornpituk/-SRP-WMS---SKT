@@ -198,6 +198,7 @@ const responseGener = ref([])
 const currentTabNew = ref(sessionStorage.getItem('currentTabReceivingForm'))
 const trickerLorryLoadind = ref(false)
 const isDialogVisibleSelecrLorry = ref(true)
+const checkSelectLorry = ref([])
 
 const generatedJournalId = async () => {
   console.log("generatedJournalId")
@@ -243,20 +244,7 @@ watch(() => {
   generatedJournalId()
 })
 
-const checkSelectLorry = ref([
-  {
-    lorryInfoKey: "10",
-    title: "EKI-A TANK (11V-110)",
-    lorryFilename: "Lorry loading EKI-A (11V-110).pdf",
-  },
 
-  {
-    lorryInfoKey: "13",
-    title: "EKI-A TANK (11V-432)",
-    lorryFilename: "Lorry loading EKI-A (11V-432).pdf",
-  },
-],
-)
 
 const resultSelectLorry = ref([])
 
@@ -314,23 +302,28 @@ const updateCurrentTab = async () => {
 // เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
 updateCurrentTab()
 
+const componentLorryForm = ref(null)
+
 const matchingLorryInfoWithComponent = lorryInfoKey => {
   switch (lorryInfoKey) {
-  case '1':
+  case '01':
+    console.log("case 1")
+    componentLorryForm.value = LorryLoadingA1IPA
+    
     return LorryLoadingA1IPA
-  case '2':
+  case '02':
     return LorryLoadingA1EA11V1098C
-  case '3':
+  case '03':
     return LorryLoadingA1EPICHLO
-  case '4':
+  case '04':
     return LorryLoadingA2SKTV144
-  case '5':
+  case '05':
     return LorryLoadingA2SKTV145
-  case '6':
+  case '06':
     return LorryLoadingB1KARAMU
-  case '7':
+  case '07':
     return LorryLoadingC1AKUMARU
-  case '9':
+  case '09':
     return LorryLoadingC2HAKU
   case '10':
     return LorryLoadingC2EKIAA111
@@ -351,19 +344,36 @@ const matchingLorryInfoWithComponent = lorryInfoKey => {
   }
 }
 
+
 const checkSelectLorryLoadingForItem = () => {
-  if(checkSelectLorry.value){
+  if(checkSelectLorry.value.length > 0){
     if(checkSelectLorry.value.length === 2){
       trickerLorryLoadind.value = false
       
       return null
     }else if(checkSelectLorry.value.length === 1){
       trickerLorryLoadind.value = true
+
+      // console.log("Component", checkSelectLorry.value[0].lorryInfoKey)
       
       return matchingLorryInfoWithComponent(checkSelectLorry.value[0].lorryInfoKey)
     }
   }
 }
+
+const testComponent = () => {
+  if(checkSelectLorry.value.length > 0){
+    console.log("Component Text", checkSelectLorry.value)
+
+    return LorryLoadingA1IPA
+  }
+  
+}
+
+watchEffect(() => {
+  testComponent()
+  checkSelectLorryLoadingForItem()
+})
 
 const tabs = [
   {
@@ -391,7 +401,7 @@ const tabs3 = [
   },
   {
     title: 'Lorry Loading Check List',
-    component: checkSelectLorryLoadingForItem(),
+    component: testComponent(),
     icon: 'ri-instance-fill',
   },
 ]
@@ -774,8 +784,9 @@ const handleAcceptPackaging = word => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTabNew === index"
+        v-if="currentTabNew === index && tab.component"
       />
+      {{ currentTabNew === index }} {{ tab.component }}
     </div>
   </div>
   <div v-if="receivedTypeId === 1">

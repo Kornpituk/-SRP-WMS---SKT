@@ -585,7 +585,6 @@ const deleteItem = () => {
 
 const submit = () => {
   console.log('Submitted')
-  window.location.href = '/skt/planning/schedule/plan'
 }
 
 const print = () => {
@@ -605,12 +604,12 @@ const print = () => {
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'dashboards-main',
+                :to="{ name: 'skt-planning-schedule',
                 }"
               >
                 <VIcon
                   size="30"
-                  icon="ri-close-circle-fill"
+                  icon="ri-arrow-left-circle-fill"
                   color="#000000"
                 />
               </IconBtn>
@@ -623,7 +622,7 @@ const print = () => {
                 <span
                   style="font-size: 22px; font-weight: bold;"
                   class="text-center"
-                >{{ $t('Production Plan') }}</span>
+                >{{ $t('Production Plan in batch') }}</span>
               </div>
             </VCol>
             <VCol
