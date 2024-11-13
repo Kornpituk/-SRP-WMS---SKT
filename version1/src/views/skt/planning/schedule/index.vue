@@ -42,15 +42,6 @@ const formatDate = date => {
   return `${day}/${month}/${year}`
 }
 
-const statuses = [ 'Aprove', 'Reject', 'Back to Edit', 'Working', 'Save Draft']
-
-// ฟังก์ชันสำหรับสุ่มสถานะ
-function getRandomStatus() {
-  const randomIndex = Math.floor(Math.random() * statuses.length)
-  
-  return statuses[3]
-}
-
 const RoleAccount = ref('User')
 
 // ฟังก์ชันสำหรับเปลี่ยนสถานะของแถวใน productionPlan
@@ -417,37 +408,6 @@ const refeshPage = () => {
 
 const isSpinning = ref(false)
 
-const headers = [
-  {
-    title: 'ID',
-    key: 'id',
-  },
-  {
-    title: 'ID',
-    key: 'id',
-  },
-  {
-    title: 'NAME',
-    key: 'fullName',
-  },
-  {
-    title: 'EMAIL',
-    key: 'email',
-  },
-  {
-    title: 'DATE',
-    key: 'startDate',
-  },
-  {
-    title: 'EXPERIENCE',
-    key: 'experience',
-  },
-  {
-    title: 'AGE',
-    key: 'age',
-  },
-]
-
 const headersDataTable = [
   {
     title: 'data-table-select',
@@ -528,7 +488,6 @@ const headersDataTable = [
 ]
 
 //--------------------- Menu
-import avatar1 from '@images/avatars/avatar-1.png'
 
 const menuDataTable = ref(false)
 
@@ -1148,7 +1107,7 @@ const print = () => {
   </div>
 
   <!-- ----------             Production plan                                ------------------------------------ -->
-  <section v-if="addBatch">
+  <section>
     <VCard
       v-if="false"
       class="mt-4"
