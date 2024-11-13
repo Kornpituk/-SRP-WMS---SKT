@@ -30,36 +30,36 @@ import PackagingInspec3 from '../packagingForm/index.vue'
 
 //---------------- Import Lorry -------------------------------
 //--- A1
-import LorryLoadingA1IPA from '@/views/skt/receiving/lorryForm/a1/IPA.vue'
-import LorryLoadingA1EA11V1098C from '@/views/skt/receiving/lorryForm/a1/EA11V-1098C.vue'
-import LorryLoadingA1EPICHLO from '@/views/skt/receiving/lorryForm/a1/EPICHLO.vue'
+import LorryLoadingA1IPA from '../lorryForm/a1/IPA.vue'
+import LorryLoadingA1EA11V1098C from '../lorryForm/a1/EA11V-1098C.vue'
+import LorryLoadingA1EPICHLO from '../lorryForm/a1/EPICHLO.vue'
 
 //--- A2
-import LorryLoadingA2SKTV144 from '@/views/skt/receiving/lorryForm/a2/SKTV-144.vue'
-import LorryLoadingA2SKTV145 from '@/views/skt/receiving/lorryForm/a2/SKTV-145.vue'
+import LorryLoadingA2SKTV144 from '../lorryForm/a2/SKTV-144.vue'
+import LorryLoadingA2SKTV145 from '../lorryForm/a2/SKTV-145.vue'
 
 //--- B1
-import LorryLoadingB1KARAMU from '@/views/skt/receiving/lorryForm/b1/KARAMU.vue'
+import LorryLoadingB1KARAMU from '../lorryForm/b1/KARAMU.vue'
 
 //--- C1
-import LorryLoadingC1AKUMARU from '@/views/skt/receiving/lorryForm/c1/AKUMARU.vue'
+import LorryLoadingC1AKUMARU from '../lorryForm/c1/AKUMARU.vue'
 
 //--- C2
-import LorryLoadingC2EKIAA111 from '@/views/skt/receiving/lorryForm/c2/EKIAA-111.vue'
-import LorryLoadingC2HAKU from '@/views/skt/receiving/lorryForm/c2/HAKU.vue'
+import LorryLoadingC2EKIAA111 from '../lorryForm/c2/EKIAA-111.vue'
+import LorryLoadingC2HAKU from '../lorryForm/c2/HAKU.vue'
 
 //--- C3
-import LorryLoadingC3DieselOil from '@/views/skt/receiving/lorryForm/c3/DieselOil.vue'
+import LorryLoadingC3DieselOil from '../lorryForm/c3/DieselOil.vue'
 
 //--- C4
-import LorryLoadingC4EKIAV432 from '@/views/skt/receiving/lorryForm/c4/EKIAV-432.vue'
-import LorryLoadingC4TELA from '@/views/skt/receiving/lorryForm/c4/TELA.vue'
+import LorryLoadingC4EKIAV432 from '../lorryForm/c4/EKIAV-432.vue'
+import LorryLoadingC4TELA from '../lorryForm/c4/TELA.vue'
 
 //--- C5
-import LorryLoadingC4NPAN30 from '@/views/skt/receiving/lorryForm/c5/NPAN30.vue'
+import LorryLoadingC5NPAN30 from '../lorryForm/c5/NPAN30.vue'
 
 //--- C6
-import LorryLoadingC5SANNIX from '@/views/skt/receiving/lorryForm/c6/SANNIX.vue'
+import LorryLoadingC6SANNIX from '../lorryForm/c6/SANNIX.vue'
 
 const LorryComponents = {
   '1': () => "IPA", //----- A1
@@ -200,6 +200,9 @@ const trickerLorryLoadind = ref(false)
 const isDialogVisibleSelecrLorry = ref(true)
 const checkSelectLorry = ref([])
 
+const typeLorryOnce = ref(null)
+const typeLorryTwo = ref(null)
+
 const generatedJournalId = async () => {
   console.log("generatedJournalId")
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
@@ -224,6 +227,15 @@ const generatedJournalId = async () => {
 
         checkSelectLorry.value = item.lorryInfos
 
+        if(checkSelectLorry.value.length > 0){
+          if(checkSelectLorry.value.length === 1){
+            typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
+          } 
+        }else{
+          trickerLorryLoadind.value = false
+          typeLorryTwo.value = checkSelectLorry.value
+        }
+
         sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
 
         currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
@@ -243,8 +255,6 @@ const generatedJournalId = async () => {
 watch(() => {
   generatedJournalId()
 })
-
-
 
 const resultSelectLorry = ref([])
 
@@ -307,7 +317,7 @@ const componentLorryForm = ref(null)
 const matchingLorryInfoWithComponent = lorryInfoKey => {
   switch (lorryInfoKey) {
   case '01':
-    console.log("case 1")
+    console.log("case 1", lorryInfoKey)
     componentLorryForm.value = LorryLoadingA1IPA
     
     return LorryLoadingA1IPA
@@ -344,7 +354,6 @@ const matchingLorryInfoWithComponent = lorryInfoKey => {
   }
 }
 
-
 const checkSelectLorryLoadingForItem = () => {
   if(checkSelectLorry.value.length > 0){
     if(checkSelectLorry.value.length === 2){
@@ -356,17 +365,22 @@ const checkSelectLorryLoadingForItem = () => {
 
       // console.log("Component", checkSelectLorry.value[0].lorryInfoKey)
       
-      return matchingLorryInfoWithComponent(checkSelectLorry.value[0].lorryInfoKey)
+      testComponent()
     }
   }
 }
 
 const testComponent = () => {
-  if(checkSelectLorry.value.length > 0){
-    console.log("Component Text", checkSelectLorry.value)
-
-    return LorryLoadingA1IPA
+  const result = ref('02')
+  if(typeLorryOnce.value){
+    result.value = typeLorryOnce.value
+    sessionStorage.setItem('typeLorryInfoId', typeLorryOnce.value)
+    console.log("Component type lorry result", result.value)
+  }else{
+    result.value = null
   }
+
+  return matchingLorryInfoWithComponent(sessionStorage.getItem('typeLorryInfoId'))
   
 }
 
@@ -529,7 +543,6 @@ const handleSelectLorryLoading = word => {
   isDialogConfirmVisible.value = false
   isDialogSubmitSuccessVisible.value = true
 }
-
 
 const handleAcceptPackaging = word => {
   console.log("StaertSSSSS!!")
@@ -782,11 +795,12 @@ const handleAcceptPackaging = word => {
       :key="index"
       class="mt-20"
     >
-      <Component
-        :is="tab.component"
-        v-if="currentTabNew === index && tab.component"
-      />
-      {{ currentTabNew === index }} {{ tab.component }}
+      <div v-if="typeLorryOnce">
+        <Component
+          :is="tab.component"
+          v-if="currentTabNew === index"
+        />
+      </div>
     </div>
   </div>
   <div v-if="receivedTypeId === 1">
