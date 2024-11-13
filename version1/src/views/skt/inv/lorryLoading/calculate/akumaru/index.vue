@@ -1,12 +1,9 @@
 <script setup>
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import { watchEffect, computed, watch, ref } from 'vue'
-import axios from '@axios'
-import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService';
-import { urlApi } from '@/api'
+import { ipaItemTemplate, ipaRequestData } from '@/services/skt/inv/lorryLoading/ipaService';
 
 var ipaItems = reactive(ipaItemTemplate);
-var ipaRequestData = ref({});
 
 var aVariable = ref(ipaItems[6].result.field[0]);
 var bVariable = ref(ipaItems[6].result.field[1]);
@@ -16,96 +13,20 @@ var bdVariable = ref(ipaItems[8].result.field[0]);
 // var eVariable = ref(ipaItems[8].result.field[0]);
 // var eVariable = ref(ipaItems[8].result.field[0]);
 
-onMounted(async () => {
-
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore');
-  const whereHouse = localStorage.getItem('whereHouseName');
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=415`, [], {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  });
-
-  const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/415`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  });
-
-  ipaRequestData.value = lorryFormIPA.data.data;
+onMounted(() => {
   for (var i of ipaItems) {
     for (var f of i.result.field) {
-      console.log(f.name, ":", lorryFormIPA.data.data[f.name]);
-      f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name]);
+      f.value = ipaRequestData[f.name];
     }
   }
 })
 
-function passInitialData(type, params) {
-  if (type == "oknot") {
-    if (params == 0) {
-      return "0";
-    } else if (params == 1) {
-      return "1";
-    } else {
-      return "-1";
-    }
-  } else {
-    return params;
-  }
+
+
+function aChangeValue(e) {
+  // aValue = e.target.value;
+  // ipaItems.value[6].result.field[1].value = 999;
 }
-
-function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0;
-    } else if (params == "1") {
-      return 1;
-    } else {
-      return -1;
-    }
-  }
-  else {
-    return params;
-  }
-}
-
-async function saveDraft(e) {
-  for (var i of ipaItems) {
-    for (var f of i.result.field) {
-      ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value);
-    }
-  }
-
-  console.log(ipaRequestData.value);
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore');
-  const whereHouse = localStorage.getItem('whereHouseName');
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/415`, ipaRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  });
-}
-
-async function submit(e) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore');
-  const whereHouse = localStorage.getItem('whereHouseName');
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/415`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  });
-}
-
-
 
 watch(ipaItems[6].result.field[0], async (x) => {
   let b = x.value / (0.78);
@@ -116,16 +37,8 @@ watch(ipaItems[7].result.field[0], async (x) => {
   let d = (x.value * 5.32) + 740.45;
   ipaItems[7].result.field[1].value = d;
   ipaItems[8].result.field[0].value = ipaItems[6].result.field[1].value + ipaItems[7].result.field[1].value;
-});
 
-watchEffect(async () => {
-  const response = await fetch(
-    `https://jsonplaceholder.typicode.com/todos/1`
-  )
-  var res = await response.json()
-  console.log(res);
-  
-})
+});
 
 
 </script>
@@ -322,14 +235,14 @@ watchEffect(async () => {
                 <div v-if="section.result.type === 'actualCheck'">
                   <VRow>
                     <VCol>
-                      <VTextField density="compact" variant="outlined" label=""
+                      <VTextField density="compact" variant="outlined" label="" type="number"
                         v-model="section.result.field[0].value" />
                     </VCol>
                     <VLabel>
                       :
                     </VLabel>
                     <VCol>
-                      <VTextField density="compact" variant="outlined" label=""
+                      <VTextField density="compact" variant="outlined" label="" type="number"
                         v-model="section.result.field[1].value" />
                     </VCol>
                   </VRow>
@@ -345,8 +258,8 @@ watchEffect(async () => {
                     </VLabel>
                     <VCol>
                       <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[1].value">
-                        <VRadio label="Ok" value=1 />
-                        <VRadio label="Not" value=0 />
+                        <VRadio label="Ok" value="1" />
+                        <VRadio label="Not" value="0" />
                       </VRadioGroup>
                     </VCol>
                   </VRow>
@@ -568,12 +481,12 @@ watchEffect(async () => {
       </VRow>
       <VRow>
         <VCol cols="1" class="justify-right offset-10">
-          <VBtn type="text" style="width: 100%;" color="warning" @click="saveDraft">
+          <VBtn type="text" style="width: 100%;" color="warning">
             Draft
           </VBtn>
         </Vcol>
         <VCol cols="1" class="justify-right">
-          <VBtn type="text" style="width: 100%;" color="secondary" @click="submit">
+          <VBtn type="text" style="width: 100%;" color="secondary" onclick="">
             Submit
           </VBtn>
         </Vcol>
