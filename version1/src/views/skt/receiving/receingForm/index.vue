@@ -2,7 +2,7 @@
 <script setup>
 import axiosIns from '@axios'
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
-import { inject, defineProps, watchEffect, watch } from 'vue'
+import { inject, defineProps, watchEffect, watch, onMounted } from 'vue'
 
 const props = defineProps({
   Data: Array,
@@ -14,6 +14,9 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
+const statusId = ref(dataProps.value.statusId) // ตัวแปรสำหรับเก็บค่า statusId
+const receivedTypeId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+
 const a = ref('A')
 
 const currentTableWatchSesstion = ref(0)
@@ -22,6 +25,68 @@ import RawMatForm from '../rawMat/index.vue'
 import LorryLoadingCal from '../lorryForm/flow/index.vue' 
 import RawMatInspec from '../inspecReqForm/index.vue'
 import PackagingInspec from '../packagingForm/index.vue'
+import PackagingInspec2 from '../packagingForm/index.vue'
+import PackagingInspec3 from '../packagingForm/index.vue'
+
+//---------------- Import Lorry -------------------------------
+//--- A1
+import LorryLoadingA1IPA from '../lorryForm/a1/IPA.vue'
+import LorryLoadingA1EA11V1098C from '../lorryForm/a1/EA11V-1098C.vue'
+import LorryLoadingA1EPICHLO from '../lorryForm/a1/EPICHLO.vue'
+
+//--- A2
+import LorryLoadingA2SKTV144 from '../lorryForm/a2/SKTV-144.vue'
+import LorryLoadingA2SKTV145 from '../lorryForm/a2/SKTV-145.vue'
+
+//--- B1
+import LorryLoadingB1KARAMU from '../lorryForm/b1/KARAMU.vue'
+
+//--- C1
+import LorryLoadingC1AKUMARU from '../lorryForm/c1/AKUMARU.vue'
+
+//--- C2
+import LorryLoadingC2EKIAA111 from '../lorryForm/c2/EKIAA-111.vue'
+import LorryLoadingC2HAKU from '../lorryForm/c2/HAKU.vue'
+
+//--- C3
+import LorryLoadingC3DieselOil from '../lorryForm/c3/DieselOil.vue'
+
+//--- C4
+import LorryLoadingC4EKIAV432 from '../lorryForm/c4/EKIAV-432.vue'
+import LorryLoadingC4TELA from '../lorryForm/c4/TELA.vue'
+
+//--- C5
+import LorryLoadingC5NPAN30 from '../lorryForm/c5/NPAN30.vue'
+
+//--- C6
+import LorryLoadingC6SANNIX from '../lorryForm/c6/SANNIX.vue'
+
+const LorryComponents = {
+  '1': () => "IPA", //----- A1
+  '2': () => import('@/views/skt/receiving/lorryForm/a1/EA11V-1098C.vue'), //----- A1
+  '3': () => import('@/views/skt/receiving/lorryForm/a1/EPICHLO.vue'), //----- A1
+
+  '4': () => import('@/views/skt/receiving/lorryForm/a2/SKTV-144.vue'), //----- A2
+  '5': () => import('@/views/skt/receiving/lorryForm/a2/SKTV-145.vue'), //----- A2
+
+  '6': () => import('@/views/skt/receiving/lorryForm/b1/KARAMU.vue'), //----- B1
+
+  '7': () => import('@/views/skt/receiving/lorryForm/c1/AKUMARU.vue'), //----- C1
+
+  '9': () => import('@/views/skt/receiving/lorryForm/c2/HAKU.vue'), //----- C2
+  '10': () => import('@/views/skt/receiving/lorryForm/c2/EKIAA-111.vue'), //----- C2
+
+  '11': () => import('@/views/skt/receiving/lorryForm/c3/DieselOil.vue'), //----- C3
+
+  '12': () => import('@/views/skt/receiving/lorryForm/c4/TELA.vue'), //----- C4
+  '13': () => import('@/views/skt/receiving/lorryForm/c4/EKIAV-432.vue'), //----- C4
+
+  '15': () => import('@/views/skt/receiving/lorryForm/c5/NPAN30.vue'), //----- C5
+
+  '16': () => import('@/views/skt/receiving/lorryForm/c6/SANNIX.vue'), //----- C6
+
+  // Add other mappings as needed...
+}
 
 const checkStatus = status => {
   switch (status) {
@@ -126,6 +191,204 @@ watchEffect(() => {
   console.log(dataProps.value)
 })
 
+const countCurrentTab = ref(0)
+
+//------------- journalId
+const responseGener = ref([])
+const currentTabNew = ref(sessionStorage.getItem('currentTabReceivingForm'))
+const trickerLorryLoadind = ref(false)
+const isDialogVisibleSelecrLorry = ref(true)
+const checkSelectLorry = ref([])
+
+const typeLorryOnce = ref(null)
+const typeLorryTwo = ref(null)
+
+const generatedJournalId = async () => {
+  console.log("generatedJournalId")
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+      console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+
+      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+
+        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+
+        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
+        statusId.value = item.statusId
+
+        checkSelectLorry.value = item.lorryInfos
+
+        if(checkSelectLorry.value.length > 0){
+          if(checkSelectLorry.value.length === 1){
+            typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
+          } 
+        }else{
+          trickerLorryLoadind.value = false
+          typeLorryTwo.value = checkSelectLorry.value
+        }
+
+        sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
+
+        currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
+
+        console.log("lorryInfos", checkSelectLorry.value)
+
+      } else {
+        console.error("ไม่มีข้อมูลใน responseGener")
+      }
+
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })
+}
+
+watch(() => {
+  generatedJournalId()
+})
+
+const resultSelectLorry = ref([])
+
+watch(() => {
+  if(checkSelectLorry.value === 0){
+    isDialogVisibleSelecrLorry.value = true
+  }
+})
+
+const checkCurrentTabBeforIn = status => {
+  let tabIndex
+
+  switch (status) {
+  case 1:
+  case 3:
+  case 8:
+  case 10:
+  case 7:
+    tabIndex = 0 // สำหรับ status 1, 3, 8, 10 ให้แสดง tab index 0
+    break
+    
+  case 4:
+  case 5:
+  case 6:
+    tabIndex = 1 // สำหรับ status 4, 5, 6, 7 ให้แสดง tab index 1
+    break
+    
+  case 12:
+  case 13:
+  case 14:
+    tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
+    break
+    
+  default:
+    tabIndex = 0 // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
+  }
+
+  return tabIndex
+}
+
+const itemsLorrySelect = [
+  'N PAN 30',
+  'SANNIX KC-703  TANK ',
+  'TELA (AMMONIA TANK   11V - 511 )',
+]
+
+const updateCurrentTab = async () => {
+  // รอให้ generatedJournalId และ generated ทำงานเสร็จก่อน
+  await generatedJournalId()
+  await generated()
+
+  // จากนั้นค่อยอัปเดต currentTab ด้วยค่าใหม่จาก getCurrentTabIndex(
+}
+
+// เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
+updateCurrentTab()
+
+const componentLorryForm = ref(null)
+
+const matchingLorryInfoWithComponent = lorryInfoKey => {
+  switch (lorryInfoKey) {
+  case '01':
+    console.log("case 1", lorryInfoKey)
+    componentLorryForm.value = LorryLoadingA1IPA
+    
+    return LorryLoadingA1IPA
+  case '02':
+    return LorryLoadingA1EA11V1098C
+  case '03':
+    return LorryLoadingA1EPICHLO
+  case '04':
+    return LorryLoadingA2SKTV144
+  case '05':
+    return LorryLoadingA2SKTV145
+  case '06':
+    return LorryLoadingB1KARAMU
+  case '07':
+    return LorryLoadingC1AKUMARU
+  case '09':
+    return LorryLoadingC2HAKU
+  case '10':
+    return LorryLoadingC2EKIAA111
+  case '11':
+    return LorryLoadingC3DieselOil
+  case '12':
+    return LorryLoadingC4TELA
+  case '13':
+    return LorryLoadingC4EKIAV432
+  case '15':
+    return LorryLoadingC5NPAN30
+  case '16':
+    return LorryLoadingC6SANNIX
+  default:
+    console.warn(`No component found for key: ${lorryInfoKey}`)
+    
+    return null
+  }
+}
+
+const checkSelectLorryLoadingForItem = () => {
+  if(checkSelectLorry.value.length > 0){
+    if(checkSelectLorry.value.length === 2){
+      trickerLorryLoadind.value = false
+      
+      return null
+    }else if(checkSelectLorry.value.length === 1){
+      trickerLorryLoadind.value = true
+
+      // console.log("Component", checkSelectLorry.value[0].lorryInfoKey)
+      
+      testComponent()
+    }
+  }
+}
+
+const testComponent = () => {
+  const result = ref('02')
+  if(typeLorryOnce.value){
+    result.value = typeLorryOnce.value
+    sessionStorage.setItem('typeLorryInfoId', typeLorryOnce.value)
+    console.log("Component type lorry result", result.value)
+  }else{
+    result.value = null
+  }
+
+  return matchingLorryInfoWithComponent(sessionStorage.getItem('typeLorryInfoId'))
+  
+}
+
+watchEffect(() => {
+  testComponent()
+  checkSelectLorryLoadingForItem()
+})
+
 const tabs = [
   {
     title: 'R/M Receiving Form',
@@ -152,7 +415,7 @@ const tabs3 = [
   },
   {
     title: 'Lorry Loading Check List',
-    component: LorryLoadingCal,
+    component: testComponent(),
     icon: 'ri-instance-fill',
   },
 ]
@@ -202,46 +465,6 @@ const tabDisablingConfig = {
   // Add more statuses and role combinations as needed
 }
 
-const tabConfig = {
-
-  /// Packaging = 1 , Raw Material Receiving 2, Lorry 3 , NUll 0
-
-  0: {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-  },
-  1: {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-  },
-  2: {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Draft R/M Inspection Form': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Inspection Approval': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Warehouse Rejection': {
-    manager: [ 'Lorry Loading Check List'],
-    issues: [ 'Lorry Loading Check List'],
-  },
-  'Waiting for Partial-Receiving': {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List'],
-  },
-  'Draft Packaging Inspection Form': {
-    manager: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-    issues: ['Raw Material Inspection Request Form', 'Lorry Loading Check List', 'Raw Material Receiving Form'],
-  },
-
-  // Add more statuses and role combinations as needed
-}
-
 // Configuration to specify which tab index to show based on status
 const tabIndexConfig = {
   1: 0,  // Show tab index 1 for this status
@@ -254,106 +477,33 @@ const tabIndexConfig = {
   10: 0,
   12: 2,
   13: 2,
+  14: 2,
 
   // Add more statuses and indices as needed
 }
 
 const getDisabledTabs = () => {
-  const status = dataProps.value.statusId
+
   const role = userRole.value
+
+  const status = ref(statusId.value)
   
   // console.log('Status:', status)
   // console.log('Role:', role)
   // console.log('Disabled Tabs:', tabDisablingConfig[status]?.[role])
   
-  return tabDisablingConfig[status]?.[role] || []
+  return tabDisablingConfig[status.value]?.[role] || []
 }
 
 const getCurrentTabIndex = () => {
-  const status = dataProps.value.statusId
+  const status = ref(statusId.value)
 
-  return tabIndexConfig[status] !== undefined ? tabIndexConfig[status] : 0
+  return tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0
 }
 
-// console.log('***Current Tab Index:', getCurrentTabIndex())
-
-const currentTab = ref()
+// เรียกใช้ฟังก์ชันนี้เพื่อให้เกิดการเปลี่ยนค่า currentTab หลังจากทุกอย่างเสร็จสิ้น
 
 const isActive = ref(true)
-
-//------------- journalId
-const responseGener = ref([])
-
-const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
-const receivedTypeId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
-
-const generatedJournalId = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-      console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
-
-      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
-
-        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
-
-        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
-        statusId.value = item.statusId // เก็บค่า statusId
-      } else {
-        console.error("ไม่มีข้อมูลใน responseGener")
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error)
-    })
-}
-
-const generated = () => {
-
-  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${data.value.poEtlLogDetailJournalID}`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-
-      // itemsManufacturer.value = response.data.data
-
-      console.log('[generatedReceivingForm]!!: ', response.data.data)
-
-    })
-    .catch(error => {
-      // Handle errors
-      console.error('Error:', error)
-    })
-}
-
-// Watch ค่า statusId และเรียกใช้ generated ถ้ามีการเปลี่ยนแปลง
-watch(statusId.value, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    generated() // เรียกใช้ function generated เมื่อ statusId เปลี่ยน
-  }
-})
-
-// เรียกใช้ generatedJournalId เมื่อ component ถูกสร้างขึ้น
-watch(() => {
-  generatedJournalId()
-  currentTab.value = getCurrentTabIndex()
-  console.log("Tabs", currentTab.value)
-  getDisabledTabs()
-  
-})
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
@@ -378,9 +528,20 @@ const textAlertDialogFunction = (word, success) => {
 
 const btnApprove = word => {
   isDialogConfirmVisible.value = true
-  console.log("word")
   wordForSubmit.value = word
 
+}
+
+const btnSelectLorry = (word, lorry) => {
+  isDialogConfirmVisible.value = true
+  wordForSubmit.value = word
+  resultSelectLorry.value = lorry
+
+}
+
+const handleSelectLorryLoading = word => {
+  isDialogConfirmVisible.value = false
+  isDialogSubmitSuccessVisible.value = true
 }
 
 const handleAcceptPackaging = word => {
@@ -401,13 +562,13 @@ const handleAcceptPackaging = word => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 300) // 10000 มิลลิวินาที = 3 วินาที
 
     })
     .catch(error => {
     // Handle errors
-      textAlertDialogFunction('ACCEPT', false)
+      textAlertDialogFunction('APPROVE', false)
 
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true
@@ -416,46 +577,9 @@ const handleAcceptPackaging = word => {
 </script>
 
 <template>
-  <div v-if="false">
-    <span />
-    <VAlert
-
-      border="top"
-      type="error"
-      variant="flat"
-      prominent
-    >
-      Failded To Loading Page, Plaease Back To Receving Plant.
-    </VAlert>
-  </div>
-  <VCard
-    v-if="false"
-    hover
-    style="position: fixed; min-width: 95%; opacity: 1 !important;"
-    elevation="6"
-  >
-    <VCardText>
-      <VTabs
-        v-model="currentTab"
-        grow
-      >
-        <VTab
-          v-for="(tab, index) in tabs"
-          :key="index"
-        >
-          <VIcon
-            v-if="false"
-            :icon="tab.icon"
-            size="40"
-          />
-          <span style="font-size: 22px; font-weight: bolder;">{{ tab.title }}</span>
-        </VTab>
-      </VTabs>
-    </VCardText>
-  </VCard>
   <div v-if="receivedTypeId === 2">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -474,7 +598,7 @@ const handleAcceptPackaging = word => {
   </div>
   <div v-if="receivedTypeId === 3">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -494,7 +618,7 @@ const handleAcceptPackaging = word => {
   </div>
   <div v-if="receivedTypeId === 1">
     <VTabs
-      v-model="currentTab"
+      v-model="currentTabNew"
       grow
     >
       <VTab
@@ -549,14 +673,14 @@ const handleAcceptPackaging = word => {
       v-if="false"
       class="mx-2"
       style="min-height: 40px;"
-      :color="colorStatusWithId(dataProps.statusId).color"
+      :color="colorStatusWithId(statusId).color"
       variant="elevated"
       closable
     >
       <span
         class="text-wrap"
         style="font-size: 12px; text-transform: capitalize;"
-      >{{ dataProps.statusText }}</span>
+      > 'statusText' </span>
     </VChip>
     <VChip
       v-if="false"
@@ -586,20 +710,97 @@ const handleAcceptPackaging = word => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTab === index"
+        v-if="currentTabNew === index"
       />
     </div>
   </div>
-  <div v-if=" receivedTypeId === 3">
+  <div v-if="receivedTypeId === 3">
+    <div v-if="currentTabNew === 2 && trickerLorryLoadind === false">
+      <VDialog
+        v-model="isDialogVisibleSelecrLorry"
+        width="500"
+        persistent
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardTitle class="text-center">
+            <span>Select Lorry Loading</span>
+          </VCardTitle>
+          <VCardText>
+            <VTable>
+              <thead>
+                <tr>
+                  <th class="bg-grey-lighten-3">
+                    Lorry Key
+                  </th>
+                  <th class="bg-grey-lighten-3">
+                    Lorry Name
+                  </th>
+                  <th class="bg-grey-lighten-3 text-center">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(itemLorry, index) in checkSelectLorry"
+                  :key="index"
+                >
+                  <td>
+                    {{ itemLorry.lorryInfoKey }}
+                  </td>
+                  <td>
+                    {{ itemLorry.title }}
+                  </td>
+                  <td class="text-center">
+                    <VBtn
+                      color="info"
+                      @click="btnSelectLorry('LORRY LOADING', itemLorry.title)"
+                    >
+                      Action
+                    </VBtn>
+                  </td>
+                </tr>
+              </tbody>
+            </VTable>
+          </VCardText>
+
+          <VCardText class="d-flex justify-center flex-wrap gap-4">
+            <VBtn
+              color="error"
+              @click="isDialogVisibleSelecrLorry = false"
+            >
+              close
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
+      <div
+        class=" d-flex align-center justify-center mt-4"
+        @click="isDialogVisibleSelecrLorry = true"
+      >
+        <VBtn
+          append-icon="ri-file-list-line"
+          variant="outlined"
+        >
+          Select Lorry LOADING
+          <template #append>
+            <VIcon size="30" />
+          </template>
+        </VBtn>
+      </div>
+    </div>
     <div
       v-for="(tab, index) in tabs3"
       :key="index"
       class="mt-20"
     >
-      <Component
-        :is="tab.component"
-        v-if="currentTab === index"
-      />
+      <div v-if="typeLorryOnce">
+        <Component
+          :is="tab.component"
+          v-if="currentTabNew === index"
+        />
+      </div>
     </div>
   </div>
   <div v-if="receivedTypeId === 1">
@@ -610,11 +811,12 @@ const handleAcceptPackaging = word => {
     >
       <Component
         :is="tab.component"
-        v-if="currentTab === index"
+        v-if="currentTabNew === index"
       />
     </div>
   </div>
 
+  <!-- Approval Btn --> 
   <div
     v-if="statusId === 7 || statusId === 15"
     style="position: fixed;
@@ -675,7 +877,17 @@ const handleAcceptPackaging = word => {
               icon="ri-question-line"
             />
           </div>
-          <div class="text-center">
+          <div
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            class="text-center"
+          >
+            <span style="font-size: 22px; font-weight: bolder;">Would you like to selcet {{ wordForSubmit }}
+              from {{ resultSelectLorry }}?</span>
+          </div>
+          <div
+            v-else
+            class="text-center"
+          >
             <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
               Transaction?</span>
           </div>
@@ -688,12 +900,20 @@ const handleAcceptPackaging = word => {
           >
             Cancel
           </VBtn>
+          
           <VBtn
             v-if="wordForSubmit === 'APPROVE'"
             color="green"
             @click="handleAcceptPackaging"
           >
             {{ wordForSubmit }}
+          </VBtn>
+          <VBtn
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            color="green"
+            @click="handleSelectLorryLoading"
+          >
+            Confirm
           </VBtn>
         </VCardAction>
       </VCard>
@@ -703,7 +923,7 @@ const handleAcceptPackaging = word => {
   <section>
     <VDialog
       v-model="isDialogSubmitSuccessVisible"
-      width="500"
+      width="700"
     >
       <!-- Dialog Content -->
       <VCard>
@@ -715,7 +935,16 @@ const handleAcceptPackaging = word => {
               icon="ri-checkbox-circle-line"
             />
           </div>
-          <div class="text-center">
+          <div
+            v-if="wordForSubmit === 'LORRY LOADING'"
+            class="text-center"
+          >
+            <span style="font-size: 22px; font-weight: bolder;">Select form {{ resultSelectLorry }} Success</span>
+          </div>
+          <div
+            v-else
+            class="text-center"
+          >
             <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Success</span>
           </div>
         </VCardText>
@@ -779,6 +1008,4 @@ const handleAcceptPackaging = word => {
       />
     </div>
   </section>
-
-  <VDivider />
 </template>
