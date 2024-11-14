@@ -233,9 +233,6 @@ const groupDataByLot = data => {
 
 const dataFilterPrintLabel = [{ key: 'lot' }]
 
-
-
-
 //------------------------- Print Label ------------------------
 //------------------------- Print Label By Barcode ------------------------
 
@@ -247,6 +244,7 @@ const { printLabelBarcodeFormViewResult, printLabelFormBarcodeService } = usePri
 const isLoadingPrintLabel = ref(false)
 const successPrintLabel = ref(null)
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const printLabel = async () => {
   console.log("12355", typePrintLabel.value)
   if(typePrintLabel.value === 'Raw Mat Label'){
@@ -259,7 +257,11 @@ const printLabel = async () => {
   if(typePrintLabel.value === 'Semi Label'){
     console.log('Semi Label print start .....')
 
-    const barcodes = selectedDataTables.value.map(item => item.barcode)
+    const barcodes = Array.isArray(selectedDataTables.value)
+      ? selectedDataTables.value.flatMap(item => 
+        Array.isArray(item.barcodes) ? item.barcodes.map(b => b.barcode) : [],
+      )
+      : []
 
     console.log('Semi Label print start .....', barcodes)
 
@@ -376,7 +378,6 @@ const updateSelectedData = sub => {
     if (index !== -1) selectedDataTables.value.splice(index, 1)
   }
 }
-
 
 const eXprtreeNode = () => {
   console.log('eXprtreeNode', selectedDataTables.value)
@@ -2023,7 +2024,7 @@ const dataTableColor = ref('#E0F7FA')
   </section>
 
   <!-- table data group by -->
-  <section v-if="true">
+  <section v-if="false">
     <VCard>
       <CardText>
         <VProgressLinear
@@ -2626,7 +2627,7 @@ const dataTableColor = ref('#E0F7FA')
               <th
                 v-for="(headerSub, index) in headerSubtitle"
                 :key="index"
-                class="px-0"
+                class="px-2"
               >
                 {{ headerSub.title }}
               </th>
@@ -2634,10 +2635,13 @@ const dataTableColor = ref('#E0F7FA')
             <tr>
               <td />
               <td />
-              <td class="px-0">
+              <td />
+              <td />
+              <td class="px-2">
                 <div
-                  v-for="(sub, index) in item.raw.sources"
+                  v-for="(sub, index) in item.raw.barcodes"
                   :key="sub.name + '-checkbox-' + index"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
                   <VCheckbox
                     v-model="sub.selected" 
@@ -2645,70 +2649,63 @@ const dataTableColor = ref('#E0F7FA')
                   />
                 </div>
               </td>
-              <td class="px-0">
+              <td class="px-2">
                 <div
-                  v-for="(sub, index) in item.raw.sources"
-                  :key="sub.name +index"
+                  v-for="(sub, index) in item.raw.barcodes"
+                  :key="sub.productId +index"
                   :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                   class="d-flex align-center"
                 >
-                  {{ sub.name }}
+                  {{ sub.productId }}
                 </div>
               </td>
-              <td class="px-0">
+              <td class="px-2">
                 <div
-                  v-for="(sub, index) in item.raw.sources"
-                  :key="sub.calories + index"
+                  v-for="(sub, index) in item.raw.barcodes"
+                  :key="sub.productName + index"
                   class="d-flex align-center"
                   :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
-                  {{ sub.calories }}
+                  {{ sub.productName }}
                 </div>
               </td>
-              <td class="px-0">
+              <td class="px-2">
                 <div
-                  v-for="(sub, index) in item.raw.sources"
-                  :key="sub.fat + index"
+                  v-for="(sub, index) in item.raw.barcodes"
+                  :key="sub.lotId + index"
                   class="d-flex align-center"
                   :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
-                  {{ sub.fat }}
+                  {{ sub.lotId }}
                 </div>
               </td>
-              <td class="px-0">
+              <td class="px-2">
                 <div
-                  v-for="(sub, index) in item.raw.sources"
-                  :key="sub.carbs + index"
+                  v-for="(sub, index) in item.raw.barcodes"
+                  :key="sub.barcode + index"
                   class="d-flex align-center"
                   :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
-                  {{ sub.carbs }}
+                  {{ sub.barcode }}
                 </div>
               </td>
-              <td class="px-0">
+              <td class="px-2">
                 <div
-                  v-for="(sub, index) in item.raw.sources"
-                  :key="sub.protein + index"
+                  v-for="(sub, index) in item.raw.barcodes"
+                  :key="sub.lotDescription + index"
                   :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                   class="d-flex align-center"
                 >
-                  {{ sub.protein }}
+                  {{ sub.lotDescription }}
                 </div>
               </td>
             </tr>
           </template>
 
-          <template #item.name="{ item}">
-            <tr>
-              <td>
-                <span class="text-capitalize">{{ item.raw.name }}: {{ item.raw.sources.length }}</span>
-              </td>
-            </tr>
-          </template>
           <template #item.lotQty="{ item}">
             <tr>
               <td>
-                <span class="text-capitalize">{{ item.raw.length }}</span>
+                <span class="text-capitalize">{{ item.raw.barcodes.length }}</span>
               </td>
             </tr>
           </template>

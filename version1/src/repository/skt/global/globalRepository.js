@@ -233,6 +233,30 @@ export const  globalService = {
     }
   },
 
+  async getPrintLabelGroup (urlApi, warehouseId, accessToken, params = {}) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/PrintLabel/Label`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': warehouseId,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          lot: params.lot || '',
+          productId: params.productId || '',
+          productName: params.productName || '',
+          purchaseOrderNo: params.purchaseOrderNo || '',
+          receivedDate: params.receivedDate || '',
+          category: params.category || '',
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      throw new Error(`Failed to printLabelView ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   async saveToPrintLotByBarcode (urlApi, warehouseId, accessToken, barcode) {
     try {
       const response = await axios.post(`${urlApi}/api/v1/PrintLabel/SaveToPrintLot/byBarcode`, barcode, {
@@ -256,6 +280,43 @@ export const  globalService = {
   },
 
   async printLabelBarcode(urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(
+        `${urlApi}/api/v1/PrintLabel/Label/Small/Pdf`,
+        {},
+        {
+          headers: {
+            'accept': 'application/pdf', // รับไฟล์ PDF
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response print Label form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+        window.open(blobUrl)
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data Genterate print Label form')
+      }
+    } catch (error) {
+      console.error('Error in printLabelBarcode:', error)
+      throw new Error(`Failed to printLabelBarcode for Lot ${lot}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async printLabelBarcodeGroup(urlApi, whereHouse, accessToken) {
     try {
       const response = await axios.post(
         `${urlApi}/api/v1/PrintLabel/Label/Small/Pdf`,

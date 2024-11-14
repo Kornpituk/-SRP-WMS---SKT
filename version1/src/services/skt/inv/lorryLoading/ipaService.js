@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref } from 'vue'
 
 
 // export const ipaRequestData = {
@@ -89,10 +89,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101010001",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -104,10 +104,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101020001",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -119,10 +119,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101030001",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -134,10 +134,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101040001",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -149,10 +149,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101050001",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -164,11 +164,12 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101060001",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
+
   //Document Check
   {
     "isSection": true,
@@ -181,14 +182,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102010101", // A
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0102010102", // B
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -200,14 +201,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102020101", // C
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0102020102", // D
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -219,14 +220,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102030101", // BD
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0102030102", // OkNot
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -238,14 +239,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102040101", // litre
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0102040102", // OkNot
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -257,14 +258,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102050101", // litre
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0102050101", // litre
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": true,
@@ -277,10 +278,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103010101", // oknot
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -292,10 +293,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103020101", // oknot
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -307,10 +308,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103030101", // oknot
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -322,10 +323,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103040101", // oknot
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -337,10 +338,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103050101", // oknot
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -352,14 +353,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103060101", // percen
-          "value:": 0
+          "value:": 0,
         },
         {
           "name": "l0103060102", // ok
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": true,
@@ -372,10 +373,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104010101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -387,10 +388,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104020101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -402,14 +403,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104030101", // percen
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0104030102", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": true,
@@ -422,10 +423,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105010101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -437,10 +438,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105020101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -452,10 +453,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105030101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": true,
@@ -468,10 +469,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106010101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -483,10 +484,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106020101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -498,10 +499,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106030101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -513,10 +514,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106040101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -528,10 +529,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106050101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -543,10 +544,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106060101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": true,
@@ -559,10 +560,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107010101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -574,10 +575,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107020101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -589,10 +590,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107030101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -604,10 +605,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107040101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": true,
@@ -620,10 +621,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108010101", // percen
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -635,14 +636,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108020101", // 1
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0108020102", // 2
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -654,13 +655,13 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108030101", // 1
-          "value:": ""
+          "value:": "",
         }, {
           "name": "l0108030102", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -672,13 +673,13 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108040101", // 1
-          "value:": ""
+          "value:": "",
         }, {
           "name": "l0108040102", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -690,10 +691,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108050101", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": true,
@@ -706,10 +707,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109010101", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -721,10 +722,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109020101", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -736,14 +737,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109030101", // 1
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0109030102", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -755,10 +756,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109040101", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -770,10 +771,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109050101", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -785,14 +786,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109060101", // 1
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0109060102", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -804,10 +805,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109070101", // 1
-          "value:": ""
+          "value:": "",
         },
-      ]
-    }
+      ],
+    },
   },
   {
     "isSection": false,
@@ -819,10 +820,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109080101", // 1
-          "value:": ""
+          "value:": "",
         },
-      ]
-    }
+      ],
+    },
   },
   {
     "isSection": false,
@@ -834,14 +835,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109090101", // 1
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0109090102", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -853,10 +854,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109100101", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -868,10 +869,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109110101", // 1
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -883,14 +884,14 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109120101", // 1
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0109120102", // 1
-          "value:": ""
-        }
-      ]
-    }
-  }
+          "value:": "",
+        },
+      ],
+    },
+  },
 
 ]
