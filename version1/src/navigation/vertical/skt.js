@@ -222,11 +222,11 @@ export default [
 
   // { heading: 'SKT' },
 
-  {
-    title: 'Stock Update',
-    icon: { icon: 'ri-store-3-line' },
-    to: 'skt-stockUpdate',
-  },
+  // {
+  //   title: 'Stock Update',
+  //   icon: { icon: 'ri-store-3-line' },
+  //   to: 'skt-stockUpdate',
+  // },
   {
     title: 'Receiving Plan',
     icon: { icon: 'ri-inbox-archive-fill' },
@@ -239,11 +239,12 @@ export default [
     to: 'skt-planning-schedule',
 
   },
-  {
-    title: 'Shipment Plan',
-    icon: { icon: 'ri-truck-fill' },
-    to: 'skt-shipping',
-  },
+
+  // {
+  //   title: 'Shipment Plan',
+  //   icon: { icon: 'ri-truck-fill' },
+  //   to: 'skt-shipping',
+  // },
   {
     title: 'Print Label',
     icon: { icon: 'ri-printer-fill' },

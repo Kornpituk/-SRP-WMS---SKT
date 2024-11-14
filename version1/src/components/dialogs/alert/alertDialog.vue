@@ -30,6 +30,16 @@ watch(() => props.isDialogVisible, newValue => {
   localDialogVisible.value = newValue
 })
 
+const wordAlert = ref('')
+
+watch(() => {
+  if(props.word === 'REJECT'){
+    wordAlert.value = 'REJECTION'
+  }else{
+    wordAlert.value = props.word
+  }
+})
+
 // ฟังก์ชันปิด Dialog
 const closeDialog = () => {
   localDialogVisible.value = false
@@ -55,7 +65,7 @@ const closeDialog = () => {
         <VIcon
           v-if="props.word === 'REJECT'"
           size="150"
-          color="warning"
+          color="error"
           icon="ri-checkbox-circle-fill"
         />
         <VIcon
@@ -86,8 +96,8 @@ const closeDialog = () => {
       </VCardText>
 
       <VCardText class="d-flex justify-center">
-        <span v-if="props.success" style="font-size: 22px; font-weight: bolder;">{{ props.word }} Successful.</span>
-        <span v-if="!props.success" style="font-size: 22px; font-weight: bolder;">{{ props.word }} Failed.</span>
+        <span v-if="props.success" style="font-size: 22px; font-weight: bolder;">{{ wordAlert}} Completed.</span>
+        <span v-if="!props.success" style="font-size: 22px; font-weight: bolder;">{{ wordAlert}} Failed.</span>
       </VCardText>
 
       <VCardText

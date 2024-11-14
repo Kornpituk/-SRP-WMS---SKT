@@ -32,3 +32,4 @@ dist-ssr
 
 # iconify dist files
 src/@iconify/icons-bundle.js
+version1/components.d.ts
