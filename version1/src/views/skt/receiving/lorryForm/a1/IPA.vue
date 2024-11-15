@@ -929,14 +929,16 @@ function formatDate(dateString) {
     </div>
   </VContainer>
 
-  <VRow class="my-2">
-    <VCol cols="8">
+  <VRow class="ma-2">
+    <VCol cols="2" />
+    <VCol cols="4">
       <h3 class="d-flex justify-center align-center pa-0">
         Lorry Loading Check List<br>
       </h3>
     </VCol>
-    <VCol cols="4">
-      <h3 class="d-flex justify-center align-center pa-0">
+    <VCol cols="3" />
+    <VCol cols="3">
+      <h3>
         <table class="custom-table">
           <tr>
             <th>P/O No.</th>
@@ -945,7 +947,8 @@ function formatDate(dateString) {
         </table>
       </h3>
     </VCol>
-    <VCol cols="8">
+    <VCol cols="2" />
+    <VCol cols="4">
       <h4 class="d-flex justify-center align-center pa-0">
         ISOPRO (IPA)
       </h4>
