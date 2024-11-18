@@ -957,7 +957,10 @@ function formatDate(dateString) {
 
   <VRow>
     <!-- Lorry Form -->
-    <VCol cols="12" style="overflow-x:auto;">
+    <VCol
+      cols="12"
+      style="overflow-x: auto;"
+    >
       <table class="custom-table">
         <thead>
           <tr>
