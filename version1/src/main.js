@@ -14,6 +14,7 @@ import { abilitiesPlugin } from '@casl/vue'
 import '@core/scss/template/index.scss'
 import '@styles/styles.scss'
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
 import VueBarcode from '@chenfengyuan/vue-barcode'
 
@@ -34,6 +35,10 @@ const app = createApp(App)
 // Use plugins
 app.use(vuetify)
 app.use(createPinia())
+
+const pinia = createPinia()
+
+pinia.use(piniaPluginPersistedstate)
 app.use(router)
 app.use(layoutsPlugin)
 app.use(i18n)
