@@ -249,7 +249,7 @@ function formatDate(dateString) {
                   {{ section.condition }}
                 </VLabel>
               </td>
-              <td style="width: 450px; border-left: 1px solid black;">
+              <td style="width: 350px; border-left: 1px solid black;">
                 <div v-if="section.result.type === 'oknot'">
                   <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
                   <VRadioGroup
@@ -957,7 +957,7 @@ function formatDate(dateString) {
 
   <VRow>
     <!-- Lorry Form -->
-    <VCol cols="12">
+    <VCol cols="12" style="overflow-x:auto;">
       <table class="custom-table">
         <thead>
           <tr>
@@ -971,7 +971,7 @@ function formatDate(dateString) {
             <th
               class="text-center"
               style="font-size: 16px;"
-              colspan="4"
+              colspan="3"
             >
               Manual works
             </th>
@@ -985,7 +985,7 @@ function formatDate(dateString) {
             <th
               class="text-center"
               style="font-size: 16px;"
-              colspan="3"
+              colspan="4"
             >
               Result
             </th>
@@ -1006,8 +1006,8 @@ function formatDate(dateString) {
               <div v-html="section.sequence" />
             </td>
             <td
-              colspan="4"
-              style=" border-left: 1px solid black; text-align: start;"
+              colspan="3"
+              style="min-width: 250px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
                 {{ section.practice }}
@@ -1015,15 +1015,15 @@ function formatDate(dateString) {
             </td>
             <td
               colspan="3"
-              style="border-left: 1px solid black; text-align: start;"
+              style="max-width: 250px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-center pa-md-2">
                 {{ section.condition }}
               </VLabel>
             </td>
             <td
-              colspan="3"
-              style="width: 450px; border-left: 1px solid black;"
+              colspan="4"
+              style="min-width: 450px; border-left: 1px solid black;"
             >
               <div v-if="section.result.type === 'oknot'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
