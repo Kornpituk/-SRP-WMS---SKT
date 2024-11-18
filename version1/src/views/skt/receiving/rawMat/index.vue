@@ -156,6 +156,8 @@ const purchaseOrder = ref({
   lotId: data.value.batch,
   packagingTypeName: '',
   storagePlaceNo: '',
+  viewHalal: false,
+  viewRSPO: false,
 
   actualMakerLotNo_1: null,
   actualNetCountKgs_1: NetCountPackage.value,
@@ -184,7 +186,6 @@ const purchaseOrder = ref({
   actualTotalQuantityKgs_4: null,
   customManufacturerName_4: '',
   customLable_4: '',
-
 
   actualMakerLotNo_5: null,
   actualNetCountKgs_5: null,
@@ -480,6 +481,9 @@ const getHearderReceivingForm = async () => {
       //------------------------- DeliveryQueue ------------------------
       deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
       deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
+
+      purchaseOrder.value.viewHalal = data[0].viewHalal
+      purchaseOrder.value.viewRSPO = data[0].viewRSPO
 
       console.log('[*****Headers]]!!: ', data[0])
       console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
@@ -3453,7 +3457,7 @@ const getDisabledFollowStatusNRole = () => {
 
       <!-- RM for Halal -->
       <VCol
-        v-if="purchaseOrder.isForHalalProduct"
+        v-if="purchaseOrder.viewHalal"
         cols="4"
       >
         <Table class="custom-table">
@@ -3477,7 +3481,7 @@ const getDisabledFollowStatusNRole = () => {
       </VCol>
       <!-- RM for RSPO -->
       <VCol
-        v-if="purchaseOrder.isForRspoProduct"
+        v-if="purchaseOrder.viewRSPO"
         cols="4"
       >
         <Table class="custom-table">

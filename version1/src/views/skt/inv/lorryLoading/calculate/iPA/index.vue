@@ -130,7 +130,7 @@ watchEffect(async () => {
 
   var res = await response.json()
   console.log(res)
-  
+
 })
 </script>
 
@@ -153,35 +153,14 @@ watchEffect(async () => {
       </VCol>
       <VCol cols="6">
         <VRow>
-          <VCol
-            style="border: 1px solid black;"
-            cols="8"
-          >
-            <div
-              style="font-size: 18px; font-weight: bolder;"
-              class="d-flex justify-center align-center"
-            >
-              <VTextField
-                v-model="aValue"
-                density="compact"
-                variant="outlined"
-                label=" By : "
-              />
+          <VCol style="border: 1px solid black;" cols="8">
+            <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
+              <VTextField v-model="aValue" density="compact" variant="outlined" label=" By : " />
             </div>
           </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            cols="4"
-          >
-            <div
-              style="font-size: 18px; font-weight: bolder;"
-              class="d-flex justify-center align-center"
-            >
-              <VTextField
-                density="compact"
-                variant="outlined"
-                label="Issued Date :"
-              />
+          <VCol style="border: 1px solid black;" cols="4">
+            <div style="font-size: 18px; font-weight: bolder;" class="d-flex justify-center align-center">
+              <VTextField density="compact" variant="outlined" label="Issued Date :" />
             </div>
           </VCol>
         </VRow>
@@ -205,15 +184,10 @@ watchEffect(async () => {
                 <h4> ผลการเช็ค</h4>
               </td>
             </tr>
-            <tr
-              v-for="(section, sectionIndex) in ipaItems"
-              :key="sectionIndex"
-            >
-              <td
-                v-if="section.isSection === true"
+            <tr v-for="(section, sectionIndex) in ipaItems" :key="sectionIndex">
+              <td v-if="section.isSection === true"
                 style="border-top: 1px solid black; border-left: 1px solid black; text-align: center; vertical-align: middle;"
-                :rowspan="[section.rowSpan]"
-              >
+                :rowspan="[section.rowSpan]">
                 <div v-html="section.sequence" />
               </td>
               <td style=" border-left: 1px solid black; text-align: start;">
@@ -229,19 +203,9 @@ watchEffect(async () => {
               <td style="width: 450px; border-left: 1px solid black;">
                 <div v-if="section.result.type === 'oknot'">
                   <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
-                  <VRadioGroup
-                    v-model="section.result.field[0].value"
-                    inline
-                    class="d-flex justify-center"
-                  >
-                    <VRadio
-                      label="Ok"
-                      value="1"
-                    />
-                    <VRadio
-                      label="Not"
-                      value="0"
-                    />
+                  <VRadioGroup v-model="section.result.field[0].value" inline class="d-flex justify-center">
+                    <VRadio label="Ok" value="1" />
+                    <VRadio label="Not" value="0" />
                   </VRadioGroup>
                 </div>
                 <div v-if="section.result.type === 'ab'">
@@ -250,13 +214,8 @@ watchEffect(async () => {
                       (A)
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       Kg.
@@ -265,12 +224,8 @@ watchEffect(async () => {
                       (B)
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
+                      <VTextField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                        label="" />
                     </VCol>
                     <VLabel>
                       Litre
@@ -283,13 +238,8 @@ watchEffect(async () => {
                       (C)
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       mm.
@@ -298,12 +248,8 @@ watchEffect(async () => {
                       (D)
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
+                      <VTextField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                        label="" />
                     </VCol>
                     <VLabel>
                       Litre
@@ -316,31 +262,16 @@ watchEffect(async () => {
                       (B) + (D) =
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       Litre
                     </VLabel>
                     <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
+                      <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                        <VRadio label="Ok" value="1" />
+                        <VRadio label="Not" value="0" />
                       </VRadioGroup>
                     </VCol>
                   </VRow>
@@ -348,31 +279,16 @@ watchEffect(async () => {
                 <div v-if="section.result.type === 'litre'">
                   <VRow>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       Litre
                     </VLabel>
                     <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
+                      <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                        <VRadio label="Ok" value="1" />
+                        <VRadio label="Not" value="0" />
                       </VRadioGroup>
                     </VCol>
                   </VRow>
@@ -380,31 +296,16 @@ watchEffect(async () => {
                 <div v-if="section.result.type === 'percen'">
                   <VRow>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       %
                     </VLabel>
                     <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
+                      <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                        <VRadio label="Ok" value="1" />
+                        <VRadio label="Not" value="0" />
                       </VRadioGroup>
                     </VCol>
                   </VRow>
@@ -412,31 +313,16 @@ watchEffect(async () => {
                 <div v-if="section.result.type === 'c'">
                   <VRow>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       C'
                     </VLabel>
                     <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
+                      <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                        <VRadio label="Ok" value="1" />
+                        <VRadio label="Not" value="0" />
                       </VRadioGroup>
                     </VCol>
                   </VRow>
@@ -444,54 +330,31 @@ watchEffect(async () => {
                 <div v-if="section.result.type === 'actualCheck'">
                   <VRow>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                        label="" />
                     </VCol>
                     <VLabel>
                       :
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
+                      <VTextField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                        label="" />
                     </VCol>
                   </VRow>
                 </div>
                 <div v-if="section.result.type === 'mpa'">
                   <VRow>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       ( Mpa )
                     </VLabel>
                     <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
+                      <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                        <VRadio label="Ok" value="1" />
+                        <VRadio label="Not" value="0" />
                       </VRadioGroup>
                     </VCol>
                   </VRow>
@@ -499,31 +362,16 @@ watchEffect(async () => {
                 <div v-if="section.result.type === 'amp'">
                   <VRow>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       Amp
                     </VLabel>
                     <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
+                      <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                        <VRadio label="Ok" value="1" />
+                        <VRadio label="Not" value="0" />
                       </VRadioGroup>
                     </VCol>
                   </VRow>
@@ -534,13 +382,8 @@ watchEffect(async () => {
                       (E)
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       mm.
@@ -549,12 +392,8 @@ watchEffect(async () => {
                       (F)
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
+                      <VTextField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                        label="" />
                     </VCol>
                     <VLabel>
                       Litre
@@ -567,13 +406,8 @@ watchEffect(async () => {
                       (G)
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       Litre
@@ -583,25 +417,15 @@ watchEffect(async () => {
                 <div v-if="section.result.type === 'litrekg'">
                   <VRow>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       Litre
                     </VLabel>
                     <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
+                      <VTextField v-model="section.result.field[1].value" density="compact" variant="outlined" label=""
+                        type="number" />
                     </VCol>
                     <VLabel>
                       Kg.
@@ -727,12 +551,7 @@ watchEffect(async () => {
               <div class="text-subtitle-2">
                 Default
               </div>
-              <VImg
-                :aspect-ratio="1"
-                class="bg-white"
-                :src="image01"
-                width="500"
-              />
+              <VImg :aspect-ratio="1" class="bg-white" :src="image01" width="500" />
             </div>
           </div>
         </VCol>
@@ -740,130 +559,42 @@ watchEffect(async () => {
     </div>
     <div style="border: 1px solid black;">
       <VRow>
-        <VCol
-          cols="2"
-          class="d-flex justify-center "
-        >
-          <VLabel class="d-flex justify-center pa-2">
-            Location
-          </VLabel>
-        </VCol>
-        <VCol
-          cols="3"
-          class="justify-left"
-        >
-          <VCombobox
-            label="Combobox"
-            :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-          />
-        </VCol>
-      </VRow>
-    </div>
-    <div style="border: 1px solid black;">
-      <VRow>
-        <VCol
-          cols="12"
-          class="d-flex justify-center"
-        >
+        <VCol cols="12" class="d-flex justify-center">
           Lorry Loading Check List
         </VCol>
       </VRow>
     </div>
     <div style="border: 1px solid black;">
       <VRow>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Staff"
-          />
+        <VCol cols="4" class="d-flex justify-center" style="border: 1px solid black;">
+          <VTextField density="compact" variant="outlined" label="Staff" />
         </VCol>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Leader"
-          />
+        <VCol cols="4" class="d-flex justify-center" style="border: 1px solid black;">
+          <VTextField density="compact" variant="outlined" label="Leader" />
         </VCol>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="SuperVisor"
-          />
+        <VCol cols="4" class="d-flex justify-center" style="border: 1px solid black;">
+          <VTextField density="compact" variant="outlined" label="SuperVisor" />
         </VCol>
       </VRow>
       <VRow>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Date"
-          />
+        <VCol cols="4" class="d-flex justify-center" style="border: 1px solid black;">
+          <VTextField density="compact" variant="outlined" label="Date" />
         </VCol>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Date"
-          />
+        <VCol cols="4" class="d-flex justify-center" style="border: 1px solid black;">
+          <VTextField density="compact" variant="outlined" label="Date" />
         </VCol>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Date"
-          />
+        <VCol cols="4" class="d-flex justify-center" style="border: 1px solid black;">
+          <VTextField density="compact" variant="outlined" label="Date" />
         </VCol>
       </VRow>
       <VRow>
-        <VCol
-          cols="1"
-          class="justify-right offset-10"
-        >
-          <VBtn
-            type="text"
-            style="width: 100%;"
-            color="warning"
-            @click="saveDraft"
-          >
+        <VCol cols="1" class="justify-right offset-10">
+          <VBtn type="text" style="width: 100%;" color="warning" @click="saveDraft">
             Draft
           </VBtn>
         </Vcol>
-        <VCol
-          cols="1"
-          class="justify-right"
-        >
-          <VBtn
-            type="text"
-            style="width: 100%;"
-            color="secondary"
-            @click="submit"
-          >
+        <VCol cols="1" class="justify-right">
+          <VBtn type="text" style="width: 100%;" color="secondary" @click="submit">
             Submit
           </VBtn>
         </Vcol>
@@ -873,6 +604,7 @@ watchEffect(async () => {
 </template>
 
 <style scoped>
+
 .table-container {
   overflow-x: auto;
 }
@@ -881,7 +613,7 @@ watchEffect(async () => {
   text-align: center;
 }
 
-.centered-input >>> input {
+.centered-input>>>input {
   padding: 0;
   block-size: 20px !important;
   text-align: center;
