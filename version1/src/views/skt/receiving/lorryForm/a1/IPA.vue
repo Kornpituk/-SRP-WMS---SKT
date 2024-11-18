@@ -119,19 +119,28 @@ async function submit(e) {
 
 watch(ipaItems[6].result.field[0], async x => {// A
   let b = x.value / (0.78)
-  ipaItems[6].result.field[1].value = b
+
+  // ipaItems[6].result.field[1].value = parseFloat(b.toFixed(2))
+
+  ipaItems[6].result.field[1].value = Math.ceil(b)
 })
 
 watch(ipaItems[7].result.field[0], async x => {// C
   let d = (x.value * 5.32) + 740.45
-  ipaItems[7].result.field[1].value = d
-  ipaItems[8].result.field[0].value = ipaItems[6].result.field[1].value + ipaItems[7].result.field[1].value
+  let bPlusd = 0
+
+  // ipaItems[7].result.field[1].value = parseFloat(d.toFixed(2))
+  ipaItems[7].result.field[1].value = Math.ceil(d)
+  bPlusd = ipaItems[6].result.field[1].value + ipaItems[7].result.field[1].value
+
+  // ipaItems[8].result.field[0].value = parseFloat(bPlusd.toFixed(2))
+  ipaItems[8].result.field[0].value = Math.ceil(bPlusd)
 })
 
 watch(ipaItems[46].result.field[0], async x => { // E
   let e = ipaItems[46].result.field[0].value
   let mm = e - 740.45 / 5.32
-  ipaItems[46].result.field[1].value = mm // F
+  ipaItems[46].result.field[1].value = mm// F
 })
 
 watchEffect(async () => {
@@ -930,14 +939,16 @@ function formatDate(dateString) {
   </VContainer>
 
   <VRow class="ma-2">
-    <VCol cols="2" />
+    <VCol cols="4" />
     <VCol cols="4">
-      <h3 class="d-flex justify-center align-center pa-0">
-        Lorry Loading Check List<br>
-      </h3>
+      <div
+        style="font-size: 22px; font-weight: bolder;"
+        class="d-flex justify-center align-center"
+      >
+        Lorry Loading Check List
+      </div>
     </VCol>
-    <VCol cols="3" />
-    <VCol cols="3">
+    <VCol cols="4">
       <h3>
         <table class="custom-table">
           <tr>
@@ -947,12 +958,16 @@ function formatDate(dateString) {
         </table>
       </h3>
     </VCol>
-    <VCol cols="2" />
+    <VCol cols="4" />
     <VCol cols="4">
-      <h4 class="d-flex justify-center align-center pa-0">
+      <div
+        style="font-size: 22px; font-weight: bolder;"
+        class="d-flex justify-center align-center"
+      >
         ISOPRO (IPA)
-      </h4>
+      </div>
     </VCol>
+    <VCol cols="4" />
   </VRow>
 
   <VRow>
@@ -1072,8 +1087,8 @@ function formatDate(dateString) {
                     <VTextField
                       v-model="section.result.field[1].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
+                      variant="solo"
+                      readonly 
                     >
                       <template #append>
                         <VLabel>
@@ -1115,7 +1130,8 @@ function formatDate(dateString) {
                     <VTextField
                       v-model="section.result.field[1].value"
                       density="compact"
-                      variant="outlined"
+                      variant="solo"
+                      readonly
                     >
                       <template #append>
                         <VLabel>
@@ -1137,8 +1153,8 @@ function formatDate(dateString) {
                     <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
+                      variant="solo"
+                      readonly
                       type="number"
                     >
                       <template #append>
