@@ -17,10 +17,6 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const route = useRoute()
 
-import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-
-const itemStore = useItemStore()
-
 //--------------------------------------- Rule Page By Status -----------------------
 
 const frozeCheck = ref(false)
@@ -54,6 +50,7 @@ const isDialogVisibleImgFileMuti = ref(false)
 
 const imgDialog = ref('')
 const imgNameDialog = ref('')
+
 
 //---------------------------------- function controller --------------------------------
 
@@ -327,9 +324,40 @@ function formatDate(dateString) {
 const isDialogRejectVisible = ref(false)
 
 //---------------------------------- Controllers ----------------------------------------------------
-const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
 
-console.log("poEtlLogDetailJournalID++**", itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+const getHearderPackagingForm = () => {
+  if (poEtlLogDetailJournalIDQueryParameters.value) {
+    axiosIns.get(`${urlApi.value}/api/v1/Packaging/View/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    },
+    {})
+      .then(response => {
+
+        const data = response.data.data
+
+        console.log('[*****Headers]]!!: ', response.data.data)
+
+      })
+      .catch(error => {
+        // Handle errors
+        console.error('Error:', error)
+      })
+  } else {
+    console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+  }
+
+}
+
+//---------------------------------- Call function functions --------------------------------
+
+// watchEffect(() => {
+//   getHearderPackagingForm()
+// })
 
 //--------------------------------- Component ---------------------------------------------
 //--------------------- alertDialog--------------------------------------------------------

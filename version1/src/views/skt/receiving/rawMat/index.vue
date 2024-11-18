@@ -15,11 +15,6 @@ const props = defineProps({
   Data: Array,
 })
 
-import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-
-const itemStore = useItemStore()
-
-
 const switchLog = ref(false)
 
 watchEffect(() => {
@@ -81,8 +76,6 @@ const userName = ref(localStorage.getItem('userCheck'))
 const accountRole = ref(sessionStorage.getItem('accountRole'))
 
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-const itemCodeCookies = itemStore.getItemDetails('itemCodeCookies')
-const supplierIdCookies = itemStore.getItemDetails('supplierIdCookies')
 
 const route = useRoute()
 
@@ -95,8 +88,8 @@ const itemsManufacturer = ref([])
 const getManufacturer = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/maker`, {
     params: {
-      productId: itemCodeCookies,
-      supplierId: supplierIdCookies,
+      productId: data.value.itemCode,
+      supplierId: data.value.supplierId,
     },
     headers: {
       'accept': '*/*',
@@ -136,7 +129,7 @@ const dataHeaderReceving = ref([])
 const NetCountPackage = ref('')
 
 const purchaseOrder = ref({
-  poEtlLogDetailJournalID: itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'),
+  poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
   linkedJournalID: data.value.linkedJournalID,
   journalID: data.value.journalID,
   selectedMakerName: 'N/A',
@@ -217,7 +210,7 @@ const generatedReceivingForm = () => {
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
     params: {
-      poEtlLogDetailJournalID: itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'),
+      poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
       updatedBy: userName.value,
     },
   },
@@ -242,10 +235,10 @@ const responseGener = ref([])
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 const typeReceivedId = ref(null)
 
-const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
 
 const generatedJournalId = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${data.value.poEtlLogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -348,7 +341,7 @@ const limitTextInputLine4 = event => {
 //-------------------------- Generate ----------------------------------
 const generated = () => {
 
-  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -736,7 +729,7 @@ const saveHeaderReceivingForm = async () => {
   // }
 
   try {
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value}`, body, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value.poEtlLogDetailJournalID}`, body, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -1002,7 +995,7 @@ const saveLotReceivingForm = async () => {
 
   // ถ้าไม่มีข้อผิดพลาด ส่งข้อมูลไปยัง API
   try {
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-lot-details/${data.value}`, body, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-lot-details/${data.value.poEtlLogDetailJournalID}`, body, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -1282,7 +1275,7 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
   try {
     console.log('formData++', formData)
 
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-coas/${data.value}`, formData, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-coas/${data.value.poEtlLogDetailJournalID}`, formData, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -1511,7 +1504,7 @@ const submitReceivingForm = async () => {
 
     // throw "Success"
 
-    axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value}`, {}, {
+    axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -2127,7 +2120,7 @@ const getDisabledFollowStatusNRole = () => {
               SKT LOT No.
             </th>
             <td
-              v-if="dataHeaderReceving.sktLot"
+              v-if="data.batch"
               class="text-center"
               colspan="3"
             >
@@ -2180,7 +2173,7 @@ const getDisabledFollowStatusNRole = () => {
                 class="text-start"
                 colspan="2"
               >
-                {{ dataHeaderReceving.purchaseOrderNo }}
+                {{ data.purchaseOrderNo }}
               </td>
               <th
                 class="text-center"

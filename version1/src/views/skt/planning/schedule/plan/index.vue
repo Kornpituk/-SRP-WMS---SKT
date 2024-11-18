@@ -42,6 +42,15 @@ const formatDate = date => {
   return `${day}/${month}/${year}`
 }
 
+const statuses = [ 'Aprove', 'Reject', 'Back to Edit', 'Working', 'Save Draft']
+
+// ฟังก์ชันสำหรับสุ่มสถานะ
+function getRandomStatus() {
+  const randomIndex = Math.floor(Math.random() * statuses.length)
+  
+  return statuses[3]
+}
+
 const RoleAccount = ref('User')
 
 // ฟังก์ชันสำหรับเปลี่ยนสถานะของแถวใน productionPlan
@@ -92,20 +101,11 @@ const mockData = ref([
     inputDate: toDayDate,
     plants: "Plant A",
     reactor: "R-101",
-    productionCode: "porduction Code",
-    productionName: "porduction Name",
-    batchScaleKgs: 500,
-    productCode1: "PC2311001",
-    productName1: "Chemical X",
-    quantityKgs1: 1000,
-    quantityPcs1: 1,
-    packagingType1: "Drum",
-    productCode2: "PC2311001",
-    productName2: "Chemical X",
-    quantityKgs2: 1000,
-    quantityPcs2: 1,
-    packagingType2: "Drum",
+    productCode: "PC2311001",
+    productName: "Chemical X leasdasdasldjlaksdjl;kajs;ldkjalsdjl;asjd;lkasjdlkjasldkjalsjdlasjkdasdasdasdasd",
+    quantity: 1000,
     uom: "kg",
+    packagingType: "Drum",
     lotNumber: "LT12345",
     producingDate: date,
     finishedDate: toDayDatePFinished.value,
@@ -113,6 +113,186 @@ const mockData = ref([
     checkBy: "John",
     remark: "Urgent",
     byWho: 'John',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant B",
+    reactor: "R-102",
+    productCode: "PC2311002",
+    productName: "Chemical Y",
+    quantity: 500,
+    uom: "kg",
+    packagingType: "Bag",
+    lotNumber: "LT12346",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-16",
+    storageCondition: "Room Temperature",
+    checkBy: "Alice",
+    remark: "Standard Order",
+    byWho: 'Alice',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant C",
+    reactor: "R-103",
+    productCode: "PC2311003",
+    productName: "Chemical Z",
+    quantity: 1500,
+    uom: "kg",
+    packagingType: "Drum",
+    lotNumber: "LT12347",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-17",
+    storageCondition: "Cool, Dry Place",
+    checkBy: "Bob",
+    remark: "",
+    byWho: 'Bob',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant D",
+    reactor: "R-104",
+    productCode: "PC2311004",
+    productName: "Chemical A",
+    quantity: 2000,
+    uom: "kg",
+    packagingType: "Bag",
+    lotNumber: "LT12348",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-18",
+    storageCondition: "Room Temperature",
+    checkBy: "Carol",
+    remark: "",
+    byWho: 'Carol',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant E",
+    reactor: "R-105",
+    productCode: "PC2311005",
+    productName: "Chemical B",
+    quantity: 750,
+    uom: "kg",
+    packagingType: "Drum",
+    lotNumber: "LT12349",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-19",
+    storageCondition: "Cool, Dry Place",
+    checkBy: "Dave",
+    remark: "Special Packaging",
+    byWho: 'Dave',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant F",
+    reactor: "R-106",
+    productCode: "PC2311006",
+    productName: "Chemical C",
+    quantity: 1250,
+    uom: "kg",
+    packagingType: "Bag",
+    lotNumber: "LT12350",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-20",
+    storageCondition: "Room Temperature",
+    checkBy: "Eva",
+    remark: "",
+    byWho: 'Eva',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant G",
+    reactor: "R-107",
+    productCode: "PC2311007",
+    productName: "Chemical D",
+    quantity: 1750,
+    uom: "kg",
+    packagingType: "Drum",
+    lotNumber: "LT12351",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-21",
+    storageCondition: "Cool, Dry Place",
+    checkBy: "Frank",
+    remark: "",
+    byWho: 'Frank',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant H",
+    reactor: "R-108",
+    productCode: "PC2311008",
+    productName: "Chemical E",
+    quantity: 2000,
+    uom: "kg",
+    packagingType: "Bag",
+    lotNumber: "LT12352",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-22",
+    storageCondition: "Room Temperature",
+    checkBy: "Grace",
+    remark: "",
+    byWho: 'Grace',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant I",
+    reactor: "R-109",
+    productCode: "PC2311009",
+    productName: "Chemical F",
+    quantity: 3000,
+    uom: "kg",
+    packagingType: "Drum",
+    lotNumber: "LT12353",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-23",
+    storageCondition: "Cool, Dry Place",
+    checkBy: "Hank",
+    remark: "Extra Care Required",
+    byWho: 'Hank',
+    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
+  },
+  {
+    
+    status: 'Working',
+    inputDate: toDayDate,
+    plants: "Plant J",
+    reactor: "R-110",
+    productCode: "PC2311010",
+    productName: "Chemical G",
+    quantity: 500,
+    uom: "kg",
+    packagingType: "Bag",
+    lotNumber: "LT12354",
+    producingDate: toDayDate,
+    finishedDate: "2023-06-24",
+    storageCondition: "Room Temperature",
+    checkBy: "Irene",
+    remark: "",
+    byWho: 'Irene',
     statusDate: getRandomDate('2023/01/01', '2023/12/31'),
   },
 ])
@@ -150,30 +330,17 @@ const addEmptyRowToPlan = () => {
   
   productionPlan.value.push({
     no: countItemProduction.value,
-    
+    productName: '',
     producingDate: '',
 
     // เพิ่มคอลัมน์อื่นๆ ตามข้อมูลใน mockData
     inputDate: '',
     plants: '',
     reactor: '',
-    productionName: '',
-    productionCode: '',
-    batchScaleKgs: '',
-
-    productName1: '',
-    productCode1: '',
-    packagingType1: '',
-    packagingKgs1: '',
-    packagingPcs1: '',
-
-    productName2: '',
-    productCode2: '',
-    packagingType2: '',
-    packagingKgs2: '',
-    packagingPcs2: '',
-
+    productCode: '',
+    quantity: '',
     uom: '',
+    packagingType: '',
     lotNumber: '',
     storageCondition: '',
     remark: '',
@@ -249,6 +416,37 @@ const refeshPage = () => {
 }
 
 const isSpinning = ref(false)
+
+const headers = [
+  {
+    title: 'ID',
+    key: 'id',
+  },
+  {
+    title: 'ID',
+    key: 'id',
+  },
+  {
+    title: 'NAME',
+    key: 'fullName',
+  },
+  {
+    title: 'EMAIL',
+    key: 'email',
+  },
+  {
+    title: 'DATE',
+    key: 'startDate',
+  },
+  {
+    title: 'EXPERIENCE',
+    key: 'experience',
+  },
+  {
+    title: 'AGE',
+    key: 'age',
+  },
+]
 
 const headersDataTable = [
   {
@@ -329,126 +527,8 @@ const headersDataTable = [
   },
 ]
 
-const headersDataTableNew = [
-  {
-    title: 'data-table-select',
-    key: 'data-table-select',
-    align: "center",
-    fixed: true,
-    readonly: true,
-  },
-  {
-    title: 'Status',
-    key: 'status',
-    fixed: true,
-  },
-  {
-    title: 'No.',
-    key: 'no',
-  },
-  {
-    title: 'Input Date',
-    key: 'inputDate',
-  },
-  {
-    title: 'Plants',
-    key: 'plants',
-  },
-  {
-    title: 'Reactor',
-    key: 'reactor',
-  },
-  {
-    title: 'Production Code',
-    key: 'productCode',
-  },
-  {
-    title: 'Production Name',
-    key: 'productName',
-  },
-  {
-    title: 'Batch Scale(Kgs)',
-    key: 'batchScaleKgs',
-  },
-  {
-    title: 'Item Code1',
-    key: 'productCode1',
-    class: 'my-header-style',
-  },
-  {
-    title: 'Item Name1',
-    key: 'productName1',
-  },
-  {
-    title: 'Packaging Type1',
-    key: 'packagingType1',
-  },
-  {
-    title: 'Packaging Kgs1',
-    key: 'packagingKgs1',
-  },
-  {
-    title: 'Packaging Pcs1',
-    key: 'packagingPcs1',
-  },
-
-  //---------------
-  {
-    title: 'Item Code2',
-    key: 'productCode2',
-  },
-  {
-    title: 'Item Name2',
-    key: 'productName2',
-  },
-  {
-    title: 'Packaging Type2',
-    key: 'packagingType2',
-  },
-  {
-    title: 'Packaging Kgs2',
-    key: 'packagingKgs2',
-  },
-  {
-    title: 'Packaging Pcs2',
-    key: 'packagingPcs2',
-  },
-  
-  {
-    title: 'Lot',
-    key: 'lotNumber',
-  },
-  {
-    title: 'Producing Date',
-    key: 'producingDate',
-  },
-  {
-    title: 'Finished Date',
-    key: 'finishedDate',
-  },
-  
-  {
-    title: 'Remark',
-    key: 'remark',
-  },
-  {
-    title: 'Update Date',
-    key: 'updateDate',
-  },
-  {
-    title: 'Update By',
-    key: 'byWho',
-  },
-  {
-    title: 'Action',
-    key: 'action',
-  },
-]
-
-
-
-
 //--------------------- Menu
+import avatar1 from '@images/avatars/avatar-1.png'
 
 const menuDataTable = ref(false)
 
@@ -505,7 +585,6 @@ const deleteItem = () => {
 
 const submit = () => {
   console.log('Submitted')
-  window.location.href = '/skt/planning/schedule/plan'
 }
 
 const print = () => {
@@ -525,12 +604,12 @@ const print = () => {
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'dashboards-main',
+                :to="{ name: 'skt-planning-schedule',
                 }"
               >
                 <VIcon
                   size="30"
-                  icon="ri-close-circle-fill"
+                  icon="ri-arrow-left-circle-fill"
                   color="#000000"
                 />
               </IconBtn>
@@ -543,7 +622,7 @@ const print = () => {
                 <span
                   style="font-size: 22px; font-weight: bold;"
                   class="text-center"
-                >{{ $t('Production Plan ฺBatch') }}</span>
+                >{{ $t('Production Plan in batch') }}</span>
               </div>
             </VCol>
             <VCol
@@ -1068,7 +1147,7 @@ const print = () => {
   </div>
 
   <!-- ----------             Production plan                                ------------------------------------ -->
-  <section>
+  <section v-if="addBatch">
     <VCard
       v-if="false"
       class="mt-4"
@@ -1949,36 +2028,12 @@ const print = () => {
         <VDataTable
           v-model:page="currentPageDataTable"
           v-model="selectedDataTables"
-          :headers="headersDataTableNew"
+          :headers="headersDataTable"
           :items="productionPlan"
           :items-per-page="5"
           show-select
           class="text-no-wrap"
         >
-          <template #column.action="{ column }">
-            <tr style="background-color: aqua !important;">
-              <th>
-                {{ column.column }} action custom
-              </th>
-            </tr>
-          </template>
-
-          <!--
-            <template #column.item1="{ column }">
-            <tr class="bg-light-blue-lighten-4">
-            <th class="bg-light-blue-lighten-4">
-            {{ column.column }} Item 1
-            <tr class="bg-light-blue-lighten-4">
-            <td class="px-2">Item Code</td>
-            <td class="px-2">Item Name1</td>
-            <td class="px-2">Packaging Type1</td>
-            <td class="px-2">Packaging Kgs1</td>
-            <td class="px-2">Packaging Pcs1</td>
-            </tr>
-            </th>
-            </tr>
-            </template>
-          -->
           <template #item="{ item }">
             <tr style="font-size: 14px;">
               <td
@@ -2041,7 +2096,7 @@ const print = () => {
               <td>{{ item.raw.reactor }}</td>
               <td>
                 <VCombobox
-                  v-model="item.raw.productionCode"
+                  v-model="item.raw.productCode"
                   :items="productNamesMockItems"
                   placeholder="deployment"
                   density="compact"
@@ -2051,106 +2106,57 @@ const print = () => {
                 />
               </td>
               <td>
-                {{ productionName }}
+                <VCombobox
+                  v-model="item.raw.productName"
+                  :items="productNamesMockItems"
+                  placeholder="deployment"
+                  density="compact"
+                  label="Plants Name"
+                  style="width: 150px;"
+                  :readonly="item.raw.status === 'Submit'"
+                />
               </td>
               <td
                 class="px-1"
                 style="min-width: 150px;"
               >
-                batchScaleKgs
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-model="item.raw.productCode1"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 1</span>
-                  </template>
-                </VCombobox>
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                {{ productName1 }}
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingType1"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type</span>
-                  </template>
-                </VCombobox>
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                {{ packagingKgs1 }}
-              </td>
-              <td class="bg-light-blue-lighten-5">
                 <VTextField
-                  v-model="item.raw.packagingPcs1"
+                  v-model="item.raw.quantity"
+                  label="Qty."
                   type="number"
+                  placeholder="Select UOM"
                   style="min-width: 100px;"
                   density="compact"
                   :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 1</span>
-                  </template>
-                </VTextField>
+                />
               </td>
-
-              <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.productCode2"
-                  :items="productNamesMockItems"
+              <td
+                class="px-1"
+                style="min-width: 150px;"
+              >
+                <VSelect
+                  v-model="item.raw.uom"
                   density="compact"
-                  style="width: 150px;"
+                  :items="items"
+                  label="UOM"
+                  placeholder="Select UOM"
+                  eager
                   :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 2</span>
-                  </template>
-                </VCombobox>
+                />
               </td>
-              <td class="bg-red-lighten-5">
-                {{ productName2 }}
-              </td>
-              <td class="bg-red-lighten-5">
+              <td
+                class="px-1"
+                style="min-width: 150px;"
+              >
                 <VCombobox
-                  v-model="item.raw.packagingType2"
+                  v-model="item.raw.packagingType"
                   :items="productNamesMockItems"
+                  placeholder="deployment"
                   density="compact"
-                  style="width: 150px;"
+                  label="Packaging Type"
                   :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type 2</span>
-                  </template>
-                </VCombobox>
+                />
               </td>
-              <td class="bg-red-lighten-5">
-                {{ packagingKgs2 }}
-              </td>
-              <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingPcs2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 2</span>
-                  </template>
-                </VCombobox>
-              </td>
-             
               <td
                 class="px-1"
                 style="min-width: 150px;"
@@ -2168,9 +2174,9 @@ const print = () => {
               >
                 <AppDateTimePicker
                   v-model="item.raw.producingDate"
+                  label="Producing Date"
                   placeholder="Producing date"
                   density="compact"
-                  style="font-size: 12px;"
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
                 />
@@ -2179,7 +2185,14 @@ const print = () => {
                 class="px-1"
                 style="min-width: 150px;"
               >
-                {{ item.raw.finishedDate }}
+                <AppDateTimePicker
+                  v-model="item.raw.finishedDate"
+                  label="Finished Date"
+                  placeholder="Finished date"
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
               </td>
               <td>
                 <VTextarea
@@ -2190,18 +2203,20 @@ const print = () => {
                   :rules="rules"
                   rows="2"
                   clearable
+                  placeholder="Placeholder Text"
                   :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Remark</span>
-                  </template>
-                </VTextarea>
+                />
+              </td>
+              <td>
+                <VTextField
+                  v-model="item.raw.byWho"
+                  density="compact"
+                  style="min-width: 150px;"
+                  :readonly="item.raw.status === 'Submit'"
+                />
               </td>
               <td>
                 {{ item.raw.statusDate }}
-              </td>
-              <td>
-                {{ item.raw.byWho }}
               </td>
               <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'"> 
                 <div class="d-flex justify-center">
@@ -2354,10 +2369,6 @@ const print = () => {
 
 .spinning {
   animation: spin 0.5s linear infinite;
-}
-
-.my-header-style {
-  background: aquamarine;
 }
 </style>
 

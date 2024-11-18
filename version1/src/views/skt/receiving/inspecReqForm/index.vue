@@ -9,15 +9,11 @@ const props = defineProps({
 
 const route = useRoute()
 
-// const dataProps = ref(JSON.parse(route.query.Data || '[]'))
+const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
-// const data = ref(JSON.parse(route.query.Data || '[]'))
+const data = ref(JSON.parse(route.query.Data || '[]'))
 
-// console.log('Data**', data)
-
-import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-
-const itemStore = useItemStore()
+console.log('Data**', data)
 
 const whereHouse = ref(localStorage.getItem('whereHouseName'))
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
@@ -126,15 +122,15 @@ const limitTextInputLine4Details = event => {
 
 //------------------------------------ Purchest Item --------------------------------
 const headerInsp =ref({
-  sktName: null,
+  sktName: dataProps.value.itemName,
   sktId: '',
-  itemCode: null,
-  supplierName: null,
-  receivedDate: null,
-  tradeNames: null,
+  itemCode: dataProps.value.itemCode,
+  supplierName: dataProps.value.supplierName,
+  receivedDate: dataProps.value.deliveryDate,
+  tradeNames: dataProps.value.concatTradename,
   ManufacturerName: null,
   certiCOA: null,
-  remark: null,
+  remark: dataProps.value.statusComments,
   note: null,
   details: null,
 
@@ -168,12 +164,9 @@ const covertFloatFixedTwo = convert => {
 //--------------------------- API --------------------------------
 
 //-------------- Generate---------------------------------------
-
-const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
-
 const generatedInsp = () => {
 
-  axiosIns.post(`${urlApi.value}/api/v1/Inspection/Generate/${poEtlLogDetailJournalIDQueryParameters.value}`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/Inspection/Generate/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -204,8 +197,10 @@ const statusId = ref(null) // ตัวแปรสำหรับเก็บ�
 const frozeCheck = ref(true)
 const poEiLog = ref()
 
+const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
+
 const generatedJournalId = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
