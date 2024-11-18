@@ -15,6 +15,11 @@ const props = defineProps({
   Data: Array,
 })
 
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
+
 const switchLog = ref(false)
 
 watchEffect(() => {
@@ -76,6 +81,8 @@ const userName = ref(localStorage.getItem('userCheck'))
 const accountRole = ref(sessionStorage.getItem('accountRole'))
 
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const itemCodeCookies = itemStore.getItemDetails('itemCodeCookies')
+const supplierIdCookies = itemStore.getItemDetails('supplierIdCookies')
 
 const route = useRoute()
 
@@ -88,8 +95,8 @@ const itemsManufacturer = ref([])
 const getManufacturer = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/maker`, {
     params: {
-      productId: data.value.itemCode,
-      supplierId: data.value.supplierId,
+      productId: itemCodeCookies,
+      supplierId: supplierIdCookies,
     },
     headers: {
       'accept': '*/*',
@@ -129,7 +136,7 @@ const dataHeaderReceving = ref([])
 const NetCountPackage = ref('')
 
 const purchaseOrder = ref({
-  poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
+  poEtlLogDetailJournalID: itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'),
   linkedJournalID: data.value.linkedJournalID,
   journalID: data.value.journalID,
   selectedMakerName: 'N/A',
@@ -149,6 +156,8 @@ const purchaseOrder = ref({
   lotId: data.value.batch,
   packagingTypeName: '',
   storagePlaceNo: '',
+  viewHalal: false,
+  viewRSPO: false,
 
   actualMakerLotNo_1: null,
   actualNetCountKgs_1: NetCountPackage.value,
@@ -177,7 +186,6 @@ const purchaseOrder = ref({
   actualTotalQuantityKgs_4: null,
   customManufacturerName_4: '',
   customLable_4: '',
-
 
   actualMakerLotNo_5: null,
   actualNetCountKgs_5: null,
@@ -209,7 +217,7 @@ const generatedReceivingForm = () => {
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
     params: {
-      poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
+      poEtlLogDetailJournalID: itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'),
       updatedBy: userName.value,
     },
   },
@@ -234,10 +242,10 @@ const responseGener = ref([])
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 const typeReceivedId = ref(null)
 
-const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
+const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 
 const generatedJournalId = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${data.value.poEtlLogDetailJournalID}`, {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -340,7 +348,7 @@ const limitTextInputLine4 = event => {
 //-------------------------- Generate ----------------------------------
 const generated = () => {
 
-  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${data.value.poEtlLogDetailJournalID}`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -473,6 +481,9 @@ const getHearderReceivingForm = async () => {
       //------------------------- DeliveryQueue ------------------------
       deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
       deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
+
+      purchaseOrder.value.viewHalal = data[0].viewHalal
+      purchaseOrder.value.viewRSPO = data[0].viewRSPO
 
       console.log('[*****Headers]]!!: ', data[0])
       console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
@@ -725,7 +736,7 @@ const saveHeaderReceivingForm = async () => {
   // }
 
   try {
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value.poEtlLogDetailJournalID}`, body, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value}`, body, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -991,7 +1002,7 @@ const saveLotReceivingForm = async () => {
 
   // ถ้าไม่มีข้อผิดพลาด ส่งข้อมูลไปยัง API
   try {
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-lot-details/${data.value.poEtlLogDetailJournalID}`, body, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-lot-details/${data.value}`, body, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -1271,7 +1282,7 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
   try {
     console.log('formData++', formData)
 
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-coas/${data.value.poEtlLogDetailJournalID}`, formData, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-coas/${data.value}`, formData, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -1500,7 +1511,7 @@ const submitReceivingForm = async () => {
 
     // throw "Success"
 
-    axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
+    axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value}`, {}, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -2116,7 +2127,7 @@ const getDisabledFollowStatusNRole = () => {
               SKT LOT No.
             </th>
             <td
-              v-if="data.batch"
+              v-if="dataHeaderReceving.sktLot"
               class="text-center"
               colspan="3"
             >
@@ -2169,7 +2180,7 @@ const getDisabledFollowStatusNRole = () => {
                 class="text-start"
                 colspan="2"
               >
-                {{ data.purchaseOrderNo }}
+                {{ dataHeaderReceving.purchaseOrderNo }}
               </td>
               <th
                 class="text-center"
@@ -3446,7 +3457,7 @@ const getDisabledFollowStatusNRole = () => {
 
       <!-- RM for Halal -->
       <VCol
-        v-if="purchaseOrder.isForHalalProduct"
+        v-if="purchaseOrder.viewHalal"
         cols="4"
       >
         <Table class="custom-table">
@@ -3470,7 +3481,7 @@ const getDisabledFollowStatusNRole = () => {
       </VCol>
       <!-- RM for RSPO -->
       <VCol
-        v-if="purchaseOrder.isForRspoProduct"
+        v-if="purchaseOrder.viewRSPO"
         cols="4"
       >
         <Table class="custom-table">

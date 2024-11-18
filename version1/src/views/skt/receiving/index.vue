@@ -12,6 +12,10 @@ import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 //---------------------- new rel table --------------------
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
+import { useItemStore, useCookieStore } from '@/stores/skt/receingFormStore/itemStore'
+
+import { useCookie } from '@/stores/skt/receingFormStore/useCookie'
+
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
 
@@ -83,10 +87,6 @@ const searchByBarcode = ref(null)
 const searchByProductId = ref(null)
 const searchByProductName = ref(null)
 const searchByUOMId = ref(null)
-
-watch(()=> {
-
-})
 
 const searchByWareHouseId = ref([whereHouse])
 
@@ -1107,6 +1107,14 @@ const selectedPrintLabel = ref([])
 const copiesPrintForm = ref(1)
 const isDialogVisibleAction = ref(false)
 
+const itemStore = useItemStore()
+
+const cookieStore = useCookieStore()
+
+const cookie = useCookie('itemCookie')
+
+cookieStore.setCookieValue(cookie.value)
+
 const detailsReceiv = ref({
   statusText: '',
   itemCode: '',
@@ -1168,12 +1176,19 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   journalIDModel.value = journalID
   updateByReceivingPlan.value = updateBy
   detailsReceiv.value = products.value[index-1]
+
+  itemStore.clearItemDetails()
+  itemStore.setItemDetails(products.value[index-1].poEtlLogDetailJournalID, 'poEtlLogDetailJournalIDCookies')
+  itemStore.setItemDetails(products.value[index-1].itemCode, 'itemCodeCookies')
+  itemStore.setItemDetails(products.value[index-1].supplierId, 'supplierIdCookies')
+
+
+  // console.log("setItemDetails", itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+
   idStatusDialogAction.value = status
   receivingTypeAction.value = receivingType
   lotAction.value = lot
   sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(status))
-
-  console.log("checkCurrentTabBeforIn(status)", checkCurrentTabBeforIn(status))
 
   selectedPrintLabel.value = []
 
@@ -2729,9 +2744,7 @@ const insetSwitch1 = ref('')
             style="font-size: 12px;"
             :disabled="!checkReceivedStatus(detailsReceiv.statusText)"
             :to="{ 
-              name: 'skt-receiving-receingForm',
-              query: { Data: JSON.stringify(detailsReceiv)
-              }, 
+              name: 'skt-receiving-receingForm'
             }"
           >
             <span class="text-white">{{ detailsReceiv.statusText }}</span>
@@ -2943,16 +2956,12 @@ const insetSwitch1 = ref('')
           >
             Print Label & Form
           </VBtn>
-
           <VBtn
             v-if="detailsReceiv.statusText !== 'ETL Failed!' && detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && detailsReceiv.statusText !== 'Cancel'"
             style="font-size: 12px;"
             :disabled="!checkReceivedStatus(detailsReceiv.statusText)"
             :to="{ 
               name: 'skt-receiving-receingForm',
-              query: { 
-                Data: JSON.stringify(detailsReceiv)
-              }, 
             }"
           >
             Receiving Form
