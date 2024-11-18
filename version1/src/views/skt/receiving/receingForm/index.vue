@@ -8,13 +8,21 @@ const props = defineProps({
   Data: Array,
 })
 
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+const poEtlLogDetailJournalID = itemStore.getItemDetails('poEtlLogDetailJournalIDCookies')
+
+console.log("setItemDetails", poEtlLogDetailJournalID)
+
+
 const route = useRoute()
 const whereHouse = ref(localStorage.getItem('whereHouseName'))
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
-const statusId = ref(dataProps.value.statusId) // ตัวแปรสำหรับเก็บค่า statusId
+const statusId = ref(itemStore.setItemDetails?.statusId) // ตัวแปรสำหรับเก็บค่า statusId
 const receivedTypeId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 
 const a = ref('A')
@@ -187,10 +195,6 @@ watch(userRole, newValue => {
   
 })
 
-watchEffect(() => {
-  console.log(dataProps.value)
-})
-
 const countCurrentTab = ref(0)
 
 //------------- journalId
@@ -205,7 +209,7 @@ const typeLorryTwo = ref(null)
 
 const generatedJournalId = async () => {
   console.log("generatedJournalId")
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${dataProps.value.poEtlLogDetailJournalID}`, {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -546,7 +550,7 @@ const handleSelectLorryLoading = word => {
 
 const handleAcceptPackaging = word => {
   console.log("StaertSSSSS!!")
-  axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/whapproval/${dataProps.value.poEtlLogDetailJournalID}`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/whapproval/${poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,

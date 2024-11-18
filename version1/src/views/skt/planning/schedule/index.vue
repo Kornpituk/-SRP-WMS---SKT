@@ -370,19 +370,6 @@ const headersDataTableNew = [
     title: 'Batch Scale(Kgs)',
     key: 'batchScaleKgs',
   },
-
-  //-----------
-  {
-    title: 'Item1',
-    align: 'center',
-    key: 'item1',
-    color: "red",
-    children: [
-      { title: 'Height (m)', value: 'height' },
-      { title: 'Base (m)', value: 'base' },
-      { title: 'Volume (m³)', value: 'volume' },
-    ],
-  },
   {
     title: 'Item Code1',
     key: 'productCode1',
@@ -1975,31 +1962,23 @@ const print = () => {
               </th>
             </tr>
           </template>
-          <template #column.item1="{ column }">
+
+          <!--
+            <template #column.item1="{ column }">
             <tr class="bg-light-blue-lighten-4">
-              <th class="bg-light-blue-lighten-4">
-                {{ column.column }} Item 1
-                <tr class="bg-light-blue-lighten-4">
-                  <td class="px-2">Item Code</td>
-                  <td class="px-2">Item Name1</td>
-                  <td class="px-2">Packaging Type1</td>
-                  <td class="px-2">Packaging Kgs1</td>
-                  <td class="px-2">Packaging Pcs1</td>
-                </tr>
-              </th>
+            <th class="bg-light-blue-lighten-4">
+            {{ column.column }} Item 1
+            <tr class="bg-light-blue-lighten-4">
+            <td class="px-2">Item Code</td>
+            <td class="px-2">Item Name1</td>
+            <td class="px-2">Packaging Type1</td>
+            <td class="px-2">Packaging Kgs1</td>
+            <td class="px-2">Packaging Pcs1</td>
             </tr>
-          </template>
-
-          <template #column.productName1="{ column }">
-            <tr style="background-color: aqua !important;">
-              <th style="background-color: aqua !important;" class="bg-red">
-                <div>
-                  {{ column.column }} Item Name1 custom
-                </div>
-              </th>
+            </th>
             </tr>
-          </template>
-
+            </template>
+          -->
           <template #item="{ item }">
             <tr style="font-size: 14px;">
               <td
@@ -2080,83 +2059,96 @@ const print = () => {
               >
                 batchScaleKgs
               </td>
-              <td class="bg-light-blue-lighten-4">
+              <td class="bg-light-blue-lighten-5">
                 <VCombobox
                   v-model="item.raw.productCode1"
                   :items="productNamesMockItems"
-                  placeholder="deployment"
                   density="compact"
-                  label="Product Code"
                   style="width: 150px;"
                   :readonly="item.raw.status === 'Submit'"
-                />
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">Item Code 1</span>
+                  </template>
+                </VCombobox>
               </td>
-              <td>
+              <td class="bg-light-blue-lighten-5">
                 {{ productName1 }}
               </td>
-              <td>
+              <td class="bg-light-blue-lighten-5">
                 <VCombobox
                   v-model="item.raw.packagingType1"
                   :items="productNamesMockItems"
-                  placeholder="deployment"
                   density="compact"
-                  label="Packaging Type"
                   style="width: 150px;"
                   :readonly="item.raw.status === 'Submit'"
-                />
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">Packaging Type</span>
+                  </template>
+                </VCombobox>
               </td>
-              <td>
+              <td class="bg-light-blue-lighten-5">
                 {{ packagingKgs1 }}
               </td>
-              <td>
+              <td class="bg-light-blue-lighten-5">
                 <VTextField
                   v-model="item.raw.packagingPcs1"
-                  label="Packaging Pcs"
                   type="number"
                   style="min-width: 100px;"
                   density="compact"
                   :readonly="item.raw.status === 'Submit'"
-                />
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">Packaging Pcs 1</span>
+                  </template>
+                </VTextField>
               </td>
 
-              <td>
+              <td class="bg-red-lighten-5">
                 <VCombobox
                   v-model="item.raw.productCode2"
                   :items="productNamesMockItems"
-                  placeholder="deployment"
                   density="compact"
-                  label="Plants Code"
                   style="width: 150px;"
                   :readonly="item.raw.status === 'Submit'"
-                />
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">Item Code 2</span>
+                  </template>
+                </VCombobox>
               </td>
-              <td>
+              <td class="bg-red-lighten-5">
                 {{ productName2 }}
               </td>
-              <td>
+              <td class="bg-red-lighten-5">
                 <VCombobox
                   v-model="item.raw.packagingType2"
                   :items="productNamesMockItems"
-                  placeholder="deployment"
                   density="compact"
-                  label="Packaging Type"
                   style="width: 150px;"
                   :readonly="item.raw.status === 'Submit'"
-                />
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">Packaging Type 2</span>
+                  </template>
+                </VCombobox>
               </td>
-              <td>
+              <td class="bg-red-lighten-5">
                 {{ packagingKgs2 }}
               </td>
-              <td>
+              <td class="bg-red-lighten-5">
                 <VCombobox
                   v-model="item.raw.packagingPcs2"
                   :items="productNamesMockItems"
-                  placeholder="deployment"
                   density="compact"
-                  label="Ppackaging Pcs"
                   style="width: 150px;"
                   :readonly="item.raw.status === 'Submit'"
-                />
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">Packaging Pcs 2</span>
+                  </template>
+                </VCombobox>
               </td>
              
               <td
@@ -2176,9 +2168,9 @@ const print = () => {
               >
                 <AppDateTimePicker
                   v-model="item.raw.producingDate"
-                  label="Producing Date"
                   placeholder="Producing date"
                   density="compact"
+                  style="font-size: 12px;"
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
                 />
@@ -2198,9 +2190,12 @@ const print = () => {
                   :rules="rules"
                   rows="2"
                   clearable
-                  placeholder="Placeholder Text"
                   :readonly="item.raw.status === 'Submit'"
-                />
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">Remark</span>
+                  </template>
+                </VTextarea>
               </td>
               <td>
                 {{ item.raw.statusDate }}
