@@ -88,7 +88,7 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101010001",
+          "name": "l0101010101",
           "value:": "",
         },
       ],
@@ -103,7 +103,7 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101020001",
+          "name": "l0101020101",
           "value:": "",
         },
       ],
@@ -118,7 +118,7 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101030001",
+          "name": "l0101030101",
           "value:": "",
         },
       ],
@@ -133,7 +133,7 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101040001",
+          "name": "l0101040101",
           "value:": "",
         },
       ],
@@ -148,7 +148,7 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101050001",
+          "name": "l0101050101",
           "value:": "",
         },
       ],
@@ -163,7 +163,7 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101060001",
+          "name": "l0101060101",
           "value:": "",
         },
       ],
@@ -254,12 +254,8 @@ export const ipaItemTemplate = [
     "practice": "5. Check Seal No. ที่รถส่งของ และ แป้นในถัง lorry ว่าตรง 10,000 ลิตร หรือไม่",
     "condition": "Seal ล็อกวาล์วไม่ขาดตรงตามใบส่ง",
     "result": {
-      "type": "litre",
-      "field": [
-        {
-          "name": "l0102050101", // litre
-          "value:": "",
-        },
+      "type": "oknot",
+      "field": [  
         {
           "name": "l0102050101", // litre
           "value:": "",

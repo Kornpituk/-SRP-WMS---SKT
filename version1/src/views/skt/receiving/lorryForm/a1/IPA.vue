@@ -96,26 +96,38 @@ async function saveDraft(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
-  })
+  });
+
+  if (response.status == 200) {
+    location.reload();
+  } else {
+    console.error(response.data);
+  }
 }
 
 async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
-  })
+  });
+
+  if (response.status == 200) {
+    location.reload();
+  } else {
+    console.error(response.data);
+  }
 }
 
 watch(ipaItems[6].result.field[0], async x => {// A
