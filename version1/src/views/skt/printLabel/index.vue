@@ -191,10 +191,15 @@ const fetchData = async () => {
 
   const result = await printLabelFormViewService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
 
-  if (printLabelFormViewResult.value) {
-    dataPrintLabel.value = result.data
+  if (result) {
+    // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
+    dataPrintLabel.value = result.data.map((item, index) => ({
+      ...item, // คงข้อมูลเดิมใน item
+      no: index + 1, // เพิ่มฟิลด์ number โดยเริ่มจาก 1
+    }))
+
     progressLinearNoData.value = true
-    console.log("printLabelFormViewService successfully view")
+    console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
   } else {
     console.log("printLabelFormViewService failed view")
   }
@@ -250,18 +255,13 @@ const printLabel = async () => {
   if(typePrintLabel.value === 'Raw Mat Label'){
     console.log('Raw Mat Label print start .....')
 
-    const barcode = ref({})
-
-    // await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
-  }
-  if(typePrintLabel.value === 'Semi Label'){
-    console.log('Semi Label print start .....')
-
     const barcodes = Array.isArray(selectedDataTables.value)
       ? selectedDataTables.value.flatMap(item => 
-        Array.isArray(item.barcodes) ? item.barcodes.map(b => b.barcode) : [],
+        Array.isArray(item.barcodes) 
+          ? item.barcodes.map(b => b.barcode)   // กรณีที่ `barcodes` เป็นอาเรย์ ให้ดึง `barcode`
+          : [item.barcode],                      // กรณีที่ `barcode` เป็นตัวเดียว ให้เก็บค่า `barcode`
       )
-      : []
+      : [selectedDataTables.value.barcode]  // ถ้า `selectedDataTables.value` ไม่ใช่อาเรย์ ให้ใช้ `barcode` ตรง ๆ
 
     console.log('Semi Label print start .....', barcodes)
 
@@ -283,6 +283,11 @@ const printLabel = async () => {
       successPrintLabel.value = false
       throw 'Could not save to print label form'
     }
+
+    // await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
+  }
+  if(typePrintLabel.value === 'Semi Label'){
+    console.log('Semi Label print start .....')
   }
   if(typePrintLabel.value === 'Product Label'){
     console.log('Product Label print start .....')
@@ -484,132 +489,13 @@ const headerSubtitle = [
   { title: 'Item Name', key: 'calories' },
   { title: 'Lot', key: 'fat' },
   { title: 'Barcode', key: 'carbs' },
-  { title: 'NO/RCVD(PCS)', key: 'protein' },
+  { title: 'NO/Lot', key: 'protein' },
   { title: '' },
   { title: '' },
   { title: '' },
   { title: '' },
   { title: '' },
 ]
-
-const desserts = [
-  {
-    name: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    sources: [
-      {
-        name: 'USDA',
-        calories: 167,
-        fat: 5.2,
-        carbs: 25,
-        protein: 54,
-        barcode: '00000000118001',
-      },
-      {
-        name: 'BLS',
-        calories: 143,
-        fat: 7.1,
-        carbs: 22,
-        protein: 54,
-        barcode: '00000000118002',
-      },
-      {
-        name: 'SLV',
-        calories: 157,
-        fat: 6.2,
-        carbs: 24,
-        protein: 54,
-        barcode: '00000000118003',
-      },
-      {
-        name: 'WRC',
-        calories: 157,
-        fat: 6.2,
-        carbs: 24,
-        protein: 54,
-        barcode: '00000000118004',
-      },
-      {
-        name: 'JLK',
-        calories: 157,
-        fat: 6.2,
-        carbs: 24,
-        protein: 54,
-        barcode: '00000000118005',
-      },
-    ],
-  },
-  {
-    name: 'Ice cream sandwich',
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    sources: [
-      {
-        name: 'USDA',
-        calories: 237,
-        fat: 9.0,
-        carbs: 37,
-        protein: 54,
-        barcode: '1N241028098001',
-      },
-      {
-        name: 'UER',
-        calories: 237,
-        fat: 9.0,
-        carbs: 37,
-        protein: 54,
-        barcode: '1N241028098003',
-      },
-    ],
-  },
-  {
-    name: 'Eclair',
-    calories: 262,
-    fat: 16.0,
-    carbs: 23,
-    sources: [
-      {
-        name: 'USDA2',
-        calories: 262,
-        fat: 16.0,
-        carbs: 23,
-        protein: 54,
-        barcode: '1N241028098002',
-      },
-    ],
-  },
-]
-
-const resolveStatusVariant = status => {
-  if (status === 1)
-    return {
-      color: 'primary',
-      text: 'Current',
-    }
-  else if (status === 2)
-    return {
-      color: 'success',
-      text: 'Professional',
-    }
-  else if (status === 3)
-    return {
-      color: 'error',
-      text: 'Rejected',
-    }
-  else if (status === 4)
-    return {
-      color: 'warning',
-      text: 'Resigned',
-    }
-  else
-    return {
-      color: 'info',
-      text: 'Applied',
-    }
-}
 
 //------------------- Highlighter --------------------------------
 
@@ -2608,12 +2494,29 @@ const dataTableColor = ref('#E0F7FA')
   <section>
     <VCard>
       <VCardText>
+        <VProgressLinear
+          v-if="!dataPrintLabel"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="!dataPrintLabel && progressLinearNoData === false"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data....</span>
+        </VProgressLinear>
         <VDataTable
-          v-if="printLabelFormViewResult"
+          v-if="dataPrintLabel && progressLinearNoData === true"
           v-model:expanded="expanded"
           v-model="selectedDataTables"
           :headers="headersNewEx"
-          :items="printLabelFormViewResult"
+          :items="dataPrintLabel"
           :items-per-page="5"
           class="text-no-wrap"
           expand-on-click
@@ -2702,10 +2605,58 @@ const dataTableColor = ref('#E0F7FA')
             </tr>
           </template>
 
+          <template #item.no="{item}">
+            <tr>
+              <td>
+                <span class="text-capitalize">{{ item.raw.no }}</span>
+              </td>
+            </tr>
+          </template>
+
           <template #item.lotQty="{ item}">
             <tr>
               <td>
                 <span class="text-capitalize">{{ item.raw.barcodes.length }}</span>
+              </td>
+            </tr>
+          </template>
+          <template #item.receivedDate="{ item}">
+            <tr>
+              <td>
+                <span class="text-capitalize">{{ convertDate(item.raw.receivedDate) }}</span>
+              </td>
+            </tr>
+          </template>
+          <template #item.qtyKgs="{item}">
+            <tr>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ formatNumber(item.raw.qtyKgs) }}</span>
+              </td>
+            </tr>
+          </template>
+          <template #item.qtyPcs="{item}">
+            <tr>
+              <td
+                class="text-end px-2"
+                style="justify-content: end;"
+              >
+                <span
+                  style="font-size: 12px;"
+                  class="text-wrap"
+                >{{ formatNumber(item.raw.qtyPcs) }}</span>
+              </td>
+            </tr>
+          </template>
+          <template #item.updatedDate="{ item}">
+            <tr>
+              <td>
+                <span class="text-capitalize">{{ convertDate(item.raw.updatedDate) }}</span>
               </td>
             </tr>
           </template>
