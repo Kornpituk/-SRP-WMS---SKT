@@ -5,12 +5,16 @@ import axios from '@axios'
 import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService'
 import { urlApi } from '@/api'
 
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
 var ipaItems = reactive(ipaItemTemplate)
 var ipaRequestData = ref({})
 const route = useRoute()
 
 const data = ref(JSON.parse(route.query.Data || '[]'))
-const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
+const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref(data.value.itemCode)
 
 const aVariable = ref(ipaItems[6].result.field[0])
