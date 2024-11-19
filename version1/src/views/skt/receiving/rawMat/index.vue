@@ -15,11 +15,6 @@ const props = defineProps({
   Data: Array,
 })
 
-import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-
-const itemStore = useItemStore()
-
-
 const switchLog = ref(false)
 
 watchEffect(() => {
@@ -81,12 +76,14 @@ const userName = ref(localStorage.getItem('userCheck'))
 const accountRole = ref(sessionStorage.getItem('accountRole'))
 
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-const itemCodeCookies = itemStore.getItemDetails('itemCodeCookies')
-const supplierIdCookies = itemStore.getItemDetails('supplierIdCookies')
 
 const route = useRoute()
 
-const data = ref(JSON.parse(route.query.Data || '[]'))
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
+const data = ref(itemStore.getItemDetails('itemDataCookies'))
 
 // console.log('data props in raw mat', data.value)
 
@@ -95,8 +92,8 @@ const itemsManufacturer = ref([])
 const getManufacturer = () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingForm/maker`, {
     params: {
-      productId: itemCodeCookies,
-      supplierId: supplierIdCookies,
+      productId: data.value.itemCode,
+      supplierId: data.value.supplierId,
     },
     headers: {
       'accept': '*/*',
@@ -136,7 +133,7 @@ const dataHeaderReceving = ref([])
 const NetCountPackage = ref('')
 
 const purchaseOrder = ref({
-  poEtlLogDetailJournalID: itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'),
+  poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
   linkedJournalID: data.value.linkedJournalID,
   journalID: data.value.journalID,
   selectedMakerName: 'N/A',
@@ -156,8 +153,6 @@ const purchaseOrder = ref({
   lotId: data.value.batch,
   packagingTypeName: '',
   storagePlaceNo: '',
-  viewHalal: false,
-  viewRSPO: false,
 
   actualMakerLotNo_1: null,
   actualNetCountKgs_1: NetCountPackage.value,
@@ -186,6 +181,7 @@ const purchaseOrder = ref({
   actualTotalQuantityKgs_4: null,
   customManufacturerName_4: '',
   customLable_4: '',
+
 
   actualMakerLotNo_5: null,
   actualNetCountKgs_5: null,
@@ -217,7 +213,7 @@ const generatedReceivingForm = () => {
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
     params: {
-      poEtlLogDetailJournalID: itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'),
+      poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
       updatedBy: userName.value,
     },
   },
@@ -238,14 +234,14 @@ const generatedReceivingForm = () => {
 
 //------------- journalId
 const responseGener = ref([])
-const dataGenJour = ref([])
+
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 const typeReceivedId = ref(null)
 
-const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
 
 const generatedJournalId = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${data.value.poEtlLogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -262,7 +258,6 @@ const generatedJournalId = () => {
 
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
-        dataGenJour.value = responseGener.value[0]
         poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
         statusId.value = item.statusId // เก็บค่า statusId
         typeReceivedId.value = item.receiveTypeId
@@ -349,7 +344,7 @@ const limitTextInputLine4 = event => {
 //-------------------------- Generate ----------------------------------
 const generated = () => {
 
-  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/generate?poEtlLogDetailJournalID=${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
@@ -482,9 +477,6 @@ const getHearderReceivingForm = async () => {
       //------------------------- DeliveryQueue ------------------------
       deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
       deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
-
-      purchaseOrder.value.viewHalal = data[0].viewHalal
-      purchaseOrder.value.viewRSPO = data[0].viewRSPO
 
       console.log('[*****Headers]]!!: ', data[0])
       console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
@@ -737,7 +729,7 @@ const saveHeaderReceivingForm = async () => {
   // }
 
   try {
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value}`, body, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value.poEtlLogDetailJournalID}`, body, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -902,6 +894,14 @@ const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
     return true  // มีข้อผิดพลาด
   }
 
+  // if(!actualMakerLotNo && !purchaseOrder.value[`actualMakerLotNo_${i+1}`] ){
+  //   alertErrorLot.value[`alertMakerLot${i}`].msg = The Lot No.${i} field missing.
+  //   alertErrorLot.value[`alertMakerLot${i}`].success = false
+
+  //   return true  // มีข้อผิดพลาด
+  // }
+
+
 
   if (validate.value === 0 && actualAmount) {
     alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot - Field cannot be left blank. Please enter the required information without leaving any spaces.`
@@ -995,7 +995,7 @@ const saveLotReceivingForm = async () => {
 
   // ถ้าไม่มีข้อผิดพลาด ส่งข้อมูลไปยัง API
   try {
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-lot-details/${data.value}`, body, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-lot-details/${data.value.poEtlLogDetailJournalID}`, body, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -1275,7 +1275,7 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
   try {
     console.log('formData++', formData)
 
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-coas/${data.value}`, formData, {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-coas/${data.value.poEtlLogDetailJournalID}`, formData, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -1504,7 +1504,7 @@ const submitReceivingForm = async () => {
 
     // throw "Success"
 
-    axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value}`, {}, {
+    axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse.value}`,
@@ -1621,9 +1621,9 @@ const dataRaeMatRequest = ref([
 watchEffect(() => {
   const updateNetCountKgs = (index, lotNo, netCountField) => {
     if (lotNo) {
-      if (typeReceivedId.value === 2) {
+      if (data.value.receiveTypeId === 2) {
         purchaseOrder.value[netCountField] = dataHeaderReceving.value.packagingQtyKg
-      } else if (typeReceivedId.value === 3 && dataHeaderReceving.value.packagingQtyKg === 0) {
+      } else if (data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0) {
         purchaseOrder.value[netCountField] = data.value.purchasingAmountKgs
       }
     } else {
@@ -2120,7 +2120,7 @@ const getDisabledFollowStatusNRole = () => {
               SKT LOT No.
             </th>
             <td
-              v-if="dataHeaderReceving.sktLot"
+              v-if="data.batch"
               class="text-center"
               colspan="3"
             >
@@ -2173,7 +2173,7 @@ const getDisabledFollowStatusNRole = () => {
                 class="text-start"
                 colspan="2"
               >
-                {{ dataHeaderReceving.purchaseOrderNo }}
+                {{ data.purchaseOrderNo }}
               </td>
               <th
                 class="text-center"
@@ -2459,6 +2459,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="2"
               >
                 <VTextField
+                
                   v-if="false"
                   v-model="purchaseOrder.actualNetCountKgs_1"
                   :style="{ width: '100%', minWidth: '150px' }"
@@ -2529,7 +2530,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="typeReceivedId.value === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_2"
+                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_2"
                   v-model="purchaseOrder.actualNetCountKgs_2"
                   :rules="[
                     v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
@@ -2576,7 +2577,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="typeReceivedId.value === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_3"
+                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_3"
                   v-model="purchaseOrder.actualNetCountKgs_3"
                   :rules="[
                     v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
@@ -2622,7 +2623,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="typeReceivedId.value === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_4"
+                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_4"
                   v-model="purchaseOrder.actualNetCountKgs_4"
                   :rules="[
                     v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
@@ -2668,7 +2669,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="typeReceivedId.value === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_5"
+                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_5"
                   v-model="purchaseOrder.actualNetCountKgs_5"
                   :rules="[
                     v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
@@ -2997,9 +2998,9 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                <span v-if="typeReceivedId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
+                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
                   formatNumber(data.purchasingAmountKgs) }}</span>
-                <span v-if="typeReceivedId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
+                <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
               </td>
               <th
                 :disabled="!purchaseOrder.actualMakerLotNo_1"
@@ -3045,7 +3046,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                {{ formatNumberToLocal(dataGenJour.purchasingQuantityPcs) }}
+                {{ formatNumberToLocal(data.purchasingQuantityPcs) }}
               </td>
               <th
                 :disabled="!purchaseOrder.actualMakerLotNo_1"
@@ -3091,7 +3092,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                {{ formatNumber(dataGenJour.purchasingAmountKgs) }}
+                {{ formatNumber(data.purchasingAmountKgs) }}
               </td>
               <th
                 class="text-center"
@@ -3449,7 +3450,7 @@ const getDisabledFollowStatusNRole = () => {
 
       <!-- RM for Halal -->
       <VCol
-        v-if="purchaseOrder.viewHalal"
+        v-if="purchaseOrder.isForHalalProduct"
         cols="4"
       >
         <Table class="custom-table">
@@ -3473,7 +3474,7 @@ const getDisabledFollowStatusNRole = () => {
       </VCol>
       <!-- RM for RSPO -->
       <VCol
-        v-if="purchaseOrder.viewRSPO"
+        v-if="purchaseOrder.isForRspoProduct"
         cols="4"
       >
         <Table class="custom-table">

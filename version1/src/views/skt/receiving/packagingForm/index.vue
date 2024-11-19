@@ -27,7 +27,7 @@ const frozeCheck = ref(false)
 
 const frozeCheckVif = ref(true)
 
-const data = ref(JSON.parse(route.query.Data || '[]'))
+const data = ref(itemStore.getItemDetails('itemDataCookies'))
 
 if(data.value){
   console.log('Data:', data)

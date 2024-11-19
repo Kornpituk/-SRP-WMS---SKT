@@ -11,13 +11,13 @@ const route = useRoute()
 
 // const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
-// const data = ref(JSON.parse(route.query.Data || '[]'))
-
 // console.log('Data**', data)
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
+
+const data = ref(itemStore.getItemDetails('itemDataCookies'))
 
 const whereHouse = ref(localStorage.getItem('whereHouseName'))
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
