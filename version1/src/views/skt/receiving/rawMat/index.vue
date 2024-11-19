@@ -902,14 +902,6 @@ const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
     return true  // มีข้อผิดพลาด
   }
 
-  // if(!actualMakerLotNo && !purchaseOrder.value[`actualMakerLotNo_${i+1}`] ){
-  //   alertErrorLot.value[`alertMakerLot${i}`].msg = The Lot No.${i} field missing.
-  //   alertErrorLot.value[`alertMakerLot${i}`].success = false
-
-  //   return true  // มีข้อผิดพลาด
-  // }
-
-
 
   if (validate.value === 0 && actualAmount) {
     alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot - Field cannot be left blank. Please enter the required information without leaving any spaces.`
@@ -1629,9 +1621,9 @@ const dataRaeMatRequest = ref([
 watchEffect(() => {
   const updateNetCountKgs = (index, lotNo, netCountField) => {
     if (lotNo) {
-      if (data.value.receiveTypeId === 2) {
+      if (typeReceivedId.value === 2) {
         purchaseOrder.value[netCountField] = dataHeaderReceving.value.packagingQtyKg
-      } else if (data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0) {
+      } else if (typeReceivedId.value === 3 && dataHeaderReceving.value.packagingQtyKg === 0) {
         purchaseOrder.value[netCountField] = data.value.purchasingAmountKgs
       }
     } else {
