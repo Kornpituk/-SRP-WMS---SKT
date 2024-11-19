@@ -446,8 +446,6 @@ const headersDataTableNew = [
 ]
 
 
-
-
 //--------------------- Menu
 
 const menuDataTable = ref(false)
@@ -525,12 +523,13 @@ const print = () => {
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'dashboards-main',
+                :to="{ name: 'skt-planning-schedule',
                 }"
               >
                 <VIcon
+
                   size="30"
-                  icon="ri-close-circle-fill"
+                  icon="ri-arrow-left-circle-fill"
                   color="#000000"
                 />
               </IconBtn>

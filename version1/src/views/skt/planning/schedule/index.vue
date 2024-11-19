@@ -21,7 +21,29 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 //------------------------------------------ Data --------------------------------
 
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
 const date = ref(new Date())
+
+function generateGUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0 // สุ่มตัวเลขระหว่าง 0-15
+    const v = c === 'x' ? r : (r & 0x3) | 0x8 // ถ้าเป็น 'y' ต้องให้บิตนำหน้าเป็น 10
+    
+    return v.toString(16) // แปลงเป็นเลขฐาน 16
+  })
+}
+
+const guidForBatch = ref(null)
+
+const newBatchGenBatch = () => {
+  guidForBatch.value = generateGUID()
+  itemStore.clearItemDetails()
+  itemStore.setItemDetails(guidForBatch.value, 'guIDForBatchCookie')
+}
+
 
 
 // In case of a range picker, you'll receive [Date, Date]
@@ -445,9 +467,6 @@ const headersDataTableNew = [
   },
 ]
 
-
-
-
 //--------------------- Menu
 
 const menuDataTable = ref(false)
@@ -513,6 +532,7 @@ const print = () => {
 }
 
 const newBatch = () => {
+  newBatchGenBatch()
   window.location.href = '/skt/planning/schedule/plan'
 }
 </script>
@@ -1008,15 +1028,15 @@ const newBatch = () => {
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
+            <VBtn @click="viewAllData">
+              <span style="font-size: 12px;">Approve</span>
+            </VBtn>
             <VBtn
               class="mx-2"
               color="info"
               @click="viewAllData"
             >
               <span style="font-size: 12px;">Finished Apporve </span>
-            </VBtn>
-            <VBtn @click="viewAllData">
-              <span style="font-size: 12px;">Approve</span>
             </VBtn>
             <VBtn
               class="mx-2"
@@ -1035,7 +1055,10 @@ const newBatch = () => {
               <span style="font-size: 12px;">Add Item</span>
             </VBtn>
           </VCol>
-          <VCol cols="2" class="d-flex justify-end">
+          <VCol
+            cols="2"
+            class="d-flex justify-end"
+          >
             <VBtn
               icon
               size="small"

@@ -1,0 +1,109 @@
+import axios from '@axios'
+
+export const productionPlanRepository = {
+
+  async getProductionPlan(batchId, urlApi, form, whereHouse, accessToken) {
+    console.log('get repo Production Plan...')
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/ProductionPlan/get/${batchId}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      console.log("response", response)
+      if (response && response.data) {
+        console.log('success get repo Production Plan...')
+        console.log('Service Response data Production Plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        console.log('Error repo Error If Production Plan...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try Production Plan...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch Production Plan for batch ID ${batchId}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async newProductionPlan(batchId, planningId, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/ProductionPlan/new`, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        params: {
+          BatchID: batchId,
+          PlaningID: planningId,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data new production plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
+  async deleteProductionPlan(batchId, planningId, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/ProductionPlan/delete`, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        params: {
+          BatchID: batchId,
+          PlaningID: planningId,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data delete production plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
+  async saveProductionPlan(formData, batchId, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/ProductionPlan/save`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        params: {
+          BatchID: batchId,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data save production plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+}

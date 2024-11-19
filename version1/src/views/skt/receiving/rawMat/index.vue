@@ -147,6 +147,8 @@ const purchaseOrder = ref({
   noteText: '',
   isForHalalProduct: null,
   isForRspoProduct: null,
+  viewHalal: false,
+  viewRSPO: false,
   updatedBy: userName.value,
   coAFile: '',
   coAFileName: files.value.name,
@@ -464,6 +466,8 @@ const getHearderReceivingForm = async () => {
 
       purchaseOrder.value.isForHalalProduct = data[0].isForHalalProduct
       purchaseOrder.value.isForRspoProduct = data[0].isForRspoProduct
+      purchaseOrder.value.viewHalal = data[0].viewHalal
+      purchaseOrder.value.viewRSPO = data[0].viewRSPO
       purchaseOrder.value.noteText = data[0].noteText
 
       purchaseOrder.value.selectedMakerName = data[0].selectedMakerName
@@ -3450,7 +3454,7 @@ const getDisabledFollowStatusNRole = () => {
 
       <!-- RM for Halal -->
       <VCol
-        v-if="purchaseOrder.isForHalalProduct"
+        v-if="purchaseOrder.viewHalal"
         cols="4"
       >
         <Table class="custom-table">
@@ -3474,7 +3478,7 @@ const getDisabledFollowStatusNRole = () => {
       </VCol>
       <!-- RM for RSPO -->
       <VCol
-        v-if="purchaseOrder.isForRspoProduct"
+        v-if="purchaseOrder.viewRSPO"
         cols="4"
       >
         <Table class="custom-table">
