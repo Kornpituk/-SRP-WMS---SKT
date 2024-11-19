@@ -1178,6 +1178,7 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   detailsReceiv.value = products.value[index-1]
 
   itemStore.clearItemDetails()
+  itemStore.setItemDetails(products.value[index-1], 'itemDataCookies')
   itemStore.setItemDetails(products.value[index-1].poEtlLogDetailJournalID, 'poEtlLogDetailJournalIDCookies')
   itemStore.setItemDetails(products.value[index-1].itemCode, 'itemCodeCookies')
   itemStore.setItemDetails(products.value[index-1].supplierId, 'supplierIdCookies')

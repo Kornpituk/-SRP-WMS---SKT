@@ -238,7 +238,7 @@ const generatedReceivingForm = () => {
 
 //------------- journalId
 const responseGener = ref([])
-
+const dataGenJour = ref([])
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
 const typeReceivedId = ref(null)
 
@@ -262,6 +262,7 @@ const generatedJournalId = () => {
 
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
+        dataGenJour.value = responseGener.value[0]
         poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
         statusId.value = item.statusId // เก็บค่า statusId
         typeReceivedId.value = item.receiveTypeId
@@ -2466,7 +2467,6 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="2"
               >
                 <VTextField
-                
                   v-if="false"
                   v-model="purchaseOrder.actualNetCountKgs_1"
                   :style="{ width: '100%', minWidth: '150px' }"
@@ -2537,7 +2537,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_2"
+                  v-if="typeReceivedId.value === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_2"
                   v-model="purchaseOrder.actualNetCountKgs_2"
                   :rules="[
                     v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
@@ -2584,7 +2584,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_3"
+                  v-if="typeReceivedId.value === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_3"
                   v-model="purchaseOrder.actualNetCountKgs_3"
                   :rules="[
                     v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
@@ -2630,7 +2630,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_4"
+                  v-if="typeReceivedId.value === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_4"
                   v-model="purchaseOrder.actualNetCountKgs_4"
                   :rules="[
                     v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
@@ -2676,7 +2676,7 @@ const getDisabledFollowStatusNRole = () => {
                   </template>
                 </VTextField>
                 <VTextField
-                  v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_5"
+                  v-if="typeReceivedId.value === 3 && dataHeaderReceving.packagingQtyKg === 0 && purchaseOrder.actualMakerLotNo_5"
                   v-model="purchaseOrder.actualNetCountKgs_5"
                   :rules="[
                     v => v === '' || (!!v && /^\d+(\.\d{0,2})?$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
@@ -3005,9 +3005,9 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
+                <span v-if="typeReceivedId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
                   formatNumber(data.purchasingAmountKgs) }}</span>
-                <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
+                <span v-if="typeReceivedId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
               </td>
               <th
                 :disabled="!purchaseOrder.actualMakerLotNo_1"
@@ -3053,7 +3053,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                {{ formatNumberToLocal(data.purchasingQuantityPcs) }}
+                {{ formatNumberToLocal(dataGenJour.purchasingQuantityPcs) }}
               </td>
               <th
                 :disabled="!purchaseOrder.actualMakerLotNo_1"
@@ -3099,7 +3099,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                {{ formatNumber(data.purchasingAmountKgs) }}
+                {{ formatNumber(dataGenJour.purchasingAmountKgs) }}
               </td>
               <th
                 class="text-center"

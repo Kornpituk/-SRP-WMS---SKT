@@ -1003,14 +1003,7 @@ const print = () => {
     <VCard>
       <VCardText class="pa-2">
         <VBtn @click="addBatch = true">
-          <span style="font-size: 12px;">Add Batch</span>
-        </VBtn>
-        <VBtn
-          color="error"
-          class="mx-2"
-          @click="addBatch = false"
-        >
-          <span style="font-size: 12px;">Cancel Batch</span>
+          <span style="font-size: 12px;">New Plan</span>
         </VBtn>
         <VBtn
           class="mx-2"
@@ -1018,6 +1011,13 @@ const print = () => {
           @click="viewAllData"
         >
           <span style="font-size: 12px;">Save Draft</span>
+        </VBtn>
+        <VBtn
+          class="mx-2"
+          color="warning"
+          @click="viewAllData"
+        >
+          <span style="font-size: 12px;">Submit</span>
         </VBtn>
         <VBtn @click="viewAllData">
           <span style="font-size: 12px;">Approve</span>
@@ -1029,6 +1029,18 @@ const print = () => {
         >
           <span style="font-size: 12px;">Add Item</span>
         </VBtn>
+
+
+        <VBtn
+          color="error"
+          class="mx-2"
+          @click="addBatch = false"
+        >
+          <span style="font-size: 12px;">Cancel Batch</span>
+        </VBtn>
+        
+        
+        
         <VBtn
           icon
           size="small"

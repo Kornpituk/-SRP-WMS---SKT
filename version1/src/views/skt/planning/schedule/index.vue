@@ -512,8 +512,8 @@ const print = () => {
   console.log('Printed')
 }
 
-const addplant = () => {
-  
+const newBatch = () => {
+  window.location.href = '/skt/planning/schedule/plan'
 }
 </script>
 
@@ -1006,44 +1006,49 @@ const addplant = () => {
   >
     <VCard>
       <VCardText class="pa-2">
-        <VBtn @click="addBatch = true">
-          <span style="font-size: 12px;">Add Batch</span>
-        </VBtn>
-        <VBtn
-          color="error"
-          class="mx-2"
-          @click="addBatch = false"
-        >
-          <span style="font-size: 12px;">Cancel Batch</span>
-        </VBtn>
-        <VBtn
-          class="mx-2"
-          color="warning"
-          @click="viewAllData"
-        >
-          <span style="font-size: 12px;">Save Draft</span>
-        </VBtn>
-        <VBtn @click="viewAllData">
-          <span style="font-size: 12px;">Approve</span>
-        </VBtn>
-        <VBtn
-          color="info"
-          class="mx-2"
-          @click="addEmptyRowToPlan"
-        >
-          <span style="font-size: 12px;">Add Item</span>
-        </VBtn>
-        <VBtn
-          icon
-          size="small"
-          @click="refeshPage"
-        >
-          <VIcon
-            size="20"
-            icon="ri-restart-line"
-            :class="{ spinning: isSpinning }"
-          />
-        </VBtn>
+        <VRow>
+          <VCol cols="10">
+            <VBtn
+              class="mx-2"
+              color="info"
+              @click="viewAllData"
+            >
+              <span style="font-size: 12px;">Finished Apporve </span>
+            </VBtn>
+            <VBtn @click="viewAllData">
+              <span style="font-size: 12px;">Approve</span>
+            </VBtn>
+            <VBtn
+              class="mx-2"
+              color="warning"
+              @click="newBatch"
+            >
+              <span style="font-size: 12px;">New Batch</span>
+            </VBtn>
+        
+            <VBtn
+              v-if="false"
+              color="info"
+              class="mx-2"
+              @click="addEmptyRowToPlan"
+            >
+              <span style="font-size: 12px;">Add Item</span>
+            </VBtn>
+          </VCol>
+          <VCol cols="2" class="d-flex justify-end">
+            <VBtn
+              icon
+              size="small"
+              @click="refeshPage"
+            >
+              <VIcon
+                size="20"
+                icon="ri-restart-line"
+                :class="{ spinning: isSpinning }"
+              />
+            </VBtn>
+          </VCol>
+        </VRow>
       </VCardText>
     </VCard>
   </div>
