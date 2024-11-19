@@ -87,7 +87,6 @@ const countItemProduction = ref(1)
 
 const mockData = ref([
   {
-    
     status: 'Working',
     inputDate: toDayDate,
     plants: "Plant A",
@@ -117,16 +116,117 @@ const mockData = ref([
   },
 ])
 
+const desserts = [
+  {
+    dessert: 'Frozen Yogurt',
+    calories: 159,
+    fat: 6,
+    carbs: 24,
+    protein: 4,
+  },
+  {
+    dessert: 'Ice cream sandwich',
+    calories: 237,
+    fat: 6,
+    carbs: 24,
+    protein: 4,
+  },
+  {
+    dessert: 'Eclair',
+    calories: 262,
+    fat: 6,
+    carbs: 24,
+    protein: 4,
+  },
+  {
+    dessert: 'Cupcake',
+    calories: 305,
+    fat: 6,
+    carbs: 24,
+    protein: 4,
+  },
+  {
+    dessert: 'Gingerbread',
+    calories: 356,
+    fat: 6,
+    carbs: 24,
+    protein: 4,
+  },
+]
+
+const dataMockProductionCode = ref([
+  'planA', 'planB', 'planC', 'planD', 'planE', 'planF',
+])
+
+const dataMockProductionCodeModel = ref([
+  {
+    productionCode: 'PA01',
+    productionName: 'planA',
+    itemCode: [
+      { itemsCodeA: 'itemCode1PA' },
+      { itemsCodeA: 'itemCode2PA' },
+      { itemsCodeA: 'itemCode3PA' },
+    ],
+    packagingtype: [
+      'packagingtype1PA',
+      'packagingtype2PA',
+      'packagingtype3PA',
+      'packagingtype4PA',
+      'packagingtype5PA',
+    ],
+  },
+  {
+    productionCode: 'PB01',
+    productionName: 'planB',
+    itemCode: [
+      { itemsCodeA: 'itemCode1PB' },
+      { itemsCodeA: 'itemCode2PB' },
+    ],
+    packagingtype: [
+      'packagingtype1PB',
+      'packagingtype2PB',
+      'packagingtype3PB',
+    ],
+  },
+])
+
+// สถานะที่เก็บข้อมูล itemCode และ packagingtype ของแผนที่เลือก
+const selectedProductionCode = ref([])
+const selectedItemCodeForPlan = ref([])
+const selectedPackagingTypeForPlan = ref([])
+const selectedItemCode = ref([])
+const selectedPackagingType = ref([])
+
+// ฟังก์ชันสำหรับเลือก plan
+const selectPlan = plan => {
+  selectedProductionCode.value = plan.productionCode
+  selectedItemCodeForPlan.value = plan.itemCode // อัปเดต itemCode
+  selectedPackagingTypeForPlan.value = plan.packagingtype // อัปเดต packagingtype
+  console.log("selectedProductionCode", selectedProductionCode.value)
+}
+
+const selectItemCode = plan => {
+  selectedItemCode.value = plan.itemsCodeA // ตั้งค่า itemCode ของแผนที่เลือก
+
+  console.log("selectedItemCode", selectedItemCode.value)
+}
+
+const selectPackaging = plan => {
+  selectedPackagingType.value = plan // ตั้งค่า packagingtype ของแผนที่เลือก
+
+  console.log("selectedPackagingType", selectedPackagingType.value)
+}
+
 //---------------------------- Add Mock Data --------------------------------
 const isDialogAddVisible = ref(false)
 
 const selectedItemNamePD = ref(null)
 
 // computed property to extract product names
-const productNamesMockItems = computed(() => mockData.value.map(item => item.productName))
+const productNamesMockItems = computed(() => mockData.value.map(item => item.productionCode))
 
-const findProductByName = productName => {
-  return mockData.value.find(item => item.productName === productName) || {}
+const findProductByName = productionCode => {
+  return mockData.value.find(item => item.productionCode === productionCode) || {}
 }
 
 const productionPlan = ref([])
@@ -350,18 +450,20 @@ const headersDataTableNew = [
     title: 'Input Date',
     key: 'inputDate',
   },
+
+  // {
+  //   title: 'Plants',
+  //   key: 'plants',
+  // },
   {
-    title: 'Plants',
-    key: 'plants',
+    title: 'Production Code',
+    key: 'productCode',
   },
   {
     title: 'Reactor',
     key: 'reactor',
   },
-  {
-    title: 'Production Code',
-    key: 'productCode',
-  },
+ 
   {
     title: 'Production Name',
     key: 'productName',
@@ -445,7 +547,6 @@ const headersDataTableNew = [
   },
 ]
 
-
 //--------------------- Menu
 
 const menuDataTable = ref(false)
@@ -491,6 +592,9 @@ const handleAction = action => {
     console.warn('Action not defined:', action)
   }
 }
+
+///---------------------- Filter Select
+const isDialogVisibleFilterSelect = ref(false)
 
 // ตัวอย่างฟังก์ชันของแต่ละ action
 const saveDraft = () => {
@@ -995,6 +1099,227 @@ const print = () => {
     </VDialog>
   </section>
 
+  <!-- Dialog Filter Select -->
+  <section>
+    <VDialog
+      v-model="isDialogVisibleFilterSelect"
+      persistent
+    >
+      <!-- Dialog Activator -->
+      <template #activator="{ props }">
+        <VBtn v-bind="props">
+          Open Dialog
+        </VBtn>
+      </template>
+
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardTitle class="d-flex justify-center">
+          <h3>Select Plan</h3>
+        </VCardTitle>
+        <DialogCloseBtn
+          variant="text"
+          size="default"
+          @click="isDialogVisibleFilterSelect = false"
+        />
+
+        <VCardText>
+          <VRow>
+            <!-- ตาราง 1: Production Code -->
+            <VCol
+              cols="4"
+              style="border: 1px solid grey; border-radius: 20px;"
+            >
+              <VTable>
+                <thead>
+                  <tr>
+                    <th class="text-uppercase">
+                      Production Code
+                    </th>
+                    <th class="text-uppercase">
+                      Production Name
+                    </th>
+                    <th class="text-uppercase">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(item, index) in dataMockProductionCodeModel"
+                    :key="index"
+                  >
+                    <td
+                      :style="{
+                        backgroundColor: item.productionCode === selectedProductionCode ? '#E3F2FD' : '',
+                      }"
+                    >
+                      {{ item.productionCode }}
+                    </td>
+                    <td
+                      :style="{
+                        backgroundColor: item.productionCode === selectedProductionCode ? '#E3F2FD' : '',
+                      }"
+                    >
+                      {{ item.productionName }}
+                    </td>
+                    <td
+                      :style="{
+                        backgroundColor: item.productionCode === selectedProductionCode ? '#E3F2FD' : '',
+                      }"
+                    >
+                      <VBtn
+                        v-if="item.productionCode === selectedProductionCode"
+                        color="info"
+                        variant="tonal"
+                        @click="selectPlan(item, index)"
+                      >
+                        Select
+                      </VBtn>
+                      <VBtn
+                        v-if="item.productionCode !== selectedProductionCode"
+                        color="info"
+                        variant="flat"
+                        @click="selectPlan(item, index)"
+                      >
+                        Select
+                      </VBtn>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
+            </VCol>
+
+            <!-- ตาราง 2: Item Code -->
+            <VCol
+              cols="4"
+              style="border: 1px solid grey; border-radius: 20px;"
+            >
+              <VTable>
+                <thead>
+                  <tr>
+                    <th class="text-uppercase">
+                      Item Code
+                    </th>
+                    <th class="text-uppercase">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(item, index) in selectedItemCodeForPlan"
+                    :key="index"
+                  >
+                    <td
+                      :style="{
+                        backgroundColor: item.itemsCodeA === selectedItemCode ? '#E3F2FD' : '',
+                      }"
+                    >
+                      {{ item.itemsCodeA }}
+                    </td>
+                    <td
+                      :style="{
+                        backgroundColor: item.itemsCodeA === selectedItemCode ? '#E3F2FD' : '',
+                      }"
+                    >
+                      <VBtn
+                        v-if="item.itemsCodeA === selectedItemCode"
+                        color="info"
+                        variant="tonal"
+                        @click="selectItemCode(item)"
+                      >
+                        Select
+                      </VBtn>
+                      <VBtn
+                        v-if="item.itemsCodeA !== selectedItemCode"
+                        color="info"
+                        variant="flat"
+                        @click="selectItemCode(item)"
+                      >
+                        Select
+                      </VBtn>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
+            </VCol>
+
+            <!-- ตาราง 3: Packaging Type -->
+            <VCol
+              cols="4"
+              style="border: 1px solid grey; border-radius: 20px;"
+            >
+              <VTable>
+                <thead>
+                  <tr>
+                    <th class="text-uppercase">
+                      Packaging Type
+                    </th>
+                    <th class="text-uppercase">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(type, index) in selectedPackagingTypeForPlan"
+                    :key="index"
+                  >
+                    <td
+                      :style="{
+                        backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
+                      }"
+                    >
+                      {{ type }}
+                    </td>
+                    <td
+                      :style="{
+                        backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
+                      }"
+                    >
+                      <VBtn
+                        v-if="type === selectedPackagingType"
+                        color="info"
+                        variant="tonal"
+                        @click="selectPackaging(type)"
+                      >
+                        Select
+                      </VBtn>
+                      <VBtn
+                        v-if="type !== selectedPackagingType"
+                        color="info"
+                        variant="flat"
+                        @click="selectPackaging(type)"
+                      >
+                        Select
+                      </VBtn>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
+            </VCol>
+          </VRow>
+        </VCardText>
+
+        <VCardText class="d-flex justify-end flex-wrap gap-4">
+          <VBtn
+            color="error"
+            @click="isDialogVisibleFilterSelect = false"
+          >
+            Disagree
+          </VBtn>
+          <VBtn
+            color="success"
+            @click="isDialogVisibleFilterSelect = false"
+          >
+            Confirm Select
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+  </section>
+
   <div
     v-if="RoleAccount === 'User'"
     class="my-2"
@@ -1080,880 +1405,6 @@ const print = () => {
 
   <!-- ----------             Production plan                                ------------------------------------ -->
   <section>
-    <VCard
-      v-if="false"
-      class="mt-4"
-    >
-      <VTable class=" table-header-bg rounded-0">
-        <!-- 👉 table head -->
-        <thead class="text-no-wrap">
-          <tr>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('No.') }}</span>
-            </th>
-            <th
-              scope="row"
-              class="text-start "
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Status') }}</span>
-            </th>
-            <th
-              scope="row"
-              class="text-center"
-              style="padding-inline: 50px;"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Input Date') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Plants') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Reactor') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Product code') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Product name') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Qty. (Kg)') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('UOM (Packaging)') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Packaging type') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Lot number') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Producing date') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Finished date') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start"
-              style="padding-inline: 100px;"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Remark') }}</span>
-            </th>
-            
-            <th
-              scope="row"
-              class="text-start "
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Update By') }}</span>
-              <VMenu
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Update On') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Action') }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody class="text-no-wrap">
-          <tr
-            v-for="(item, index) in productionPlan"
-            :key="index"
-            style="font-size: 14px;"
-          >
-            <td>{{ index + 1 }}</td>
-            <td class="text-start">
-              <span v-if="item.status === 'Aprove'">
-                <VChip color="success">{{ item.status }}</VChip>
-              </span>
-              <span v-if="item.status === 'Submit'">
-                <VChip color="success">{{ item.status }}</VChip>
-              </span>
-              <span v-else-if="item.status === 'Back to Edit'">
-                <VChip color="warning">{{ item.status }}</VChip>
-              </span>
-              <span v-else-if="item.status === 'Working'">
-                <VChip color="info">{{ item.status }}</VChip>
-              </span>
-              <span v-else-if="item.status === 'Save Draft'">
-                <VChip color="warning">{{ item.status }}</VChip>
-              </span>
-              <span v-else-if="item.status === 'Reject'">
-                <VChip color="error">{{ item.status }}</VChip>
-              </span>
-            </td>
-            <td>
-              <AppDateTimePicker
-                v-model="item.inputDate"
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              >
-                <template #label>
-                  <span>Input Data</span>
-                </template>
-              </AppDateTimePicker>
-            </td>
-            <td>
-              <VCombobox
-                v-model="item.plants"
-                :readonly="item.status === 'Submit'"
-                :items="productNamesMockItems"
-                placeholder="deployment"
-                density="compact"
-                label="Plants Type"
-                style="width: 150px;"
-              />
-            </td>
-            <td>{{ item.reactor }}</td>
-            <td>
-              <VCombobox
-                v-model="item.productCode"
-                :items="productNamesMockItems"
-                placeholder="deployment"
-                density="compact"
-                label="Plants Code"
-                style="width: 150px;"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td>
-              <VCombobox
-                v-model="item.productName"
-                :items="productNamesMockItems"
-                placeholder="deployment"
-                density="compact"
-                label="Plants Name"
-                style="width: 150px;"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <VTextField
-                v-model="item.quantity"
-                label="Qty."
-                type="number"
-                placeholder="Select UOM"
-                style="min-width: 100px;"
-                density="compact"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <VSelect
-                v-model="item.uom"
-                density="compact"
-                :items="items"
-                label="UOM"
-                placeholder="Select UOM"
-                eager
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <VCombobox
-                v-model="item.packagingType"
-                :items="productNamesMockItems"
-                placeholder="deployment"
-                density="compact"
-                label="Packaging Type"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <VTextField
-                v-model="item.lotNumber"
-                density="compact"
-                style="min-width: 150px;"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <AppDateTimePicker
-                v-model="item.producingDate"
-                label="Producing Date"
-                placeholder="Producing date"
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <AppDateTimePicker
-                v-model="item.finishedDate"
-                label="Finished Date"
-                placeholder="Finished date"
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              />
-            </td>
-            <td style="width: 35px;">
-              <VTextarea
-                v-model="item.remark"
-                class="pa-2"
-                label="Remark"
-                :rules="rules"
-                rows="2"
-                clearable
-                placeholder="Placeholder Text"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td>
-              <VTextField
-                v-model="item.byWho"
-                density="compact"
-                style="min-width: 150px;"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td>
-              {{ item.statusDate }}
-            </td>
-            <td v-if="item.status !== 'Submit' || RoleAccount === 'Manager'"> 
-              <VBtn
-                color="warning"
-                @click="changeStatusProductPlanSaveDraft(index)"
-              >
-                Save Draft
-              </VBtn>
-              <VBtn
-                v-if="RoleAccount === 'Manager'"
-                color="red"
-                class="mx-2"
-                @click="rejectProduction(index)"
-              >
-                Reject
-              </VBtn>
-              <VBtn
-                v-if="RoleAccount !== 'Manager'"
-                color="red"
-                class="mx-2"
-                @click="cancelProduct(index)"
-              >
-                Cancel
-              </VBtn>
-              <VBtn
-                v-if="RoleAccount !== 'Manager'"
-                class="mx-2"
-                color="green"
-                @click="changeStatusProductPlanSubmit(index)"
-              >
-                Submit
-              </VBtn>
-              <VBtn
-                v-if="RoleAccount === 'Manager'"
-                class="mx-2"
-                color="green"
-                @click="changeStatusProductPlanSubmit(index)"
-              >
-                Approve
-              </VBtn>
-             
-              
-              <VBtn
-                color="warning"
-                prepend-icon="ri-printer-fill"
-              >
-                {{ $t('Print') }}
-              </VBtn>
-            </td>
-            <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'"> 
-              <VBtn
-                color="grey"
-                disabled
-                @click="changeStatusProductPlanSaveDraft(index)"
-              >
-                Save Draft
-              </VBtn>
-              <VBtn
-                color="grey"
-                disabled
-                class="mx-2"
-                @click="cancelProduct(index)"
-              >
-                Cancel
-              </VBtn>
-              <VBtn
-                class="mx-2"
-                color="grey"
-                disabled
-                @click="changeStatusProductPlanSubmit(index)"
-              >
-                Submit
-              </VBtn>
-              
-              <VBtn
-                color="warning"
-                prepend-icon="ri-printer-fill"
-              >
-                {{ $t('Print') }}
-              </VBtn>
-            </td>
-          </tr>
-        </tbody>
-      </VTable>
-      <VDivider />
-      <VCardText class="d-flex align-center flex-wrap justify-end gap-4 pa-2">
-        <div
-          class="d-flex align-center me-3"
-          style="width: 171px;"
-        >
-          <span class="text-no-wrap me-3">Rows per page:</span>
-
-          <VSelect
-            v-model="rowPerPage"
-            density="compact"
-            variant="plain"
-            class="mt-n4"
-            :items="[10, 20, 30, 50]"
-          />
-        </div>
-
-        <div class="d-flex align-center">
-          <h6 class="text-sm font-weight-regular">
-            {{ paginationData }}
-          </h6>
-
-          <VPagination
-            v-model="currentPage"
-            :length="totalPage"
-            :total-visible="$vuetify.display.mdAndUp ? 7 : 3"
-            @next="selectedRows = []"
-            @prev="selectedRows = []"
-          />
-        </div>
-      </VCardText>
-    </VCard>
-
     <!-- VData table -->
     <VCard>
       <VCardText>
@@ -2040,20 +1491,8 @@ const print = () => {
               </td>
               <td>
                 <VCombobox
-                  v-model="item.raw.plants"
-                  :readonly="item.raw.status === 'Submit'"
-                  :items="productNamesMockItems"
-                  placeholder="deployment"
-                  density="compact"
-                  label="Plants Type"
-                  style="width: 150px;"
-                />
-              </td>
-              <td>{{ item.raw.reactor }}</td>
-              <td>
-                <VCombobox
                   v-model="item.raw.productionCode"
-                  :items="productNamesMockItems"
+                  :items="dataMockProductionCode"
                   placeholder="deployment"
                   density="compact"
                   label="Plants Code"
@@ -2061,6 +1500,7 @@ const print = () => {
                   :readonly="item.raw.status === 'Submit'"
                 />
               </td>
+              <td>{{ item.raw.reactor }}</td>
               <td>
                 {{ productionName }}
               </td>
