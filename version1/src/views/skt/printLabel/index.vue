@@ -1101,7 +1101,7 @@ const dataTableColor = ref('#E0F7FA')
           v-model="selectedDataTables"
           :headers="headersNewEx"
           :items="dataPrintLabel"
-          :items-per-page="5"
+          :items-per-page="10"
           class="text-no-wrap"
           expand-on-click
           show-expand

@@ -160,32 +160,51 @@ const dataMockProductionCode = ref([
 
 const dataMockProductionCodeModel = ref([
   {
-    productionCode: 'PA01',
-    productionName: 'planA',
+    productionCode: '4509261005831250',
+    productionName: ' F-190 (1250KG)  IBC  1st-org1',
+    planName: 'TP-1',
+    reactorName: '11R-311',
+    batchScale: '11536.00',
+    durationDays: '1',
     itemCode: [
-      { itemsCodeA: 'itemCode1PA' },
-      { itemsCodeA: 'itemCode2PA' },
-      { itemsCodeA: 'itemCode3PA' },
+      { itemsCode: '450926100561', InBomName: 'F-190  LORRY  1st-org1' },
+      { itemsCode: '4509261005831250', InBomName: 'F-190 (1250KG)  IBC  1st-org1' },
+      { itemsCode: '450926101764', InBomName: 'F-190 PE FLEXITANK' },
+      { itemsCode: '4509261027831250', InBomName: 'F-190 IBC (EXPORT) 1ST-ORG1' },
     ],
     packagingtype: [
-      'packagingtype1PA',
-      'packagingtype2PA',
-      'packagingtype3PA',
-      'packagingtype4PA',
-      'packagingtype5PA',
+      { itemCode: '494603110', productName: 'IBC CONTAINER (SECOND HAND)  1st-Org1', packagingQtyKsg: '1250.00' },
     ],
   },
   {
-    productionCode: 'PB01',
-    productionName: 'planB',
+    productionCode: '425626300551180',
+    productionName: 'SKT DDA BE D/M 1st-org2',
+    planName: 'TP-1',
+    ReactorName: '11R-331',
+    BatchScale: '6165.00',
+    DurationDays: '2',
     itemCode: [
-      { itemsCodeA: 'itemCode1PB' },
-      { itemsCodeA: 'itemCode2PB' },
+      { itemsCode: '425626300551180', ProductionCode: '425626300551180', InBomName: 'SKT DDA BE D/M 1st-org2' },
     ],
     packagingtype: [
-      'packagingtype1PB',
-      'packagingtype2PB',
-      'packagingtype3PB',
+      { itemCode: '494601910', productName: 'BC18D/M  1st-Org1', packagingQtyKsg: '180.00' },
+      { itemCode: '494601930', productName: 'BC18D/M  1st-Org2', packagingQtyKsg: '180.00' },
+    ],
+  },
+  {
+    productionCode: '450171201753200',
+    productionName: 'CHEMICLEAN PR-029 D/M  Clean',
+    planName: 'Cleanroom',
+    ReactorName: '13R-201',
+    BatchScale: '5000.00',
+    DurationDays: '3',
+    itemCode: [
+      { itemsCode: '45017120171320', ProductionCode: '450171201753200', InBomName: 'CHEMICLEAN PR-029  C/N  Clean' },
+      { itemsCode: '450171201753200', ProductionCode: '450171201753200', InBomName: 'CHEMICLEAN PR-029 D/M  Clean' },
+    ],
+    packagingtype: [
+      { itemCode: '494605425', productName: '20L CLEAN GALLON', packagingQtyKsg: '20.00' },
+      { itemCode: '494605910', productName: 'PL D/M (9.4) 1st-Org-1(EURO)', packagingQtyKsg: '200.00' },
     ],
   },
 ])
@@ -1105,13 +1124,6 @@ const print = () => {
       v-model="isDialogVisibleFilterSelect"
       persistent
     >
-      <!-- Dialog Activator -->
-      <template #activator="{ props }">
-        <VBtn v-bind="props">
-          Open Dialog
-        </VBtn>
-      </template>
-
       <!-- Dialog Content -->
       <VCard>
         <VCardTitle class="d-flex justify-center">
@@ -1138,6 +1150,18 @@ const print = () => {
                     </th>
                     <th class="text-uppercase">
                       Production Name
+                    </th>
+                    <th class="text-uppercase">
+                      Plan Name
+                    </th>
+                    <th class="text-uppercase">
+                      Reactor Name
+                    </th>
+                    <th class="text-uppercase">
+                      Batch Scale
+                    </th>
+                    <th class="text-uppercase">
+                      Duration Days
                     </th>
                     <th class="text-uppercase">
                       Action
@@ -1202,13 +1226,16 @@ const print = () => {
                       Item Code
                     </th>
                     <th class="text-uppercase">
+                      In Bom Name
+                    </th>
+                    <th class="text-uppercase">
                       Action
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(item, index) in selectedItemCodeForPlan"
+                    v-for="(item, index) in selectedItemCodeForPlan.itemCode"
                     :key="index"
                   >
                     <td
@@ -1216,7 +1243,14 @@ const print = () => {
                         backgroundColor: item.itemsCodeA === selectedItemCode ? '#E3F2FD' : '',
                       }"
                     >
-                      {{ item.itemsCodeA }}
+                      {{ item.itemsCode }}
+                    </td>
+                    <td
+                      :style="{
+                        backgroundColor: item.itemsCodeA === selectedItemCode ? '#E3F2FD' : '',
+                      }"
+                    >
+                      {{ item.InBomName }}
                     </td>
                     <td
                       :style="{
@@ -1254,7 +1288,13 @@ const print = () => {
                 <thead>
                   <tr>
                     <th class="text-uppercase">
-                      Packaging Type
+                      Item Code
+                    </th>
+                    <th class="text-uppercase">
+                      Product Name
+                    </th>
+                    <th class="text-uppercase">
+                      Packaging Qty Kgs
                     </th>
                     <th class="text-uppercase">
                       Action
@@ -1263,7 +1303,7 @@ const print = () => {
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(type, index) in selectedPackagingTypeForPlan"
+                    v-for="(type, index) in dataMockProductionCodeModel.packagingtype"
                     :key="index"
                   >
                     <td
@@ -1271,7 +1311,21 @@ const print = () => {
                         backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
                       }"
                     >
-                      {{ type }}
+                      {{ type.itemCode }}
+                    </td>
+                    <td
+                      :style="{
+                        backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
+                      }"
+                    >
+                      {{ type.productName }}
+                    </td>
+                    <td
+                      :style="{
+                        backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
+                      }"
+                    >
+                      {{ type.packagingQtyKsg }}
                     </td>
                     <td
                       :style="{
@@ -1491,6 +1545,7 @@ const print = () => {
               </td>
               <td>
                 <VCombobox
+                  v-if="false"
                   v-model="item.raw.productionCode"
                   :items="dataMockProductionCode"
                   placeholder="deployment"
@@ -1499,6 +1554,15 @@ const print = () => {
                   style="width: 150px;"
                   :readonly="item.raw.status === 'Submit'"
                 />
+                <VBtn
+                  variant="outlined"
+                  @click="isDialogVisibleFilterSelect = true"
+                >
+                  production code
+                  <template #append>
+                    <VIcon icon="ri-arrow-down-s-fill" />
+                  </template>
+                </VBtn>
               </td>
               <td>{{ item.raw.reactor }}</td>
               <td>
