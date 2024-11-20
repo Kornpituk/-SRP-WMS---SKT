@@ -116,44 +116,6 @@ const mockData = ref([
   },
 ])
 
-const desserts = [
-  {
-    dessert: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Ice cream sandwich',
-    calories: 237,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Eclair',
-    calories: 262,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Cupcake',
-    calories: 305,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Gingerbread',
-    calories: 356,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-]
-
 const dataMockProductionCode = ref([
   'planA', 'planB', 'planC', 'planD', 'planE', 'planF',
 ])
@@ -225,13 +187,13 @@ const selectPlan = plan => {
 }
 
 const selectItemCode = plan => {
-  selectedItemCode.value = plan.itemsCodeA // ตั้งค่า itemCode ของแผนที่เลือก
+  selectedItemCode.value = plan.itemsCode // ตั้งค่า itemCode ของแผนที่เลือก
 
   console.log("selectedItemCode", selectedItemCode.value)
 }
 
 const selectPackaging = plan => {
-  selectedPackagingType.value = plan // ตั้งค่า packagingtype ของแผนที่เลือก
+  selectedPackagingType.value = plan.itemCode // ตั้งค่า packagingtype ของแผนที่เลือก
 
   console.log("selectedPackagingType", selectedPackagingType.value)
 }
@@ -1136,62 +1098,49 @@ const print = () => {
         />
 
         <VCardText>
-          <VRow>
+          <VRow class="pa-6">
             <!-- ตาราง 1: Production Code -->
             <VCol
-              cols="4"
               style="border: 1px solid grey; border-radius: 20px;"
+              cols="12"
+              class="mb-4"
             >
+              <div>
+                <VTextField
+                  v-model="search"
+                  label="Search"
+                  prepend-inner-icon="mdi-magnify"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  single-line
+                />
+              </div>
               <VTable>
                 <thead>
                   <tr>
-                    <th class="text-uppercase">
-                      Production Code
-                    </th>
-                    <th class="text-uppercase">
-                      Production Name
-                    </th>
-                    <th class="text-uppercase">
-                      Plan Name
-                    </th>
-                    <th class="text-uppercase">
-                      Reactor Name
-                    </th>
-                    <th class="text-uppercase">
-                      Batch Scale
-                    </th>
-                    <th class="text-uppercase">
-                      Duration Days
-                    </th>
-                    <th class="text-uppercase">
-                      Action
-                    </th>
+                    <th>Production Code</th>
+                    <th>Production Name</th>
+                    <th>Plan Name</th>
+                    <th>Reactor Name</th>
+                    <th>Batch Scale</th>
+                    <th>Duration Days</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
                     v-for="(item, index) in dataMockProductionCodeModel"
                     :key="index"
+                    :style="{ backgroundColor: item.productionCode === selectedProductionCode ? '#E3F2FD' : '' }"
                   >
-                    <td
-                      :style="{
-                        backgroundColor: item.productionCode === selectedProductionCode ? '#E3F2FD' : '',
-                      }"
-                    >
-                      {{ item.productionCode }}
-                    </td>
-                    <td
-                      :style="{
-                        backgroundColor: item.productionCode === selectedProductionCode ? '#E3F2FD' : '',
-                      }"
-                    >
-                      {{ item.productionName }}
-                    </td>
-                    <td
-                      :style="{
-                        backgroundColor: item.productionCode === selectedProductionCode ? '#E3F2FD' : '',
-                      }"
-                    >
+                    <td>{{ item.productionCode }}</td>
+                    <td>{{ item.productionName }}</td>
+                    <td>{{ item.planName }}</td>
+                    <td>{{ item.reactorName }}</td>
+                    <td>{{ item.batchScale }}</td>
+                    <td>{{ item.durationDays }}</td>
+                    <td>
                       <VBtn
                         v-if="item.productionCode === selectedProductionCode"
                         color="info"
@@ -1216,49 +1165,41 @@ const print = () => {
 
             <!-- ตาราง 2: Item Code -->
             <VCol
-              cols="4"
               style="border: 1px solid grey; border-radius: 20px;"
+              cols="6"
             >
-              <VTable>
+              <div>
+                <VTextField
+                  v-model="search"
+                  label="Search"
+                  prepend-inner-icon="mdi-magnify"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  single-line
+                />
+              </div>
+              <VTable v-if="selectedProductionCode.length > 0">
                 <thead>
                   <tr>
-                    <th class="text-uppercase">
-                      Item Code
-                    </th>
-                    <th class="text-uppercase">
-                      In Bom Name
-                    </th>
-                    <th class="text-uppercase">
-                      Action
-                    </th>
+                    <th>Item Code</th>
+                    <th>In Bom Name</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(item, index) in selectedItemCodeForPlan.itemCode"
+                    v-for="(item, index) in dataMockProductionCodeModel.find(
+                      (data) => data.productionCode === selectedProductionCode
+                    ).itemCode"
                     :key="index"
+                    :style="{ backgroundColor: item.itemsCode === selectedItemCode ? '#E3F2FD' : '' }"
                   >
-                    <td
-                      :style="{
-                        backgroundColor: item.itemsCodeA === selectedItemCode ? '#E3F2FD' : '',
-                      }"
-                    >
-                      {{ item.itemsCode }}
-                    </td>
-                    <td
-                      :style="{
-                        backgroundColor: item.itemsCodeA === selectedItemCode ? '#E3F2FD' : '',
-                      }"
-                    >
-                      {{ item.InBomName }}
-                    </td>
-                    <td
-                      :style="{
-                        backgroundColor: item.itemsCodeA === selectedItemCode ? '#E3F2FD' : '',
-                      }"
-                    >
+                    <td>{{ item.itemsCode }}</td>
+                    <td>{{ item.InBomName }}</td>
+                    <td>
                       <VBtn
-                        v-if="item.itemsCodeA === selectedItemCode"
+                        v-if="item.itemsCode === selectedItemCode"
                         color="info"
                         variant="tonal"
                         @click="selectItemCode(item)"
@@ -1266,7 +1207,7 @@ const print = () => {
                         Select
                       </VBtn>
                       <VBtn
-                        v-if="item.itemsCodeA !== selectedItemCode"
+                        v-if="item.itemsCode !== selectedItemCode"
                         color="info"
                         variant="flat"
                         @click="selectItemCode(item)"
@@ -1281,59 +1222,43 @@ const print = () => {
 
             <!-- ตาราง 3: Packaging Type -->
             <VCol
-              cols="4"
               style="border: 1px solid grey; border-radius: 20px;"
+              cols="6"
             >
-              <VTable>
+              <div>
+                <VTextField
+                  v-model="search"
+                  label="Search"
+                  prepend-inner-icon="mdi-magnify"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  single-line
+                />
+              </div>
+              <VTable v-if="selectedProductionCode.length > 0">
                 <thead>
                   <tr>
-                    <th class="text-uppercase">
-                      Item Code
-                    </th>
-                    <th class="text-uppercase">
-                      Product Name
-                    </th>
-                    <th class="text-uppercase">
-                      Packaging Qty Kgs
-                    </th>
-                    <th class="text-uppercase">
-                      Action
-                    </th>
+                    <th>Item Code</th>
+                    <th>Product Name</th>
+                    <th>Packaging Qty Kgs</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(type, index) in dataMockProductionCodeModel.packagingtype"
+                    v-for="(type, index) in dataMockProductionCodeModel.find(
+                      (data) => data.productionCode === selectedProductionCode
+                    ).packagingtype"
                     :key="index"
+                    :style="{ backgroundColor: type.itemCode === selectedPackagingType ? '#E3F2FD' : '' }"
                   >
-                    <td
-                      :style="{
-                        backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
-                      }"
-                    >
-                      {{ type.itemCode }}
-                    </td>
-                    <td
-                      :style="{
-                        backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
-                      }"
-                    >
-                      {{ type.productName }}
-                    </td>
-                    <td
-                      :style="{
-                        backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
-                      }"
-                    >
-                      {{ type.packagingQtyKsg }}
-                    </td>
-                    <td
-                      :style="{
-                        backgroundColor: type === selectedPackagingType ? '#E3F2FD' : '',
-                      }"
-                    >
+                    <td>{{ type.itemCode }}</td>
+                    <td>{{ type.productName }}</td>
+                    <td>{{ type.packagingQtyKsg }}</td>
+                    <td>
                       <VBtn
-                        v-if="type === selectedPackagingType"
+                        v-if="type.itemCode === selectedPackagingType"
                         color="info"
                         variant="tonal"
                         @click="selectPackaging(type)"
@@ -1341,7 +1266,7 @@ const print = () => {
                         Select
                       </VBtn>
                       <VBtn
-                        v-if="type !== selectedPackagingType"
+                        v-if="type.itemCode !== selectedPackagingType"
                         color="info"
                         variant="flat"
                         @click="selectPackaging(type)"
@@ -1357,12 +1282,6 @@ const print = () => {
         </VCardText>
 
         <VCardText class="d-flex justify-end flex-wrap gap-4">
-          <VBtn
-            color="error"
-            @click="isDialogVisibleFilterSelect = false"
-          >
-            Disagree
-          </VBtn>
           <VBtn
             color="success"
             @click="isDialogVisibleFilterSelect = false"
