@@ -4,8 +4,9 @@ import { watchEffect, computed, watch, ref } from 'vue'
 import axios from '@axios'
 import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService'
 import { urlApi } from '@/api'
-
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 
 const itemStore = useItemStore()
 
@@ -15,21 +16,32 @@ const route = useRoute()
 
 const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+console.log(poEtlLogDetailJournalIDQueryParameters);
 const poNo = ref(data.value.itemCode)
 
-const aVariable = ref(ipaItems[6].result.field[0])
-const bVariable = ref(ipaItems[6].result.field[1])
-const cVariable = ref(ipaItems[7].result.field[0])
-const dVariable = ref(ipaItems[7].result.field[1])
-const bdVariable = ref(ipaItems[8].result.field[0])
-const dcsBefore = ref(ipaItems[9].result.field[0])
-const eVariable = ref(ipaItems[46].result.field[0])
-const fVariable = ref(ipaItems[46].result.field[1])
-const gVariable = ref(ipaItems[47].result.field[0])
+const aVariable = ref(ipaItems[6].result.field[0]);
+const bVariable = ref(ipaItems[6].result.field[1]);
+const cVariable = ref(ipaItems[7].result.field[0]);
+const dVariable = ref(ipaItems[7].result.field[1]);
+const bdVariable = ref(ipaItems[8].result.field[0]);
+const dcsBefore = ref(ipaItems[9].result.field[0]);
+const eVariable = ref(ipaItems[46].result.field[0]);
+const fVariable = ref(ipaItems[46].result.field[1]);
+const gVariable = ref(ipaItems[47].result.field[0]);
 var dcsDiff = 0
 var tankDiff = 0
 
-const dataLorryForm = ref(null)
+const isDialogVisibleAlertDialog = ref(false)
+const wordForSubmit = ref('')
+const successDialAlert = ref(false)
+
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word;
+  successDialAlert.value = success;
+  isDialogVisibleAlertDialog.value = true;
+  console.log("textAlertDialogFunction Start!!");
+}
 
 onMounted(async () => {
 
@@ -50,7 +62,8 @@ onMounted(async () => {
       'x-location': `${whereHouse}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
-  })
+  });
+
 
   ipaRequestData.value = lorryFormIPA.data.data
   for (var i of ipaItems) {
@@ -109,7 +122,8 @@ async function saveDraft(e) {
   })
 
   if (response.status == 200) {
-    location.reload()
+    textAlertDialogFunction(alertConst.saveDraft, true);
+    window.location.reload();
   } else {
     console.error(response.data)
   }
@@ -140,24 +154,24 @@ watch(ipaItems[6].result.field[0], async x => {// A
   // ipaItems[6].result.field[1].value = parseFloat(b.toFixed(2))
 
   ipaItems[6].result.field[1].value = b.toFixed(2);
-})
+});
 
 watch(ipaItems[7].result.field[0], async x => {// C
   let d = (x.value * 5.32) + 740.45
   ipaItems[7].result.field[1].value = d.toFixed(2); // D
-})
+});
 
 watch(ipaItems[46].result.field[0], async x => { // E
   ipaItems[46].result.field[1].value = mm2litre(x.value)// F
-})
+});
 
 watchEffect(async () => {
   dcsDiff = (ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value).toFixed(2);
   tankDiff = (ipaItems[46].result.field[1].value - ipaItems[7].result.field[1].value).toFixed(2);
   ipaItems[8].result.field[0].value = (parseFloat(ipaItems[6].result.field[1].value) + parseFloat(ipaItems[7].result.field[1].value)).toFixed(2);
-  ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - ipaItems[46].result.field[1].value).toFixed(2);
-  ipaItems[49].result.field[1].value = (ipaItems[49].result.field[0].value * ipaItems[7].result.field[1].value).toFixed(2);
-})
+  ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - parseFloat(ipaItems[46].result.field[1].value)).toFixed(2);
+  ipaItems[49].result.field[1].value = (parseFloat(ipaItems[49].result.field[0].value) * 0.78).toFixed(2);
+});
 
 
 function mm2litre(mm) {
@@ -747,6 +761,15 @@ function formatDate(dateString) {
       </VBtn>
     </VCol>
   </VRow>
+
+  <!-- Alert Dialog Success/Fiald new -->
+  <section>
+    <div>
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog :is-dialog-visible="isDialogVisibleAlertDialog" :word="wordForSubmit"
+        :success="successDialAlert" @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val" />
+    </div>
+  </section>
 </template>
 
 <style scoped>
