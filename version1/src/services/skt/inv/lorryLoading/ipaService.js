@@ -345,7 +345,7 @@ export const ipaItemTemplate = [
     "practice": "6. Moisture เท่าไหร่",
     "condition": "0.100 Max",
     "result": {
-      "type": "oknot",
+      "type": "percen",
       "field": [
         {
           "name": "l0103060101", // percen
@@ -395,7 +395,7 @@ export const ipaItemTemplate = [
     "practice": "3. Temperature เท่าไหร่",
     "condition": "อุณหภูมิต้องไม่สูงกว่า 25 C'",
     "result": {
-      "type": "oknot",
+      "type": "percen",
       "field": [
         {
           "name": "l0104030101", // percen

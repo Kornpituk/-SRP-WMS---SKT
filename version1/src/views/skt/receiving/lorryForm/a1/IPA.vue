@@ -7,6 +7,7 @@ import { urlApi } from '@/api'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import alertWordConst from '@/utilities/constant'
 
 const itemStore = useItemStore()
 
@@ -16,7 +17,6 @@ const route = useRoute()
 
 const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
-console.log(poEtlLogDetailJournalIDQueryParameters);
 const poNo = ref(data.value.itemCode)
 
 const aVariable = ref(ipaItems[6].result.field[0]);
@@ -35,6 +35,7 @@ const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
+const statusId = ref(0);
 
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word;
@@ -64,13 +65,23 @@ onMounted(async () => {
     },
   });
 
-
   ipaRequestData.value = lorryFormIPA.data.data
   for (var i of ipaItems) {
     for (var f of i.result.field) {
       f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
     }
   }
+
+
+  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  });
+
+  statusId.value = lorryFormIPAStatus.data.data.statusId;
 
 })
 
@@ -122,7 +133,7 @@ async function saveDraft(e) {
   })
 
   if (response.status == 200) {
-    textAlertDialogFunction(alertConst.saveDraft, true);
+    textAlertDialogFunction(alertWordConst.saveDraft, true);
     window.location.reload();
   } else {
     console.error(response.data)
@@ -142,6 +153,27 @@ async function submit(e) {
   })
 
   if (response.status == 200) {
+    textAlertDialogFunction(alertWordConst.submit, true);
+    location.reload()
+  } else {
+    console.error(response.data)
+  }
+}
+
+async function approve(e) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  if (response.status == 200) {
+    textAlertDialogFunction(alertWordConst.approve, true);
     location.reload()
   } else {
     console.error(response.data)
@@ -753,11 +785,14 @@ function formatDate(dateString) {
     <!-- Btn -->
     <VCol cols="4" />
     <VCol cols="8" class="d-flex justify-end">
-      <VBtn type="text" color="warning" class="mx-2" @click="saveDraft">
+      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="warning" class="mx-1" @click="saveDraft">
         Draft
       </VBtn>
-      <VBtn type="text" color="secondary" @click="submit">
+      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="secondary " class="mx-1" @click="submit">
         Submit
+      </VBtn>
+      <VBtn v-if="(statusId === 18)" type="text" color="primary" class="mx-1" @click="approve">
+        Approve
       </VBtn>
     </VCol>
   </VRow>
