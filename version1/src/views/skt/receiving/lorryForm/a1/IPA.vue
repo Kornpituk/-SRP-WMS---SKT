@@ -17,7 +17,7 @@ const route = useRoute()
 
 const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
-const poNo = ref(data.value.itemCode)
+const poNo = ref('')
 
 const aVariable = ref(ipaItems[6].result.field[0]);
 const bVariable = ref(ipaItems[6].result.field[1]);
@@ -65,7 +65,9 @@ onMounted(async () => {
     },
   });
 
+  console.log(lorryFormIPA);
   ipaRequestData.value = lorryFormIPA.data.data
+  poNo.value = lorryFormIPA.data.data.purchaseOrderNo;
   for (var i of ipaItems) {
     for (var f of i.result.field) {
       f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
