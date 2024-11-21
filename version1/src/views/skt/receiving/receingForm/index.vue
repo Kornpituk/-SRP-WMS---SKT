@@ -204,60 +204,64 @@ const trickerLorryLoadind = ref(false)
 const isDialogVisibleSelecrLorry = ref(true)
 const checkSelectLorry = ref([])
 
-const typeLorryOnce = ref(null)
+const typeLorryOnce = ref(itemStore.getItemDetails('typeLorryInfoId'))
 const typeLorryTwo = ref(null)
 
 const generatedJournalId = async () => {
   console.log("generatedJournalId")
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-      console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
 
-      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+  typeLorryOnce.value
 
-        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+  try {
+    // ใช้ await เพื่อรอการเรียก API เสร็จ
+    const response = await axiosIns.get(
+      `${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`,
+      {
+        headers: {
+          accept: '*/*',
+          'x-location': `${whereHouse.value}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      },
+    )
 
-        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
-        statusId.value = item.statusId
+    console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
 
-        checkSelectLorry.value = item.lorryInfos
+    // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+    if (response.data && response.data.data && response.data.data.length > 0) {
+      responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
 
-        if(checkSelectLorry.value.length > 0){
-          if(checkSelectLorry.value.length === 1){
-            typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
-          } 
-        }else{
-          trickerLorryLoadind.value = false
-          typeLorryTwo.value = checkSelectLorry.value
+      const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+
+      receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
+      statusId.value = item.statusId
+
+      checkSelectLorry.value = item.lorryInfos
+
+      if (checkSelectLorry.value.length > 0) {
+        if (checkSelectLorry.value.length === 1) {
+          typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
         }
-
-        sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
-
-        currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
-
-        console.log("lorryInfos", checkSelectLorry.value)
-
       } else {
-        console.error("ไม่มีข้อมูลใน responseGener")
+        trickerLorryLoadind.value = false
+        typeLorryTwo.value = checkSelectLorry.value
       }
 
-    })
-    .catch(error => {
-      console.error('Error:', error)
-    })
+      sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
+
+      currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
+
+      console.log("lorryInfos", checkSelectLorry.value)
+    } else {
+      console.error("ไม่มีข้อมูลใน responseGener")
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
 }
 
-watch(() => {
-  generatedJournalId()
+onMounted(async () => {
+  await generatedJournalId()
 })
 
 const resultSelectLorry = ref([])

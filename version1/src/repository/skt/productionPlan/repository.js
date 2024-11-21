@@ -5,7 +5,7 @@ export const productionPlanRepository = {
   async getProductionPlan(batchId, urlApi, form, whereHouse, accessToken) {
     console.log('get repo Production Plan...')
     try {
-      const response = await axios.get(`${urlApi}/api/v1/${form}/ProductionPlan/get/${batchId}`, {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/get/${batchId}`, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -30,9 +30,37 @@ export const productionPlanRepository = {
     }
   },
 
+  async getProductionPlanBatch(urlApi, form, whereHouse, accessToken) {
+    console.log('get batch repo Production Plan...')
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/newId/`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (response && response.data) {
+        console.log('success get batch repo Production Plan...')
+
+        // console.log('Service Response data Production Plan:', response.data)
+        
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If Production Plan...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try Production Plan...')
+      console.error('Error in getProductionPlanBatch:', error)
+      throw new Error(`Failed to fetch Production Plan for batch }: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   async newProductionPlan(batchId, planningId, urlApi, form, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/ProductionPlan/new`, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/new`, {}, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,
@@ -58,15 +86,11 @@ export const productionPlanRepository = {
 
   async deleteProductionPlan(batchId, planningId, urlApi, form, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/ProductionPlan/delete`, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/delete/${batchId}`, planningId, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,
           'Authorization': `Bearer ${accessToken}`,
-        },
-        params: {
-          BatchID: batchId,
-          PlaningID: planningId,
         },
       })
   
