@@ -32,16 +32,46 @@ export const useNewProductionPlanService = () => {
   }
 }
 
+export const useDeleteBatchProductionPlanService = () => {
+  const responseDeleteBatchProductionPlan = ref(null)
+  const errorMessageDeleteBatchProductionPlan = ref(null)
+  
+  const deleteBatchProdutcionPlanFunc = async (batchId, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageDeleteBatchProductionPlan.value = null
+      console.log('Delete Batch Produtcion Plan Func...')
+  
+      const result = await productionPlanRepository.deleteBatchProductionPlan(batchId, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Delete Batch Produtcion Plan Func result:', result)
+        responseDeleteBatchProductionPlan.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in deleteBatchProdutcionPlanFunc:', error)
+      errorMessageDeleteBatchProductionPlan.value = error.message
+    }
+  }
+  
+  return {
+    responseDeleteBatchProductionPlan,
+    errorMessageDeleteBatchProductionPlan,
+    deleteBatchProdutcionPlanFunc,
+  }
+}
+
 export const useDeleteProductionPlanService = () => {
   const responseDeleteProductionPlan = ref(null)
   const errorMessageDeleteProductionPlan = ref(null)
   
-  const deleteProdutcionPlanFunc = async (batchId, planningId, urlApi, form, whereHouse, accessToke) => {
+  const deleteProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageDeleteProductionPlan.value = null
       console.log('Delete Produtcion Plan Func...')
   
-      const result = await productionPlanRepository.deleteProductionPlan(batchId, planningId, urlApi, form, whereHouse, accessToke)
+      const result = await productionPlanRepository.deleteProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
         
       if (result) {
         console.log('Delete Produtcion Plan Func result:', result)
@@ -59,36 +89,6 @@ export const useDeleteProductionPlanService = () => {
     responseDeleteProductionPlan,
     errorMessageDeleteProductionPlan,
     deleteProdutcionPlanFunc,
-  }
-}
-
-export const useSaveProductionPlanService = () => {
-  const responseSaveProductionPlan = ref(null)
-  const errorMessageSaveProductionPlan = ref(null)
-    
-  const saveProdutcionPlanFunc = async (formData, batchId, urlApi, form, whereHouse, accessToke) => {
-    try {
-      errorMessageSaveProductionPlan.value = null
-      console.log('New Produtcion Plan Func...')
-    
-      const result = await productionPlanRepository.saveProductionPlan(formData, batchId, urlApi, form, whereHouse, accessToke)
-          
-      if (result) {
-        console.log('New Produtcion Plan Func result:', result)
-        responseSaveProductionPlan.value = result
-      } else {
-        console.warn('No data returned from the API')
-      }
-    } catch (error) {
-      console.error('Error in saveProdutcionPlanFunc:', error)
-      errorMessageSaveProductionPlan.value = error.message
-    }
-  }
-    
-  return {
-    responseSaveProductionPlan,
-    errorMessageSaveProductionPlan,
-    saveProdutcionPlanFunc,
   }
 }
 

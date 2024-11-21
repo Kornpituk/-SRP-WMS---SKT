@@ -84,11 +84,33 @@ export const productionPlanRepository = {
     }
   },
 
-  async deleteProductionPlan(batchId, planningId, urlApi, form, whereHouse, accessToken) {
+  async deleteBatchProductionPlan(batchId, urlApi, form, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/delete/${batchId}`, planningId, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/delete`, batchId, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data delete Batch production plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
+  async deleteProductionPlan(planningId, urlApi, form, whereHouse, accessToken) {
+    const body = JSON.stringify(planningId)  // แปลงเป็น JSON string
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/delete`, planningId, {
+        headers: {
           'x-location': whereHouse,
           'Authorization': `Bearer ${accessToken}`,
         },

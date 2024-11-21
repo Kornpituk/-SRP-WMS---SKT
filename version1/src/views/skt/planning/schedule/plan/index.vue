@@ -461,7 +461,7 @@ const deletePlan = async () => {
 
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await deleteProdutcionPlanFunc(batchId.value, body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    await deleteProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
 
     console.log("productionPlan deleted successfully")
   } catch (error) {
