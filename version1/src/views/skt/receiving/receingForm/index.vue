@@ -207,57 +207,113 @@ const checkSelectLorry = ref([])
 const typeLorryOnce = ref(null)
 const typeLorryTwo = ref(null)
 
+// const generatedJournalId = async () => {
+//   console.log("generatedJournalId 0")
+//   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`, {
+//     headers: {
+//       'accept': '*/*',
+//       'x-location': `${whereHouse.value}`,
+//       Authorization: `Bearer ${accessTokenAtStore}`, 
+//     },
+//   },
+//   {})
+//     .then(response => {
+//       console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+//       console.log("generatedJournalId 1")
+
+//       // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+//       if (response.data && response.data.data && response.data.data.length > 0) {
+//         responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+
+//         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+
+//         receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
+//         statusId.value = item.statusId
+
+//         checkSelectLorry.value = item.lorryInfos
+
+//         if(checkSelectLorry.value.length > 0){
+//           if(checkSelectLorry.value.length === 1){
+//             typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
+//           } 
+//         }else{
+//           trickerLorryLoadind.value = false
+//           typeLorryTwo.value = checkSelectLorry.value
+//         }
+
+//         sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
+
+//         currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
+
+//         console.log("lorryInfos", checkSelectLorry.value)
+
+//       } else {
+//         console.error("ไม่มีข้อมูลใน responseGener")
+//       }
+//       console.log("generatedJournalId 3")
+
+//     })
+//     .catch(error => {
+//       console.error('Error:', error)
+//     })
+// }
+
 const generatedJournalId = async () => {
-  console.log("generatedJournalId")
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-      console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+  console.log("generatedJournalId 0")
 
-      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+  try {
+    // ใช้ await เพื่อรอการส่ง API เสร็จ
+    const response = await axiosIns.get(
+      `${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`,
+      {
+        headers: {
+          accept: '*/*',
+          'x-location': `${whereHouse.value}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      },
+    )
 
-        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+    console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+    console.log("generatedJournalId 1")
 
-        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
-        statusId.value = item.statusId
+    // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+    if (response.data && response.data.data && response.data.data.length > 0) {
+      responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
 
-        checkSelectLorry.value = item.lorryInfos
+      const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
-        if(checkSelectLorry.value.length > 0){
-          if(checkSelectLorry.value.length === 1){
-            typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
-          } 
-        }else{
-          trickerLorryLoadind.value = false
-          typeLorryTwo.value = checkSelectLorry.value
+      receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
+      statusId.value = item.statusId
+
+      checkSelectLorry.value = item.lorryInfos
+
+      if (checkSelectLorry.value.length > 0) {
+        if (checkSelectLorry.value.length === 1) {
+          typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
         }
-
-        sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
-
-        currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
-
-        console.log("lorryInfos", checkSelectLorry.value)
-
       } else {
-        console.error("ไม่มีข้อมูลใน responseGener")
+        trickerLorryLoadind.value = false
+        typeLorryTwo.value = checkSelectLorry.value
       }
 
-    })
-    .catch(error => {
-      console.error('Error:', error)
-    })
+      sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
+      currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
+
+      console.log("lorryInfos", checkSelectLorry.value)
+    } else {
+      console.error("ไม่มีข้อมูลใน responseGener")
+    }
+
+    console.log("generatedJournalId 3")
+  } catch (error) {
+    console.log("generatedJournalId 4")
+    console.error("Error:", error)
+  }
 }
 
-watch(() => {
-  generatedJournalId()
+onMounted(async () => {
+  await generatedJournalId()
 })
 
 const resultSelectLorry = ref([])
@@ -375,22 +431,31 @@ const checkSelectLorryLoadingForItem = () => {
 }
 
 const testComponent = () => {
-  const result = ref('02')
+  const result = ref('00')
+  
   if(typeLorryOnce.value){
     result.value = typeLorryOnce.value
-    sessionStorage.setItem('typeLorryInfoId', typeLorryOnce.value)
+    sessionStorage.setItem('typeLorryInfoId', result.value)
     console.log("Component type lorry result", result.value)
   }else{
     result.value = null
+    console.log("Component typeLorryOnce.value", typeLorryOnce.value)
   }
 
   return matchingLorryInfoWithComponent(sessionStorage.getItem('typeLorryInfoId'))
   
 }
 
-watchEffect(() => {
+watch(() => {
   testComponent()
   checkSelectLorryLoadingForItem()
+
+  if(typeLorryOnce.value === null){
+    testComponent()
+    checkSelectLorryLoadingForItem()
+  }else{
+    console.log("find typeLorryOnce.value", typeLorryOnce.value)
+  }
 })
 
 const tabs = [
@@ -804,6 +869,15 @@ const handleAcceptPackaging = word => {
           :is="tab.component"
           v-if="currentTabNew === index"
         />
+      </div>
+      <div v-else>
+        <VProgressLinear
+          height="20"
+          color="success"
+          indeterminate 
+        >
+          <span>Loading</span>
+        </VProgressLinear>
       </div>
     </div>
   </div>
