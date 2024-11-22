@@ -30,6 +30,37 @@ export const productionPlanRepository = {
     }
   },
 
+  async getProductionPlanMaster(search, urlApi, form, whereHouse, accessToken) {
+    console.log('get repo Production Plan...')
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/getmasters`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          Search: search,
+        },
+      })
+
+      console.log("response", response)
+      if (response && response.data) {
+        console.log('success get repo Production Plan Master...')
+        console.log('Service Response data Production Plan Master:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        console.log('Error repo Error If Production Plan Master...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try Production Plan Master...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch Production Plan Master${error.response?.data?.message || error.message}`)
+    }
+  },
+
   async getProductionPlanBatch(urlApi, form, whereHouse, accessToken) {
     console.log('get batch repo Production Plan...')
     try {

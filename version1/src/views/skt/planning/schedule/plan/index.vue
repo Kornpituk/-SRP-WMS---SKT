@@ -92,6 +92,16 @@ const toDayDate = format(new Date())
 const toDayDatePFinished = ref('NaN')
 
 //------------------------------------------ Mock Data --------------------------------
+
+//----------------------------- function true data ---------------------------------
+
+import { useGetProductionPlanService, 
+  useNewProductionPlanService, 
+  useGetBatchProductionPlanService, 
+  useDeleteProductionPlanService,
+  useGetProductionPlanMasterService,
+} from '@/services/skt/productionPlan/services'
+
 const countItemProduction = ref(1)
 
 const mockData = ref([
@@ -136,7 +146,7 @@ const headerDataTableItem1 = [
   },
   {
     title: 'Plan Name',
-    key: 'planName',
+    key: 'plantName',
   },
   {
     title: 'Reactor Name',
@@ -144,7 +154,7 @@ const headerDataTableItem1 = [
   },
   {
     title: 'Batch Scale',
-    key: 'batchScale',
+    key: 'batchScaleKgs',
   },
   {
     title: 'Duration Days',
@@ -159,11 +169,11 @@ const headerDataTableItem1 = [
 const itemCodeDataTable = [
   {
     title: 'Item Code',
-    key: 'itemsCode',
+    key: 'itemCode',
   },
   {
-    title: 'In Bom Name',
-    key: 'InBomName',
+    title: 'Item Name',
+    key: 'itemName',
   },
   {
     title: 'Action',
@@ -178,11 +188,11 @@ const packagingKgsDataTable = [
   },
   {
     title: 'Product Name',
-    key: 'InBomName',
+    key: 'itemName',
   },
   {
     title: 'Packaging Qty Kgs',
-    key: 'packagingQtyKsg',
+    key: 'packingQtyKgs',
   },
   {
     title: 'Action',
@@ -331,16 +341,52 @@ const dataMockProductionCodeModel2 = ref([
   },
 ])
 
+const dataMasterForSelectFilter = ref([])
+
+const searchForMasterDataPlan = ref(null)
+
+const { getProductionplanMasterResult, errorMessageGetProductionPlanMaster, fetchGetProductionplanMaster } = useGetProductionPlanMasterService()
+
+watchEffect(async () => {
+  try {
+    await fetchGetProductionplanMaster(
+      searchForMasterDataPlan.value,
+      urlApi.value,
+      'ProductionPlan',
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
+    if (getProductionplanMasterResult.value?.data && Array.isArray(getProductionplanMasterResult.value.data)) {
+      console.log("getProductionplanMasterResult", getProductionplanMasterResult.value.data)
+      dataMasterForSelectFilter.value = getProductionplanMasterResult.value.data
+    } else {
+      console.warn("getProductionplanMasterResult.data is not an array")
+      dataMasterForSelectFilter.value = []
+    }
+  } catch (error) {
+    console.error("Error fetching production plan master data:", error)
+    dataMasterForSelectFilter.value = []
+  }
+})
+
 // สถานะที่เก็บข้อมูล itemCode และ packagingtype ของแผนที่เลือก
 const btnSelectitem1 = ref(true)
 const btnSelectitem2 = ref(false)
 
 //--------------------------------------------- item 1
-const selectedProductionCode = ref([])
+
 const selectedItemCodeForPlan = ref([])
 const selectedPackagingTypeForPlan = ref([])
+
+const selectedProductionCode = ref([])
 const selectedItemCode = ref([])
 const selectedPackagingType = ref([])
+
+const selectedProductionCode2 = ref([])
+const selectedItemCode2 = ref([])
+const selectedPackagingType2 = ref([])
 
 // Computed property to determine which items to show
 const selectedItems = computed(() => {
@@ -350,29 +396,68 @@ const selectedItems = computed(() => {
   return [] // Default empty or fallback data
 })
 
+const selectProductionCodeSwitch = computed(() => {
+  if (btnSelectitem1.value) return selectedProductionCode.value
+  if (btnSelectitem2.value) return selectedProductionCode2.value
+  
+  return [] // Default empty or fallback data
+})
+
+const selectItemCodeSwitch = computed(() => {
+  if (btnSelectitem1.value) return selectedItemCode.value
+  if (btnSelectitem2.value) return selectedItemCode2.value
+  
+  return [] // Default empty or fallback data
+})
+
+const selectPackagingTypeSwitch = computed(() => {
+  if (btnSelectitem1.value) return selectedPackagingType.value
+  if (btnSelectitem2.value) return selectedPackagingType2.value
+  
+  return [] // Default empty or fallback data
+})
+
 // ฟังก์ชันสำหรับเลือก plan
 const selectPlan = plan => {
-  selectedProductionCode.value = plan.productionCode
+  selectProductionCodeSwitch.value = plan.productionCode
   selectedItemCodeForPlan.value = plan.itemCode // อัปเดต itemCode
   selectedPackagingTypeForPlan.value = plan.packagingtype // อัปเดต packagingtype
-  console.log("selectedProductionCode", selectedProductionCode.value)
+
+  if(btnSelectitem1.value){
+    selectedProductionCode.value = plan.productionCode
+    selectedItemCode.value = plan.itemCode
+    selectedPackagingType.value = plan.itemCode
+    console.log("selectedProductionCode", selectedProductionCode.value)
+  }
+  if(btnSelectitem2.value){
+    selectedItemCode2.value = plan.productionCode
+    selectedPackagingType2.value = plan.itemCode
+    selectedProductionCode2.value = plan.itemCode
+    console.log("selectedItemCode2", selectedItemCode2.value)
+  }
 }
 
 const selectItemCode = plan => {
-  selectedItemCode.value = plan.itemsCode // ตั้งค่า itemCode ของแผนที่เลือก
-
-  console.log("selectedItemCode", selectedItemCode.value)
+  if(btnSelectitem1.value){
+    selectedItemCode.value = plan.itemCode
+    console.log("selectedItemCode", selectedItemCode.value)
+  }
+  if(btnSelectitem2.value){
+    selectedItemCode2.value = plan.itemCode
+    console.log("selectedItemCode2", selectedItemCode2.value)
+  }
 }
 
 const selectPackaging = plan => {
-  selectedPackagingType.value = plan.itemCode // ตั้งค่า packagingtype ของแผนที่เลือก
-
-  console.log("selectedPackagingType", selectedPackagingType.value)
+  if(btnSelectitem1.value){
+    selectedPackagingType.value = plan.itemCode
+    console.log("selectedPackagingType", selectedPackagingType.value)
+  }
+  if(btnSelectitem2.value){
+    selectedPackagingType2.value = plan.itemCode
+    console.log("selectedProductionCode2", selectedPackagingType2.value)
+  }
 }
-
-//----------------------------- function true data ---------------------------------
-
-import { useGetProductionPlanService, useNewProductionPlanService, useGetBatchProductionPlanService, useDeleteProductionPlanService } from '@/services/skt/productionPlan/services'
 
 //------------------------------ func get production plan service --------------------------------
 const { getProductionplanResult, errorMessageGetProductionPlan, fetchGetProductionplan } = useGetProductionPlanService()
@@ -1158,15 +1243,12 @@ const print = () => {
                 />
               </div>
               <VDataTable
+                v-if="dataMasterForSelectFilter.length > 0"
                 :headers="headerDataTableItem1"
-                :items="selectedItems"
+                :items="dataMasterForSelectFilter"
                 :items-per-page="5"
                 class="text-no-wrap"
               >
-                <template #item.id="{ item }">
-                  <span class="text-h6">{{ item.id }}</span>
-                </template>
-
                 <template #item="{ item }">
                   <tr>
                     <td>
@@ -1176,20 +1258,20 @@ const print = () => {
                       <span style="font-size: 12px;">{{ item.raw.productionName }}</span>
                     </td>
                     <td>
-                      <span style="font-size: 12px;">{{ item.raw.planName }}</span>
+                      <span style="font-size: 12px;">{{ item.raw.plantName }}</span>
                     </td>
                     <td>
                       <span style="font-size: 12px;">{{ item.raw.reactorName }}</span>
                     </td>
                     <td>
-                      <span style="font-size: 12px;">{{ item.raw.batchScale }}</span>
+                      <span style="font-size: 12px;">{{ item.raw.batchScaleKgs }}</span>
                     </td>
                     <td>
                       <span style="font-size: 12px;">{{ item.raw.durationDays }}</span>
                     </td>
                     <td>
                       <VBtn
-                        v-if="item.raw.productionCode === selectedProductionCode"
+                        v-if="item.raw.productionCode === selectProductionCodeSwitch"
                         color="info"
                         variant="tonal"
                         @click="selectPlan(item.raw, index)"
@@ -1197,7 +1279,7 @@ const print = () => {
                         Select
                       </VBtn>
                       <VBtn
-                        v-if="item.raw.productionCode !== selectedProductionCode"
+                        v-if="item.raw.productionCode !== selectProductionCodeSwitch"
                         color="info"
                         variant="flat"
                         @click="selectPlan(item.raw, index)"
@@ -1225,31 +1307,28 @@ const print = () => {
                   hide-details
                   single-line
                 />
+                {{ selectProductionCodeSwitch.length }}
               </div>
               <VDataTable
-                v-if="selectedProductionCode.length > 0"
+                v-if="selectProductionCodeSwitch.length > 0"
                 :headers="itemCodeDataTable"
-                :items="selectedItems.find(
-                  (data) => data.productionCode === selectedProductionCode
-                ).itemCode"
+                :items="dataMasterForSelectFilter.find(
+                  (data) => data.productionCode === selectProductionCodeSwitch
+                ).products"
                 :items-per-page="5"
                 class="text-no-wrap"
               >
-                <template #item.id="{ item }">
-                  <span class="text-h6">{{ item.id }}</span>
-                </template>
-
                 <template #item="{ item }">
                   <tr>
                     <td>
-                      <span style="font-size: 12px;">{{ item.raw.itemsCode }}</span>
+                      <span style="font-size: 12px;">{{ item.raw.itemCode }}</span>
                     </td>
                     <td>
-                      <span style="font-size: 12px;">{{ item.raw.InBomName }}</span>
+                      <span style="font-size: 12px;">{{ item.raw.itemName }}</span>
                     </td>
                     <td>
                       <VBtn
-                        v-if="item.raw.itemsCode === selectedItemCode"
+                        v-if="item.raw.itemCode === selectItemCodeSwitch"
                         color="info"
                         variant="tonal"
                         @click="selectItemCode(item.raw, index)"
@@ -1257,7 +1336,7 @@ const print = () => {
                         Select
                       </VBtn>
                       <VBtn
-                        v-if="item.raw.itemsCode !== selectedItemCode"
+                        v-if="item.raw.itemCode !== selectItemCodeSwitch"
                         color="info"
                         variant="flat"
                         @click="selectItemCode(item.raw, index)"
@@ -1287,11 +1366,11 @@ const print = () => {
                 />
               </div>
               <VDataTable
-                v-if="selectedProductionCode.length > 0"
+                v-if="selectProductionCodeSwitch.length > 0"
                 :headers="packagingKgsDataTable"
-                :items="selectedItems.find(
-                  (data) => data.productionCode === selectedProductionCode
-                ).packagingtype"
+                :items="dataMasterForSelectFilter.find(
+                  (data) => data.productionCode === selectProductionCodeSwitch
+                ).packagings"
                 :items-per-page="5"
                 class="text-no-wrap"
               >
@@ -1305,14 +1384,14 @@ const print = () => {
                       <span style="font-size: 12px;">{{ item.raw.itemCode }}</span>
                     </td>
                     <td>
-                      <span style="font-size: 12px;">{{ item.raw.productName }}</span>
+                      <span style="font-size: 12px;">{{ item.raw.itemName }}</span>
                     </td>
                     <td>
-                      <span style="font-size: 12px;">{{ item.raw.packagingQtyKsg }}</span>
+                      <span style="font-size: 12px;">{{ item.raw.packingQtyKgs }}</span>
                     </td>
                     <td>
                       <VBtn
-                        v-if="item.raw.itemCode === selectedPackagingType"
+                        v-if="item.raw.itemCode === selectPackagingTypeSwitch"
                         color="info"
                         variant="tonal"
                         @click="selectPackaging(item.raw)"
@@ -1320,7 +1399,7 @@ const print = () => {
                         Select
                       </VBtn>
                       <VBtn
-                        v-if="item.raw.itemCode !== selectedPackagingType"
+                        v-if="item.raw.itemCode !== selectPackagingTypeSwitch"
                         color="info"
                         variant="flat"
                         @click="selectPackaging(item.raw)"

@@ -122,6 +122,36 @@ export const useGetProductionPlanService = () => {
   }
 }
 
+export const useGetProductionPlanMasterService = () => {
+  const getProductionplanMasterResult = ref(null)
+  const errorMessageGetProductionPlanMaster = ref(null)
+  
+  const fetchGetProductionplanMaster = async (search, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageGetProductionPlanMaster.value = null
+      console.log('Fetching fetchGetProductionplanMaster...')
+  
+      const result = await productionPlanRepository.getProductionPlanMaster(search, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Fetching data fetchGetProductionplanMaster:', result)
+        getProductionplanMasterResult.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in fetchGetProductionplanMaster:', error)
+      errorMessageGetProductionPlanMaster.value = error.message
+    }
+  }
+  
+  return {
+    getProductionplanMasterResult,
+    errorMessageGetProductionPlanMaster,
+    fetchGetProductionplanMaster,
+  }
+}
+
 export const useGetBatchProductionPlanService = () => {
   const getBatchProductionplanResult = ref(null)
   const errorMessageGetBatchProductionPlan = ref(null)

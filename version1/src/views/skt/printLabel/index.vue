@@ -199,8 +199,12 @@ const fetchData = async () => {
       no: index + 1, // เพิ่มฟิลด์ number โดยเริ่มจาก 1
     }))
 
+    // dataPrintLabel.value = result
+
     progressLinearNoData.value = true
     console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
+
+    // console.log("printLabelFormViewResult successfully view", printLabelFormViewResult.value)
   } else {
     console.log("printLabelFormViewService failed view")
   }
