@@ -393,9 +393,9 @@ export const ipaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "3. Temperature เท่าไหร่",
-    "condition": "อุณหภูมิต้องไม่สูงกว่า 25 C'",
+    "condition": "อุณหภูมิต้องไม่สูงกว่า 25 C°",
     "result": {
-      "type": "percen",
+      "type": "c",
       "field": [
         {
           "name": "l0104030101", // percen
