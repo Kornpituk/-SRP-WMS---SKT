@@ -466,7 +466,7 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'kg'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
                       label="" text-start="" text-end="Kg.'">
                     </VCurrencyField>
                   </VCol>
