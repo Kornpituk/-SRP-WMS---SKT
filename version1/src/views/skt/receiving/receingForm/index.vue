@@ -204,7 +204,7 @@ const trickerLorryLoadind = ref(false)
 const isDialogVisibleSelecrLorry = ref(true)
 const checkSelectLorry = ref([])
 
-const typeLorryOnce = ref(null)
+const typeLorryOnce = ref(itemStore.getItemDetails('typeLorryInfoId'))
 const typeLorryTwo = ref(null)
 
 // const generatedJournalId = async () => {
@@ -259,6 +259,7 @@ const typeLorryTwo = ref(null)
 // }
 
 const generatedJournalId = async () => {
+<<<<<<< HEAD
   console.log("generatedJournalId 0")
 
   try {
@@ -283,6 +284,33 @@ const generatedJournalId = async () => {
 
       const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
+=======
+  console.log("generatedJournalId")
+
+  typeLorryOnce.value
+
+  try {
+    // ใช้ await เพื่อรอการเรียก API เสร็จ
+    const response = await axiosIns.get(
+      `${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`,
+      {
+        headers: {
+          accept: '*/*',
+          'x-location': `${whereHouse.value}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      },
+    )
+
+    console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+
+    // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+    if (response.data && response.data.data && response.data.data.length > 0) {
+      responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+
+      const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+
+>>>>>>> f36288f962c29d1c00f9112e0eee4564c8563c62
       receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
       statusId.value = item.statusId
 
@@ -298,17 +326,26 @@ const generatedJournalId = async () => {
       }
 
       sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
+<<<<<<< HEAD
+=======
+
+>>>>>>> f36288f962c29d1c00f9112e0eee4564c8563c62
       currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
 
       console.log("lorryInfos", checkSelectLorry.value)
     } else {
       console.error("ไม่มีข้อมูลใน responseGener")
     }
+<<<<<<< HEAD
 
     console.log("generatedJournalId 3")
   } catch (error) {
     console.log("generatedJournalId 4")
     console.error("Error:", error)
+=======
+  } catch (error) {
+    console.error('Error:', error)
+>>>>>>> f36288f962c29d1c00f9112e0eee4564c8563c62
   }
 }
 
