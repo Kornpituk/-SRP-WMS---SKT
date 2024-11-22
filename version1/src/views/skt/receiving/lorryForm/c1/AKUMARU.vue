@@ -1,785 +1,717 @@
 <script setup>
+import { urlApi } from '@/api'
+import VCurrencyField from "@/components/VCurrencyField.vue"
+import { akumaruRequestData, akumuruItemTemplate } from '@/services/skt/inv/lorryLoading/akumaruService'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
-import { watchEffect, computed, watch, ref } from 'vue'
-import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService'
+import axios from '@axios'
+import { ref, watchEffect } from 'vue'
 
-var ipaItems = reactive(ipaItemTemplate)
-
-var aVariable = ref(ipaItems[6].result.field[0])
-var bVariable = ref(ipaItems[6].result.field[1])
-var cVariable = ref(ipaItems[7].result.field[0])
-var dVariable = ref(ipaItems[7].result.field[1])
-var bdVariable = ref(ipaItems[8].result.field[0])
-
-// var eVariable = ref(ipaItems[8].result.field[0]);
-// var eVariable = ref(ipaItems[8].result.field[0]);
-
-onMounted(() => {
-  for (var i of ipaItems) {
-    for (var f of i.result.field) {
-      f.value = ipaRequestData[f.name]
-    }
-  }
-})
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import alertWordConst from '@/utilities/constant'
 
 
+const itemStore = useItemStore()
 
-function aChangeValue(e) {
-  // aValue = e.target.value;
-  // ipaItems.value[6].result.field[1].value = 999;
+var lorryItem = reactive(akumuruItemTemplate)
+var lorryRequestData = ref({})
+const route = useRoute()
+
+const data = ref(JSON.parse(route.query.Data || '[]'))
+const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+const poNo = ref('')
+
+const aVariable = ref(lorryItem[6].result.field[0])
+const bVariable = ref(lorryItem[6].result.field[1])
+const cVariable = ref(lorryItem[7].result.field[0])
+const dVariable = ref(lorryItem[7].result.field[1])
+const bdVariable = ref(lorryItem[8].result.field[0])
+const dcsBefore = ref(lorryItem[9].result.field[0])
+const eVariable = ref(lorryItem[46].result.field[0])
+const fVariable = ref(lorryItem[46].result.field[1])
+const gVariable = ref(lorryItem[47].result.field[0])
+var dcsDiff = 0
+var tankDiff = 0
+
+const isDialogVisibleAlertDialog = ref(false)
+const wordForSubmit = ref('')
+const successDialAlert = ref(false)
+
+const statusId = ref(0)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+  console.log("textAlertDialogFunction Start!!")
 }
 
-watch(ipaItems[6].result.field[0], async x => {
-  let b = x.value / (0.78)
-  ipaItems[6].result.field[1].value = b
+onMounted(async () => {
+
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  // const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+  //   headers: {
+  //     'accept': '*/*',
+  //     'x-location': `${whereHouse}`,
+  //     Authorization: `Bearer ${accessTokenAtStore}`,
+  //   },
+  // })
+  console.log(akumuruItemTemplate)
+  lorryRequestData.value = akumaruRequestData; //lorryFormIPA.data.data
+  // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
+      f.value = passInitialData(i.result.type, lorryRequestData.value[f.name])
+    }
+  }
+
+
+  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  statusId.value = lorryFormIPAStatus.data.data.statusId
+
 })
 
-watch(ipaItems[7].result.field[0], async x => {
-  let d = (x.value * 5.32) + 740.45
-  ipaItems[7].result.field[1].value = d
-  ipaItems[8].result.field[0].value = ipaItems[6].result.field[1].value + ipaItems[7].result.field[1].value
+function passInitialData(type, params) {
+  if (type == "oknot") {
+    if (params == 0) {
+      return "0"
+    } else if (params == 1) {
+      return "1"
+    } else {
+      return "-1"
+    }
+  } else {
+    return params
+  }
+}
 
+function passSubmitData(type, params) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else {
+    return params
+  }
+}
+
+async function saveDraft(e) {
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+  }
+
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  if (response.status == 200) {
+    textAlertDialogFunction(alertWordConst.saveDraft, true)
+  } else {
+    console.error(response.data)
+  }
+}
+
+async function submit(e) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  if (response.status == 200) {
+    textAlertDialogFunction(alertWordConst.submit, true)
+  } else {
+    console.error(response.data)
+  }
+}
+
+async function approve(e) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  if (response.status == 200) {
+    textAlertDialogFunction(alertWordConst.approve, true)
+    location.reload()
+  } else {
+    console.error(response.data)
+  }
+}
+
+// watch(lorryItem[6].result.field[0], async x => {// A
+//   let b = x.value / (0.78)
+//   lorryItem[6].result.field[1].value = b.toFixed(2)
+// })
+
+// watch(lorryItem[7].result.field[0], async x => {// C
+//   let d = (x.value * 5.32) + 740.45
+//   lorryItem[7].result.field[1].value = d.toFixed(2) // D
+// })
+
+// watch(lorryItem[46].result.field[0], async x => { // E
+//   lorryItem[46].result.field[1].value = mm2litre(x.value)// F
+// })
+
+watchEffect(async () => {
+  // dcsDiff = (lorryItem[47].result.field[0].value - lorryItem[9].result.field[0].value).toFixed(2)
+  // tankDiff = (lorryItem[46].result.field[1].value - lorryItem[7].result.field[1].value).toFixed(2)
+  // lorryItem[8].result.field[0].value = (parseFloat(lorryItem[6].result.field[1].value) + parseFloat(lorryItem[7].result.field[1].value)).toFixed(2)
+  // lorryItem[49].result.field[0].value = (parseFloat(lorryItem[8].result.field[0].value) - parseFloat(lorryItem[46].result.field[1].value)).toFixed(2)
+  // lorryItem[49].result.field[1].value = (parseFloat(lorryItem[49].result.field[0].value) * 0.78).toFixed(2)
 })
+
+
+// function mm2litre(mm) {
+//   let litre = mm * 5.32 + 740.45
+
+//   return litre.toFixed(2)
+// }
+
+//----------------- Formate
+function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
 </script>
 
 <template>
-  <VContainer>
-    <VRow>
-      <VCol cols="6">
-        <VRow>
-          <VCol cols="12">
-            <h3 class="d-flex justify-center align-center pa-0">
-              Lorry Loading Check List<br>
-            </h3>
-          </VCol>
-          <VCol cols="12">
-            <h4 class="d-flex justify-center align-center pa-0">
-              ISOPRO (IPA)
-            </h4>
-          </VCol>
-        </VRow>
-      </VCol>
-      <VCol cols="6">
-        <VRow>
-          <VCol
-            style="border: 1px solid black;"
-            cols="8"
-          >
-            <div
-              style="font-size: 18px; font-weight: bolder;"
-              class="d-flex justify-center align-center"
-            >
-              <VTextField
-                v-model="aValue"
-                density="compact"
-                variant="outlined"
-                label=" By : "
-              />
-            </div>
-          </VCol>
-          <VCol
-            style="border: 1px solid black;"
-            cols="4"
-          >
-            <div
-              style="font-size: 18px; font-weight: bolder;"
-              class="d-flex justify-center align-center"
-            >
-              <VTextField
-                density="compact"
-                variant="outlined"
-                label="Issued Date :"
-              />
-            </div>
-          </VCol>
-        </VRow>
-      </VCol>
-    </VRow>
-    <VRow>
-      <VCol>
-        <VTable>
-          <tbody>
-            <tr>
-              <td style="padding: 10px; border: 1px solid black; text-align: center;">
-                <h4> Leader</h4>
-              </td>
-              <td style="padding: 10px; border: 1px solid black; text-align: center;">
-                <h4> วิธีปฏิบัติ</h4>
-              </td>
-              <td style="padding: 10px; border: 1px solid black; text-align: center;">
-                <h4> Condition</h4>
-              </td>
-              <td style="padding: 10px; border: 1px solid black; text-align: center;">
-                <h4> ผลการเช็ค</h4>
-              </td>
-            </tr>
-            <tr
-              v-for="(section, sectionIndex) in ipaItems"
-              :key="sectionIndex"
-            >
-              <td
-                v-if="section.isSection === true"
-                style="border-top: 1px solid black; border-left: 1px solid black; text-align: center; vertical-align: middle;"
-                :rowspan="[section.rowSpan]"
-              >
-                <div v-html="section.sequence" />
-              </td>
-              <td style=" border-left: 1px solid black; text-align: start;">
-                <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                  {{ section.practice }}
-                </VLabel>
-              </td>
-              <td style="border-left: 1px solid black; text-align: start;">
-                <VLabel class="d-flex justify-center pa-md-2">
-                  {{ section.condition }}
-                </VLabel>
-              </td>
-              <td style="width: 450px; border-left: 1px solid black;">
-                <div v-if="section.result.type === 'oknot'">
-                  <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
-                  <VRadioGroup
-                    v-model="section.result.field[0].value"
-                    inline
-                    class="d-flex justify-center"
-                  >
-                    <VRadio
-                      label="Ok"
-                      value="1"
-                    />
-                    <VRadio
-                      label="Not"
-                      value="0"
-                    />
-                  </VRadioGroup>
-                </div>
-                <div v-if="section.result.type === 'ab'">
-                  <VRow>
-                    <VLabel>
-                      (A)
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      Kg.
-                    </VLabel>
-                    <VLabel>
-                      (B)
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
-                    </VCol>
-                    <VLabel>
-                      Litre
-                    </VLabel>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'cd'">
-                  <VRow>
-                    <VLabel>
-                      (C)
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      mm.
-                    </VLabel>
-                    <VLabel>
-                      (D)
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
-                    </VCol>
-                    <VLabel>
-                      Litre
-                    </VLabel>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'bd'">
-                  <VRow>
-                    <VLabel>
-                      (B) + (D) =
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      Litre
-                    </VLabel>
-                    <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
-                      </VRadioGroup>
-                    </VCol>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'litre'">
-                  <VRow>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      Litre
-                    </VLabel>
-                    <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
-                      </VRadioGroup>
-                    </VCol>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'percen'">
-                  <VRow>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      %
-                    </VLabel>
-                    <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
-                      </VRadioGroup>
-                    </VCol>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'c'">
-                  <VRow>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      C'
-                    </VLabel>
-                    <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
-                      </VRadioGroup>
-                    </VCol>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'actualCheck'">
-                  <VRow>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
-                    </VCol>
-                    <VLabel>
-                      :
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
-                    </VCol>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'mpa'">
-                  <VRow>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      ( Mpa )
-                    </VLabel>
-                    <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
-                      </VRadioGroup>
-                    </VCol>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'amp'">
-                  <VRow>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      Amp
-                    </VLabel>
-                    <VCol>
-                      <VRadioGroup
-                        v-model="section.result.field[1].value"
-                        inline
-                        class="d-flex justify-center"
-                      >
-                        <VRadio
-                          label="Ok"
-                          value="1"
-                        />
-                        <VRadio
-                          label="Not"
-                          value="0"
-                        />
-                      </VRadioGroup>
-                    </VCol>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'ef'">
-                  <VRow>
-                    <VLabel>
-                      (E)
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      mm.
-                    </VLabel>
-                    <VLabel>
-                      (F)
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                      />
-                    </VCol>
-                    <VLabel>
-                      Litre
-                    </VLabel>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'g'">
-                  <VRow>
-                    <VLabel>
-                      (G)
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      Litre
-                    </VLabel>
-                  </VRow>
-                </div>
-                <div v-if="section.result.type === 'litrekg'">
-                  <VRow>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[0].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      Litre
-                    </VLabel>
-                    <VCol>
-                      <VTextField
-                        v-model="section.result.field[1].value"
-                        density="compact"
-                        variant="outlined"
-                        label=""
-                        type="number"
-                      />
-                    </VCol>
-                    <VLabel>
-                      Kg.
-                    </VLabel>
-                  </VRow>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </VTable>
-      </VCol>
-    </VRow>
-    <div style="border: 1px solid black;">
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            <u>สูตรคำนวน</u>
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            หาเป็นลิตร = mm x 5.32 + 740.45
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            หาเป็น mm = Litre - 740.45 / 5.32
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            (B) = (A) / 0.78
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            = {{ aVariable.value }} /0.78
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            = {{ bVariable.value }} Litre
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            (D) - ((C) X 5.32) + 740.45
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            = ({{ cVariable.value }}X 5.32 ) + 740.45
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            = {{ dVariable.value }}Litre
-          </VLabel>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol>
-          <VLabel class="d-flex justify-center">
-            Density IPA = 0.78
-          </VLabel>
-        </VCol>
-      </VRow>
-    </div>
-    <div style="border: 1px solid black;">
-      <VTable>
-        <tr>
-          <th />
-          <th>DCS</th>
-          <th>TANK</th>
-          <th />
-        </tr>
-        <tr>
-          <td>After</td>
-          <td />
-          <td />
-          <td>Ltr</td>
-        </tr>
-        <tr>
-          <td>Befor</td>
-          <td />
-          <td />
-          <td>Ltr</td>
-        </tr>
-        <tr>
-          <td>Diff</td>
-          <td />
-          <td />
-          <td>Ltr</td>
-        </tr>
-      </VTable>
-    </div>
-    <div style="border: 1px solid black;">
-      <Vrow>
-        <VCol style="border: 1px solid black;">
-          Flow Chart
-        </VCol>
-      </Vrow>
-      <Vrow>
-        <VCol cols="12">
-          <div class="d-flex justify-space-around align-center bg-grey-lighten-4">
-            <div class="ma-4">
-              <div class="text-subtitle-2">
-                Default
+  <VRow class="ma-2">
+    <VCol cols="4" />
+    <VCol cols="4">
+      <div style="font-size: 22px; font-weight: bolder;" class="d-flex justify-center align-center">
+        Lorry Loading Check List
+      </div>
+    </VCol>
+    <VCol cols="4">
+      <h3>
+        <table class="custom-table">
+          <tr>
+            <th>P/O No.</th>
+            <td>{{ poNo }}</td>
+          </tr>
+        </table>
+      </h3>
+    </VCol>
+    <VCol cols="4" />
+    <VCol cols="4">
+      <div style="font-size: 22px; font-weight: bolder;" class="d-flex justify-center align-center">
+        AKUMARUUUUUU
+      </div>
+    </VCol>
+    <VCol cols="4" />
+  </VRow>
+
+  <VRow>
+    <!-- Lorry Form -->
+    <VCol cols="12" style="overflow-x: auto;">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th class="text-center" style="font-size: 16px;" colspan="2">
+              Job Flow
+            </th>
+            <th class="text-center" style="font-size: 16px;" colspan="3">
+              Manual works
+            </th>
+            <th class="text-center" style="font-size: 16px;" colspan="3">
+              Condition
+            </th>
+            <th class="text-center" style="font-size: 16px;" colspan="4">
+              Result
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(section, sectionIndex) in lorryItem" :key="sectionIndex" :sectionIndex="sectionIndex">
+            <td v-if="section.isSection === true"
+              style="border-top: 1px solid black; border-left: 1px solid black; text-align: center; vertical-align: middle;"
+              :rowspan="[section.rowSpan]" colspan="2">
+              <div v-html="section.sequence" />
+            </td>
+            <td colspan="3" style="max-width: 400px; border-left: 1px solid black; text-align: start;">
+              <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+                {{ section.practice }}
+              </VLabel>
+            </td>
+            <td colspan="3" style="max-width: 350px; border-left: 1px solid black; text-align: start;">
+              <VLabel class="d-flex justify-center pa-md-2">
+                {{ section.condition }}
+              </VLabel>
+            </td>
+            <td colspan="4" style="min-width: 450px; border-left: 1px solid black;">
+              <div v-if="section.result.type === 'oknot'">
+                <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
+                <VRadioGroup v-model="section.result.field[0].value" inline class="d-flex justify-center"
+                  :fieldname="section.result.field[0].name">
+                  <VRadio label="Ok" value="1" />
+                  <VRadio label="Not" value="0" />
+                </VRadioGroup>
               </div>
-              <VImg
-                :aspect-ratio="1"
-                class="bg-white"
-                :src="image01"
-                width="500"
-              />
+              <div v-if="section.result.type === 'ab'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="solo"
+                      text-start="(A)" text-end="Kg." />
+                  </VCol>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
+                      text-start="Litre" text-end="(B)" readonly="true" />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'cd'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="(C)" text-end="mm." />
+                  </VCol>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
+                      text-start="(D)" text-end="mm." readonly="true" />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'bd'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="solo"
+                      text-start=" (B) + (D) =" text-end="Litre" readonly="true" />
+                  </VCol>
+                  <VCol>
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
+                    </VRadioGroup>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'litre'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Litre" readonly="true" />
+                  </VCol>
+                  <VCol>
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
+                    </VRadioGroup>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'percen'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="%" readonly="true" />
+                  </VCol>
+                  <VCol>
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
+                    </VRadioGroup>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'c'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="C°" />
+                  </VCol>
+                  <VCol>
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
+                    </VRadioGroup>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'actualCheck'">
+                <VRow>
+                  <VCol>
+                    <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label="" />
+                  </VCol>
+                  <VLabel>
+                    :
+                  </VLabel>
+                  <VCol>
+                    <VTextField v-model="section.result.field[1].value" density="compact" variant="outlined" label="" />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'mpa'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="( Mpa )'" />
+                  </VCol>
+                  <VCol>
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
+                    </VRadioGroup>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'amp'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Amp'" />
+                  </VCol>
+
+                  <VCol>
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
+                    </VRadioGroup>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'ef'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="(E)" text-end="mm.'" />
+                  </VCol>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                      label="" text-start="(F)" text-end="Litre'" />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'g'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="(G)" text-end="Litre'" type="number" />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'litrekg'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Litre'" />
+                  </VCol>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Kg.'">
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VCurrencyField>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'kg'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Kg.'">
+                    </VCurrencyField>
+                  </VCol>
+                </VRow>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </VCol>
+    <!-- Calculation formula -->
+    <VCol cols="12">
+      <div style="border: 1px solid black;">
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              <u>สูตรคำนวน</u>
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              หาเป็นลิตร = mm x 5.32 + 740.45
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              หาเป็น mm = Litre - 740.45 / 5.32
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              (B) = (A) / 0.78
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              = {{ aVariable.value }} /0.78
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              = {{ bVariable.value }} Litre
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              (D) - ((C) X 5.32) + 740.45
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              = ({{ cVariable.value }}X 5.32 ) + 740.45
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              = {{ dVariable.value }}Litre
+            </VLabel>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol>
+            <VLabel class="d-flex justify-center">
+              Density IPA = 0.78
+            </VLabel>
+          </VCol>
+        </VRow>
+      </div>
+    </VCol>
+    <!-- Dcs Tank -->
+    <VCol cols="12">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th />
+            <th class="text-center" style="font-size: 16px;">
+              DSC
+            </th>
+            <th class="text-center" style="font-size: 16px;">
+              TANK
+            </th>
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-size: 16px;">
+              After
+            </td>
+            <td class="py-4 text-center">
+              {{ gVariable.value }}
+            </td>
+            <td class="py-4 text-center">
+              {{ fVariable.value }}
+            </td>
+            <td style="font-size: 16px;">
+              Ltr
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 16px;">
+              Before
+            </td>
+            <td class="py-4 text-center">
+              {{ dcsBefore.value }}
+            </td>
+            <td class="py-4 text-center">
+              {{ dVariable.value }}
+            </td>
+            <td style="font-size: 16px;">
+              Ltr
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 16px;">
+              Diff
+            </td>
+            <td class="py-4 text-center">
+              {{ dcsDiff }}
+            </td>
+            <td class="py-4 text-center">
+              {{ tankDiff }}
+            </td>
+            <td style="font-size: 16px;">
+              Ltr
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </VCol>
+    <!-- Flow Chat -->
+    <VCol cols="12">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th style="font-size: 16px;">
+              Flow Chart
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <div class="d-flex justify-space-around align-center bg-grey-lighten-4">
+              <div class="ma-4">
+                <div class="text-subtitle-2">
+                  Default
+                </div>
+                <VImg :aspect-ratio="1" class="bg-white" :src="image01" width="500" />
+              </div>
             </div>
-          </div>
-        </VCol>
-      </Vrow>
+          </tr>
+        </tbody>
+      </table>
+    </VCol>
+    <VCol cols="12" lg="12">
+      <table class="custom-table">
+        <tr>
+          <th class="text-center cursor-pointer" colspan="12">
+            Lorry Loading Check List
+          </th>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <span>Staff: {{ lorryRequestData.whStaff }}</span>
+          </td>
+          <td colspan="4">
+            <span>Leader: {{ lorryRequestData.whLeader }}</span>
+          </td>
+          <td colspan="4">
+            <span>Supervisor: {{ lorryRequestData.whSupervisor }}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="min-width: 150px;" colspan="4">
+            <div v-if="lorryRequestData.whStaffUpdatedDate">
+              <span v-if="lorryRequestData.whStaffUpdatedDate">{{ formatDate(lorryRequestData.whStaffUpdatedDate)
+                }}</span>
+            </div>
+          </td>
+          <td style="min-width: 150px;" colspan="4">
+            <div v-if="lorryRequestData.whLeaderDate">
+              <span v-if="lorryRequestData.whLeaderDate">{{ formatDate(lorryRequestData.whLeaderDate) }}</span>
+            </div>
+          </td>
+          <td style="min-width: 150px;" colspan="4">
+            <div v-if="lorryRequestData.whSupervisorDate">
+              <span v-if="lorryRequestData.whSupervisorDate">{{ formatDate(lorryRequestData.whSupervisorDate) }}</span>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </VCol>
+  </VRow>
+  <!-- Btn -->
+  <VRow>
+    <!-- Btn -->
+    <VCol cols="4" />
+    <VCol cols="8" class="d-flex justify-end">
+      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="warning" class="mx-1" @click="saveDraft">
+        Draft
+      </VBtn>
+      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="secondary " class="mx-1" @click="submit">
+        Submit
+      </VBtn>
+      <VBtn v-if="(statusId === 18)" type="text" color="primary" class="mx-1" @click="approve">
+        Approve
+      </VBtn>
+    </VCol>
+  </VRow>
+
+  <!-- Alert Dialog Success/Fiald new -->
+  <section>
+    <div>
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog :is-dialog-visible="isDialogVisibleAlertDialog" :word="wordForSubmit"
+        :success="successDialAlert" @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val" />
     </div>
-    <div style="border: 1px solid black;">
-      <VRow>
-        <VCol
-          cols="2"
-          class="d-flex justify-center "
-        >
-          <VLabel class="d-flex justify-center pa-2">
-            Location
-          </VLabel>
-        </VCol>
-        <VCol
-          cols="3"
-          class="justify-left"
-        >
-          <VCombobox
-            label="Combobox"
-            :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-          />
-        </VCol>
-      </VRow>
-    </div>
-    <div style="border: 1px solid black;">
-      <VRow>
-        <VCol
-          cols="12"
-          class="d-flex justify-center"
-        >
-          Lorry Loading Check List
-        </VCol>
-      </VRow>
-    </div>
-    <div style="border: 1px solid black;">
-      <VRow>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Staff"
-          />
-        </VCol>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Leader"
-          />
-        </VCol>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="SuperVisor"
-          />
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Date"
-          />
-        </VCol>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Date"
-          />
-        </VCol>
-        <VCol
-          cols="4"
-          class="d-flex justify-center"
-          style="border: 1px solid black;"
-        >
-          <VTextField
-            density="compact"
-            variant="outlined"
-            label="Date"
-          />
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol
-          cols="1"
-          class="justify-right offset-10"
-        >
-          <VBtn
-            type="text"
-            style="width: 100%;"
-            color="warning"
-          >
-            Draft
-          </VBtn>
-        </Vcol>
-        <VCol
-          cols="1"
-          class="justify-right"
-        >
-          <VBtn
-            type="text"
-            style="width: 100%;"
-            color="secondary"
-            onclick=""
-          >
-            Submit
-          </VBtn>
-        </Vcol>
-      </VRow>
-    </div>
-  </VContainer>
+  </section>
 </template>
 
 <style scoped>
+.dcs-tank-td {
+  line-height: 60px;
+}
+
+.br-1 {
+  border: 1px solid black;
+}
+
 .table-container {
   overflow-x: auto;
 }
@@ -788,7 +720,7 @@ watch(ipaItems[7].result.field[0], async x => {
   text-align: center;
 }
 
-.centered-input >>> input {
+.centered-input>>>input {
   padding: 0;
   block-size: 20px !important;
   text-align: center;

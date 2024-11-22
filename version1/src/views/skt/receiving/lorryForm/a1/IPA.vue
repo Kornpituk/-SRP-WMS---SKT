@@ -1,11 +1,11 @@
 <script setup>
-import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
-import { watchEffect, computed, watch, ref } from 'vue'
-import axios from '@axios'
-import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService'
 import { urlApi } from '@/api'
-import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import VCurrencyField from "@/components/VCurrencyField.vue"
+import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
+import axios from '@axios'
+import { ref, watch, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
@@ -185,9 +185,6 @@ async function approve(e) {
 
 watch(ipaItems[6].result.field[0], async x => {// A
   let b = x.value / (0.78)
-
-  // ipaItems[6].result.field[1].value = parseFloat(b.toFixed(2))
-
   ipaItems[6].result.field[1].value = b.toFixed(2)
 })
 
@@ -332,7 +329,7 @@ function formatDate(dateString) {
               style="max-width: 350px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-center pa-md-2">
-                {{ section.condition }}
+                {{ section.condition }} 
               </VLabel>
             </td>
             <td
@@ -675,6 +672,21 @@ function formatDate(dateString) {
                           Kg.
                         </VLabel>
                       </template>
+                    </VCurrencyField>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'kg'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Kg.'"
+                    >
                     </VCurrencyField>
                   </VCol>
                 </VRow>
