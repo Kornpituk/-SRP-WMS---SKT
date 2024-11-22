@@ -191,6 +191,7 @@ const fetchData = async () => {
 
   const result = await printLabelFormViewService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
 
+  progressLinearNoData.value = true
   if (result) {
     // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
     dataPrintLabel.value = result.data.map((item, index) => ({
@@ -1087,7 +1088,7 @@ const dataTableColor = ref('#E0F7FA')
           <span>No Data....</span>
         </VProgressLinear>
         <VProgressLinear
-          v-if="!dataPrintLabel && progressLinearNoData === false"
+          v-if="progressLinearNoData === false"
           height="20"
           indeterminate
           color="primary"
@@ -1245,7 +1246,10 @@ const dataTableColor = ref('#E0F7FA')
             </tr>
           </template>
         </VDataTable>
-        <VBtn @click="eXprtreeNode">
+        <VBtn
+          v-if="false"
+          @click="eXprtreeNode"
+        >
           EXprtreeNode
         </VBtn>
       </VCardText>

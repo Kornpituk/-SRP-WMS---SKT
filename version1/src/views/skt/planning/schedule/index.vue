@@ -625,57 +625,6 @@ const newBatch = async () => {
             <VForm @submit.prevent="submitSearchButton">
               <!-- Barcode | Product code | Product Name | Button Export -->
               <VRow>
-                <!-- 👉 Select Product code -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <AppDateTimePicker
-                    v-model="date"
-                    label="Producing Date"
-                    placeholder="Select date"
-                    density="compact"
-                    prepend-inner-icon="ri-calendar-schedule-fill"
-                    :config="{ dateFormat: 'd/m/Y' }"
-                  />
-                </VCol>
-                
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <AppDateTimePicker
-                    v-model="date"
-                    label="Finished Date"
-                    placeholder="Select date"
-                    density="compact"
-                    prepend-inner-icon="ri-calendar-schedule-fill"
-                    :config="{ dateFormat: 'd/m/Y' }"
-                  />
-                </VCol>
-
-                <!-- 👉 Select Product Name -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VTextField
-                    v-model="searchByProductName"
-                    :label="$t('Lot Number')"
-                    type="Product Name"
-                    density="compact"
-                  >
-                    <template #label>
-                      <span style="font-size: 12px;">Lot Number</span>
-                    </template>
-                  </VTextField>
-                </VCol>
                 <VCol
                   cols="12"
                   lg="4"
@@ -693,6 +642,7 @@ const newBatch = async () => {
                     </template>
                   </VAutocomplete> 
                 </VCol>
+               
                 <VCol
                   cols="12"
                   lg="4"
@@ -701,12 +651,63 @@ const newBatch = async () => {
                 >
                   <VTextField
                     v-model="searchByProductName"
-                    :label="$t('Product Name')"
                     type="Product Name"
                     density="compact"
                   >
                     <template #label>
-                      <span style="font-size: 12px;">Product Name</span>
+                      <span style="font-size: 12px;">Prodcution Code/Name</span>
+                    </template>
+                  </VTextField>
+                </VCol>
+
+                <!-- 👉 Select Product Name -->
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <VTextField
+                    v-model="searchByProductName"
+                    type="Product Name"
+                    density="compact"
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Item Code/Name</span>
+                    </template>
+                  </VTextField>
+                </VCol>
+
+                <!-- 👉 Select Product code -->
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <AppDateTimePicker
+                    v-model="date"
+                    label="Producing Date"
+                    placeholder="Select date"
+                    density="compact"
+                    prepend-inner-icon="ri-calendar-schedule-fill"
+                    :config="{ dateFormat: 'd/m/Y' }"
+                  />
+                </VCol>
+               
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <VTextField
+                    v-model="searchByProductName"
+                    type="Product Name"
+                    density="compact"
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Lot</span>
                     </template>
                   </VTextField>
                 </VCol>
@@ -1063,7 +1064,7 @@ const newBatch = async () => {
               color="info"
               @click="viewAllData"
             >
-              <span style="font-size: 12px;">Finished Apporve </span>
+              <span style="font-size: 12px;">Finished Approve </span>
             </VBtn>
             <VBtn
               class="mx-2"
@@ -1129,7 +1130,7 @@ const newBatch = async () => {
   <!-- ----------             Production plan                                ------------------------------------ -->
   <section>
     <!-- VData table -->
-    <VCard>
+    <VCard v-if="false">
       <VCardText>
         <VDataTable
           v-model:page="currentPageDataTable"
