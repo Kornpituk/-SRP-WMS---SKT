@@ -1,4 +1,3 @@
-import { ref } from 'vue'
 
 
 // export const ipaRequestData = {
@@ -89,7 +88,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101010101",
-          "value:": "",
+
         },
       ],
     },
@@ -104,7 +103,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101020101",
-          "value:": "",
+
         },
       ],
     },
@@ -119,7 +118,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101030101",
-          "value:": "",
+
         },
       ],
     },
@@ -134,7 +133,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101040101",
-          "value:": "",
+
         },
       ],
     },
@@ -149,7 +148,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101050101",
-          "value:": "",
+
         },
       ],
     },
@@ -164,7 +163,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101060101",
-          "value:": "",
+
         },
       ],
     },
@@ -182,11 +181,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102010101", // A
-          "value:": "",
+
         },
         {
           "name": "l0102010102", // B
-          "value:": "",
+
         },
       ],
     },
@@ -201,11 +200,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102020101", // C
-          "value:": "",
+
         },
         {
           "name": "l0102020102", // D
-          "value:": "",
+
         },
       ],
     },
@@ -220,11 +219,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102030101", // BD
-          "value:": "",
+
         },
         {
           "name": "l0102030102", // OkNot
-          "value:": "",
+
         },
       ],
     },
@@ -239,11 +238,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102040101", // litre
-          "value:": "",
+
         },
         {
           "name": "l0102040102", // OkNot
-          "value:": "",
+
         },
       ],
     },
@@ -255,10 +254,10 @@ export const ipaItemTemplate = [
     "condition": "Seal ล็อกวาล์วไม่ขาดตรงตามใบส่ง",
     "result": {
       "type": "oknot",
-      "field": [  
+      "field": [
         {
           "name": "l0102050101", // litre
-          "value:": "",
+
         },
       ],
     },
@@ -274,7 +273,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103010101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -289,7 +288,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103020101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -304,7 +303,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103030101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -319,7 +318,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103040101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -334,7 +333,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103050101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -353,7 +352,7 @@ export const ipaItemTemplate = [
         },
         {
           "name": "l0103060102", // ok
-          "value:": "",
+
         },
       ],
     },
@@ -369,7 +368,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -384,7 +383,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -399,11 +398,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104030101", // percen
-          "value:": "",
+
         },
         {
           "name": "l0104030102", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -419,7 +418,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -434,7 +433,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -449,7 +448,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -465,7 +464,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -480,7 +479,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -495,7 +494,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -510,7 +509,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106040101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -525,7 +524,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106050101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -540,7 +539,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106060101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -556,7 +555,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -571,7 +570,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -586,7 +585,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -601,7 +600,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107040101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -617,7 +616,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -632,11 +631,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108020101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0108020102", // 2
-          "value:": "",
+
         },
       ],
     },
@@ -651,10 +650,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108030101", // 1
-          "value:": "",
+
         }, {
           "name": "l0108030102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -669,10 +668,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108040101", // 1
-          "value:": "",
+
         }, {
           "name": "l0108040102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -687,7 +686,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108050101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -703,7 +702,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109010101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -718,7 +717,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109020101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -733,11 +732,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109030101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0109030102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -752,7 +751,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109040101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -767,7 +766,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109050101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -782,11 +781,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109060101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0109060102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -801,7 +800,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109070101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -816,7 +815,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109080101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -831,11 +830,9 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109090101", // 1
-          "value:": "",
         },
         {
           "name": "l0109090102", // 1
-          "value:": "",
         },
       ],
     },
@@ -850,7 +847,6 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109100101", // 1
-          "value:": "",
         },
       ],
     },
@@ -865,7 +861,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109110101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -879,12 +875,10 @@ export const ipaItemTemplate = [
       "type": "litrekg",
       "field": [
         {
-          "name": "l0109120101", // 1
-          "value:": "",
+          "name": "l0109120101", // 1    
         },
         {
-          "name": "l0109120102", // 1
-          "value:": "",
+          "name": "l0109120102", // 1         
         },
       ],
     },

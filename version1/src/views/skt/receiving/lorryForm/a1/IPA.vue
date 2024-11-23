@@ -5,10 +5,11 @@ import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import axios from '@axios'
-import { ref, watch, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import VNumberInput from '@/components/VNumberInput.vue'
 import alertWordConst from '@/utilities/constant'
 
 
@@ -27,12 +28,17 @@ const bVariable = ref(ipaItems[6].result.field[1])
 const cVariable = ref(ipaItems[7].result.field[0])
 const dVariable = ref(ipaItems[7].result.field[1])
 const bdVariable = ref(ipaItems[8].result.field[0])
-const dcsBefore = ref(ipaItems[9].result.field[0])
+
 const eVariable = ref(ipaItems[46].result.field[0])
-const fVariable = ref(ipaItems[46].result.field[1])
 const gVariable = ref(ipaItems[47].result.field[0])
-var dcsDiff = 0
-var tankDiff = 0
+
+var dcsAfter = ref(0);
+var dcsBefore = ref(0);
+var dcsDiff = 0;
+
+var tankAfter = ref(0);
+var tankBefore = ref(0);
+var tankDiff = ref(0);
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -91,7 +97,7 @@ onMounted(async () => {
 })
 
 function passInitialData(type, params) {
-  if (type == "oknot") {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
     if (params == 0) {
       return "0"
     } else if (params == 1) {
@@ -105,7 +111,7 @@ function passInitialData(type, params) {
 }
 
 function passSubmitData(type, params) {
-  if (type == "oknot") {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
     if (params == "0") {
       return 0
     } else if (params == "1") {
@@ -115,7 +121,7 @@ function passSubmitData(type, params) {
     }
   }
   else {
-    return params
+    return parseFloat(params)
   }
 }
 
@@ -183,32 +189,38 @@ async function approve(e) {
   }
 }
 
-watch(ipaItems[6].result.field[0], async x => {// A
-  let b = x.value / (0.78)
-  ipaItems[6].result.field[1].value = b.toFixed(2)
-})
-
-watch(ipaItems[7].result.field[0], async x => {// C
-  let d = (x.value * 5.32) + 740.45
-  ipaItems[7].result.field[1].value = d.toFixed(2) // D
-})
-
-watch(ipaItems[46].result.field[0], async x => { // E
-  ipaItems[46].result.field[1].value = mm2litre(x.value)// F
-})
 
 watchEffect(async () => {
-  dcsDiff = (ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value).toFixed(2)
-  tankDiff = (ipaItems[46].result.field[1].value - ipaItems[7].result.field[1].value).toFixed(2)
+  ipaItems[6].result.field[1].value = currencyFormat(ipaItems[6].result.field[0].value / (0.78)); // B
+  ipaItems[7].result.field[1].value = currencyFormat((ipaItems[7].result.field[0].value * 5.32) + 740.45); // D
+  ipaItems[46].result.field[1].value = currencyFormat(mm2litre(ipaItems[46].result.field[0].value)); // F
+
+
   ipaItems[8].result.field[0].value = (parseFloat(ipaItems[6].result.field[1].value) + parseFloat(ipaItems[7].result.field[1].value)).toFixed(2)
   ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - parseFloat(ipaItems[46].result.field[1].value)).toFixed(2)
   ipaItems[49].result.field[1].value = (parseFloat(ipaItems[49].result.field[0].value) * 0.78).toFixed(2)
+
+  dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value));
+  dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value));
+  dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
+  tankAfter.value = ipaItems[46].result.field[1].value;
+  tankBefore.value = ipaItems[7].result.field[1].value;
+  tankDiff.value = currencyFormat(parseFloat(ipaItems[46].result.field[1].value) - parseFloat(ipaItems[7].result.field[1].value))
 })
+
+function currencyFormat(number) {
+  var responseText = new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(number);
+  return responseText;
+}
 
 
 function mm2litre(mm) {
   let litre = mm * 5.32 + 740.45
-  
+
   return litre.toFixed(2)
 }
 
@@ -234,10 +246,7 @@ function formatDate(dateString) {
   <VRow class="ma-2">
     <VCol cols="4" />
     <VCol cols="4">
-      <div
-        style="font-size: 22px; font-weight: bolder;"
-        class="d-flex justify-center align-center"
-      >
+      <div style="font-size: 22px; font-weight: bolder;" class="d-flex justify-center align-center">
         Lorry Loading Check List
       </div>
     </VCol>
@@ -253,10 +262,7 @@ function formatDate(dateString) {
     </VCol>
     <VCol cols="4" />
     <VCol cols="4">
-      <div
-        style="font-size: 22px; font-weight: bolder;"
-        class="d-flex justify-center align-center"
-      >
+      <div style="font-size: 22px; font-weight: bolder;" class="d-flex justify-center align-center">
         ISOPRO (IPA)
       </div>
     </VCol>
@@ -265,168 +271,84 @@ function formatDate(dateString) {
 
   <VRow>
     <!-- Lorry Form -->
-    <VCol
-      cols="12"
-      style="overflow-x: auto;"
-    >
+    <VCol cols="12" style="overflow-x: auto;">
       <table class="custom-table">
         <thead>
           <tr>
-            <th
-              class="text-center"
-              style="font-size: 16px;"
-              colspan="2"
-            >
+            <th class="text-center" style="font-size: 16px;" colspan="2">
               Job Flow
             </th>
-            <th
-              class="text-center"
-              style="font-size: 16px;"
-              colspan="3"
-            >
+            <th class="text-center" style="font-size: 16px;" colspan="3">
               Manual works
             </th>
-            <th
-              class="text-center"
-              style="font-size: 16px;"
-              colspan="3"
-            >
+            <th class="text-center" style="font-size: 16px;" colspan="3">
               Condition
             </th>
-            <th
-              class="text-center"
-              style="font-size: 16px;"
-              colspan="4"
-            >
+            <th class="text-center" style="font-size: 16px;" colspan="4">
               Result
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(section, sectionIndex) in ipaItems"
-            :key="sectionIndex"
-            :sectionIndex="sectionIndex"
-          >
-            <td
-              v-if="section.isSection === true"
+          <tr v-for="(section, sectionIndex) in ipaItems" :key="sectionIndex" :sectionIndex="sectionIndex">
+            <td v-if="section.isSection === true"
               style="border-top: 1px solid black; border-left: 1px solid black; text-align: center; vertical-align: middle;"
-              :rowspan="[section.rowSpan]"
-              colspan="2"
-            >
+              :rowspan="[section.rowSpan]" colspan="2">
               <div v-html="section.sequence" />
             </td>
-            <td
-              colspan="3"
-              style="max-width: 400px; border-left: 1px solid black; text-align: start;"
-            >
+            <td colspan="3" style="max-width: 400px; border-left: 1px solid black; text-align: start;">
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
                 {{ section.practice }}
               </VLabel>
             </td>
-            <td
-              colspan="3"
-              style="max-width: 350px; border-left: 1px solid black; text-align: start;"
-            >
+            <td colspan="3" style="max-width: 350px; border-left: 1px solid black; text-align: start;">
               <VLabel class="d-flex justify-center pa-md-2">
-                {{ section.condition }} 
+                {{ section.condition }}
               </VLabel>
             </td>
-            <td
-              colspan="4"
-              style="min-width: 450px; border-left: 1px solid black;"
-            >
+            <td colspan="4" style="min-width: 450px; border-left: 1px solid black;">
               <div v-if="section.result.type === 'oknot'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
-                <VRadioGroup
-                  v-model="section.result.field[0].value"
-                  inline
-                  class="d-flex justify-center"
-                  :fieldname="section.result.field[0].name"
-                >
-                  <VRadio
-                    label="Ok"
-                    value="1"
-                  />
-                  <VRadio
-                    label="Not"
-                    value="0"
-                  />
+                <VRadioGroup v-model="section.result.field[0].value" inline class="d-flex justify-center"
+                  :fieldname="section.result.field[0].name">
+                  <VRadio label="Ok" value="1" />
+                  <VRadio label="Not" value="0" />
                 </VRadioGroup>
               </div>
               <div v-if="section.result.type === 'ab'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="(A)"
-                      text-end="Kg."
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="solo"
+                      text-start="(A)" text-end="Kg." />
                   </VCol>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="Litre"
-                      text-end="(B)"
-                      readonly="true"
-                    />
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
+                      text-start="(B)" text-end="Litre" readonly="true" />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'cd'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(C)"
-                      text-end="mm."
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="(C)" text-end="mm." />
                   </VCol>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="(D)"
-                      text-end="mm."
-                      readonly="true"
-                    />
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
+                      text-start="(D)" text-end="mm." readonly="true" />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'bd'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="solo"
-                      text-start=" (B) + (D) ="
-                      text-end="Litre"
-                      readonly="true"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="solo"
+                      text-start=" (B) + (D) =" text-end="Litre" readonly="true" />
                   </VCol>
                   <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -434,30 +356,13 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'litre'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Litre"
-                      readonly="true"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Litre" />
                   </VCol>
                   <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -465,30 +370,13 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'percen'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="%"
-                      readonly="true"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="%" />
                   </VCol>
                   <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -496,29 +384,13 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'c'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="C°"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="C°" />
                   </VCol>
                   <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -526,52 +398,28 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                    />
+                    <!-- <VNumberInput v-model="section.result.field[0]" density="compact" variant="outlined" label=""
+                      type="number" /> -->
+                    <VNumberInput v-model="section.result.field[0].value" density="compact" variant="outlined" />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                    />
+                    <VNumberInput v-model="section.result.field[1].value" density="compact" variant="outlined" />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'mpa'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="( Mpa )'"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="(Mpa)" />
                   </VCol>
                   <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -579,30 +427,14 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'amp'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Amp'"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Amp" />
                   </VCol>
 
                   <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
+                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
+                      <VRadio label="Ok" value="1" />
+                      <VRadio label="Not" value="0" />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -610,63 +442,32 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'ef'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(E)"
-                      text-end="mm.'"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="(E)" text-end="mm." />
                   </VCol>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(F)"
-                      text-end="Litre'"
-                    />
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                      label="" text-start="(F)" text-end="Litre" readonly="true" />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'g'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(G)"
-                      text-end="Litre'"
-                      type="number"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="(G)" text-end="Litre" />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'litrekg'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Litre'"
-                    />
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Litre" readonly="true" />
                   </VCol>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Kg.'"
-                    >
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Kg." readonly="true">
                       <template #append>
                         <VLabel>
                           Kg.
@@ -679,14 +480,8 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'kg'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Kg.'"
-                    >
+                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Kg.">
                     </VCurrencyField>
                   </VCol>
                 </VRow>
@@ -777,16 +572,10 @@ function formatDate(dateString) {
         <thead>
           <tr>
             <th />
-            <th
-              class="text-center"
-              style="font-size: 16px;"
-            >
+            <th class="text-center" style="font-size: 16px;">
               DSC
             </th>
-            <th
-              class="text-center"
-              style="font-size: 16px;"
-            >
+            <th class="text-center" style="font-size: 16px;">
               TANK
             </th>
             <th />
@@ -798,10 +587,10 @@ function formatDate(dateString) {
               After
             </td>
             <td class="py-4 text-center">
-              {{ gVariable.value }}
+              {{ dcsAfter }}
             </td>
             <td class="py-4 text-center">
-              {{ fVariable.value }}
+              {{ tankAfter }}
             </td>
             <td style="font-size: 16px;">
               Ltr
@@ -812,7 +601,7 @@ function formatDate(dateString) {
               Before
             </td>
             <td class="py-4 text-center">
-              {{ dcsBefore.value }}
+              {{ dcsBefore }}
             </td>
             <td class="py-4 text-center">
               {{ dVariable.value }}
@@ -855,28 +644,17 @@ function formatDate(dateString) {
                 <div class="text-subtitle-2">
                   Default
                 </div>
-                <VImg
-                  :aspect-ratio="1"
-                  class="bg-white"
-                  :src="image01"
-                  width="500"
-                />
+                <VImg :aspect-ratio="1" class="bg-white" :src="image01" width="500" />
               </div>
             </div>
           </tr>
         </tbody>
       </table>
     </VCol>
-    <VCol
-      cols="12"
-      lg="12"
-    >
+    <VCol cols="12" lg="12">
       <table class="custom-table">
         <tr>
-          <th
-            class="text-center cursor-pointer"
-            colspan="12"
-          >
+          <th class="text-center cursor-pointer" colspan="12">
             Lorry Loading Check List
           </th>
         </tr>
@@ -892,26 +670,17 @@ function formatDate(dateString) {
           </td>
         </tr>
         <tr>
-          <td
-            style="min-width: 150px;"
-            colspan="4"
-          >
+          <td style="min-width: 150px;" colspan="4">
             <div v-if="ipaRequestData.whStaffUpdatedDate">
               <span v-if="ipaRequestData.whStaffUpdatedDate">{{ formatDate(ipaRequestData.whStaffUpdatedDate) }}</span>
             </div>
           </td>
-          <td
-            style="min-width: 150px;"
-            colspan="4"
-          >
+          <td style="min-width: 150px;" colspan="4">
             <div v-if="ipaRequestData.whLeaderDate">
               <span v-if="ipaRequestData.whLeaderDate">{{ formatDate(ipaRequestData.whLeaderDate) }}</span>
             </div>
           </td>
-          <td
-            style="min-width: 150px;"
-            colspan="4"
-          >
+          <td style="min-width: 150px;" colspan="4">
             <div v-if="ipaRequestData.whSupervisorDate">
               <span v-if="ipaRequestData.whSupervisorDate">{{ formatDate(ipaRequestData.whSupervisorDate) }}</span>
             </div>
@@ -924,35 +693,14 @@ function formatDate(dateString) {
   <VRow>
     <!-- Btn -->
     <VCol cols="4" />
-    <VCol
-      cols="8"
-      class="d-flex justify-end"
-    >
-      <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
-        type="text"
-        color="warning"
-        class="mx-1"
-        @click="saveDraft"
-      >
+    <VCol cols="8" class="d-flex justify-end">
+      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="warning" class="mx-1" @click="saveDraft">
         Draft
       </VBtn>
-      <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
-        type="text"
-        color="secondary "
-        class="mx-1"
-        @click="submit"
-      >
+      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="secondary " class="mx-1" @click="submit">
         Submit
       </VBtn>
-      <VBtn
-        v-if="(statusId === 18)"
-        type="text"
-        color="primary"
-        class="mx-1"
-        @click="approve"
-      >
+      <VBtn v-if="(statusId === 18)" type="text" color="primary" class="mx-1" @click="approve">
         Approve
       </VBtn>
     </VCol>
@@ -962,12 +710,8 @@ function formatDate(dateString) {
   <section>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->
-      <AuthenticatorDialog
-        :is-dialog-visible="isDialogVisibleAlertDialog"
-        :word="wordForSubmit"
-        :success="successDialAlert"
-        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
-      />
+      <AuthenticatorDialog :is-dialog-visible="isDialogVisibleAlertDialog" :word="wordForSubmit"
+        :success="successDialAlert" @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val" />
     </div>
   </section>
 </template>
@@ -989,7 +733,7 @@ function formatDate(dateString) {
   text-align: center;
 }
 
-.centered-input >>> input {
+.centered-input>>>input {
   padding: 0;
   block-size: 20px !important;
   text-align: center;

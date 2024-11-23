@@ -1,6 +1,5 @@
 <script setup>
-import { CurrencyDisplay, useCurrencyInput } from 'vue-currency-input'
-import { watch, watchEffect } from 'vue'
+import { CurrencyDisplay, useCurrencyInput } from 'vue-currency-input';
 
 const props = defineProps({
   textStart: {
@@ -17,7 +16,7 @@ const props = defineProps({
 const { inputRef, formattedValue, setValue } = useCurrencyInput({
   currency: 'THB',
   hideCurrencySymbolOnFocus: true,
-  hideGroupingSeparatorOnFocus: true,
+  hideGroupingSeparatorOnFocus: false,
   precision: 2,
   valueRange: { min: 0 },
   currencyDisplay: CurrencyDisplay.hidden,
@@ -28,12 +27,7 @@ const textStart = ref(props.textStart)
 </script>
 
 <template>
-  <VTextField
-    ref="inputRef"
-    v-model="formattedValue"
-    density="compact"
-    variant="solo"
-  >
+  <VTextField ref="inputRef" v-model="formattedValue" density="compact" variant="solo">
     <template #prepend>
       <VLabel>
         {{ textStart }}
