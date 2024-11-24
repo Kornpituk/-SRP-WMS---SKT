@@ -12,7 +12,6 @@ import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
-import VNumberInput from '@/components/VNumberInput.vue'
 import alertWordConst from '@/utilities/constant'
 
 
@@ -29,7 +28,8 @@ const poNo = ref('')
 const aVariable = ref(ipaItems[6].result.field[0])
 const bVariable = ref(ipaItems[6].result.field[1])
 const cVariable = ref(ipaItems[7].result.field[0])
-const dVariable = ref(ipaItems[7].result.field[1])
+const dVariable = ref(0)
+const fvariable = ref(0)
 
 var dcsAfter = ref(0)
 var dcsBefore = ref(0)
@@ -69,7 +69,9 @@ onMounted(async () => {
 
   const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  console.log("statusId", lorryFormIPAStatus.data)
+
+  statusId.value = lorryFormIPAStatus.data.data[0].statusId
 
 })
 
@@ -141,12 +143,10 @@ async function approve(e) {
 
 watchEffect(async () => {
   ipaItems[6].result.field[1].value = currencyFormat(ipaItems[6].result.field[0].value / (0.78)) // B
-  ipaItems[7].result.field[1].value = currencyFormat((ipaItems[7].result.field[0].value * 5.32) + 740.45) // D
-  ipaItems[46].result.field[1].value = currencyFormat(mm2litre(ipaItems[46].result.field[0].value)) // F
+  ipaItems[7].result.field[1].value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45) // D
+  ipaItems[46].result.field[1].value = currencyFormat(ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) // F
 
-  console.log("B", parseFloat(ipaItems[6].result.field[1].value))
-  console.log("D", parseFloat(ipaItems[7].result.field[1].value))
-  ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + ((ipaItems[7].result.field[0].value * 5.32) + 740.45))
+  ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
   ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - parseFloat(ipaItems[46].result.field[1].value)).toFixed(2)
   ipaItems[49].result.field[1].value = (parseFloat(ipaItems[49].result.field[0].value) * 0.78).toFixed(2)
 
@@ -155,7 +155,7 @@ watchEffect(async () => {
   dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
   tankAfter.value = ipaItems[46].result.field[1].value
   tankBefore.value = ipaItems[7].result.field[1].value
-  tankDiff.value = currencyFormat(parseFloat(ipaItems[46].result.field[1].value) - parseFloat(ipaItems[7].result.field[1].value))
+  tankDiff.value = currencyFormat((ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) - (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
 })
 </script>
 
@@ -453,24 +453,26 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <!--
-                      <VNumberInput v-model="section.result.field[0]" density="compact" variant="outlined" label=""
-                      type="number" /> 
-                    -->
-                    <VNumberInput
+                    <VCurrencyField
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end=""
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VCurrencyField
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end=""
                     />
                   </VCol>
                 </VRow>

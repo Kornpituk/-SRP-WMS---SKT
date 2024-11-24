@@ -615,7 +615,6 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108010101", // percen
-
         },
       ],
     },
