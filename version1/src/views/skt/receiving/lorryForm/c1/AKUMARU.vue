@@ -75,6 +75,12 @@ onMounted(async () => {
       // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
       f.value = passInitialData(i.result.type, lorryRequestData.value[f.name])
     }
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
+        f.value = passInitialData(i.practice.type, lorryRequestData.value[f.name])
+      }
+    }
   }
 
 
@@ -341,6 +347,56 @@ function formatDate(dateString) {
                   v-model="section.practice.field[0].value"
                   :label="section.practice.startPracticeText"
                 />
+              </div>
+              <div v-else-if="section.practice.type === 'checkbox3'">
+                <VRow>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[0].value"
+                      :label="section.practice.field[0].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[1].value"
+                      :label="section.practice.field[1].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[2].value"
+                      :label="section.practice.field[2].startPracticeText"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-else-if="section.practice.type === 'checkbox4'">
+                <VRow>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[0].value"
+                      :label="section.practice.field[0].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[1].value"
+                      :label="section.practice.field[1].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[2].value"
+                      :label="section.practice.field[2].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[3].value"
+                      :label="section.practice.field[3].startPracticeText"
+                    />
+                  </VCol>
+                </VRow>
               </div>
               <div v-else>
                 <VLabel class="d-flex justify-left pa-md-2 text-wrap">
@@ -709,7 +765,7 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="Kg.'"
+                      text-end="Kg."
                     />
                   </VCol>
                 </VRow>
@@ -904,26 +960,23 @@ function formatDate(dateString) {
     <!-- Precautions -->
     <VCol cols="12">
       <table class="custom-table">
-        <thead>
-          <tr>
-            <th style="font-size: 16px;">
+        <tr>
+          <td class="tr-border-right-0">
+            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
               ข้อควรระวัง
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-              <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน
-              <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
-            </th>
-            <!--
-              <th style="font-size: 16px;" colspan="3">
-              : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-              </th> 
-            -->
-          </tr>
-        </thead>
+            </VLabel>
+          </td>
+          <td class="tr-border-left-0">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            <br>
+            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
+          </td>
+          <!--
+            <th style="font-size: 16px;" colspan="3">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            </th> 
+          -->
+        </tr>
       </table>
     </VCol>
     <!-- Flow Chat -->
@@ -1160,5 +1213,15 @@ function formatDate(dateString) {
 .v-selection-control__wrapper {
   block-size: 50% !important;
   inline-size: 50% !important;
+}
+
+.tr-border-right-0 {
+  font-size: 16px;
+  border-right: 0px !important;
+}
+
+.tr-border-left-0 {
+  font-size: 16px;
+  border-left: 0px !important;
 }
 </style>
