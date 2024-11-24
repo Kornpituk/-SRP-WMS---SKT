@@ -211,3 +211,33 @@ export const useGetBatchProductionPlanService = () => {
     fetchGetBatchProductionplan,
   }
 }
+
+export const useSaveProductionPlanService = () => {
+  const responseSaveProductionPlan = ref(null)
+  const errorMessageSaveProductionPlan = ref(null)
+  
+  const saveProdutcionPlanFunc = async (formData, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageSaveProductionPlan.value = null
+      console.log('Save Produtcion Plan Func...')
+  
+      const result = await productionPlanRepository.saveProductionPlan(formData, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Save Produtcion Plan Func result:', result)
+        responseSaveProductionPlan.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in saveProdutcionPlanFunc:', error)
+      errorMessageSaveProductionPlan.value = error.message
+    }
+  }
+  
+  return {
+    responseSaveProductionPlan,
+    errorMessageSaveProductionPlan,
+    saveProdutcionPlanFunc,
+  }
+}

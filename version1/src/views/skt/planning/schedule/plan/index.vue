@@ -100,6 +100,7 @@ import { useGetProductionPlanService,
   useGetBatchProductionPlanService, 
   useDeleteProductionPlanService,
   useGetProductionPlanMasterService,
+  useSaveProductionPlanService,
 } from '@/services/skt/productionPlan/services'
 
 const countItemProduction = ref(1)
@@ -375,7 +376,30 @@ watchEffect(async () => {
 const btnSelectitem1 = ref(true)
 const btnSelectitem2 = ref(false)
 
-//--------------------------------------------- item 1
+//--------------------------------------------- item 1 && item 2 
+
+const dataPlanningForSave = ref([
+  {
+    planningID: "",
+    inputDate: "",
+    productionCode: "",
+
+    product1SelectedCode: "",
+    product1SelectedPackagingCode: "",
+    product1PackingQtyKgs: 10,
+    product1UomCount: 2,
+
+    product2SelectedCode: "",
+    product2SelectedPackagingCode: "",
+    product2PackingQtyKgs: 20,
+    product2UomCount: 3,
+
+    lotNumber: "",
+    producingDate: "",
+    remark: "",
+  },
+])
+
 
 const selectedItemCodeForPlan = ref([])
 const selectedPackagingTypeForPlan = ref([])
@@ -419,22 +443,13 @@ const selectPackagingTypeSwitch = computed(() => {
 
 // ฟังก์ชันสำหรับเลือก plan
 const selectPlan = plan => {
-  selectProductionCodeSwitch.value = plan.productionCode
   selectedItemCodeForPlan.value = plan.itemCode // อัปเดต itemCode
   selectedPackagingTypeForPlan.value = plan.packagingtype // อัปเดต packagingtype
+  selectedProductionCode.value = plan.productionCode
+  selectedPackagingType2.value = plan.itemCode
+  selectedProductionCode2.value = plan.itemCode
 
-  if(btnSelectitem1.value){
-    selectedProductionCode.value = plan.productionCode
-    selectedItemCode.value = plan.itemCode
-    selectedPackagingType.value = plan.itemCode
-    console.log("selectedProductionCode", selectedProductionCode.value)
-  }
-  if(btnSelectitem2.value){
-    selectedItemCode2.value = plan.productionCode
-    selectedPackagingType2.value = plan.itemCode
-    selectedProductionCode2.value = plan.itemCode
-    console.log("selectedItemCode2", selectedItemCode2.value)
-  }
+  console.log("selectedProductionCode", selectedProductionCode.value)
 }
 
 const selectItemCode = plan => {
@@ -458,6 +473,29 @@ const selectPackaging = plan => {
     console.log("selectedProductionCode2", selectedPackagingType2.value)
   }
 }
+
+// const dataPlanningForSave = ref([
+//   {
+//     planningID: "",
+//     inputDate: "",
+//     productionCode: "",
+
+//     product1SelectedCode: "",
+//     product1SelectedPackagingCode: "",
+//     product1PackingQtyKgs: 10,
+//     product1UomCount: 2,
+
+//     product2SelectedCode: "",
+//     product2SelectedPackagingCode: "",
+//     product2PackingQtyKgs: 20,
+//     product2UomCount: 3,
+
+//     lotNumber: "",
+//     producingDate: "",
+//     remark: "",
+//   },
+// ])
+
 
 //------------------------------ func get production plan service --------------------------------
 const { getProductionplanResult, errorMessageGetProductionPlan, fetchGetProductionplan } = useGetProductionPlanService()
@@ -493,6 +531,35 @@ watchEffect(async () => {
     console.error("Error fetching production plan:", error)
   }
 })
+
+//------------------------------ func Save add data production plan service --------------------------------
+const confirmFilterSelectProduction = () => {
+  dataPlanningForSave.value.productionCode = selectedProductionCode.value
+
+  dataPlanningForSave.value.product1SelectedCode = selectedItemCode.value
+  dataPlanningForSave.value.product1SelectedPackagingCode = selectedPackagingType.value
+  dataPlanningForSave.value.product2SelectedCode = selectedItemCode2.value
+  dataPlanningForSave.value.product2SelectedPackagingCode = selectedPackagingType2.value
+}
+
+//------------------------------ func save production plan service --------------------------------
+const { responseSaveProductionPlan, errorMessageSaveProductionPlan, saveProdutcionPlanFunc } = useSaveProductionPlanService()
+
+const saveProductionPlan = async () => {
+  try {
+    // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    await saveProdutcionPlanFunc(getProductionplanResult.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+
+    // อัปเดต productionPlan.value หลังจากได้ผลลัพธ์
+    productionPlan.value = (getProductionplanResult.value.data)
+
+    // แสดงค่าใน console
+    console.log("productionPlan", productionPlan.value)
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+    console.error("Error fetching production plan:", error)
+  }
+}
 
 //--- func new plan service --------------------------------
 
@@ -1231,9 +1298,12 @@ const print = () => {
               cols="12"
               class="mb-4"
             >
-              <div>
+              <div class="d-flex justify-center">
+                <h4>Production</h4>
+              </div>
+              <div class="d-flex justify-center">
                 <VTextField
-                  v-model="search"
+                  v-model="searchForMasterDataPlan"
                   label="Search"
                   prepend-inner-icon="mdi-magnify"
                   variant="outlined"
@@ -1251,35 +1321,99 @@ const print = () => {
               >
                 <template #item="{ item }">
                   <tr>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.productionCode === selectedProductionCode && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.productionCode === selectedProductionCode && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.productionCode }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.productionCode === selectedProductionCode && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.productionCode === selectedProductionCode && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.productionName }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.productionCode === selectedProductionCode && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.productionCode === selectedProductionCode && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.plantName }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.productionCode === selectedProductionCode && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.productionCode === selectedProductionCode && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.reactorName }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.productionCode === selectedProductionCode && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.productionCode === selectedProductionCode && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.batchScaleKgs }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.productionCode === selectedProductionCode && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.productionCode === selectedProductionCode && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.durationDays }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.productionCode === selectedProductionCode && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.productionCode === selectedProductionCode && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <VBtn
-                        v-if="item.raw.productionCode === selectProductionCodeSwitch"
+                        v-if="item.raw.productionCode === selectedProductionCode"
                         color="info"
                         variant="tonal"
+                        
                         @click="selectPlan(item.raw, index)"
                       >
                         Select
                       </VBtn>
                       <VBtn
-                        v-if="item.raw.productionCode !== selectProductionCodeSwitch"
+                        v-if="item.raw.productionCode !== selectedProductionCode"
                         color="info"
                         variant="flat"
                         @click="selectPlan(item.raw, index)"
@@ -1297,9 +1431,10 @@ const print = () => {
               style="border: 1px solid grey; border-radius: 20px;"
               cols="6"
             >
-              <div>
+              <div class="d-flex justify-center">
                 <VTextField
-                  v-model="search"
+                  v-if="false"
+                  v-model="searchForMasterDataPlan"
                   label="Search"
                   prepend-inner-icon="mdi-magnify"
                   variant="outlined"
@@ -1307,26 +1442,53 @@ const print = () => {
                   hide-details
                   single-line
                 />
-                {{ selectProductionCodeSwitch.length }}
+                <h5>Item</h5>
               </div>
               <VDataTable
-                v-if="selectProductionCodeSwitch.length > 0"
+                v-if="selectedProductionCode.length > 0"
                 :headers="itemCodeDataTable"
                 :items="dataMasterForSelectFilter.find(
-                  (data) => data.productionCode === selectProductionCodeSwitch
+                  (data) => data.productionCode === selectedProductionCode
                 ).products"
                 :items-per-page="5"
                 class="text-no-wrap"
               >
                 <template #item="{ item }">
                   <tr>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.itemCode }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.itemName }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <VBtn
                         v-if="item.raw.itemCode === selectItemCodeSwitch"
                         color="info"
@@ -1354,9 +1516,10 @@ const print = () => {
               style="border: 1px solid grey; border-radius: 20px;"
               cols="6"
             >
-              <div>
+              <div class="d-flex justify-center">
                 <VTextField
-                  v-model="search"
+                  v-if="false"
+                  v-model="searchForMasterDataPlan"
                   label="Search"
                   prepend-inner-icon="mdi-magnify"
                   variant="outlined"
@@ -1364,12 +1527,13 @@ const print = () => {
                   hide-details
                   single-line
                 />
+                <h5>Packaging</h5>
               </div>
               <VDataTable
-                v-if="selectProductionCodeSwitch.length > 0"
+                v-if="selectedProductionCode.length > 0"
                 :headers="packagingKgsDataTable"
                 :items="dataMasterForSelectFilter.find(
-                  (data) => data.productionCode === selectProductionCodeSwitch
+                  (data) => data.productionCode === selectedProductionCode
                 ).packagings"
                 :items-per-page="5"
                 class="text-no-wrap"
@@ -1380,16 +1544,52 @@ const print = () => {
 
                 <template #item="{ item }">
                   <tr>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.itemCode }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.itemName }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <span style="font-size: 12px;">{{ item.raw.packingQtyKgs }}</span>
                     </td>
-                    <td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
                       <VBtn
                         v-if="item.raw.itemCode === selectPackagingTypeSwitch"
                         color="info"
@@ -1429,7 +1629,7 @@ const print = () => {
         <VBtn
           class="mx-2"
           color="warning"
-          @click="viewAllData"
+          @click="saveProductionPlan"
         >
           <span style="font-size: 12px;">Save Draft</span>
         </VBtn>
@@ -1504,6 +1704,7 @@ const print = () => {
   <section>
     <!-- VData table -->
     <VCard>
+      <VCardText><span style="font-weight: bolder;">BatchID: </span>{{ batchId }}</VCardText>
       <VCardText>
         <VDataTable
           v-if="productionPlan"

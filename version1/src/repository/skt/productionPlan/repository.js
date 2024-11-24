@@ -195,16 +195,12 @@ export const productionPlanRepository = {
     }
   },
 
-  async saveProductionPlan(formData, batchId, urlApi, form, whereHouse, accessToken) {
+  async saveProductionPlan(formData, urlApi, form, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/ProductionPlan/save`, formData, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/save`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,
           'Authorization': `Bearer ${accessToken}`,
-        },
-        params: {
-          BatchID: batchId,
         },
       })
   
