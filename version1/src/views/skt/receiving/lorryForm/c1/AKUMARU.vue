@@ -22,15 +22,15 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(lorryItem[6].result.field[0])
-const bVariable = ref(lorryItem[6].result.field[1])
-const cVariable = ref(lorryItem[7].result.field[0])
-const dVariable = ref(lorryItem[7].result.field[1])
-const bdVariable = ref(lorryItem[8].result.field[0])
-const dcsBefore = ref(lorryItem[9].result.field[0])
-const eVariable = ref(lorryItem[46].result.field[0])
-const fVariable = ref(lorryItem[46].result.field[1])
-const gVariable = ref(lorryItem[47].result.field[0])
+const aVariable = ref('')
+const bVariable = ref('')
+const cVariable = ref('')
+const dVariable = ref('')
+const bdVariable = ref('')
+const dcsBefore = ref('')
+const eVariable = ref('')
+const fVariable = ref('')
+const gVariable = ref('')
 var dcsDiff = 0
 var tankDiff = 0
 
@@ -472,13 +472,37 @@ function formatDate(dateString) {
                   </VCol>
                 </VRow>
               </div>
+              <div v-if="section.result.type === 'mpa2'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="( Mpa )" />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'amp2'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="Amp" />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'c2'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
+                      label="" text-start="" text-end="C°" />
+                  </VCol>
+                </VRow>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
     </VCol>
     <!-- Calculation formula -->
-    <VCol cols="12">
+    <!-- <VCol cols="12">
       <div style="border: 1px solid black;">
         <VRow>
           <VCol>
@@ -551,9 +575,9 @@ function formatDate(dateString) {
           </VCol>
         </VRow>
       </div>
-    </VCol>
+    </VCol> -->
     <!-- Dcs Tank -->
-    <VCol cols="12">
+    <!-- <VCol cols="12">
       <table class="custom-table">
         <thead>
           <tr>
@@ -611,6 +635,28 @@ function formatDate(dateString) {
             </td>
           </tr>
         </tbody>
+      </table>
+    </VCol> -->
+    <!-- Precautions -->
+    <VCol cols="12">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th style="font-size: 16px;">
+              ข้อควรระวัง &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+              <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน
+              <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
+            </th>
+            <!-- <th style="font-size: 16px;" colspan="3">
+              : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            </th> -->
+          </tr>
+        </thead>
       </table>
     </VCol>
     <!-- Flow Chat -->
