@@ -474,29 +474,6 @@ const selectPackaging = plan => {
   }
 }
 
-// const dataPlanningForSave = ref([
-//   {
-//     planningID: "",
-//     inputDate: "",
-//     productionCode: "",
-
-//     product1SelectedCode: "",
-//     product1SelectedPackagingCode: "",
-//     product1PackingQtyKgs: 10,
-//     product1UomCount: 2,
-
-//     product2SelectedCode: "",
-//     product2SelectedPackagingCode: "",
-//     product2PackingQtyKgs: 20,
-//     product2UomCount: 3,
-
-//     lotNumber: "",
-//     producingDate: "",
-//     remark: "",
-//   },
-// ])
-
-
 //------------------------------ func get production plan service --------------------------------
 const { getProductionplanResult, errorMessageGetProductionPlan, fetchGetProductionplan } = useGetProductionPlanService()
 
@@ -1695,7 +1672,7 @@ const print = () => {
   >
     <VCard>
       <VCardText class="pa-2">
-        <VBtn @click="addBatch = true">
+        <VBtn @click="addEmptyRowToPlan">
           <span style="font-size: 12px;">New Plan</span>
         </VBtn>
         <VBtn
@@ -1716,6 +1693,7 @@ const print = () => {
           <span style="font-size: 12px;">Approve</span>
         </VBtn>
         <VBtn
+          v-if="false"
           color="info"
           class="mx-2"
           @click="addEmptyRowToPlan"

@@ -32,13 +32,22 @@ import { useFormatDateUtilities } from '@/utilities/utilities'
 const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
 
 const filterForSearchBatchProductionPlan = ref({
-  StatusID: '',
+  StatusID: null,
   ProductionTextSearch: "",
   ItemTextSearch: "",
   ProducingDateFrom: "",
   ProducingDateTo: "",
   LotTextSearch: "",
 })
+
+const clearModelFolter = () => {
+  filterForSearchBatchProductionPlan.value.StatusID = null,
+  filterForSearchBatchProductionPlan.value.ProductionTextSearch = "",
+  filterForSearchBatchProductionPlan.value.ItemTextSearch = "",
+  filterForSearchBatchProductionPlan.value.ProducingDateFrom = "",
+  filterForSearchBatchProductionPlan.value.ProducingDateTo = "",
+  filterForSearchBatchProductionPlan.value.LotTextSearch = ""
+}
 
 const searchResult = ref([]) // ตัวแปรสำหรับเก็บผลลัพธ์
 
@@ -169,12 +178,37 @@ const rules = [v => v.length <= 150 || 'Max 25 characters']
 
 //---------------------------------
 
-const items = [
-  'Programming',
-  'Design',
-  'Vue',
-  'Vuetify',
+const itemsStatus = [
+  { name: "All", id: null },
+  { name: "Draft PROD plan", id: 101 },
+  { name: "Waiting for PROD APVL", id: 102 },
+  { name: "Waiting for Mat. Picking", id: 103 },
+  { name: "In Producing", id: 105 },
+  { name: "Waiting for FG/PROD APVL", id: 107 },
+  { name: "PROD Completed", id: 108 },
+  { name: "Plan Rejected", id: 109 },
 ]
+
+const colorStatusWithId = id => {
+  switch (id) {
+  case 101:
+    return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan' }
+  case 102:
+    return { color: 'green', message: 'green', text: 'Waiting for PROD APVL' }
+  case 103:
+    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking' }
+  case 105:
+    return { color: 'purple', message: 'purple', text: 'In Producing' }
+  case 107:
+    return { color: 'brown', message: 'brown', text: 'Waiting for FG/PROD APVL' }
+  case 108:
+    return { color: 'green', message: 'green', text: 'PROD Completed' }
+  case 109:
+    return { color: 'red', message: 'red', text: 'Plan Rejected' }
+  default:
+    return { color: 'grey', message: 'grey', text: 'All' }
+  }
+}
 
 ///------------------------------------------------------------------------------
 const panel = ref(['filter'])
@@ -535,13 +569,31 @@ const newBatch = async batchID => {
                   class="py-1"
                 >
                   <VAutocomplete
-                    label="Status"
-                    :items="items"
+                    v-model="filterForSearchBatchProductionPlan.StatusID"
+                    :items="itemsStatus"
+                    item-title="name"
+                    item-value="id"
                     density="compact"
-                    placeholder="Select State"
                   >
                     <template #label>
-                      <span style="font-size: 12px;">Status</span>
+                      <span
+                        class="d-flex align-center"
+                        style="font-size: 12px;"
+                      >
+                        Select Status
+                      </span>
+                    </template>
+
+                    <template #selection="{ item }">
+                      <VChip
+                        variant="elevated"
+                        :style="{ color: colorStatusWithId(item.raw.id).message }"
+                        size="x-small"
+                        style="min-height: 20px;"
+                        :color="colorStatusWithId(item.raw.id).color"
+                      >
+                        <span class="text-white">{{ colorStatusWithId(item.raw.id).text }}</span>
+                      </VChip>
                     </template>
                   </VAutocomplete>
                 </VCol>
@@ -553,7 +605,7 @@ const newBatch = async batchID => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
+                    v-model="filterForSearchBatchProductionPlan.ProductionTextSearch"
                     type="Product Name"
                     density="compact"
                   >
@@ -571,7 +623,7 @@ const newBatch = async batchID => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
+                    v-model="filterForSearchBatchProductionPlan.ItemTextSearch"
                     type="Product Name"
                     density="compact"
                   >
@@ -589,7 +641,7 @@ const newBatch = async batchID => {
                   class="py-1"
                 >
                   <AppDateTimePicker
-                    v-model="date"
+                    v-model="filterForSearchBatchProductionPlan.ProducingDateFrom"
                     label="Producing Date"
                     placeholder="Select date"
                     density="compact"
@@ -605,8 +657,7 @@ const newBatch = async batchID => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
-                    type="Product Name"
+                    v-model="filterForSearchBatchProductionPlan.LotTextSearch"
                     density="compact"
                   >
                     <template #label>
@@ -641,7 +692,7 @@ const newBatch = async batchID => {
                         height="100%"
                         width="100%"
                         density="compact"
-                        @click="clearModel"
+                        @click="clearModelFolter"
                       >
                         <span style="font-size: 12px;">{{ $t('Clear') }}</span>
                       </VBtn>
@@ -1069,7 +1120,10 @@ const newBatch = async batchID => {
                 class="text-start"
               >
                 <span>
-                  <VChip color="success">{{ item.raw.statusId }}</VChip>
+                  <VChip
+                    :color="colorStatusWithId(item.raw.statusId).color"
+                    :style="{ color: colorStatusWithId(item.raw.statusId).color }"
+                  >{{ item.raw.statusId }}</VChip>
                 </span>
               </td>
               <td>{{ item.raw.no }}</td>
@@ -1143,20 +1197,7 @@ const newBatch = async batchID => {
                 {{ item.raw.finishedDate }}
               </td>
               <td>
-                <VTextarea
-                  v-model="item.raw.remark"
-                  style="min-width: 200px;"
-                  class="pa-2"
-                  label="Remark"
-                  :rules="rules"
-                  rows="2"
-                  clearable
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Remark</span>
-                  </template>
-                </VTextarea>
+                {{ item.raw.remark }}
               </td>
               <td>
                 {{ useFormatDateUtilities(item.raw.updatedDate) }}
@@ -1166,7 +1207,7 @@ const newBatch = async batchID => {
               </td>
               <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'">
                 <div class="d-flex justify-center">
-                  <VMenu transition="scale-transition">
+                  <VMenu v-if="false" transition="scale-transition">
                     <template #activator="{ props }">
                       <VIcon
                         v-bind="props"
