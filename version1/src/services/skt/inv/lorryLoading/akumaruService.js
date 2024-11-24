@@ -52,6 +52,38 @@ export const akumaruRequestData = {
   "l0707080101": "-1",
   "l0707090101": "-1",
   "l0707100101": "-1",
+  "l070102": "0",
+  "l070401": "0",
+  "l070405": "0",
+  "l070501": "0",
+  "l070502": "0",
+  "l070503": "0",
+  "l070504": "0",
+  "l070505": "0",
+  "l070506": "0",
+  "l070507": "0",
+  "l070508": "0",
+  "l070509": "0",
+  "l070510": "0",
+  "l070511": "0",
+  "l070512": "0",
+  "l070513": "0",
+  "l070604": "0",
+  "l070605": "0",
+  "l070606": "0",
+  "l070607": "0",
+  "l070608": "0",
+  "l070609": "0",
+  "l070701": "0",
+  "l070702": "0",
+  "l070703": "0",
+  "l070704": "0",
+  "l070705": "0",
+  "l070706": "0",
+  "l070707": "0",
+  "l070708": "0",
+  "l070709": "0",
+  "l070710": "0",
 }
 
 export const akumuruItemTemplate = [
@@ -75,7 +107,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "( B ) จำนวนที่คิดได้จาก Level ก่อนรับ          .…………..………….…mm.",
+    "practice": {
+      "startPracticeText": "( B ) จำนวนที่คิดได้จาก Level ก่อนรับ ",
+      "endPracticeText": "mm.",
+      "type": "d",
+      "field": [
+        {
+          "name": "l070102",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ต้องไม่เกิน 1,100 mm.",
     "result": {
       "type": "kg",
@@ -184,7 +226,35 @@ export const akumuruItemTemplate = [
     "isSection": true,
     "rowSpan": 2,
     "sequence": "<strong>4.อุปกรณ์ PPE </strong>",
-    "practice": "   O  ถุงมือ O ชุดป้องกันสารเคมี  O กระบังหน้า O รองเท้าบูท",
+    "practice": {
+      "type": "checkbox4",
+      "field": [
+        {
+          "startPracticeText": "ถุงมือ",
+          "endPracticeText": "",
+          "name": "L070401",
+          "value:": "",
+        },
+        {
+          "startPracticeText": "ชุดป้องกันสารเคมี",
+          "endPracticeText": "",
+          "name": "L070402",
+          "value:": "",
+        },
+        {
+          "startPracticeText": "กระบังหน้า",
+          "endPracticeText": "",
+          "name": "L070403",
+          "value:": "",
+        },
+        {
+          "startPracticeText": "รองเท้าบูท",
+          "endPracticeText": "",
+          "name": "L070404",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "",
     "result": {
       "type": "",
@@ -194,7 +264,29 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "   O แว่นตา    O หน้ากาก กรองอากาศสีเหลือง O เข็มขัดนิรภัย",
+    "practice": {
+      "type": "checkbox3",
+      "field": [
+        {
+          "startPracticeText": "แว่นตา",
+          "endPracticeText": "",
+          "name": "L070405",
+          "value:": "",
+        },
+        {
+          "startPracticeText": "หน้ากาก กรองอากาศสีเหลือง",
+          "endPracticeText": "",
+          "name": "L070406",
+          "value:": "",
+        },
+        {
+          "startPracticeText": "เข็มขัดนิรภัย",
+          "endPracticeText": "",
+          "name": "L070407",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "",
     "result": {
       "type": "",
@@ -208,12 +300,12 @@ export const akumuruItemTemplate = [
     "rowSpan": 13,
     "sequence": "<strong>5. ขั้นตอนการปฏิบัติ</strong>",
     "practice": {
-      "startPracticeText": " หยุดรถบริเวณที่ปฏิบัติงาน และดับเครื่องยนต์",
+      "startPracticeText": "หยุดรถบริเวณที่ปฏิบัติงาน และดับเครื่องยนต์",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l0707060101",
+          "name": "l070501",
           "value:": "",
         },
       ],
@@ -232,7 +324,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  ใส่หมอนลองห้ามล้อเคลื่อนทั้งด้านหน้า - หลัง",
+    "practice": {
+      "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อนทั้งด้านหน้า - หลัง",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070502",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ใส่แล้ว",
     "result": {
       "type": "oknot",
@@ -247,7 +349,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  ต่อสายกราวน์เข้ากับตัวรถ",
+    "practice": {
+      "startPracticeText": "ต่อสายกราวน์เข้ากับตัวรถ",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070503",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ต่อแล้ว",
     "result": {
       "type": "oknot",
@@ -262,7 +374,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  ต่อ Line Vent เข้ากับ Vent บนรถ พร้อมเปิด Vent (No. 6)",
+    "practice": {
+      "startPracticeText": "ต่อ Line Vent เข้ากับ Vent บนรถ พร้อมเปิด Vent (No. 6)",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070504",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ต่อแล้ว",
     "result": {
       "type": "oknot",
@@ -277,7 +399,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  เก็บตัวอย่างที่ 1 จาก Line Drain sample ( No. 16 )",
+    "practice": {
+      "startPracticeText": "เก็บตัวอย่างที่ 1 จาก Line Drain sample ( No. 16 )",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070505",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เก็บแล้ว",
     "result": {
       "type": "oknot",
@@ -292,7 +424,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  ต่อสายจากรถเข้า pump (ในวงกลม) พร้อมล็อกให้เรียบร้อย",
+    "practice": {
+      "startPracticeText": "ต่อสายจากรถเข้า pump (ในวงกลม) พร้อมล็อกให้เรียบร้อย",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070506",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ทำ",
     "result": {
       "type": "oknot",
@@ -307,7 +449,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  เปิด pump ว่าพร้อมใช้งานหรือไม่โดยเลื่อน สวิตซ์ไปที่ ON ถ้า Pump ทำงานปกติให้เลื่อนกลับมาที่ AUTO  ( No. 14 )",
+    "practice": {
+      "startPracticeText": "เปิด pump ว่าพร้อมใช้งานหรือไม่โดยเลื่อน สวิตซ์ไปที่ ON ถ้า Pump ทำงานปกติให้เลื่อนกลับมาที่ AUTO  ( No. 14 )",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070507",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "pump ทำงาน",
     "result": {
       "type": "oknot",
@@ -322,7 +474,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   เปิดวาล์วท้ายรถ Check leak ที่สายต่อว่ารั่วหรื่อไม่",
+    "practice": {
+      "startPracticeText": "เปิดวาล์วท้ายรถ Check leak ที่สายต่อว่ารั่วหรื่อไม่",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070508",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ไม่รั่ว",
     "result": {
       "type": "oknot",
@@ -337,7 +499,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   ปิดวาล์วหมายเลข No. 4 , 3 , 2 ,16 ",
+    "practice": {
+      "startPracticeText": "ปิดวาล์วหมายเลข No. 4 , 3 , 2 ,16 ",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070509",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ปิด",
     "result": {
       "type": "oknot",
@@ -352,7 +524,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   เปิดวาล์วท้ายรถ และเปิดวาล์วเข้า Pump No.5 , 1",
+    "practice": {
+      "startPracticeText": "เปิดวาล์วท้ายรถ และเปิดวาล์วเข้า Pump No.5 , 1",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070510",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เปิด",
     "result": {
       "type": "oknot",
@@ -367,7 +549,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   ปรับระดับการไหลของเคมี โดยค่อย ๆ ปิด Line circulate",
+    "practice": {
+      "startPracticeText": "ปรับระดับการไหลของเคมี โดยค่อย ๆ ปิด Line circulate",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070511",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ปิด",
     "result": {
       "type": "oknot",
@@ -382,7 +574,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   หากมีสิ่งแปลกปลอมเข้า pump ให้หยุดทันที(สังเกตแผ่นกระจกใส No. 5)",
+    "practice": {
+      "startPracticeText": "หากมีสิ่งแปลกปลอมเข้า pump ให้หยุดทันที(สังเกตแผ่นกระจกใส No. 5)",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070512",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ไม่มีสิ่งแปลกปลอม",
     "result": {
       "type": "oknot",
@@ -397,7 +599,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   บันทึกเวลา start  (11P-131)",
+    "practice": {
+      "startPracticeText": "บันทึกเวลา start  (11P-131)",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070513",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "",
     "result": {
       "type": "actualCheck",
@@ -459,7 +671,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O    Pumpหยุดเมื่อเคมีใน lorry หมด ให้ปิดสวิตซ์ไป Off เปิด circulate No. 17",
+    "practice": {
+      "startPracticeText": "Pumpหยุดเมื่อเคมีใน lorry หมด ให้ปิดสวิตซ์ไป Off เปิด circulate No. 17",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070604",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ปิดสวิตซ์อยู่ที่ off",
     "result": {
       "type": "oknot",
@@ -474,7 +696,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   Start ไปที่ ON อีกครั้ง โดยหรี่วาล์ว Line circulate 431 จนแน่ใจว่าหมด",
+    "practice": {
+      "startPracticeText": "Start ไปที่ ON อีกครั้ง โดยหรี่วาล์ว Line circulate 431 จนแน่ใจว่าหมด",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070605",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "หมด",
     "result": {
       "type": "oknot",
@@ -489,7 +721,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   ปิดวาล์วท้ายรถ และ วาล์วหัว pump No 5,1",
+    "practice": {
+      "startPracticeText": "ปิดวาล์วท้ายรถ และ วาล์วหัว pump No 5,1",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070606",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ปิด",
     "result": {
       "type": "oknot",
@@ -504,7 +746,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   Start pump โดยเปิด circulate 431 100% ทิ้งไว้ 15 นาที",
+    "practice": {
+      "startPracticeText": "Start pump โดยเปิด circulate 431 100% ทิ้งไว้ 15 นาที",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070607",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
@@ -519,7 +771,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   ถอดสาย Hose และเก็บ sample จาก line No.2",
+    "practice": {
+      "startPracticeText": "ถอดสาย Hose และเก็บ sample จาก line No.2",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070608",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
@@ -534,7 +796,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   ถอด line vent และปิด เรียบร้อย  No.6",
+    "practice": {
+      "startPracticeText": "ถอด line vent และปิด เรียบร้อย  No.6",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070609",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
@@ -552,7 +824,17 @@ export const akumuruItemTemplate = [
     "isSection": true,
     "rowSpan": 10,
     "sequence": "<strong>7.ขั้นตอนเมื่อรับเสร็จ</strong>",
-    "practice": "O  บันทึกเวลารับเสร็จ",
+    "practice": {
+      "startPracticeText": "บันทึกเวลารับเสร็จ",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070701",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "",
     "result": {
       "type": "actualCheck",
@@ -571,7 +853,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O   ถอด สาย hose - สายกราวด์ ออกแล้วหรือยัง",
+    "practice": {
+      "startPracticeText": "ถอด สาย hose - สายกราวด์ ออกแล้วหรือยัง",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070702",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ปิด",
     "result": {
       "type": "oknot",
@@ -586,7 +878,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  ตรวจเช็ค valve เปิด อีกครั้งให้อยู่ในสภาพเดิมก่อนรับ No.17,431,413",
+    "practice": {
+      "startPracticeText": "ตรวจเช็ค valve เปิด อีกครั้งให้อยู่ในสภาพเดิมก่อนรับ No.17,431,413",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070703",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
@@ -601,7 +903,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  หลังจาก 15 นาที ให้เลื่อนสวิตซ์ไปที่ auto เก็บตัวอย่างที่ 3 No.16",
+    "practice": {
+      "startPracticeText": "หลังจาก 15 นาที ให้เลื่อนสวิตซ์ไปที่ auto เก็บตัวอย่างที่ 3 No.16",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070704",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เก็บแล้ว",
     "result": {
       "type": "oknot",
@@ -616,7 +928,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  เก็บกรวย และอุปกรณ์ PPE ทำความสะอาด",
+    "practice": {
+      "startPracticeText": "เก็บกรวย และอุปกรณ์ PPE ทำความสะอาด",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070705",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เก็บแล้ว",
     "result": {
       "type": "oknot",
@@ -637,7 +959,7 @@ export const akumuruItemTemplate = [
       "type": "d",
       "field": [
         {
-          "name": "l0707060101",
+          "name": "l070706",
           "value:": "",
         },
       ],
@@ -656,7 +978,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)                    ",
+    "practice": {
+      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070707",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "",
     "result": {
       "type": "kg",
@@ -671,7 +1003,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  อุปกรณ์  ทำความสะอาด และหมอน ลองล้อรถออก           ",
+    "practice": {
+      "startPracticeText": "อุปกรณ์  ทำความสะอาด และหมอน ลองล้อรถออก",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070708",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
@@ -686,7 +1028,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  ตรวจเช็ค valve ปิด อีกครั้งให้อยู่ในสภาพเดิมก่อนรับ No. 5,4,3,2,1,16",
+    "practice": {
+      "startPracticeText": "ตรวจเช็ค valve ปิด อีกครั้งให้อยู่ในสภาพเดิมก่อนรับ No. 5,4,3,2,1,16",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070709",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
@@ -701,7 +1053,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "O  ทำการล้าง ตาม check sheet วิธีการล้าง ",
+    "practice": {
+      "startPracticeText": "ทำการล้าง ตาม check sheet วิธีการล้าง",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l070710",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ทำ",
     "result": {
       "type": "oknot",

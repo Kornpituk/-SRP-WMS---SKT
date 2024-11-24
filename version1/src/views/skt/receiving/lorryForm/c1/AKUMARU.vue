@@ -68,12 +68,18 @@ onMounted(async () => {
   //   },
   // })
   console.log(akumuruItemTemplate)
-  lorryRequestData.value = akumaruRequestData; //lorryFormIPA.data.data
+  lorryRequestData.value = akumaruRequestData //lorryFormIPA.data.data
   // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
   for (var i of lorryItem) {
     for (var f of i.result.field) {
       // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
       f.value = passInitialData(i.result.type, lorryRequestData.value[f.name])
+    }
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
+        f.value = passInitialData(i.practice.type, lorryRequestData.value[f.name])
+      }
     }
   }
 
@@ -234,7 +240,10 @@ function formatDate(dateString) {
   <VRow class="ma-2">
     <VCol cols="4" />
     <VCol cols="4">
-      <div style="font-size: 22px; font-weight: bolder;" class="d-flex justify-center align-center">
+      <div
+        style="font-size: 22px; font-weight: bolder;"
+        class="d-flex justify-center align-center"
+      >
         Lorry Loading Check List
       </div>
     </VCol>
@@ -250,7 +259,10 @@ function formatDate(dateString) {
     </VCol>
     <VCol cols="4" />
     <VCol cols="4">
-      <div style="font-size: 22px; font-weight: bolder;" class="d-flex justify-center align-center">
+      <div
+        style="font-size: 22px; font-weight: bolder;"
+        class="d-flex justify-center align-center"
+      >
         AKUMARUUUUUU
       </div>
     </VCol>
@@ -259,46 +271,132 @@ function formatDate(dateString) {
 
   <VRow>
     <!-- Lorry Form -->
-    <VCol cols="12" style="overflow-x: auto;">
+    <VCol
+      cols="12"
+      style="overflow-x: auto;"
+    >
       <table class="custom-table">
         <thead>
           <tr>
-            <th class="text-center" style="font-size: 16px;" colspan="2">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+              colspan="2"
+            >
               Job Flow
             </th>
-            <th class="text-center" style="font-size: 16px;" colspan="3">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+              colspan="3"
+            >
               Manual works
             </th>
-            <th class="text-center" style="font-size: 16px;" colspan="3">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+              colspan="3"
+            >
               Condition
             </th>
-            <th class="text-center" style="font-size: 16px;" colspan="4">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+              colspan="4"
+            >
               Result
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(section, sectionIndex) in lorryItem" :key="sectionIndex" :sectionIndex="sectionIndex">
-            <td v-if="section.isSection === true"
+          <tr
+            v-for="(section, sectionIndex) in lorryItem"
+            :key="sectionIndex"
+            :sectionIndex="sectionIndex"
+          >
+            <td
+              v-if="section.isSection === true"
               style="border-top: 1px solid black; border-left: 1px solid black; text-align: center; vertical-align: middle;"
-              :rowspan="[section.rowSpan]" colspan="2">
+              :rowspan="[section.rowSpan]"
+              colspan="2"
+            >
               <div v-html="section.sequence" />
             </td>
-            <td colspan="3" style="max-width: 400px; border-left: 1px solid black; text-align: start;">
+            <td
+              colspan="3"
+              style="max-width: 400px; border-left: 1px solid black; text-align: start;"
+            >
               <div v-if="section.practice.type === 'd'">
                 <VRow>
                   <VCol>
                     <VLabel class="d-flex justify-left pa-md-2 text-wrap">
                       {{ section.practice.startPracticeText }}
-                      <VCurrencyField v-model="section.practice.field[0].value" density="compact" variant="solo"
-                        text-start="" text-end="" /> {{ section.practice.endPracticeText }}
+                      <VCurrencyField
+                        v-model="section.practice.field[0].value"
+                        density="compact"
+                        variant="solo"
+                        text-start=""
+                        text-end=""
+                      /> {{ section.practice.endPracticeText }}
                     </VLabel>
                   </VCol>
                 </VRow>
               </div>
               <div v-else-if="section.practice.type === 'checkbox'">
-                <v-checkbox :label="section.practice.startPracticeText"
-                  v-model="section.practice.field[0].value"></v-checkbox>
+                <VCheckbox
+                  v-model="section.practice.field[0].value"
+                  :label="section.practice.startPracticeText"
+                />
+              </div>
+              <div v-else-if="section.practice.type === 'checkbox3'">
+                <VRow>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[0].value"
+                      :label="section.practice.field[0].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[1].value"
+                      :label="section.practice.field[1].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[2].value"
+                      :label="section.practice.field[2].startPracticeText"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-else-if="section.practice.type === 'checkbox4'">
+                <VRow>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[0].value"
+                      :label="section.practice.field[0].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[1].value"
+                      :label="section.practice.field[1].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[2].value"
+                      :label="section.practice.field[2].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[3].value"
+                      :label="section.practice.field[3].startPracticeText"
+                    />
+                  </VCol>
+                </VRow>
               </div>
               <div v-else>
                 <VLabel class="d-flex justify-left pa-md-2 text-wrap">
@@ -306,54 +404,109 @@ function formatDate(dateString) {
                 </VLabel>
               </div>
             </td>
-            <td colspan="3" style="max-width: 350px; border-left: 1px solid black; text-align: start;">
+            <td
+              colspan="3"
+              style="max-width: 350px; border-left: 1px solid black; text-align: start;"
+            >
               <VLabel class="d-flex justify-center pa-md-2">
                 {{ section.condition }}
               </VLabel>
             </td>
-            <td colspan="4" style="min-width: 450px; border-left: 1px solid black;">
+            <td
+              colspan="4"
+              style="min-width: 450px; border-left: 1px solid black;"
+            >
               <div v-if="section.result.type === 'oknot'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
-                <VRadioGroup v-model="section.result.field[0].value" inline class="d-flex justify-center"
-                  :fieldname="section.result.field[0].name">
-                  <VRadio label="Ok" value="1" />
-                  <VRadio label="Not" value="0" />
+                <VRadioGroup
+                  v-model="section.result.field[0].value"
+                  inline
+                  class="d-flex justify-center"
+                  :fieldname="section.result.field[0].name"
+                >
+                  <VRadio
+                    label="Ok"
+                    value="1"
+                  />
+                  <VRadio
+                    label="Not"
+                    value="0"
+                  />
                 </VRadioGroup>
               </div>
               <div v-if="section.result.type === 'ab'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="solo"
-                      text-start="(A)" text-end="Kg." />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      text-start="(A)"
+                      text-end="Kg."
+                    />
                   </VCol>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
-                      text-start="Litre" text-end="(B)" readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="solo"
+                      text-start="Litre"
+                      text-end="(B)"
+                      readonly="true"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'cd'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="(C)" text-end="mm." />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="(C)"
+                      text-end="mm."
+                    />
                   </VCol>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
-                      text-start="(D)" text-end="mm." readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="solo"
+                      text-start="(D)"
+                      text-end="mm."
+                      readonly="true"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'bd'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="solo"
-                      text-start=" (B) + (D) =" text-end="Litre" readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      text-start=" (B) + (D) ="
+                      text-end="Litre"
+                      readonly="true"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -361,13 +514,30 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'litre'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Litre" readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Litre"
+                      readonly="true"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -375,13 +545,30 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'percen'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="%" readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="%"
+                      readonly="true"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -389,13 +576,29 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'c'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="C°" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="C°"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -403,26 +606,52 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField v-model="section.result.field[0].value" density="compact" variant="outlined" label="" />
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                    />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField v-model="section.result.field[1].value" density="compact" variant="outlined" label="" />
+                    <VTextField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'mpa'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="( Mpa )'" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="( Mpa )'"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -430,14 +659,30 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'amp'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Amp'" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Amp'"
+                    />
                   </VCol>
 
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -445,32 +690,63 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'ef'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="(E)" text-end="mm.'" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="(E)"
+                      text-end="mm.'"
+                    />
                   </VCol>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
-                      label="" text-start="(F)" text-end="Litre'" />
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="(F)"
+                      text-end="Litre'"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'g'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="(G)" text-end="Litre'" type="number" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="(G)"
+                      text-end="Litre'"
+                      type="number"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'litrekg'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Litre'" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Litre'"
+                    />
                   </VCol>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Kg.'">
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Kg.'"
+                    >
                       <template #append>
                         <VLabel>
                           Kg.
@@ -483,33 +759,56 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'kg'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Kg.'">
-                    </VCurrencyField>
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Kg."
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'mpa2'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="( Mpa )" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="( Mpa )"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'amp2'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Amp" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Amp"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'c2'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="C°" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="C°"
+                    />
                   </VCol>
                 </VRow>
               </div>
@@ -519,162 +818,165 @@ function formatDate(dateString) {
       </table>
     </VCol>
     <!-- Calculation formula -->
-    <!-- <VCol cols="12">
+    <!--
+      <VCol cols="12">
       <div style="border: 1px solid black;">
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              <u>สูตรคำนวน</u>
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              หาเป็นลิตร = mm x 5.32 + 740.45
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              หาเป็น mm = Litre - 740.45 / 5.32
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              (B) = (A) / 0.78
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              = {{ aVariable.value }} /0.78
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              = {{ bVariable.value }} Litre
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              (D) - ((C) X 5.32) + 740.45
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              = ({{ cVariable.value }}X 5.32 ) + 740.45
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              = {{ dVariable.value }}Litre
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              Density IPA = 0.78
-            </VLabel>
-          </VCol>
-        </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      <u>สูตรคำนวน</u>
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      หาเป็นลิตร = mm x 5.32 + 740.45
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      หาเป็น mm = Litre - 740.45 / 5.32
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      (B) = (A) / 0.78
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      = {{ aVariable.value }} /0.78
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      = {{ bVariable.value }} Litre
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      (D) - ((C) X 5.32) + 740.45
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      = ({{ cVariable.value }}X 5.32 ) + 740.45
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      = {{ dVariable.value }}Litre
+      </VLabel>
+      </VCol>
+      </VRow>
+      <VRow>
+      <VCol>
+      <VLabel class="d-flex justify-center">
+      Density IPA = 0.78
+      </VLabel>
+      </VCol>
+      </VRow>
       </div>
-    </VCol> -->
+      </VCol> 
+    -->
     <!-- Dcs Tank -->
-    <!-- <VCol cols="12">
+    <!--
+      <VCol cols="12">
       <table class="custom-table">
-        <thead>
-          <tr>
-            <th />
-            <th class="text-center" style="font-size: 16px;">
-              DSC
-            </th>
-            <th class="text-center" style="font-size: 16px;">
-              TANK
-            </th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="font-size: 16px;">
-              After
-            </td>
-            <td class="py-4 text-center">
-              {{ gVariable.value }}
-            </td>
-            <td class="py-4 text-center">
-              {{ fVariable.value }}
-            </td>
-            <td style="font-size: 16px;">
-              Ltr
-            </td>
-          </tr>
-          <tr>
-            <td style="font-size: 16px;">
-              Before
-            </td>
-            <td class="py-4 text-center">
-              {{ dcsBefore.value }}
-            </td>
-            <td class="py-4 text-center">
-              {{ dVariable.value }}
-            </td>
-            <td style="font-size: 16px;">
-              Ltr
-            </td>
-          </tr>
-          <tr>
-            <td style="font-size: 16px;">
-              Diff
-            </td>
-            <td class="py-4 text-center">
-              {{ dcsDiff }}
-            </td>
-            <td class="py-4 text-center">
-              {{ tankDiff }}
-            </td>
-            <td style="font-size: 16px;">
-              Ltr
-            </td>
-          </tr>
-        </tbody>
+      <thead>
+      <tr>
+      <th />
+      <th class="text-center" style="font-size: 16px;">
+      DSC
+      </th>
+      <th class="text-center" style="font-size: 16px;">
+      TANK
+      </th>
+      <th />
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td style="font-size: 16px;">
+      After
+      </td>
+      <td class="py-4 text-center">
+      {{ gVariable.value }}
+      </td>
+      <td class="py-4 text-center">
+      {{ fVariable.value }}
+      </td>
+      <td style="font-size: 16px;">
+      Ltr
+      </td>
+      </tr>
+      <tr>
+      <td style="font-size: 16px;">
+      Before
+      </td>
+      <td class="py-4 text-center">
+      {{ dcsBefore.value }}
+      </td>
+      <td class="py-4 text-center">
+      {{ dVariable.value }}
+      </td>
+      <td style="font-size: 16px;">
+      Ltr
+      </td>
+      </tr>
+      <tr>
+      <td style="font-size: 16px;">
+      Diff
+      </td>
+      <td class="py-4 text-center">
+      {{ dcsDiff }}
+      </td>
+      <td class="py-4 text-center">
+      {{ tankDiff }}
+      </td>
+      <td style="font-size: 16px;">
+      Ltr
+      </td>
+      </tr>
+      </tbody>
       </table>
-    </VCol> -->
+      </VCol> 
+    -->
     <!-- Precautions -->
     <VCol cols="12">
       <table class="custom-table">
-        <thead>
-          <tr>
-            <th style="font-size: 16px;">
+        <tr>
+          <td class="tr-border-right-0">
+            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
               ข้อควรระวัง
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-              <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน
-              <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
-            </th>
-            <!-- <th style="font-size: 16px;" colspan="3">
-              : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            </th> -->
-          </tr>
-        </thead>
+            </VLabel>
+          </td>
+          <td class="tr-border-left-0">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            <br>
+            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
+          </td>
+          <!--
+            <th style="font-size: 16px;" colspan="3">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            </th> 
+          -->
+        </tr>
       </table>
     </VCol>
     <!-- Flow Chat -->
@@ -694,17 +996,28 @@ function formatDate(dateString) {
                 <div class="text-subtitle-2">
                   Default
                 </div>
-                <VImg :aspect-ratio="1" class="bg-white" :src="image01" width="500" />
+                <VImg
+                  :aspect-ratio="1"
+                  class="bg-white"
+                  :src="image01"
+                  width="500"
+                />
               </div>
             </div>
           </tr>
         </tbody>
       </table>
     </VCol>
-    <VCol cols="12" lg="12">
+    <VCol
+      cols="12"
+      lg="12"
+    >
       <table class="custom-table">
         <tr>
-          <th class="text-center cursor-pointer" colspan="12">
+          <th
+            class="text-center cursor-pointer"
+            colspan="12"
+          >
             Lorry Loading Check List
           </th>
         </tr>
@@ -720,18 +1033,27 @@ function formatDate(dateString) {
           </td>
         </tr>
         <tr>
-          <td style="min-width: 150px;" colspan="4">
+          <td
+            style="min-width: 150px;"
+            colspan="4"
+          >
             <div v-if="lorryRequestData.whStaffUpdatedDate">
               <span v-if="lorryRequestData.whStaffUpdatedDate">{{ formatDate(lorryRequestData.whStaffUpdatedDate)
-                }}</span>
+              }}</span>
             </div>
           </td>
-          <td style="min-width: 150px;" colspan="4">
+          <td
+            style="min-width: 150px;"
+            colspan="4"
+          >
             <div v-if="lorryRequestData.whLeaderDate">
               <span v-if="lorryRequestData.whLeaderDate">{{ formatDate(lorryRequestData.whLeaderDate) }}</span>
             </div>
           </td>
-          <td style="min-width: 150px;" colspan="4">
+          <td
+            style="min-width: 150px;"
+            colspan="4"
+          >
             <div v-if="lorryRequestData.whSupervisorDate">
               <span v-if="lorryRequestData.whSupervisorDate">{{ formatDate(lorryRequestData.whSupervisorDate) }}</span>
             </div>
@@ -744,14 +1066,35 @@ function formatDate(dateString) {
   <VRow>
     <!-- Btn -->
     <VCol cols="4" />
-    <VCol cols="8" class="d-flex justify-end">
-      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="warning" class="mx-1" @click="saveDraft">
+    <VCol
+      cols="8"
+      class="d-flex justify-end"
+    >
+      <VBtn
+        v-if="(statusId !== 15 && statusId !== 18)"
+        type="text"
+        color="warning"
+        class="mx-1"
+        @click="saveDraft"
+      >
         Draft
       </VBtn>
-      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="secondary " class="mx-1" @click="submit">
+      <VBtn
+        v-if="(statusId !== 15 && statusId !== 18)"
+        type="text"
+        color="secondary "
+        class="mx-1"
+        @click="submit"
+      >
         Submit
       </VBtn>
-      <VBtn v-if="(statusId === 18)" type="text" color="primary" class="mx-1" @click="approve">
+      <VBtn
+        v-if="(statusId === 18)"
+        type="text"
+        color="primary"
+        class="mx-1"
+        @click="approve"
+      >
         Approve
       </VBtn>
     </VCol>
@@ -761,8 +1104,12 @@ function formatDate(dateString) {
   <section>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->
-      <AuthenticatorDialog :is-dialog-visible="isDialogVisibleAlertDialog" :word="wordForSubmit"
-        :success="successDialAlert" @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val" />
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
     </div>
   </section>
 </template>
@@ -866,5 +1213,15 @@ function formatDate(dateString) {
 .v-selection-control__wrapper {
   block-size: 50% !important;
   inline-size: 50% !important;
+}
+
+.tr-border-right-0 {
+  font-size: 16px;
+  border-right: 0px !important;
+}
+
+.tr-border-left-0 {
+  font-size: 16px;
+  border-left: 0px !important;
 }
 </style>
