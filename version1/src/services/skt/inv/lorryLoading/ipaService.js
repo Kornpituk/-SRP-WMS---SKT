@@ -1,79 +1,83 @@
+import { urlApi } from '@/api'
+import axios from '@axios'
+
+export async function generate(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function get(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  return lorryFormIPA;
+}
+
+export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  return lorryFormIPAStatus;
+}
+
+export function currencyFormat(number) {
+  var responseText = new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(number);
+  return responseText;
+}
 
 
-// export const ipaRequestData = {
-//   "RmLorryLoadingFormJournalId": 0,
-//   "ProductId": "",
-//   "ProductName": "",
-//   "LoadedDate": null,
-//   "PurchaseOrderNo": null,
-//   "WHStaff": "",
-//   "WHStaffUpdatedDate": null,
-//   "WHLeader": "",
-//   "WHLeaderDate": null,
-//   "WHSupervisor": "",
-//   "WHSupervisorDate": null,
-//   "L0101010001": "1",
-//   "L0101020001": "1",
-//   "L0101030001": "1",
-//   "L0101040001": "1",
-//   "L0101050001": "",
-//   "L0101060001": "",
-//   "L0102010101": "",
-//   "L0102010102": "",
-//   "L0102020101": "",
-//   "L0102020102": "",
-//   "L0102030101": "",
-//   "L0102030102": "",
-//   "L0102040101": "",
-//   "L0102040102": "",
-//   "L0102050101": "",
-//   "L0103010101": "",
-//   "L0103020101": "",
-//   "L0103030101": "",
-//   "L0103040101": "",
-//   "L0103050101": "",
-//   "L0103060101": "",
-//   "L0103060102": "",
-//   "L0104010101": "",
-//   "L0104020101": "",
-//   "L0104030101": "",
-//   "L0104030102": "",
-//   "L0105010101": "",
-//   "L0105020101": "",
-//   "L0105030101": "",
-//   "L0106010101": "",
-//   "L0106020101": "",
-//   "L0106030101": "",
-//   "L0106040101": "",
-//   "L0106050101": "",
-//   "L0106060101": "",
-//   "L0107010101": "",
-//   "L0107020101": "",
-//   "L0107030101": "",
-//   "L0107040101": "",
-//   "L0108010101": "",
-//   "L0108020101": "",
-//   "L0108030101": "",
-//   "L0108030102": "",
-//   "L0108040101": "",
-//   "L0108040102": "",
-//   "L0108050101": "",
-//   "L0109010101": "",
-//   "L0109020101": "",
-//   "L0109030101": "",
-//   "L0109040101": "",
-//   "L0109050101": "",
-//   "L0109060101": "",
-//   "L0109060102": "",
-//   "L0109070101": "",
-//   "L0109080101": "",
-//   "L0109090101": "",
-//   "L0109090102": "",
-//   "L0109100101": "",
-//   "L0109110101": "",
-//   "L0109120101": "",
-//   "L0109120102": ""
-// }
+export function mm2litre(mm) {
+  let litre = mm * 5.32 + 740.45
+
+  return litre.toFixed(2)
+}
+
+//----------------- Formate
+export function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
+
+
 
 export const ipaItemTemplate = [
   // ข้อควรระวัง
@@ -88,7 +92,6 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101010101",
-
         },
       ],
     },
@@ -885,3 +888,32 @@ export const ipaItemTemplate = [
   },
 
 ]
+
+export function passInitialData(type, params) {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
+    if (params == 0) {
+      return "0"
+    } else if (params == 1) {
+      return "1"
+    } else {
+      return "-1"
+    }
+  } else {
+    return params
+  }
+}
+
+export function passSubmitData(type, params) {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else {
+    return parseFloat(params)
+  }
+}

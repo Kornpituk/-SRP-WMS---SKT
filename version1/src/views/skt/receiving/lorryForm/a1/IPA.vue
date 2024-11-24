@@ -1,7 +1,10 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService'
+import {
+  currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, ipaItemTemplate,
+  mm2litre, passInitialData, passSubmitData
+} from '@/services/skt/inv/lorryLoading/ipaService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import axios from '@axios'
@@ -27,10 +30,6 @@ const aVariable = ref(ipaItems[6].result.field[0])
 const bVariable = ref(ipaItems[6].result.field[1])
 const cVariable = ref(ipaItems[7].result.field[0])
 const dVariable = ref(ipaItems[7].result.field[1])
-const bdVariable = ref(ipaItems[8].result.field[0])
-
-const eVariable = ref(ipaItems[46].result.field[0])
-const gVariable = ref(ipaItems[47].result.field[0])
 
 var dcsAfter = ref(0);
 var dcsBefore = ref(0);
@@ -50,82 +49,30 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
 
 onMounted(async () => {
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
+  await generate(poEtlLogDetailJournalIDQueryParameters.value);
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  const lorryFormIPA = await get(poEtlLogDetailJournalIDQueryParameters.value);
+  ipaRequestData.value = lorryFormIPA.data.data;
 
-  const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  poNo.value = lorryFormIPA.data.data.purchaseOrderNo;
 
-  console.log(lorryFormIPA)
-  ipaRequestData.value = lorryFormIPA.data.data
-  poNo.value = lorryFormIPA.data.data.purchaseOrderNo
   for (var i of ipaItems) {
     for (var f of i.result.field) {
       f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
     }
   }
 
-
-  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value);
+  statusId.value = lorryFormIPAStatus.data.data.statusId;
 
 })
 
-function passInitialData(type, params) {
-  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
-    }
-  } else {
-    return params
-  }
-}
-
-function passSubmitData(type, params) {
-  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else {
-    return parseFloat(params)
-  }
-}
-
 async function saveDraft(e) {
+
   for (var i of ipaItems) {
     for (var f of i.result.field) {
       ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
@@ -208,38 +155,7 @@ watchEffect(async () => {
   tankDiff.value = currencyFormat(parseFloat(ipaItems[46].result.field[1].value) - parseFloat(ipaItems[7].result.field[1].value))
 })
 
-function currencyFormat(number) {
-  var responseText = new Intl.NumberFormat("th-TH", {
-    style: 'decimal',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(number);
-  return responseText;
-}
 
-
-function mm2litre(mm) {
-  let litre = mm * 5.32 + 740.45
-
-  return litre.toFixed(2)
-}
-
-//----------------- Formate
-function formatDate(dateString) {
-  if (dateString === null || dateString === '' || dateString === undefined) {
-    return 'Null'
-  } else if (dateString.length > 0) {
-    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
-    const year = date.getFullYear()
-
-    return `${day}/${month}/${year}`
-
-  }
-
-  return 'null'
-}
 </script>
 
 <template>
