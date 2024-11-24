@@ -546,18 +546,88 @@ const confirmFilterSelectProduction = () => {
 const { responseSaveProductionPlan, errorMessageSaveProductionPlan, saveProdutcionPlanFunc } = useSaveProductionPlanService()
 
 const saveProductionPlan = async () => {
+  console.log("saveProductionPlan staret")
   try {
-    // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await saveProdutcionPlanFunc(getProductionplanResult.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    console.log("saveProductionPlan staret in")
 
-    // อัปเดต productionPlan.value หลังจากได้ผลลัพธ์
-    productionPlan.value = (getProductionplanResult.value.data)
+
+    // กรองข้อมูลเฉพาะฟิลด์ที่ต้องการจาก getProductionplanResult.value
+    // const filteredData = null 
+
+    // if(dataPlanningForSave.value.productionCode){
+    //   filteredData = getProductionplanResult.value.data.map(item => ({
+    //     planningID: item.planningID,
+    //     inputDate: item.inputDate,
+    //     productionCode: dataPlanningForSave.value.productionCode,
+
+    //     product1SelectedCode: dataPlanningForSave.value.product1SelectedCode,
+    //     product1SelectedPackagingCode: dataPlanningForSave.value.product1SelectedPackagingCode,
+    //     product1PackingQtyKgs: item.product1PackingQtyKgs,
+    //     product1UomCount: item.product1UomCount,
+
+    //     product2SelectedCode: dataPlanningForSave.value.product2SelectedCode,
+    //     product2SelectedPackagingCode: dataPlanningForSave.value.product2SelectedPackagingCode,
+    //     product2PackingQtyKgs: item.product2PackingQtyKgs,
+    //     product2UomCount: item.product2UomCount,
+
+    //     lotNumber: item.lotNumber,
+    //     producingDate: item.producingDate,
+    //     remark: item.remark,
+    //   }))
+    // }else{
+    //   filteredData = getProductionplanResult.value.data.map(item => ({
+    //     planningID: item.planningID,
+    //     inputDate: item.inputDate,
+    //     productionCode: item.productionCode,
+    //     product1SelectedCode: item.product1SelectedCode,
+    //     product1SelectedPackagingCode: item.product1SelectedPackagingCode,
+    //     product1PackingQtyKgs: item.product1PackingQtyKgs,
+    //     product1UomCount: item.product1UomCount,
+    //     product2SelectedCode: item.product2SelectedCode,
+    //     product2SelectedPackagingCode: item.product2SelectedPackagingCode,
+    //     product2PackingQtyKgs: item.product2PackingQtyKgs,
+    //     product2UomCount: item.product2UomCount,
+    //     lotNumber: item.lotNumber,
+    //     producingDate: item.producingDate,
+    //     remark: item.remark,
+    //   }))
+    // }
+
+    const filteredData = productionPlan.value.map(item => ({
+      planningID: item.planningID,
+      inputDate: item.inputDate,
+      productionCode: item.productionCode,
+
+      product1SelectedCode: item.product1SelectedCode,
+      product1SelectedPackagingCode: item.product1SelectedPackagingCode,
+      product1PackingQtyKgs: item.product1PackingQtyKgs,
+      product1UomCount: item.product1UomCount,
+
+      product2SelectedCode: item.product2SelectedCode,
+      product2SelectedPackagingCode: item.product2SelectedPackagingCode,
+      product2PackingQtyKgs: item.product2PackingQtyKgs,
+      product2UomCount: item.product2UomCount,
+
+      lotNumber: item.lotNumber,
+      producingDate: item.producingDate,
+      remark: item.remark,
+    }))
+
+    console.log("saveProductionPlan staret in 2")
+
+    // ส่งข้อมูลที่กรองแล้วไปยัง API
+    await saveProdutcionPlanFunc(filteredData, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+
+    // // อัปเดต productionPlan.value หลังจากบันทึกข้อมูล
+    // productionPlan.value = filteredData
+
+    console.log("saveProductionPlan staret in 3")
 
     // แสดงค่าใน console
-    console.log("productionPlan", productionPlan.value)
+    console.log("Filtered Production Plan Saved:", filteredData)
   } catch (error) {
     // จัดการข้อผิดพลาด
-    console.error("Error fetching production plan:", error)
+    console.error("Error saving production plan:", error)
   }
 }
 
@@ -1290,7 +1360,9 @@ const print = () => {
                 </VBtn>
               </VCol>
               <VCol cols="2">
-                <VBtn>Confirm select</VBtn>
+                <VBtn @click="confirmFilterSelectProduction">
+                  Confirm select
+                </VBtn>
               </VCol>
             </VRow>
             <VCol
