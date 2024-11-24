@@ -1,80 +1,83 @@
-import { ref } from 'vue'
+import { urlApi } from '@/api'
+import axios from '@axios'
+
+export async function generate(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function get(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  return lorryFormIPA;
+}
+
+export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  return lorryFormIPAStatus;
+}
+
+export function currencyFormat(number) {
+  var responseText = new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(number);
+  return responseText;
+}
 
 
-// export const ipaRequestData = {
-//   "RmLorryLoadingFormJournalId": 0,
-//   "ProductId": "",
-//   "ProductName": "",
-//   "LoadedDate": null,
-//   "PurchaseOrderNo": null,
-//   "WHStaff": "",
-//   "WHStaffUpdatedDate": null,
-//   "WHLeader": "",
-//   "WHLeaderDate": null,
-//   "WHSupervisor": "",
-//   "WHSupervisorDate": null,
-//   "L0101010001": "1",
-//   "L0101020001": "1",
-//   "L0101030001": "1",
-//   "L0101040001": "1",
-//   "L0101050001": "",
-//   "L0101060001": "",
-//   "L0102010101": "",
-//   "L0102010102": "",
-//   "L0102020101": "",
-//   "L0102020102": "",
-//   "L0102030101": "",
-//   "L0102030102": "",
-//   "L0102040101": "",
-//   "L0102040102": "",
-//   "L0102050101": "",
-//   "L0103010101": "",
-//   "L0103020101": "",
-//   "L0103030101": "",
-//   "L0103040101": "",
-//   "L0103050101": "",
-//   "L0103060101": "",
-//   "L0103060102": "",
-//   "L0104010101": "",
-//   "L0104020101": "",
-//   "L0104030101": "",
-//   "L0104030102": "",
-//   "L0105010101": "",
-//   "L0105020101": "",
-//   "L0105030101": "",
-//   "L0106010101": "",
-//   "L0106020101": "",
-//   "L0106030101": "",
-//   "L0106040101": "",
-//   "L0106050101": "",
-//   "L0106060101": "",
-//   "L0107010101": "",
-//   "L0107020101": "",
-//   "L0107030101": "",
-//   "L0107040101": "",
-//   "L0108010101": "",
-//   "L0108020101": "",
-//   "L0108030101": "",
-//   "L0108030102": "",
-//   "L0108040101": "",
-//   "L0108040102": "",
-//   "L0108050101": "",
-//   "L0109010101": "",
-//   "L0109020101": "",
-//   "L0109030101": "",
-//   "L0109040101": "",
-//   "L0109050101": "",
-//   "L0109060101": "",
-//   "L0109060102": "",
-//   "L0109070101": "",
-//   "L0109080101": "",
-//   "L0109090101": "",
-//   "L0109090102": "",
-//   "L0109100101": "",
-//   "L0109110101": "",
-//   "L0109120101": "",
-//   "L0109120102": ""
-// }
+export function mm2litre(mm) {
+  let litre = mm * 5.32 + 740.45
+
+  return litre.toFixed(2)
+}
+
+//----------------- Formate
+export function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
+
+
 
 export const ipaItemTemplate = [
   // ข้อควรระวัง
@@ -89,7 +92,6 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101010101",
-          "value:": "",
         },
       ],
     },
@@ -104,7 +106,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101020101",
-          "value:": "",
+
         },
       ],
     },
@@ -119,7 +121,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101030101",
-          "value:": "",
+
         },
       ],
     },
@@ -134,7 +136,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101040101",
-          "value:": "",
+
         },
       ],
     },
@@ -149,7 +151,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101050101",
-          "value:": "",
+
         },
       ],
     },
@@ -164,7 +166,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0101060101",
-          "value:": "",
+
         },
       ],
     },
@@ -182,11 +184,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102010101", // A
-          "value:": "",
+
         },
         {
           "name": "l0102010102", // B
-          "value:": "",
+
         },
       ],
     },
@@ -201,11 +203,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102020101", // C
-          "value:": "",
+
         },
         {
           "name": "l0102020102", // D
-          "value:": "",
+
         },
       ],
     },
@@ -220,11 +222,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102030101", // BD
-          "value:": "",
+
         },
         {
           "name": "l0102030102", // OkNot
-          "value:": "",
+
         },
       ],
     },
@@ -239,11 +241,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102040101", // litre
-          "value:": "",
+
         },
         {
           "name": "l0102040102", // OkNot
-          "value:": "",
+
         },
       ],
     },
@@ -255,10 +257,10 @@ export const ipaItemTemplate = [
     "condition": "Seal ล็อกวาล์วไม่ขาดตรงตามใบส่ง",
     "result": {
       "type": "oknot",
-      "field": [  
+      "field": [
         {
           "name": "l0102050101", // litre
-          "value:": "",
+
         },
       ],
     },
@@ -274,7 +276,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103010101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -289,7 +291,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103020101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -304,7 +306,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103030101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -319,7 +321,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103040101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -334,7 +336,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103050101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -353,7 +355,7 @@ export const ipaItemTemplate = [
         },
         {
           "name": "l0103060102", // ok
-          "value:": "",
+
         },
       ],
     },
@@ -369,7 +371,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -384,7 +386,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -399,11 +401,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104030101", // percen
-          "value:": "",
+
         },
         {
           "name": "l0104030102", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -419,7 +421,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -434,7 +436,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -449,7 +451,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -465,7 +467,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -480,7 +482,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -495,7 +497,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -510,7 +512,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106040101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -525,7 +527,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106050101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -540,7 +542,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106060101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -556,7 +558,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -571,7 +573,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -586,7 +588,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -601,7 +603,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107040101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -617,7 +619,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -632,11 +634,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108020101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0108020102", // 2
-          "value:": "",
+
         },
       ],
     },
@@ -651,10 +653,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108030101", // 1
-          "value:": "",
+
         }, {
           "name": "l0108030102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -669,10 +671,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108040101", // 1
-          "value:": "",
+
         }, {
           "name": "l0108040102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -687,7 +689,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108050101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -703,7 +705,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109010101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -718,7 +720,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109020101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -733,11 +735,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109030101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0109030102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -752,7 +754,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109040101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -767,7 +769,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109050101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -782,11 +784,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109060101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0109060102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -801,7 +803,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109070101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -816,7 +818,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109080101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -831,11 +833,9 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109090101", // 1
-          "value:": "",
         },
         {
           "name": "l0109090102", // 1
-          "value:": "",
         },
       ],
     },
@@ -850,7 +850,6 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109100101", // 1
-          "value:": "",
         },
       ],
     },
@@ -865,7 +864,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109110101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -879,15 +878,42 @@ export const ipaItemTemplate = [
       "type": "litrekg",
       "field": [
         {
-          "name": "l0109120101", // 1
-          "value:": "",
+          "name": "l0109120101", // 1    
         },
         {
-          "name": "l0109120102", // 1
-          "value:": "",
+          "name": "l0109120102", // 1         
         },
       ],
     },
   },
 
 ]
+
+export function passInitialData(type, params) {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
+    if (params == 0) {
+      return "0"
+    } else if (params == 1) {
+      return "1"
+    } else {
+      return "-1"
+    }
+  } else {
+    return params
+  }
+}
+
+export function passSubmitData(type, params) {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else {
+    return parseFloat(params)
+  }
+}
