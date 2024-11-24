@@ -51,7 +51,7 @@ export const akumaruRequestData = {
   "l0707070101": "0",
   "l0707080101": "-1",
   "l0707090101": "-1",
-  "l0707100101": "-1"
+  "l0707100101": "-1",
 }
 
 export const akumuruItemTemplate = [
@@ -82,10 +82,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0701020101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -97,10 +97,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0701030101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -109,9 +109,10 @@ export const akumuruItemTemplate = [
     "condition": "",
     "result": {
       "type": "",
-      "field": []
-    }
+      "field": [],
+    },
   },
+
   // 2.Seal check
   {
     "isSection": true,
@@ -124,11 +125,12 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0702010101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
+
   // 3. check ก่อนปฏิบัติ
   {
     "isSection": true,
@@ -141,10 +143,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0703010101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -171,11 +173,12 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0703030101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
+
   // 4.อุปกรณ์ PPE 
   {
     "isSection": true,
@@ -185,8 +188,8 @@ export const akumuruItemTemplate = [
     "condition": "",
     "result": {
       "type": "",
-      "field": []
-    }
+      "field": [],
+    },
   },
   {
     "isSection": false,
@@ -195,9 +198,10 @@ export const akumuruItemTemplate = [
     "condition": "",
     "result": {
       "type": "",
-      "field": []
-    }
+      "field": [],
+    },
   },
+
   // 5. ขั้นตอนการปฏิบัติ
   {
     "isSection": true,
@@ -210,9 +214,9 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707060101",
-          "value:": ""
-        }
-      ]
+          "value:": "",
+        },
+      ],
     },
     "condition": "หยุด",
     "result": {
@@ -220,10 +224,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705010101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -235,10 +239,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705020101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -250,10 +254,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705030101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -265,10 +269,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705040101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -280,10 +284,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705050101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -295,10 +299,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705060101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -310,10 +314,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705070101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -325,10 +329,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705080101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -340,10 +344,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705090101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -355,10 +359,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705100101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -370,10 +374,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705110101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -385,10 +389,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705120101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -400,15 +404,16 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705130101", // A
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0705130102", // B
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
+
   // 6. ขั้นตอนขณะปฏิบัติงาน
   {
     "isSection": true,
@@ -418,8 +423,8 @@ export const akumuruItemTemplate = [
     "condition": "",
     "result": {
       "type": "",
-      "field": []
-    }
+      "field": [],
+    },
   },
   {
     "isSection": false,
@@ -431,10 +436,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706020101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -446,10 +451,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706030101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -461,10 +466,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706040101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -476,10 +481,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706050101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -491,10 +496,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706060101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -506,10 +511,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706070101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -521,10 +526,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706080101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -536,11 +541,12 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706090101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
+
   // 7.ขั้นตอนเมื่อรับเสร็จ
   {
     "isSection": true,
@@ -553,14 +559,14 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707010101",
-          "value:": ""
+          "value:": "",
         },
         {
           "name": "l0707010102",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -572,10 +578,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707020101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -587,10 +593,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707030101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -602,10 +608,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707040101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -617,10 +623,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707050101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -632,9 +638,9 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707060101",
-          "value:": ""
-        }
-      ]
+          "value:": "",
+        },
+      ],
     },
     "condition": "น้ำหนักที่อ่านได้",
     "result": {
@@ -642,10 +648,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707060101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -657,10 +663,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707070101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -672,10 +678,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707080101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -687,10 +693,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707090101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
   {
     "isSection": false,
@@ -702,10 +708,10 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707100101",
-          "value:": ""
-        }
-      ]
-    }
+          "value:": "",
+        },
+      ],
+    },
   },
 
 ]

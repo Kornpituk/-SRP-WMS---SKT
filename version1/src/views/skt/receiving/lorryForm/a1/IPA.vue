@@ -3,7 +3,7 @@ import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import {
   currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, ipaItemTemplate,
-  mm2litre, passInitialData, passSubmitData
+  mm2litre, passInitialData, passSubmitData,
 } from '@/services/skt/inv/lorryLoading/ipaService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
@@ -31,13 +31,13 @@ const bVariable = ref(ipaItems[6].result.field[1])
 const cVariable = ref(ipaItems[7].result.field[0])
 const dVariable = ref(ipaItems[7].result.field[1])
 
-var dcsAfter = ref(0);
-var dcsBefore = ref(0);
-var dcsDiff = 0;
+var dcsAfter = ref(0)
+var dcsBefore = ref(0)
+var dcsDiff = 0
 
-var tankAfter = ref(0);
-var tankBefore = ref(0);
-var tankDiff = ref(0);
+var tankAfter = ref(0)
+var tankBefore = ref(0)
+var tankDiff = ref(0)
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -53,12 +53,13 @@ const textAlertDialogFunction = (word, success) => {
 
 onMounted(async () => {
 
-  await generate(poEtlLogDetailJournalIDQueryParameters.value);
+  await generate(poEtlLogDetailJournalIDQueryParameters.value)
 
-  const lorryFormIPA = await get(poEtlLogDetailJournalIDQueryParameters.value);
-  ipaRequestData.value = lorryFormIPA.data.data;
+  const lorryFormIPA = await get(poEtlLogDetailJournalIDQueryParameters.value)
 
-  poNo.value = lorryFormIPA.data.data.purchaseOrderNo;
+  ipaRequestData.value = lorryFormIPA.data.data
+
+  poNo.value = lorryFormIPA.data.data.purchaseOrderNo
 
   for (var i of ipaItems) {
     for (var f of i.result.field) {
@@ -66,8 +67,9 @@ onMounted(async () => {
     }
   }
 
-  const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value);
-  statusId.value = lorryFormIPAStatus.data.data.statusId;
+  const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
+
+  statusId.value = lorryFormIPAStatus.data.data.statusId
 
 })
 
@@ -138,32 +140,33 @@ async function approve(e) {
 
 
 watchEffect(async () => {
-  ipaItems[6].result.field[1].value = currencyFormat(ipaItems[6].result.field[0].value / (0.78)); // B
-  ipaItems[7].result.field[1].value = currencyFormat((ipaItems[7].result.field[0].value * 5.32) + 740.45); // D
-  ipaItems[46].result.field[1].value = currencyFormat(mm2litre(ipaItems[46].result.field[0].value)); // F
+  ipaItems[6].result.field[1].value = currencyFormat(ipaItems[6].result.field[0].value / (0.78)) // B
+  ipaItems[7].result.field[1].value = currencyFormat((ipaItems[7].result.field[0].value * 5.32) + 740.45) // D
+  ipaItems[46].result.field[1].value = currencyFormat(mm2litre(ipaItems[46].result.field[0].value)) // F
 
-  console.log("B", parseFloat(ipaItems[6].result.field[1].value));
-  console.log("D", parseFloat(ipaItems[7].result.field[1].value));
+  console.log("B", parseFloat(ipaItems[6].result.field[1].value))
+  console.log("D", parseFloat(ipaItems[7].result.field[1].value))
   ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + ((ipaItems[7].result.field[0].value * 5.32) + 740.45))
   ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - parseFloat(ipaItems[46].result.field[1].value)).toFixed(2)
   ipaItems[49].result.field[1].value = (parseFloat(ipaItems[49].result.field[0].value) * 0.78).toFixed(2)
 
-  dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value));
-  dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value));
+  dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value))
+  dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))
   dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
-  tankAfter.value = ipaItems[46].result.field[1].value;
-  tankBefore.value = ipaItems[7].result.field[1].value;
+  tankAfter.value = ipaItems[46].result.field[1].value
+  tankBefore.value = ipaItems[7].result.field[1].value
   tankDiff.value = currencyFormat(parseFloat(ipaItems[46].result.field[1].value) - parseFloat(ipaItems[7].result.field[1].value))
 })
-
-
 </script>
 
 <template>
   <VRow class="ma-2">
     <VCol cols="4" />
     <VCol cols="4">
-      <div style="font-size: 22px; font-weight: bolder;" class="d-flex justify-center align-center">
+      <div
+        style="font-size: 22px; font-weight: bolder;"
+        class="d-flex justify-center align-center"
+      >
         Lorry Loading Check List
       </div>
     </VCol>
@@ -179,7 +182,10 @@ watchEffect(async () => {
     </VCol>
     <VCol cols="4" />
     <VCol cols="4">
-      <div style="font-size: 22px; font-weight: bolder;" class="d-flex justify-center align-center">
+      <div
+        style="font-size: 22px; font-weight: bolder;"
+        class="d-flex justify-center align-center"
+      >
         ISOPRO (IPA)
       </div>
     </VCol>
@@ -188,84 +194,168 @@ watchEffect(async () => {
 
   <VRow>
     <!-- Lorry Form -->
-    <VCol cols="12" style="overflow-x: auto;">
+    <VCol
+      cols="12"
+      style="overflow-x: auto;"
+    >
       <table class="custom-table">
         <thead>
           <tr>
-            <th class="text-center" style="font-size: 16px;" colspan="2">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+              colspan="2"
+            >
               Job Flow
             </th>
-            <th class="text-center" style="font-size: 16px;" colspan="3">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+              colspan="3"
+            >
               Manual works
             </th>
-            <th class="text-center" style="font-size: 16px;" colspan="3">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+              colspan="3"
+            >
               Condition
             </th>
-            <th class="text-center" style="font-size: 16px;" colspan="4">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+              colspan="4"
+            >
               Result
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(section, sectionIndex) in ipaItems" :key="sectionIndex" :sectionIndex="sectionIndex">
-            <td v-if="section.isSection === true"
+          <tr
+            v-for="(section, sectionIndex) in ipaItems"
+            :key="sectionIndex"
+            :sectionIndex="sectionIndex"
+          >
+            <td
+              v-if="section.isSection === true"
               style="border-top: 1px solid black; border-left: 1px solid black; text-align: center; vertical-align: middle;"
-              :rowspan="[section.rowSpan]" colspan="2">
+              :rowspan="[section.rowSpan]"
+              colspan="2"
+            >
               <div v-html="section.sequence" />
             </td>
-            <td colspan="3" style="max-width: 400px; border-left: 1px solid black; text-align: start;">
+            <td
+              colspan="3"
+              style="max-width: 400px; border-left: 1px solid black; text-align: start;"
+            >
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
                 {{ section.practice }}
               </VLabel>
             </td>
-            <td colspan="3" style="max-width: 350px; border-left: 1px solid black; text-align: start;">
+            <td
+              colspan="3"
+              style="max-width: 350px; border-left: 1px solid black; text-align: start;"
+            >
               <VLabel class="d-flex justify-center pa-md-2">
                 {{ section.condition }}
               </VLabel>
             </td>
-            <td colspan="4" style="min-width: 450px; border-left: 1px solid black;">
+            <td
+              colspan="4"
+              style="min-width: 450px; border-left: 1px solid black;"
+            >
               <div v-if="section.result.type === 'oknot'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
-                <VRadioGroup v-model="section.result.field[0].value" inline class="d-flex justify-center"
-                  :fieldname="section.result.field[0].name">
-                  <VRadio label="Ok" value="1" />
-                  <VRadio label="Not" value="0" />
+                <VRadioGroup
+                  v-model="section.result.field[0].value"
+                  inline
+                  class="d-flex justify-center"
+                  :fieldname="section.result.field[0].name"
+                >
+                  <VRadio
+                    label="Ok"
+                    value="1"
+                  />
+                  <VRadio
+                    label="Not"
+                    value="0"
+                  />
                 </VRadioGroup>
               </div>
               <div v-if="section.result.type === 'ab'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="solo"
-                      text-start="(A)" text-end="Kg." />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      text-start="(A)"
+                      text-end="Kg."
+                    />
                   </VCol>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
-                      text-start="(B)" text-end="Litre" readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="solo"
+                      text-start="(B)"
+                      text-end="Litre"
+                      readonly="true"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'cd'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="(C)" text-end="mm." />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="(C)"
+                      text-end="mm."
+                    />
                   </VCol>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
-                      text-start="(D)" text-end="Litre." readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="solo"
+                      text-start="(D)"
+                      text-end="Litre."
+                      readonly="true"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'bd'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="solo"
-                      text-start=" (B) + (D) =" text-end="Litre" readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      text-start=" (B) + (D) ="
+                      text-end="Litre"
+                      readonly="true"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -273,13 +363,29 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'litre'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Litre" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Litre"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -287,13 +393,29 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'percen'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="%" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="%"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -301,13 +423,29 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'c'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="C°" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="C°"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -315,28 +453,54 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <!-- <VNumberInput v-model="section.result.field[0]" density="compact" variant="outlined" label=""
-                      type="number" /> -->
-                    <VNumberInput v-model="section.result.field[0].value" density="compact" variant="outlined" />
+                    <!--
+                      <VNumberInput v-model="section.result.field[0]" density="compact" variant="outlined" label=""
+                      type="number" /> 
+                    -->
+                    <VNumberInput
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                    />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput v-model="section.result.field[1].value" density="compact" variant="outlined" />
+                    <VNumberInput
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'mpa'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="(Mpa)" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="(Mpa)"
+                    />
                   </VCol>
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -344,14 +508,30 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'amp'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Amp" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Amp"
+                    />
                   </VCol>
 
                   <VCol>
-                    <VRadioGroup v-model="section.result.field[1].value" inline class="d-flex justify-center">
-                      <VRadio label="Ok" value="1" />
-                      <VRadio label="Not" value="0" />
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
                     </VRadioGroup>
                   </VCol>
                 </VRow>
@@ -359,32 +539,65 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'ef'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="(E)" text-end="mm." />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="(E)"
+                      text-end="mm."
+                    />
                   </VCol>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
-                      label="" text-start="(F)" text-end="Litre" readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="(F)"
+                      text-end="Litre"
+                      readonly="true"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'g'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="(G)" text-end="Litre" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="(G)"
+                      text-end="Litre"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'litrekg'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[0].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Litre" readonly="true" />
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Litre"
+                      readonly="true"
+                    />
                   </VCol>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Kg." readonly="true">
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Kg."
+                      readonly="true"
+                    >
                       <template #append>
                         <VLabel>
                           Kg.
@@ -397,9 +610,14 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'kg'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="outlined"
-                      label="" text-start="" text-end="Kg.">
-                    </VCurrencyField>
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Kg."
+                    />
                   </VCol>
                 </VRow>
               </div>
@@ -489,10 +707,16 @@ watchEffect(async () => {
         <thead>
           <tr>
             <th />
-            <th class="text-center" style="font-size: 16px;">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+            >
               DSC
             </th>
-            <th class="text-center" style="font-size: 16px;">
+            <th
+              class="text-center"
+              style="font-size: 16px;"
+            >
               TANK
             </th>
             <th />
@@ -561,17 +785,28 @@ watchEffect(async () => {
                 <div class="text-subtitle-2">
                   Default
                 </div>
-                <VImg :aspect-ratio="1" class="bg-white" :src="image01" width="500" />
+                <VImg
+                  :aspect-ratio="1"
+                  class="bg-white"
+                  :src="image01"
+                  width="500"
+                />
               </div>
             </div>
           </tr>
         </tbody>
       </table>
     </VCol>
-    <VCol cols="12" lg="12">
+    <VCol
+      cols="12"
+      lg="12"
+    >
       <table class="custom-table">
         <tr>
-          <th class="text-center cursor-pointer" colspan="12">
+          <th
+            class="text-center cursor-pointer"
+            colspan="12"
+          >
             Lorry Loading Check List
           </th>
         </tr>
@@ -587,17 +822,26 @@ watchEffect(async () => {
           </td>
         </tr>
         <tr>
-          <td style="min-width: 150px;" colspan="4">
+          <td
+            style="min-width: 150px;"
+            colspan="4"
+          >
             <div v-if="ipaRequestData.whStaffUpdatedDate">
               <span v-if="ipaRequestData.whStaffUpdatedDate">{{ formatDate(ipaRequestData.whStaffUpdatedDate) }}</span>
             </div>
           </td>
-          <td style="min-width: 150px;" colspan="4">
+          <td
+            style="min-width: 150px;"
+            colspan="4"
+          >
             <div v-if="ipaRequestData.whLeaderDate">
               <span v-if="ipaRequestData.whLeaderDate">{{ formatDate(ipaRequestData.whLeaderDate) }}</span>
             </div>
           </td>
-          <td style="min-width: 150px;" colspan="4">
+          <td
+            style="min-width: 150px;"
+            colspan="4"
+          >
             <div v-if="ipaRequestData.whSupervisorDate">
               <span v-if="ipaRequestData.whSupervisorDate">{{ formatDate(ipaRequestData.whSupervisorDate) }}</span>
             </div>
@@ -610,14 +854,35 @@ watchEffect(async () => {
   <VRow>
     <!-- Btn -->
     <VCol cols="4" />
-    <VCol cols="8" class="d-flex justify-end">
-      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="warning" class="mx-1" @click="saveDraft">
+    <VCol
+      cols="8"
+      class="d-flex justify-end"
+    >
+      <VBtn
+        v-if="(statusId !== 15 && statusId !== 18)"
+        type="text"
+        color="warning"
+        class="mx-1"
+        @click="saveDraft"
+      >
         Draft
       </VBtn>
-      <VBtn v-if="(statusId !== 15 && statusId !== 18)" type="text" color="secondary " class="mx-1" @click="submit">
+      <VBtn
+        v-if="(statusId !== 15 && statusId !== 18)"
+        type="text"
+        color="secondary "
+        class="mx-1"
+        @click="submit"
+      >
         Submit
       </VBtn>
-      <VBtn v-if="(statusId === 18)" type="text" color="primary" class="mx-1" @click="approve">
+      <VBtn
+        v-if="(statusId === 18)"
+        type="text"
+        color="primary"
+        class="mx-1"
+        @click="approve"
+      >
         Approve
       </VBtn>
     </VCol>
@@ -627,8 +892,12 @@ watchEffect(async () => {
   <section>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->
-      <AuthenticatorDialog :is-dialog-visible="isDialogVisibleAlertDialog" :word="wordForSubmit"
-        :success="successDialAlert" @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val" />
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
     </div>
   </section>
 </template>
@@ -650,7 +919,7 @@ watchEffect(async () => {
   text-align: center;
 }
 
-.centered-input>>>input {
+.centered-input >>> input {
   padding: 0;
   block-size: 20px !important;
   text-align: center;

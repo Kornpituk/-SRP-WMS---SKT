@@ -18,38 +18,34 @@ export async function get(poEtlLogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalID}`, {
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
   })
-  return lorryFormIPA;
 }
 
 export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
   })
-
-  return lorryFormIPAStatus;
 }
 
 export function currencyFormat(number) {
-  var responseText = new Intl.NumberFormat("th-TH", {
+  return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(number);
-  return responseText;
+    maximumFractionDigits: 2,
+  }).format(number)
 }
 
 
