@@ -142,8 +142,9 @@ watchEffect(async () => {
   ipaItems[7].result.field[1].value = currencyFormat((ipaItems[7].result.field[0].value * 5.32) + 740.45); // D
   ipaItems[46].result.field[1].value = currencyFormat(mm2litre(ipaItems[46].result.field[0].value)); // F
 
-
-  ipaItems[8].result.field[0].value = (parseFloat(ipaItems[6].result.field[1].value) + parseFloat(ipaItems[7].result.field[1].value)).toFixed(2)
+  console.log("B", parseFloat(ipaItems[6].result.field[1].value));
+  console.log("D", parseFloat(ipaItems[7].result.field[1].value));
+  ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + ((ipaItems[7].result.field[0].value * 5.32) + 740.45))
   ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - parseFloat(ipaItems[46].result.field[1].value)).toFixed(2)
   ipaItems[49].result.field[1].value = (parseFloat(ipaItems[49].result.field[0].value) * 0.78).toFixed(2)
 
@@ -251,7 +252,7 @@ watchEffect(async () => {
                   </VCol>
                   <VCol>
                     <VCurrencyField v-model="section.result.field[1].value" density="compact" variant="solo"
-                      text-start="(D)" text-end="mm." readonly="true" />
+                      text-start="(D)" text-end="Litre." readonly="true" />
                   </VCol>
                 </VRow>
               </div>

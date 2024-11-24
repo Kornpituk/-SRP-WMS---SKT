@@ -60,7 +60,7 @@ export const akumuruItemTemplate = [
     "isSection": true,
     "rowSpan": 4,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า    ",
+    "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า ",
     "condition": "",
     "result": {
       "type": "kg",
@@ -203,7 +203,17 @@ export const akumuruItemTemplate = [
     "isSection": true,
     "rowSpan": 13,
     "sequence": "<strong>5. ขั้นตอนการปฏิบัติ</strong>",
-    "practice": "O  หยุดรถบริเวณที่ปฏิบัติงาน และดับเครื่องยนต์",
+    "practice": {
+      "startPracticeText": " หยุดรถบริเวณที่ปฏิบัติงาน และดับเครื่องยนต์",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l0707060101",
+          "value:": ""
+        }
+      ]
+    },
     "condition": "หยุด",
     "result": {
       "type": "oknot",
@@ -615,7 +625,17 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "(D)  เช็ค Level ในแท้งค์11V-431 เท่ากับ………………….mm.          ",
+    "practice": {
+      "startPracticeText": "(D)  เช็ค Level ในแท้งค์11V-431 เท่ากับ ",
+      "endPracticeText": "mm.",
+      "type": "d",
+      "field": [
+        {
+          "name": "l0707060101",
+          "value:": ""
+        }
+      ]
+    },
     "condition": "น้ำหนักที่อ่านได้",
     "result": {
       "type": "kg",

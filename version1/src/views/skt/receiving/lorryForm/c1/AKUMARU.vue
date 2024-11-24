@@ -285,9 +285,26 @@ function formatDate(dateString) {
               <div v-html="section.sequence" />
             </td>
             <td colspan="3" style="max-width: 400px; border-left: 1px solid black; text-align: start;">
-              <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                {{ section.practice }}
-              </VLabel>
+              <div v-if="section.practice.type === 'd'">
+                <VRow>
+                  <VCol>
+                    <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+                      {{ section.practice.startPracticeText }}
+                      <VCurrencyField v-model="section.practice.field[0].value" density="compact" variant="solo"
+                        text-start="" text-end="" /> {{ section.practice.endPracticeText }}
+                    </VLabel>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-else-if="section.practice.type === 'checkbox'">
+                <v-checkbox :label="section.practice.startPracticeText"
+                  v-model="section.practice.field[0].value"></v-checkbox>
+              </div>
+              <div v-else>
+                <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+                  {{ section.practice }}
+                </VLabel>
+              </div>
             </td>
             <td colspan="3" style="max-width: 350px; border-left: 1px solid black; text-align: start;">
               <VLabel class="d-flex justify-center pa-md-2">
@@ -643,8 +660,9 @@ function formatDate(dateString) {
         <thead>
           <tr>
             <th style="font-size: 16px;">
-              ข้อควรระวัง &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-               : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+              ข้อควรระวัง
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
               <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน
