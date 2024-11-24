@@ -1,6 +1,5 @@
 <script setup>
 import { CurrencyDisplay, useCurrencyInput } from 'vue-currency-input'
-import { watch, watchEffect } from 'vue'
 
 const props = defineProps({
   textStart: {
@@ -17,7 +16,7 @@ const props = defineProps({
 const { inputRef, formattedValue, setValue } = useCurrencyInput({
   currency: 'THB',
   hideCurrencySymbolOnFocus: true,
-  hideGroupingSeparatorOnFocus: true,
+  hideGroupingSeparatorOnFocus: false,
   precision: 2,
   valueRange: { min: 0 },
   currencyDisplay: CurrencyDisplay.hidden,

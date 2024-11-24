@@ -1,11 +1,14 @@
 <script setup>
-import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
-import { watchEffect, computed, watch, ref } from 'vue'
-import axios from '@axios'
-import { ipaItemTemplate } from '@/services/skt/inv/lorryLoading/ipaService'
 import { urlApi } from '@/api'
-import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import VCurrencyField from "@/components/VCurrencyField.vue"
+import {
+  currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, ipaItemTemplate,
+  mm2litre, passInitialData, passSubmitData,
+} from '@/services/skt/inv/lorryLoading/ipaService'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
+import axios from '@axios'
+import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
@@ -25,14 +28,16 @@ const poNo = ref('')
 const aVariable = ref(ipaItems[6].result.field[0])
 const bVariable = ref(ipaItems[6].result.field[1])
 const cVariable = ref(ipaItems[7].result.field[0])
-const dVariable = ref(ipaItems[7].result.field[1])
-const bdVariable = ref(ipaItems[8].result.field[0])
-const dcsBefore = ref(ipaItems[9].result.field[0])
-const eVariable = ref(ipaItems[46].result.field[0])
-const fVariable = ref(ipaItems[46].result.field[1])
-const gVariable = ref(ipaItems[47].result.field[0])
+const dVariable = ref(0)
+const fvariable = ref(0)
+
+var dcsAfter = ref(0)
+var dcsBefore = ref(0)
 var dcsDiff = 0
-var tankDiff = 0
+
+var tankAfter = ref(0)
+var tankBefore = ref(0)
+var tankDiff = ref(0)
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -44,82 +49,34 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
 
 onMounted(async () => {
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
+  await generate(poEtlLogDetailJournalIDQueryParameters.value)
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  const lorryFormIPA = await get(poEtlLogDetailJournalIDQueryParameters.value)
 
-  const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  console.log(lorryFormIPA)
   ipaRequestData.value = lorryFormIPA.data.data
+
   poNo.value = lorryFormIPA.data.data.purchaseOrderNo
+
   for (var i of ipaItems) {
     for (var f of i.result.field) {
       f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
     }
   }
 
+  const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  console.log("statusId", lorryFormIPAStatus.data)
 
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  statusId.value = lorryFormIPAStatus.data.data[0].statusId
 
 })
 
-function passInitialData(type, params) {
-  if (type == "oknot") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
-    }
-  } else {
-    return params
-  }
-}
-
-function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else {
-    return params
-  }
-}
-
 async function saveDraft(e) {
+
   for (var i of ipaItems) {
     for (var f of i.result.field) {
       ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
@@ -191,54 +148,23 @@ async function approve(e) {
   }
 }
 
-watch(ipaItems[6].result.field[0], async x => {// A
-  let b = x.value / (0.78)
-
-  // ipaItems[6].result.field[1].value = parseFloat(b.toFixed(2))
-
-  ipaItems[6].result.field[1].value = b.toFixed(2)
-})
-
-watch(ipaItems[7].result.field[0], async x => {// C
-  let d = (x.value * 5.32) + 740.45
-  ipaItems[7].result.field[1].value = d.toFixed(2) // D
-})
-
-watch(ipaItems[46].result.field[0], async x => { // E
-  ipaItems[46].result.field[1].value = mm2litre(x.value)// F
-})
 
 watchEffect(async () => {
-  dcsDiff = (ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value).toFixed(2)
-  tankDiff = (ipaItems[46].result.field[1].value - ipaItems[7].result.field[1].value).toFixed(2)
-  ipaItems[8].result.field[0].value = (parseFloat(ipaItems[6].result.field[1].value) + parseFloat(ipaItems[7].result.field[1].value)).toFixed(2)
+  ipaItems[6].result.field[1].value = currencyFormat(ipaItems[6].result.field[0].value / (0.78)) // B
+  ipaItems[7].result.field[1].value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45) // D
+  ipaItems[46].result.field[1].value = currencyFormat(ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) // F
+
+  ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
   ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - parseFloat(ipaItems[46].result.field[1].value)).toFixed(2)
   ipaItems[49].result.field[1].value = (parseFloat(ipaItems[49].result.field[0].value) * 0.78).toFixed(2)
+
+  dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value))
+  dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))
+  dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
+  tankAfter.value = ipaItems[46].result.field[1].value
+  tankBefore.value = ipaItems[7].result.field[1].value
+  tankDiff.value = currencyFormat((ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) - (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
 })
-
-
-function mm2litre(mm) {
-  let litre = mm * 5.32 + 740.45
-  
-  return litre.toFixed(2)
-}
-
-//----------------- Formate
-function formatDate(dateString) {
-  if (dateString === null || dateString === '' || dateString === undefined) {
-    return 'Null'
-  } else if (dateString.length > 0) {
-    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
-    const year = date.getFullYear()
-
-    return `${day}/${month}/${year}`
-
-  }
-
-  return 'null'
-}
 </script>
 
 <template>
@@ -381,8 +307,8 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="solo"
-                      text-start="Litre"
-                      text-end="(B)"
+                      text-start="(B)"
+                      text-end="Litre"
                       readonly="true"
                     />
                   </VCol>
@@ -406,7 +332,7 @@ function formatDate(dateString) {
                       density="compact"
                       variant="solo"
                       text-start="(D)"
-                      text-end="mm."
+                      text-end="Litre."
                       readonly="true"
                     />
                   </VCol>
@@ -452,7 +378,6 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Litre"
-                      readonly="true"
                     />
                   </VCol>
                   <VCol>
@@ -483,7 +408,6 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="%"
-                      readonly="true"
                     />
                   </VCol>
                   <VCol>
@@ -537,22 +461,26 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField
+                    <VCurrencyField
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="outlined"
                       label=""
+                      text-start=""
+                      text-end=""
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField
+                    <VCurrencyField
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="outlined"
                       label=""
+                      text-start=""
+                      text-end=""
                     />
                   </VCol>
                 </VRow>
@@ -566,7 +494,7 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="( Mpa )'"
+                      text-end="(Mpa)"
                     />
                   </VCol>
                   <VCol>
@@ -596,7 +524,7 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="Amp'"
+                      text-end="Amp"
                     />
                   </VCol>
 
@@ -627,7 +555,7 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start="(E)"
-                      text-end="mm.'"
+                      text-end="mm."
                     />
                   </VCol>
                   <VCol>
@@ -637,7 +565,8 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start="(F)"
-                      text-end="Litre'"
+                      text-end="Litre"
+                      readonly="true"
                     />
                   </VCol>
                 </VRow>
@@ -651,8 +580,7 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start="(G)"
-                      text-end="Litre'"
-                      type="number"
+                      text-end="Litre"
                     />
                   </VCol>
                 </VRow>
@@ -666,7 +594,8 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="Litre'"
+                      text-end="Litre"
+                      readonly="true"
                     />
                   </VCol>
                   <VCol>
@@ -676,7 +605,8 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="Kg.'"
+                      text-end="Kg."
+                      readonly="true"
                     >
                       <template #append>
                         <VLabel>
@@ -684,6 +614,20 @@ function formatDate(dateString) {
                         </VLabel>
                       </template>
                     </VCurrencyField>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'kg'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Kg."
+                    />
                   </VCol>
                 </VRow>
               </div>
@@ -794,10 +738,10 @@ function formatDate(dateString) {
               After
             </td>
             <td class="py-4 text-center">
-              {{ gVariable.value }}
+              {{ dcsAfter }}
             </td>
             <td class="py-4 text-center">
-              {{ fVariable.value }}
+              {{ tankAfter }}
             </td>
             <td style="font-size: 16px;">
               Ltr
@@ -808,7 +752,7 @@ function formatDate(dateString) {
               Before
             </td>
             <td class="py-4 text-center">
-              {{ dcsBefore.value }}
+              {{ dcsBefore }}
             </td>
             <td class="py-4 text-center">
               {{ dVariable.value }}
