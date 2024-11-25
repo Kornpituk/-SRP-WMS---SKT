@@ -92,6 +92,36 @@ export const useDeleteProductionPlanService = () => {
   }
 }
 
+export const useGetProductionPlanSearchService = () => {
+  const getProductionplanSearchResult = ref(null)
+  const errorMessageGetProductionPlanSearch = ref(null)
+  
+  const fetchGetProductionplanSearch = async (filter, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageGetProductionPlanSearch.value = null
+      console.log('Fetching getProductionPlanSearch...')
+  
+      const result = await productionPlanRepository.getProductionPlanSearch(filter, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Fetching data getProductionPlanSearch:', result)
+        getProductionplanSearchResult.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in fetchGetProductionplanSearch:', error)
+      errorMessageGetProductionPlanSearch.value = error.message
+    }
+  }
+  
+  return {
+    getProductionplanSearchResult,
+    errorMessageGetProductionPlanSearch,
+    fetchGetProductionplanSearch,
+  }
+}
+
 export const useGetProductionPlanService = () => {
   const getProductionplanResult = ref(null)
   const errorMessageGetProductionPlan = ref(null)
@@ -179,5 +209,35 @@ export const useGetBatchProductionPlanService = () => {
     getBatchProductionplanResult,
     errorMessageGetBatchProductionPlan,
     fetchGetBatchProductionplan,
+  }
+}
+
+export const useSaveProductionPlanService = () => {
+  const responseSaveProductionPlan = ref(null)
+  const errorMessageSaveProductionPlan = ref(null)
+  
+  const saveProdutcionPlanFunc = async (formData, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageSaveProductionPlan.value = null
+      console.log('Save Produtcion Plan Func...')
+  
+      const result = await productionPlanRepository.saveProductionPlan(formData, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Save Produtcion Plan Func result:', result)
+        responseSaveProductionPlan.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in saveProdutcionPlanFunc:', error)
+      errorMessageSaveProductionPlan.value = error.message
+    }
+  }
+  
+  return {
+    responseSaveProductionPlan,
+    errorMessageSaveProductionPlan,
+    saveProdutcionPlanFunc,
   }
 }

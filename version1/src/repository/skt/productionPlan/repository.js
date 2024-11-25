@@ -30,6 +30,42 @@ export const productionPlanRepository = {
     }
   },
 
+  async getProductionPlanSearch(filter, urlApi, form, whereHouse, accessToken) {
+    console.log('get repo Production Plan Search...')
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/searchplans`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          StatusID: filter.StatusID,
+          ProductionTextSearch: filter.ProductionTextSearch,
+          ItemTextSearch: filter.ItemTextSearch,
+          ProducingDateFrom: filter.ProducingDateFrom,
+          ProducingDateTo: filter.ProducingDateTo,
+          LotTextSearch: filter.LotTextSearch,
+        },
+      })
+
+      console.log("response", response)
+      if (response && response.data) {
+        console.log('success get repo Production Plan Search...')
+        console.log('Service Response data Production Plan Search:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        console.log('Error repo Error If Production Plan Search...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try Production Plan Search...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch Production Plan Search ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   async getProductionPlanMaster(search, urlApi, form, whereHouse, accessToken) {
     console.log('get repo Production Plan...')
     try {
@@ -159,16 +195,12 @@ export const productionPlanRepository = {
     }
   },
 
-  async saveProductionPlan(formData, batchId, urlApi, form, whereHouse, accessToken) {
+  async saveProductionPlan(formData, urlApi, form, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/ProductionPlan/save`, formData, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/save`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,
           'Authorization': `Bearer ${accessToken}`,
-        },
-        params: {
-          BatchID: batchId,
         },
       })
   

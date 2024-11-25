@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { onMounted, ref, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -23,48 +23,109 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
-import { useGetBatchProductionPlanService } from '@/services/skt/productionPlan/services'
+import { useGetBatchProductionPlanService, useGetProductionPlanSearchService } from '@/services/skt/productionPlan/services'
+
+import { useFormatDateUtilities } from '@/utilities/utilities'
+
+//----------------------------------- Get Batch Production plan ---------------------------
+
+const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
+
+const filterForSearchBatchProductionPlan = ref({
+  StatusID: null,
+  ProductionTextSearch: "",
+  ItemTextSearch: "",
+  ProducingDateFrom: "",
+  ProducingDateTo: "",
+  LotTextSearch: "",
+})
+
+const clearModelFolter = () => {
+  filterForSearchBatchProductionPlan.value.StatusID = null,
+  filterForSearchBatchProductionPlan.value.ProductionTextSearch = "",
+  filterForSearchBatchProductionPlan.value.ItemTextSearch = "",
+  filterForSearchBatchProductionPlan.value.ProducingDateFrom = "",
+  filterForSearchBatchProductionPlan.value.ProducingDateTo = "",
+  filterForSearchBatchProductionPlan.value.LotTextSearch = "",
+  datePickerFilter.value = ''
+}
+
+const searchResult = ref([]) // ตัวแปรสำหรับเก็บผลลัพธ์
+const datePickerFilter = ref(null)
+const productionPlanItems = ref([]) // กำหนดค่าเริ่มต้นเป็น array ว่าง
+
+const formatToMMDDYYYY = date => {
+  const [day, month, year] = date.split("/")
+  
+  return `${month}/${day}/${year}`
+}
+
+watchEffect(async () => {
+  try {
+
+    if(datePickerFilter.value){
+      const [startDate, endDate] = datePickerFilter.value.split(" to ")
+
+      filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
+      filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+    }
+
+    await fetchGetProductionplanSearch(
+      filterForSearchBatchProductionPlan.value, 
+      urlApi.value, 'ProductionPlan', whereHouse, 
+      accessTokenAtStore)
+
+    // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
+    if (getProductionplanSearchResult.value?.data && Array.isArray(getProductionplanSearchResult.value.data)) {
+      console.log("getProductionplanSearchResult", getProductionplanSearchResult.value.data)
+      productionPlanItems.value = getProductionplanSearchResult.value.data
+    } else {
+      console.warn("getProductionplanSearchResult.data is not an array")
+      productionPlanItems.value = []
+    }
+  } catch (error) {
+    console.error("Error fetching production plan master data:", error)
+    productionPlanItems.value = []
+  }
+})
+
+
+//--------------------------- New batch -----------------------------------------------------
 
 const { getBatchProductionplanResult, errorMessageGetBatchProductionPlan, fetchGetBatchProductionplan } = useGetBatchProductionPlanService()
-
 
 const itemStore = useItemStore()
 
 const date = ref(new Date())
 
-function generateGUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0 // สุ่มตัวเลขระหว่าง 0-15
-    const v = c === 'x' ? r : (r & 0x3) | 0x8 // ถ้าเป็น 'y' ต้องให้บิตนำหน้าเป็น 10
-    
-    return v.toString(16) // แปลงเป็นเลขฐาน 16
-  })
-}
-
 const guidForBatch = ref(null)
+
+const batchIDDataPlan = ref()
 
 const newBatchGenBatch = async () => {
   try {
-    // สร้าง GUID สำหรับ batch
-    guidForBatch.value = generateGUID()
-
-    // เรียกใช้ fetch และรอให้ทำงานเสร็จ
-    await fetchGetBatchProductionplan(urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
-
-    // ตรวจสอบว่าผลลัพธ์ไม่เป็น undefined หรือ null
-    if (getBatchProductionplanResult.value) {
-      itemStore.setItemDetails(getBatchProductionplanResult.value, 'guIDForBatchCookie')
+    if(batchIDDataPlan.value){
+      itemStore.setItemDetails(batchIDDataPlan.value, 'guIDForBatchCookie')
 
       console.log("getBatchProductionplanResult", itemStore.getItemDetails('guIDForBatchCookie'))
-    } else {
-      console.error("getBatchProductionplanResult.value is undefined or null")
+    }else{
+      // เรียกใช้ fetch และรอให้ทำงานเสร็จ
+      await fetchGetBatchProductionplan(urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+
+      // ตรวจสอบว่าผลลัพธ์ไม่เป็น undefined หรือ null
+      if (getBatchProductionplanResult.value) {
+        itemStore.setItemDetails(getBatchProductionplanResult.value, 'guIDForBatchCookie')
+
+        console.log("getBatchProductionplanResult", itemStore.getItemDetails('guIDForBatchCookie'))
+      } else {
+        console.error("getBatchProductionplanResult.value is undefined or null")
+      }
     }
+    
   } catch (error) {
     console.error("Error in newBatchGenBatch:", error)
   }
 }
-
-
 
 // In case of a range picker, you'll receive [Date, Date]
 const format = date => {
@@ -97,7 +158,7 @@ const indexSubmit = ref('')
 const changeStatusProductPlanSubmit = index => {
   isDialogSubmitVisible.value = true
   indexSubmit.value = index
-  
+
 }
 
 const submitProductionPlan = index => {
@@ -113,11 +174,11 @@ function getRandomDate(start, end) {
   const endDate = new Date(end)
   const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime())
   const randomDate = new Date(randomTime)
-  
+
   const year = randomDate.getFullYear()
   const month = String(randomDate.getMonth() + 1).padStart(2, '0') // Months are zero-based
   const day = String(randomDate.getDate()).padStart(2, '0')
-  
+
   return `${day}/${month}/${year}`
 }
 
@@ -127,153 +188,42 @@ const toDayDatePFinished = ref('NaN')
 //------------------------------------------ Mock Data --------------------------------
 const countItemProduction = ref(1)
 
-const mockData = ref([
-  {
-    
-    status: 'Working',
-    inputDate: toDayDate,
-    plants: "Plant A",
-    reactor: "R-101",
-    productionCode: "porduction Code",
-    productionName: "porduction Name",
-    batchScaleKgs: 500,
-    productCode1: "PC2311001",
-    productName1: "Chemical X",
-    quantityKgs1: 1000,
-    quantityPcs1: 1,
-    packagingType1: "Drum",
-    productCode2: "PC2311001",
-    productName2: "Chemical X",
-    quantityKgs2: 1000,
-    quantityPcs2: 1,
-    packagingType2: "Drum",
-    uom: "kg",
-    lotNumber: "LT12345",
-    producingDate: date,
-    finishedDate: toDayDatePFinished.value,
-    storageCondition: "Cool, Dry Place",
-    checkBy: "John",
-    remark: "Urgent",
-    byWho: 'John',
-    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
-  },
-])
-
-//---------------------------- Add Mock Data --------------------------------
-const isDialogAddVisible = ref(false)
-
-const selectedItemNamePD = ref(null)
-
-// computed property to extract product names
-const productNamesMockItems = computed(() => mockData.value.map(item => item.productName))
-
-const findProductByName = productName => {
-  return mockData.value.find(item => item.productName === productName) || {}
-}
-
-const productionPlan = ref([])
-const selectedItem = ref(null)
-const selectedDataTables = ref([])
-
-const addProductToPlantrue = () => {
-  if (selectedItem.value) {
-    const product = findProductByName(selectedItem.value)
-    if (product) {
-      const formattedProducingDate = formatDate(product.producingDate) // แปลงเป็น string ตาม format ที่ต้องการ
-
-      productionPlan.value.push({ ...product, producingDate: formattedProducingDate })
-    }
-    isDialogAddVisible.value = false
-  }
-}
-
-// ฟังก์ชันสำหรับเพิ่มแถวว่างใน productionPlan
-const addEmptyRowToPlan = () => {
-  
-  productionPlan.value.push({
-    no: countItemProduction.value,
-    
-    producingDate: '',
-
-    // เพิ่มคอลัมน์อื่นๆ ตามข้อมูลใน mockData
-    inputDate: '',
-    plants: '',
-    reactor: '',
-    productionName: '',
-    productionCode: '',
-    batchScaleKgs: '',
-
-    productName1: '',
-    productCode1: '',
-    packagingType1: '',
-    packagingKgs1: '',
-    packagingPcs1: '',
-
-    productName2: '',
-    productCode2: '',
-    packagingType2: '',
-    packagingKgs2: '',
-    packagingPcs2: '',
-
-    uom: '',
-    lotNumber: '',
-    storageCondition: '',
-    remark: '',
-    byWho: '',
-    statusDate: '',
-    status: 'Working',
-    updateDate: '',
-  })
-  countItemProduction.value+= 1
-}
-
-// Watch สำหรับอัพเดทข้อมูลเมื่อเลือกชื่อสินค้า
-watch(productionPlan, newPlan => {
-  newPlan.forEach((item, index) => {
-    if ((item.plants || item.productCode) && item.status === 'Working') {
-      const product = findProductByName(item.productCode || item.plants)
-      if (product && (product.plants || product.productCode)) {
-        const formattedProducingDate = formatDate(product.producingDate)
-
-        // ตรวจสอบสถานะปัจจุบันและอัพเดทเฉพาะเมื่อจำเป็น
-        if (item.producingDate !== formattedProducingDate) {
-          productionPlan.value[index] = { 
-            ...product, 
-            producingDate: formattedProducingDate, 
-            status: item.status, 
-          }
-        }
-      }
-    }
-  })
-}, { deep: true })
-
-// ฟังก์ชันสำหรับอัพเดทข้อมูลเมื่อเลือกชื่อสินค้า
-
-const cancelProduct = index => {
-  productionPlan.value.splice(index, 1) ; ''
-  isDialogRejectVisible.value = false
-}
-
-const cancelAllProducts = () => {
-  productionPlan.value = []
-}
-
-const viewAllData = () => {
-  console.log('ALl Data Date', productionPlan.value)
-}
-
 const selectedDateInput = ref(toDayDate)
 const rules = [v => v.length <= 150 || 'Max 25 characters']
 
 //---------------------------------
 
-const items = [
-  'Programming',
-  'Design',
-  'Vue',
-  'Vuetify',
+const itemsStatus = [
+  { name: "All", id: null },
+  { name: "Draft PROD plan", id: 101 },
+  { name: "Waiting for PROD APVL", id: 102 },
+  { name: "Waiting for Mat. Picking", id: 103 },
+  { name: "In Producing", id: 105 },
+  { name: "Waiting for FG/PROD APVL", id: 107 },
+  { name: "PROD Completed", id: 108 },
+  { name: "Plan Rejected", id: 109 },
 ]
+
+const colorStatusWithId = id => {
+  switch (id) {
+  case 101:
+    return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan' }
+  case 102:
+    return { color: 'green', message: 'green', text: 'Waiting for PROD APVL' }
+  case 103:
+    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking' }
+  case 105:
+    return { color: 'purple', message: 'purple', text: 'In Producing' }
+  case 107:
+    return { color: 'brown', message: 'brown', text: 'Waiting for FG/PROD APVL' }
+  case 108:
+    return { color: 'green', message: 'green', text: 'PROD Completed' }
+  case 109:
+    return { color: 'red', message: 'red', text: 'Plan Rejected' }
+  default:
+    return { color: 'grey', message: 'grey', text: 'All' }
+  }
+}
 
 ///------------------------------------------------------------------------------
 const panel = ref(['filter'])
@@ -286,7 +236,7 @@ const refeshPage = () => {
   isSpinning.value = true
   setTimeout(() => {
     isSpinning.value = false
-  }, 10*1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+  }, 10 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   location.reload()
 }
 
@@ -455,7 +405,7 @@ const headersDataTableNew = [
     title: 'Packaging Pcs2',
     key: 'packagingPcs2',
   },
-  
+
   {
     title: 'Lot',
     key: 'lotNumber',
@@ -468,7 +418,7 @@ const headersDataTableNew = [
     title: 'Finished Date',
     key: 'finishedDate',
   },
-  
+
   {
     title: 'Remark',
     key: 'remark',
@@ -551,7 +501,8 @@ const print = () => {
   console.log('Printed')
 }
 
-const newBatch = async () => {
+const newBatch = async batchID => {
+  batchIDDataPlan.value = batchID
   try {
     // รอให้ newBatchGenBatch ทำงานเสร็จ
     await newBatchGenBatch()
@@ -576,7 +527,8 @@ const newBatch = async () => {
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'dashboards-main',
+                :to="{
+                  name: 'dashboards-main',
                 }"
               >
                 <VIcon
@@ -632,17 +584,35 @@ const newBatch = async () => {
                   class="py-1"
                 >
                   <VAutocomplete
-                    label="Status"
-                    :items="items"
+                    v-model="filterForSearchBatchProductionPlan.StatusID"
+                    :items="itemsStatus"
+                    item-title="name"
+                    item-value="id"
                     density="compact"
-                    placeholder="Select State"
                   >
                     <template #label>
-                      <span style="font-size: 12px;">Status</span>
+                      <span
+                        class="d-flex align-center"
+                        style="font-size: 12px;"
+                      >
+                        Select Status
+                      </span>
                     </template>
-                  </VAutocomplete> 
+
+                    <template #selection="{ item }">
+                      <VChip
+                        variant="elevated"
+                        :style="{ color: colorStatusWithId(item.raw.id).message }"
+                        size="x-small"
+                        style="min-height: 20px;"
+                        :color="colorStatusWithId(item.raw.id).color"
+                      >
+                        <span class="text-white">{{ colorStatusWithId(item.raw.id).text }}</span>
+                      </VChip>
+                    </template>
+                  </VAutocomplete>
                 </VCol>
-               
+
                 <VCol
                   cols="12"
                   lg="4"
@@ -650,7 +620,7 @@ const newBatch = async () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
+                    v-model="filterForSearchBatchProductionPlan.ProductionTextSearch"
                     type="Product Name"
                     density="compact"
                   >
@@ -668,7 +638,7 @@ const newBatch = async () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
+                    v-model="filterForSearchBatchProductionPlan.ItemTextSearch"
                     type="Product Name"
                     density="compact"
                   >
@@ -686,15 +656,15 @@ const newBatch = async () => {
                   class="py-1"
                 >
                   <AppDateTimePicker
-                    v-model="date"
+                    v-model="datePickerFilter"
                     label="Producing Date"
                     placeholder="Select date"
                     density="compact"
                     prepend-inner-icon="ri-calendar-schedule-fill"
-                    :config="{ dateFormat: 'd/m/Y' }"
+                    :config="{ dateFormat: 'd/m/Y', mode: 'range' }"
                   />
                 </VCol>
-               
+
                 <VCol
                   cols="12"
                   lg="4"
@@ -702,8 +672,7 @@ const newBatch = async () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
-                    type="Product Name"
+                    v-model="filterForSearchBatchProductionPlan.LotTextSearch"
                     density="compact"
                   >
                     <template #label>
@@ -727,8 +696,6 @@ const newBatch = async () => {
                         color="primary"
                         density="compact"
                         class="mx-0"
-                      
-                        @click="isDialogPrintLabelVisible = true"
                       >
                         <span style="font-size: 12px;">{{ $t('Search') }}</span>
                       </VBtn>
@@ -739,7 +706,7 @@ const newBatch = async () => {
                         height="100%"
                         width="100%"
                         density="compact"
-                        @click="clearModel"
+                        @click="clearModelFolter"
                       >
                         <span style="font-size: 12px;">{{ $t('Clear') }}</span>
                       </VBtn>
@@ -856,7 +823,8 @@ const newBatch = async () => {
                     }}:&nbsp;</span>&nbsp;{{ groupSupProduct }}<br>
                     <span style="font-size: large; font-weight: 900;">{{
                       $t("Total")
-                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{ (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
+                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{
+                      (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
                   </VCol>
                 </VRow>
                 <span style="font-size: large; font-weight: 900;">{{
@@ -1069,11 +1037,11 @@ const newBatch = async () => {
             <VBtn
               class="mx-2"
               color="warning"
-              @click="newBatch"
+              @click="newBatch(null)"
             >
               <span style="font-size: 12px;">New Batch</span>
             </VBtn>
-        
+
             <VBtn
               v-if="false"
               color="info"
@@ -1130,381 +1098,15 @@ const newBatch = async () => {
   <!-- ----------             Production plan                                ------------------------------------ -->
   <section>
     <!-- VData table -->
-    <VCard v-if="false">
-      <VCardText>
-        <VDataTable
-          v-model:page="currentPageDataTable"
-          v-model="selectedDataTables"
-          :headers="headersDataTableNew"
-          :items="productionPlan"
-          :items-per-page="5"
-          show-select
-          class="text-no-wrap"
-        >
-          <template #column.action="{ column }">
-            <tr style="background-color: aqua !important;">
-              <th>
-                {{ column.column }} action custom
-              </th>
-            </tr>
-          </template>
-
-          <!--
-            <template #column.item1="{ column }">
-            <tr class="bg-light-blue-lighten-4">
-            <th class="bg-light-blue-lighten-4">
-            {{ column.column }} Item 1
-            <tr class="bg-light-blue-lighten-4">
-            <td class="px-2">Item Code</td>
-            <td class="px-2">Item Name1</td>
-            <td class="px-2">Packaging Type1</td>
-            <td class="px-2">Packaging Kgs1</td>
-            <td class="px-2">Packaging Pcs1</td>
-            </tr>
-            </th>
-            </tr>
-            </template>
-          -->
-          <template #item="{ item }">
-            <tr style="font-size: 14px;">
-              <td
-                class="text-center px-2"
-                style="position: sticky; z-index: 1; left: 0;"
-              >
-                <VCheckboxBtn
-                  v-model="selectedDataTables"
-                  :value="item.raw"
-                  @update:modelValue="(selected) => handleSelection(selected, item.raw)"
-                />
-              </td>
-              <td
-                style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
-                class="text-start"
-              >
-                <span v-if="item.raw.status === 'Aprove'">
-                  <VChip color="success">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-if="item.raw.status === 'Submit'">
-                  <VChip color="success">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Back to Edit'">
-                  <VChip color="warning">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Working'">
-                  <VChip color="info">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Save Draft'">
-                  <VChip color="warning">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Reject'">
-                  <VChip color="error">{{ item.raw.status }}</VChip>
-                </span>
-              </td>
-              <td>{{ item.raw.no }}</td>
-              <td>
-                <AppDateTimePicker
-                  v-model="item.raw.inputDate"
-                  density="compact"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                >
-                  <template #label>
-                    <span>Input Data</span>
-                  </template>
-                </AppDateTimePicker>
-              </td>
-              <td>
-                <VCombobox
-                  v-model="item.raw.plants"
-                  :readonly="item.raw.status === 'Submit'"
-                  :items="productNamesMockItems"
-                  placeholder="deployment"
-                  density="compact"
-                  label="Plants Type"
-                  style="width: 150px;"
-                />
-              </td>
-              <td>{{ item.raw.reactor }}</td>
-              <td>
-                <VCombobox
-                  v-model="item.raw.productionCode"
-                  :items="productNamesMockItems"
-                  placeholder="deployment"
-                  density="compact"
-                  label="Plants Code"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                />
-              </td>
-              <td>
-                {{ productionName }}
-              </td>
-              <td
-                class="px-1"
-                style="min-width: 150px;"
-              >
-                batchScaleKgs
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-model="item.raw.productCode1"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 1</span>
-                  </template>
-                </VCombobox>
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                {{ productName1 }}
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingType1"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type</span>
-                  </template>
-                </VCombobox>
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                {{ packagingKgs1 }}
-              </td>
-              <td class="bg-light-blue-lighten-5">
-                <VTextField
-                  v-model="item.raw.packagingPcs1"
-                  type="number"
-                  style="min-width: 100px;"
-                  density="compact"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 1</span>
-                  </template>
-                </VTextField>
-              </td>
-
-              <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.productCode2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 2</span>
-                  </template>
-                </VCombobox>
-              </td>
-              <td class="bg-red-lighten-5">
-                {{ productName2 }}
-              </td>
-              <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingType2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type 2</span>
-                  </template>
-                </VCombobox>
-              </td>
-              <td class="bg-red-lighten-5">
-                {{ packagingKgs2 }}
-              </td>
-              <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingPcs2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 2</span>
-                  </template>
-                </VCombobox>
-              </td>
-             
-              <td
-                class="px-1"
-                style="min-width: 150px;"
-              >
-                <VTextField
-                  v-model="item.raw.lotNumber"
-                  density="compact"
-                  style="min-width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                />
-              </td>
-              <td
-                class="px-1"
-                style="min-width: 150px;"
-              >
-                <AppDateTimePicker
-                  v-model="item.raw.producingDate"
-                  placeholder="Producing date"
-                  density="compact"
-                  style="font-size: 12px;"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                />
-              </td>
-              <td
-                class="px-1"
-                style="min-width: 150px;"
-              >
-                {{ item.raw.finishedDate }}
-              </td>
-              <td>
-                <VTextarea
-                  v-model="item.raw.remark"
-                  style="min-width: 200px;"
-                  class="pa-2"
-                  label="Remark"
-                  :rules="rules"
-                  rows="2"
-                  clearable
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Remark</span>
-                  </template>
-                </VTextarea>
-              </td>
-              <td>
-                {{ item.raw.statusDate }}
-              </td>
-              <td>
-                {{ item.raw.byWho }}
-              </td>
-              <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'"> 
-                <div class="d-flex justify-center">
-                  <VMenu transition="scale-transition">
-                    <template #activator="{ props }">
-                      <VIcon
-                        v-bind="props"
-                        icon="ri-more-2-fill"
-                      />
-                    </template>
-                    <VList>
-                      <VListItem
-                        v-for="(itemAction, index) in itemsActionDataTable"
-                        :key="index"
-                        @click="handleAction(itemAction.value)"
-                      >
-                        {{ itemAction.title }}
-                        <template #prepend>
-                          <VIcon :icon="itemAction.icon" />
-                        </template>
-                      </VListItem>
-                    </VList>
-                  </VMenu>
-                </div>
-                <div v-if="false">
-                  <VBtn
-                    color="warning"
-                    @click="changeStatusProductPlanSaveDraft(index)"
-                  >
-                    Save Draft
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount === 'Manager'"
-                    color="red"
-                    class="mx-2"
-                    @click="rejectProduction(index)"
-                  >
-                    Reject
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount !== 'Manager'"
-                    color="red"
-                    class="mx-2"
-                    @click="cancelProduct(index)"
-                  >
-                    Cancel
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount !== 'Manager'"
-                    class="mx-2"
-                    color="green"
-                    @click="changeStatusProductPlanSubmit(index)"
-                  >
-                    Submit
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount === 'Manager'"
-                    class="mx-2"
-                    color="green"
-                    @click="changeStatusProductPlanSubmit(index)"
-                  >
-                    Approve
-                  </VBtn>
-                  <VBtn
-                    color="warning"
-                    prepend-icon="ri-printer-fill"
-                  >
-                    {{ $t('Print') }}
-                  </VBtn>
-                </div>
-              </td>
-              <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'"> 
-                <VBtn
-                  color="grey"
-                  disabled
-                  @click="changeStatusProductPlanSaveDraft(index)"
-                >
-                  Save Draft
-                </VBtn>
-                <VBtn
-                  color="grey"
-                  disabled
-                  class="mx-2"
-                  @click="cancelProduct(index)"
-                >
-                  Cancel
-                </VBtn>
-                <VBtn
-                  class="mx-2"
-                  color="grey"
-                  disabled
-                  @click="changeStatusProductPlanSubmit(index)"
-                >
-                  Submit
-                </VBtn>
-              
-                <VBtn
-                  color="warning"
-                  prepend-icon="ri-printer-fill"
-                >
-                  {{ $t('Print') }}
-                </VBtn>
-              </td>
-            </tr>
-          </template>
-        </VDataTable>
-      </VCardText>
-    </VCard>
-
     <VCard>
       <VCardText>
-        <VDataTable
+        <VDataTable 
+          v-if="productionPlanItems.length > 0"
           v-model:page="currentPageDataTable"
           v-model="selectedDataTables"
           :headers="headersDataTableNew"
-          :items="productionPlan"
-          :items-per-page="5"
+          :items="productionPlanItems"
+          :items-per-page="10"
           show-select
           class="text-no-wrap"
         >
@@ -1515,23 +1117,6 @@ const newBatch = async () => {
               </th>
             </tr>
           </template>
-
-          <!--
-            <template #column.item1="{ column }">
-            <tr class="bg-light-blue-lighten-4">
-            <th class="bg-light-blue-lighten-4">
-            {{ column.column }} Item 1
-            <tr class="bg-light-blue-lighten-4">
-            <td class="px-2">Item Code</td>
-            <td class="px-2">Item Name1</td>
-            <td class="px-2">Packaging Type1</td>
-            <td class="px-2">Packaging Kgs1</td>
-            <td class="px-2">Packaging Pcs1</td>
-            </tr>
-            </th>
-            </tr>
-            </template>
-          -->
           <template #item="{ item }">
             <tr style="font-size: 14px;">
               <td
@@ -1548,185 +1133,76 @@ const newBatch = async () => {
                 style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
                 class="text-start"
               >
-                <span v-if="item.raw.status === 'Aprove'">
-                  <VChip color="success">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-if="item.raw.status === 'Submit'">
-                  <VChip color="success">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Back to Edit'">
-                  <VChip color="warning">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Working'">
-                  <VChip color="info">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Save Draft'">
-                  <VChip color="warning">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Reject'">
-                  <VChip color="error">{{ item.raw.status }}</VChip>
+                <span>
+                  <VChip
+                    :color="colorStatusWithId(item.raw.statusId).color"
+                    :style="{ color: colorStatusWithId(item.raw.statusId).color }"
+                  >{{ colorStatusWithId(item.raw.statusId).text }}</VChip>
                 </span>
               </td>
               <td>{{ item.raw.no }}</td>
               <td>
-                <AppDateTimePicker
-                  v-model="item.raw.inputDate"
-                  density="compact"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                >
-                  <template #label>
-                    <span>Input Data</span>
-                  </template>
-                </AppDateTimePicker>
+                {{ item.raw.inputDate }}
               </td>
               <td>
-                <VCombobox
-                  v-model="item.raw.plants"
-                  :readonly="item.raw.status === 'Submit'"
-                  :items="productNamesMockItems"
-                  placeholder="deployment"
-                  density="compact"
-                  label="Plants Type"
-                  style="width: 150px;"
-                />
+                {{ item.raw.planningID }}
               </td>
-              <td>{{ item.raw.reactor }}</td>
+              <td>{{ item.raw.reactorName }}</td>
               <td>
-                <VCombobox
-                  v-model="item.raw.productionCode"
-                  :items="productNamesMockItems"
-                  placeholder="deployment"
-                  density="compact"
-                  label="Plants Code"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                />
+                {{ item.raw.productionCode }}
               </td>
               <td>
-                {{ productionName }}
+                {{ item.raw.productionName }}
               </td>
               <td
                 class="px-1"
                 style="min-width: 150px;"
               >
-                batchScaleKgs
+                {{ item.raw.quantityKgs }}
               </td>
               <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-model="item.raw.productCode1"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 1</span>
-                  </template>
-                </VCombobox>
+                {{ item.raw.product1InBomName }}
               </td>
               <td class="bg-light-blue-lighten-5">
-                {{ productName1 }}
+                {{ item.raw.product1Name }}
               </td>
               <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingType1"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type</span>
-                  </template>
-                </VCombobox>
+                {{ item.raw.product1SelectedPackagingCode }}
               </td>
               <td class="bg-light-blue-lighten-5">
-                {{ packagingKgs1 }}
+                {{ product1PackagingName }}
               </td>
               <td class="bg-light-blue-lighten-5">
-                <VTextField
-                  v-model="item.raw.packagingPcs1"
-                  type="number"
-                  style="min-width: 100px;"
-                  density="compact"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 1</span>
-                  </template>
-                </VTextField>
+                {{ product1PackingQtyKgs }}
               </td>
 
               <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.productCode2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 2</span>
-                  </template>
-                </VCombobox>
+                {{ item.raw.product2InBomName }}
               </td>
               <td class="bg-red-lighten-5">
-                {{ productName2 }}
+                {{ item.raw.product2Name }}
               </td>
               <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingType2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type 2</span>
-                  </template>
-                </VCombobox>
+                {{ item.raw.product2SelectedPackagingCode }}
               </td>
               <td class="bg-red-lighten-5">
-                {{ packagingKgs2 }}
+                {{ item.raw.product2PackagingName }}
               </td>
               <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingPcs2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 2</span>
-                  </template>
-                </VCombobox>
+                {{ item.raw.product2PackingQtyKgs }}
               </td>
-             
+
               <td
                 class="px-1"
                 style="min-width: 150px;"
               >
-                <VTextField
-                  v-model="item.raw.lotNumber"
-                  density="compact"
-                  style="min-width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                />
+                {{ item.raw.lotNumber }}
               </td>
               <td
                 class="px-1"
                 style="min-width: 150px;"
               >
-                <AppDateTimePicker
-                  v-model="item.raw.producingDate"
-                  placeholder="Producing date"
-                  density="compact"
-                  style="font-size: 12px;"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                />
+                {{ item.raw.producingDate }}
               </td>
               <td
                 class="px-1"
@@ -1735,30 +1211,20 @@ const newBatch = async () => {
                 {{ item.raw.finishedDate }}
               </td>
               <td>
-                <VTextarea
-                  v-model="item.raw.remark"
-                  style="min-width: 200px;"
-                  class="pa-2"
-                  label="Remark"
-                  :rules="rules"
-                  rows="2"
-                  clearable
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Remark</span>
-                  </template>
-                </VTextarea>
+                {{ item.raw.remark }}
               </td>
               <td>
-                {{ item.raw.statusDate }}
+                {{ useFormatDateUtilities(item.raw.updatedDate) }}
               </td>
               <td>
-                {{ item.raw.byWho }}
+                {{ item.raw.updatedBy }}
               </td>
-              <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'"> 
+              <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'">
                 <div class="d-flex justify-center">
-                  <VMenu transition="scale-transition">
+                  <VMenu
+                    v-if="false"
+                    transition="scale-transition"
+                  >
                     <template #activator="{ props }">
                       <VIcon
                         v-bind="props"
@@ -1778,6 +1244,12 @@ const newBatch = async () => {
                       </VListItem>
                     </VList>
                   </VMenu>
+                  <VBtn
+                    color="info"
+                    @click="newBatch(item.raw.batchID)"
+                  >
+                    Action
+                  </VBtn>
                 </div>
                 <div v-if="false">
                   <VBtn
@@ -1826,7 +1298,7 @@ const newBatch = async () => {
                   </VBtn>
                 </div>
               </td>
-              <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'"> 
+              <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'">
                 <VBtn
                   color="grey"
                   disabled
@@ -1850,7 +1322,7 @@ const newBatch = async () => {
                 >
                   Submit
                 </VBtn>
-              
+
                 <VBtn
                   color="warning"
                   prepend-icon="ri-printer-fill"
@@ -1877,7 +1349,7 @@ const newBatch = async () => {
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.5(Last Updated 11/11/2024 ) {{ products.length }} Rows of Data 
+          Version : 2.5(Last Updated 11/11/2024 ) {{ products.length }} Rows of Data
         </VAlert>
       </VCardText>
     </VCard>
@@ -1913,4 +1385,3 @@ const newBatch = async () => {
   background: aquamarine;
 }
 </style>
-

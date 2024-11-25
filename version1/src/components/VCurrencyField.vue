@@ -1,5 +1,5 @@
 <script setup>
-import { CurrencyDisplay, useCurrencyInput } from 'vue-currency-input';
+import { CurrencyDisplay, useCurrencyInput } from 'vue-currency-input'
 
 const props = defineProps({
   textStart: {
@@ -27,7 +27,12 @@ const textStart = ref(props.textStart)
 </script>
 
 <template>
-  <VTextField ref="inputRef" v-model="formattedValue" density="compact" variant="solo">
+  <VTextField
+    ref="inputRef"
+    v-model="formattedValue"
+    density="compact"
+    variant="solo"
+  >
     <template #prepend>
       <VLabel>
         {{ textStart }}

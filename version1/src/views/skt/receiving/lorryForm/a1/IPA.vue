@@ -1,6 +1,7 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
+import VNumberInput from '@/components/VNumberInput.vue'
 import {
   currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, ipaItemTemplate,
   mm2litre, passInitialData, passSubmitData,
@@ -12,7 +13,6 @@ import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
-import VNumberInput from '@/components/VNumberInput.vue'
 import alertWordConst from '@/utilities/constant'
 
 
@@ -29,7 +29,8 @@ const poNo = ref('')
 const aVariable = ref(ipaItems[6].result.field[0])
 const bVariable = ref(ipaItems[6].result.field[1])
 const cVariable = ref(ipaItems[7].result.field[0])
-const dVariable = ref(ipaItems[7].result.field[1])
+const dVariable = ref(0)
+const fvariable = ref(0)
 
 var dcsAfter = ref(0)
 var dcsBefore = ref(0)
@@ -69,7 +70,9 @@ onMounted(async () => {
 
   const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  console.log("statusId", lorryFormIPAStatus.data)
+
+  statusId.value = lorryFormIPAStatus.data.data[0].statusId
 
 })
 
@@ -94,6 +97,9 @@ async function saveDraft(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
+    setTimeout(() => {
+      location.reload()
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
@@ -102,6 +108,23 @@ async function saveDraft(e) {
 async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
+
+
+  let isValid = true
+  for (var i of ipaItems) {
+    for (var f of i.result.field) {
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+        isValid = false
+      }
+    }
+  }
+
+  if(!isValid){
+    alert("กรุณากรอกข้อมูลให้ครบ")
+    
+    return
+  }
+ 
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
@@ -113,6 +136,9 @@ async function submit(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
@@ -132,7 +158,9 @@ async function approve(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.approve, true)
-    location.reload()
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
@@ -141,12 +169,10 @@ async function approve(e) {
 
 watchEffect(async () => {
   ipaItems[6].result.field[1].value = currencyFormat(ipaItems[6].result.field[0].value / (0.78)) // B
-  ipaItems[7].result.field[1].value = currencyFormat((ipaItems[7].result.field[0].value * 5.32) + 740.45) // D
-  ipaItems[46].result.field[1].value = currencyFormat(mm2litre(ipaItems[46].result.field[0].value)) // F
+  ipaItems[7].result.field[1].value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45) // D
+  ipaItems[46].result.field[1].value = currencyFormat(ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) // F
 
-  console.log("B", parseFloat(ipaItems[6].result.field[1].value))
-  console.log("D", parseFloat(ipaItems[7].result.field[1].value))
-  ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + ((ipaItems[7].result.field[0].value * 5.32) + 740.45))
+  ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
   ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - parseFloat(ipaItems[46].result.field[1].value)).toFixed(2)
   ipaItems[49].result.field[1].value = (parseFloat(ipaItems[49].result.field[0].value) * 0.78).toFixed(2)
 
@@ -154,8 +180,8 @@ watchEffect(async () => {
   dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))
   dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
   tankAfter.value = ipaItems[46].result.field[1].value
-  tankBefore.value = ipaItems[7].result.field[1].value
-  tankDiff.value = currencyFormat(parseFloat(ipaItems[46].result.field[1].value) - parseFloat(ipaItems[7].result.field[1].value))
+  tankBefore.value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45)
+  tankDiff.value = currencyFormat((ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) - (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
 })
 </script>
 
@@ -263,7 +289,7 @@ watchEffect(async () => {
             </td>
             <td
               colspan="4"
-              style="min-width: 450px; border-left: 1px solid black;"
+              style="min-width: 500px; border-left: 1px solid black;"
             >
               <div v-if="section.result.type === 'oknot'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
@@ -453,14 +479,9 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <!--
-                      <VNumberInput v-model="section.result.field[0]" density="compact" variant="outlined" label=""
-                      type="number" /> 
-                    -->
                     <VNumberInput
                       v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
+                      :max-length="2"
                     />
                   </VCol>
                   <VLabel>
@@ -469,8 +490,7 @@ watchEffect(async () => {
                   <VCol>
                     <VNumberInput
                       v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
+                      :max-length="2"
                     />
                   </VCol>
                 </VRow>
@@ -745,7 +765,7 @@ watchEffect(async () => {
               {{ dcsBefore }}
             </td>
             <td class="py-4 text-center">
-              {{ dVariable.value }}
+              {{ tankBefore }}
             </td>
             <td style="font-size: 16px;">
               Ltr

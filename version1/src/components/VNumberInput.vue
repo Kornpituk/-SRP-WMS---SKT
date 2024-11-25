@@ -1,47 +1,61 @@
-<template>
-    <div>
-        <v-text-field v-model.number="inputValue" @keydown="onInput" density="compact" variant="outlined"
-            class="justify-center" />
-    </div>
-</template>
+<script setup>
+import { ref, watch } from 'vue'
+import { CurrencyDisplay, useCurrencyInput } from 'vue-currency-input'
 
-<script lang="ts">
-import { defineComponent, PropType, ref, watch } from 'vue';
+const props = defineProps({
+  textStart: {
+    type: String,
+    required: false,
+  },
+  textEnd: {
+    type: String,
+    required: false,
+  },
+})
 
-export default defineComponent({
-    name: 'VNumberInput',
-    props: {
-        modelValue: {
-            type: [String, Number] as PropType<string | number>,
-            default: '',
-        },
-    },
-    emits: ['update:modelValue'],
-    setup(props, { emit }) {
-        const inputValue = ref<string | number>(props.modelValue);
 
-        // Watch for changes in modelValue and update inputValue
-        watch(() => props.modelValue, (newValue) => {
-            inputValue.value = newValue;
-        });
+const { inputRef, formattedValue, setValue } = useCurrencyInput({
+  currency: 'THB',
+  hideCurrencySymbolOnFocus: true,
+  hideGroupingSeparatorOnFocus: true,
+  precision: 0,
 
-        const onInput = (event: Event) => {
-            const target = event.target as HTMLInputElement;
-            // Remove non-numeric characters
-            const sanitizedValue = target.value.replace(/[^0-9]/g, '');
-            inputValue.value = sanitizedValue;
-            // Emit the sanitized value to the parent component
-            emit('update:modelValue', sanitizedValue);
-        };
+  //   valueRange: { min: 2 },
+  currencyDisplay: CurrencyDisplay.hidden,
+})
 
-        return {
-            inputValue,
-            onInput,
-        };
-    },
-});
+const internalValue = ref('')
+
+watch(formattedValue, newValue => {
+  // Limit the input to a maximum of 2 digits
+  if(newValue != null){
+    if (newValue.length > 2) {
+    // Strip any non-digit characters (e.g., commas) and limit to 2 digits
+      internalValue.value = newValue.slice(0, 2)
+      setValue(internalValue.value)
+    } else {
+      internalValue.value = newValue
+    }
+  }
+}, { immediate: true })
 </script>
 
-<style scoped>
-/* You can customize the styling, but Vuetify will handle the theme and general styling for you */
-</style>
+<template>
+  <VTextField
+    ref="inputRef"
+    v-model="formattedValue"
+    density="compact"
+    variant="solo"
+  >
+    <template #prepend>
+      <VLabel>
+        {{ props.textStart }}
+      </VLabel>
+    </template>
+    <template #append>
+      <VLabel>
+        {{ props.textEnd }}
+      </VLabel>
+    </template>
+  </VTextField>
+</template>

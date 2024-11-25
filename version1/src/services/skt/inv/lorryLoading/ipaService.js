@@ -615,7 +615,6 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108010101", // percen
-
         },
       ],
     },
@@ -908,6 +907,8 @@ export function passSubmitData(type, params) {
     } else {
       return -1
     }
+  }else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
   }
   else {
     return parseFloat(params)
