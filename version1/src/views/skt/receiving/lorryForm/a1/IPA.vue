@@ -1,6 +1,7 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
+import VNumberInput from '@/components/VNumberInput.vue'
 import {
   currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, ipaItemTemplate,
   mm2litre, passInitialData, passSubmitData,
@@ -79,6 +80,9 @@ async function saveDraft(e) {
 
   for (var i of ipaItems) {
     for (var f of i.result.field) {
+      if(f.name == "l0108020101"){
+        debugger
+      }
       ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
@@ -271,7 +275,7 @@ watchEffect(async () => {
             </td>
             <td
               colspan="4"
-              style="min-width: 450px; border-left: 1px solid black;"
+              style="min-width: 500px; border-left: 1px solid black;"
             >
               <div v-if="section.result.type === 'oknot'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
@@ -463,7 +467,7 @@ watchEffect(async () => {
                   <VCol>
                     <VNumberInput
                       v-model="section.result.field[0].value"
-                      :max-length="1"
+                      :max-length="2"
                     />
                   </VCol>
                   <VLabel>
@@ -472,7 +476,7 @@ watchEffect(async () => {
                   <VCol>
                     <VNumberInput
                       v-model="section.result.field[1].value"
-                      :max-length="1"
+                      :max-length="2"
                     />
                   </VCol>
                 </VRow>

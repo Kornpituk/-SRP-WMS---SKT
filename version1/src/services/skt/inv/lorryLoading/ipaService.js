@@ -907,6 +907,8 @@ export function passSubmitData(type, params) {
     } else {
       return -1
     }
+  }else if(type == "actualCheck"){
+    return params.toString()
   }
   else {
     return parseFloat(params)
