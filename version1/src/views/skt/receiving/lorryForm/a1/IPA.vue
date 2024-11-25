@@ -80,9 +80,6 @@ async function saveDraft(e) {
 
   for (var i of ipaItems) {
     for (var f of i.result.field) {
-      if(f.name == "l0108020101"){
-        debugger
-      }
       ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
@@ -111,6 +108,23 @@ async function saveDraft(e) {
 async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
+
+
+  let isValid = true
+  for (var i of ipaItems) {
+    for (var f of i.result.field) {
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+        isValid = false
+      }
+    }
+  }
+
+  if(!isValid){
+    alert("กรุณากรอกข้อมูลให้ครบ")
+    
+    return
+  }
+ 
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
