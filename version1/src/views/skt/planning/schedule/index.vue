@@ -1123,7 +1123,7 @@ const newBatch = async batchID => {
                   <VChip
                     :color="colorStatusWithId(item.raw.statusId).color"
                     :style="{ color: colorStatusWithId(item.raw.statusId).color }"
-                  >{{ item.raw.statusId }}</VChip>
+                  >{{ colorStatusWithId(item.raw.statusId).text }}</VChip>
                 </span>
               </td>
               <td>{{ item.raw.no }}</td>

@@ -91,6 +91,38 @@ function getRandomDate(start, end) {
 const toDayDate = format(new Date())
 const toDayDatePFinished = ref('NaN')
 
+const itemsStatus = [
+  { name: "All", id: null },
+  { name: "Draft PROD plan", id: 101 },
+  { name: "Waiting for PROD APVL", id: 102 },
+  { name: "Waiting for Mat. Picking", id: 103 },
+  { name: "In Producing", id: 105 },
+  { name: "Waiting for FG/PROD APVL", id: 107 },
+  { name: "PROD Completed", id: 108 },
+  { name: "Plan Rejected", id: 109 },
+]
+
+const colorStatusWithId = id => {
+  switch (id) {
+  case 101:
+    return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan' }
+  case 102:
+    return { color: 'green', message: 'green', text: 'Waiting for PROD APVL' }
+  case 103:
+    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking' }
+  case 105:
+    return { color: 'purple', message: 'purple', text: 'In Producing' }
+  case 107:
+    return { color: 'brown', message: 'brown', text: 'Waiting for FG/PROD APVL' }
+  case 108:
+    return { color: 'green', message: 'green', text: 'PROD Completed' }
+  case 109:
+    return { color: 'red', message: 'red', text: 'Plan Rejected' }
+  default:
+    return { color: 'grey', message: 'grey', text: 'All' }
+  }
+}
+
 //------------------------------------------ Mock Data --------------------------------
 
 //----------------------------- function true data ---------------------------------
@@ -1782,24 +1814,12 @@ const print = () => {
                 style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
                 class="text-start"
               >
-                <span v-if="item.raw.status === 'Aprove'">
-                  <VChip color="success">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-if="item.raw.status === 'Submit'">
-                  <VChip color="success">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Back to Edit'">
-                  <VChip color="warning">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Working'">
-                  <VChip color="info">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Save Draft'">
-                  <VChip color="warning">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Reject'">
-                  <VChip color="error">{{ item.raw.status }}</VChip>
-                </span>
+                <VChip
+                  :color="colorStatusWithId(item.raw.statusId).color"
+                  :style="{ color: colorStatusWithId(item.raw.statusId).color }"
+                >
+                  {{ colorStatusWithId(item.raw.statusId).text }}
+                </VChip>
               </td>
               <td>{{ item.raw.no }}</td>
               <td>

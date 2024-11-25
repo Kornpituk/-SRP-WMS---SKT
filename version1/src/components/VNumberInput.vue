@@ -31,17 +31,17 @@ export default defineComponent({
         const onInput = (event: Event) => {
             const targetKey = event as KeyboardEvent;
             const target = event.target as HTMLTextAreaElement;
-            if (targetKey.key.length === 1 && isNaN(Number(targetKey.key))) {
-                event.preventDefault();
-            }
+            // if (targetKey.key.length === 1 && isNaN(Number(targetKey.key))) {  
+            //     event.preventDefault();
+            // }
 
-            if(target.value.length > props.maxLength){
-                if(targetKey.key != "Backspace" && targetKey.key != "Delete" && targetKey.key != "ArrowLeft"
-                 && targetKey.key != "ArrowRight" && targetKey.key != "ArrowDown" && targetKey.key != "ArrowUp" ){ 
-                    console.log(targetKey.key)
-                    event.preventDefault();
-                }
-            }
+            // if(target.value.length > props.maxLength){
+            //     if(targetKey.key != "Backspace" && targetKey.key != "Delete" && targetKey.key != "ArrowLeft"
+            //      && targetKey.key != "ArrowRight" && targetKey.key != "ArrowDown" && targetKey.key != "ArrowUp" ){ 
+            //         console.log(targetKey.key)
+            //         event.preventDefault();
+            //     }
+            // }
 
             // Emit the sanitized value to the parent component
             emit('update:modelValue', inputValue.value);
