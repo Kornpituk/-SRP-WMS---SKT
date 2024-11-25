@@ -1,6 +1,6 @@
 
 
-export const hakuRequestData = {
+export const eki110RequestData = {
   "RmLorryLoadingFormJournalId": 0,
   "ProductId": "",
   "ProductName": "",
@@ -12,101 +12,100 @@ export const hakuRequestData = {
   "WHLeaderDate": null,
   "WHSupervisor": "",
   "WHSupervisorDate": null,
-  "l0901010101": "0",
-  "l0901020101": "0",
-  "l0901030101": "0",
-  "l0901040101": "-1",
-  "l0901050101": "-1",
-  "l0902010101": "-1",
-  "l0904010101": "-1",
-  "l0904020101": "-1",
-  "l0904030101": "-1",
-  "l0904040101": "-1",
-  "l0904050101": "-1",
-  "l0904060101": "-1",
-  "l0904070101": "-1",
-  "l0904080101": "-1",
-  "l0904090101": "-1",
-  "l0904100101": "-1",
-  "l0904110101": "-1",
-  "l0904120101": "-1",
-  "l0904130101": "-1",
-  "l0904140101": "-1",
-  "l0904150101": "0",
-  "l0904150102": "0",
-  "l0905020101": "0",
-  "l0905030101": "0",
-  "l0905040101": "-1",
-  "l0905050101": "-1",
-  "l0905060101": "-1",
-  "l0905070101": "-1",
-  "l0905080101": "-1",
-  "l0905090101": "-1",
-  "l0906010101": "0",
-  "l0906020101": "0",
-  "l0906030101": "0",
-  "l0906010102": "0",
-  "l0906040101": "-1",
-  "l0906050101": "-1",
-  "l0906060101": "-1",
-  "l0906070101": "-1",
-  "l0906080101": "-1",
-  "l0906090101": "-1",
-  "l0906100101": "-1",
-  "l090301": "0",
-  "l090302": "0",
-  "l090303": "0",
-  "l090304": "0",
-  "l090305": "0",
-  "l090306": "0",
-  "l090307": "0",
-  "l090401": "0",
-  "l090402": "0",
-  "l090403": "0",
-  "l090404": "0",
-  "l090405": "0",
-  "l090406": "0",
-  "l090407": "0",
-  "l090408": "0",
-  "l090409": "0",
-  "l090410": "0",
-  "l090411": "0",
-  "l090412": "0",
-  "l090413": "0",
-  "l090414": "0",
-  "l090415": "0",
-  "l090504": "0",
-  "l090505": "0",
-  "l090506": "0",
-  "l090507": "0",
-  "l090508": "0",
-  "l090509": "0",
-  "l090601": "0",
-  "l090602": "0",
-  "l090603": "0",
-  "l090604": "0",
-  "l090605": "0",
-  "l090606": "0",
-  "l090607": "0",
-  "l090608": "0",
-  "l090609": "0",
-  "l090610": "0",
-
+  "l1001010101": "0",
+  "l1001020101": "0",
+  "l1001030101": "0",
+  "l1001040101": "-1",
+  "l1001050101": "-1",
+  "l1002010101": "-1",
+  "l1004010101": "-1",
+  "l1004020101": "-1",
+  "l1004030101": "-1",
+  "l1004040101": "-1",
+  "l1004050101": "-1",
+  "l1004060101": "-1",
+  "l1004070101": "-1",
+  "l1004080101": "-1",
+  "l1004090101": "-1",
+  "l1004100101": "-1",
+  "l1004110101": "-1",
+  "l1004120101": "-1",
+  "l1004130101": "-1",
+  "l1004140101": "-1",
+  "l1004150101": "0",
+  "l1004150102": "0",
+  "l1005020101": "0",
+  "l1005030101": "0",
+  "l1005040101": "-1",
+  "l1005050101": "-1",
+  "l1005060101": "-1",
+  "l1005070101": "-1",
+  "l1005080101": "-1",
+  "l1005090101": "-1",
+  "l1006010101": "0",
+  "l1006010102": "0",
+  "l1006020101": "0",
+  "l1006030101": "0",
+  "l1006040101": "-1",
+  "l1006050101": "-1",
+  "l1006060101": "-1",
+  "l1006070101": "-1",
+  "l1006080101": "-1",
+  "l1006090101": "-1",
+  "l1006100101": "-1",
+  "l100301": "0",
+  "l100302": "0",
+  "l100303": "0",
+  "l100304": "0",
+  "l100305": "0",
+  "l100306": "0",
+  "l100307": "0",
+  "l100401": "0",
+  "l100402": "0",
+  "l100403": "0",
+  "l100404": "0",
+  "l100405": "0",
+  "l100406": "0",
+  "l100407": "0",
+  "l100408": "0",
+  "l100409": "0",
+  "l100410": "0",
+  "l100411": "0",
+  "l100412": "0",
+  "l100413": "0",
+  "l100414": "0",
+  "l100415": "0",
+  "l100504": "0",
+  "l100505": "0",
+  "l100506": "0",
+  "l100507": "0",
+  "l100508": "0",
+  "l100509": "0",
+  "l100601": "0",
+  "l100602": "0",
+  "l100603": "0",
+  "l100604": "0",
+  "l100605": "0",
+  "l100606": "0",
+  "l100607": "0",
+  "l100608": "0",
+  "l100609": "0",
+  "l100610": "0",
 }
 
-export const hakuItemTemplate = [
-  // 1.check ใบส่งสินค้า 
+export const eki110ItemTemplate = [
+  // 1.check ใบส่งสินค้า  
   {
     "isSection": true,
-    "rowSpan": 4,
+    "rowSpan": 5,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า ",
+    "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า    ",
     "condition": "",
     "result": {
       "type": "kgA",
       "field": [
         {
-          "name": "l0901010101",
+          "name": "l1001010101",
           "value:": "",
         },
       ],
@@ -116,12 +115,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "( B ) จำนวนที่ได้จาก Level  จากการอ่าน DCS",
-    "condition": "ต้องไม่เกิน 15,000 kg",
+    "condition": "ต้องไม่เกิน 25,000 kg",
     "result": {
       "type": "kgB",
       "field": [
         {
-          "name": "l0901020101",
+          "name": "l1001020101",
           "value:": "",
         },
       ],
@@ -136,7 +135,7 @@ export const hakuItemTemplate = [
       "type": "kg",
       "field": [
         {
-          "name": "l0901030101",
+          "name": "l1001030101",
           "value:": "",
         },
       ],
@@ -145,13 +144,13 @@ export const hakuItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "จำเป็นต้องยืนยันว่า A+B ต้องน้อยกว่า 28,000 kg",
-    "condition": "A+B = < 28,000 kg",
+    "practice": "จำเป็นต้องยืนยันว่า A+B ต้องน้อยกว่า 40,000 kg",
+    "condition": "A+B = < 40,000 kg",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l0901040101",
+          "name": "l1001040101",
           "value:": "",
         },
       ],
@@ -166,7 +165,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0901050101",
+          "name": "l1001050101",
           "value:": "",
         },
       ],
@@ -184,7 +183,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0902010101",
+          "name": "l1002010101",
           "value:": "",
         },
       ],
@@ -212,25 +211,25 @@ export const hakuItemTemplate = [
         {
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
-          "name": "l090301",
+          "name": "l100301",
           "value:": "",
         },
         {
           "startPracticeText": "ชุดป้องกันสารเคมี",
           "endPracticeText": "",
-          "name": "l090302",
+          "name": "l100302",
           "value:": "",
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
-          "name": "l090303",
+          "name": "l100303",
           "value:": "",
         },
         {
-          "startPracticeText": "รองเท้าบูท",
+          "startPracticeText": "รองเท้าเซฟตี๊",
           "endPracticeText": "",
-          "name": "l090304",
+          "name": "l100304",
           "value:": "",
         },
       ],
@@ -250,19 +249,19 @@ export const hakuItemTemplate = [
         {
           "startPracticeText": "แว่นตา",
           "endPracticeText": "",
-          "name": "l090305",
+          "name": "l100305",
           "value:": "",
         },
         {
           "startPracticeText": "หน้ากาก กรองสารเคมี (สีขาว)",
           "endPracticeText": "",
-          "name": "l090306",
+          "name": "l100306",
           "value:": "",
         },
         {
           "startPracticeText": "เข็มขัดนิรภัย",
           "endPracticeText": "",
-          "name": "l090307",
+          "name": "l100307",
           "value:": "",
         },
       ],
@@ -285,7 +284,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090401",
+          "name": "l100401",
           "value:": "",
         },
       ],
@@ -295,7 +294,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904010101",
+          "name": "l1004010101",
           "value:": "",
         },
       ],
@@ -310,7 +309,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090402",
+          "name": "l100402",
           "value:": "",
         },
       ],
@@ -320,7 +319,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904020101",
+          "name": "l1004020101",
           "value:": "",
         },
       ],
@@ -335,7 +334,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090403",
+          "name": "l100403",
           "value:": "",
         },
       ],
@@ -345,7 +344,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904030101",
+          "name": "l1004030101",
           "value:": "",
         },
       ],
@@ -360,7 +359,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090404",
+          "name": "l100404",
           "value:": "",
         },
       ],
@@ -370,7 +369,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904040101",
+          "name": "l1004040101",
           "value:": "",
         },
       ],
@@ -380,12 +379,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เก็บ Sample (จาก Lorry tank )ส่ง INSP  รอผล Lab",
+      "startPracticeText": "เก็บ Sample (จาก Lorry tank )ส่ง INSP No.4 ( รอผล Lab )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090405",
+          "name": "l100405",
           "value:": "",
         },
       ],
@@ -395,7 +394,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904050101",
+          "name": "l1004050101",
           "value:": "",
         },
       ],
@@ -405,12 +404,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ต่อสายจากรถเข้า pump 11P-111A No.5",
+      "startPracticeText": "ต่อสายจากรถเข้า pump 11P-110A No.5",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090406",
+          "name": "l100406",
           "value:": "",
         },
       ],
@@ -420,7 +419,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904060101",
+          "name": "l1004060101",
           "value:": "",
         },
       ],
@@ -435,7 +434,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090407",
+          "name": "l100407",
           "value:": "",
         },
       ],
@@ -445,7 +444,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904070101",
+          "name": "l1004070101",
           "value:": "",
         },
       ],
@@ -460,7 +459,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090408",
+          "name": "l100408",
           "value:": "",
         },
       ],
@@ -470,7 +469,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904080101",
+          "name": "l1004080101",
           "value:": "",
         },
       ],
@@ -485,7 +484,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090409",
+          "name": "l100409",
           "value:": "",
         },
       ],
@@ -495,7 +494,7 @@ export const hakuItemTemplate = [
       "type": "leak",
       "field": [
         {
-          "name": "l0904090101",
+          "name": "l1004090101",
           "value:": "",
         },
       ],
@@ -510,7 +509,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090410",
+          "name": "l100410",
           "value:": "",
         },
       ],
@@ -520,7 +519,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904100101",
+          "name": "l1004100101",
           "value:": "",
         },
       ],
@@ -530,12 +529,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "กดปุ่ม Unloading วงกลมสีแดง ( X )",
+      "startPracticeText": "กดปุ่ม Unloading ( วงกลมสีแดง ) ( X )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090411",
+          "name": "l100411",
           "value:": "",
         },
       ],
@@ -545,7 +544,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904110101",
+          "name": "l1004110101",
           "value:": "",
         },
       ],
@@ -555,12 +554,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เช็คตู้ควบคุมวาล์ว XV-111C,D ต้องเปิด",
+      "startPracticeText": "เช็คที่ตู้ควบคุมวาล์ว XV-110 C ต้องเปิด ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090412",
+          "name": "l100412",
           "value:": "",
         },
       ],
@@ -570,7 +569,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904120101",
+          "name": "l1004120101",
           "value:": "",
         },
       ],
@@ -580,22 +579,22 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาติ ดับหรือติด ( Y )/ ตัว Scrubber ต้องทำงาน",
+      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาติ ดับหรือติด ( Y )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090413",
+          "name": "l100413",
           "value:": "",
         },
       ],
     },
-    "condition": "ไฟติด/ทำงาน",
+    "condition": "ไฟติด",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l0904130101",
+          "name": "l1004130101",
           "value:": "",
         },
       ],
@@ -605,12 +604,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "กดปุ่ม Start ที่ตัวควบคุม ( วงกลมสีแดง ) ( Z )",
+      "startPracticeText": "กดปุ่ม Start ที่ตัวควบคุมปั๊ม ( วงกลมสีแดง ) ( Z )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090414",
+          "name": "l100414",
           "value:": "",
         },
       ],
@@ -620,7 +619,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0904140101",
+          "name": "l1004140101",
           "value:": "",
         },
       ],
@@ -630,12 +629,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "บันทึกเวลา start  (11P-111A)",
+      "startPracticeText": "บันทึกเวลา start  (11P-110A)",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090415",
+          "name": "l100415",
           "value:": "",
         },
       ],
@@ -645,11 +644,11 @@ export const hakuItemTemplate = [
       "type": "actualCheck",
       "field": [
         {
-          "name": "l0904150101", // A
+          "name": "l1004150101", // A
           "value:": "",
         },
         {
-          "name": "l0904150102", // B
+          "name": "l1004150102", // B
           "value:": "",
         },
       ],
@@ -672,12 +671,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "      :  pressure",
-    "condition": "อยู่ระหว่าง  0.2 - 0.4",
+    "condition": "อยู่ระหว่าง  0.25 - 0.35",
     "result": {
       "type": "mpa2",
       "field": [
         {
-          "name": "l0905020101",
+          "name": "l1005020101",
           "value:": "",
         },
       ],
@@ -692,7 +691,7 @@ export const hakuItemTemplate = [
       "type": "amp2",
       "field": [
         {
-          "name": "l0905030101",
+          "name": "l1005030101",
           "value:": "",
         },
       ],
@@ -707,7 +706,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090504",
+          "name": "l100504",
           "value:": "",
         },
       ],
@@ -717,7 +716,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0905040101",
+          "name": "l1005040101",
           "value:": "",
         },
       ],
@@ -732,7 +731,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090505",
+          "name": "l100505",
           "value:": "",
         },
       ],
@@ -742,7 +741,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0905050101",
+          "name": "l1005050101",
           "value:": "",
         },
       ],
@@ -757,7 +756,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090506",
+          "name": "l100506",
           "value:": "",
         },
       ],
@@ -767,7 +766,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0905060101",
+          "name": "l1005060101",
           "value:": "",
         },
       ],
@@ -777,12 +776,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ต่อสายลมจาก No.12 มาต่อที่ข้อต่อที่Tankแล้วเปิด Air ไล่สารในสายให้หมด",
+      "startPracticeText": "ต่อสายลมจาก No.12 มาต่อที่ข้อต่อที่Tank  แล้วเปิด Air ไล่สารในสายให้หมด",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090507",
+          "name": "l100507",
           "value:": "",
         },
       ],
@@ -792,7 +791,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0905070101",
+          "name": "l1005070101",
           "value:": "",
         },
       ],
@@ -807,7 +806,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090508",
+          "name": "l100508",
           "value:": "",
         },
       ],
@@ -817,7 +816,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0905080101",
+          "name": "l1005080101",
           "value:": "",
         },
       ],
@@ -832,7 +831,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090509",
+          "name": "l100509",
           "value:": "",
         },
       ],
@@ -842,7 +841,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0905090101",
+          "name": "l1005090101",
           "value:": "",
         },
       ],
@@ -860,7 +859,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090601",
+          "name": "l100601",
           "value:": "",
         },
       ],
@@ -870,11 +869,11 @@ export const hakuItemTemplate = [
       "type": "actualCheck",
       "field": [
         {
-          "name": "l0906010101",
+          "name": "l1006010101",
           "value:": "",
         },
         {
-          "name": "l0906010102",
+          "name": "l1006010102",
           "value:": "",
         },
       ],
@@ -884,12 +883,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "(D)  เช็ค Level ในแท้งค์11V-111 เท่ากับ",
+      "startPracticeText": "(D)  เช็ค Level ในแท้งค์11V-110 เท่ากับ",
       "endPracticeText": "%     ( X )     ",
       "type": "d",
       "field": [
         {
-          "name": "l090602",
+          "name": "l100602",
           "value:": "",
         },
       ],
@@ -899,7 +898,7 @@ export const hakuItemTemplate = [
       "type": "kg",
       "field": [
         {
-          "name": "l0906020101",
+          "name": "l1006020101",
           "value:": "",
         },
       ],
@@ -909,12 +908,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)                    ",
+      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)             ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090603",
+          "name": "l100603",
           "value:": "",
         },
       ],
@@ -924,7 +923,7 @@ export const hakuItemTemplate = [
       "type": "kg",
       "field": [
         {
-          "name": "l0906030101",
+          "name": "l1006030101",
           "value:": "",
         },
       ],
@@ -939,7 +938,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l0906040101",
+          "name": "l1006040101",
           "value:": "",
         },
       ],
@@ -949,7 +948,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0906040101",
+          "name": "l1006040101",
           "value:": "",
         },
       ],
@@ -964,7 +963,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l090605",
+          "name": "l100605",
           "value:": "",
         },
       ],
@@ -974,7 +973,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0906050101",
+          "name": "l1006050101",
           "value:": "",
         },
       ],
@@ -984,12 +983,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "กดปุ่ม Finish unloading  ( วงกลมสีเขียว ) ( X ) ",
+      "startPracticeText": "กดปุ่ม finish unloading ( วงกลมสีเขียว )(X)",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090606",
+          "name": "l100606",
           "value:": "",
         },
       ],
@@ -999,7 +998,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0906060101",
+          "name": "l1006060101",
           "value:": "",
         },
       ],
@@ -1009,12 +1008,12 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เช็คตู้ควบคุมวาล์ว XV-111 C, D ต้องปิด ( X ) ",
+      "startPracticeText": "เช็คตู้ควบคุมวาล์ว XV-110C ต้องปิด",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090607",
+          "name": "l100607",
           "value:": "",
         },
       ],
@@ -1024,7 +1023,7 @@ export const hakuItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0906070101",
+          "name": "l1006070101",
           "value:": "",
         },
       ],
@@ -1034,22 +1033,22 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Scrubber blower ต้องดับไม่ทำงาน ( New scrubber area )",
+      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาต ดับหรือติด ( Y )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090608",
+          "name": "l100608",
           "value:": "",
         },
       ],
     },
-    "condition": "ไม่ทำงาน",
+    "condition": "ไฟดับ",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l0906080101",
+          "name": "l1006080101",
           "value:": "",
         },
       ],
@@ -1059,22 +1058,22 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาติ ติดหรือดับ ( Y )",
+      "startPracticeText": "เอาหมอนลองล้อ รถออก  No.2",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090609",
+          "name": "l100609",
           "value:": "",
         },
       ],
     },
-    "condition": "ดับ",
+    "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l0906090101",
+          "name": "l1006090101",
           "value:": "",
         },
       ],
@@ -1084,22 +1083,22 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เก็บกรวยและอุปกรณ์ PPE ทำความสะอาดพื้นที่",
+      "startPracticeText": "เก็บกรวย และอุปกรณ์ PPE ทำความสะอาด No.1",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l090610",
+          "name": "l100610",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l0906100101",
+          "name": "l1006100101",
           "value:": "",
         },
       ],
