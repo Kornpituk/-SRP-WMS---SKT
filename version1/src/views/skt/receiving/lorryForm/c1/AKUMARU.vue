@@ -1,14 +1,15 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import { akumaruRequestData, akumuruItemTemplate } from '@/services/skt/inv/lorryLoading/akumaruService'
+import { akumuruItemTemplate } from '@/services/skt/inv/lorryLoading/akumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
+import image01 from '@/views/skt/inv/lorryLoading/calculate/akumaru/Acrylic ( 431 ).png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import { currencyFormat } from '@/services/skt/inv/lorryLoading/ipaService'
 import alertWordConst from '@/utilities/constant'
 
 
@@ -18,21 +19,9 @@ var lorryItem = reactive(akumuruItemTemplate)
 var lorryRequestData = ref({})
 const route = useRoute()
 
-const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref('')
-const bVariable = ref('')
-const cVariable = ref('')
-const dVariable = ref('')
-const bdVariable = ref('')
-const dcsBefore = ref('')
-const eVariable = ref('')
-const fVariable = ref('')
-const gVariable = ref('')
-var dcsDiff = 0
-var tankDiff = 0
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -52,7 +41,7 @@ onMounted(async () => {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
+  await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -60,24 +49,23 @@ onMounted(async () => {
     },
   })
 
-  // const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-  //   headers: {
-  //     'accept': '*/*',
-  //     'x-location': `${whereHouse}`,
-  //     Authorization: `Bearer ${accessTokenAtStore}`,
-  //   },
-  // })
-  console.log(akumuruItemTemplate)
-  lorryRequestData.value = akumaruRequestData //lorryFormIPA.data.data
-  // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
+  const lorryForm = await axios.get(`${urlApi.value}/api/v1/LorryFormAkumaru/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  lorryRequestData.value = lorryForm.data.data
+  poNo.value = lorryForm.data.data.purchaseOrderNo
+
   for (var i of lorryItem) {
     for (var f of i.result.field) {
-      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
       f.value = passInitialData(i.result.type, lorryRequestData.value[f.name])
     }
     if(i.practice.field != undefined){
       for (var f of i.practice.field) {
-      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
         f.value = passInitialData(i.practice.type, lorryRequestData.value[f.name])
       }
     }
@@ -97,7 +85,7 @@ onMounted(async () => {
 })
 
 function passInitialData(type, params) {
-  if (type == "oknot") {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
     if (params == 0) {
       return "0"
     } else if (params == 1) {
@@ -111,7 +99,7 @@ function passInitialData(type, params) {
 }
 
 function passSubmitData(type, params) {
-  if (type == "oknot") {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
     if (params == "0") {
       return 0
     } else if (params == "1") {
@@ -119,16 +107,25 @@ function passSubmitData(type, params) {
     } else {
       return -1
     }
+  }else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
   }
   else {
-    return params
+    return parseFloat(params)
   }
 }
+
 
 async function saveDraft(e) {
   for (var i of lorryItem) {
     for (var f of i.result.field) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+      }
     }
   }
 
@@ -189,26 +186,11 @@ async function approve(e) {
   }
 }
 
-// watch(lorryItem[6].result.field[0], async x => {// A
-//   let b = x.value / (0.78)
-//   lorryItem[6].result.field[1].value = b.toFixed(2)
-// })
-
-// watch(lorryItem[7].result.field[0], async x => {// C
-//   let d = (x.value * 5.32) + 740.45
-//   lorryItem[7].result.field[1].value = d.toFixed(2) // D
-// })
-
-// watch(lorryItem[46].result.field[0], async x => { // E
-//   lorryItem[46].result.field[1].value = mm2litre(x.value)// F
-// })
-
 watchEffect(async () => {
-  // dcsDiff = (lorryItem[47].result.field[0].value - lorryItem[9].result.field[0].value).toFixed(2)
-  // tankDiff = (lorryItem[46].result.field[1].value - lorryItem[7].result.field[1].value).toFixed(2)
-  // lorryItem[8].result.field[0].value = (parseFloat(lorryItem[6].result.field[1].value) + parseFloat(lorryItem[7].result.field[1].value)).toFixed(2)
-  // lorryItem[49].result.field[0].value = (parseFloat(lorryItem[8].result.field[0].value) - parseFloat(lorryItem[46].result.field[1].value)).toFixed(2)
-  // lorryItem[49].result.field[1].value = (parseFloat(lorryItem[49].result.field[0].value) * 0.78).toFixed(2)
+  var c = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value
+  var d = lorryItem[37].result.field[0].value
+  lorryItem[2].result.field[0].value = currencyFormat(c)
+  lorryItem[38].result.field[0].value = currencyFormat(c-d)
 })
 
 
@@ -263,7 +245,7 @@ function formatDate(dateString) {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        AKUMARUUUUUU
+        AKUMARU S Tank ( 11V - 431 )
       </div>
     </VCol>
     <VCol cols="4" />
@@ -817,147 +799,6 @@ function formatDate(dateString) {
         </tbody>
       </table>
     </VCol>
-    <!-- Calculation formula -->
-    <!--
-      <VCol cols="12">
-      <div style="border: 1px solid black;">
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      <u>สูตรคำนวน</u>
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      หาเป็นลิตร = mm x 5.32 + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      หาเป็น mm = Litre - 740.45 / 5.32
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      (B) = (A) / 0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ aVariable.value }} /0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ bVariable.value }} Litre
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      (D) - ((C) X 5.32) + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = ({{ cVariable.value }}X 5.32 ) + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ dVariable.value }}Litre
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      Density IPA = 0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      </div>
-      </VCol> 
-    -->
-    <!-- Dcs Tank -->
-    <!--
-      <VCol cols="12">
-      <table class="custom-table">
-      <thead>
-      <tr>
-      <th />
-      <th class="text-center" style="font-size: 16px;">
-      DSC
-      </th>
-      <th class="text-center" style="font-size: 16px;">
-      TANK
-      </th>
-      <th />
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td style="font-size: 16px;">
-      After
-      </td>
-      <td class="py-4 text-center">
-      {{ gVariable.value }}
-      </td>
-      <td class="py-4 text-center">
-      {{ fVariable.value }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      <tr>
-      <td style="font-size: 16px;">
-      Before
-      </td>
-      <td class="py-4 text-center">
-      {{ dcsBefore.value }}
-      </td>
-      <td class="py-4 text-center">
-      {{ dVariable.value }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      <tr>
-      <td style="font-size: 16px;">
-      Diff
-      </td>
-      <td class="py-4 text-center">
-      {{ dcsDiff }}
-      </td>
-      <td class="py-4 text-center">
-      {{ tankDiff }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      </tbody>
-      </table>
-      </VCol> 
-    -->
-    <!-- Precautions -->
     <VCol cols="12">
       <table class="custom-table">
         <tr>

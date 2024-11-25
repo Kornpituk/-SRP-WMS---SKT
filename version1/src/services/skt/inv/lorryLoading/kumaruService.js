@@ -5,7 +5,7 @@ export async function generate(poEtlLogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+  await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -18,7 +18,7 @@ export async function get(poEtlLogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  return await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalID}`, {
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormKaramu/get/${poEtlLogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -168,7 +168,7 @@ export const kumaruItemTemplate = [
     "practice": "1. จำนวนที่ระบุในใบส่งสินค้า",
     "condition": "ตามเอกสารใบส่ง",
     "result": {
-      "type": "oknot",
+      "type": "a",
       "field": [
         {
           "name": "l0602010101",
@@ -183,7 +183,7 @@ export const kumaruItemTemplate = [
     "practice": "2. Level ที่อ่านได้จาก Tank 21V-306 ก่อนรับ",
     "condition": "ต้องไม่เกิน….....kg",
     "result": {
-      "type": "oknot",
+      "type": "b",
       "field": [
         {
           "name": "l0602020101",
@@ -198,10 +198,13 @@ export const kumaruItemTemplate = [
     "practice": "3. ตรวจสอบว่าปริมาณหลังจากรับไม่เกินความจุถัง",
     "condition": "ต้องไม่เกิน…...kg",
     "result": {
-      "type": "oknot",
+      "type": "ab",
       "field": [
         {
           "name": "l0602030101",
+        },
+        {
+          "name": "l0302030102",
         },
       ],
     },
@@ -798,7 +801,7 @@ export const kumaruItemTemplate = [
     "practice": "13. ตรวจสอบระดับของเหลวใน 21V-306",
     "condition": "ตรวจเช็คที่ DCS",
     "result": {
-      "type": "oknot",
+      "type": "cdcs",
       "field": [
         {
           "name": "l0606140101",
@@ -813,7 +816,7 @@ export const kumaruItemTemplate = [
     "practice": "14. ทำการจดบันทึกค่าที่ต่างกันหลังจากรับ",
     "condition": "ต้องไม่ต่างจากที่คำนวณไม่เกิน...........kg",
     "result": {
-      "type": "oknot",
+      "type": "cb",
       "field": [
         {
           "name": "l0606150101",
