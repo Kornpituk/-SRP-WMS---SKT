@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-text-field v-model.number="inputValue" @keydown="onInput" density="compact" variant="outlined"
+        <v-text-field v-model.number="inputValue" @keydown="onInput" density="compact" variant="outlined" oninput="if(Number(this.value) > Number(this.max)) this.value = this.max;" max="2"
             class="justify-center" />
     </div>
 </template>
@@ -15,6 +15,9 @@ export default defineComponent({
             type: [String, Number] as PropType<string | number>,
             default: '',
         },
+        maxLength: {
+            type: [Number] as PropType<number>
+        },
     },
     emits: ['update:modelValue'],
     setup(props, { emit }) {
@@ -26,12 +29,22 @@ export default defineComponent({
         });
 
         const onInput = (event: Event) => {
-            const target = event.target as HTMLInputElement;
-            // Remove non-numeric characters
-            const sanitizedValue = target.value.replace(/[^0-9]/g, '');
-            inputValue.value = sanitizedValue;
+            const targetKey = event as KeyboardEvent;
+            const target = event.target as HTMLTextAreaElement;
+            if (targetKey.key.length === 1 && isNaN(Number(targetKey.key))) {
+                event.preventDefault();
+            }
+
+            if(target.value.length > props.maxLength){
+                if(targetKey.key != "Backspace" && targetKey.key != "Delete" && targetKey.key != "ArrowLeft"
+                 && targetKey.key != "ArrowRight" && targetKey.key != "ArrowDown" && targetKey.key != "ArrowUp" ){ 
+                    console.log(targetKey.key)
+                    event.preventDefault();
+                }
+            }
+
             // Emit the sanitized value to the parent component
-            emit('update:modelValue', sanitizedValue);
+            emit('update:modelValue', inputValue.value);
         };
 
         return {

@@ -162,7 +162,7 @@ watchEffect(async () => {
   dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))
   dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
   tankAfter.value = ipaItems[46].result.field[1].value
-  tankBefore.value = ipaItems[7].result.field[1].value
+  tankBefore.value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45)
   tankDiff.value = currencyFormat((ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) - (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
 })
 </script>
@@ -461,26 +461,18 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VNumberInput
                       v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end=""
+                      :max-length="1"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VCurrencyField
+                    <VNumberInput
                       v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end=""
+                      :max-length="1"
                     />
                   </VCol>
                 </VRow>
@@ -755,7 +747,7 @@ watchEffect(async () => {
               {{ dcsBefore }}
             </td>
             <td class="py-4 text-center">
-              {{ dVariable.value }}
+              {{ tankBefore }}
             </td>
             <td style="font-size: 16px;">
               Ltr
