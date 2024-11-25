@@ -4,6 +4,7 @@ const alertWordConst = {
   accept: 'ACCEPT',
   approve: 'APPROVE',
   submit: 'SUBMIT',
+  cancel: 'CENCEL',
 }
 
 export default alertWordConst

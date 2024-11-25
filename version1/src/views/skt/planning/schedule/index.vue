@@ -46,15 +46,30 @@ const clearModelFolter = () => {
   filterForSearchBatchProductionPlan.value.ItemTextSearch = "",
   filterForSearchBatchProductionPlan.value.ProducingDateFrom = "",
   filterForSearchBatchProductionPlan.value.ProducingDateTo = "",
-  filterForSearchBatchProductionPlan.value.LotTextSearch = ""
+  filterForSearchBatchProductionPlan.value.LotTextSearch = "",
+  datePickerFilter.value = ''
 }
 
 const searchResult = ref([]) // ตัวแปรสำหรับเก็บผลลัพธ์
-
+const datePickerFilter = ref(null)
 const productionPlanItems = ref([]) // กำหนดค่าเริ่มต้นเป็น array ว่าง
+
+const formatToMMDDYYYY = date => {
+  const [day, month, year] = date.split("/")
+  
+  return `${month}/${day}/${year}`
+}
 
 watchEffect(async () => {
   try {
+
+    if(datePickerFilter.value){
+      const [startDate, endDate] = datePickerFilter.value.split(" to ")
+
+      filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
+      filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+    }
+
     await fetchGetProductionplanSearch(
       filterForSearchBatchProductionPlan.value, 
       urlApi.value, 'ProductionPlan', whereHouse, 
@@ -641,12 +656,12 @@ const newBatch = async batchID => {
                   class="py-1"
                 >
                   <AppDateTimePicker
-                    v-model="filterForSearchBatchProductionPlan.ProducingDateFrom"
+                    v-model="datePickerFilter"
                     label="Producing Date"
                     placeholder="Select date"
                     density="compact"
                     prepend-inner-icon="ri-calendar-schedule-fill"
-                    :config="{ dateFormat: 'd/m/Y' }"
+                    :config="{ dateFormat: 'd/m/Y', mode: 'range' }"
                   />
                 </VCol>
 
@@ -681,7 +696,6 @@ const newBatch = async batchID => {
                         color="primary"
                         density="compact"
                         class="mx-0"
-                        @click="isDialogPrintLabelVisible = true"
                       >
                         <span style="font-size: 12px;">{{ $t('Search') }}</span>
                       </VBtn>
@@ -1092,7 +1106,7 @@ const newBatch = async batchID => {
           v-model="selectedDataTables"
           :headers="headersDataTableNew"
           :items="productionPlanItems"
-          :items-per-page="5"
+          :items-per-page="10"
           show-select
           class="text-no-wrap"
         >
@@ -1207,7 +1221,10 @@ const newBatch = async batchID => {
               </td>
               <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'">
                 <div class="d-flex justify-center">
-                  <VMenu v-if="false" transition="scale-transition">
+                  <VMenu
+                    v-if="false"
+                    transition="scale-transition"
+                  >
                     <template #activator="{ props }">
                       <VIcon
                         v-bind="props"

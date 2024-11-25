@@ -81,6 +81,12 @@ const closeDialog = () => {
           icon="ri-checkbox-circle-fill"
         />
         <VIcon
+          v-if="props.word === 'CENCEL'"
+          size="150"
+          color="success"
+          icon="ri-checkbox-circle-fill"
+        />
+        <VIcon
           v-if="props.word === 'SUBMIT'"
           size="150"
           color="success"

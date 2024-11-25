@@ -10,6 +10,21 @@ import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import alertWordConst from '@/utilities/constant'
+
+const isDialogVisibleAlertDialog = ref(false)
+const wordForSubmit = ref('')
+const successDialAlert = ref(false)
+
+const statusId = ref(0)
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
@@ -432,32 +447,22 @@ const dataPlanningForSave = ref([
   },
 ])
 
-
 const selectedItemCodeForPlan = ref([])
 const selectedPackagingTypeForPlan = ref([])
 
 const selectedProductionCode = ref([])
-const selectedItemCode = ref([])
-const selectedPackagingType = ref([])
+const selectedItemCode = ref(null)
+const selectedItemName = ref(null)
+const selectedPackagingType = ref(null)
+const selectedPackagingName = ref(null)
+const selectedPackagingKgs = ref(null)
 
 const selectedProductionCode2 = ref([])
-const selectedItemCode2 = ref([])
-const selectedPackagingType2 = ref([])
-
-// Computed property to determine which items to show
-const selectedItems = computed(() => {
-  if (btnSelectitem1.value) return dataMockProductionCodeModel1.value
-  if (btnSelectitem2.value) return dataMockProductionCodeModel2.value
-  
-  return [] // Default empty or fallback data
-})
-
-const selectProductionCodeSwitch = computed(() => {
-  if (btnSelectitem1.value) return selectedProductionCode.value
-  if (btnSelectitem2.value) return selectedProductionCode2.value
-  
-  return [] // Default empty or fallback data
-})
+const selectedItemCode2 = ref(null)
+const selectedItemName2 = ref(null)
+const selectedPackagingType2 = ref(null)
+const selectedPackagingName2 = ref(null)
+const selectedPackagingKgs2 = ref(null)
 
 const selectItemCodeSwitch = computed(() => {
   if (btnSelectitem1.value) return selectedItemCode.value
@@ -487,10 +492,12 @@ const selectPlan = plan => {
 const selectItemCode = plan => {
   if(btnSelectitem1.value){
     selectedItemCode.value = plan.itemCode
+    selectedItemName.value = plan.itemName
     console.log("selectedItemCode", selectedItemCode.value)
   }
   if(btnSelectitem2.value){
     selectedItemCode2.value = plan.itemCode
+    selectedItemName2.value = plan.itemName
     console.log("selectedItemCode2", selectedItemCode2.value)
   }
 }
@@ -498,10 +505,14 @@ const selectItemCode = plan => {
 const selectPackaging = plan => {
   if(btnSelectitem1.value){
     selectedPackagingType.value = plan.itemCode
+    selectedPackagingName.value = plan.itemName
+    selectedPackagingKgs.value = plan.packingQtyKgs
     console.log("selectedPackagingType", selectedPackagingType.value)
   }
   if(btnSelectitem2.value){
     selectedPackagingType2.value = plan.itemCode
+    selectedPackagingName2.value = plan.itemName
+    selectedPackagingKgs2.value = plan.packingQtyKgs
     console.log("selectedProductionCode2", selectedPackagingType2.value)
   }
 }
@@ -542,6 +553,13 @@ watchEffect(async () => {
 })
 
 //------------------------------ func Save add data production plan service --------------------------------
+const indexSelectBoxFilter = ref(null)
+
+const selectFilterProduction = index => {
+  indexSelectBoxFilter.value = index
+  isDialogVisibleFilterSelect.value = true
+}
+
 const confirmFilterSelectProduction = () => {
   dataPlanningForSave.value.productionCode = selectedProductionCode.value
 
@@ -549,6 +567,29 @@ const confirmFilterSelectProduction = () => {
   dataPlanningForSave.value.product1SelectedPackagingCode = selectedPackagingType.value
   dataPlanningForSave.value.product2SelectedCode = selectedItemCode2.value
   dataPlanningForSave.value.product2SelectedPackagingCode = selectedPackagingType2.value
+
+  const index = indexSelectBoxFilter.value
+  if (index !== null) {
+    // อัปเดตค่าที่เลือกในตำแหน่งของแถวที่กด
+    productionPlan.value[index].productionCode = selectedProductionCode.value
+    
+    productionPlan.value[index].product1SelectedCode = selectedItemCode.value || null
+    productionPlan.value[index].product1Name = selectedItemName.value || null
+    productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value || null
+    productionPlan.value[index].product1PackagingName = selectedPackagingName.value || null
+    productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value || null
+
+    productionPlan.value[index].product2SelectedCode = selectedItemCode2.value || null
+    productionPlan.value[index].product2Name = selectedItemName2.value || null
+    productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value || null
+    productionPlan.value[index].product2PackagingName = selectedPackagingName2.value || null
+    productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value || null
+
+    console.log("Updated row:", productionPlan.value[index])
+  }
+
+  isDialogVisibleFilterSelect.value = false // ปิด dialog
+
 }
 
 //------------------------------ func save production plan service --------------------------------
@@ -561,46 +602,7 @@ const saveProductionPlan = async () => {
 
 
     // กรองข้อมูลเฉพาะฟิลด์ที่ต้องการจาก getProductionplanResult.value
-    // const filteredData = null 
-
-    // if(dataPlanningForSave.value.productionCode){
-    //   filteredData = getProductionplanResult.value.data.map(item => ({
-    //     planningID: item.planningID,
-    //     inputDate: item.inputDate,
-    //     productionCode: dataPlanningForSave.value.productionCode,
-
-    //     product1SelectedCode: dataPlanningForSave.value.product1SelectedCode,
-    //     product1SelectedPackagingCode: dataPlanningForSave.value.product1SelectedPackagingCode,
-    //     product1PackingQtyKgs: item.product1PackingQtyKgs,
-    //     product1UomCount: item.product1UomCount,
-
-    //     product2SelectedCode: dataPlanningForSave.value.product2SelectedCode,
-    //     product2SelectedPackagingCode: dataPlanningForSave.value.product2SelectedPackagingCode,
-    //     product2PackingQtyKgs: item.product2PackingQtyKgs,
-    //     product2UomCount: item.product2UomCount,
-
-    //     lotNumber: item.lotNumber,
-    //     producingDate: item.producingDate,
-    //     remark: item.remark,
-    //   }))
-    // }else{
-    //   filteredData = getProductionplanResult.value.data.map(item => ({
-    //     planningID: item.planningID,
-    //     inputDate: item.inputDate,
-    //     productionCode: item.productionCode,
-    //     product1SelectedCode: item.product1SelectedCode,
-    //     product1SelectedPackagingCode: item.product1SelectedPackagingCode,
-    //     product1PackingQtyKgs: item.product1PackingQtyKgs,
-    //     product1UomCount: item.product1UomCount,
-    //     product2SelectedCode: item.product2SelectedCode,
-    //     product2SelectedPackagingCode: item.product2SelectedPackagingCode,
-    //     product2PackingQtyKgs: item.product2PackingQtyKgs,
-    //     product2UomCount: item.product2UomCount,
-    //     lotNumber: item.lotNumber,
-    //     producingDate: item.producingDate,
-    //     remark: item.remark,
-    //   }))
-    // }
+    
 
     const filteredData = productionPlan.value.map(item => ({
       planningID: item.planningID,
@@ -675,6 +677,20 @@ const addEmptyRowToPlan = async () => {
   planningId.value = await genPlanningIdGUID()
 
   await newProdutcionPlanFunc(batchId.value, planningId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+
+  if(responseNewProductionPlan.value){
+    console.log("New Plan Success")
+    textAlertDialogFunction(alertWordConst.saveDraft, true)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+  }else{
+    console.log("New Plan Not Success")
+    textAlertDialogFunction(alertWordConst.saveDraft, false)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+  }
   
   countItemProduction.value+= 1
 }
@@ -683,6 +699,10 @@ const addEmptyRowToPlan = async () => {
 
 //--------------------- delete plan
 const { responseDeleteProductionPlan, errorMessageDeleteProductionPlan, deleteProdutcionPlanFunc } = useDeleteProductionPlanService()
+
+const showSelectBox = () => {
+  console.log("selectedDataTables", selectedDataTables.value)
+}
 
 const deletePlan = async () => {
 
@@ -693,8 +713,10 @@ const deletePlan = async () => {
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await deleteProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
-
-    console.log("productionPlan deleted successfully")
+    textAlertDialogFunction(alertWordConst.cancel, true)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error deleted production plan:", error)
@@ -739,85 +761,6 @@ const refeshPage = () => {
 }
 
 const isSpinning = ref(false)
-
-const headersDataTable = [
-  {
-    title: 'data-table-select',
-    key: 'data-table-select',
-    align: "center",
-    fixed: true,
-    readonly: true,
-  },
-  {
-    title: 'Status',
-    key: 'status',
-    fixed: true,
-  },
-  {
-    title: 'No.',
-    key: 'no',
-  },
-  {
-    title: 'Input Date',
-    key: 'inputDate',
-  },
-  {
-    title: 'Plants',
-    key: 'plants',
-  },
-  {
-    title: 'Reactor',
-    key: 'reactor',
-  },
-  {
-    title: 'Item Code',
-    key: 'productCode',
-  },
-  {
-    title: 'Item Name',
-    key: 'productName',
-  },
-  {
-    title: 'Qty(Kg.)',
-    key: 'quantity',
-  },
-  {
-    title: 'UOM(Packaging)',
-    key: 'uom',
-  },
-  {
-    title: 'Packaging Type',
-    key: 'packagingType',
-  },
-  {
-    title: 'Lot Number',
-    key: 'lotNumber',
-  },
-  {
-    title: 'Producing Date',
-    key: 'producingDate',
-  },
-  {
-    title: 'Finished Date',
-    key: 'finishedDate',
-  },
-  {
-    title: 'Remark',
-    key: 'remark',
-  },
-  {
-    title: 'Update By',
-    key: 'byWho',
-  },
-  {
-    title: 'Update Date',
-    key: 'updateDate',
-  },
-  {
-    title: 'Action',
-    key: 'Action',
-  },
-]
 
 const headersDataTableNew = [
   {
@@ -931,10 +874,11 @@ const headersDataTableNew = [
     title: 'Update By',
     key: 'byWho',
   },
-  {
-    title: 'Action',
-    key: 'action',
-  },
+
+  // {
+  //   title: 'Action',
+  //   key: 'action',
+  // },
 ]
 
 //--------------------- Menu
@@ -1741,6 +1685,15 @@ const print = () => {
         >
           <span style="font-size: 12px;">Cancel Batch</span>
         </VBtn>
+
+        <VBtn
+          v-if="false"
+          color="error"
+          class="mx-2"
+          @click="showSelectBox"
+        >
+          <span style="font-size: 12px;">Debug Cancel Batch</span>
+        </VBtn>
         
         
         
@@ -1793,11 +1746,11 @@ const print = () => {
           v-model="selectedDataTables"
           :headers="headersDataTableNew"
           :items="productionPlan"
-          :items-per-page="5"
+          :items-per-page="10"
           show-select
           class="text-no-wrap"
         >
-          <template #item="{ item }">
+          <template #item="{ item, index }">
             <tr style="font-size: 14px;">
               <td
                 class="text-center px-2"
@@ -1847,9 +1800,9 @@ const print = () => {
                 />
                 <VBtn
                   variant="outlined"
-                  @click="isDialogVisibleFilterSelect = true"
+                  @click="selectFilterProduction(index)"
                 >
-                  production code
+                  <span v-if="item.raw.productionCode">{{ item.raw.productionCode }}</span><span v-else>Select Production</span>
                   <template #append>
                     <VIcon icon="ri-arrow-down-s-fill" />
                   </template>
@@ -1867,6 +1820,7 @@ const print = () => {
               </td>
               <td class="bg-light-blue-lighten-5">
                 <VCombobox
+                  v-if="false"
                   v-model="item.raw.product1SelectedCode"
                   :items="productNamesMockItems"
                   density="compact"
@@ -1877,13 +1831,23 @@ const print = () => {
                     <span style="font-size: 12px;">Item Code 1</span>
                   </template>
                 </VCombobox>
+                <VBtn
+                  variant="outlined"
+                  @click="selectFilterProduction(index)"
+                >
+                  <span v-if="item.raw.product1SelectedCode">{{ item.raw.product1SelectedCode }}</span><span v-else>Select Item</span>
+                  <template #append>
+                    <VIcon icon="ri-arrow-down-s-fill" />
+                  </template>
+                </VBtn>
               </td>
               <td class="bg-light-blue-lighten-5">
-                {{ product1SelectedCode }}ddd
+                {{ item.raw.product1Name }}
               </td>
               <td class="bg-light-blue-lighten-5">
                 <VCombobox
-                  v-model="item.raw.packagingType1"
+                  v-if="false"
+                  v-model="item.raw.product1SelectedPackagingCode"
                   :items="productNamesMockItems"
                   density="compact"
                   style="width: 150px;"
@@ -1893,9 +1857,18 @@ const print = () => {
                     <span style="font-size: 12px;">Packaging Type</span>
                   </template>
                 </VCombobox>
+                <VBtn
+                  variant="outlined"
+                  @click="selectFilterProduction(index)"
+                >
+                  <span v-if="item.raw.product1SelectedPackagingCode">{{ item.raw.product1SelectedPackagingCode }}</span><span v-else>Select Packaging</span>
+                  <template #append>
+                    <VIcon icon="ri-arrow-down-s-fill" />
+                  </template>
+                </VBtn>
               </td>
               <td class="bg-light-blue-lighten-5">
-                {{ packagingKgs1 }}
+                {{ item.raw.product1PackingQtyKgs }}
               </td>
               <td class="bg-light-blue-lighten-5">
                 <VTextField
@@ -1913,7 +1886,8 @@ const print = () => {
 
               <td class="bg-red-lighten-5">
                 <VCombobox
-                  v-model="item.raw.productCode2"
+                  v-if="false"
+                  v-model="item.raw.product2SelectedCode"
                   :items="productNamesMockItems"
                   density="compact"
                   style="width: 150px;"
@@ -1923,13 +1897,23 @@ const print = () => {
                     <span style="font-size: 12px;">Item Code 2</span>
                   </template>
                 </VCombobox>
+                <VBtn
+                  variant="outlined"
+                  @click="selectFilterProduction(index)"
+                >
+                  <span v-if="item.raw.product2SelectedCode">{{ item.raw.product2SelectedCode }}</span><span v-else>Select Production</span>
+                  <template #append>
+                    <VIcon icon="ri-arrow-down-s-fill" />
+                  </template>
+                </VBtn>
               </td>
               <td class="bg-red-lighten-5">
-                {{ productName2 }}
+                {{ item.raw.product2Name }}
               </td>
               <td class="bg-red-lighten-5">
                 <VCombobox
-                  v-model="item.raw.packagingType2"
+                  v-if="false"
+                  v-model="item.raw.product2SelectedPackagingCode"
                   :items="productNamesMockItems"
                   density="compact"
                   style="width: 150px;"
@@ -1939,9 +1923,18 @@ const print = () => {
                     <span style="font-size: 12px;">Packaging Type 2</span>
                   </template>
                 </VCombobox>
+                <VBtn
+                  variant="outlined"
+                  @click="selectFilterProduction(index)"
+                >
+                  <span v-if="item.raw.product2SelectedPackagingCode">{{ item.raw.product2SelectedPackagingCode }}</span><span v-else>Select Packaging</span>
+                  <template #append>
+                    <VIcon icon="ri-arrow-down-s-fill" />
+                  </template>
+                </VBtn>
               </td>
               <td class="bg-red-lighten-5">
-                {{ packagingKgs2 }}
+                {{ item.raw.product2PackingQtyKgs }}
               </td>
               <td class="bg-red-lighten-5">
                 <VCombobox
@@ -2009,7 +2002,7 @@ const print = () => {
               <td>
                 {{ item.raw.byWho }}
               </td>
-              <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'"> 
+              <td v-if="false"> 
                 <div class="d-flex justify-center">
                   <VMenu transition="scale-transition">
                     <template #activator="{ props }">
@@ -2116,6 +2109,19 @@ const print = () => {
         </VDataTable>
       </VCardText>
     </VCard>
+  </section>
+
+  <!-- Alert Dialog Success/Fiald new -->
+  <section>
+    <div>
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
   </section>
 
   <!-- Footer -->
