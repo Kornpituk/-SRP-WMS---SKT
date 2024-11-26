@@ -5,6 +5,7 @@ const alertWordConst = {
   approve: 'APPROVE',
   submit: 'SUBMIT',
   cancel: 'CENCEL',
+  newPlan: 'NEWPLAN',
 }
 
 export default alertWordConst

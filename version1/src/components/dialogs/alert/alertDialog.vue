@@ -92,6 +92,12 @@ const closeDialog = () => {
           color="success"
           icon="ri-checkbox-circle-fill"
         />
+        <VIcon
+          v-if="props.word === 'NEWPLAN'"
+          size="150"
+          color="success"
+          icon="ri-checkbox-circle-fill"
+        />
       </VCardText>
       <VCardText v-if="!props.success" class="d-flex justify-center">
         <VIcon

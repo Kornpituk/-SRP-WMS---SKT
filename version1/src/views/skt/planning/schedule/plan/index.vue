@@ -652,8 +652,10 @@ const saveProductionPlan = async () => {
     // ส่งข้อมูลที่กรองแล้วไปยัง API
     await saveProdutcionPlanFunc(filteredData, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
 
-    // // อัปเดต productionPlan.value หลังจากบันทึกข้อมูล
-    // productionPlan.value = filteredData
+    textAlertDialogFunction(alertWordConst.saveDraft, true)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
     console.log("saveProductionPlan staret in 3")
 
@@ -661,6 +663,10 @@ const saveProductionPlan = async () => {
     console.log("Filtered Production Plan Saved:", filteredData)
   } catch (error) {
     // จัดการข้อผิดพลาด
+    textAlertDialogFunction(alertWordConst.saveDraft, false)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
     console.error("Error saving production plan:", error)
   }
 }
@@ -703,15 +709,15 @@ const addEmptyRowToPlan = async () => {
 
   if(responseNewProductionPlan.value){
     console.log("New Plan Success")
-    textAlertDialogFunction(alertWordConst.saveDraft, true)
+    textAlertDialogFunction(alertWordConst.newPlan, true)
     setTimeout(() => {
-      location.reload()
+      // location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
   }else{
     console.log("New Plan Not Success")
-    textAlertDialogFunction(alertWordConst.saveDraft, false)
+    textAlertDialogFunction(alertWordConst.newPlan, false)
     setTimeout(() => {
-      location.reload()
+      // location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
   }
   
