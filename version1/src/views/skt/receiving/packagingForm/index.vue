@@ -559,17 +559,37 @@ fetchPackagingFormHeader(poEtlLogDetailJournalIDQueryParameters.value, urlApi.va
 const handleInputNumberOnly = e => {
   let value = e.target.value
 
-  // ตรวจสอบว่าเป็นตัวเลขจำนวนเต็มเท่านั้น (ไม่รวมทศนิยม)
-  const regex = /^[0-9]*$/
+  // ตรวจสอบว่าเป็นตัวเลขจำนวนเต็มหรือทศนิยมไม่เกิน 2 หลัก
+  const regex = /^[0-9]*\.?[0-9]{0,2}$/
 
   // หากไม่ตรงกับเงื่อนไขของ regex จะคืนค่าสุดท้ายที่ถูกต้อง
   if (!regex.test(value)) {
-    value = value.replace(/\D/g, '') // ลบตัวอักษรที่ไม่ใช่ตัวเลขออก
+    // ลบตัวอักษรที่ไม่ใช่ตัวเลขและจุดออก
+    value = value.replace(/[^0-9.]/g, '')
+
+    // ตรวจสอบว่ามีจุดทศนิยมเกิน 1 จุดหรือไม่
+    const parts = value.split('.')
+    if (parts.length > 2) {
+      // เก็บเฉพาะจุดทศนิยมแรกที่เจอ
+      value = parts[0] + '.' + parts[1]
+    }
+
+    // จำกัดให้ส่วนทศนิยมมีไม่เกิน 2 หลัก
+    if (parts[1]?.length > 2) {
+      value = parts[0] + '.' + parts[1].slice(0, 2)
+    }
   }
 
-  // จำกัดจำนวนหลักรวมไม่เกิน 8 หลัก
-  if (value.length > 8) {
-    value = value.slice(0, 8) // ตัดค่าที่เกินออก
+  // จำกัดจำนวนหลักรวมไม่เกิน 8 หลัก (ไม่นับจุด)
+  const numericLength = value.replace('.', '').length
+  if (numericLength > 8) {
+    if (value.includes('.')) {
+      const [intPart, decPart] = value.split('.')
+
+      value = intPart.slice(0, 8) + (decPart ? '.' + decPart.slice(0, 2) : '')
+    } else {
+      value = value.slice(0, 8)
+    }
   }
 
   // อัปเดตค่าใน dataHeader.actualCheck
