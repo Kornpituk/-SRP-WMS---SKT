@@ -2001,7 +2001,7 @@ const print = () => {
                 class="px-1"
                 style="min-width: 150px;"
               >
-                {{ item.raw.finishedDate }}
+                {{ formatDate(item.raw.finishedDate) }}
               </td>
               <td>
                 <VTextarea
