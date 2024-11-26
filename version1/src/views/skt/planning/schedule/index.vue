@@ -1140,9 +1140,9 @@ const newBatch = async batchID => {
                   >{{ colorStatusWithId(item.raw.statusId).text }}</VChip>
                 </span>
               </td>
-              <td>{{ index+1 }}</td>
+              <td>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</td>
               <td>
-                {{ item.raw.inputDate }}
+                {{ formatDate(item.raw.inputDate) }}
               </td>
               <td>
                 {{ item.raw.planningID }}
@@ -1199,16 +1199,16 @@ const newBatch = async batchID => {
                 {{ item.raw.lotNumber }}
               </td>
               <td
-                class="px-1"
+                class="px-1 text-center"
                 style="min-width: 150px;"
               >
-                {{ item.raw.producingDate }}
+                {{ formatDate(item.raw.producingDate) }}
               </td>
               <td
-                class="px-1"
+                class="px-1 text-center"
                 style="min-width: 150px;"
               >
-                {{ item.raw.finishedDate }}
+                {{ formatDate(item.raw.finishedDate) }}
               </td>
               <td>
                 {{ item.raw.remark }}

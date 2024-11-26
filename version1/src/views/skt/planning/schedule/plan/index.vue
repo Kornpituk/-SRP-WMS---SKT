@@ -1720,7 +1720,7 @@ const print = () => {
                   {{ colorStatusWithId(item.raw.statusId).text }}
                 </VChip>
               </td>
-              <td>{{ index+1 }}</td>
+              <td>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</td>
               <td>
                 <AppDateTimePicker
                   v-model="item.raw.inputDate"
