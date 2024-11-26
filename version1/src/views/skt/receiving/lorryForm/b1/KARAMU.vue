@@ -487,7 +487,7 @@ watchEffect(async () => {
   text-align: center;
 }
 
-.centered-input>>>input {
+.centered-input >>> input {
   padding: 0;
   block-size: 20px !important;
   text-align: center;

@@ -972,7 +972,7 @@ function formatDate(dateString) {
   text-align: center;
 }
 
-.centered-input>>>input {
+.centered-input >>> input {
   padding: 0;
   block-size: 20px !important;
   text-align: center;
@@ -1057,12 +1057,12 @@ function formatDate(dateString) {
 }
 
 .tr-border-right-0 {
+  border-inline-end: 0 !important;
   font-size: 16px;
-  border-right: 0px !important;
 }
 
 .tr-border-left-0 {
+  border-inline-start: 0 !important;
   font-size: 16px;
-  border-left: 0px !important;
 }
 </style>
