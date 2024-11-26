@@ -887,7 +887,7 @@ export const ipaItemTemplate = [
 export function passInitialData(type, params, index) {
   if (type == "oknot" ) {
     return params.toString()
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c"){
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
     if(index == 0){
       return params
     }else{
@@ -909,7 +909,7 @@ export function passSubmitData(type, params) {
       return -1
     }
   }
-  else if(type == "bd" || type == "litre" || type == "percen" || type =="c"){
+  else if(type == "bd" || type == "litre" || type == "percen" || type =="c" || type=='mpa'|| type=='amp'){
     return parseFloat(params)
   }
   else if(type == "actualCheck"){
