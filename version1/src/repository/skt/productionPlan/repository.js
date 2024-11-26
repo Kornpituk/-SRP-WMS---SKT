@@ -173,6 +173,50 @@ export const productionPlanRepository = {
     }
   },
 
+  async submitProductionPlan(planningId, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/submit`, planningId, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data submit Batch production plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
+  async approveProductionPlan(planningId, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/approve`, planningId, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data approve Batch production plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
   async deleteProductionPlan(planningId, urlApi, form, whereHouse, accessToken) {
     const body = JSON.stringify(planningId)  // แปลงเป็น JSON string
     try {

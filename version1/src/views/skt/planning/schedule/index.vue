@@ -1117,7 +1117,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #item="{ item }">
+          <template #item="{ item, index }">
             <tr style="font-size: 14px;">
               <td
                 class="text-center px-2"
@@ -1140,7 +1140,7 @@ const newBatch = async batchID => {
                   >{{ colorStatusWithId(item.raw.statusId).text }}</VChip>
                 </span>
               </td>
-              <td>{{ item.raw.no }}</td>
+              <td>{{ index+1 }}</td>
               <td>
                 {{ item.raw.inputDate }}
               </td>

@@ -92,6 +92,67 @@ export const useDeleteProductionPlanService = () => {
   }
 }
 
+export const useSubmitProductionPlanService = () => {
+  const responseSubmitProductionPlan = ref(null)
+  const errorMessageSubmitProductionPlan = ref(null)
+  
+  const submitProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageSubmitProductionPlan.value = null
+      console.log('Submit Produtcion Plan Func...')
+  
+      const result = await productionPlanRepository.submitProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Submit Produtcion Plan Func result:', result)
+        responseSubmitProductionPlan.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in submitProdutcionPlanFunc:', error)
+      errorMessageSubmitProductionPlan.value = error.message
+    }
+  }
+  
+  return {
+    responseSubmitProductionPlan,
+    errorMessageSubmitProductionPlan,
+    submitProdutcionPlanFunc,
+  }
+}
+
+export const useApproveProductionPlanService = () => {
+  const responseApproveProductionPlan = ref(null)
+  const errorMessageApproveProductionPlan = ref(null)
+  
+  const approveProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageApproveProductionPlan.value = null
+      console.log('Approve Produtcion Plan Func...')
+  
+      const result = await productionPlanRepository.approveProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Approve Produtcion Plan Func result:', result)
+        responseApproveProductionPlan.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in ApproveProdutcionPlanFunc:', error)
+      errorMessageApproveProductionPlan.value = error.message
+    }
+  }
+  
+  return {
+    responseApproveProductionPlan,
+    errorMessageApproveProductionPlan,
+    approveProdutcionPlanFunc,
+  }
+}
+
+
 export const useGetProductionPlanSearchService = () => {
   const getProductionplanSearchResult = ref(null)
   const errorMessageGetProductionPlanSearch = ref(null)

@@ -148,6 +148,8 @@ import { useGetProductionPlanService,
   useDeleteProductionPlanService,
   useGetProductionPlanMasterService,
   useSaveProductionPlanService,
+  useSubmitProductionPlanService,
+  useApproveProductionPlanService,
 } from '@/services/skt/productionPlan/services'
 
 const countItemProduction = ref(1)
@@ -247,147 +249,6 @@ const packagingKgsDataTable = [
     key: 'action',
   },
 ]
-
-const dataMockProductionCodeModel1 = ref([
-  {
-    productionCode: '4509261005831250',
-    productionName: ' F-190 (1250KG)  IBC  1st-org1',
-    planName: 'TP-1',
-    reactorName: '11R-311',
-    batchScale: '11536.00',
-    durationDays: '1',
-    itemCode: [
-      { itemsCode: '450926100561', InBomName: 'F-190  LORRY  1st-org1' },
-      { itemsCode: '4509261005831250', InBomName: 'F-190 (1250KG)  IBC  1st-org1' },
-      { itemsCode: '450926101764', InBomName: 'F-190 PE FLEXITANK' },
-      { itemsCode: '4509261027831250', InBomName: 'F-190 IBC (EXPORT) 1ST-ORG1' },
-    ],
-    packagingtype: [
-      { itemCode: '494603110', productName: 'IBC CONTAINER (SECOND HAND)  1st-Org1', packagingQtyKsg: '1250.00' },
-    ],
-  },
-  {
-    productionCode: '425626300551180',
-    productionName: 'SKT DDA BE D/M 1st-org2',
-    planName: 'TP-1',
-    ReactorName: '11R-331',
-    BatchScale: '6165.00',
-    DurationDays: '2',
-    itemCode: [
-      { itemsCode: '425626300551180', ProductionCode: '425626300551180', InBomName: 'SKT DDA BE D/M 1st-org2' },
-    ],
-    packagingtype: [
-      { itemCode: '494601910', productName: 'BC18D/M  1st-Org1', packagingQtyKsg: '180.00' },
-      { itemCode: '494601930', productName: 'BC18D/M  1st-Org2', packagingQtyKsg: '180.00' },
-    ],
-  },
-  {
-    productionCode: '450171201753200',
-    productionName: 'CHEMICLEAN PR-029 D/M  Clean',
-    planName: 'Cleanroom',
-    ReactorName: '13R-201',
-    BatchScale: '5000.00',
-    DurationDays: '3',
-    itemCode: [
-      { itemsCode: '45017120171320', InBomName: 'CHEMICLEAN PR-029  C/N  Clean' },
-      { itemsCode: '450171201753200', InBomName: 'CHEMICLEAN PR-029 D/M  Clean' },
-    ],
-    packagingtype: [
-      { itemCode: '494605425', productName: '20L CLEAN GALLON', packagingQtyKsg: '20.00' },
-      { itemCode: '494605910', productName: 'PL D/M (9.4) 1st-Org-1(EURO)', packagingQtyKsg: '200.00' },
-    ],
-  },
-
-  {
-    productionCode: '451008201583800',
-    productionName: 'OIL-AR (800 KG) IBC CLEAN ROOM',
-    planName: 'Cleanroom',
-    ReactorName: '13R-202',
-    BatchScale: '3800.00',
-    DurationDays: '1',
-    itemCode: [
-      { itemsCode: '451008201583800', InBomName: 'OIL-AR (800 KG) IBC CLEAN ROOM' },
-    ],
-    packagingtype: [
-      { itemCode: '494603110', productName: 'IBC CONTAINER (SECOND HAND)  1st-Org1', packagingQtyKsg: '800.00' },
-    ],
-  },
-  {
-    productionCode: '451394201583925',
-    productionName: 'OIL-BR (925 Kg) IBC CLEAN ROOM',
-    planName: 'Cleanroom',
-    ReactorName: '13R-202',
-    BatchScale: '4380.00',
-    DurationDays: '1',
-    itemCode: [
-      { itemsCode: '451394201583925', ProductionCode: '451394201583925', InBomName: 'OIL-BR (925 Kg) IBC CLEAN ROOM' },
-    ],
-    packagingtype: [
-      { itemCode: '494603110', productName: 'IBC CONTAINER (SECOND HAND)  1st-Org1', packagingQtyKsg: '925.00' },
-    ],
-  },
-  {
-    productionCode: '451506101753180',
-    productionName: 'OSMORIN DA-50 (180kg) D/M 1st-org1',
-    planName: 'TP-1',
-    ReactorName: '11R-311',
-    BatchScale: '5943.00',
-    DurationDays: '1',
-    itemCode: [
-      { itemsCode: '451506101753180', ProductionCode: '451506101753180', InBomName: 'OSMORIN DA-50 (180kg) D/M 1st-org1' },
-    ],
-    packagingtype: [
-      { itemCode: '494604610', productName: 'PL D/M (9.5) 1st-Org-1(TAIKO)', packagingQtyKsg: '180.00' },
-    ],
-  },
-])
-
-const dataMockProductionCodeModel2 = ref([
-  {
-    productionCode: '451640101753170',
-    productionName: ' CATION PG-50  D/M  1st-org1',
-    planName: 'TP-1',
-    reactorName: '11R-321',
-    batchScale: '6111.00',
-    durationDays: '3',
-    itemCode: [
-      { itemsCode: '451640101753170', InBomName: 'CATION PG-50  D/M  1st-org1' },
-    ],
-    packagingtype: [
-      { itemCode: '494604610', productName: 'PL D/M (9.5) 1st-Org-1(TAIKO)', packagingQtyKsg: '170.00' },
-    ],
-  },
-  {
-    productionCode: '451715300551170',
-    productionName: 'SANPRENE IB-D20  D/M  1st-Org2',
-    planName: 'TP-1',
-    ReactorName: '11R-331',
-    BatchScale: '9118.00',
-    DurationDays: '2',
-    itemCode: [
-      { itemsCode: '451715300551170', InBomName: 'SANPRENE IB-D20  D/M  1st-Org2' },
-      { itemsCode: '451715300751170', InBomName: 'SANPRENE IB-D20(Export)  D/M  1st-Org2' },
-    ],
-    packagingtype: [
-      { itemCode: '494601910', productName: 'BC18D/M  1st-Org1', packagingQtyKsg: '170.00' },
-      { itemCode: '494601930', productName: 'BC18D/M  1st-Org2', packagingQtyKsg: '170.00' },
-    ],
-  },
-  {
-    productionCode: '451789102553200',
-    productionName: 'AL-40  D/M  1st-org1 DO',
-    planName: 'Cleanroom',
-    ReactorName: '13R-201',
-    BatchScale: '5000.00',
-    DurationDays: '1',
-    itemCode: [
-      { itemsCode: '451789102553200', InBomName: 'AL-40  D/M  1st-org1 DO' },
-    ],
-    packagingtype: [
-      { itemCode: '494604320', productName: 'PL D/M small cap PackDelta Clean room', packagingQtyKsg: '200.00' },
-    ],
-  },
-])
 
 const dataMasterForSelectFilter = ref([])
 
@@ -711,13 +572,13 @@ const addEmptyRowToPlan = async () => {
     console.log("New Plan Success")
     textAlertDialogFunction(alertWordConst.newPlan, true)
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
   }else{
     console.log("New Plan Not Success")
     textAlertDialogFunction(alertWordConst.newPlan, false)
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
   }
   
@@ -749,6 +610,62 @@ const deletePlan = async () => {
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error deleted production plan:", error)
+  }
+
+  console.log("body selectedDataTables", body)
+}
+
+//------------------------- submit plan
+const { responseSubmitProductionPlan, errorMessageSubmitProductionPlan, submitProdutcionPlanFunc } = useSubmitProductionPlanService()
+
+const submitPlan = async () => {
+
+  // console.log("selectedDataTables", selectedDataTables.value)
+
+  const body = selectedDataTables.value.map(item => item.planningID)
+
+  try {
+  // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    await submitProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+  } catch (error) {
+  // จัดการข้อผิดพลาด
+    textAlertDialogFunction(alertWordConst.submit, false)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    console.error("Error submited production plan:", error)
+  }
+
+  console.log("body selectedDataTables", body)
+}
+
+//------------------------- approve plan
+const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approveProdutcionPlanFunc } = useApproveProductionPlanService()
+
+const approvePlan = async () => {
+
+  // console.log("selectedDataTables", selectedDataTables.value)
+
+  const body = selectedDataTables.value.map(item => item.planningID)
+
+  try {
+  // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+  } catch (error) {
+  // จัดการข้อผิดพลาด
+    textAlertDialogFunction(alertWordConst.approve, false)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    console.error("Error approved production plan:", error)
   }
 
   console.log("body selectedDataTables", body)
@@ -1689,7 +1606,7 @@ const print = () => {
         </VBtn>
         <VBtn
           class="mx-2"
-          color="warning"
+          color="success"
           @click="viewAllData"
         >
           <span style="font-size: 12px;">Submit</span>
@@ -1803,7 +1720,7 @@ const print = () => {
                   {{ colorStatusWithId(item.raw.statusId).text }}
                 </VChip>
               </td>
-              <td>{{ item.raw.no }}</td>
+              <td>{{ index+1 }}</td>
               <td>
                 <AppDateTimePicker
                   v-model="item.raw.inputDate"
@@ -1839,7 +1756,7 @@ const print = () => {
               </td>
               <td>{{ item.raw.reactorName }}</td>
               <td>
-                {{ productionName }}
+                {{ item.raw.productionName }}
               </td>
               <td
                 class="px-1"
