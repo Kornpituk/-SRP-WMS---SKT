@@ -586,14 +586,14 @@ const addSelectProdutionCode = index => {
   productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value || null
   productionPlan.value[index].product1PackagingName = selectedPackagingName.value || null
   productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value || null
-  productionPlan.value[index].product1UomCount = selectedProductionbatchScaleKgs.value/selectedPackagingKgs.value || null
+  productionPlan.value[index].product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value/selectedPackagingKgs.value) || null
 
   productionPlan.value[index].product2SelectedCode = selectedItemCode2.value || null
   productionPlan.value[index].product2Name = selectedItemName2.value || null
   productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value || null
   productionPlan.value[index].product2PackagingName = selectedPackagingName2.value || null
   productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value || null
-  productionPlan.value[index].product2UomCount = selectedProductionbatchScaleKgs.value/selectedPackagingKgs2.value || null
+  productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value/selectedPackagingKgs2.value) || null
 
   console.log("Updated row:", productionPlan.value[index])
 }
@@ -1803,7 +1803,7 @@ const print = () => {
                   v-model="item.raw.inputDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
+                  :config="{ dateFormat: 'Y-m-d' }"
                 >
                   <template #label>
                     <span>Input Data</span>
@@ -1994,7 +1994,7 @@ const print = () => {
                   density="compact"
                   style="font-size: 12px;"
                   prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
+                  :config="{ dateFormat: 'Y-m-d' }"
                 />
               </td>
               <td
