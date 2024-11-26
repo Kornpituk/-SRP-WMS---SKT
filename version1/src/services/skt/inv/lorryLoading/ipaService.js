@@ -41,9 +41,11 @@ export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryP
 }
 
 export function currencyFormat(number) {
+  console.log("currencyFormat", number)
+  
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(number)
 }
@@ -909,13 +911,22 @@ export function passSubmitData(type, params) {
       return -1
     }
   }
-  else if(type == "bd" || type == "litre" || type == "percen" || type =="c" || type=='mpa'|| type=='amp'){
-    return parseFloat(params)
-  }
+
+  // else if(type == "bd" || type == "litre" || type == "percen" || type =="c" || type=='mpa'|| type=='amp'){
+  //   if(isNaN(Number(params))){
+  //     return parseFloat( params.replace(/,/g, ''))
+  //   }else{
+  //     return parseFloat(params)
+  //   }
+  // }
   else if(type == "actualCheck"){
     return !params ? "0": params.toString()
   }
   else {
-    return parseFloat(params)
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
   }
 }

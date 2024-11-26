@@ -170,7 +170,6 @@ async function approve(e) {
 
 
 watchEffect(async () => {
-
   var b = ipaItems[6].result.field[0].value / (0.78)
   var d = ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45
   var f = ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)
@@ -181,7 +180,7 @@ watchEffect(async () => {
 
   ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
   ipaItems[49].result.field[0].value = currencyFormat((b + d) - f)
-  ipaItems[49].result.field[1].value = currencyFormat(parseFloat(ipaItems[49].result.field[0].value) * 0.78)
+  ipaItems[49].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
 
   dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value))
   dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))
@@ -328,14 +327,23 @@ watchEffect(async () => {
                     />
                   </VCol>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="solo"
-                      text-start="(B)"
-                      text-end="Litre"
                       readonly="true"
-                    />
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          (B)
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Litre
+                        </VLabel>
+                      </template>
+                    </VTextField>
                   </VCol>
                 </VRow>
               </div>
@@ -352,28 +360,46 @@ watchEffect(async () => {
                     />
                   </VCol>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="solo"
-                      text-start="(D)"
-                      text-end="Litre."
                       readonly="true"
-                    />
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          (D)
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Litre
+                        </VLabel>
+                      </template>
+                    </VTextField>
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'bd'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
-                      text-start=" (B) + (D) ="
-                      text-end="Litre"
                       readonly="true"
-                    />
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          (B) + (D) =
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Litre
+                        </VLabel>
+                      </template>
+                    </VTextField>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -576,15 +602,23 @@ watchEffect(async () => {
                     />
                   </VCol>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[1].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(F)"
-                      text-end="Litre"
+                      variant="solo"
                       readonly="true"
-                    />
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          (F)
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Litre
+                        </VLabel>
+                      </template>
+                    </VTextField> 
                   </VCol>
                 </VRow>
               </div>
@@ -605,32 +639,38 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'litrekg'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Litre"
-                      readonly="true"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Kg."
+                      variant="solo"
                       readonly="true"
                     >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Litre
+                        </VLabel>
+                      </template>
+                    </VTextField> 
+                  </VCol>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[1].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
                       <template #append>
                         <VLabel>
                           Kg.
                         </VLabel>
                       </template>
-                    </VCurrencyField>
+                    </VTextField> 
                   </VCol>
                 </VRow>
               </div>
