@@ -63,8 +63,10 @@ onMounted(async () => {
   poNo.value = lorryFormIPA.data.data.purchaseOrderNo
 
   for (var i of ipaItems) {
+    let index = 0
     for (var f of i.result.field) {
-      f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
+      f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name], index)
+      index ++
     }
   }
 
@@ -168,13 +170,18 @@ async function approve(e) {
 
 
 watchEffect(async () => {
-  ipaItems[6].result.field[1].value = currencyFormat(ipaItems[6].result.field[0].value / (0.78)) // B
-  ipaItems[7].result.field[1].value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45) // D
-  ipaItems[46].result.field[1].value = currencyFormat(ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) // F
+
+  var b = ipaItems[6].result.field[0].value / (0.78)
+  var d = ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45
+  var f = ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)
+
+  ipaItems[6].result.field[1].value = currencyFormat(b) // B
+  ipaItems[7].result.field[1].value = currencyFormat(d) // D
+  ipaItems[46].result.field[1].value = currencyFormat(f) // F
 
   ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
-  ipaItems[49].result.field[0].value = (parseFloat(ipaItems[8].result.field[0].value) - parseFloat(ipaItems[46].result.field[1].value)).toFixed(2)
-  ipaItems[49].result.field[1].value = (parseFloat(ipaItems[49].result.field[0].value) * 0.78).toFixed(2)
+  ipaItems[49].result.field[0].value = currencyFormat((b + d) - f)
+  ipaItems[49].result.field[1].value = currencyFormat(parseFloat(ipaItems[49].result.field[0].value) * 0.78)
 
   dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value))
   dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))

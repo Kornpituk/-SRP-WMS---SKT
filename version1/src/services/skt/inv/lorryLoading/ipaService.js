@@ -884,22 +884,23 @@ export const ipaItemTemplate = [
 
 ]
 
-export function passInitialData(type, params) {
-  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
+export function passInitialData(type, params, index) {
+  if (type == "oknot" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c"){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
     }
-  } else {
+  }
+  else {
     return params
   }
 }
 
 export function passSubmitData(type, params) {
-  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
+  if (type == "oknot") {
     if (params == "0") {
       return 0
     } else if (params == "1") {
@@ -907,7 +908,11 @@ export function passSubmitData(type, params) {
     } else {
       return -1
     }
-  }else if(type == "actualCheck"){
+  }
+  else if(type == "bd" || type == "litre" || type == "percen" || type =="c"){
+    return parseFloat(params)
+  }
+  else if(type == "actualCheck"){
     return !params ? "0": params.toString()
   }
   else {
