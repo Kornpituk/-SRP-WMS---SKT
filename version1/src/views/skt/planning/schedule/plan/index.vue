@@ -451,6 +451,12 @@ const selectedItemCodeForPlan = ref([])
 const selectedPackagingTypeForPlan = ref([])
 
 const selectedProductionCode = ref([])
+const selectedProductionName = ref(null)
+const selectedProductionbatchScaleKgs = ref(null)
+const selectedProductionDurationDays = ref(null)
+const selectedProductionReactorName = ref(null)
+const selectedProductionPlanName = ref(null)
+
 const selectedItemCode = ref(null)
 const selectedItemName = ref(null)
 const selectedPackagingType = ref(null)
@@ -481,6 +487,12 @@ const selectPackagingTypeSwitch = computed(() => {
 // ฟังก์ชันสำหรับเลือก plan
 const selectPlan = plan => {
   selectedItemCodeForPlan.value = plan.itemCode // อัปเดต itemCode
+  selectedProductionName.value = plan.productionName
+  selectedProductionbatchScaleKgs.value = plan.batchScaleKgs
+  selectedProductionDurationDays.value = plan.durationDays
+  selectedProductionReactorName.value = plan.reactorName
+  selectedProductionPlanName.value = plan.plantName
+
   selectedPackagingTypeForPlan.value = plan.packagingtype // อัปเดต packagingtype
   selectedProductionCode.value = plan.productionCode
   selectedPackagingType2.value = plan.itemCode
@@ -560,6 +572,32 @@ const selectFilterProduction = index => {
   isDialogVisibleFilterSelect.value = true
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const addSelectProdutionCode = index => {
+  // อัปเดตค่าที่เลือกในตำแหน่งของแถวที่กด
+  productionPlan.value[index].productionCode = selectedProductionCode.value || null
+  productionPlan.value[index].productionName = selectedProductionName.value || null
+  productionPlan.value[index].reactorName = selectedProductionReactorName.value || null
+  productionPlan.value[index].batchID = selectedProductionbatchScaleKgs.value || null
+  productionPlan.value[index].plantName = selectedProductionPlanName.value || null
+    
+  productionPlan.value[index].product1SelectedCode = selectedItemCode.value || null
+  productionPlan.value[index].product1Name = selectedItemName.value || null
+  productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value || null
+  productionPlan.value[index].product1PackagingName = selectedPackagingName.value || null
+  productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value || null
+  productionPlan.value[index].product1UomCount = selectedProductionbatchScaleKgs.value/selectedPackagingKgs.value || null
+
+  productionPlan.value[index].product2SelectedCode = selectedItemCode2.value || null
+  productionPlan.value[index].product2Name = selectedItemName2.value || null
+  productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value || null
+  productionPlan.value[index].product2PackagingName = selectedPackagingName2.value || null
+  productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value || null
+  productionPlan.value[index].product2UomCount = selectedProductionbatchScaleKgs.value/selectedPackagingKgs2.value || null
+
+  console.log("Updated row:", productionPlan.value[index])
+}
+
 const confirmFilterSelectProduction = () => {
   dataPlanningForSave.value.productionCode = selectedProductionCode.value
 
@@ -570,22 +608,7 @@ const confirmFilterSelectProduction = () => {
 
   const index = indexSelectBoxFilter.value
   if (index !== null) {
-    // อัปเดตค่าที่เลือกในตำแหน่งของแถวที่กด
-    productionPlan.value[index].productionCode = selectedProductionCode.value
-    
-    productionPlan.value[index].product1SelectedCode = selectedItemCode.value || null
-    productionPlan.value[index].product1Name = selectedItemName.value || null
-    productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value || null
-    productionPlan.value[index].product1PackagingName = selectedPackagingName.value || null
-    productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value || null
-
-    productionPlan.value[index].product2SelectedCode = selectedItemCode2.value || null
-    productionPlan.value[index].product2Name = selectedItemName2.value || null
-    productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value || null
-    productionPlan.value[index].product2PackagingName = selectedPackagingName2.value || null
-    productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value || null
-
-    console.log("Updated row:", productionPlan.value[index])
+    addSelectProdutionCode(index)
   }
 
   isDialogVisibleFilterSelect.value = false // ปิด dialog
@@ -1872,7 +1895,7 @@ const print = () => {
               </td>
               <td class="bg-light-blue-lighten-5">
                 <VTextField
-                  v-model="item.raw.packagingPcs1"
+                  v-model="item.raw.product1UomCount"
                   type="number"
                   style="min-width: 100px;"
                   density="compact"
@@ -1937,17 +1960,17 @@ const print = () => {
                 {{ item.raw.product2PackingQtyKgs }}
               </td>
               <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingPcs2"
-                  :items="productNamesMockItems"
+                <VTextField
+                  v-model="item.raw.product2UomCount"
+                  type="number"
+                  style="min-width: 100px;"
                   density="compact"
-                  style="width: 150px;"
                   :readonly="item.raw.status === 'Submit'"
                 >
                   <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 2</span>
+                    <span style="font-size: 12px;">Packaging Pcs 1</span>
                   </template>
-                </VCombobox>
+                </VTextField>
               </td>
              
               <td
