@@ -1,6 +1,7 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
+import VNumberInput from '@/components/VNumberInput.vue'
 import {
   formatDate, generate, get, GetByPoEtlLogDetailJournalID, kumaruItemTemplate,
   passInitialData, passSubmitData,
@@ -344,6 +345,27 @@ watchEffect(async () => {
                     />
                   </VCol>
                 </vrow>
+              </div>
+              <div v-if="section.result.type === 'actualCheck'">
+                <VRow>
+                  <VCol>
+                    <VNumberInput
+                      v-model="section.result.field[0].value"
+                      :max-length="2"
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+                  <VLabel>
+                    :
+                  </VLabel>
+                  <VCol>
+                    <VNumberInput
+                      v-model="section.result.field[1].value"
+                      :max-length="2"
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+                </VRow>
               </div>
               <div v-if="section.result.type === 'cb'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->

@@ -106,7 +106,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1001010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -121,7 +121,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1001020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -136,7 +136,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1001030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -151,7 +151,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1001040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -166,7 +166,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1001050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -184,7 +184,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1002010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -212,25 +212,25 @@ export const eki110ItemTemplate = [
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
           "name": "l100301",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "ชุดป้องกันสารเคมี",
           "endPracticeText": "",
           "name": "l100302",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
           "name": "l100303",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "รองเท้าเซฟตี๊",
           "endPracticeText": "",
           "name": "l100304",
-          "value:": "",
+          
         },
       ],
     },
@@ -250,19 +250,19 @@ export const eki110ItemTemplate = [
           "startPracticeText": "แว่นตา",
           "endPracticeText": "",
           "name": "l100305",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "หน้ากาก กรองสารเคมี (สีขาว)",
           "endPracticeText": "",
           "name": "l100306",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "เข็มขัดนิรภัย",
           "endPracticeText": "",
           "name": "l100307",
-          "value:": "",
+          
         },
       ],
     },
@@ -285,7 +285,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100401",
-          "value:": "",
+          
         },
       ],
     },
@@ -295,7 +295,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -310,7 +310,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100402",
-          "value:": "",
+          
         },
       ],
     },
@@ -320,7 +320,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -335,7 +335,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100403",
-          "value:": "",
+          
         },
       ],
     },
@@ -345,7 +345,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -360,7 +360,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100404",
-          "value:": "",
+          
         },
       ],
     },
@@ -370,7 +370,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -385,7 +385,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100405",
-          "value:": "",
+          
         },
       ],
     },
@@ -395,7 +395,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -410,7 +410,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100406",
-          "value:": "",
+          
         },
       ],
     },
@@ -420,7 +420,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -435,7 +435,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100407",
-          "value:": "",
+          
         },
       ],
     },
@@ -445,7 +445,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -460,7 +460,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100408",
-          "value:": "",
+          
         },
       ],
     },
@@ -470,7 +470,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -485,7 +485,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100409",
-          "value:": "",
+          
         },
       ],
     },
@@ -495,7 +495,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -510,7 +510,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100410",
-          "value:": "",
+          
         },
       ],
     },
@@ -520,7 +520,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004100101",
-          "value:": "",
+          
         },
       ],
     },
@@ -535,7 +535,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100411",
-          "value:": "",
+          
         },
       ],
     },
@@ -545,7 +545,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004110101",
-          "value:": "",
+          
         },
       ],
     },
@@ -560,7 +560,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100412",
-          "value:": "",
+          
         },
       ],
     },
@@ -570,7 +570,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004120101",
-          "value:": "",
+          
         },
       ],
     },
@@ -585,7 +585,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100413",
-          "value:": "",
+          
         },
       ],
     },
@@ -595,7 +595,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004130101",
-          "value:": "",
+          
         },
       ],
     },
@@ -610,7 +610,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100414",
-          "value:": "",
+          
         },
       ],
     },
@@ -620,7 +620,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004140101",
-          "value:": "",
+          
         },
       ],
     },
@@ -635,7 +635,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100415",
-          "value:": "",
+          
         },
       ],
     },
@@ -645,11 +645,11 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1004150101", // A
-          "value:": "",
+          
         },
         {
           "name": "l1004150102", // B
-          "value:": "",
+          
         },
       ],
     },
@@ -677,7 +677,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1005020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -692,7 +692,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1005030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -707,7 +707,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100504",
-          "value:": "",
+          
         },
       ],
     },
@@ -717,7 +717,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1005040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -732,7 +732,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100505",
-          "value:": "",
+          
         },
       ],
     },
@@ -742,7 +742,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1005050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -757,7 +757,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100506",
-          "value:": "",
+          
         },
       ],
     },
@@ -767,7 +767,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1005060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -782,7 +782,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100507",
-          "value:": "",
+          
         },
       ],
     },
@@ -792,7 +792,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1005070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -807,7 +807,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100508",
-          "value:": "",
+          
         },
       ],
     },
@@ -817,7 +817,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1005080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -832,7 +832,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100509",
-          "value:": "",
+          
         },
       ],
     },
@@ -842,7 +842,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1005090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -860,7 +860,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100601",
-          "value:": "",
+          
         },
       ],
     },
@@ -870,11 +870,11 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006010101",
-          "value:": "",
+          
         },
         {
           "name": "l1006010102",
-          "value:": "",
+          
         },
       ],
     },
@@ -889,7 +889,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100602",
-          "value:": "",
+          
         },
       ],
     },
@@ -899,7 +899,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -914,7 +914,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100603",
-          "value:": "",
+          
         },
       ],
     },
@@ -924,7 +924,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -939,7 +939,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -949,7 +949,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -964,7 +964,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100605",
-          "value:": "",
+          
         },
       ],
     },
@@ -974,7 +974,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -989,7 +989,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100606",
-          "value:": "",
+          
         },
       ],
     },
@@ -999,7 +999,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1014,7 +1014,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100607",
-          "value:": "",
+          
         },
       ],
     },
@@ -1024,7 +1024,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1039,7 +1039,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100608",
-          "value:": "",
+          
         },
       ],
     },
@@ -1049,7 +1049,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1064,7 +1064,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100609",
-          "value:": "",
+          
         },
       ],
     },
@@ -1074,7 +1074,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1089,7 +1089,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l100610",
-          "value:": "",
+          
         },
       ],
     },
@@ -1099,7 +1099,7 @@ export const eki110ItemTemplate = [
       "field": [
         {
           "name": "l1006100101",
-          "value:": "",
+          
         },
       ],
     },

@@ -546,10 +546,13 @@ export const kumaruItemTemplate = [
     "practice": "6. ทำการ start pump 21P-101 ที่หน้างานชั้น 1",
     "condition": "สตาร์ทที่ Panel ตรงปั้มชั้น 1",
     "result": {
-      "type": "oknot",
+      "type": "actualCheck",
       "field": [
         {
           "name": "l0605060101",
+        },
+        {
+          "name": "l0305060102",
         },
       ],
     },
@@ -756,10 +759,13 @@ export const kumaruItemTemplate = [
     "practice": "10. หลังจากตรวจสอบแล้วว่าไม่มีของเหลวค้างภายในท่อให้ทำการปิดไนโตรเจนและปิดวาล์วที่ขึ้นไป 21V-306",
     "condition": "ตรวจเช็คว่า valve ปิดจริง",
     "result": {
-      "type": "oknot",
+      "type": "actualCheck",
       "field": [
         {
           "name": "l0606110101",
+        },
+        {
+          "name": "l0306110102",
         },
       ],
     },

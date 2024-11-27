@@ -1,6 +1,7 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
+import VNumberInput from '@/components/VNumberInput.vue'
 import { eki110ItemTemplate } from '@/services/skt/inv/lorryLoading/eki110Service'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
@@ -52,7 +53,7 @@ onMounted(async () => {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
+  await axios.post(`${urlApi.value}/api/v1/LorryFormEkiA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -60,15 +61,17 @@ onMounted(async () => {
     },
   })
 
-  // const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-  //   headers: {
-  //     'accept': '*/*',
-  //     'x-location': `${whereHouse}`,
-  //     Authorization: `Bearer ${accessTokenAtStore}`,
-  //   },
-  // })
-  console.log(eki110ItemTemplate)
-  lorryRequestData.value = akumaruRequestData //lorryFormIPA.data.data
+  const lorryForm = await axios.get(`${urlApi.value}/api/v1/LorryFormEkiA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+
+  // console.log(eki110ItemTemplate)
+  lorryRequestData.value = lorryForm.data.data
+
   // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
   for (var i of lorryItem) {
     for (var f of i.result.field) {
@@ -84,7 +87,7 @@ onMounted(async () => {
   }
 
 
-  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
+  const lorryFormStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -92,24 +95,27 @@ onMounted(async () => {
     },
   })
 
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  statusId.value = lorryFormStatus.data.data.statusId
 
 })
 
-function passInitialData(type, params) {
-  if (type == "oknot") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
+function passInitialData(type, params, index) {
+  if (type == "oknot" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
     }
-  } else {
+  }
+  else {
     return params
   }
 }
 
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function passSubmitData(type, params) {
   if (type == "oknot") {
     if (params == "0") {
@@ -120,11 +126,20 @@ function passSubmitData(type, params) {
       return -1
     }
   }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }
+  else if(type == "checkbox4" || type == "checkbox3" || type == "checkbox"){
+    return params === true ? 1 : 0
+  } 
   else {
-    return params
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
   }
 }
-
 async function saveDraft(e) {
   for (var i of lorryItem) {
     for (var f of i.result.field) {
@@ -135,7 +150,7 @@ async function saveDraft(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEkiA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -154,7 +169,7 @@ async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEkiA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -173,7 +188,7 @@ async function approve(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEkiA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -263,7 +278,7 @@ function formatDate(dateString) {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        AKUMARUUUUUU
+        EKI
       </div>
     </VCol>
     <VCol cols="4" />
@@ -624,22 +639,20 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :max-length="2"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :max-length="2"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
