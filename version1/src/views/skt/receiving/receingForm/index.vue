@@ -345,6 +345,7 @@ const checkCurrentTabBeforIn = status => {
   case 12:
   case 13:
   case 14:
+  case 18:
     tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
     break
     
@@ -547,6 +548,7 @@ const tabIndexConfig = {
   12: 2,
   13: 2,
   14: 2,
+  18: 2,
 
   // Add more statuses and indices as needed
 }
