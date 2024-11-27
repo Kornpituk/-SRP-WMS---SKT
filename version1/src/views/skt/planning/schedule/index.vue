@@ -27,7 +27,7 @@ import { useGetBatchProductionPlanService, useGetProductionPlanSearchService } f
 
 import { useFormatDateUtilities } from '@/utilities/utilities'
 
-import { useGetCOAFormController } from '@/utilities/utilities'
+import { useGetCOAFormController } from '@/utilities/format'
 
 //----------------------------------- Get Batch Production plan ---------------------------
 
@@ -1160,7 +1160,7 @@ const newBatch = async batchID => {
                 class="px-8 text-end"
                 style="min-width: 150px;"
               >
-                {{ item.raw.quantityKgs }}
+                {{ useGetCOAFormController(item.raw.quantityKgs) }}
               </td>
               <td class="bg-light-blue-lighten-5">
                 {{ item.raw.product1InBomName }}
