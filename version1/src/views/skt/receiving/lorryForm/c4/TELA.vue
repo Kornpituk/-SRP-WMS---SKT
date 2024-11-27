@@ -263,7 +263,7 @@ function formatDate(dateString) {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        AKUMARUUUUUU
+        TELA
       </div>
     </VCol>
     <VCol cols="4" />
@@ -371,7 +371,6 @@ function formatDate(dateString) {
                   </VCol>
                 </VRow>
               </div> 
-             
               <div v-else-if="section.practice.type === 'checkbox4'">
                 <VRow>
                   <VCol>

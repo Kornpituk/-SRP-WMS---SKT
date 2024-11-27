@@ -263,7 +263,7 @@ function formatDate(dateString) {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        AKUMARUUUUUU
+        HAKU
       </div>
     </VCol>
     <VCol cols="4" />
