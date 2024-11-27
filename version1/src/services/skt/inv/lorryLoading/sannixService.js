@@ -12,57 +12,6 @@ export const npanRequestData = {
   "WHLeaderDate": null,
   "WHSupervisor": "",
   "WHSupervisorDate": null,
-  "l1501010101": "0",
-  "l1502010101": "-1",
-  "l1503010101": "-1",
-  "l1504010101": "-1",
-  "l1504020101": "-1",
-  "l1504030101": "-1",
-  "l1504040101": "-1",
-  "l1504050101": "-1",
-  "l1504060101": "-1",
-  "l1504070101": "-1",
-  "l1504080101": "-1",
-  "l1504090101": "-1",
-  "l1504100101": "-1",
-  "l1505010101": "0",
-  "l1505010102": "0",
-  "l1505020101": "-1",
-  "l1505030101": "-1",
-  "l1505040101": "-1",
-  "l1506010101": "-1",
-  "l1506020101": "-1",
-  "l1506030101": "-1",
-  "l1506040101": "-1",
-  "l1506050101": "-1",
-  "l1506060101": "-1",
-  "l150301": "0",
-  "l150302": "0",
-  "l150303": "0",
-  "l150304": "0",
-  "l150305": "0",
-  "l150401": "0",
-  "l150402": "0",
-  "l150403": "0",
-  "l150404": "0",
-  "l150405": "0",
-  "l150406": "0",
-  "l150407": "0",
-  "l150408": "0",
-  "l150409": "0",
-  "l150410": "0",
-  "l150501": "0",
-  "l150502": "0",
-  "l150503": "0",
-  "l150504": "0",
-  "l150601": "0",
-  "l150602": "0",
-  "l150603": "0",
-  "l150604": "0",
-  "l150605": "0",
-  "l150606": "0",
-
-
 }
 
 export const npanItemTemplate = [
@@ -71,13 +20,23 @@ export const npanItemTemplate = [
     "isSection": true,
     "rowSpan": 1,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "จำนวนที่ระบุ ในใบส่งสินค้า    ",
+    "practice": {
+      "startPracticeText": "จำนวนที่ระบุ ในใบส่งสินค้า    ",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l160101",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ทำ",
     "result": {
       "type": "kg",
       "field": [
         {
-          "name": "l1501010101",
+          "name": "l1601010101",
           "value:": "",
         },
       ],
@@ -95,7 +54,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1502010101",
+          "name": "l1602010101",
           "value:": "",
         },
       ],
@@ -113,19 +72,19 @@ export const npanItemTemplate = [
         {
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
-          "name": "l150301",
+          "name": "l160301",
           "value:": "",
         },
         {
           "startPracticeText": "ชุดป้องกันสารเคมี",
           "endPracticeText": "",
-          "name": "l150302",
+          "name": "l160302",
           "value:": "",
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
-          "name": "l150303",
+          "name": "l160303",
           "value:": "",
         },
       ],
@@ -135,7 +94,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1503010101",
+          "name": "l1603010101",
           "value:": "",
         },
       ],
@@ -150,13 +109,13 @@ export const npanItemTemplate = [
         {
           "startPracticeText": "แว่นตา",
           "endPracticeText": "",
-          "name": "l150304",
+          "name": "l160304",
           "value:": "",
         },
         {
           "startPracticeText": "เข็มขัดนิรภัย",
           "endPracticeText": "",
-          "name": "l150305",
+          "name": "l160305",
           "value:": "",
         },
       ],
@@ -171,7 +130,7 @@ export const npanItemTemplate = [
   // 5. ขั้นตอนการปฏิบัติ
   {
     "isSection": true,
-    "rowSpan": 10,
+    "rowSpan": 19,
     "sequence": "<strong>5. ขั้นตอนการปฏิบัติ</strong>",
     "practice": {
       "startPracticeText": "หยุดรถบริเวณที่ปฏิบัติงาน และดับเครื่องยนต์ No.1",
@@ -179,7 +138,7 @@ export const npanItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l150401",
+          "name": "l160401",
           "value:": "",
         },
       ],
@@ -189,7 +148,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1504010101",
+          "name": "l1604010101",
           "value:": "",
         },
       ],
@@ -204,7 +163,7 @@ export const npanItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l150402",
+          "name": "l160402",
           "value:": "",
         },
       ],
@@ -214,10 +173,60 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1504020101",
+          "name": "l1604020101",
           "value:": "",
         },
       ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "ประตูด้านซ้าย ติดป้ายเตือน \"ห้ามเปิดประตูตู้ 2 บาน\"",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l160403",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1604030101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": "แล้วให้เปิดประตูบานด้านขวาบานเดียว",
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1604040101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": "( Please do not open this latch Liquid Contents may spill out)",
+    "condition": "",
+    "result": {
+      "type": "",
+      "field": [],
     },
   },
   {
@@ -229,7 +238,7 @@ export const npanItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l150403",
+          "name": "l160406",
           "value:": "",
         },
       ],
@@ -239,7 +248,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1504030101",
+          "name": "l1604060101",
           "value:": "",
         },
       ],
@@ -254,7 +263,7 @@ export const npanItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l150404",
+          "name": "l160407",
           "value:": "",
         },
       ],
@@ -264,7 +273,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1504040101",
+          "name": "l1604070101",
           "value:": "",
         },
       ],
@@ -274,22 +283,22 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจดูการต่อสาย Hose มีการล็อก ข้อต่อสาย เรียบร้อย No.4",
+      "startPracticeText": "ต่อสายจากรถเข้า pump 11P-143 No.6 ,7",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150405",
+          "name": "l160408",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "ต่อแล้ว",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1504050101",
+          "name": "l1604080101",
           "value:": "",
         },
       ],
@@ -299,12 +308,12 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจสอบภายใน IBC มีสิ่งปลอมปนหรือไม่พร้อมทั้งปิด Valve no.5 ที่ IBC",
+      "startPracticeText": "ตรวจดูการต่อสาย Hose มีการล็อก ข้อต่อสาย เรียบร้อย No.6,7",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150406",
+          "name": "l160409",
           "value:": "",
         },
       ],
@@ -314,7 +323,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1504060101",
+          "name": "l1604090101",
           "value:": "",
         },
       ],
@@ -324,22 +333,22 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "นำ IBC มาวางเพื่อรับเคมี ที่ line ลง IBC",
+      "startPracticeText": "นำ IBC มาวางเพื่อรับเคมี ที่ line ลง IBC,Drums",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150407",
+          "name": "l160410",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "เปิด",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1504070101",
+          "name": "l1604100101",
           "value:": "",
         },
       ],
@@ -349,22 +358,22 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิด  valve จาก Lorry  Tank No.4,6",
+      "startPracticeText": "เปิด  valve จาก Lorry  Tank No.6",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150408",
+          "name": "l160411",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "เปิด",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1504080101",
+          "name": "l1604110101",
           "value:": "",
         },
       ],
@@ -374,22 +383,22 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่ No.4",
+      "startPracticeText": "เปิดวาล์วเข้า Pump  NO.7",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150409",
+          "name": "l160412",
           "value:": "",
         },
       ],
     },
     "condition": "ทำ",
     "result": {
-      "type": "oknot",
+      "type": "leak",
       "field": [
         {
-          "name": "l1504090101",
+          "name": "l1604120101",
           "value:": "",
         },
       ],
@@ -399,12 +408,12 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิด Valve No.4 ไป IBC (เก็บ sample ส่ง INSP ที่ IBC ใบแรก)",
+      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่ No.6,7",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150410",
+          "name": "l160413",
           "value:": "",
         },
       ],
@@ -414,25 +423,147 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1504100101",
+          "name": "l1604130101",
           "value:": "",
         },
       ],
     },
   },
-
-  // 6. ขั้นตอนขณะปฏิบัติงาน
   {
-    "isSection": true,
-    "rowSpan": 4,
-    "sequence": "<strong>6. ขั้นตอนขณะปฏิบัติงาน</strong>",
+    "isSection": false,
+    "sequence": "",
     "practice": {
-      "startPracticeText": "บันทึกเวลา start ลงใน check sheet",
+      "startPracticeText": "Check pump ว่าพร้อมใช้งานหรือไม่ โดยกด switch ไปที่ ON   ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150501",
+          "name": "l160414",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1604140101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "เปิด Valve No.10 (line circulate)",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l160415",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1604150101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "กดswitch 11P-143 ไปที่ ON  No.13",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l160416",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1604160101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "เปิด Valve No.11 ไป IBC No.12, 13(เก็บ sample ส่งQC ที่ IBC ใบแรก)",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l160417",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1604170101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "ปรับระดับการไหลของเคมี โดยค่อยๆ ปิด line circulate No.10  80%",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l160418",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1604180101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "บันทึกเวลา start  (11P-143)ลงใน check sheet",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l160419",
           "value:": "",
         },
       ],
@@ -442,11 +573,69 @@ export const npanItemTemplate = [
       "type": "actualCheck",
       "field": [
         {
-          "name": "l1505010101", // A
+          "name": "l1604190101", // A
           "value:": "",
         },
         {
-          "name": "l1505010102", // B
+          "name": "l1604190102", // B
+          "value:": "",
+        },
+      ],
+    },
+  },
+
+  // 6. ขั้นตอนขณะปฏิบัติงาน
+  {
+    "isSection": true,
+    "rowSpan": 6,
+    "sequence": "<strong>6. ขั้นตอนขณะปฏิบัติงาน</strong>",
+    "practice": " Check",
+    "condition": "",
+    "result": {
+      "type": "",
+      "field": [],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": "      :  pressure",
+    "condition": "อยู่ระหว่าง 0.35 - 0.50 ",
+    "result": {
+      "type": "mpa2",
+      "field": [
+        {
+          "name": "l1605020101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": "      :  Amp meter ",
+    "condition": " ( 6.1 Amp )",
+    "result": {
+      "type": "amp2",
+      "field": [
+        {
+          "name": "l1605030101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": " เปิดวาล์ว circulate No.10 เพิ่มขึ้นและ ปิด วาล์วไป IBC No.11 , 12, 13",
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1605040101",
           "value:": "",
         },
       ],
@@ -456,12 +645,12 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิด Valve No.4 อย่างช้าๆ จนถึง 100 % ",
+      "startPracticeText": "Start ไปที่ ON อีกครั้ง โดยหรี่วาล์ว Line circulate No.10 ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150502",
+          "name": "l160505",
           "value:": "",
         },
       ],
@@ -471,7 +660,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1505020101",
+          "name": "l1605050101",
           "value:": "",
         },
       ],
@@ -481,12 +670,12 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ปิด  Valve No. 4 เมื่อสารเคมีใกล้เต็ม IBC ",
+      "startPracticeText": "เปิดวาล์ว  Line circulate 20%",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150503",
+          "name": "l160506",
           "value:": "",
         },
       ],
@@ -496,32 +685,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1505030101",
-          "value:": "",
-        },
-      ],
-    },
-  },
-  {
-    "isSection": false,
-    "sequence": "",
-    "practice": {
-      "startPracticeText": "นำ IBC มารองรับสารเคมีและทำจนกว่าจะรับสารเคมีหมด Lorry",
-      "endPracticeText": "",
-      "type": "checkbox",
-      "field": [
-        {
-          "name": "l150504",
-          "value:": "",
-        },
-      ],
-    },
-    "condition": "เรียบร้อย",
-    "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1505040101",
+          "name": "l1605060101",
           "value:": "",
         },
       ],
@@ -531,25 +695,35 @@ export const npanItemTemplate = [
   // 7.ขั้นตอนเมื่อรับเสร็จ
   {
     "isSection": true,
-    "rowSpan": 6,
+    "rowSpan": 7,
     "sequence": "<strong>7.ขั้นตอนเมื่อรับเสร็จ</strong>",
     "practice": {
-      "startPracticeText": "ปิด Valve ไป IBC no.4 และ ปิดวาล์วLine vent  no.6ข้างบนTank lorry",
+      "startPracticeText": "เปิด Valve ไป IBC และ เปิดวาล์ว  Line circulate 100% ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150601",
+          "name": "l160607",
           "value:": "",
         },
       ],
     },
+    "condition": "",
+    "result": {
+      "type": "",
+      "field": [],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": " เปิด N2 เพื่อไล่สารออกให้หมด",
     "condition": "ทำ",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1506010101",
+          "name": "l1606080101",
           "value:": "",
         },
       ],
@@ -559,12 +733,12 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ถอดสาย Hose และล้างทำความสะอาดให้เรียบร้อย",
+      "startPracticeText": "ถอดสาย Hose และล้างหัววาลว์ ปิด cap เรียบร้อย No.7",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150602",
+          "name": "l160609",
           "value:": "",
         },
       ],
@@ -574,7 +748,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1506020101",
+          "name": "l1606090101",
           "value:": "",
         },
       ],
@@ -589,7 +763,7 @@ export const npanItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l150603",
+          "name": "l160610",
           "value:": "",
         },
       ],
@@ -599,7 +773,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1506030101",
+          "name": "l1606100101",
           "value:": "",
         },
       ],
@@ -609,22 +783,22 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เช็ค valveปิดเรียบร้อย อีกครั้ง ",
+      "startPracticeText": "เช็ค valveปิด อีกครั้ง ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l150604",
+          "name": "l160611",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "ปิด",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1506040101",
+          "name": "l1606110101",
           "value:": "",
         },
       ],
@@ -639,17 +813,17 @@ export const npanItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l150605",
+          "name": "l160612",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1506050101",
+          "name": "l1606120101",
           "value:": "",
         },
       ],
@@ -664,7 +838,7 @@ export const npanItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l150606",
+          "name": "l160613",
           "value:": "",
         },
       ],
@@ -674,7 +848,7 @@ export const npanItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1506060101",
+          "name": "l1606130101",
           "value:": "",
         },
       ],
