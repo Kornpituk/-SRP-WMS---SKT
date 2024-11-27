@@ -411,7 +411,7 @@ const colorStatusWithId = id => {
   case 11:
     return { color: 'lime-lighten-4', message: 'cycan' }
   case 12:
-    return { color: 'yellow-lighten-4', message: 'brown' }
+    return { color: 'yellow-darken-3', message: 'brown' }
   case 13:
     return { color: 'orange-lighten-4', message: 'orange' }
   case 14:
@@ -422,6 +422,8 @@ const colorStatusWithId = id => {
     return { color: 'red-darken-2', message: 'red-darken-2' }
   case 17:
     return { color: 'green-darken-2', message: 'green-darken-2' }
+  case 18:
+    return { color: 'orange-darken-4', message: 'green-darken-2' }
   default:
     return { color: 'grey', message: 'grey' }
   }
@@ -454,7 +456,7 @@ const colorStatusWithId2 = id => {
   case 11:
     return { color: 'lime', message: 'cycan' }
   case 12:
-    return { color: 'yellow', message: 'brown' }
+    return { color: 'yellow-darken-4', message: 'brown' }
   case 13:
     return { color: 'orange', message: 'orange' }
   case 14:
@@ -465,6 +467,8 @@ const colorStatusWithId2 = id => {
     return { color: 'red-darken-2', message: 'red-darken-2' }
   case 17:
     return { color: 'green-darken-2', message: 'green-darken-2' }
+  case 18:
+    return { color: 'orange-darken-4', message: 'green-darken-2' }
   default:
     return { color: 'grey', message: 'grey' }
   }
