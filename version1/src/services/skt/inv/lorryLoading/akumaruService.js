@@ -99,7 +99,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0701010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -114,7 +114,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070102",
-          "value:": "",
+          
         },
       ],
     },
@@ -124,7 +124,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0701020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -139,7 +139,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0701030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -167,7 +167,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0702010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -185,7 +185,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0703010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -200,7 +200,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0703020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -215,7 +215,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0703030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -233,25 +233,25 @@ export const akumuruItemTemplate = [
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
           "name": "l070401",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "ชุดป้องกันสารเคมี",
           "endPracticeText": "",
           "name": "l070402",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
           "name": "l070403",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "รองเท้าบูท",
           "endPracticeText": "",
           "name": "l070404",
-          "value:": "",
+          
         },
       ],
     },
@@ -271,19 +271,19 @@ export const akumuruItemTemplate = [
           "startPracticeText": "แว่นตา",
           "endPracticeText": "",
           "name": "l070405",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "หน้ากาก กรองอากาศสีเหลือง",
           "endPracticeText": "",
           "name": "l070406",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "เข็มขัดนิรภัย",
           "endPracticeText": "",
           "name": "l070407",
-          "value:": "",
+          
         },
       ],
     },
@@ -306,7 +306,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070501",
-          "value:": "",
+          
         },
       ],
     },
@@ -316,7 +316,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -331,7 +331,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070502",
-          "value:": "",
+          
         },
       ],
     },
@@ -341,7 +341,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -356,7 +356,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070503",
-          "value:": "",
+          
         },
       ],
     },
@@ -366,7 +366,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -381,7 +381,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070504",
-          "value:": "",
+          
         },
       ],
     },
@@ -391,7 +391,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -406,7 +406,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070505",
-          "value:": "",
+          
         },
       ],
     },
@@ -416,7 +416,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -431,7 +431,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070506",
-          "value:": "",
+          
         },
       ],
     },
@@ -441,7 +441,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -456,7 +456,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070507",
-          "value:": "",
+          
         },
       ],
     },
@@ -466,7 +466,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -481,7 +481,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070508",
-          "value:": "",
+          
         },
       ],
     },
@@ -491,7 +491,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -506,7 +506,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070509",
-          "value:": "",
+          
         },
       ],
     },
@@ -516,7 +516,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -531,7 +531,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070510",
-          "value:": "",
+          
         },
       ],
     },
@@ -541,7 +541,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705100101",
-          "value:": "",
+          
         },
       ],
     },
@@ -556,7 +556,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070511",
-          "value:": "",
+          
         },
       ],
     },
@@ -566,7 +566,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705110101",
-          "value:": "",
+          
         },
       ],
     },
@@ -581,7 +581,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070512",
-          "value:": "",
+          
         },
       ],
     },
@@ -591,7 +591,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705120101",
-          "value:": "",
+          
         },
       ],
     },
@@ -606,7 +606,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070513",
-          "value:": "",
+          
         },
       ],
     },
@@ -616,11 +616,11 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0705130101", // A
-          "value:": "",
+          
         },
         {
           "name": "l0705130102", // B
-          "value:": "",
+          
         },
       ],
     },
@@ -648,7 +648,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -663,7 +663,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -678,7 +678,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070604",
-          "value:": "",
+          
         },
       ],
     },
@@ -688,7 +688,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -703,7 +703,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070605",
-          "value:": "",
+          
         },
       ],
     },
@@ -713,7 +713,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -728,7 +728,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070606",
-          "value:": "",
+          
         },
       ],
     },
@@ -738,7 +738,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -753,7 +753,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070607",
-          "value:": "",
+          
         },
       ],
     },
@@ -763,7 +763,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -778,7 +778,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070608",
-          "value:": "",
+          
         },
       ],
     },
@@ -788,7 +788,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -803,7 +803,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070609",
-          "value:": "",
+          
         },
       ],
     },
@@ -813,7 +813,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0706090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -831,7 +831,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070701",
-          "value:": "",
+          
         },
       ],
     },
@@ -841,11 +841,11 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707010101",
-          "value:": "",
+          
         },
         {
           "name": "l0707010102",
-          "value:": "",
+          
         },
       ],
     },
@@ -860,7 +860,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070702",
-          "value:": "",
+          
         },
       ],
     },
@@ -870,7 +870,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -885,7 +885,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070703",
-          "value:": "",
+          
         },
       ],
     },
@@ -895,7 +895,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -910,7 +910,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070704",
-          "value:": "",
+          
         },
       ],
     },
@@ -920,7 +920,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -935,7 +935,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070705",
-          "value:": "",
+          
         },
       ],
     },
@@ -945,7 +945,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -960,7 +960,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070706",
-          "value:": "",
+          
         },
       ],
     },
@@ -970,7 +970,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -985,7 +985,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070707",
-          "value:": "",
+          
         },
       ],
     },
@@ -995,7 +995,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1010,7 +1010,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070708",
-          "value:": "",
+          
         },
       ],
     },
@@ -1020,7 +1020,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1035,7 +1035,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070709",
-          "value:": "",
+          
         },
       ],
     },
@@ -1045,7 +1045,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1060,7 +1060,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l070710",
-          "value:": "",
+          
         },
       ],
     },
@@ -1070,7 +1070,7 @@ export const akumuruItemTemplate = [
       "field": [
         {
           "name": "l0707100101",
-          "value:": "",
+          
         },
       ],
     },

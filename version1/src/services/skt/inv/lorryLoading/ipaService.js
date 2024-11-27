@@ -911,14 +911,6 @@ export function passSubmitData(type, params) {
       return -1
     }
   }
-
-  // else if(type == "bd" || type == "litre" || type == "percen" || type =="c" || type=='mpa'|| type=='amp'){
-  //   if(isNaN(Number(params))){
-  //     return parseFloat( params.replace(/,/g, ''))
-  //   }else{
-  //     return parseFloat(params)
-  //   }
-  // }
   else if(type == "actualCheck"){
     return !params ? "0": params.toString()
   }

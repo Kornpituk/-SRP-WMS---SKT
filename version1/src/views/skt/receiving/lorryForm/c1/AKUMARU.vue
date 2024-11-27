@@ -1,6 +1,7 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
+import VNumberInput from '@/components/VNumberInput.vue'
 import { akumuruItemTemplate } from '@/services/skt/inv/lorryLoading/akumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/akumaru/Acrylic ( 431 ).png'
@@ -28,6 +29,7 @@ const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
 const statusId = ref(0)
+var isReadOnly = ref(false)
 
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
@@ -82,6 +84,10 @@ onMounted(async () => {
 
   statusId.value = lorryFormIPAStatus.data.data.statusId
 
+  if(statusId.value == 15 || statusId.value == 18){
+    isReadOnly.value = true
+  }
+
 })
 
 function passInitialData(type, params, index) {
@@ -100,6 +106,7 @@ function passInitialData(type, params, index) {
 }
 
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function passSubmitData(type, params) {
   if (type == "oknot") {
     if (params == "0") {
@@ -110,17 +117,12 @@ function passSubmitData(type, params) {
       return -1
     }
   }
-
-  // else if(type == "bd" || type == "litre" || type == "percen" || type =="c" || type=='mpa'|| type=='amp'){
-  //   if(isNaN(Number(params))){
-  //     return parseFloat( params.replace(/,/g, ''))
-  //   }else{
-  //     return parseFloat(params)
-  //   }
-  // }
   else if(type == "actualCheck"){
     return !params ? "0": params.toString()
   }
+  else if(type == "checkbox4" || type == "checkbox3" || type == "checkbox"){
+    return params === true ? 1 : 0
+  } 
   else {
     if(isNaN(Number(params))){
       return parseFloat( params.replace(/,/g, ''))
@@ -139,6 +141,8 @@ async function saveDraft(e) {
 
     if(i.practice.field != undefined){
       for (var f of i.practice.field) {
+        if(f.name == "l070401")
+          debugger
         lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
       }
     }
@@ -603,22 +607,20 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :max-length="2"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :max-length="2"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
