@@ -1288,7 +1288,11 @@ const dataPrintlabel = ref([])
 
 //------------------------ Print Label------------------------------------------
 // const success = ref(false)
-import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService, usePrintPackagingFormService, usePrintExportExcelService  }  from '@/services/skt/global/gloBalService'
+import { useViewPrintLabelFormService, usePrintReceivingFormService, 
+  usePrintInspectionFormService, usePrintPackagingFormService, 
+  usePrintExportExcelService }  from '@/services/skt/global/gloBalService'
+
+import { usePrintIPAFormService } from '@/services/skt/receivingFrom/lorry/ipaServices'
 
 const { printLabelFormViewResult, printLabelFormViewService } = useViewPrintLabelFormService()
 const processingPrintLabel = ref(false)
@@ -1482,11 +1486,15 @@ const { errorMessageInspection, printInspectionFormService } = usePrintInspectio
 
 const { errorMessagePackaging, printPackagingFormService } = usePrintPackagingFormService()
 
+const { printIPAFormResult, errorMessageIPAPrintPDF, printIPAFormService } = usePrintIPAFormService()
+
 const processingPrint = ref(false)
 
 const processingPrintForm1 = ref(false)
 const processingPrintForm2 = ref(false)
 const processingPrintForm3 = ref(false)
+
+const processingPrintForm4 = ref(false)
 
 const disabledCheckboxListRawM = () => {
   // ถ้า idStatusDialogAction.value มีค่าเป็น 0, 1, 2 หรือ 3 จะคืนค่าเป็น true
@@ -1499,6 +1507,48 @@ const disabledCheckboxListInsp = () => {
 
 const disabledCheckboxListPk = () => {
   return [0, 1, 2, 3, 4, 5, 10].includes(idStatusDialogAction.value)
+}
+
+const disabledCheckboxListLorry = () => {
+  return [0, 1, 2, 3, 4, 5, 10, 11, 13].includes(idStatusDialogAction.value)
+}
+
+const checkTypeLorryToPrintPDF = () => {
+  const typeID = sessionStorage.getItem('typeLorryInfoId')
+  switch (typeID) {
+  case '01':
+    return 'LorryFormIPA'
+  case '02':
+    return "LorryFormEA"
+  case '03':
+    return "LorryFormEPICHLO"
+  case '04':
+    return 'LorryFormSKT EP-400BE 11V-144'
+  case '05':
+    return "LorryFormSKT EP-400BE 11V-145"
+  case '06':
+    return "LorryFormKARAMU"
+  case '07':
+    return "LorryFormAKAMARU"
+  case '09':
+    return "LorryFormHAKU-C (11V-111)"
+  case '10':
+    return "LorryFormEKI-A (11V-110)"
+  case '11':
+    return "LorryFormDIESEL OIL"
+  case '12':
+    return "LorryFormTELA"
+  case '13':
+    return "LorryFormHAKU-C (11V-111)"
+  case '15':
+    return "LorryFormN PAN"
+  case '16':
+    return "LorryFormSANNIX FA-703V"
+  default:
+    console.warn(`No component found for key: ${typeID}`)
+    
+    return null
+  }
 }
 
 const printFormAll = async () => {
@@ -1534,6 +1584,19 @@ const printFormAll = async () => {
         return await printPackagingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
       } finally {
         processingPrintForm3.value = false // เสร็จสิ้นการพิมพ์
+      }
+    }
+
+    if (label === 'Lorry Loading Checklist') {
+      processingPrintForm4.value = true // เริ่มพิมพ์
+      console.log('Printing Lorry Loading Checklist...')
+
+      const typeLorryID = ref(checkTypeLorryToPrintPDF())
+
+      try {
+        return await printIPAFormService(typeLorryID.value, poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
+      } finally {
+        processingPrintForm4.value = false // เสร็จสิ้นการพิมพ์
       }
     }
   })
@@ -1627,7 +1690,6 @@ const printExportExcelFunction = async () => {
     return
   }
   
-
   try {
     // รอให้ printExportExcel ทำงานและได้ผลลัพธ์กลับมา
     await printExportExcelService(urlApi.value, whereHouse, accessTokenAtStore, params)
@@ -3097,7 +3159,7 @@ const insetSwitch1 = ref('')
             <VCol cols="6">
               <!-- Align VCheckbox items to the right -->
               <VCheckbox
-                v-if="receivingTypeAction === 2"
+                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListRawM()"
                 label="Receiving Form"
@@ -3114,7 +3176,7 @@ const insetSwitch1 = ref('')
                 </template>
               </VCheckbox>
               <VCheckbox
-                v-if="receivingTypeAction === 2"
+                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListInsp()"
                 label="Inspection Request Form"
@@ -3124,6 +3186,23 @@ const insetSwitch1 = ref('')
                 <template #append>
                   <VProgressCircular
                     v-if="processingPrintForm2"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
+              <VCheckbox
+                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListLorry()"
+                label="Lorry Loading Checklist"
+                value="Lorry Loading Checklist"
+                class="ms-auto"
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm4"
                     :size="10"
                     color="primary"
                     indeterminate
