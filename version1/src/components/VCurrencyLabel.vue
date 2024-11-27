@@ -1,6 +1,4 @@
 <script setup>
-import { CurrencyDisplay, useCurrencyInput } from 'vue-currency-input'
-
 const props = defineProps({
   textStart: {
     type: String,
@@ -12,7 +10,6 @@ const props = defineProps({
   },
   modelValue: Number, // Vue 2: value
 })
-
 
 const { inputRef, formattedValue, setValue } = useCurrencyInput({
   currency: 'THB',
@@ -30,9 +27,6 @@ watch(
     setValue(value)
   },
 )
-
-
-const textStart = ref(props.textStart)
 </script>
 
 <template>
