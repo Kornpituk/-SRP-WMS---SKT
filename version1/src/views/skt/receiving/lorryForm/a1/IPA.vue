@@ -31,6 +31,7 @@ const bVariable = ref(ipaItems[6].result.field[1])
 const cVariable = ref(ipaItems[7].result.field[0])
 const dVariable = ref(0)
 const fvariable = ref(0)
+var isReadOnly = ref(false)
 
 var dcsAfter = ref(0)
 var dcsBefore = ref(0)
@@ -75,6 +76,10 @@ onMounted(async () => {
   console.log("statusId", lorryFormIPAStatus.data)
 
   statusId.value = lorryFormIPAStatus.data.data[0].statusId
+
+  if(statusId.value == 15 || statusId.value == 18){
+    isReadOnly.value = true
+  }
 
 })
 
@@ -174,6 +179,8 @@ watchEffect(async () => {
   var d = ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45
   var f = ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)
 
+  dVariable.value = currencyFormat(d)
+
   ipaItems[6].result.field[1].value = currencyFormat(b) // B
   ipaItems[7].result.field[1].value = currencyFormat(d) // D
   ipaItems[46].result.field[1].value = currencyFormat(f) // F
@@ -188,6 +195,8 @@ watchEffect(async () => {
   tankAfter.value = ipaItems[46].result.field[1].value
   tankBefore.value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45)
   tankDiff.value = currencyFormat((ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) - (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
+
+  
 })
 </script>
 
@@ -304,6 +313,7 @@ watchEffect(async () => {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="Ok"
@@ -324,6 +334,7 @@ watchEffect(async () => {
                       variant="solo"
                       text-start="(A)"
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -357,6 +368,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(C)"
                       text-end="mm."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -364,7 +376,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="solo"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     >
                       <template #prepend>
                         <VLabel>
@@ -382,12 +394,12 @@ watchEffect(async () => {
               </div>
               <div v-if="section.result.type === 'bd'">
                 <VRow>
-                  <VCol>
+                  <VCol col="9">
                     <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     >
                       <template #prepend>
                         <VLabel>
@@ -401,11 +413,12 @@ watchEffect(async () => {
                       </template>
                     </VTextField>
                   </VCol>
-                  <VCol>
+                  <VCol col="3">
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -429,6 +442,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Litre"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -436,6 +450,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -459,6 +474,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="%"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -466,6 +482,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -489,6 +506,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="C°"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -496,6 +514,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -515,6 +534,7 @@ watchEffect(async () => {
                     <VNumberInput
                       v-model="section.result.field[0].value"
                       :max-length="2"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VLabel>
@@ -524,6 +544,7 @@ watchEffect(async () => {
                     <VNumberInput
                       v-model="section.result.field[1].value"
                       :max-length="2"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -538,6 +559,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="(Mpa)"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -545,6 +567,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -568,6 +591,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Amp"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
 
@@ -576,6 +600,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -599,6 +624,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(E)"
                       text-end="mm."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -632,6 +658,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(G)"
                       text-end="Litre"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -684,6 +711,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -741,7 +769,7 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              (D) - ((C) X 5.32) + 740.45
+              (D) = ((C) X 5.32) + 740.45
             </VLabel>
           </VCol>
         </VRow>
@@ -755,7 +783,7 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ dVariable.value }}Litre
+              = {{ dVariable }} Litre
             </VLabel>
           </VCol>
         </VRow>

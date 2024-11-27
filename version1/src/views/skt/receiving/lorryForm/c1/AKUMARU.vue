@@ -84,22 +84,24 @@ onMounted(async () => {
 
 })
 
-function passInitialData(type, params) {
-  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
+function passInitialData(type, params, index) {
+  if (type == "oknot" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
     }
-  } else {
+  }
+  else {
     return params
   }
 }
 
+
 function passSubmitData(type, params) {
-  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
+  if (type == "oknot") {
     if (params == "0") {
       return 0
     } else if (params == "1") {
@@ -107,11 +109,24 @@ function passSubmitData(type, params) {
     } else {
       return -1
     }
-  }else if(type == "actualCheck"){
+  }
+
+  // else if(type == "bd" || type == "litre" || type == "percen" || type =="c" || type=='mpa'|| type=='amp'){
+  //   if(isNaN(Number(params))){
+  //     return parseFloat( params.replace(/,/g, ''))
+  //   }else{
+  //     return parseFloat(params)
+  //   }
+  // }
+  else if(type == "actualCheck"){
     return !params ? "0": params.toString()
   }
   else {
-    return parseFloat(params)
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
   }
 }
 
@@ -132,7 +147,7 @@ async function saveDraft(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -151,7 +166,7 @@ async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -170,7 +185,7 @@ async function approve(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
