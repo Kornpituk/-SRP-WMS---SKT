@@ -1,15 +1,14 @@
 <script setup>
 import { urlApi } from '@/api'
-import VCurrencyField from "@/components/VCurrencyField.vue"
-import VNumberInput from '@/components/VNumberInput.vue'
 import {
-  currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, ItemTemplate,
-  mm2litre, passInitialData, passSubmitData,
+  formatDate,
+  ItemTemplate,
+  passSubmitData,
 } from '@/services/skt/inv/lorryLoading/epichloService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import axios from '@axios'
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
@@ -26,11 +25,6 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(lorryItems[6].result.field[0])
-const bVariable = ref(lorryItems[6].result.field[1])
-const cVariable = ref(lorryItems[7].result.field[0])
-const dVariable = ref(0)
-const fvariable = ref(0)
 var isReadOnly = ref(false)
 
 var dcsAfter = ref(0)
@@ -172,32 +166,6 @@ async function approve(e) {
     console.error(response.data)
   }
 }
-
-
-watchEffect(async () => {
-  var b = lorryItems[6].result.field[0].value / (0.78)
-  var d = lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.32) + 740.45
-  var f = lorryItems[46].result.field[0].value == 0 ? 0 : mm2litre(lorryItems[46].result.field[0].value)
-
-  dVariable.value = currencyFormat(d)
-
-  lorryItems[6].result.field[1].value = currencyFormat(b) // B
-  lorryItems[7].result.field[1].value = currencyFormat(d) // D
-  lorryItems[46].result.field[1].value = currencyFormat(f) // F
-
-  lorryItems[8].result.field[0].value = currencyFormat((lorryItems[6].result.field[0].value / (0.78)) + (lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.32) + 740.45))
-  lorryItems[49].result.field[0].value = currencyFormat((b + d) - f)
-  lorryItems[49].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
-
-  dcsAfter.value = currencyFormat(parseFloat(lorryItems[47].result.field[0].value))
-  dcsBefore.value = currencyFormat(parseFloat(lorryItems[9].result.field[0].value))
-  dcsDiff = currencyFormat(lorryItems[47].result.field[0].value - lorryItems[9].result.field[0].value)
-  tankAfter.value = lorryItems[46].result.field[1].value
-  tankBefore.value = currencyFormat(lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.32) + 740.45)
-  tankDiff.value = currencyFormat((lorryItems[46].result.field[0].value == 0 ? 0 : mm2litre(lorryItems[46].result.field[0].value)) - (lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.32) + 740.45))
-
-  
-})
 </script>
 
 <template>
@@ -325,6 +293,7 @@ watchEffect(async () => {
                   />
                 </VRadioGroup>
               </div>
+              
               <div v-if="section.result.type === 'ab'">
                 <VRow>
                   <VCol>
@@ -755,14 +724,14 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ aVariable.value }} /0.78
+              = xxx /0.78
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ bVariable.value }} Litre
+              = xxx Litre
             </VLabel>
           </VCol>
         </VRow>
@@ -776,14 +745,14 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = ({{ cVariable.value }}X 5.32 ) + 740.45
+              = (xxx X 5.32 ) + 740.45
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ dVariable }} Litre
+              = xxx Litre
             </VLabel>
           </VCol>
         </VRow>

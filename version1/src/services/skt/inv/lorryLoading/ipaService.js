@@ -41,8 +41,6 @@ export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryP
 }
 
 export function currencyFormat(number) {
-  console.log("currencyFormat", number)
-  
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
     minimumFractionDigits: 0,

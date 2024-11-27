@@ -2,7 +2,7 @@
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import VNumberInput from '@/components/VNumberInput.vue'
-import { akumuruItemTemplate } from '@/services/skt/inv/lorryLoading/akumaruService'
+import { akumuruItemTemplate, currencyFormat, passInitialData, passSubmitData } from '@/services/skt/inv/lorryLoading/akumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/akumaru/Acrylic ( 431 ).png'
 import axios from '@axios'
@@ -10,7 +10,7 @@ import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
-import { currencyFormat } from '@/services/skt/inv/lorryLoading/ipaService'
+
 import alertWordConst from '@/utilities/constant'
 
 
@@ -90,48 +90,6 @@ onMounted(async () => {
 
 })
 
-function passInitialData(type, params, index) {
-  if (type == "oknot" ) {
-    return params.toString()
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
-    if(index == 0){
-      return params
-    }else{
-      return params.toString()
-    }
-  }
-  else {
-    return params
-  }
-}
-
-
-// eslint-disable-next-line sonarjs/cognitive-complexity
-function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else if(type == "actualCheck"){
-    return !params ? "0": params.toString()
-  }
-  else if(type == "checkbox4" || type == "checkbox3" || type == "checkbox"){
-    return params === true ? 1 : 0
-  } 
-  else {
-    if(isNaN(Number(params))){
-      return parseFloat( params.replace(/,/g, ''))
-    }else{
-      return parseFloat(params)
-    }
-  }
-}
-
 
 async function saveDraft(e) {
   for (var i of lorryItem) {
@@ -141,8 +99,6 @@ async function saveDraft(e) {
 
     if(i.practice.field != undefined){
       for (var f of i.practice.field) {
-        if(f.name == "l070401")
-          debugger
         lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
       }
     }
@@ -208,6 +164,7 @@ async function approve(e) {
 watchEffect(async () => {
   var c = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value
   var d = lorryItem[37].result.field[0].value
+  
   lorryItem[2].result.field[0].value = currencyFormat(c)
   lorryItem[38].result.field[0].value = currencyFormat(c-d)
 })
@@ -577,30 +534,21 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'c'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="C°"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
+                      variant="solo"
+                      readonly="true"
                     >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VTextField> 
                   </VCol>
                 </VRow>
               </div>
@@ -766,6 +714,27 @@ function formatDate(dateString) {
                       text-start=""
                       text-end="Kg."
                     />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'cdkg'">
+                <VRow>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VTextField> 
                   </VCol>
                 </VRow>
               </div>

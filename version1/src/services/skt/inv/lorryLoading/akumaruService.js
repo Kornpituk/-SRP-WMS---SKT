@@ -1,89 +1,47 @@
 
+export function currencyFormat(number) {
+  return new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(number)
+}
 
-export const akumaruRequestData = {
-  "RmLorryLoadingFormJournalId": 0,
-  "ProductId": "",
-  "ProductName": "",
-  "LoadedDate": null,
-  "PurchaseOrderNo": null,
-  "WHStaff": "",
-  "WHStaffUpdatedDate": null,
-  "WHLeader": "",
-  "WHLeaderDate": null,
-  "WHSupervisor": "",
-  "WHSupervisorDate": null,
-  "l0701010101": "0",
-  "l0701020101": "0",
-  "l0701030101": "0",
-  "l0702010101": "-1",
-  "l0703010101": "-1",
-  "l0703020101": "0",
-  "l0703030101": "-1",
-  "l0705010101": "-1",
-  "l0705020101": "-1",
-  "l0705030101": "-1",
-  "l0705040101": "-1",
-  "l0705050101": "-1",
-  "l0705060101": "-1",
-  "l0705070101": "-1",
-  "l0705080101": "-1",
-  "l0705090101": "-1",
-  "l0705100101": "-1",
-  "l0705110101": "-1",
-  "l0705120101": "-1",
-  "l0705130101": "",
-  "l0705130102": "",
-  "l0706020101": "0",
-  "l0706030101": "0",
-  "l0706040101": "-1",
-  "l0706050101": "-1",
-  "l0706060101": "-1",
-  "l0706070101": "-1",
-  "l0706080101": "-1",
-  "l0706090101": "-1",
-  "l0707010101": "",
-  "l0707010102": "",
-  "l0707020101": "-1",
-  "l0707030101": "-1",
-  "l0707040101": "-1",
-  "l0707050101": "-1",
-  "l0707060101": "0",
-  "l0707070101": "0",
-  "l0707080101": "-1",
-  "l0707090101": "-1",
-  "l0707100101": "-1",
-  "l070102": "0",
-  "l070401": "0",
-  "l070405": "0",
-  "l070501": "0",
-  "l070502": "0",
-  "l070503": "0",
-  "l070504": "0",
-  "l070505": "0",
-  "l070506": "0",
-  "l070507": "0",
-  "l070508": "0",
-  "l070509": "0",
-  "l070510": "0",
-  "l070511": "0",
-  "l070512": "0",
-  "l070513": "0",
-  "l070604": "0",
-  "l070605": "0",
-  "l070606": "0",
-  "l070607": "0",
-  "l070608": "0",
-  "l070609": "0",
-  "l070701": "0",
-  "l070702": "0",
-  "l070703": "0",
-  "l070704": "0",
-  "l070705": "0",
-  "l070706": "0",
-  "l070707": "0",
-  "l070708": "0",
-  "l070709": "0",
-  "l070710": "0",
+export function passInitialData(type, params, index) {
+  if (type == "oknot" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }
+  else {
+    return params
+  }
+}
+
+export function passSubmitData(type, params) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
 }
 
 export const akumuruItemTemplate = [
@@ -135,11 +93,10 @@ export const akumuruItemTemplate = [
     "practice": "( C ) จากการคำนวนค่าที่ได้( A + B )",
     "condition": "ต้องไม่เกิน 40,000  Kg.",
     "result": {
-      "type": "kg",
+      "type": "c",
       "field": [
         {
           "name": "l0701030101",
-          
         },
       ],
     },
@@ -991,11 +948,10 @@ export const akumuruItemTemplate = [
     },
     "condition": "",
     "result": {
-      "type": "kg",
+      "type": "cdkg",
       "field": [
         {
-          "name": "l0707070101",
-          
+          "name": "l0707070101",    
         },
       ],
     },
