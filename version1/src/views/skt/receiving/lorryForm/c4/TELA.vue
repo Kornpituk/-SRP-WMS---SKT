@@ -204,11 +204,8 @@ async function approve(e) {
 // })
 
 watchEffect(async () => {
-  // dcsDiff = (lorryItem[47].result.field[0].value - lorryItem[9].result.field[0].value).toFixed(2)
-  // tankDiff = (lorryItem[46].result.field[1].value - lorryItem[7].result.field[1].value).toFixed(2)
-  // lorryItem[8].result.field[0].value = (parseFloat(lorryItem[6].result.field[1].value) + parseFloat(lorryItem[7].result.field[1].value)).toFixed(2)
-  // lorryItem[49].result.field[0].value = (parseFloat(lorryItem[8].result.field[0].value) - parseFloat(lorryItem[46].result.field[1].value)).toFixed(2)
-  // lorryItem[49].result.field[1].value = (parseFloat(lorryItem[49].result.field[0].value) * 0.78).toFixed(2)
+  lorryItem[2].result.field[0].value = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value // A+B
+  lorryItem[33].result.field[0].value = lorryItem[2].result.field[0].value - lorryItem[32].result.field[0].value // C-D
 })
 
 
@@ -326,23 +323,7 @@ function formatDate(dateString) {
               colspan="3"
               style="max-width: 400px; border-left: 1px solid black; text-align: start;"
             >
-              <div v-if="section.practice.type === 'd'">
-                <VRow>
-                  <VCol>
-                    <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                      {{ section.practice.startPracticeText }}
-                      <VCurrencyField
-                        v-model="section.practice.field[0].value"
-                        density="compact"
-                        variant="solo"
-                        text-start=""
-                        text-end=""
-                      /> {{ section.practice.endPracticeText }}
-                    </VLabel>
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-else-if="section.practice.type === 'checkbox'">
+              <div v-if="section.practice.type === 'checkbox'">
                 <VCheckbox
                   v-model="section.practice.field[0].value"
                   :label="section.practice.startPracticeText"
@@ -417,6 +398,48 @@ function formatDate(dateString) {
               colspan="4"
               style="min-width: 450px; border-left: 1px solid black;"
             >
+              <div v-if="section.result.type === 'c'">
+                <VRow>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VTextField>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'cd'">
+                <VRow>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VTextField>
+                  </VCol>
+                </VRow>
+              </div>
               <div v-if="section.result.type === 'oknot'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
                 <VRadioGroup
@@ -512,30 +535,6 @@ function formatDate(dateString) {
                   </VCol>
                 </VRow>
               </div>
-              <div v-if="section.result.type === 'cd'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(C)"
-                      text-end="mm."
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="(D)"
-                      text-end="mm."
-                      readonly="true"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
               <div v-if="section.result.type === 'bd'">
                 <VRow>
                   <VCol>
@@ -608,36 +607,6 @@ function formatDate(dateString) {
                       text-start=""
                       text-end="%"
                       readonly="true"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'c'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="C°"
                     />
                   </VCol>
                   <VCol>

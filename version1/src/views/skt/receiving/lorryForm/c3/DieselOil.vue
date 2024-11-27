@@ -784,7 +784,7 @@ function formatDate(dateString) {
                   </VCol>
                 </VRow>
               </div>
-              <div v-if="section.result.type === 'kgA'">
+              <div v-if="section.result.type === 'LTR'">
                 <VRow>
                   <VCol>
                     <VCurrencyField
