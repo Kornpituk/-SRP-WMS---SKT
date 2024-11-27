@@ -2,7 +2,12 @@
 import { urlApi } from '@/api'
 import {
   formatDate,
+  generate,
+  get,
+  GetByPoEtlLogDetailJournalID,
   ItemTemplate,
+  mm2litre,
+  passInitialData,
   passSubmitData,
 } from '@/services/skt/inv/lorryLoading/epichloService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
@@ -12,6 +17,7 @@ import { ref } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
 
 
@@ -25,6 +31,10 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
+const aVariable = ref(lorryItems[6].result.field[0])
+const bVariable = ref(lorryItems[6].result.field[1])
+const cVariable = ref(lorryItems[7].result.field[0])
+const dVariable = ref(0)
 var isReadOnly = ref(false)
 
 var dcsAfter = ref(0)
@@ -166,6 +176,28 @@ async function approve(e) {
     console.error(response.data)
   }
 }
+
+watchEffect(async () => {
+  var b = lorryItems[6].result.field[0].value / (0.78)
+  var d = lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.32) + 740.45
+  var f = lorryItems[42].result.field[0].value == 0 ? 0 : mm2litre(lorryItems[42].result.field[0].value)
+  lorryItems[6].result.field[1].value = currencyFormat(b)
+  lorryItems[7].result.field[1].value = currencyFormat(d)
+  lorryItems[8].result.field[0].value = currencyFormat(b+d)
+  lorryItems[42].result.field[1].value = currencyFormat(f)
+  lorryItems[44].result.field[0].value = currencyFormat(((b + d) - f))
+  lorryItems[44].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
+
+  dcsAfter.value = currencyFormat(lorryItems[43].result.field[0].value)
+  dcsBefore.value = currencyFormat(lorryItems[9].result.field[0].value)
+  dcsDiff = currencyFormat(lorryItems[43].result.field[0].value - lorryItems[9].result.field[0].value)
+
+  tankAfter.value = currencyFormat(f)
+  tankBefore.value = currencyFormat(d)
+  tankDiff.value = currencyFormat(f-d)
+
+
+})
 </script>
 
 <template>
@@ -293,7 +325,6 @@ async function approve(e) {
                   />
                 </VRadioGroup>
               </div>
-              
               <div v-if="section.result.type === 'ab'">
                 <VRow>
                   <VCol>
@@ -345,7 +376,7 @@ async function approve(e) {
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="solo"
-                      :readonly="isReadOnly"
+                      readonly="true"
                     >
                       <template #prepend>
                         <VLabel>
@@ -433,70 +464,6 @@ async function approve(e) {
                   </VCol>
                 </VRow>
               </div>
-              <div v-if="section.result.type === 'percen'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="%"
-                      :readonly="isReadOnly"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
-                      :readonly="isReadOnly"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'c'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="C°"
-                      :readonly="isReadOnly"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
-                      :readonly="isReadOnly"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
@@ -531,39 +498,6 @@ async function approve(e) {
                       :readonly="isReadOnly"
                     />
                   </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                      :readonly="isReadOnly"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'amp'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Amp"
-                      :readonly="isReadOnly"
-                    />
-                  </VCol>
-
                   <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
@@ -632,6 +566,71 @@ async function approve(e) {
                   </VCol>
                 </VRow>
               </div>
+              <div v-if="section.result.type === 'amp'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="Amp"
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+
+                  <VCol>
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="d-flex justify-center"
+                      :readonly="isReadOnly"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
+                    </VRadioGroup>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === '25c'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="C°"
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="justify-center"
+                      :readonly="isReadOnly"
+                    >
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
+                    </VRadioGroup>
+                  </VCol>
+                </VRow>
+              </div>
               <div v-if="section.result.type === 'litrekg'">
                 <VRow>
                   <VCol>
@@ -670,27 +669,11 @@ async function approve(e) {
                   </VCol>
                 </VRow>
               </div>
-              <div v-if="section.result.type === 'kg'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Kg."
-                      :readonly="isReadOnly"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
             </td>
           </tr>
         </tbody>
       </table>
     </VCol>
-    <!-- Calculation formula -->
     <VCol cols="12">
       <div style="border: 1px solid black;">
         <VRow>
@@ -724,14 +707,14 @@ async function approve(e) {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = xxx /0.78
+              = {{ aVariable.value }} /0.78
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = xxx Litre
+              = {{ bVariable.value }} Litre
             </VLabel>
           </VCol>
         </VRow>
@@ -745,14 +728,14 @@ async function approve(e) {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = (xxx X 5.32 ) + 740.45
+              = ({{ cVariable.value }}X 5.32 ) + 740.45
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = xxx Litre
+              = {{ dVariable }} Litre
             </VLabel>
           </VCol>
         </VRow>

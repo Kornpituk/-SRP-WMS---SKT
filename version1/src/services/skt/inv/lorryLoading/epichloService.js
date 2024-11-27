@@ -27,7 +27,7 @@ export async function get(poEtllogDetailJournalID) {
   })
 }
 
-export async function GetByPoEtllogDetailJournalID(poEtllogDetailJournalIDQueryParameters) {
+export async function GetByPoEtlLogDetailJournalID(poEtllogDetailJournalIDQueryParameters) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
@@ -163,7 +163,7 @@ export const ItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101060101",
+          "name": "l0301060001",
 
         },
       ],
@@ -266,7 +266,7 @@ export const ItemTemplate = [
   {
     "isSection": true,
     "rowSpan": 4,
-    "sequence": "ก่อนการปฏิบัติงาน",
+    "sequence": "<strong>ก่อนการปฏิบัติงาน<strong>",
     "practice": "1. หยุดรถและดับเครื่องเรียบร้อย",
     "condition": "รถต้องหยุดนิ่งสนิท",
     "result": {
@@ -362,7 +362,7 @@ export const ItemTemplate = [
     "practice": "3. Temperature เท่าไหร่",
     "condition": "อุณหภูมิต้องไม่สูงกว่า  25 C' ",
     "result": {
-      "type": "c",
+      "type": "25c",
       "field": [
         {
           "name": "l0304030101", // percen
@@ -377,7 +377,7 @@ export const ItemTemplate = [
   },
   {
     "isSection": true,
-    "rowspan": 3,
+    "rowSpan": 3,
     "sequence": "<strong>11P-109D</strong>",
     "practice": "1. วาล์ว 6 , 7 , 8 , 9 ",
     "condition": "Close ( ปิด )",
@@ -386,7 +386,6 @@ export const ItemTemplate = [
       "field": [
         {
           "name": "l0305040101", // percen
-
         },
       ],
     },
@@ -422,7 +421,7 @@ export const ItemTemplate = [
   },
   {
     "isSection": true,
-    "rowspan": 5,
+    "rowSpan": 5,
     "sequence": "<strong>Operator ทำการสวมใส่อุปกรณ์ PPE </strong>",
     "practice": " - ถุงมือ",
     "condition": "ใส่ถุงมือยาง",
@@ -496,7 +495,7 @@ export const ItemTemplate = [
   },
   {
     "isSection": true,
-    "rowspan": 4,
+    "rowSpan": 4,
     "sequence": "<strong>lorry tank</strong>",
     "practice": "1. ต่อสายHose   เข้ากับ Valve 11",
     "condition": "ต่อโดยตรงโดยไม่ผ่านPump รถ lorry",
@@ -553,7 +552,7 @@ export const ItemTemplate = [
   },
   {
     "isSection": true,
-    "rowspan": 5,
+    "rowSpan": 5,
     "sequence": "<strong>Charging</strong>",
     "practice": "1. เปิดวาล์ว",
     "condition": "วาล์ว 11 เปิด",
@@ -633,7 +632,7 @@ export const ItemTemplate = [
   },
   {
     "isSection": true,
-    "rowspan": 5,
+    "rowSpan": 10,
     "sequence": "<strong>เมื่อรับเสร็จ</strong>",
     "practice": "1. เมื่อ Pump หยุดทำงาน ปิด Valve   11, 14 และ Vent  12 ",
     "condition": "ด้านล่าง บริเวณ Pump 11V-109D",
@@ -687,9 +686,6 @@ export const ItemTemplate = [
       "field": [
         {
           "name": "l0309040101", // percen
-        },
-        {
-          "name": "l0309030102", // percen
         },
       ],
     },
@@ -778,14 +774,23 @@ export const ItemTemplate = [
         {
           "name": "l0309100101", // percen
         },
+        {
+          "name": "l0309100102", // percen
+        },
       ],
     },
   },
 ]
 
 export function passInitialData(type, params, index) {
-  if (type == "oknot" ) {
-    return params.toString()
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
   }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
     if(index == 0){
       return params
