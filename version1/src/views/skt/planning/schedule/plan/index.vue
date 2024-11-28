@@ -627,16 +627,21 @@ const submitPlan = async () => {
   try {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await submitProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      location.reload()
-    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    if(responseSubmitProductionPlan.value){
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      textAlertDialogFunction(alertWordConst.submit, false)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
+    
   } catch (error) {
   // จัดการข้อผิดพลาด
-    textAlertDialogFunction(alertWordConst.submit, false)
-    setTimeout(() => {
-      location.reload()
-    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    
     console.error("Error submited production plan:", error)
   }
 
@@ -655,16 +660,20 @@ const approvePlan = async () => {
   try {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      location.reload()
-    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    if(responseApproveProductionPlan.value){
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      textAlertDialogFunction(alertWordConst.approve, false)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
   } catch (error) {
   // จัดการข้อผิดพลาด
-    textAlertDialogFunction(alertWordConst.approve, false)
-    setTimeout(() => {
-      location.reload()
-    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    
     console.error("Error approved production plan:", error)
   }
 
@@ -1607,11 +1616,11 @@ const print = () => {
         <VBtn
           class="mx-2"
           color="success"
-          @click="viewAllData"
+          @click="submitPlan"
         >
           <span style="font-size: 12px;">Submit</span>
         </VBtn>
-        <VBtn @click="viewAllData">
+        <VBtn @click="approvePlan">
           <span style="font-size: 12px;">Approve</span>
         </VBtn>
         <VBtn

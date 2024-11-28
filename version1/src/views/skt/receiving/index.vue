@@ -1263,7 +1263,9 @@ const findProductByJournalID = journalID => {
         itemStore.setItemDetails(typeLorryOnce, 'typeLorryInfoId')
         
         console.log('Found Product typeLorryOnce:', typeLorryOnce)
-      } 
+      }else{
+        itemStore.setItemDetails(null, 'typeLorryInfoId')
+      }
     }else{
       console.log('No typeLorryOnce')
     }

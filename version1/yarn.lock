@@ -7848,7 +7848,7 @@ vue-columns-resizable@^0.0.1:
 
 vue-currency-input@^3.1.0:
   version "3.1.0"
-  resolved "https://registry.npmjs.org/vue-currency-input/-/vue-currency-input-3.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/vue-currency-input/-/vue-currency-input-3.1.0.tgz#869a89bbbb98cc8e483cb410adbdd0f8d6eb1d74"
   integrity sha512-XZ8bg61zRNJjRDo7I4K0UAah9qtkipexRcn/h9MzEqZQ9gVZWABObgN+042UchmCTiwSfsjGOd6DZGzd/TUUMA==
 
 vue-demi@>=0.14.0:

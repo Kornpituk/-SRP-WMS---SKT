@@ -177,7 +177,6 @@ export const productionPlanRepository = {
     try {
       const response = await axios.post(`${urlApi}/api/v1/${form}/submit`, planningId, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,
           'Authorization': `Bearer ${accessToken}`,
         },
@@ -199,7 +198,6 @@ export const productionPlanRepository = {
     try {
       const response = await axios.post(`${urlApi}/api/v1/${form}/approve`, planningId, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,
           'Authorization': `Bearer ${accessToken}`,
         },
