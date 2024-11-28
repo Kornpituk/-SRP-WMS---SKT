@@ -11,6 +11,10 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  valueRange: {
+    type: Number,
+    required: false,
+  },
 })
 
 
@@ -19,8 +23,7 @@ const { inputRef, formattedValue, setValue } = useCurrencyInput({
   hideCurrencySymbolOnFocus: true,
   hideGroupingSeparatorOnFocus: true,
   precision: 0,
-
-  //   valueRange: { min: 2 },
+  valueRange: { max: props.valueRange },
   currencyDisplay: CurrencyDisplay.hidden,
 })
 

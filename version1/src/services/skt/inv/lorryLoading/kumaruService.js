@@ -70,6 +70,43 @@ export function formatDate(dateString) {
   return 'null'
 }
 
+export function passInitialData(type, params) {
+  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
+    if (params == 0) {
+      return "0"
+    } else if (params == 1) {
+      return "1"
+    } else {
+      return "-1"
+    }
+  } else {
+    return params
+  }
+}
+
+export function passSubmitData(type, params) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
+}
+
+
 export const kumaruItemTemplate = [
   {
     "isSection": true,
@@ -833,31 +870,3 @@ export const kumaruItemTemplate = [
 
 ]
 
-export function passInitialData(type, params) {
-  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
-    }
-  } else {
-    return params
-  }
-}
-
-export function passSubmitData(type, params) {
-  if (type == "oknot" || type == "bd" || type == "litre" || type == "percen") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else {
-    return parseFloat(params)
-  }
-}

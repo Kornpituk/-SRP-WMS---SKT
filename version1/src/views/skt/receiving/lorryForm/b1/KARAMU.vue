@@ -86,6 +86,9 @@ async function saveDraft(e) {
 }
 
 async function submit(e) {
+
+  await saveDraft(e)
+
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 

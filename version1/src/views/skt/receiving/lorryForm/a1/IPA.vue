@@ -131,13 +131,16 @@ async function saveDraft(e) {
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
+    event.preventDefault()
   }
 }
 
 async function submit(e) {
+
+  await saveDraft(e)
+
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
-
 
   let isValid = true
   for (var i of ipaItems) {
@@ -566,6 +569,7 @@ watchEffect(async () => {
                     <VNumberInput
                       v-model="section.result.field[0].value"
                       :max-length="2"
+                      :value-range="23"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -576,6 +580,7 @@ watchEffect(async () => {
                     <VNumberInput
                       v-model="section.result.field[1].value"
                       :max-length="2"
+                      :value-range="59"
                       :readonly="isReadOnly"
                     />
                   </VCol>

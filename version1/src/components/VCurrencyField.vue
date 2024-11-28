@@ -31,6 +31,11 @@ watch(
   },
 )
 
+var handleInput = (async event =>{
+  if(event.key == "-"){
+    event.preventDefault()
+  }
+})
 
 const textStart = ref(props.textStart)
 </script>
@@ -41,6 +46,7 @@ const textStart = ref(props.textStart)
     v-model="formattedValue"
     density="compact"
     variant="solo"
+    @keypress="handleInput"
   >
     <template #prepend>
       <VLabel>
