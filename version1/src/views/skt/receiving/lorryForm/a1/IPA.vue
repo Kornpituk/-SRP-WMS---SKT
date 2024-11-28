@@ -13,6 +13,7 @@ import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
 import alertWordConst from '@/utilities/constant'
 
 
@@ -42,6 +43,8 @@ var tankBefore = ref(0)
 var tankDiff = ref(0)
 
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
@@ -51,6 +54,26 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
+}
+
+const textConfirmDialogFunction = async (word, success, confirm) => {
+  wordForSubmit.value = word
+  confirmValueCheck.value = confirm
+  successDialAlert.value = success
+  isDialogVisibleConfirmDialog.value = true
+
+  // รอคำตอบจากผู้ใช้
+  return new Promise(resolve => {
+    const unwatch = watchEffect(
+      () => isDialogVisibleConfirmDialog.value,
+      newValue => {
+        if (!newValue) { // เมื่อ Dialog ถูกปิด
+          unwatch() // ยกเลิก watch
+          resolve(confirmValueCheck.value) // คืนค่าคำตอบ
+        }
+      },
+    )
+  })
 }
 
 onMounted(async () => {
@@ -131,24 +154,34 @@ async function submit(e) {
     
     return
   }
- 
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  // เรียกใช้งาน Dialog
+  const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
 
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+  if (confirmed) {
+    console.log("User confirmed:", confirmValueCheck.value)
+
+    // เรียก API หรือดำเนินการต่อ
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
+    }
   } else {
-    console.error(response.data)
+    console.log("User declined")
   }
+
 }
 
 async function approve(e) {
@@ -992,6 +1025,16 @@ watchEffect(async () => {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog
+        :is-dialog-visible="isDialogVisibleConfirmDialog"
+        :confirm="confirmValueCheck"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleConfirmDialog.value = val"
       />
     </div>
   </section>

@@ -1,4 +1,5 @@
 <script setup>
+import { trueAndFalseValue } from '@/views/demos/forms/form-elements/switch/demoCodeSwitch'
 import pixinventQr from '@images/pages/pixinvent-qr.png'
 
 const props = defineProps({
@@ -7,6 +8,10 @@ const props = defineProps({
     required: false,
   },
   isDialogVisible: {
+    type: Boolean,
+    required: true,
+  },
+  confirm: {
     type: Boolean,
     required: true,
   },
@@ -20,28 +25,33 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:isDialogVisible'])
+const emit = defineEmits(['update:isDialogVisible', 'update:confirm'])
 
 // ใช้ ref แทน props
 const localDialogVisible = ref(props.isDialogVisible)
+const localConfirm = ref(props.confirm)
+
+const wordAlert = ref(null)
 
 // ใช้ watch เพื่อตรวจจับการเปลี่ยนแปลงของ props
-watch(() => props.isDialogVisible, newValue => {
-  localDialogVisible.value = newValue
-})
-
-const wordAlert = ref('')
-
-watch(() => {
-  if(props.word === 'REJECT'){
-    wordAlert.value = 'REJECTION'
-  }else{
-    wordAlert.value = props.word
-  }
+watch([() => props.isDialogVisible, () => props.confirm, () => props.word], ([newVisible, newConfirm, newWord]) => {
+  localDialogVisible.value = newVisible
+  localConfirm.value = newConfirm
+  wordAlert.value = newWord === 'REJECT' ? 'REJECTION' : newWord
 })
 
 // ฟังก์ชันปิด Dialog
 const closeDialog = () => {
+  localConfirm.value = true
+  emit('update:confirm', false)
+  localDialogVisible.value = false
+  emit('update:isDialogVisible', false)
+}
+
+const confirmDialog = () => {
+  localConfirm.value = true
+  emit('update:confirm', true)
+  console.log("Confirm dialog", localConfirm.value)
   localDialogVisible.value = false
   emit('update:isDialogVisible', false)
 }
@@ -49,7 +59,7 @@ const closeDialog = () => {
 
 <template>
   <VDialog
-    v-model="isDialogConfirmVisible"
+    v-model="localDialogVisible"
     width="500"
   >
     <!-- Dialog Content -->
@@ -63,7 +73,7 @@ const closeDialog = () => {
           />
         </div>
         <div class="text-center">
-          <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
+          <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordAlert }}
             Transaction?</span>
         </div>
       </VCardText>
@@ -71,16 +81,16 @@ const closeDialog = () => {
       <VCardAction class="d-flex justify-space-between pa-4">
         <VBtn
           color="error"
-          @click="isDialogConfirmVisible = false"
+          @click="closeDialog"
         >
           Cancel
         </VBtn>
         <VBtn
-          v-if="wordForSubmit === 'ACCEPT'"
+          v-if="wordAlert === 'SUBMIT' || wordAlert === 'ACCEPT' || wordAlert === 'APPROVE' "
           color="green"
-          @click="btnAccept"
+          @click="confirmDialog"
         >
-          {{ wordForSubmit }}
+          {{ wordAlert }}
         </VBtn>
       </VCardAction>
     </VCard>

@@ -1730,7 +1730,7 @@ const print = () => {
                 </VChip>
               </td>
               <td>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</td>
-              <td>
+              <td style="min-width: 150px;">
                 <AppDateTimePicker
                   v-model="item.raw.inputDate"
                   density="compact"
@@ -1918,7 +1918,7 @@ const print = () => {
               </td>
               <td
                 class="px-1"
-                style="min-width: 150px;"
+                style="max-width: 150px;"
               >
                 <AppDateTimePicker
                   v-model="item.raw.producingDate"

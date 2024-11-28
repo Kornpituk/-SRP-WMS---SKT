@@ -661,8 +661,7 @@ const newBatch = async batchID => {
                 >
                   <AppDateTimePicker
                     v-model="datePickerFilter"
-                    label="Producing Date"
-                    placeholder="Select date"
+                    placeholder="Producing date"
                     density="compact"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     :config="{ dateFormat: 'd/m/Y', mode: 'range' }"
