@@ -31,13 +31,16 @@ export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestDat
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  return await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
   })
+  
+  return response
 }
 
 export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {

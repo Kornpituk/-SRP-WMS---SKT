@@ -116,9 +116,22 @@ async function saveDraft(e) {
   }
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
+
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+      }
+    }
+  }
   
   var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
   if (response.status == 200) {

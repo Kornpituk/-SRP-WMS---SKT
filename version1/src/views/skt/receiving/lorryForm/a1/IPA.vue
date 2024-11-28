@@ -130,13 +130,17 @@ async function saveDraft(e) {
 
 async function submit(e) {
 
+  for (var i of ipaItems) {
+    for (var f of i.result.field) {
+      ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+  }
+
   var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
 
-  if (response.status == 200) {
-    console.error(response.data)
-  } else {
-    e.preventDefault()
-  }
+  if (response.status != 200) 
+    return
+
 
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
