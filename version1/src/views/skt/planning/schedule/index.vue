@@ -629,7 +629,7 @@ const newBatch = async batchID => {
                     density="compact"
                   >
                     <template #label>
-                      <span style="font-size: 12px;">Prodcution Code/Name</span>
+                      <span style="font-size: 12px;">Production Code/Name</span>
                     </template>
                   </VTextField>
                 </VCol>
@@ -1114,9 +1114,9 @@ const newBatch = async batchID => {
           class="text-no-wrap"
         >
           <template #column.action="{ column }">
-            <tr style="background-color: aqua !important;">
+            <tr class="d-flex justify-center">
               <th>
-                {{ column.column }} action custom
+                {{ column.column }} action
               </th>
             </tr>
           </template>
@@ -1148,7 +1148,7 @@ const newBatch = async batchID => {
                 {{ formatDate(item.raw.inputDate) }}
               </td>
               <td>
-                {{ item.raw.planningID }}
+                {{ item.raw.plantName }}
               </td>
               <td>{{ item.raw.reactorName }}</td>
               <td>
@@ -1164,7 +1164,7 @@ const newBatch = async batchID => {
                 {{ formatNumber(item.raw.quantityKgs) }}
               </td>
               <td class="bg-light-blue-lighten-5">
-                {{ item.raw.product1InBomName }}
+                {{ item.raw.product1SelectedCode }}
               </td>
               <td class="bg-light-blue-lighten-5">
                 {{ item.raw.product1Name }}
@@ -1172,11 +1172,13 @@ const newBatch = async batchID => {
               <td class="bg-light-blue-lighten-5">
                 {{ item.raw.product1SelectedPackagingCode }}
               </td>
-              <td class="bg-light-blue-lighten-5">
-                {{ product1PackagingName }}
+              <td class="bg-light-blue-lighten-5 text-end">
+                <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product1PackingQtyKgs) }}</span>
+                <span v-else>0.00</span>
               </td>
-              <td class="bg-light-blue-lighten-5">
-                {{ product1PackingQtyKgs }}
+              <td class="bg-light-blue-lighten-5 text-end">
+                <span v-if="item.raw.product1UomCount">{{ item.raw.product1UomCount }}</span>
+                <span v-else>0</span>
               </td>
 
               <td class="bg-red-lighten-5">
@@ -1188,11 +1190,13 @@ const newBatch = async batchID => {
               <td class="bg-red-lighten-5">
                 {{ item.raw.product2SelectedPackagingCode }}
               </td>
-              <td class="bg-red-lighten-5">
-                {{ item.raw.product2PackagingName }}
+              <td class="bg-red-lighten-5 text-end">
+                <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product2PackingQtyKgs) }}</span>
+                <span v-else>0.00</span>
               </td>
-              <td class="bg-red-lighten-5">
-                {{ item.raw.product2PackingQtyKgs }}
+              <td class="bg-red-lighten-5 text-end">
+                <span v-if="item.raw.product1UomCount">{{ item.raw.product2UomCount }}</span>
+                <span v-else>0</span>
               </td>
 
               <td

@@ -92,6 +92,13 @@ const confirmDialog = () => {
         >
           {{ wordAlert }}
         </VBtn>
+        <VBtn
+          v-else
+          color="green"
+          @click="confirmDialog"
+        >
+          Select
+        </VBtn>
       </VCardAction>
     </VCard>
   </VDialog>

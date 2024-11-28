@@ -10,6 +10,12 @@ const props = defineProps({
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
+import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
+import alertWordConst from '@/utilities/constant'
+
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
+
 const itemStore = useItemStore()
 const poEtlLogDetailJournalID = itemStore.getItemDetails('poEtlLogDetailJournalIDCookies')
 
@@ -206,57 +212,6 @@ const checkSelectLorry = ref([])
 
 const typeLorryOnce = ref(itemStore.getItemDetails('typeLorryInfoId'))
 const typeLorryTwo = ref(null)
-
-// const generatedJournalId = async () => {
-//   console.log("generatedJournalId 0")
-//   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`, {
-//     headers: {
-//       'accept': '*/*',
-//       'x-location': `${whereHouse.value}`,
-//       Authorization: `Bearer ${accessTokenAtStore}`, 
-//     },
-//   },
-//   {})
-//     .then(response => {
-//       console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
-//       console.log("generatedJournalId 1")
-
-//       // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
-//       if (response.data && response.data.data && response.data.data.length > 0) {
-//         responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
-
-//         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
-
-//         receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
-//         statusId.value = item.statusId
-
-//         checkSelectLorry.value = item.lorryInfos
-
-//         if(checkSelectLorry.value.length > 0){
-//           if(checkSelectLorry.value.length === 1){
-//             typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
-//           } 
-//         }else{
-//           trickerLorryLoadind.value = false
-//           typeLorryTwo.value = checkSelectLorry.value
-//         }
-
-//         sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
-
-//         currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
-
-//         console.log("lorryInfos", checkSelectLorry.value)
-
-//       } else {
-//         console.error("ไม่มีข้อมูลใน responseGener")
-//       }
-//       console.log("generatedJournalId 3")
-
-//     })
-//     .catch(error => {
-//       console.error('Error:', error)
-//     })
-// }
 
 const generatedJournalId = async () => {
   console.log("generatedJournalId 0")
@@ -588,6 +543,8 @@ const isDialogConfirmVisible = ref(false)
 const isDialogSubmitSuccessVisible = ref(false)
 const isDialogSubmitFailedVisible = ref(false)
 
+const selectLorryInfoKey = ref(null)
+
 const successDialAlert = ref(false)
 
 const textAlertDialogFunction = (word, success) => {
@@ -603,16 +560,28 @@ const btnApprove = word => {
 
 }
 
-const btnSelectLorry = (word, lorry) => {
-  isDialogConfirmVisible.value = true
+const textConfirmDialogFunction = async (word, success, confirm) => {
   wordForSubmit.value = word
-  resultSelectLorry.value = lorry
+  confirmValueCheck.value = confirm
+  successDialAlert.value = success
+  isDialogConfirmVisible.value = true
 
+  console.log("User textConfirmDialogFunction", isDialogVisibleConfirmDialog.value)
+
+  
 }
 
 const handleSelectLorryLoading = word => {
-  isDialogConfirmVisible.value = false
-  isDialogSubmitSuccessVisible.value = true
+  confirmValueCheck.value = true
+  sessionStorage.setItem('typeLorryInfoId', selectLorryInfoKey.value)
+  typeLorryOnce.value = selectLorryInfoKey.value
+
+  // window.location.href = '/skt/receiving'
+
+  // isDialogConfirmVisible.value = false
+  // isDialogSubmitSuccessVisible.value = true
+
+
 }
 
 const handleAcceptPackaging = word => {
@@ -644,6 +613,15 @@ const handleAcceptPackaging = word => {
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true
     })
+}
+
+const btnSelectLorry = async (word, word2, lorryInfoKey) => {
+  isDialogVisibleConfirmDialog.value = false
+  selectLorryInfoKey.value = lorryInfoKey
+
+  const confirmed = await textConfirmDialogFunction(word+word2, true, false)
+
+  
 }
 </script>
 
@@ -801,7 +779,10 @@ const handleAcceptPackaging = word => {
             <VTable>
               <thead>
                 <tr>
-                  <th class="bg-grey-lighten-3">
+                  <th
+                    v-if="false"
+                    class="bg-grey-lighten-3"
+                  >
                     Lorry Key
                   </th>
                   <th class="bg-grey-lighten-3">
@@ -817,7 +798,7 @@ const handleAcceptPackaging = word => {
                   v-for="(itemLorry, index) in checkSelectLorry"
                   :key="index"
                 >
-                  <td>
+                  <td v-if="false">
                     {{ itemLorry.lorryInfoKey }}
                   </td>
                   <td>
@@ -826,7 +807,7 @@ const handleAcceptPackaging = word => {
                   <td class="text-center">
                     <VBtn
                       color="info"
-                      @click="btnSelectLorry('LORRY LOADING', itemLorry.title)"
+                      @click="btnSelectLorry('LORRY LOADING', itemLorry.title, itemLorry.lorryInfoKey)"
                     >
                       Action
                     </VBtn>
@@ -847,6 +828,7 @@ const handleAcceptPackaging = word => {
         </VCard>
       </VDialog>
       <div
+        v-if="!typeLorryOnce"
         class=" d-flex align-center justify-center mt-4"
         @click="isDialogVisibleSelecrLorry = true"
       >
@@ -982,14 +964,6 @@ const handleAcceptPackaging = word => {
           </VBtn>
           
           <VBtn
-            v-if="wordForSubmit === 'APPROVE'"
-            color="green"
-            @click="handleAcceptPackaging"
-          >
-            {{ wordForSubmit }}
-          </VBtn>
-          <VBtn
-            v-if="wordForSubmit === 'LORRY LOADING'"
             color="green"
             @click="handleSelectLorryLoading"
           >
@@ -1085,6 +1059,17 @@ const handleAcceptPackaging = word => {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog
+        :is-dialog-visible="isDialogVisibleConfirmDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:confirm="confirmValueCheck = $event"
+        @update:isDialogVisible="(val) => isDialogVisibleConfirmDialog.value = val"
       />
     </div>
   </section>

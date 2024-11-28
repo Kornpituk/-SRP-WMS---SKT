@@ -49,6 +49,10 @@ const date = ref(new Date())
 
 const productionPlan = ref([])
 
+import { useGetCOAFormController } from '@/utilities/format'
+
+const { formatNumber } = useGetCOAFormController()
+
 // In case of a range picker, you'll receive [Date, Date]
 const format = date => {
   const day = date.getDate()
@@ -65,6 +69,26 @@ const formatDate = date => {
   const year = d.getFullYear()
 
   return `${day}/${month}/${year}`
+}
+
+const formatDateYMDWhyQ = date => {
+  // ตรวจสอบรูปแบบวันที่เป็น YYYY-MM-DDTHH:mm:ss
+  const isoDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
+  if (isoDatePattern.test(date)) {
+    return date // คืนค่าถ้าอยู่ในรูปแบบ ISO 8601
+  }
+
+  // ตรวจสอบว่ามี "/" เป็นตัวแบ่งและแปลง
+  if (date.includes('/')) {
+    const [day, month, year] = date.split('/')
+    
+    return `${year}-${month}-${day}`
+  }
+
+  // คืนค่าว่างหรือข้อความแสดงข้อผิดพลาด หากไม่อยู่ในรูปแบบที่รองรับ
+  console.warn('Invalid date format:', date)
+  
+  return ''
 }
 
 const RoleAccount = ref('User')
@@ -484,13 +508,9 @@ const saveProductionPlan = async () => {
   try {
     console.log("saveProductionPlan staret in")
 
-
-    // กรองข้อมูลเฉพาะฟิลด์ที่ต้องการจาก getProductionplanResult.value
-    
-
     const filteredData = productionPlan.value.map(item => ({
       planningID: item.planningID,
-      inputDate: item.inputDate,
+      inputDate: formatDateYMDWhyQ(item.inputDate),
       productionCode: item.productionCode,
 
       product1SelectedCode: item.product1SelectedCode,
@@ -504,7 +524,7 @@ const saveProductionPlan = async () => {
       product2UomCount: item.product2UomCount,
 
       lotNumber: item.lotNumber,
-      producingDate: item.producingDate,
+      producingDate: formatDateYMDWhyQ(item.producingDate),
       remark: item.remark,
     }))
 
@@ -512,16 +532,23 @@ const saveProductionPlan = async () => {
 
     // ส่งข้อมูลที่กรองแล้วไปยัง API
     await saveProdutcionPlanFunc(filteredData, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    if(responseSaveProductionPlan.value){
+      textAlertDialogFunction(alertWordConst.saveDraft, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
-    textAlertDialogFunction(alertWordConst.saveDraft, true)
-    setTimeout(() => {
-      location.reload()
-    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      console.log("saveProductionPlan staret in 3")
 
-    console.log("saveProductionPlan staret in 3")
+      // แสดงค่าใน console
+      console.log("Filtered Production Plan Saved:", filteredData)
+    }else{
+      textAlertDialogFunction(alertWordConst.saveDraft, false)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
 
-    // แสดงค่าใน console
-    console.log("Filtered Production Plan Saved:", filteredData)
   } catch (error) {
     // จัดการข้อผิดพลาด
     textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -1732,15 +1759,17 @@ const print = () => {
               <td>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</td>
               <td style="min-width: 150px;">
                 <AppDateTimePicker
+                  v-if="item.raw.statusId === 101"
                   v-model="item.raw.inputDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'Y-m-d' }"
+                  :config="{ dateFormat: 'd/m/Y' }"
                 >
                   <template #label>
                     <span>Input Data</span>
                   </template>
                 </AppDateTimePicker>
+                <span v-else>{{ formatDate(item.raw.inputDate) }}</span>
               </td>
               <td>
                 <VCombobox
@@ -1754,6 +1783,7 @@ const print = () => {
                   :readonly="item.raw.status === 'Submit'"
                 />
                 <VBtn
+                  v-if="item.raw.statusId === 101"
                   variant="outlined"
                   @click="selectFilterProduction(index)"
                 >
@@ -1762,6 +1792,7 @@ const print = () => {
                     <VIcon icon="ri-arrow-down-s-fill" />
                   </template>
                 </VBtn>
+                <span v-else>{{ (item.raw.productionCode) }}</span>
               </td>
               <td>{{ item.raw.reactorName }}</td>
               <td>
@@ -1787,6 +1818,7 @@ const print = () => {
                   </template>
                 </VCombobox>
                 <VBtn
+                  v-if="item.raw.statusId === 101"
                   variant="outlined"
                   @click="selectFilterProduction(index)"
                 >
@@ -1795,6 +1827,7 @@ const print = () => {
                     <VIcon icon="ri-arrow-down-s-fill" />
                   </template>
                 </VBtn>
+                <span v-else>{{ (item.raw.product1SelectedCode) }}</span>
               </td>
               <td class="bg-light-blue-lighten-5">
                 {{ item.raw.product1Name }}
@@ -1813,6 +1846,7 @@ const print = () => {
                   </template>
                 </VCombobox>
                 <VBtn
+                  v-if="item.raw.statusId === 101"
                   variant="outlined"
                   @click="selectFilterProduction(index)"
                 >
@@ -1821,12 +1855,14 @@ const print = () => {
                     <VIcon icon="ri-arrow-down-s-fill" />
                   </template>
                 </VBtn>
+                <span v-else>{{ (item.raw.product1SelectedPackagingCode) }}</span>
               </td>
               <td class="bg-light-blue-lighten-5">
-                {{ item.raw.product1PackingQtyKgs }}
+                {{ formatNumber(item.raw.product1PackingQtyKgs) }}
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td class="bg-light-blue-lighten-5 text-end">
                 <VTextField
+                  v-if="item.raw.statusId === 101"
                   v-model="item.raw.product1UomCount"
                   type="number"
                   style="min-width: 100px;"
@@ -1837,6 +1873,10 @@ const print = () => {
                     <span style="font-size: 12px;">Packaging Pcs 1</span>
                   </template>
                 </VTextField>
+                <span
+                  v-else
+                  class="px-6"
+                >{{ (item.raw.product1UomCount) }}</span>
               </td>
 
               <td class="bg-red-lighten-5">
@@ -1853,6 +1893,7 @@ const print = () => {
                   </template>
                 </VCombobox>
                 <VBtn
+                  v-if="item.raw.statusId === 101"
                   variant="outlined"
                   @click="selectFilterProduction(index)"
                 >
@@ -1861,6 +1902,7 @@ const print = () => {
                     <VIcon icon="ri-arrow-down-s-fill" />
                   </template>
                 </VBtn>
+                <span v-else>{{ (item.raw.product2SelectedCode) }}</span>
               </td>
               <td class="bg-red-lighten-5">
                 {{ item.raw.product2Name }}
@@ -1879,6 +1921,7 @@ const print = () => {
                   </template>
                 </VCombobox>
                 <VBtn
+                  v-if="item.raw.statusId === 101"
                   variant="outlined"
                   @click="selectFilterProduction(index)"
                 >
@@ -1887,12 +1930,14 @@ const print = () => {
                     <VIcon icon="ri-arrow-down-s-fill" />
                   </template>
                 </VBtn>
+                <span v-else>{{ (item.raw.product2SelectedPackagingCode) }}</span>
               </td>
               <td class="bg-red-lighten-5">
-                {{ item.raw.product2PackingQtyKgs }}
+                {{ formatNumber(item.raw.product2PackingQtyKgs) }}
               </td>
-              <td class="bg-red-lighten-5">
+              <td class="bg-red-lighten-5 text-end">
                 <VTextField
+                  v-if="item.raw.statusId === 101"
                   v-model="item.raw.product2UomCount"
                   type="number"
                   style="min-width: 100px;"
@@ -1903,6 +1948,10 @@ const print = () => {
                     <span style="font-size: 12px;">Packaging Pcs 1</span>
                   </template>
                 </VTextField>
+                <span
+                  v-else
+                  class="px-6"
+                >{{ (item.raw.product2UomCount) }}</span>
               </td>
              
               <td
@@ -1910,33 +1959,44 @@ const print = () => {
                 style="min-width: 150px;"
               >
                 <VTextField
+                  v-if="item.raw.statusId === 101"
                   v-model="item.raw.lotNumber"
                   density="compact"
                   style="min-width: 150px;"
                   :readonly="item.raw.status === 'Submit'"
                 />
+                <span
+                  v-else
+                  class="px-4"
+                >{{ (item.raw.lotNumber) }}</span>
               </td>
               <td
                 class="px-1"
                 style="max-width: 150px;"
               >
                 <AppDateTimePicker
+                  v-if="item.raw.statusId === 101"
                   v-model="item.raw.producingDate"
                   placeholder="Producing date"
                   density="compact"
                   style="font-size: 12px;"
                   prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'Y-m-d' }"
+                  :config="{ dateFormat: 'd/m/Y' }"
                 />
+                <span
+                  v-else
+                  class="px-4"
+                >{{ formatDate(item.raw.producingDate) }}</span>
               </td>
               <td
-                class="px-1"
+                class="px-4"
                 style="min-width: 150px;"
               >
                 {{ formatDate(item.raw.finishedDate) }}
               </td>
               <td>
                 <VTextarea
+                  v-if="item.raw.statusId === 101"
                   v-model="item.raw.remark"
                   style="min-width: 200px;"
                   class="pa-2"
@@ -1950,6 +2010,7 @@ const print = () => {
                     <span style="font-size: 12px;">Remark</span>
                   </template>
                 </VTextarea>
+                <span v-else>{{ (item.raw.remark) }}</span>
               </td>
               <td>
                 {{ item.raw.statusDate }}
