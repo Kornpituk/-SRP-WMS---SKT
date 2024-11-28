@@ -78,8 +78,9 @@ onMounted(async () => {
   statusId.value = lorryFormIPAStatus.data.data.statusId
 
   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
-    isReadOnly.value=true
+    isReadOnly.value = true
   }
+
 
 })
 
@@ -105,7 +106,7 @@ async function saveDraft(e) {
 
 async function submit(e) {
 
-  var response = save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
   if (response.status == 200) {
     console.log(response.data)
   } else {
@@ -142,6 +143,9 @@ async function submit(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
@@ -498,7 +502,7 @@ watchEffect(async () => {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
         color="warning"
         class="mx-1"
@@ -507,9 +511,9 @@ watchEffect(async () => {
         Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
-        color="secondary "
+        color="primary "
         class="mx-1"
         @click="submit"
       >

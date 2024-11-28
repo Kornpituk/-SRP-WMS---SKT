@@ -950,7 +950,7 @@ function formatDate(dateString) {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
         color="warning"
         class="mx-1"
@@ -959,9 +959,9 @@ function formatDate(dateString) {
         Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
-        color="secondary "
+        color="primary "
         class="mx-1"
         @click="submit"
       >
