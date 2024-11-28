@@ -14,6 +14,7 @@ const props = defineProps({
   valueRange: {
     type: Number,
     required: false,
+    default: 99,
   },
 })
 

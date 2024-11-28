@@ -126,6 +126,23 @@ async function submit(e) {
   } else {
     e.preventDefault()
   }
+
+  let isValid = true
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+        isValid = false
+      }
+    }
+  }
+
+  if(!isValid){
+    alert("กรุณากรอกข้อมูลให้ครบ")
+    
+    return
+  }
+
+
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',

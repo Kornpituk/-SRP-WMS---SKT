@@ -101,7 +101,7 @@ onMounted(async () => {
   statusId.value = lorryFormIPAStatus.data.data[0].statusId
   console.log("StatusId : ", statusId.value)
 
-  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 18){
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
 
@@ -412,7 +412,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="solo"
-                      :readonly="isReadOnly"
+                      readonly="true"
                     >
                       <template #prepend>
                         <VLabel>
@@ -435,7 +435,7 @@ watchEffect(async () => {
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
-                      :readonly="isReadOnly"
+                      readonly="true"
                     >
                       <template #prepend>
                         <VLabel>

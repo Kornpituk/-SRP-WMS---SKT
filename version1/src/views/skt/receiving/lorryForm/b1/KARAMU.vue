@@ -37,6 +37,26 @@ const textAlertDialogFunction = (word, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
+const textConfirmDialogFunction = async (word, success, confirm) => {
+  wordForSubmit.value = word
+  confirmValueCheck.value = confirm
+  successDialAlert.value = success
+  isDialogVisibleConfirmDialog.value = true
+
+  // รอคำตอบจากผู้ใช้
+  return new Promise(resolve => {
+    const unwatch = watchEffect(
+      () => isDialogVisibleConfirmDialog.value,
+      newValue => {
+        if (!newValue) { // เมื่อ Dialog ถูกปิด
+          unwatch() // ยกเลิก watch
+          resolve(confirmValueCheck.value) // คืนค่าคำตอบ
+        }
+      },
+    )
+  })
+}
+
 onMounted(async () => {
 
   await generate(poEtlLogDetailJournalIDQueryParameters.value)
@@ -71,21 +91,46 @@ async function saveDraft(e) {
     }
   }
 
-  var response = save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
+    setTimeout(() => {
+      location.reload()
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
-    console.error(response.data)
+    console.log(response.data)
   }
 }
 
 async function submit(e) {
 
-  await saveDraft(e)
+  var response = save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+  if (response.status == 200) {
+    console.log(response.data)
+  } else {
+    console.error(response.data)
+    e.preventDefault()
+    
+  }
 
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
+
+  let isValid = true
+  for (var i of kumaruItems) {
+    for (var f of i.result.field) {
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+        isValid = false
+      }
+    }
+  }
+
+  if(!isValid){
+    alert("กรุณากรอกข้อมูลให้ครบ")
+    
+    return
+  }
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
