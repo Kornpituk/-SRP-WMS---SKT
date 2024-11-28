@@ -1035,7 +1035,7 @@ const newBatch = async batchID => {
               color="info"
               @click="viewAllData"
             >
-              <span style="font-size: 12px;">Finished Approve </span>
+              <span style="font-size: 12px;">PROD Apporoved</span>
             </VBtn>
             <VBtn
               class="mx-2"

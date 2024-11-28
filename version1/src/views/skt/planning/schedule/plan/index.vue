@@ -1386,7 +1386,7 @@ const print = () => {
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
                     >
-                      <span style="font-size: 12px;">{{ item.raw.batchScaleKgs }}</span>
+                      <span style="font-size: 12px;">{{ formatNumber(item.raw.batchScaleKgs) }}</span>
                     </td>
                     <td
                       :style="{
@@ -1585,7 +1585,7 @@ const print = () => {
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
                     >
-                      <span style="font-size: 12px;">{{ item.raw.packingQtyKgs }}</span>
+                      <span class="text-end" style="font-size: 12px;">{{ formatNumber(item.raw.packingQtyKgs) }}</span>
                     </td>
                     <td
                       :style="{
