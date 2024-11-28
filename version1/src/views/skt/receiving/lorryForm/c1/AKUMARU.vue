@@ -82,9 +82,9 @@ onMounted(async () => {
     },
   })
 
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  statusId.value = lorryFormIPAStatus.data.data[0].statusId
 
-  if(statusId.value == 15 || statusId.value == 18){
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
 

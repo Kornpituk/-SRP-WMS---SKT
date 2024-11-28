@@ -75,7 +75,9 @@ onMounted(async () => {
 
   const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  statusId.value = lorryFormIPAStatus.data.data[0].statusId
+
+  console.log("StatusId ", statusId.value)
 
   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
