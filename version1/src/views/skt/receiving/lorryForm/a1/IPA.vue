@@ -98,8 +98,9 @@ onMounted(async () => {
   console.log("statusId", lorryFormIPAStatus.data)
 
   statusId.value = lorryFormIPAStatus.data.data[0].statusId
+  console.log("StatusId : ", statusId.value)
 
-  if(statusId.value == 15 || statusId.value == 18){
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 18){
     isReadOnly.value = true
   }
 
@@ -991,7 +992,7 @@ watchEffect(async () => {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
         color="warning"
         class="mx-1"
@@ -1000,7 +1001,7 @@ watchEffect(async () => {
         Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
         color="secondary "
         class="mx-1"
