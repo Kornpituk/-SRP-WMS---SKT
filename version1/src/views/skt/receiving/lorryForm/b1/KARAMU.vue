@@ -4,7 +4,7 @@ import VCurrencyField from "@/components/VCurrencyField.vue"
 import VNumberInput from '@/components/VNumberInput.vue'
 import {
   formatDate, generate, get, GetByPoEtlLogDetailJournalID, kumaruItemTemplate,
-  passInitialData, passSubmitData,
+  passInitialData, passSubmitData, save,
 } from '@/services/skt/inv/lorryLoading/kumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import axios from '@axios'
@@ -23,7 +23,7 @@ const route = useRoute()
 
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
-
+var isReadOnly = ref(false)
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -57,6 +57,10 @@ onMounted(async () => {
 
   statusId.value = lorryFormIPAStatus.data.data.statusId
 
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+    isReadOnly.value=true
+  }
+
 })
 
 async function saveDraft(e) {
@@ -67,16 +71,7 @@ async function saveDraft(e) {
     }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -247,6 +242,7 @@ watchEffect(async () => {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="Ok"
@@ -269,6 +265,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(A)"
                       text-end="kg"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </vrow>
@@ -284,6 +281,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(B) DCS"
                       text-end="kg"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </vrow>
@@ -298,7 +296,7 @@ watchEffect(async () => {
                       label=""
                       text-start="A) + (B) ="
                       text-end="Kg"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -330,6 +328,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(A)"
                       text-end="kg"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </vrow>
@@ -345,6 +344,7 @@ watchEffect(async () => {
                       label=""
                       text-start="( C ) DCS"
                       text-end="kg"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </vrow>
@@ -381,6 +381,7 @@ watchEffect(async () => {
                       label=""
                       text-start="( C )-( B )"
                       text-end="kg"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </vrow>

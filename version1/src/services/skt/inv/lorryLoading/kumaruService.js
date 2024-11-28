@@ -40,6 +40,19 @@ export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryP
   })
 }
 
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
 export function currencyFormat(number) {
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
@@ -218,7 +231,7 @@ export const kumaruItemTemplate = [
     "rowSpan": 1,
     "sequence": "<strong>รายการที่ต้องตรวจสอบ</strong>",
     "practice": "2. Level ที่อ่านได้จาก Tank 21V-306 ก่อนรับ",
-    "condition": "ต้องไม่เกิน….....kg",
+    "condition": "ต้องไม่เกิน 7,000 kg",
     "result": {
       "type": "b",
       "field": [
@@ -233,7 +246,7 @@ export const kumaruItemTemplate = [
     "rowSpan": 1,
     "sequence": "<strong>รายการที่ต้องตรวจสอบ</strong>",
     "practice": "3. ตรวจสอบว่าปริมาณหลังจากรับไม่เกินความจุถัง",
-    "condition": "ต้องไม่เกิน…...kg",
+    "condition": "ต้องไม่เกิน 27,000 kg",
     "result": {
       "type": "ab",
       "field": [

@@ -5,6 +5,7 @@ import VNumberInput from '@/components/VNumberInput.vue'
 import {
   currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, ipaItemTemplate,
   mm2litre, passInitialData, passSubmitData,
+  save,
 } from '@/services/skt/inv/lorryLoading/ipaService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
@@ -114,16 +115,7 @@ async function saveDraft(e) {
     }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -132,13 +124,19 @@ async function saveDraft(e) {
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
-    event.preventDefault()
+    e.preventDefault()
   }
 }
 
 async function submit(e) {
 
-  await saveDraft(e)
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+
+  if (response.status == 200) {
+    console.error(response.data)
+  } else {
+    e.preventDefault()
+  }
 
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
@@ -158,32 +156,34 @@ async function submit(e) {
     return
   }
 
-  // เรียกใช้งาน Dialog
-  const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
+  // // เรียกใช้งาน Dialog
+  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
 
-  if (confirmed) {
-    console.log("User confirmed:", confirmValueCheck.value)
+  //if (confirmed) {
+  // if (confirmed) {
+  console.log("User confirmed:", confirmValueCheck.value)
 
-    // เรียก API หรือดำเนินการต่อ
-    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    })
+  // เรียก API หรือดำเนินการต่อ
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
 
-    if (response.status == 200) {
-      textAlertDialogFunction(alertWordConst.submit, true)
-      setTimeout(() => {
-        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-    } else {
-      console.error(response.data)
-    }
+  if (response.status == 200) {
+    textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
-    console.log("User declined")
+    console.error(response.data)
   }
+
+  // } else {
+  //   console.log("User declined")
+  // }
 
 }
 
@@ -1003,7 +1003,7 @@ watchEffect(async () => {
       <VBtn
         v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
-        color="secondary "
+        color="primary "
         class="mx-1"
         @click="submit"
       >

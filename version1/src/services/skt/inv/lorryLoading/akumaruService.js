@@ -1,4 +1,7 @@
 
+import { urlApi } from '@/api'
+import axios from '@axios'
+
 export function currencyFormat(number) {
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
@@ -42,6 +45,19 @@ export function passSubmitData(type, params) {
       return parseFloat(params)
     }
   }
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData){
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+  
+  return await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
 }
 
 export const akumuruItemTemplate = [

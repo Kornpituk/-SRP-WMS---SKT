@@ -2,7 +2,7 @@
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import VNumberInput from '@/components/VNumberInput.vue'
-import { akumuruItemTemplate, currencyFormat, passInitialData, passSubmitData } from '@/services/skt/inv/lorryLoading/akumaruService'
+import { akumuruItemTemplate, currencyFormat, passInitialData, passSubmitData, save } from '@/services/skt/inv/lorryLoading/akumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/akumaru/Acrylic ( 431 ).png'
 import axios from '@axios'
@@ -104,19 +104,13 @@ async function saveDraft(e) {
     }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
+    setTimeout(() => {
+      location.reload()
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
@@ -125,7 +119,13 @@ async function saveDraft(e) {
 async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
-
+  
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
+  if (response.status == 200) {
+    console.log(response.data)
+  } else {
+    e.preventDefault()
+  }
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
@@ -304,6 +304,8 @@ function formatDate(dateString) {
                 <VCheckbox
                   v-model="section.practice.field[0].value"
                   :label="section.practice.startPracticeText"
+                  :false-value="0"
+                  :true-value="1"
                 />
               </div>
               <div v-else-if="section.practice.type === 'checkbox3'">
@@ -312,18 +314,24 @@ function formatDate(dateString) {
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
+                      :false-value="0"
+                      :true-value="1"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
+                      :false-value="0"
+                      :true-value="1"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :label="section.practice.field[2].startPracticeText"
+                      :false-value="0"
+                      :true-value="1"
                     />
                   </VCol>
                 </VRow>
@@ -334,24 +342,32 @@ function formatDate(dateString) {
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
+                      :false-value="0"
+                      :true-value="1"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
+                      :false-value="0"
+                      :true-value="1"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :label="section.practice.field[2].startPracticeText"
+                      :false-value="0"
+                      :true-value="1"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[3].value"
                       :label="section.practice.field[3].startPracticeText"
+                      :false-value="0"
+                      :true-value="1"
                     />
                   </VCol>
                 </VRow>
@@ -381,6 +397,7 @@ function formatDate(dateString) {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="Ok"
@@ -401,6 +418,7 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start="(A)"
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -410,7 +428,7 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start="Litre"
                       text-end="(B)"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -425,6 +443,7 @@ function formatDate(dateString) {
                       label=""
                       text-start="(C)"
                       text-end="mm."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -434,7 +453,7 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start="(D)"
                       text-end="mm."
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -448,7 +467,7 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start=" (B) + (D) ="
                       text-end="Litre"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -456,6 +475,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -479,7 +499,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Litre"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -487,6 +507,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -510,7 +531,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="%"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -518,6 +539,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -538,7 +560,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     >
                       <template #prepend>
                         <VLabel />
@@ -583,6 +605,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="( Mpa )'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -590,6 +613,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -613,6 +637,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Amp'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
 
@@ -621,6 +646,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -644,6 +670,7 @@ function formatDate(dateString) {
                       label=""
                       text-start="(E)"
                       text-end="mm.'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -654,6 +681,7 @@ function formatDate(dateString) {
                       label=""
                       text-start="(F)"
                       text-end="Litre'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -669,6 +697,7 @@ function formatDate(dateString) {
                       text-start="(G)"
                       text-end="Litre'"
                       type="number"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -683,6 +712,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Litre'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -693,6 +723,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Kg.'"
+                      :readonly="isReadOnly"
                     >
                       <template #append>
                         <VLabel>
@@ -713,6 +744,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -748,6 +780,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="( Mpa )"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -762,6 +795,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Amp"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -776,6 +810,7 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="C°"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
