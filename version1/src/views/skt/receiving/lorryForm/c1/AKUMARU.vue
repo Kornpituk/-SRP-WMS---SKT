@@ -166,6 +166,9 @@ async function submit(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
@@ -611,6 +614,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[0].value"
                       :max-length="2"
                       :readonly="isReadOnly"
+                      :value-range="23"
                     />
                   </VCol>
                   <VLabel>
@@ -621,6 +625,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       :max-length="2"
                       :readonly="isReadOnly"
+                      :value-range="59"
                     />
                   </VCol>
                 </VRow>

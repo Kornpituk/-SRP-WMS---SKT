@@ -411,6 +411,7 @@ watchEffect(async () => {
                       v-model="section.result.field[0].value"
                       :max-length="2"
                       :readonly="isReadOnly"
+                      :value-range="23"
                     />
                   </VCol>
                   <VLabel>
@@ -421,6 +422,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       :max-length="2"
                       :readonly="isReadOnly"
+                      :value-range="59"
                     />
                   </VCol>
                 </VRow>
