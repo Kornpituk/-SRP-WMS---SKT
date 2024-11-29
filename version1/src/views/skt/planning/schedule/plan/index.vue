@@ -73,6 +73,16 @@ const formatDate = date => {
 
 const formatDateYMDWhyQ = date => {
   // ตรวจสอบรูปแบบวันที่เป็น YYYY-MM-DDTHH:mm:ss
+
+  console.log("Data", date)
+
+  if(date === null){
+    date = new Date().toISOString()
+    console.log("Data null", date)
+    
+    return date
+  }
+
   const isoDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
   if (isoDatePattern.test(date)) {
     return date // คืนค่าถ้าอยู่ในรูปแบบ ISO 8601
@@ -85,10 +95,12 @@ const formatDateYMDWhyQ = date => {
     return `${year}-${month}-${day}`
   }
 
+  
+
   // คืนค่าว่างหรือข้อความแสดงข้อผิดพลาด หากไม่อยู่ในรูปแบบที่รองรับ
   console.warn('Invalid date format:', date)
   
-  return ''
+  return 'null'
 }
 
 const RoleAccount = ref('User')
@@ -506,11 +518,19 @@ const { responseSaveProductionPlan, errorMessageSaveProductionPlan, saveProdutci
 const saveProductionPlan = async () => {
   console.log("saveProductionPlan staret")
   try {
-    console.log("saveProductionPlan staret in")
+    console.log("saveProductionPlan staret in", productionPlan.value)
+
+    if(productionPlan.value.inputDate === null){
+      productionPlan.value.inputDate = new Date().toISOString()
+    }
+
+    if(productionPlan.value.producingDate === null){
+      productionPlan.value.producingDate = new Date().toISOString()
+    }
 
     const filteredData = productionPlan.value.map(item => ({
       planningID: item.planningID,
-      inputDate: formatDateYMDWhyQ(item.inputDate),
+      inputDate: item.inputDate,
       productionCode: item.productionCode,
 
       product1SelectedCode: item.product1SelectedCode,
@@ -690,12 +710,12 @@ const approvePlan = async () => {
     if(responseApproveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.submit, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }else{
       textAlertDialogFunction(alertWordConst.approve, false)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }
   } catch (error) {
@@ -1414,13 +1434,14 @@ const print = () => {
                         v-if="item.raw.productionCode === selectedProductionCode"
                         color="info"
                         variant="tonal"
-                        
+                        :disabled="btnSelectitem2"
                         @click="selectPlan(item.raw, index)"
                       >
                         Select
                       </VBtn>
                       <VBtn
                         v-if="item.raw.productionCode !== selectedProductionCode"
+                        :disabled="btnSelectitem2"
                         color="info"
                         variant="flat"
                         @click="selectPlan(item.raw, index)"
@@ -1585,7 +1606,10 @@ const print = () => {
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
                     >
-                      <span class="text-end" style="font-size: 12px;">{{ formatNumber(item.raw.packingQtyKgs) }}</span>
+                      <span
+                        class="text-end"
+                        style="font-size: 12px;"
+                      >{{ formatNumber(item.raw.packingQtyKgs) }}</span>
                     </td>
                     <td
                       :style="{
@@ -1666,6 +1690,14 @@ const print = () => {
           @click="deletePlan"
         >
           <span style="font-size: 12px;">Cancel Batch</span>
+        </VBtn>
+
+        <VBtn
+          color="info"
+          class="mx-2"
+          disabled
+        >
+          <span style="font-size: 12px;">Gen Lot</span>
         </VBtn>
 
         <VBtn
@@ -1759,7 +1791,7 @@ const print = () => {
               <td>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</td>
               <td style="min-width: 150px;">
                 <AppDateTimePicker
-                  v-if="item.raw.statusId === 101"
+                  v-if="false"
                   v-model="item.raw.inputDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -1769,7 +1801,7 @@ const print = () => {
                     <span>Input Data</span>
                   </template>
                 </AppDateTimePicker>
-                <span v-else>{{ formatDate(item.raw.inputDate) }}</span>
+                <span>{{ formatDate(item.raw.inputDate) }}</span>
               </td>
               <td>
                 <VCombobox
@@ -1799,10 +1831,10 @@ const print = () => {
                 {{ item.raw.productionName }}
               </td>
               <td
-                class="px-1"
+                class="px-8 text-end"
                 style="min-width: 150px;"
               >
-                batchScaleKgs
+                {{ formatNumber(item.raw.quantityKgs) }}
               </td>
               <td class="bg-light-blue-lighten-5">
                 <VCombobox
@@ -1857,7 +1889,7 @@ const print = () => {
                 </VBtn>
                 <span v-else>{{ (item.raw.product1SelectedPackagingCode) }}</span>
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td class="bg-light-blue-lighten-5 text-end px-8">
                 {{ formatNumber(item.raw.product1PackingQtyKgs) }}
               </td>
               <td class="bg-light-blue-lighten-5 text-end">
@@ -1897,7 +1929,7 @@ const print = () => {
                   variant="outlined"
                   @click="selectFilterProduction(index)"
                 >
-                  <span v-if="item.raw.product2SelectedCode">{{ item.raw.product2SelectedCode }}</span><span v-else>Select Production</span>
+                  <span v-if="item.raw.product2SelectedCode">{{ item.raw.product2SelectedCode }}</span><span v-else>Select Item</span>
                   <template #append>
                     <VIcon icon="ri-arrow-down-s-fill" />
                   </template>
@@ -1932,7 +1964,7 @@ const print = () => {
                 </VBtn>
                 <span v-else>{{ (item.raw.product2SelectedPackagingCode) }}</span>
               </td>
-              <td class="bg-red-lighten-5">
+              <td class="bg-red-lighten-5 text-end px-8">
                 {{ formatNumber(item.raw.product2PackingQtyKgs) }}
               </td>
               <td class="bg-red-lighten-5 text-end">

@@ -964,6 +964,14 @@ const btnSelectLorry = async (word, word2, lorryInfoKey) => {
           </VBtn>
           
           <VBtn
+            v-if="wordForSubmit === 'APPROVE'"
+            color="green"
+            @click="handleAcceptPackaging"
+          >
+            {{ wordForSubmit }}
+          </VBtn>
+          <VBtn
+            v-if="wordForSubmit === 'LORRY LOADING'"
             color="green"
             @click="handleSelectLorryLoading"
           >

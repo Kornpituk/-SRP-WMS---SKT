@@ -15,6 +15,7 @@ const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
 
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
+const selectedDataTables = ref([])
 
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
@@ -23,13 +24,33 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
-import { useGetBatchProductionPlanService, useGetProductionPlanSearchService } from '@/services/skt/productionPlan/services'
+import { useGetBatchProductionPlanService, useGetProductionPlanSearchService, useApproveProductionPlanService } from '@/services/skt/productionPlan/services'
 
 import { useFormatDateUtilities } from '@/utilities/utilities'
 
 import { useGetCOAFormController } from '@/utilities/format'
 
 const { formatNumber } = useGetCOAFormController()
+
+//----------------------------------- Dialog -------------------------------------------
+//------------------------ Dialog Confirm --------------------------------
+import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+import alertWordConst from '@/utilities/constant'
+
+const isDialogVisibleConfirmDialog = ref(false)
+const wordForSubmit = ref('')
+const successDialAlert = ref(false)
+const confirmValueCheck = ref(false)
+
+//--------------------- model --------------------------------
+//-- dialog 2 
+const confirmDialog = ref(null)
+
+const showConfirmDialog = word => {
+  wordForSubmit.value = alertWordConst.approve
+  isDialogVisibleConfirmDialog.value = true
+}
 
 //----------------------------------- Get Batch Production plan ---------------------------
 
@@ -129,6 +150,36 @@ const newBatchGenBatch = async () => {
   } catch (error) {
     console.error("Error in newBatchGenBatch:", error)
   }
+}
+
+//------------------------------- approved ----------------------------------------------------------------
+const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approveProdutcionPlanFunc } = useApproveProductionPlanService()
+
+const approvePlan = async () => {
+
+  const body = selectedDataTables.value.map(item => item.planningID)
+
+  try {
+  // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    if(responseApproveProductionPlan.value){
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      textAlertDialogFunction(alertWordConst.approve, false)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
+  } catch (error) {
+  // จัดการข้อผิดพลาด
+    
+    console.error("Error approved production plan:", error)
+  }
+
+  console.log("body selectedDataTables", body)
 }
 
 // In case of a range picker, you'll receive [Date, Date]
@@ -1019,6 +1070,7 @@ const newBatch = async batchID => {
     </VDialog>
   </section>
 
+  <!-- Btn Approve / PROD APPROVE / NEW BATCH -->
   <div
     v-if="RoleAccount === 'User'"
     class="my-2"
@@ -1027,7 +1079,7 @@ const newBatch = async batchID => {
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
-            <VBtn @click="viewAllData">
+            <VBtn @click="showConfirmDialog">
               <span style="font-size: 12px;">Approve</span>
             </VBtn>
             <VBtn
@@ -1079,7 +1131,7 @@ const newBatch = async batchID => {
     v-if="RoleAccount === 'Manager'"
     class="mt-4"
   >
-    <VBtn @click="viewAllData">
+    <VBtn @click="showConfirmDialog">
       Approve
     </VBtn>
     <VBtn
@@ -1360,6 +1412,20 @@ const newBatch = async batchID => {
         </VAlert>
       </VCardText>
     </VCard>
+  </section>
+
+  <!-- Alert Dialog Component -->
+  <section>
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog
+        :is-dialog-visible="isDialogVisibleConfirmDialog"
+        :word="wordForSubmit"
+        :success="successDialAlert"
+        @update:confirm="confirmValueCheck = $event"
+        @update:isDialogVisible="(val) => isDialogVisibleConfirmDialog.value = val"
+      />
+    </div>
   </section>
 </template>
 

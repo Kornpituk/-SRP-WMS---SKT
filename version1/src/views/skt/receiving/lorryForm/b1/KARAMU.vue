@@ -173,7 +173,7 @@ async function approve(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.approve, true)
-    location.reload()
+    window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
   } else {
     console.error(response.data)
   }
@@ -518,7 +518,7 @@ watchEffect(async () => {
         class="mx-1"
         @click="saveDraft"
       >
-        Draft
+        SAVE Draft
       </VBtn>
       <VBtn
         v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
