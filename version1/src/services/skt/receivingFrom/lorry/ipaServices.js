@@ -7,7 +7,7 @@ export const usePrintIPAFormService = () => {
   const printIPAFormService = async (typeLorryID, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageIPAPrintPDF.value = null
-      console.log('Print IPA Form Service Starting...')
+      console.log('Print IPA Form Service Starting...', typeLorryID)
     
       const result = await ipaRepo.printIPAFormPDF(typeLorryID, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
           

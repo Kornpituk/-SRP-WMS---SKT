@@ -14,6 +14,7 @@ import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
 import alertWordConst from '@/utilities/constant'
 
@@ -42,6 +43,7 @@ var tankAfter = ref(0)
 var tankBefore = ref(0)
 var tankDiff = ref(0)
 
+//------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
 const isDialogVisibleConfirmDialog = ref(false)
 const confirmValueCheck = ref(false)
@@ -56,24 +58,27 @@ const textAlertDialogFunction = (word, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
-const textConfirmDialogFunction = async (word, success, confirm) => {
-  wordForSubmit.value = word
-  confirmValueCheck.value = confirm
-  successDialAlert.value = success
-  isDialogVisibleConfirmDialog.value = true
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
 
-  // รอคำตอบจากผู้ใช้
-  return new Promise(resolve => {
-    const unwatch = watchEffect(
-      () => isDialogVisibleConfirmDialog.value,
-      newValue => {
-        if (!newValue) { // เมื่อ Dialog ถูกปิด
-          unwatch() // ยกเลิก watch
-          resolve(confirmValueCheck.value) // คืนค่าคำตอบ
-        }
-      },
-    )
-  })
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(wordForSubmit.value === "SUBMIT"){
+    submit()
+  }else if(wordForSubmit.value === "APPROVE"){
+    approve()
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
 }
 
 onMounted(async () => {
@@ -1009,7 +1014,7 @@ watchEffect(async () => {
         type="text"
         color="primary "
         class="mx-1"
-        @click="submit"
+        @click="openConfirmDialog('SUBMIT')"
       >
         Submit
       </VBtn>
@@ -1018,7 +1023,7 @@ watchEffect(async () => {
         type="text"
         color="primary"
         class="mx-1"
-        @click="approve"
+        @click="openConfirmDialog('APPROVE')"
       >
         Approve
       </VBtn>
@@ -1039,12 +1044,11 @@ watchEffect(async () => {
 
     <div>
       <!-- ใช้ confirmDialog component -->
-      <ConfirmDialog
-        :is-dialog-visible="isDialogVisibleConfirmDialog"
-        :confirm="confirmValueCheck"
-        :word="wordForSubmit"
-        :success="successDialAlert"
-        @update:isDialogVisible="(val) => isDialogVisibleConfirmDialog.value = val"
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>

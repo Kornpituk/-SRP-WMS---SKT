@@ -1260,6 +1260,8 @@ const findProductByJournalID = journalID => {
       if(foundProduct.lorryInfos.length === 1){
         const typeLorryOnce = foundProduct.lorryInfos[0].lorryInfoKey
 
+        typeLorryID.value = foundProduct.lorryInfos[0].lorryInfoKey
+
         itemStore.setItemDetails(typeLorryOnce, 'typeLorryInfoId')
         
         console.log('Found Product typeLorryOnce:', typeLorryOnce)
@@ -1517,9 +1519,11 @@ const disabledCheckboxListLorry = () => {
   return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].includes(idStatusDialogAction.value)
 }
 
+const typeLorryID = ref(null)
+
 const checkTypeLorryToPrintPDF = () => {
-  const typeID = sessionStorage.getItem('typeLorryInfoId')
-  switch (typeID) {
+  const typeID = ref(sessionStorage.getItem('typeLorryInfoId'))
+  switch (typeLorryID.value) {
   case '01':
     return 'LorryFormIPA'
   case '02':
@@ -1533,7 +1537,7 @@ const checkTypeLorryToPrintPDF = () => {
   case '06':
     return "LorryFormKARAMU"
   case '07':
-    return "LorryFormAKAMARU"
+    return "LorryFormAKUMARU"
   case '09':
     return "LorryFormHAKU-C (11V-111)"
   case '10':
@@ -1549,7 +1553,7 @@ const checkTypeLorryToPrintPDF = () => {
   case '16':
     return "LorryFormSANNIX FA-703V"
   default:
-    console.warn(`No component found for key: ${typeID}`)
+    console.warn(`No component found for key: ${typeID.value}`)
     
     return null
   }
@@ -1598,6 +1602,8 @@ const printFormAll = async () => {
       const typeLorryID = ref(checkTypeLorryToPrintPDF())
 
       try {
+        console.log('Printing Lorry Loading Checklist...', typeLorryID.value)
+        
         return await printIPAFormService(typeLorryID.value, poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
       } finally {
         processingPrintForm4.value = false // เสร็จสิ้นการพิมพ์

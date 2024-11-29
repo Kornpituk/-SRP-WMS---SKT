@@ -172,7 +172,9 @@ async function approve(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.approve, true)
-    window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }

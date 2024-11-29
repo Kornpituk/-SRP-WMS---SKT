@@ -34,25 +34,33 @@ defineExpose({
 <template>
   <VDialog
     v-model="dialog"
-    max-width="400"
+    max-width="500"
   >
     <VCard>
-      <VCardTitle class="text-h6">
-        Confirmation
-      </VCardTitle>
-      <VCardText>{{ message }}</VCardText>
-      <VCardActions>
-        <VSpacer />
+      <VCardText>
+        <div class="d-flex justify-center">
+          <VIcon
+            size="100"
+            color="warning"
+            icon="ri-question-line"
+          />
+        </div>
+        <div class="text-center">
+          <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ props.message }}
+            Transaction?</span>
+        </div>
+      </VCardText>
+      <VCardActions class="d-flex justify-space-between">
         <VBtn
-          text
           color="red"
+          variant="flat"
           @click="cancel"
         >
           Cancel
         </VBtn>
         <VBtn
-          text
           color="green"
+          variant="flat"
           @click="confirm"
         >
           Confirm

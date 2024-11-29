@@ -36,20 +36,38 @@ const { formatNumber } = useGetCOAFormController()
 //------------------------ Dialog Confirm --------------------------------
 import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import alertWordConst from '@/utilities/constant'
 
 const isDialogVisibleConfirmDialog = ref(false)
+const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 const confirmValueCheck = ref(false)
 
 //--------------------- model --------------------------------
 //-- dialog 2 
-const confirmDialog = ref(null)
+const confirmDialog2 = ref(null)
 
-const showConfirmDialog = word => {
+function openConfirmDialog() {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
   wordForSubmit.value = alertWordConst.approve
-  isDialogVisibleConfirmDialog.value = true
+  confirmDialog2.value.openDialog()
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+  approvePlan()
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
 }
 
 //----------------------------------- Get Batch Production plan ---------------------------
@@ -170,7 +188,7 @@ const approvePlan = async () => {
     }else{
       textAlertDialogFunction(alertWordConst.approve, false)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }
   } catch (error) {
@@ -1079,7 +1097,7 @@ const newBatch = async batchID => {
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
-            <VBtn @click="showConfirmDialog">
+            <VBtn @click="openConfirmDialog">
               <span style="font-size: 12px;">Approve</span>
             </VBtn>
             <VBtn
@@ -1418,12 +1436,21 @@ const newBatch = async batchID => {
   <section>
     <div>
       <!-- ใช้ confirmDialog component -->
-      <ConfirmDialog
-        :is-dialog-visible="isDialogVisibleConfirmDialog"
+      <ConfirmDialog2
+        ref="confirmDialog2"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
         :word="wordForSubmit"
         :success="successDialAlert"
-        @update:confirm="confirmValueCheck = $event"
-        @update:isDialogVisible="(val) => isDialogVisibleConfirmDialog.value = val"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
       />
     </div>
   </section>
