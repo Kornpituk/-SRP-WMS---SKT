@@ -148,7 +148,7 @@ async function submit(e) {
   let isValid = true
   for (var i of ipaItems) {
     for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1" || (i.result.type, f.value) == ""){     
         isValid = false
       }
     }
@@ -331,7 +331,7 @@ watchEffect(async () => {
               style="max-width: 400px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                {{ section.practice }}
+                <div v-html="section.practice" />
               </VLabel>
             </td>
             <td
@@ -373,7 +373,7 @@ watchEffect(async () => {
                       density="compact"
                       variant="solo"
                       text-start="(A)"
-                      text-end="Kg."
+                      text-end="Kg. = "
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -407,7 +407,7 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start="(C)"
-                      text-end="mm."
+                      text-end="mm. = "
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -1002,7 +1002,7 @@ watchEffect(async () => {
         class="mx-1"
         @click="saveDraft"
       >
-        Draft
+        Save Draft
       </VBtn>
       <VBtn
         v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"

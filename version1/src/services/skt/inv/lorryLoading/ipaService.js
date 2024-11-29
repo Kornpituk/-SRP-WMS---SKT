@@ -59,7 +59,7 @@ export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryP
 export function currencyFormat(number) {
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(number)
 }
@@ -131,7 +131,7 @@ export const ipaItemTemplate = [
   {
     "isSection": true,
     "rowSpan": 6,
-    "sequence": "<strong>ข้อควรระวัง</strong>",
+    "sequence": "<strong><u>ข้อควรระวัง</u></strong>",
     "practice": "หากมีงาน Hot work or Fire work ใกล้เคียง ให้แจ้งหัวหน้างานให้หยุดชั่วคราว",
     "condition": "",
     "result": {
@@ -146,7 +146,7 @@ export const ipaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "ให้ปิดโทรศัพท์ขณะ loading Solvent",
+    "practice": "ให้<u>ปิด</u>โทรศัพท์ขณะ loading Solvent",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -161,7 +161,7 @@ export const ipaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "หากมี Solvent หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ ห้ามใช้น้ำล้าง",
+    "practice": "หากมี Solvent หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ <strong>ห้ามใช้น้ำล้าง</strong>",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -223,7 +223,7 @@ export const ipaItemTemplate = [
   {
     "isSection": true,
     "rowSpan": 5,
-    "sequence": "<strong>Document Check</strong>",
+    "sequence": "Document Check",
     "practice": "1. จำนวนที่ระบุ ในใบส่งสินค้า",
     "condition": "ตามเอกสารใบส่ง",
     "result": {
@@ -628,8 +628,8 @@ export const ipaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "3. เปิดวาล์วจาก Lorry No.14",
-    "condition": "Open (เปิด)",
+    "practice": "3. เปิดวาล์วจาก Lorry ",
+    "condition": "No.14 Open (เปิด)",
     "result": {
       "type": "oknot",
       "field": [

@@ -5,7 +5,7 @@ import axios from '@axios'
 export function currencyFormat(number) {
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(number)
 }
@@ -13,7 +13,7 @@ export function currencyFormat(number) {
 export function passInitialData(type, params, index) {
   if (type == "oknot" ) {
     return params.toString()
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp' || type=='ab'){
     if(index == 0){
       return params
     }else{
@@ -167,7 +167,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": " Checkอุณหภูมิ ในlorry tank ",
-    "condition": "ต้องไม่เกิน 25 C'",
+    "condition": "ต้องไม่เกิน 25 C°",
     "result": {
       "type": "c2",
       "field": [

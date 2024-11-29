@@ -143,7 +143,7 @@ async function submit(e) {
   let isValid = true
   for (var i of lorryItem) {
     for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1" || (i.result.type, f.value) == ""){     
         isValid = false
       }
     }
@@ -188,7 +188,9 @@ async function approve(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.approve, true)
-    location.reload()
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
@@ -974,7 +976,7 @@ function formatDate(dateString) {
         class="mx-1"
         @click="saveDraft"
       >
-        Draft
+        Save Draft
       </VBtn>
       <VBtn
         v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
