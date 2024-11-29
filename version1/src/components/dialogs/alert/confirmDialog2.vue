@@ -1,0 +1,77 @@
+<script setup>
+import { ref } from 'vue'
+
+const props = defineProps({
+  message: {
+    type: String,
+    default: 'Are you sure you want to proceed?',
+  },
+})
+
+const emit = defineEmits(['confirm', 'cancel'])
+const dialog = ref(false)
+
+function openDialog() {
+  dialog.value = true
+}
+
+function confirm() {
+  emit('confirm')
+  dialog.value = false
+}
+
+function cancel() {
+  emit('cancel')
+  dialog.value = false
+}
+
+// ใช้ defineExpose เพื่อเปิดเผยฟังก์ชัน openDialog
+defineExpose({
+  openDialog,
+})
+</script>
+
+<template>
+  <VDialog
+    v-model="dialog"
+    max-width="500"
+  >
+    <VCard>
+      <VCardText>
+        <div class="d-flex justify-center">
+          <VIcon
+            size="100"
+            color="warning"
+            icon="ri-question-line"
+          />
+        </div>
+        <div class="text-center">
+          <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ props.message }}
+            Transaction?</span>
+        </div>
+      </VCardText>
+      <VCardActions class="d-flex justify-space-between">
+        <VBtn
+          color="red"
+          variant="flat"
+          @click="cancel"
+        >
+          Cancel
+        </VBtn>
+        <VBtn
+          color="green"
+          variant="flat"
+          @click="confirm"
+        >
+          Confirm
+        </VBtn>
+      </VCardActions>
+    </VCard>
+  </VDialog>
+</template>
+
+<style scoped>
+.v-card-actions {
+  justify-content: flex-end;
+}
+</style>

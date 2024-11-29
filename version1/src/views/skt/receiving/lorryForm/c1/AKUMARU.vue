@@ -143,7 +143,7 @@ async function submit(e) {
   let isValid = true
   for (var i of lorryItem) {
     for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1" || (i.result.type, f.value) == ""){     
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
         isValid = false
       }
     }
@@ -154,7 +154,6 @@ async function submit(e) {
     
     return
   }
-
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
@@ -976,7 +975,7 @@ function formatDate(dateString) {
         class="mx-1"
         @click="saveDraft"
       >
-        Save Draft
+        SAVE Draft
       </VBtn>
       <VBtn
         v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"

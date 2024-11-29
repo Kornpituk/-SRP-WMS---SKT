@@ -12,7 +12,6 @@ import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
-import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
 
 
@@ -69,12 +68,8 @@ onMounted(async () => {
   poNo.value = lorryFormIPA.data.data.purchaseOrderNo
 
   for (var i of kumaruItems) {
-    let index = 0
     for (var f of i.result.field) {
-      if(f.name == "l0606150101")
-        debugger
-      f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name], index)
-      index ++
+      f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
     }
   }
 
@@ -87,7 +82,6 @@ onMounted(async () => {
   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
-
 
 })
 
@@ -134,7 +128,7 @@ async function submit(e) {
   let isValid = true
   for (var i of kumaruItems) {
     for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1" || (i.result.type, f.value) == ""){     
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
         isValid = false
       }
     }
@@ -188,8 +182,8 @@ async function approve(e) {
 
 
 watchEffect(async () => {
-  kumaruItems[8].result.field[0].value = currencyFormat(kumaruItems[6].result.field[0].value + kumaruItems[7].result.field[0].value )
-  kumaruItems[49].result.field[0].value = currencyFormat(kumaruItems[48].result.field[0].value - kumaruItems[7].result.field[0].value)
+  kumaruItems[8].result.field[0].value = kumaruItems[6].result.field[0].value + kumaruItems[7].result.field[0].value 
+  kumaruItems[49].result.field[0].value = kumaruItems[48].result.field[0].value - kumaruItems[7].result.field[0].value
 })
 </script>
 
@@ -358,7 +352,7 @@ watchEffect(async () => {
                       density="compact"
                       variant="outlined"
                       label=""
-                      text-start="(A) + (B) ="
+                      text-start="A) + (B) ="
                       text-end="Kg"
                       :readonly="isReadOnly"
                     />
@@ -368,7 +362,6 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
-                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -414,30 +407,6 @@ watchEffect(async () => {
                   </VCol>
                 </vrow>
               </div>
-              <div v-if="section.result.type === 'cb'">
-                <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
-                <VRow>
-                  <VCol>
-                    <VTextField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="solo"
-                      readonly="true"
-                    >
-                      <template #prepend>
-                        <VLabel>
-                          ( C )-( B )
-                        </VLabel>
-                      </template>
-                      <template #append>
-                        <VLabel>
-                          kg
-                        </VLabel>
-                      </template>
-                    </VTextField> 
-                  </VCol>
-                </vrow>
-              </div>
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
@@ -460,6 +429,22 @@ watchEffect(async () => {
                     />
                   </VCol>
                 </VRow>
+              </div>
+              <div v-if="section.result.type === 'cb'">
+                <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
+                <VRow>
+                  <VCol>
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="( C )-( B )"
+                      text-end="kg"
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+                </vrow>
               </div>
             </td>
           </tr>
@@ -534,7 +519,7 @@ watchEffect(async () => {
         class="mx-1"
         @click="saveDraft"
       >
-        Save Draft
+        SAVE Draft
       </VBtn>
       <VBtn
         v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"

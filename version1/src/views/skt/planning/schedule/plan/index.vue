@@ -73,22 +73,25 @@ const formatDate = date => {
 
 const formatDateYMDWhyQ = date => {
   // ตรวจสอบรูปแบบวันที่เป็น YYYY-MM-DDTHH:mm:ss
+
   const isoDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
   if (isoDatePattern.test(date)) {
     return date // คืนค่าถ้าอยู่ในรูปแบบ ISO 8601
-  }
-
-  // ตรวจสอบว่ามี "/" เป็นตัวแบ่งและแปลง
-  if (date.includes('/')) {
+  }else if(date.includes('/')){
     const [day, month, year] = date.split('/')
     
     return `${year}-${month}-${day}`
+  }else if(date === null){
+    date = new Date().toISOString()
+    console.log("Data null", date)
+    
+    return date
   }
 
   // คืนค่าว่างหรือข้อความแสดงข้อผิดพลาด หากไม่อยู่ในรูปแบบที่รองรับ
   console.warn('Invalid date format:', date)
   
-  return ''
+  return 'null'
 }
 
 const RoleAccount = ref('User')
@@ -438,8 +441,15 @@ watchEffect(async () => {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await fetchGetProductionplan(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
 
-    // อัปเดต productionPlan.value หลังจากได้ผลลัพธ์
-    productionPlan.value = (getProductionplanResult.value.data)
+    // จัดรูปแบบข้อมูลก่อนเก็บลง productionPlan.value
+    const formattedData = getProductionplanResult.value.data.map(item => ({
+      ...item, // คัดลอกข้อมูลเดิมทั้งหมด
+      inputDate: formatDateDMY(item.inputDate), // จัดรูปแบบ producingDate
+      producingDate: formatDateDMY(item.producingDate), // จัดรูปแบบ producingDate
+    }))
+
+    // อัปเดต productionPlan.value หลังจากจัดรูปแบบ
+    productionPlan.value = formattedData
 
     // แสดงค่าใน console
     console.log("productionPlan", productionPlan.value)
@@ -448,6 +458,21 @@ watchEffect(async () => {
     console.error("Error fetching production plan:", error)
   }
 })
+
+// ฟังก์ชันจัดรูปแบบวันที่
+const formatDateDMY = date => {
+  if (!date) return null // ถ้าไม่มีวันที่ให้คืนค่า null
+
+  const isoDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
+  if (isoDatePattern.test(date)) {
+    const [year, month, day] = date.split('T')[0].split('-') // แยกปี เดือน วัน
+    
+    return `${day}/${month}/${year}` // คืนค่าในรูปแบบ dd/mm/yyyy
+  }
+
+  // คืนค่าที่ไม่ได้ถูกแปลง
+  return date
+}
 
 //------------------------------ func Save add data production plan service --------------------------------
 const indexSelectBoxFilter = ref(null)
@@ -463,7 +488,7 @@ const addSelectProdutionCode = index => {
   productionPlan.value[index].productionCode = selectedProductionCode.value || null
   productionPlan.value[index].productionName = selectedProductionName.value || null
   productionPlan.value[index].reactorName = selectedProductionReactorName.value || null
-  productionPlan.value[index].batchID = selectedProductionbatchScaleKgs.value || null
+  productionPlan.value[index].quantityKgs = selectedProductionbatchScaleKgs.value || null
   productionPlan.value[index].plantName = selectedProductionPlanName.value || null
     
   productionPlan.value[index].product1SelectedCode = selectedItemCode.value || null
@@ -505,13 +530,21 @@ const { responseSaveProductionPlan, errorMessageSaveProductionPlan, saveProdutci
 
 const saveProductionPlan = async () => {
   console.log("saveProductionPlan staret")
+
+  // ตรวจสอบฟิลด์ inputDate และ producingDate
+  productionPlan.value = productionPlan.value.map(item => ({
+    ...item,
+    inputDate: item.inputDate || new Date().toISOString(),
+    producingDate: item.producingDate || new Date().toISOString(),
+  }))
+
+  console.log("saveProductionPlan staret in 2", productionPlan.value.producingDate)
   try {
-    console.log("saveProductionPlan staret in")
+    console.log("saveProductionPlan staret in", productionPlan.value)
 
     const filteredData = productionPlan.value.map(item => ({
       planningID: item.planningID,
       inputDate: formatDateYMDWhyQ(item.inputDate),
-      productionCode: item.productionCode,
 
       product1SelectedCode: item.product1SelectedCode,
       product1SelectedPackagingCode: item.product1SelectedPackagingCode,
@@ -535,7 +568,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")
@@ -545,7 +578,7 @@ const saveProductionPlan = async () => {
     }else{
       textAlertDialogFunction(alertWordConst.saveDraft, false)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }
 
@@ -553,7 +586,7 @@ const saveProductionPlan = async () => {
     // จัดการข้อผิดพลาด
     textAlertDialogFunction(alertWordConst.saveDraft, false)
     setTimeout(() => {
-      location.reload()
+      // location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
     console.error("Error saving production plan:", error)
   }
@@ -645,34 +678,69 @@ const deletePlan = async () => {
 //------------------------- submit plan
 const { responseSubmitProductionPlan, errorMessageSubmitProductionPlan, submitProdutcionPlanFunc } = useSubmitProductionPlanService()
 
+const isFieldMissing = (item, field) => {
+  return item[field] === null || item[field] === undefined || item[field] === ""
+}
+
 const submitPlan = async () => {
+  const requiredFields = [
+    "inputDate",
+    "productionCode",
+    "product1SelectedCode",
+    "product1Name",
+    "product1SelectedPackagingCode",
+    "product1PackingQtyKgs",
+    "product1UomCount",
 
-  // console.log("selectedDataTables", selectedDataTables.value)
+    "lotNumber",
+    "planningID",
+    "producingDate",
+    "remark",
+  ]
 
-  const body = selectedDataTables.value.map(item => item.planningID)
-
-  try {
-  // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await submitProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
-    if(responseSubmitProductionPlan.value){
-      textAlertDialogFunction(alertWordConst.submit, true)
-      setTimeout(() => {
-        location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
-    }else{
-      textAlertDialogFunction(alertWordConst.submit, false)
-      setTimeout(() => {
-        location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+  // ตรวจสอบฟิลด์ที่ไม่มีค่า
+  let hasErrors = false
+  selectedDataTables.value.forEach(item => {
+  // กำหนดค่าเริ่มต้น
+    if (!item.missingFields) {
+      item.missingFields = []
     }
+
+    requiredFields.forEach(field => {
+      if (isFieldMissing(item, field)) {
+        item.missingFields.push(field)
+        hasErrors = true // หากพบฟิลด์ที่ไม่มีค่า
+      }
+    })
+  })
+
+  // ถ้ามีฟิลด์ที่ไม่มีค่า ให้หยุดและแจ้งเตือน
+  if (hasErrors) {
+    console.warn("Some fields are missing:", selectedDataTables.value)
+    textAlertDialogFunction(alertWordConst.submit, fale)
     
-  } catch (error) {
-  // จัดการข้อผิดพลาด
-    
-    console.error("Error submited production plan:", error)
+    return // หยุดการทำงานถ้าข้อมูลไม่ครบ
   }
 
-  console.log("body selectedDataTables", body)
+  // ดำเนินการเรียก API ถ้าข้อมูลครบถ้วน
+  try {
+    const body = selectedDataTables.value.map(item => item.planningID)
+
+    await submitProdutcionPlanFunc(
+      body,
+      urlApi.value,
+      "ProductionPlan",
+      whereHouse,
+      accessTokenAtStore,
+    )
+    textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      location.reload()
+    }, 500)
+  } catch (error) {
+    console.error("Error submitting production plan:", error)
+    textAlertDialogFunction(alertWordConst.submit, false)
+  }
 }
 
 //------------------------- approve plan
@@ -690,12 +758,12 @@ const approvePlan = async () => {
     if(responseApproveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.submit, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }else{
       textAlertDialogFunction(alertWordConst.approve, false)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }
   } catch (error) {
@@ -1414,13 +1482,14 @@ const print = () => {
                         v-if="item.raw.productionCode === selectedProductionCode"
                         color="info"
                         variant="tonal"
-                        
+                        :disabled="btnSelectitem2"
                         @click="selectPlan(item.raw, index)"
                       >
                         Select
                       </VBtn>
                       <VBtn
                         v-if="item.raw.productionCode !== selectedProductionCode"
+                        :disabled="btnSelectitem2"
                         color="info"
                         variant="flat"
                         @click="selectPlan(item.raw, index)"
@@ -1585,7 +1654,10 @@ const print = () => {
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
                     >
-                      <span class="text-end" style="font-size: 12px;">{{ formatNumber(item.raw.packingQtyKgs) }}</span>
+                      <span
+                        class="text-end"
+                        style="font-size: 12px;"
+                      >{{ formatNumber(item.raw.packingQtyKgs) }}</span>
                     </td>
                     <td
                       :style="{
@@ -1669,6 +1741,14 @@ const print = () => {
         </VBtn>
 
         <VBtn
+          color="info"
+          class="mx-2"
+          disabled
+        >
+          <span style="font-size: 12px;">Gen Lot</span>
+        </VBtn>
+
+        <VBtn
           v-if="false"
           color="error"
           class="mx-2"
@@ -1723,6 +1803,9 @@ const print = () => {
     <VCard>
       <VCardText><span style="font-weight: bolder;">BatchID: </span>{{ batchId }}</VCardText>
       <VCardText>
+        <VBtn v-if="false" @click="showSelectBox">
+          ShowSelect
+        </VBtn>
         <VDataTable
           v-if="productionPlan"
           v-model="selectedDataTables"
@@ -1759,7 +1842,7 @@ const print = () => {
               <td>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</td>
               <td style="min-width: 150px;">
                 <AppDateTimePicker
-                  v-if="item.raw.statusId === 101"
+                  v-if="false"
                   v-model="item.raw.inputDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -1769,19 +1852,9 @@ const print = () => {
                     <span>Input Data</span>
                   </template>
                 </AppDateTimePicker>
-                <span v-else>{{ formatDate(item.raw.inputDate) }}</span>
+                <span>{{ (item.raw.inputDate) }}</span>
               </td>
               <td>
-                <VCombobox
-                  v-if="false"
-                  v-model="item.raw.productionCode"
-                  :items="dataMockProductionCode"
-                  placeholder="deployment"
-                  density="compact"
-                  label="Plants Code"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                />
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -1793,30 +1866,31 @@ const print = () => {
                   </template>
                 </VBtn>
                 <span v-else>{{ (item.raw.productionCode) }}</span>
+
+                <!-- ตรวจสอบว่ามี missingFields ก่อนเรียก includes -->
+                <div
+                  v-if="item.raw.missingFields"
+                  class="error-message"
+                >
+                  <span
+                    v-if="item.raw.missingFields.includes('productionCode') && !item.raw.productionCode"
+                    class="text-red"
+                  >Missing Input Production Code</span>
+                </div>
               </td>
-              <td>{{ item.raw.reactorName }}</td>
+              <td>
+                {{ item.raw.reactorName }}
+              </td>
               <td>
                 {{ item.raw.productionName }}
               </td>
               <td
-                class="px-1"
+                class="px-8 text-end"
                 style="min-width: 150px;"
               >
-                batchScaleKgs
+                {{ formatNumber(item.raw.quantityKgs) }}
               </td>
               <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-if="false"
-                  v-model="item.raw.product1SelectedCode"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 1</span>
-                  </template>
-                </VCombobox>
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -1828,23 +1902,21 @@ const print = () => {
                   </template>
                 </VBtn>
                 <span v-else>{{ (item.raw.product1SelectedCode) }}</span>
+                <!-- ตรวจสอบว่ามี missingFields ก่อนเรียก includes -->
+                <div
+                  v-if="item.raw.missingFields"
+                  class="error-message"
+                >
+                  <span
+                    v-if="item.raw.missingFields.includes('product1SelectedCode') && !item.raw.product1SelectedCode"
+                    class="text-red"
+                  >Missing Input Item Code 1</span>
+                </div>
               </td>
               <td class="bg-light-blue-lighten-5">
                 {{ item.raw.product1Name }}
               </td>
               <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-if="false"
-                  v-model="item.raw.product1SelectedPackagingCode"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type</span>
-                  </template>
-                </VCombobox>
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -1856,8 +1928,18 @@ const print = () => {
                   </template>
                 </VBtn>
                 <span v-else>{{ (item.raw.product1SelectedPackagingCode) }}</span>
+                <!-- ตรวจสอบว่ามี missingFields ก่อนเรียก includes -->
+                <div
+                  v-if="item.raw.missingFields"
+                  class="error-message"
+                >
+                  <span
+                    v-if="item.raw.missingFields.includes('product1SelectedPackagingCode') && !item.raw.product1SelectedPackagingCode"
+                    class="text-red"
+                  >Missing Input Packaging 1</span>
+                </div>
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td class="bg-light-blue-lighten-5 text-end px-8">
                 {{ formatNumber(item.raw.product1PackingQtyKgs) }}
               </td>
               <td class="bg-light-blue-lighten-5 text-end">
@@ -1877,27 +1959,25 @@ const print = () => {
                   v-else
                   class="px-6"
                 >{{ (item.raw.product1UomCount) }}</span>
+                <!-- ตรวจสอบว่ามี missingFields ก่อนเรียก includes -->
+                <div
+                  v-if="item.raw.missingFields"
+                  class="error-message"
+                >
+                  <span
+                    v-if="item.raw.missingFields.includes('product1UomCount') && !item.raw.product1UomCount"
+                    class="text-red"
+                  >Missing Input Packaging Pcs 1</span>
+                </div>
               </td>
 
               <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-if="false"
-                  v-model="item.raw.product2SelectedCode"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 2</span>
-                  </template>
-                </VCombobox>
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
                   @click="selectFilterProduction(index)"
                 >
-                  <span v-if="item.raw.product2SelectedCode">{{ item.raw.product2SelectedCode }}</span><span v-else>Select Production</span>
+                  <span v-if="item.raw.product2SelectedCode">{{ item.raw.product2SelectedCode }}</span><span v-else>Select Item</span>
                   <template #append>
                     <VIcon icon="ri-arrow-down-s-fill" />
                   </template>
@@ -1908,18 +1988,6 @@ const print = () => {
                 {{ item.raw.product2Name }}
               </td>
               <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-if="false"
-                  v-model="item.raw.product2SelectedPackagingCode"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type 2</span>
-                  </template>
-                </VCombobox>
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -1932,7 +2000,7 @@ const print = () => {
                 </VBtn>
                 <span v-else>{{ (item.raw.product2SelectedPackagingCode) }}</span>
               </td>
-              <td class="bg-red-lighten-5">
+              <td class="bg-red-lighten-5 text-end px-8">
                 {{ formatNumber(item.raw.product2PackingQtyKgs) }}
               </td>
               <td class="bg-red-lighten-5 text-end">
@@ -1945,7 +2013,7 @@ const print = () => {
                   :readonly="item.raw.status === 'Submit'"
                 >
                   <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 1</span>
+                    <span style="font-size: 12px;">Packaging Pcs 2</span>
                   </template>
                 </VTextField>
                 <span
@@ -1969,6 +2037,16 @@ const print = () => {
                   v-else
                   class="px-4"
                 >{{ (item.raw.lotNumber) }}</span>
+                <!-- ตรวจสอบว่ามี missingFields ก่อนเรียก includes -->
+                <div
+                  v-if="item.raw.missingFields"
+                  class="error-message"
+                >
+                  <span
+                    v-if="item.raw.missingFields.includes('lotNumber') && !item.raw.lotNumber"
+                    class="text-red"
+                  >Missing Input lotNumber</span>
+                </div>
               </td>
               <td
                 class="px-1"
@@ -1986,7 +2064,17 @@ const print = () => {
                 <span
                   v-else
                   class="px-4"
-                >{{ formatDate(item.raw.producingDate) }}</span>
+                >{{ (item.raw.producingDate) }}</span>
+                <!-- ตรวจสอบว่ามี missingFields ก่อนเรียก includes -->
+                <div
+                  v-if="item.raw.missingFields"
+                  class="error-message"
+                >
+                  <span
+                    v-if="item.raw.missingFields.includes('producingDate') && !item.raw.producingDate"
+                    class="text-red"
+                  >Missing Input Producing Date</span>
+                </div>
               </td>
               <td
                 class="px-4"
@@ -2011,114 +2099,22 @@ const print = () => {
                   </template>
                 </VTextarea>
                 <span v-else>{{ (item.raw.remark) }}</span>
-              </td>
-              <td>
-                {{ item.raw.statusDate }}
-              </td>
-              <td>
-                {{ item.raw.byWho }}
-              </td>
-              <td v-if="false"> 
-                <div class="d-flex justify-center">
-                  <VMenu transition="scale-transition">
-                    <template #activator="{ props }">
-                      <VIcon
-                        v-bind="props"
-                        icon="ri-more-2-fill"
-                      />
-                    </template>
-                    <VList>
-                      <VListItem
-                        v-for="(itemAction, index) in itemsActionDataTable"
-                        :key="index"
-                        @click="handleAction(itemAction.value)"
-                      >
-                        {{ itemAction.title }}
-                        <template #prepend>
-                          <VIcon :icon="itemAction.icon" />
-                        </template>
-                      </VListItem>
-                    </VList>
-                  </VMenu>
-                </div>
-                <div v-if="false">
-                  <VBtn
-                    color="warning"
-                    @click="changeStatusProductPlanSaveDraft(index)"
-                  >
-                    Save Draft
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount === 'Manager'"
-                    color="red"
-                    class="mx-2"
-                    @click="rejectProduction(index)"
-                  >
-                    Reject
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount !== 'Manager'"
-                    color="red"
-                    class="mx-2"
-                    @click="cancelProduct(index)"
-                  >
-                    Cancel
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount !== 'Manager'"
-                    class="mx-2"
-                    color="green"
-                    @click="changeStatusProductPlanSubmit(index)"
-                  >
-                    Submit
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount === 'Manager'"
-                    class="mx-2"
-                    color="green"
-                    @click="changeStatusProductPlanSubmit(index)"
-                  >
-                    Approve
-                  </VBtn>
-                  <VBtn
-                    color="warning"
-                    prepend-icon="ri-printer-fill"
-                  >
-                    {{ $t('Print') }}
-                  </VBtn>
+                <!-- ตรวจสอบว่ามี missingFields ก่อนเรียก includes -->
+                <div
+                  v-if="item.raw.missingFields"
+                  class="error-message"
+                >
+                  <span
+                    v-if="item.raw.missingFields.includes('remark') && !item.raw.remark"
+                    class="text-red"
+                  >Missing Input Remark</span>
                 </div>
               </td>
-              <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'"> 
-                <VBtn
-                  color="grey"
-                  disabled
-                  @click="changeStatusProductPlanSaveDraft(index)"
-                >
-                  Save Draft
-                </VBtn>
-                <VBtn
-                  color="grey"
-                  disabled
-                  class="mx-2"
-                  @click="cancelProduct(index)"
-                >
-                  Cancel
-                </VBtn>
-                <VBtn
-                  class="mx-2"
-                  color="grey"
-                  disabled
-                  @click="changeStatusProductPlanSubmit(index)"
-                >
-                  Submit
-                </VBtn>
-              
-                <VBtn
-                  color="warning"
-                  prepend-icon="ri-printer-fill"
-                >
-                  {{ $t('Print') }}
-                </VBtn>
+              <td>
+                {{ formatDate(item.raw.updatedDate) }}
+              </td>
+              <td>
+                {{ item.raw.updatedBy }}
               </td>
             </tr>
           </template>

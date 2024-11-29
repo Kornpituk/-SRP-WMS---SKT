@@ -249,6 +249,10 @@ export default [
     title: 'Print Label',
     icon: { icon: 'ri-printer-fill' },
     to: 'skt-printLabel',
+    children: [
+      { title: 'Sticker', to: 'skt-printLabel-productionLabel' },
+      { title: 'Product Label', to: 'skt-printLabel-sticker' },
+    ],
   },
 ]
   
