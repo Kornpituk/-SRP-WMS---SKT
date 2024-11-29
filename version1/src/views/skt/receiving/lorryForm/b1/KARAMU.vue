@@ -83,7 +83,6 @@ onMounted(async () => {
     isReadOnly.value = true
   }
 
-
 })
 
 async function saveDraft(e) {

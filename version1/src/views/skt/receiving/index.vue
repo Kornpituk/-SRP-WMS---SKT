@@ -1304,6 +1304,8 @@ const disabledBtnLebal = () => {
   return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16, 12, 13, 14].includes(idStatusDialogAction.value)
 }
 
+const disabledTypeReceiving = ref(itemStore.getItemDetails('typeLorryInfoId'))
+
 const getPrintLabelView = async lot => {
   // console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/PrintLabel/Label?lot=${lot}`, {
@@ -3247,6 +3249,7 @@ const insetSwitch1 = ref('')
                 class="mt-4"
               >
                 <VBtn
+                  v-if="!disabledTypeReceiving"
                   style="width: 100%;"
                   :disabled="checkPersistent"
                   @click="btnPrintLabel"
