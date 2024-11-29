@@ -1512,7 +1512,7 @@ const disabledCheckboxListPk = () => {
 }
 
 const disabledCheckboxListLorry = () => {
-  return [0, 1, 2, 3, 4, 5, 10, 11, 13, 14].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14].includes(idStatusDialogAction.value)
 }
 
 const checkTypeLorryToPrintPDF = () => {
