@@ -1,7 +1,7 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import { telaItemTemplate } from '@/services/skt/inv/lorryLoading/telaService'
+import { eki432ItemTemplate } from '@/services/skt/inv/lorryLoading/eki432Service'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import axios from '@axios'
@@ -14,7 +14,7 @@ import alertWordConst from '@/utilities/constant'
 
 const itemStore = useItemStore()
 
-var lorryItem = reactive(telaItemTemplate)
+var lorryItem = reactive(eki432ItemTemplate)
 var lorryRequestData = ref({})
 const route = useRoute()
 
@@ -67,7 +67,7 @@ onMounted(async () => {
   //     Authorization: `Bearer ${accessTokenAtStore}`,
   //   },
   // })
-  console.log(telaItemTemplate)
+  console.log(eki432ItemTemplate)
   lorryRequestData.value = akumaruRequestData //lorryFormIPA.data.data
   // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
   for (var i of lorryItem) {
@@ -209,6 +209,8 @@ watchEffect(async () => {
   // lorryItem[8].result.field[0].value = (parseFloat(lorryItem[6].result.field[1].value) + parseFloat(lorryItem[7].result.field[1].value)).toFixed(2)
   // lorryItem[49].result.field[0].value = (parseFloat(lorryItem[8].result.field[0].value) - parseFloat(lorryItem[46].result.field[1].value)).toFixed(2)
   // lorryItem[49].result.field[1].value = (parseFloat(lorryItem[49].result.field[0].value) * 0.78).toFixed(2)
+  lorryItem[2].result.field[0].value = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value // A+B
+  lorryItem[35].result.field[0].value = lorryItem[2].result.field[0].value - lorryItem[34].result.field[0].value // C-D
 })
 
 
@@ -417,6 +419,46 @@ function formatDate(dateString) {
               colspan="4"
               style="min-width: 450px; border-left: 1px solid black;"
             >
+              <div v-if="section.result.type === 'c'">
+                <VRow>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel />
+                      </template>
+                    </VTextField>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'cd'">
+                <VRow>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VTextField>
+                  </VCol>
+                </VRow>
+              </div>
               <div v-if="section.result.type === 'oknot'">
                 <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
                 <VRadioGroup
@@ -453,211 +495,6 @@ function formatDate(dateString) {
                   />
                 </VRadioGroup>
               </div>
-              <div v-if="section.result.type === 'straight'">
-                <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
-                <VRadioGroup
-                  v-model="section.result.field[0].value"
-                  inline
-                  class="d-flex justify-center"
-                  :fieldname="section.result.field[0].name"
-                >
-                  <VRadio
-                    label="ตรง"
-                    value="1"
-                  />
-                  <VRadio
-                    label="ไม่ตรง"
-                    value="0"
-                  />
-                </VRadioGroup>
-              </div>
-              <div v-if="section.result.type === 'soldout'">
-                <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
-                <VRadioGroup
-                  v-model="section.result.field[0].value"
-                  inline
-                  class="d-flex justify-center"
-                  :fieldname="section.result.field[0].name"
-                >
-                  <VRadio
-                    label="หมด"
-                    value="1"
-                  />
-                  <VRadio
-                    label="ไม่หมด"
-                    value="0"
-                  />
-                </VRadioGroup>
-              </div>
-              <div v-if="section.result.type === 'ab'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="(A)"
-                      text-end="Kg."
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="Litre"
-                      text-end="(B)"
-                      readonly="true"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'cd'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(C)"
-                      text-end="mm."
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="(D)"
-                      text-end="mm."
-                      readonly="true"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'bd'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="solo"
-                      text-start=" (B) + (D) ="
-                      text-end="Litre"
-                      readonly="true"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'litre'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Litre"
-                      readonly="true"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'percen'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="%"
-                      readonly="true"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'c'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="C°"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
@@ -677,136 +514,6 @@ function formatDate(dateString) {
                       density="compact"
                       variant="outlined"
                       label=""
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'mpa'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="( Mpa )'"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
-              <!--
-                <div v-if="section.result.type === 'amp'">
-                <VRow>
-                <VCol>
-                <VCurrencyField
-                v-model="section.result.field[0].value"
-                density="compact"
-                variant="outlined"
-                label=""
-                text-start=""
-                text-end="Amp'"
-                />
-                </VCol>
-
-                <VCol>
-                <VRadioGroup
-                v-model="section.result.field[1].value"
-                inline
-                class="d-flex justify-center"
-                >
-                <VRadio
-                label="Ok"
-                value="1"
-                />
-                <VRadio
-                label="Not"
-                value="0"
-                />
-                </VRadioGroup>
-                </VCol>
-                </VRow>
-                </div> 
-              -->
-              <div v-if="section.result.type === 'ef'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(E)"
-                      text-end="mm.'"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(F)"
-                      text-end="Litre'"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'g'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(G)"
-                      text-end="Litre'"
-                      type="number"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'kgA'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="LTR"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'kgB'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="Kg.( B )"
                     />
                   </VCol>
                 </VRow>
@@ -849,20 +556,6 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Amp"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'c2'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="C°"
                     />
                   </VCol>
                 </VRow>

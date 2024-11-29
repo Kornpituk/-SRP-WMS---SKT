@@ -1,7 +1,7 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import { hakuItemTemplate } from '@/services/skt/inv/lorryLoading/hakuService'
+import { sannixItemTemplate } from '@/services/skt/inv/lorryLoading/sannixService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import axios from '@axios'
@@ -14,7 +14,7 @@ import alertWordConst from '@/utilities/constant'
 
 const itemStore = useItemStore()
 
-var lorryItem = reactive(hakuItemTemplate)
+var lorryItem = reactive(sannixItemTemplate)
 var lorryRequestData = ref({})
 const route = useRoute()
 
@@ -67,7 +67,7 @@ onMounted(async () => {
   //     Authorization: `Bearer ${accessTokenAtStore}`,
   //   },
   // })
-  console.log(hakuItemTemplate)
+  console.log(sannixItemTemplate)
   lorryRequestData.value = akumaruRequestData //lorryFormIPA.data.data
   // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
   for (var i of lorryItem) {

@@ -1,6 +1,6 @@
 
 
-export const sannixRequestData = {
+export const eki432RequestData = {
   "RmLorryLoadingFormJournalId": 0,
   "ProductId": "",
   "ProductName": "",
@@ -12,34 +12,75 @@ export const sannixRequestData = {
   "WHLeaderDate": null,
   "WHSupervisor": "",
   "WHSupervisorDate": null,
+
 }
 
-export const sannixItemTemplate = [
+export const eki432ItemTemplate = [
   // 1.check ใบส่งสินค้า  
   {
     "isSection": true,
-    "rowSpan": 1,
+    "rowSpan": 4,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": {
-      "startPracticeText": "จำนวนที่ระบุ ในใบส่งสินค้า    ",
-      "endPracticeText": "",
-      "type": "checkbox",
-      "field": [
-        {
-          "name": "l160101",
-          "value:": "",
-        },
-      ],
-    },
-    "condition": "ทำ",
+    "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า    ",
+    "condition": "",
     "result": {
       "type": "kg",
       "field": [
         {
-          "name": "l1601010101",
+          "name": "l1301010101",
           "value:": "",
         },
       ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "( B ) จำนวนที่คิดได้จาก Level",
+      "endPracticeText": "mm.",
+      "type": "d",
+      "field": [
+        {
+          "name": "l130102",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "ต้องไม่เกิน 2,015 mm.",
+    "result": {
+      "type": "kg",
+      "field": [
+        {
+          "name": "l1301020101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": "( C ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
+    "condition": "ต้องไม่เกิน 45,000 Kg.",
+    "result": {
+      "type": "c",
+      "field": [
+        {
+          "name": "l1301030101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": "หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที",
+    "condition": "",
+    "result": {
+      "type": "",
+      "field": [],
     },
   },
 
@@ -48,13 +89,13 @@ export const sannixItemTemplate = [
     "isSection": true,
     "rowSpan": 1,
     "sequence": "<strong>2.Seal No. check</strong>",
-    "practice": "Check No.ตู้ ตรงกับใบส่งหรือไม่",
+    "practice": "Check Seal No.ที่ล็อกวาล์วและฝาถังว่าตรงกับใบส่งหรือไม่",
     "condition": "ตรง",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1602010101",
+          "name": "l1302010101",
           "value:": "",
         },
       ],
@@ -67,55 +108,62 @@ export const sannixItemTemplate = [
     "rowSpan": 2,
     "sequence": "<strong>3.อุปกรณ์ PPE  </strong>",
     "practice": {
-      "type": "checkbox3",
+      "type": "checkbox4",
       "field": [
         {
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
-          "name": "l160301",
+          "name": "l130301",
           "value:": "",
         },
         {
           "startPracticeText": "ชุดป้องกันสารเคมี",
           "endPracticeText": "",
-          "name": "l160302",
+          "name": "l130302",
           "value:": "",
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
-          "name": "l160303",
+          "name": "l130303",
+          "value:": "",
+        },
+        {
+          "startPracticeText": "รองเท้าบูท",
+          "endPracticeText": "",
+          "name": "l130304",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "",
     "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1603010101",
-          "value:": "",
-        },
-      ],
+      "type": "",
+      "field": [],
     },
   },
   {
     "isSection": false,
     "sequence": "",
     "practice": {
-      "type": "checkbox2",
+      "type": "checkbox3",
       "field": [
         {
           "startPracticeText": "แว่นตา",
           "endPracticeText": "",
-          "name": "l160304",
+          "name": "l130305",
+          "value:": "",
+        },
+        {
+          "startPracticeText": "หน้ากาก กรองสารเคมี (สีขาว)",
+          "endPracticeText": "",
+          "name": "l130306",
           "value:": "",
         },
         {
           "startPracticeText": "เข็มขัดนิรภัย",
           "endPracticeText": "",
-          "name": "l160305",
+          "name": "l130307",
           "value:": "",
         },
       ],
@@ -130,7 +178,7 @@ export const sannixItemTemplate = [
   // 5. ขั้นตอนการปฏิบัติ
   {
     "isSection": true,
-    "rowSpan": 19,
+    "rowSpan": 16,
     "sequence": "<strong>5. ขั้นตอนการปฏิบัติ</strong>",
     "practice": {
       "startPracticeText": "หยุดรถบริเวณที่ปฏิบัติงาน และดับเครื่องยนต์ No.1",
@@ -138,17 +186,17 @@ export const sannixItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l160401",
+          "name": "l130401",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1604010101",
+          "name": "l1304010101",
           "value:": "",
         },
       ],
@@ -163,70 +211,20 @@ export const sannixItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l160402",
+          "name": "l130402",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "ใส่แล้ว",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1604020101",
+          "name": "l1304020101",
           "value:": "",
         },
       ],
-    },
-  },
-  {
-    "isSection": false,
-    "sequence": "",
-    "practice": {
-      "startPracticeText": "ประตูด้านซ้าย ติดป้ายเตือน \"ห้ามเปิดประตูตู้ 2 บาน\"",
-      "endPracticeText": "",
-      "type": "checkbox",
-      "field": [
-        {
-          "name": "l160403",
-          "value:": "",
-        },
-      ],
-    },
-    "condition": "ทำ",
-    "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1604030101",
-          "value:": "",
-        },
-      ],
-    },
-  },
-  {
-    "isSection": false,
-    "sequence": "",
-    "practice": "แล้วให้เปิดประตูบานด้านขวาบานเดียว",
-    "condition": "ทำ",
-    "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1604040101",
-          "value:": "",
-        },
-      ],
-    },
-  },
-  {
-    "isSection": false,
-    "sequence": "",
-    "practice": "( Please do not open this latch Liquid Contents may spill out)",
-    "condition": "",
-    "result": {
-      "type": "",
-      "field": [],
     },
   },
   {
@@ -238,7 +236,7 @@ export const sannixItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l160406",
+          "name": "l130403",
           "value:": "",
         },
       ],
@@ -248,7 +246,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604060101",
+          "name": "l1304030101",
           "value:": "",
         },
       ],
@@ -263,7 +261,7 @@ export const sannixItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l160407",
+          "name": "l130404",
           "value:": "",
         },
       ],
@@ -273,7 +271,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604070101",
+          "name": "l1304040101",
           "value:": "",
         },
       ],
@@ -283,12 +281,37 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ต่อสายจากรถเข้า pump 11P-143 No.6 ,7",
+      "startPracticeText": "เก็บ Sample (จาก Lorry tank บนรถ)ส่ง INSP No.4",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160408",
+          "name": "l130405",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "เรียบร้อย",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1304050101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "ต่อสายจากรถเข้า pump 11P-132 No.5",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l130406",
           "value:": "",
         },
       ],
@@ -298,7 +321,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604080101",
+          "name": "l1304060101",
           "value:": "",
         },
       ],
@@ -308,12 +331,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจดูการต่อสาย Hose มีการล็อก ข้อต่อสาย เรียบร้อย No.6,7",
+      "startPracticeText": "ตรวจดูการต่อสาย Hose มีการล็อก ข้อต่อสาย เรียบร้อย No.7,6",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160409",
+          "name": "l130407",
           "value:": "",
         },
       ],
@@ -323,32 +346,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604090101",
-          "value:": "",
-        },
-      ],
-    },
-  },
-  {
-    "isSection": false,
-    "sequence": "",
-    "practice": {
-      "startPracticeText": "นำ IBC มาวางเพื่อรับเคมี ที่ line ลง IBC,Drums",
-      "endPracticeText": "",
-      "type": "checkbox",
-      "field": [
-        {
-          "name": "l160410",
-          "value:": "",
-        },
-      ],
-    },
-    "condition": "เปิด",
-    "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1604100101",
+          "name": "l1304070101",
           "value:": "",
         },
       ],
@@ -363,7 +361,7 @@ export const sannixItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l160411",
+          "name": "l130408",
           "value:": "",
         },
       ],
@@ -373,7 +371,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604110101",
+          "name": "l1304080101",
           "value:": "",
         },
       ],
@@ -383,12 +381,37 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิดวาล์วเข้า Pump  NO.7",
+      "startPracticeText": " เปิดวาล์วเข้า Pump  No.7",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160412",
+          "name": "l130409",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "เปิด",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1304090101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่ No.5",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l130410",
           "value:": "",
         },
       ],
@@ -398,7 +421,7 @@ export const sannixItemTemplate = [
       "type": "leak",
       "field": [
         {
-          "name": "l1604120101",
+          "name": "l1304100101",
           "value:": "",
         },
       ],
@@ -408,12 +431,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่ No.6,7",
+      "startPracticeText": "Check pump ว่าพร้อมใช้งานหรือไม่ โดยเลื่อน switch ไปที่ ON  ถ้า pump ทำงานปกติให้เลื่อนกลับมาที่ AUTO  No.8  ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160413",
+          "name": "l130411",
           "value:": "",
         },
       ],
@@ -423,7 +446,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604130101",
+          "name": "l1304110101",
           "value:": "",
         },
       ],
@@ -433,12 +456,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check pump ว่าพร้อมใช้งานหรือไม่ โดยกด switch ไปที่ ON   ",
+      "startPracticeText": "เปิด Valve น้ำ CTWS หล่อ 11P-132 ประมาณ 50 % No.9",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160414",
+          "name": "l130412",
           "value:": "",
         },
       ],
@@ -448,7 +471,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604140101",
+          "name": "l1304120101",
           "value:": "",
         },
       ],
@@ -458,12 +481,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิด Valve No.10 (line circulate)",
+      "startPracticeText": "ปิด Valve ไป 11R-311  No.11",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160415",
+          "name": "l130413",
           "value:": "",
         },
       ],
@@ -473,7 +496,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604150101",
+          "name": "l1304130101",
           "value:": "",
         },
       ],
@@ -483,12 +506,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "กดswitch 11P-143 ไปที่ ON  No.13",
+      "startPracticeText": "ปรับ switch 11P-132 ไปที่ ON  No.8",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160416",
+          "name": "l130414",
           "value:": "",
         },
       ],
@@ -498,7 +521,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604160101",
+          "name": "l1304140101",
           "value:": "",
         },
       ],
@@ -508,12 +531,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิด Valve No.11 ไป IBC No.12, 13(เก็บ sample ส่งQC ที่ IBC ใบแรก)",
+      "startPracticeText": "ปรับระดับการไหลของเคมี โดยค่อยๆ ปิด line circulate No.10",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160417",
+          "name": "l130415",
           "value:": "",
         },
       ],
@@ -523,7 +546,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1604170101",
+          "name": "l1304150101",
           "value:": "",
         },
       ],
@@ -533,37 +556,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ปรับระดับการไหลของเคมี โดยค่อยๆ ปิด line circulate No.10  80%",
+      "startPracticeText": "บันทึกเวลา start  (11P-132)",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160418",
-          "value:": "",
-        },
-      ],
-    },
-    "condition": "ทำ",
-    "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1604180101",
-          "value:": "",
-        },
-      ],
-    },
-  },
-  {
-    "isSection": false,
-    "sequence": "",
-    "practice": {
-      "startPracticeText": "บันทึกเวลา start  (11P-143)ลงใน check sheet",
-      "endPracticeText": "",
-      "type": "checkbox",
-      "field": [
-        {
-          "name": "l160419",
+          "name": "l120416",
           "value:": "",
         },
       ],
@@ -573,11 +571,11 @@ export const sannixItemTemplate = [
       "type": "actualCheck",
       "field": [
         {
-          "name": "l1604190101", // A
+          "name": "l1204160101", // A
           "value:": "",
         },
         {
-          "name": "l1604190102", // B
+          "name": "l1204160102", // B
           "value:": "",
         },
       ],
@@ -587,7 +585,7 @@ export const sannixItemTemplate = [
   // 6. ขั้นตอนขณะปฏิบัติงาน
   {
     "isSection": true,
-    "rowSpan": 6,
+    "rowSpan": 10,
     "sequence": "<strong>6. ขั้นตอนขณะปฏิบัติงาน</strong>",
     "practice": " Check",
     "condition": "",
@@ -600,12 +598,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "      :  pressure",
-    "condition": "อยู่ระหว่าง 0.35 - 0.50 ",
+    "condition": "อยู่ระหว่าง  0.2 - 0.4",
     "result": {
       "type": "mpa2",
       "field": [
         {
-          "name": "l1605020101",
+          "name": "l1305020101",
           "value:": "",
         },
       ],
@@ -615,27 +613,12 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "      :  Amp meter ",
-    "condition": " ( 6.1 Amp )",
+    "condition": " ( 10 - 20 Amp )",
     "result": {
       "type": "amp2",
       "field": [
         {
-          "name": "l1605030101",
-          "value:": "",
-        },
-      ],
-    },
-  },
-  {
-    "isSection": false,
-    "sequence": "",
-    "practice": " เปิดวาล์ว circulate No.10 เพิ่มขึ้นและ ปิด วาล์วไป IBC No.11 , 12, 13",
-    "condition": "ทำ",
-    "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1605040101",
+          "name": "l1305030101",
           "value:": "",
         },
       ],
@@ -645,22 +628,22 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Start ไปที่ ON อีกครั้ง โดยหรี่วาล์ว Line circulate No.10 ",
+      "startPracticeText": "Pumpหยุดเมื่อเคมีใน lorry หมด ให้ปิดสวิตซ์ไป Off เปิด circulate No.10",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160505",
+          "name": "l130504",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "ปิดสวิตซ์อยู่ที่ off",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1605050101",
+          "name": "l1305040101",
           "value:": "",
         },
       ],
@@ -670,60 +653,72 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิดวาล์ว  Line circulate 20%",
+      "startPracticeText": "Start ไปที่ ON อีกครั้ง โดยหรี่วาล์ว Line circulate No.10 จนแน่ใจว่าหมด",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160506",
+          "name": "l130505",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "หมด",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1605060101",
+          "name": "l1305050101",
           "value:": "",
         },
       ],
-    },
-  },
-
-  // 7.ขั้นตอนเมื่อรับเสร็จ
-  {
-    "isSection": true,
-    "rowSpan": 7,
-    "sequence": "<strong>7.ขั้นตอนเมื่อรับเสร็จ</strong>",
-    "practice": {
-      "startPracticeText": "เปิด Valve ไป IBC และ เปิดวาล์ว  Line circulate 100% ",
-      "endPracticeText": "",
-      "type": "checkbox",
-      "field": [
-        {
-          "name": "l160607",
-          "value:": "",
-        },
-      ],
-    },
-    "condition": "",
-    "result": {
-      "type": "",
-      "field": [],
     },
   },
   {
     "isSection": false,
     "sequence": "",
-    "practice": " เปิด N2 เพื่อไล่สารออกให้หมด",
+    "practice": {
+      "startPracticeText": "เปิดวาล์ว  Line circulate 100%",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l130506",
+          "value:": "",
+        },
+      ],
+    },
     "condition": "ทำ",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1606080101",
+          "name": "l1305060101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "ปิดน้ำ CTWS และปิด  No.9 และเปิดวาล์ว No.6",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l130507",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "ทำ",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1305070101",
           "value:": "",
         },
       ],
@@ -738,17 +733,17 @@ export const sannixItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l160609",
+          "name": "l130508",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l1606090101",
+          "name": "l1305080101",
           "value:": "",
         },
       ],
@@ -757,23 +752,80 @@ export const sannixItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
+    "practice": {
+      "startPracticeText": "เลื่อนสวิตซ์11P-132 ไปที่ AUTO ตามปกติ",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l130509",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "เรียบร้อย",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1305090101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "เปิด Valve ไป 11R-311ไปที่ตำแหน่งปกติคือเปิด  No.11",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l130510",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "เรียบร้อย",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1305100101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+
+  // 7.ขั้นตอนเมื่อรับเสร็จ
+  {
+    "isSection": true,
+    "rowSpan": 7,
+    "sequence": "<strong>7.ขั้นตอนเมื่อรับเสร็จ</strong>",
     "practice": {
       "startPracticeText": "บันทึกเวลาที่รับเสร็จ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160610",
+          "name": "l130601",
           "value:": "",
         },
       ],
     },
-    "condition": "ทำ",
+    "condition": "",
     "result": {
-      "type": "oknot",
+      "type": "actualCheck",
       "field": [
         {
-          "name": "l1606100101",
+          "name": "l1306010101",
+          "value:": "",
+        },
+        {
+          "name": "l1306010102",
           "value:": "",
         },
       ],
@@ -783,12 +835,62 @@ export const sannixItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เช็ค valveปิด อีกครั้ง ",
+      "startPracticeText": "(D)  เช็ค Level ในแท้งค์11V-432 เท่ากับ",
+      "endPracticeText": "mm.",
+      "type": "d",
+      "field": [
+        {
+          "name": "l130602",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "น้ำหนักที่อ่านได้",
+    "result": {
+      "type": "kg",
+      "field": [
+        {
+          "name": "l1306020101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)                    ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l160611",
+          "name": "l130603",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "",
+    "result": {
+      "type": "cd",
+      "field": [
+        {
+          "name": "l1306030101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "เช็ค valveปิด อีกครั้ง No. 7,9",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l130604",
           "value:": "",
         },
       ],
@@ -798,7 +900,32 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1606110101",
+          "name": "l1306040101",
+          "value:": "",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "startPracticeText": "เช็ค valve เปิด อีกครั้ง No.10",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l130605",
+          "value:": "",
+        },
+      ],
+    },
+    "condition": "เปิด",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1306050101",
           "value:": "",
         },
       ],
@@ -813,7 +940,7 @@ export const sannixItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l160612",
+          "name": "l130606",
           "value:": "",
         },
       ],
@@ -823,7 +950,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1606120101",
+          "name": "l1306060101",
           "value:": "",
         },
       ],
@@ -838,7 +965,7 @@ export const sannixItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l160613",
+          "name": "l130607",
           "value:": "",
         },
       ],
@@ -848,7 +975,7 @@ export const sannixItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1606130101",
+          "name": "l1306070101",
           "value:": "",
         },
       ],

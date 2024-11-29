@@ -209,6 +209,7 @@ watchEffect(async () => {
   // lorryItem[8].result.field[0].value = (parseFloat(lorryItem[6].result.field[1].value) + parseFloat(lorryItem[7].result.field[1].value)).toFixed(2)
   // lorryItem[49].result.field[0].value = (parseFloat(lorryItem[8].result.field[0].value) - parseFloat(lorryItem[46].result.field[1].value)).toFixed(2)
   // lorryItem[49].result.field[1].value = (parseFloat(lorryItem[49].result.field[0].value) * 0.78).toFixed(2)
+  lorryItem[2].result.field[0].value = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value // A+B
 })
 
 
