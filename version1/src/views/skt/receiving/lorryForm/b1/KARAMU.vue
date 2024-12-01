@@ -129,6 +129,7 @@ async function submit(e) {
   for (var i of kumaruItems) {
     for (var f of i.result.field) {
       if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+        debugger
         isValid = false
       }
     }
@@ -183,7 +184,7 @@ async function approve(e) {
 
 watchEffect(async () => {
   kumaruItems[8].result.field[0].value = kumaruItems[6].result.field[0].value + kumaruItems[7].result.field[0].value 
-  kumaruItems[49].result.field[0].value = kumaruItems[48].result.field[0].value - kumaruItems[7].result.field[0].value
+  kumaruItems[50].result.field[0].value = kumaruItems[49].result.field[0].value - kumaruItems[7].result.field[0].value
 })
 </script>
 
@@ -384,8 +385,8 @@ watchEffect(async () => {
                       density="compact"
                       variant="outlined"
                       label=""
-                      text-start="(A)"
-                      text-end="kg"
+                      text-start=""
+                      text-end="C°"
                       :readonly="isReadOnly"
                     />
                   </VCol>

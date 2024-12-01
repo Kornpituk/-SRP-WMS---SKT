@@ -1,14 +1,21 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import { hakuItemTemplate } from '@/services/skt/inv/lorryLoading/hakuService'
+import {
+  formatDate, generate,
+  get,
+  hakuItemTemplate,
+  passInitialData, passSubmitData,
+  save,
+} from '@/services/skt/inv/lorryLoading/hakuService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
+import image01 from '@/views/skt/receiving/lorryForm/c2/HAKU C ( 111 ).png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
 
 
@@ -52,23 +59,14 @@ onMounted(async () => {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  await generate(poEtlLogDetailJournalIDQueryParameters.value)
 
-  // const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-  //   headers: {
-  //     'accept': '*/*',
-  //     'x-location': `${whereHouse}`,
-  //     Authorization: `Bearer ${accessTokenAtStore}`,
-  //   },
-  // })
+ 
+  var lorryForm =  await get(poEtlLogDetailJournalIDQueryParameters.value)
+
   console.log(hakuItemTemplate)
-  lorryRequestData.value = akumaruRequestData //lorryFormIPA.data.data
+  lorryRequestData.value = lorryForm.data.data
+
   // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
   for (var i of lorryItem) {
     for (var f of i.result.field) {
@@ -96,65 +94,74 @@ onMounted(async () => {
 
 })
 
-function passInitialData(type, params) {
-  if (type == "oknot") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
-    }
-  } else {
-    return params
-  }
-}
-
-function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else {
-    return params
-  }
-}
 
 async function saveDraft(e) {
+
   for (var i of lorryItem) {
     for (var f of i.result.field) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
+
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+      }
+    }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
+    setTimeout(() => {
+      location.reload()
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
+    e.preventDefault()
   }
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 async function submit(e) {
+
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+      }
+    }
+  }
+
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
+
+  if (response.status != 200) 
+    return
+
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  let isValid = true
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+        isValid = false
+      }
+    }
+  }
+
+  if(!isValid){
+    alert("กรุณากรอกข้อมูลให้ครบ")
+    
+    return
+  }
+
+  // เรียก API หรือดำเนินการต่อ
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -164,16 +171,20 @@ async function submit(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
+
 }
 
 async function approve(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -188,52 +199,9 @@ async function approve(e) {
     console.error(response.data)
   }
 }
-
-// watch(lorryItem[6].result.field[0], async x => {// A
-//   let b = x.value / (0.78)
-//   lorryItem[6].result.field[1].value = b.toFixed(2)
-// })
-
-// watch(lorryItem[7].result.field[0], async x => {// C
-//   let d = (x.value * 5.32) + 740.45
-//   lorryItem[7].result.field[1].value = d.toFixed(2) // D
-// })
-
-// watch(lorryItem[46].result.field[0], async x => { // E
-//   lorryItem[46].result.field[1].value = mm2litre(x.value)// F
-// })
-
 watchEffect(async () => {
-  // dcsDiff = (lorryItem[47].result.field[0].value - lorryItem[9].result.field[0].value).toFixed(2)
-  // tankDiff = (lorryItem[46].result.field[1].value - lorryItem[7].result.field[1].value).toFixed(2)
-  // lorryItem[8].result.field[0].value = (parseFloat(lorryItem[6].result.field[1].value) + parseFloat(lorryItem[7].result.field[1].value)).toFixed(2)
-  // lorryItem[49].result.field[0].value = (parseFloat(lorryItem[8].result.field[0].value) - parseFloat(lorryItem[46].result.field[1].value)).toFixed(2)
-  // lorryItem[49].result.field[1].value = (parseFloat(lorryItem[49].result.field[0].value) * 0.78).toFixed(2)
+  lorryItem[2].result.field[0].value = currencyFormat(lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value)
 })
-
-
-// function mm2litre(mm) {
-//   let litre = mm * 5.32 + 740.45
-
-//   return litre.toFixed(2)
-// }
-
-//----------------- Formate
-function formatDate(dateString) {
-  if (dateString === null || dateString === '' || dateString === undefined) {
-    return 'Null'
-  } else if (dateString.length > 0) {
-    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
-    const year = date.getFullYear()
-
-    return `${day}/${month}/${year}`
-
-  }
-
-  return 'null'
-}
 </script>
 
 <template>
@@ -423,6 +391,7 @@ function formatDate(dateString) {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="Ok"
@@ -441,6 +410,7 @@ function formatDate(dateString) {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="รั่ว"
@@ -452,29 +422,6 @@ function formatDate(dateString) {
                   />
                 </VRadioGroup>
               </div>
-              <div v-if="section.result.type === 'ab'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="(A)"
-                      text-end="Kg."
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="Litre"
-                      text-end="(B)"
-                      readonly="true"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
               <div v-if="section.result.type === 'cd'">
                 <VRow>
                   <VCol>
@@ -485,6 +432,7 @@ function formatDate(dateString) {
                       label=""
                       text-start="(C)"
                       text-end="mm."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -494,38 +442,8 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start="(D)"
                       text-end="mm."
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'bd'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="solo"
-                      text-start=" (B) + (D) ="
-                      text-end="Litre"
-                      readonly="true"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
                   </VCol>
                 </VRow>
               </div>
@@ -624,22 +542,22 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :max-length="2"
+                      :readonly="isReadOnly"
+                      :value-range="23"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :max-length="2"
+                      :readonly="isReadOnly"
+                      :value-range="59"
                     />
                   </VCol>
                 </VRow>
@@ -769,6 +687,27 @@ function formatDate(dateString) {
                       text-start=""
                       text-end="Kg.( B )"
                     />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'ab'">
+                <VRow>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VTextField> 
                   </VCol>
                 </VRow>
               </div>

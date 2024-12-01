@@ -282,7 +282,7 @@ export const kumaruItemTemplate = [
     "practice": "5. ตรวจสอบอุณหภูมิของรถ ISO container",
     "condition": "ต้องอยู่ระหว่าง 60-90 องศาเซลเซียส",
     "result": {
-      "type": "oknot",
+      "type": "c",
       "field": [
         {
           "name": "l0602050101",
@@ -724,6 +724,21 @@ export const kumaruItemTemplate = [
       "field": [
         {
           "name": "l0606040101",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "rowSpan": 1,
+    "sequence": "<strong>เสร็จสิ้นการ loading</strong>",
+    "practice": "   โดยให้ทำการตรวจสอบที่ side glass จนกว่าไม่มีของไหลแล้วจึงทำการปิดวาล์วไนโตรเจน",
+    "condition": "ตรวจเช็คว่า valve ปิดจริง",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l0606050101",
         },
       ],
     },
