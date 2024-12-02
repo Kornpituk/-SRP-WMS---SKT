@@ -550,8 +550,6 @@ const selectLorryInfoKey = ref(null)
 
 const successDialAlert = ref(false)
 
-
-
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
@@ -560,6 +558,8 @@ const textAlertDialogFunction = (word, success) => {
 }
 
 const btnApprove = word => {
+  console.log("Apporved Start!!")
+  isDialogVisibleConfirmDialog2.value.openDialog()
   isDialogConfirmVisible.value = true
   wordForSubmit.value = word
 
@@ -573,7 +573,6 @@ const textConfirmDialogFunction = async (word, success, confirm) => {
 
   console.log("User textConfirmDialogFunction", isDialogVisibleConfirmDialog.value)
 
-  
 }
 
 const handleSelectLorryLoading = word => {
@@ -649,8 +648,11 @@ function handleConfirmAction() {
   if(selectLorryInfoKey.value){
     console.log('Action selectLorryInfoKey.', selectLorryInfoKey.value)
     handleSelectLorryLoading(selectLorryInfoKey.value)
-  }else {
-    console.log('Action failed.')
+  }else if(wordForSubmit.value === 'APPROVE'){
+    handleAcceptPackaging()
+  }
+  else {
+    console.log('Action failed.', wordForSubmit.value)
   }
 
 }

@@ -50,7 +50,7 @@ defineExpose({
           />
         </div>
         <div class="text-center">
-          <span style="font-size: 22px; font-weight: bolder;">Would you like to12 {{ props.message }}
+          <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ props.message }}
             Transaction?</span>
         </div>
       </VCardText>

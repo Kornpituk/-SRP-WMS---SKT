@@ -566,6 +566,7 @@ const saveProductionPlan = async () => {
     const filteredData = productionPlan.value.map(item => ({
       planningID: item.planningID,
       inputDate: (item.inputDate),
+      productionCode: item.productionCode,
 
       product1SelectedCode: item.product1SelectedCode,
       product1SelectedPackagingCode: item.product1SelectedPackagingCode,
