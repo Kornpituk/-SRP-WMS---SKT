@@ -391,6 +391,7 @@ const selectPlan = plan => {
 
   selectedPackagingTypeForPlan.value = plan.packagingtype // อัปเดต packagingtype
   selectedProductionCode.value = plan.productionCode
+
   selectedPackagingType2.value = plan.itemCode
   selectedProductionCode2.value = plan.itemCode
 
@@ -444,6 +445,10 @@ const dataTableCliclHighlightIsToggle = no => {
   console.log("dataTableNummberedToggle.value:", dataTableNummberedToggle.value, "no:", no)
 }
 
+const batchSale = ref(null)
+const packagingkgs1 = ref(null)
+const packagingkgs2 = ref(null)
+
 watchEffect(async () => {
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
@@ -462,14 +467,36 @@ watchEffect(async () => {
     // แสดงค่าใน console
     console.log("productionPlan", productionPlan.value)
 
-    // selectedItemCode.value = productionPlan.value[0].product1SelectedCode
+    //------ Item 1 Add data 
+    selectedItemCode.value = productionPlan.value[0].product1SelectedCode
+    selectedPackagingType.value = productionPlan.value[0].product1SelectedPackagingCode
 
-    // selectedProductionCode.value = productionPlan.value[0].productionCode
+    //------ Item 1 Add data 
+    selectedItemCode2.value = productionPlan.value[0].product2SelectedCode
+    selectedPackagingType2.value = productionPlan.value[0].product2SelectedPackagingCode
+
+    selectedProductionCode.value = productionPlan.value[0].productionCode
+
+    selectedItemCodeForPlan.value = productionPlan.value[0].product1SelectedCode
+
+    //---------------------------- validate ------------------------------------
+    batchSale.value = productionPlan.value[0].quantityKgs
+    packagingkgs1.value = productionPlan.value[0].product1UomCount
+    packagingkgs2.value = productionPlan.value[0].product2UomCount
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error fetching production plan:", error)
   }
 })
+
+const textAlert = ref(false)
+
+watch(() => {
+  if( batchSale.value >= (packagingkgs1.value + packagingkgs2.value)){
+    textAlert.value = true
+  }
+})
+
 
 // ฟังก์ชันจัดรูปแบบวันที่
 const formatDateDMY = date => {
@@ -590,7 +617,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")
@@ -1994,6 +2021,18 @@ const print = () => {
                     v-if="item.raw.missingFields.includes('product1UomCount') && !item.raw.product1UomCount"
                     class="text-red"
                   >Missing Input Packaging Pcs 1</span>
+                </div>
+                <div>
+                  <span
+                    v-if="textAlert === true"
+                    class="text-red"
+                  >packaging must not exceed</span>
+                </div>
+                <div class="text-start">
+                  <span
+                    v-if="textAlert === true"
+                    class="text-red"
+                  >the batch scale (kgs).</span>
                 </div>
               </td>
 
