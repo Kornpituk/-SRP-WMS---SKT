@@ -1,5 +1,6 @@
 <script setup>
 import { urlApi } from '@/api'
+import VCurrencyField from '@/components/VCurrencyField.vue'
 import {
   formatDate,
   generate,

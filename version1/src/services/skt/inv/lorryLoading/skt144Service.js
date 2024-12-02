@@ -5,7 +5,7 @@ export async function generate(poEtllogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/lorryFormEpichlo/generate?poEtllogDetailJournalID=${poEtllogDetailJournalID}`, [], {
+  await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBe/generate?poEtllogDetailJournalID=${poEtllogDetailJournalID}`, [], {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -18,7 +18,7 @@ export async function get(poEtllogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  return await axios.get(`${urlApi.value}/api/v1/lorryFormEpichlo/get/${poEtllogDetailJournalID}`, {
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormSktEpBe/get/${poEtllogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -38,6 +38,22 @@ export async function GetByPoEtlLogDetailJournalID(poEtllogDetailJournalIDQueryP
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
   })
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBe/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
 }
 
 export function currencyFormat(number) {
@@ -392,7 +408,7 @@ export const ItemTemplate = [
     "practice": "3. Temperature เท่าไหร่",
     "condition": "อุณหภูมิต้องไม่สูงกว่า  35 C' ",
     "result": {
-      "type": "25c",
+      "type": "35c",
       "field": [
         {
           "name": "l0404030101", // percen
@@ -774,7 +790,7 @@ export const ItemTemplate = [
     "practice": "10. Check level DCS ได้เท่าไหร่",
     "condition": "Actual  Check",
     "result": {
-      "type": "oknot",
+      "type": "kg",
       "field": [
         {
           "name": "l0408100101", // percen
@@ -833,6 +849,7 @@ export function passInitialData(type, params, index) {
   }
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export function passSubmitData(type, params) {
   if (type == "oknot") {
     if (params == "0") {
@@ -845,6 +862,10 @@ export function passSubmitData(type, params) {
   }
   else if(type == "actualCheck"){
     return !params ? "0": params.toString()
+  }else if(type == "percent"){
+    if(params == undefined)
+      return 0
+    else parseFloat(params)
   }
   else {
     if(isNaN(Number(params))){
