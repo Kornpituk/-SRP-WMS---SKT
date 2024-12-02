@@ -91,7 +91,7 @@ export function formatDate(dateString) {
 }
 
 export function passInitialData(type, params, index) {
-  if (type == "oknot" ) {
+  if (type == "oknot" || type=="leak" ) {
     return params.toString()
   }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
     if(index == 0){
@@ -99,7 +99,7 @@ export function passInitialData(type, params, index) {
     }else{
       return params.toString()
     }
-  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"){
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"|| type=="checkbox2"){
     return params == 1
   }
   else {
@@ -109,7 +109,7 @@ export function passInitialData(type, params, index) {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export function passSubmitData(type, params) {
-  if (type == "oknot") {
+  if (type == "oknot" || type=="leak") {
     if (params == "0") {
       return 0
     } else if (params == "1") {
@@ -120,7 +120,7 @@ export function passSubmitData(type, params) {
   }
   else if(type == "actualCheck"){
     return !params ? "0": params.toString()
-  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"){
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3" || type=="checkbox2"){
     if(params === true)
       return 1
     else
@@ -962,7 +962,7 @@ export const hakuItemTemplate = [
     },
     "condition": "",
     "result": {
-      "type": "kg",
+      "type": "cdkg",
       "field": [
         {
           "name": "l0906030101",
