@@ -462,8 +462,9 @@ watchEffect(async () => {
     // แสดงค่าใน console
     console.log("productionPlan", productionPlan.value)
 
-    selectedItemCode.value = productionPlan.value[0].product1SelectedCode
-    selectedProductionCode.value = productionPlan.value[0].productionCode
+    // selectedItemCode.value = productionPlan.value[0].product1SelectedCode
+
+    // selectedProductionCode.value = productionPlan.value[0].productionCode
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error fetching production plan:", error)
@@ -588,7 +589,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")
@@ -1540,7 +1541,7 @@ const print = () => {
                   hide-details
                   single-line
                 />
-                <h5>Item{{ selectedItemCode }} : pro {{ selectedProductionCode }}</h5>
+                <h5>Item</h5>
               </div>
               <VDataTable
                 v-if="selectedProductionCode.length > 0"
