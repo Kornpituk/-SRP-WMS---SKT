@@ -62,6 +62,14 @@ const format = date => {
   return `${day}/${month}/${year}`
 }
 
+const formatYMD = date => {
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+
+  return `${year}-${month}-${day}`
+}
+
 const formatDate = date => {
   const d = new Date(date)
   const day = d.getDate().toString().padStart(2, '0')
@@ -89,7 +97,7 @@ const formatDateYMDWhyQ = date => {
   }
 
   // คืนค่าว่างหรือข้อความแสดงข้อผิดพลาด หากไม่อยู่ในรูปแบบที่รองรับ
-  console.warn('Invalid date format:', date)
+  console.log('Invalid date format:', date)
   
   return 'null'
 }
@@ -556,7 +564,7 @@ const saveProductionPlan = async () => {
 
     const filteredData = productionPlan.value.map(item => ({
       planningID: item.planningID,
-      inputDate: formatDateYMDWhyQ(item.inputDate),
+      inputDate: (item.inputDate),
 
       product1SelectedCode: item.product1SelectedCode,
       product1SelectedPackagingCode: item.product1SelectedPackagingCode,
@@ -580,7 +588,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")
@@ -1842,7 +1850,6 @@ const print = () => {
                 <VCheckboxBtn
                   v-model="selectedDataTables"
                   :value="item.raw"
-                  @update:modelValue="(selected) => handleSelection(selected, item.raw)"
                 />
               </td>
               <td
