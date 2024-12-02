@@ -7,6 +7,7 @@ import {
   passInitialData, passSubmitData, save,
 } from '@/services/skt/inv/lorryLoading/kumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import image01 from '@/views/skt/receiving/lorryForm/b1/CAPOLACTUM.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
@@ -71,6 +72,11 @@ onMounted(async () => {
     for (var f of i.result.field) {
       f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
     }
+    if(i.condition.field != undefined){
+      for (var f of i.condition.field) {
+        f.value = passInitialData(i.condition.type, lorryFormIPA.data.data[f.name])
+      }
+    }
   }
 
   const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
@@ -90,6 +96,11 @@ async function saveDraft(e) {
   for (var i of kumaruItems) {
     for (var f of i.result.field) {
       ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+    if(i.condition.field != undefined){
+      for (var f of i.condition.field) {
+        ipaRequestData.value[f.name] = passSubmitData(i.condition.type, f.value)
+      }
     }
   }
 
@@ -129,6 +140,7 @@ async function submit(e) {
   for (var i of kumaruItems) {
     for (var f of i.result.field) {
       if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+        debugger
         isValid = false
       }
     }
@@ -154,7 +166,7 @@ async function submit(e) {
       window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
-    console.error(response.data)
+    textAlertDialogFunction(alertWordConst.submit, false)
   }
 }
 
@@ -183,7 +195,7 @@ async function approve(e) {
 
 watchEffect(async () => {
   kumaruItems[8].result.field[0].value = kumaruItems[6].result.field[0].value + kumaruItems[7].result.field[0].value 
-  kumaruItems[49].result.field[0].value = kumaruItems[48].result.field[0].value - kumaruItems[7].result.field[0].value
+  kumaruItems[50].result.field[0].value = kumaruItems[49].result.field[0].value - kumaruItems[7].result.field[0].value
 })
 </script>
 
@@ -285,9 +297,26 @@ watchEffect(async () => {
               colspan="3"
               style="max-width: 350px; border-left: 1px solid black; text-align: start;"
             >
-              <VLabel class="d-flex justify-center pa-md-2">
-                {{ section.condition }}
-              </VLabel>
+              <div v-if="section.condition.type === 'kg'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField
+                      v-model="section.condition.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      :text-start="section.condition.startText"
+                      :text-end="section.condition.endText"
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+                </vrow>
+              </div>
+              <div v-else>
+                <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+                  {{ section.condition }}
+                </VLabel>
+              </div>
             </td>
             <td
               colspan="4"
@@ -384,8 +413,8 @@ watchEffect(async () => {
                       density="compact"
                       variant="outlined"
                       label=""
-                      text-start="(A)"
-                      text-end="kg"
+                      text-start=""
+                      text-end="C°"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -501,6 +530,35 @@ watchEffect(async () => {
             </div>
           </td>
         </tr>
+      </table>
+    </VCol>
+    <!-- Flow Chat -->
+    <VCol cols="12">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th style="font-size: 16px;">
+              Flow Chart
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <div class="d-flex justify-space-around align-center bg-grey-lighten-4">
+              <div class="ma-4">
+                <div class="text-subtitle-2">
+                  Default
+                </div>
+                <VImg
+                  :aspect-ratio="1"
+                  class="bg-white"
+                  :src="image01"
+                  width="500"
+                />
+              </div>
+            </div>
+          </tr>
+        </tbody>
       </table>
     </VCol>
   </VRow>

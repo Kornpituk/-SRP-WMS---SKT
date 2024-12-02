@@ -192,6 +192,7 @@ async function approve(e) {
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
+    textAlertDialogFunction(alertWordConst.submit, false)
   }
 }
 

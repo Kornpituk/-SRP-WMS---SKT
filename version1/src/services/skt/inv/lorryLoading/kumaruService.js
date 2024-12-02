@@ -282,7 +282,7 @@ export const kumaruItemTemplate = [
     "practice": "5. ตรวจสอบอุณหภูมิของรถ ISO container",
     "condition": "ต้องอยู่ระหว่าง 60-90 องศาเซลเซียส",
     "result": {
-      "type": "oknot",
+      "type": "c",
       "field": [
         {
           "name": "l0602050101",
@@ -732,6 +732,21 @@ export const kumaruItemTemplate = [
     "isSection": false,
     "rowSpan": 1,
     "sequence": "<strong>เสร็จสิ้นการ loading</strong>",
+    "practice": "   โดยให้ทำการตรวจสอบที่ side glass จนกว่าไม่มีของไหลแล้วจึงทำการปิดวาล์วไนโตรเจน",
+    "condition": "ตรวจเช็คว่า valve ปิดจริง",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l0606050101",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "rowSpan": 1,
+    "sequence": "<strong>เสร็จสิ้นการ loading</strong>",
     "practice": "5. ต่อสายไนโตรเจนเข้ากับวาล์วหมายเลข 9 แล้วเปิดไนโตรเจนไล่ของเหลวที่อยู่ในสาย hose จนถึง 21V-306 โดยให้ทำการตรวจสอบที่ side glass จนกว่าไม่มีของไหล",
     "condition": "ตรวจสอบที่ side glass ว่าไม่มีของเหลวตกค้าง",
     "result": {
@@ -871,7 +886,16 @@ export const kumaruItemTemplate = [
     "rowSpan": 1,
     "sequence": "<strong>เสร็จสิ้นการ loading</strong>",
     "practice": "14. ทำการจดบันทึกค่าที่ต่างกันหลังจากรับ",
-    "condition": "ต้องไม่ต่างจากที่คำนวณไม่เกิน...........kg",
+    "condition": {
+      "startText": "ต้องไม่ต่างจากที่คำนวณไม่เกิน",
+      "endText": "kg",
+      "type": "kg",
+      "field": [
+        {
+          "name": "l060615",       
+        },
+      ],
+    },
     "result": {
       "type": "cb",
       "field": [
@@ -881,6 +905,5 @@ export const kumaruItemTemplate = [
       ],
     },
   },
-
 ]
 

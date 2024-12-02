@@ -1,104 +1,145 @@
 
 
-export const hakuRequestData = {
-  "RmLorryLoadingFormJournalId": 0,
-  "ProductId": "",
-  "ProductName": "",
-  "LoadedDate": null,
-  "PurchaseOrderNo": null,
-  "WHStaff": "",
-  "WHStaffUpdatedDate": null,
-  "WHLeader": "",
-  "WHLeaderDate": null,
-  "WHSupervisor": "",
-  "WHSupervisorDate": null,
-  "l0901010101": "0",
-  "l0901020101": "0",
-  "l0901030101": "0",
-  "l0901040101": "-1",
-  "l0901050101": "-1",
-  "l0902010101": "-1",
-  "l0904010101": "-1",
-  "l0904020101": "-1",
-  "l0904030101": "-1",
-  "l0904040101": "-1",
-  "l0904050101": "-1",
-  "l0904060101": "-1",
-  "l0904070101": "-1",
-  "l0904080101": "-1",
-  "l0904090101": "-1",
-  "l0904100101": "-1",
-  "l0904110101": "-1",
-  "l0904120101": "-1",
-  "l0904130101": "-1",
-  "l0904140101": "-1",
-  "l0904150101": "0",
-  "l0904150102": "0",
-  "l0905020101": "0",
-  "l0905030101": "0",
-  "l0905040101": "-1",
-  "l0905050101": "-1",
-  "l0905060101": "-1",
-  "l0905070101": "-1",
-  "l0905080101": "-1",
-  "l0905090101": "-1",
-  "l0906010101": "0",
-  "l0906020101": "0",
-  "l0906030101": "0",
-  "l0906010102": "0",
-  "l0906040101": "-1",
-  "l0906050101": "-1",
-  "l0906060101": "-1",
-  "l0906070101": "-1",
-  "l0906080101": "-1",
-  "l0906090101": "-1",
-  "l0906100101": "-1",
-  "l090301": "0",
-  "l090302": "0",
-  "l090303": "0",
-  "l090304": "0",
-  "l090305": "0",
-  "l090306": "0",
-  "l090307": "0",
-  "l090401": "0",
-  "l090402": "0",
-  "l090403": "0",
-  "l090404": "0",
-  "l090405": "0",
-  "l090406": "0",
-  "l090407": "0",
-  "l090408": "0",
-  "l090409": "0",
-  "l090410": "0",
-  "l090411": "0",
-  "l090412": "0",
-  "l090413": "0",
-  "l090414": "0",
-  "l090415": "0",
-  "l090504": "0",
-  "l090505": "0",
-  "l090506": "0",
-  "l090507": "0",
-  "l090508": "0",
-  "l090509": "0",
-  "l090601": "0",
-  "l090602": "0",
-  "l090603": "0",
-  "l090604": "0",
-  "l090605": "0",
-  "l090606": "0",
-  "l090607": "0",
-  "l090608": "0",
-  "l090609": "0",
-  "l090610": "0",
+import { urlApi } from '@/api'
+import axios from '@axios'
 
+export async function generate(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function get(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormHaku/get/${poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
+
+export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export function currencyFormat(number) {
+  return new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(number)
+}
+
+
+export function mm2litre(mm) {
+  let litre = mm * 5.32 + 740.45
+
+  return litre.toFixed(2)
+}
+
+//----------------- Formate
+export function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
+export function passInitialData(type, params, index) {
+  if (type == "oknot" || type=="leak" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"|| type=="checkbox2"){
+    return params == 1
+  }
+  else {
+    return params
+  }
+}
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function passSubmitData(type, params) {
+  if (type == "oknot" || type=="leak") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3" || type=="checkbox2"){
+    if(params === true)
+      return 1
+    else
+      return 0
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
 }
 
 export const hakuItemTemplate = [
   // 1.check ใบส่งสินค้า 
   {
     "isSection": true,
-    "rowSpan": 4,
+    "rowSpan": 5,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
     "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า ",
     "condition": "",
@@ -107,7 +148,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0901010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -122,7 +163,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0901020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -133,11 +174,11 @@ export const hakuItemTemplate = [
     "practice": "( C ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
     "condition": "A+B",
     "result": {
-      "type": "kg",
+      "type": "ab",
       "field": [
         {
           "name": "l0901030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -152,7 +193,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0901040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -167,7 +208,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0901050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -185,7 +226,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0902010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -213,25 +254,25 @@ export const hakuItemTemplate = [
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
           "name": "l090301",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "ชุดป้องกันสารเคมี",
           "endPracticeText": "",
           "name": "l090302",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
           "name": "l090303",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "รองเท้าบูท",
           "endPracticeText": "",
           "name": "l090304",
-          "value:": "",
+          
         },
       ],
     },
@@ -251,19 +292,19 @@ export const hakuItemTemplate = [
           "startPracticeText": "แว่นตา",
           "endPracticeText": "",
           "name": "l090305",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "หน้ากาก กรองสารเคมี (สีขาว)",
           "endPracticeText": "",
           "name": "l090306",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "เข็มขัดนิรภัย",
           "endPracticeText": "",
           "name": "l090307",
-          "value:": "",
+          
         },
       ],
     },
@@ -286,7 +327,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090401",
-          "value:": "",
+          
         },
       ],
     },
@@ -296,7 +337,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -311,7 +352,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090402",
-          "value:": "",
+          
         },
       ],
     },
@@ -321,7 +362,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -336,7 +377,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090403",
-          "value:": "",
+          
         },
       ],
     },
@@ -346,7 +387,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -361,7 +402,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090404",
-          "value:": "",
+          
         },
       ],
     },
@@ -371,7 +412,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -386,7 +427,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090405",
-          "value:": "",
+          
         },
       ],
     },
@@ -396,7 +437,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -411,7 +452,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090406",
-          "value:": "",
+          
         },
       ],
     },
@@ -421,7 +462,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -436,7 +477,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090407",
-          "value:": "",
+          
         },
       ],
     },
@@ -446,7 +487,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -461,7 +502,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090408",
-          "value:": "",
+          
         },
       ],
     },
@@ -471,7 +512,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -486,7 +527,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090409",
-          "value:": "",
+          
         },
       ],
     },
@@ -496,7 +537,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -511,7 +552,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090410",
-          "value:": "",
+          
         },
       ],
     },
@@ -521,7 +562,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904100101",
-          "value:": "",
+          
         },
       ],
     },
@@ -536,7 +577,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090411",
-          "value:": "",
+          
         },
       ],
     },
@@ -546,7 +587,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904110101",
-          "value:": "",
+          
         },
       ],
     },
@@ -561,7 +602,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090412",
-          "value:": "",
+          
         },
       ],
     },
@@ -571,7 +612,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904120101",
-          "value:": "",
+          
         },
       ],
     },
@@ -586,7 +627,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090413",
-          "value:": "",
+          
         },
       ],
     },
@@ -596,7 +637,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904130101",
-          "value:": "",
+          
         },
       ],
     },
@@ -611,7 +652,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090414",
-          "value:": "",
+          
         },
       ],
     },
@@ -621,7 +662,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904140101",
-          "value:": "",
+          
         },
       ],
     },
@@ -636,7 +677,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090415",
-          "value:": "",
+          
         },
       ],
     },
@@ -646,11 +687,11 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0904150101", // A
-          "value:": "",
+          
         },
         {
           "name": "l0904150102", // B
-          "value:": "",
+          
         },
       ],
     },
@@ -678,7 +719,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0905020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -693,7 +734,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0905030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -708,7 +749,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090504",
-          "value:": "",
+          
         },
       ],
     },
@@ -718,7 +759,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0905040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -733,7 +774,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090505",
-          "value:": "",
+          
         },
       ],
     },
@@ -743,7 +784,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0905050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -758,7 +799,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090506",
-          "value:": "",
+          
         },
       ],
     },
@@ -768,7 +809,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0905060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -783,7 +824,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090507",
-          "value:": "",
+          
         },
       ],
     },
@@ -793,7 +834,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0905070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -808,7 +849,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090508",
-          "value:": "",
+          
         },
       ],
     },
@@ -818,7 +859,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0905080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -833,7 +874,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090509",
-          "value:": "",
+          
         },
       ],
     },
@@ -843,7 +884,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0905090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -861,7 +902,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090601",
-          "value:": "",
+          
         },
       ],
     },
@@ -871,11 +912,11 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906010101",
-          "value:": "",
+          
         },
         {
           "name": "l0906010102",
-          "value:": "",
+          
         },
       ],
     },
@@ -890,7 +931,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090602",
-          "value:": "",
+          
         },
       ],
     },
@@ -900,7 +941,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -915,17 +956,17 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090603",
-          "value:": "",
+          
         },
       ],
     },
     "condition": "",
     "result": {
-      "type": "kg",
+      "type": "cdkg",
       "field": [
         {
           "name": "l0906030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -940,7 +981,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -950,7 +991,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -965,7 +1006,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090605",
-          "value:": "",
+          
         },
       ],
     },
@@ -975,7 +1016,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -990,7 +1031,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090606",
-          "value:": "",
+          
         },
       ],
     },
@@ -1000,7 +1041,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1015,7 +1056,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090607",
-          "value:": "",
+          
         },
       ],
     },
@@ -1025,7 +1066,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1040,7 +1081,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090608",
-          "value:": "",
+          
         },
       ],
     },
@@ -1050,7 +1091,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1065,7 +1106,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090609",
-          "value:": "",
+          
         },
       ],
     },
@@ -1075,7 +1116,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -1090,7 +1131,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l090610",
-          "value:": "",
+          
         },
       ],
     },
@@ -1100,7 +1141,7 @@ export const hakuItemTemplate = [
       "field": [
         {
           "name": "l0906100101",
-          "value:": "",
+          
         },
       ],
     },

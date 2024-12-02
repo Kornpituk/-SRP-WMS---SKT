@@ -1,17 +1,138 @@
 
 
-export const sannixRequestData = {
-  "RmLorryLoadingFormJournalId": 0,
-  "ProductId": "",
-  "ProductName": "",
-  "LoadedDate": null,
-  "PurchaseOrderNo": null,
-  "WHStaff": "",
-  "WHStaffUpdatedDate": null,
-  "WHLeader": "",
-  "WHLeaderDate": null,
-  "WHSupervisor": "",
-  "WHSupervisorDate": null,
+import { urlApi } from '@/api'
+import axios from '@axios'
+
+export async function generate(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  await axios.post(`${urlApi.value}/api/v1/LorryFormSannix/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function get(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormSannix/get/${poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormSannix/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
+
+export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export function currencyFormat(number) {
+  return new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(number)
+}
+
+
+export function mm2litre(mm) {
+  let litre = mm * 5.32 + 740.45
+
+  return litre.toFixed(2)
+}
+
+//----------------- Formate
+export function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
+export function passInitialData(type, params, index) {
+  if (type == "oknot" || type=="leak" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"|| type=="checkbox2"){
+    return params == 1
+  }
+  else {
+    return params
+  }
+}
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function passSubmitData(type, params) {
+  if (type == "oknot" || type=="leak") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"|| type=="checkbox2"){
+    if(params === true)
+      return 1
+    else
+      return 0
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
 }
 
 export const sannixItemTemplate = [
@@ -27,7 +148,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160101",
-          "value:": "",
+          
         },
       ],
     },
@@ -37,7 +158,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1601010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -55,7 +176,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1602010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -68,24 +189,21 @@ export const sannixItemTemplate = [
     "sequence": "<strong>3.อุปกรณ์ PPE  </strong>",
     "practice": {
       "type": "checkbox3",
-      "field": [
+      "field": [  
         {
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
           "name": "l160301",
-          "value:": "",
         },
         {
           "startPracticeText": "ชุดป้องกันสารเคมี",
           "endPracticeText": "",
-          "name": "l160302",
-          "value:": "",
+          "name": "l160302",       
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
-          "name": "l160303",
-          "value:": "",
+          "name": "l160303",  
         },
       ],
     },
@@ -95,7 +213,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1603010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -110,13 +228,13 @@ export const sannixItemTemplate = [
           "startPracticeText": "แว่นตา",
           "endPracticeText": "",
           "name": "l160304",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "เข็มขัดนิรภัย",
           "endPracticeText": "",
           "name": "l160305",
-          "value:": "",
+          
         },
       ],
     },
@@ -139,7 +257,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160401",
-          "value:": "",
+          
         },
       ],
     },
@@ -149,7 +267,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -164,7 +282,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160402",
-          "value:": "",
+          
         },
       ],
     },
@@ -174,7 +292,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -189,7 +307,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160403",
-          "value:": "",
+          
         },
       ],
     },
@@ -199,7 +317,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -214,7 +332,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -239,7 +357,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160406",
-          "value:": "",
+          
         },
       ],
     },
@@ -249,7 +367,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -264,7 +382,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160407",
-          "value:": "",
+          
         },
       ],
     },
@@ -274,7 +392,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -289,7 +407,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160408",
-          "value:": "",
+          
         },
       ],
     },
@@ -299,7 +417,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -314,7 +432,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160409",
-          "value:": "",
+          
         },
       ],
     },
@@ -324,7 +442,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -339,7 +457,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160410",
-          "value:": "",
+          
         },
       ],
     },
@@ -349,7 +467,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604100101",
-          "value:": "",
+          
         },
       ],
     },
@@ -364,7 +482,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160411",
-          "value:": "",
+          
         },
       ],
     },
@@ -374,7 +492,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604110101",
-          "value:": "",
+          
         },
       ],
     },
@@ -389,7 +507,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160412",
-          "value:": "",
+          
         },
       ],
     },
@@ -399,7 +517,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604120101",
-          "value:": "",
+          
         },
       ],
     },
@@ -414,7 +532,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160413",
-          "value:": "",
+          
         },
       ],
     },
@@ -424,7 +542,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604130101",
-          "value:": "",
+          
         },
       ],
     },
@@ -439,7 +557,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160414",
-          "value:": "",
+          
         },
       ],
     },
@@ -449,7 +567,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604140101",
-          "value:": "",
+          
         },
       ],
     },
@@ -464,7 +582,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160415",
-          "value:": "",
+          
         },
       ],
     },
@@ -474,7 +592,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604150101",
-          "value:": "",
+          
         },
       ],
     },
@@ -489,7 +607,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160416",
-          "value:": "",
+          
         },
       ],
     },
@@ -499,7 +617,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604160101",
-          "value:": "",
+          
         },
       ],
     },
@@ -514,7 +632,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160417",
-          "value:": "",
+          
         },
       ],
     },
@@ -524,7 +642,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604170101",
-          "value:": "",
+          
         },
       ],
     },
@@ -539,7 +657,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160418",
-          "value:": "",
+          
         },
       ],
     },
@@ -549,7 +667,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604180101",
-          "value:": "",
+          
         },
       ],
     },
@@ -564,7 +682,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160419",
-          "value:": "",
+          
         },
       ],
     },
@@ -574,11 +692,11 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1604190101", // A
-          "value:": "",
+          
         },
         {
           "name": "l1604190102", // B
-          "value:": "",
+          
         },
       ],
     },
@@ -606,7 +724,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1605020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -621,7 +739,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1605030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -636,7 +754,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1605040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -651,7 +769,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160505",
-          "value:": "",
+          
         },
       ],
     },
@@ -661,7 +779,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1605050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -676,7 +794,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160506",
-          "value:": "",
+          
         },
       ],
     },
@@ -686,7 +804,6 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1605060101",
-          "value:": "",
         },
       ],
     },
@@ -704,7 +821,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160607",
-          "value:": "",
+          
         },
       ],
     },
@@ -724,7 +841,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1606080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -739,7 +856,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160609",
-          "value:": "",
+          
         },
       ],
     },
@@ -749,7 +866,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1606090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -764,7 +881,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160610",
-          "value:": "",
+          
         },
       ],
     },
@@ -774,7 +891,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1606100101",
-          "value:": "",
+          
         },
       ],
     },
@@ -789,7 +906,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160611",
-          "value:": "",
+          
         },
       ],
     },
@@ -799,7 +916,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1606110101",
-          "value:": "",
+          
         },
       ],
     },
@@ -814,7 +931,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160612",
-          "value:": "",
+          
         },
       ],
     },
@@ -824,7 +941,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1606120101",
-          "value:": "",
+          
         },
       ],
     },
@@ -839,7 +956,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l160613",
-          "value:": "",
+          
         },
       ],
     },
@@ -849,7 +966,7 @@ export const sannixItemTemplate = [
       "field": [
         {
           "name": "l1606130101",
-          "value:": "",
+          
         },
       ],
     },

@@ -1563,13 +1563,21 @@ const printFormAll = async () => {
   // ตั้งค่าสถานะการประมวลผลให้เป็น true
   processingPrint.value = true
 
+  const typeReceiving = ref('ReceivingForm')
+
   const printPromises = selectedPrintLabel.value.map(async label => {
     if (label === 'Receiving Form') {
       processingPrintForm1.value = true // เริ่มพิมพ์
       console.log('Printing Receiving Form...')
 
+      if(receivingTypeAction.value === 2){
+        typeReceiving.value = 'ReceivingForm'
+      }else if(receivingTypeAction.value === 3){
+        typeReceiving.value = 'ReceivingFormByLorry'
+      }
+
       try {
-        return await printReceivingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) // คืนค่าผลลัพธ์
+        return await printReceivingFormService(typeReceiving.value, poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) // คืนค่าผลลัพธ์
       } finally {
         processingPrintForm1.value = false // เสร็จสิ้นการพิมพ์
       }

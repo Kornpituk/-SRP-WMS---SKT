@@ -41,12 +41,12 @@ export const usePrintReceivingFormService = () => {
   const printReceivingFormResult = ref(null)
   const errorMessageGenerateView = ref(null)
   
-  const printReceivingFormService = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+  const printReceivingFormService = async (typeReceiving, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageGenerateView.value = null
       console.log('Print Receiving Form Service Starting...')
   
-      const result = await globalService.printReceivingFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      const result = await globalService.printReceivingFormPDF(typeReceiving, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
         
       if (result) {
         console.log('Print Receiving Form Service Complate:', result)
