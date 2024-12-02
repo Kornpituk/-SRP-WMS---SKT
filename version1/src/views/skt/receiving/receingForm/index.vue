@@ -14,6 +14,7 @@ import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
 import alertWordConst from '@/utilities/constant'
 
 const isDialogVisibleConfirmDialog = ref(false)
+const isDialogVisibleConfirmDialog2 = ref(false)
 const confirmValueCheck = ref(false)
 
 const itemStore = useItemStore()
@@ -41,6 +42,8 @@ import RawMatInspec from '../inspecReqForm/index.vue'
 import PackagingInspec from '../packagingForm/index.vue'
 import PackagingInspec2 from '../packagingForm/index.vue'
 import PackagingInspec3 from '../packagingForm/index.vue'
+
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 
 //---------------- Import Lorry -------------------------------
 //--- A1
@@ -547,6 +550,8 @@ const selectLorryInfoKey = ref(null)
 
 const successDialAlert = ref(false)
 
+
+
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
@@ -576,10 +581,15 @@ const handleSelectLorryLoading = word => {
   sessionStorage.setItem('typeLorryInfoId', selectLorryInfoKey.value)
   typeLorryOnce.value = selectLorryInfoKey.value
 
-  // window.location.href = '/skt/receiving'
+  // location.reload()
 
-  // isDialogConfirmVisible.value = false
-  // isDialogSubmitSuccessVisible.value = true
+  isDialogSubmitSuccessVisible.value = true
+  
+  setTimeout(() => {
+    isDialogSubmitSuccessVisible.value = false
+    isDialogVisibleConfirmDialog2.value?.closeDialog()
+    isDialogVisibleSelecrLorry.value = false
+  }, 1000) // 10000 มิลลิวินาที = 10 วินาที
 
 
 }
@@ -616,12 +626,37 @@ const handleAcceptPackaging = word => {
 }
 
 const btnSelectLorry = async (word, word2, lorryInfoKey) => {
-  isDialogVisibleConfirmDialog.value = false
+  isDialogVisibleConfirmDialog2.value.openDialog()
   selectLorryInfoKey.value = lorryInfoKey
 
   const confirmed = await textConfirmDialogFunction(word+word2, true, false)
 
   
+}
+
+//----------------------------------- select lorry
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(selectLorryInfoKey.value){
+    console.log('Action selectLorryInfoKey.', selectLorryInfoKey.value)
+    handleSelectLorryLoading(selectLorryInfoKey.value)
+  }else {
+    console.log('Action failed.')
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
 }
 </script>
 
@@ -923,64 +958,6 @@ const btnSelectLorry = async (word, word2, lorryInfoKey) => {
     </VRow>
   </section>
 
-  <!-- Dialog Submit -->
-  <section>
-    <VDialog
-      v-model="isDialogConfirmVisible"
-      width="500"
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardText>
-          <div class="d-flex justify-center">
-            <VIcon
-              size="100"
-              color="warning"
-              icon="ri-question-line"
-            />
-          </div>
-          <div
-            v-if="wordForSubmit === 'LORRY LOADING'"
-            class="text-center"
-          >
-            <span style="font-size: 22px; font-weight: bolder;">Would you like to selcet {{ wordForSubmit }}
-              from {{ resultSelectLorry }}?</span>
-          </div>
-          <div
-            v-else
-            class="text-center"
-          >
-            <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
-              Transaction?</span>
-          </div>
-        </VCardText>
-
-        <VCardAction class="d-flex justify-space-between pa-4">
-          <VBtn
-            color="error"
-            @click="isDialogConfirmVisible = false"
-          >
-            Cancel
-          </VBtn>
-          
-          <VBtn
-            v-if="wordForSubmit === 'APPROVE'"
-            color="green"
-            @click="handleAcceptPackaging"
-          >
-            {{ wordForSubmit }}
-          </VBtn>
-          <VBtn
-            v-if="wordForSubmit === 'LORRY LOADING'"
-            color="green"
-            @click="handleSelectLorryLoading"
-          >
-            Confirm
-          </VBtn>
-        </VCardAction>
-      </VCard>
-    </VDialog>
-  </section>
   <!-- Dialog Submit Success -->
   <section>
     <VDialog
@@ -1069,15 +1046,13 @@ const btnSelectLorry = async (word, word2, lorryInfoKey) => {
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
       />
     </div>
-
     <div>
       <!-- ใช้ confirmDialog component -->
-      <ConfirmDialog
-        :is-dialog-visible="isDialogVisibleConfirmDialog"
-        :word="wordForSubmit"
-        :success="successDialAlert"
-        @update:confirm="confirmValueCheck = $event"
-        @update:isDialogVisible="(val) => isDialogVisibleConfirmDialog.value = val"
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog2"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>

@@ -155,7 +155,7 @@ async function submit(e) {
       window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
-    console.error(response.data)
+    textAlertDialogFunction(alertWordConst.submit, false)
   }
 }
 

@@ -15,6 +15,10 @@ function openDialog() {
   dialog.value = true
 }
 
+function closeDialog() {
+  dialog.value = false
+}
+
 function confirm() {
   emit('confirm')
   dialog.value = false
@@ -25,9 +29,9 @@ function cancel() {
   dialog.value = false
 }
 
-// ใช้ defineExpose เพื่อเปิดเผยฟังก์ชัน openDialog
 defineExpose({
   openDialog,
+  closeDialog,
 })
 </script>
 
@@ -46,7 +50,7 @@ defineExpose({
           />
         </div>
         <div class="text-center">
-          <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ props.message }}
+          <span style="font-size: 22px; font-weight: bolder;">Would you like to12 {{ props.message }}
             Transaction?</span>
         </div>
       </VCardText>
