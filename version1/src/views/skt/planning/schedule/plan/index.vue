@@ -345,7 +345,7 @@ const selectedProductionDurationDays = ref(null)
 const selectedProductionReactorName = ref(null)
 const selectedProductionPlanName = ref(null)
 
-const selectedItemCode = ref(null)
+const selectedItemCode = ref(productionPlan.value[1] || null)
 const selectedItemName = ref(null)
 const selectedPackagingType = ref(null)
 const selectedPackagingName = ref(null)
@@ -453,6 +453,9 @@ watchEffect(async () => {
 
     // แสดงค่าใน console
     console.log("productionPlan", productionPlan.value)
+
+    selectedItemCode.value = productionPlan.value[0].product1SelectedCode
+    selectedProductionCode.value = productionPlan.value[0].productionCode
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error fetching production plan:", error)
@@ -477,8 +480,17 @@ const formatDateDMY = date => {
 //------------------------------ func Save add data production plan service --------------------------------
 const indexSelectBoxFilter = ref(null)
 
-const selectFilterProduction = index => {
+const selectFilterProduction = (index, item) => {
   indexSelectBoxFilter.value = index
+  if(item === 1){
+    btnSelectitem1.value = true
+    btnSelectitem2.value = false
+    console.log("Itesm", item)
+  }else if(item === 2){
+    btnSelectitem2.value = true
+    btnSelectitem1.value = false
+    console.log("Itesm", item)
+  }
   isDialogVisibleFilterSelect.value = true
 }
 
@@ -1348,6 +1360,7 @@ const print = () => {
             <VRow class="mb-1">
               <VCol cols="10">
                 <VBtn
+                  v-if="false"
                   color="light-blue-lighten-1"
                   :variant="btnSelectitem1 ? 'tonal' : 'flat'"
                   @click="btnSelectitem1 = true, btnSelectitem2 = false"
@@ -1355,6 +1368,7 @@ const print = () => {
                   Item 1
                 </VBtn> 
                 <VBtn
+                  v-if="false"
                   color="red-lighten-1"
                   :variant="btnSelectitem2 ? 'tonal' : 'flat'"
                   @click="btnSelectitem1 = false, btnSelectitem2 = true"
@@ -1518,7 +1532,7 @@ const print = () => {
                   hide-details
                   single-line
                 />
-                <h5>Item</h5>
+                <h5>Item{{ selectedItemCode }} : pro {{ selectedProductionCode }}</h5>
               </div>
               <VDataTable
                 v-if="selectedProductionCode.length > 0"
@@ -1803,7 +1817,10 @@ const print = () => {
     <VCard>
       <VCardText><span style="font-weight: bolder;">BatchID: </span>{{ batchId }}</VCardText>
       <VCardText>
-        <VBtn v-if="false" @click="showSelectBox">
+        <VBtn
+          v-if="false"
+          @click="showSelectBox"
+        >
           ShowSelect
         </VBtn>
         <VDataTable
@@ -1852,13 +1869,13 @@ const print = () => {
                     <span>Input Data</span>
                   </template>
                 </AppDateTimePicker>
-                <span>{{ (item.raw.inputDate) }}</span>
+                <span>{{ formatDate(item.raw.inputDate) }}</span>
               </td>
               <td>
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
-                  @click="selectFilterProduction(index)"
+                  @click="selectFilterProduction(index,1)"
                 >
                   <span v-if="item.raw.productionCode">{{ item.raw.productionCode }}</span><span v-else>Select Production</span>
                   <template #append>
@@ -1894,7 +1911,7 @@ const print = () => {
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
-                  @click="selectFilterProduction(index)"
+                  @click="selectFilterProduction(index,1)"
                 >
                   <span v-if="item.raw.product1SelectedCode">{{ item.raw.product1SelectedCode }}</span><span v-else>Select Item</span>
                   <template #append>
@@ -1920,7 +1937,7 @@ const print = () => {
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
-                  @click="selectFilterProduction(index)"
+                  @click="selectFilterProduction(index,1)"
                 >
                   <span v-if="item.raw.product1SelectedPackagingCode">{{ item.raw.product1SelectedPackagingCode }}</span><span v-else>Select Packaging</span>
                   <template #append>
@@ -1975,7 +1992,7 @@ const print = () => {
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
-                  @click="selectFilterProduction(index)"
+                  @click="selectFilterProduction(index,2)"
                 >
                   <span v-if="item.raw.product2SelectedCode">{{ item.raw.product2SelectedCode }}</span><span v-else>Select Item</span>
                   <template #append>
@@ -1991,7 +2008,7 @@ const print = () => {
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
-                  @click="selectFilterProduction(index)"
+                  @click="selectFilterProduction(index,2)"
                 >
                   <span v-if="item.raw.product2SelectedPackagingCode">{{ item.raw.product2SelectedPackagingCode }}</span><span v-else>Select Packaging</span>
                   <template #append>
