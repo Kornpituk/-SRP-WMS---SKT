@@ -387,6 +387,26 @@ const selectPackagingTypeSwitch = computed(() => {
   return [] // Default empty or fallback data
 })
 
+const colorBtnSwitch = () => {
+  if(btnSelectitem2.value){
+    return 'red-lighten-1'
+  }else if(btnSelectitem1.value){
+    return 'blue-lighten-3'
+  }else{
+    return '#FFFFFF'
+  }
+}
+
+const colorBtnSwitchActive = () => {
+  if(btnSelectitem2.value){
+    return 'red-lighten-1'
+  }else if(btnSelectitem1.value){
+    return 'info'
+  }else{
+    return '#FFFFFF'
+  }
+}
+
 // ฟังก์ชันสำหรับเลือก plan
 const selectPlan = plan => {
   selectedItemCodeForPlan.value = plan.itemCode // อัปเดต itemCode
@@ -1640,7 +1660,7 @@ const print = () => {
                     >
                       <VBtn
                         v-if="item.raw.productionCode === selectedProductionCode"
-                        color="info"
+                        :color="colorBtnSwitch()"
                         variant="tonal"
                         :disabled="btnSelectitem2"
                         @click="selectPlan(item.raw, index)"
@@ -1650,7 +1670,7 @@ const print = () => {
                       <VBtn
                         v-if="item.raw.productionCode !== selectedProductionCode"
                         :disabled="btnSelectitem2"
-                        color="info"
+                        :color="colorBtnSwitchActive()"
                         variant="flat"
                         @click="selectPlan(item.raw, index)"
                       >
@@ -1735,7 +1755,7 @@ const print = () => {
                     >
                       <VBtn
                         v-if="item.raw.itemCode === selectItemCodeSwitch"
-                        color="info"
+                        :color="colorBtnSwitch()"
                         variant="tonal"
                         @click="selectItemCode(item.raw, index)"
                       >
@@ -1743,7 +1763,7 @@ const print = () => {
                       </VBtn>
                       <VBtn
                         v-if="item.raw.itemCode !== selectItemCodeSwitch"
-                        color="info"
+                        :color="colorBtnSwitchActive()"
                         variant="flat"
                         @click="selectItemCode(item.raw, index)"
                       >
@@ -1759,6 +1779,14 @@ const print = () => {
             <VCol
               style="border: 1px solid grey; border-radius: 20px;"
               cols="6"
+              :style="{
+                background:
+                  selectedProductionCode && btnSelectitem2
+                    ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                    : selectedProductionCode && btnSelectitem1
+                      ? '#D3E3FC' // เงื่อนไขแรก
+                      : '#FFFFFF', // ค่าเริ่มต้น
+              }"
             >
               <div class="d-flex justify-center">
                 <VTextField
@@ -1839,7 +1867,7 @@ const print = () => {
                     >
                       <VBtn
                         v-if="item.raw.itemCode === selectPackagingTypeSwitch"
-                        color="info"
+                        :color="colorBtnSwitch()"
                         variant="tonal"
                         @click="selectPackaging(item.raw)"
                       >
@@ -1847,7 +1875,7 @@ const print = () => {
                       </VBtn>
                       <VBtn
                         v-if="item.raw.itemCode !== selectPackagingTypeSwitch"
-                        color="info"
+                        :color="colorBtnSwitchActive()"
                         variant="flat"
                         @click="selectPackaging(item.raw)"
                       >
