@@ -1,9 +1,16 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import { telaItemTemplate } from '@/services/skt/inv/lorryLoading/telaService'
+import {
+  formatDate, generate,
+  get,
+  GetByPoEtlLogDetailJournalID,
+  npanItemTemplate,
+  passInitialData, passSubmitData,
+  save,
+} from '@/services/skt/inv/lorryLoading/npanService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
+import image01 from '@/views/skt/receiving/lorryForm/c5/N PAN 30.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
@@ -14,7 +21,7 @@ import alertWordConst from '@/utilities/constant'
 
 const itemStore = useItemStore()
 
-var lorryItem = reactive(telaItemTemplate)
+var lorryItem = reactive(npanItemTemplate)
 var lorryRequestData = ref({})
 const route = useRoute()
 
@@ -22,19 +29,10 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref('')
-const bVariable = ref('')
-const cVariable = ref('')
-const dVariable = ref('')
-const bdVariable = ref('')
-const dcsBefore = ref('')
-const eVariable = ref('')
-const fVariable = ref('')
-const gVariable = ref('')
-var dcsDiff = 0
-var tankDiff = 0
-
+//------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
@@ -44,32 +42,45 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
+
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(wordForSubmit.value === "SUBMIT"){
+    submit()
+  }else if(wordForSubmit.value === "APPROVE"){
+    approve()
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
+
 
 onMounted(async () => {
 
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  await generate(poEtlLogDetailJournalIDQueryParameters.value)
 
-  // const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-  //   headers: {
-  //     'accept': '*/*',
-  //     'x-location': `${whereHouse}`,
-  //     Authorization: `Bearer ${accessTokenAtStore}`,
-  //   },
-  // })
-  console.log(telaItemTemplate)
-  lorryRequestData.value = akumaruRequestData //lorryFormIPA.data.data
-  // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
+ 
+  var lorryForm =  await get(poEtlLogDetailJournalIDQueryParameters.value)
+
+  lorryRequestData.value = lorryForm.data.data
+
+  poNo.value = lorryForm.data.data.purchaseOrderNo
   for (var i of lorryItem) {
     for (var f of i.result.field) {
       // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
@@ -83,78 +94,80 @@ onMounted(async () => {
     }
   }
 
+  const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  statusId.value = lorryFormStatus.data.data[0].statusId
 
 })
 
-function passInitialData(type, params) {
-  if (type == "oknot") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
-    }
-  } else {
-    return params
-  }
-}
-
-function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else {
-    return params
-  }
-}
 
 async function saveDraft(e) {
+
   for (var i of lorryItem) {
     for (var f of i.result.field) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
+
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+      }
+    }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
+    setTimeout(() => {
+      location.reload()
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
+    e.preventDefault()
   }
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 async function submit(e) {
+
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+      }
+    }
+  }
+
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
+
+  if (response.status != 200) 
+    return
+
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  let isValid = true
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
+        isValid = false
+      }
+    }
+  }
+
+  if(!isValid){
+    alert("กรุณากรอกข้อมูลให้ครบ")
+    
+    return
+  }
+
+  // เรียก API หรือดำเนินการต่อ
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormNpan/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -164,16 +177,20 @@ async function submit(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.submit, true)
+    setTimeout(() => {
+      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
   }
+
 }
 
 async function approve(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormNpan/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -188,52 +205,9 @@ async function approve(e) {
     console.error(response.data)
   }
 }
-
-// watch(lorryItem[6].result.field[0], async x => {// A
-//   let b = x.value / (0.78)
-//   lorryItem[6].result.field[1].value = b.toFixed(2)
-// })
-
-// watch(lorryItem[7].result.field[0], async x => {// C
-//   let d = (x.value * 5.32) + 740.45
-//   lorryItem[7].result.field[1].value = d.toFixed(2) // D
-// })
-
-// watch(lorryItem[46].result.field[0], async x => { // E
-//   lorryItem[46].result.field[1].value = mm2litre(x.value)// F
-// })
-
 watchEffect(async () => {
-  // dcsDiff = (lorryItem[47].result.field[0].value - lorryItem[9].result.field[0].value).toFixed(2)
-  // tankDiff = (lorryItem[46].result.field[1].value - lorryItem[7].result.field[1].value).toFixed(2)
-  // lorryItem[8].result.field[0].value = (parseFloat(lorryItem[6].result.field[1].value) + parseFloat(lorryItem[7].result.field[1].value)).toFixed(2)
-  // lorryItem[49].result.field[0].value = (parseFloat(lorryItem[8].result.field[0].value) - parseFloat(lorryItem[46].result.field[1].value)).toFixed(2)
-  // lorryItem[49].result.field[1].value = (parseFloat(lorryItem[49].result.field[0].value) * 0.78).toFixed(2)
+
 })
-
-
-// function mm2litre(mm) {
-//   let litre = mm * 5.32 + 740.45
-
-//   return litre.toFixed(2)
-// }
-
-//----------------- Formate
-function formatDate(dateString) {
-  if (dateString === null || dateString === '' || dateString === undefined) {
-    return 'Null'
-  } else if (dateString.length > 0) {
-    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
-    const year = date.getFullYear()
-
-    return `${day}/${month}/${year}`
-
-  }
-
-  return 'null'
-}
 </script>
 
 <template>
@@ -534,22 +508,22 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :max-length="2"
+                      :readonly="isReadOnly"
+                      :value-range="23"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :max-length="2"
+                      :readonly="isReadOnly"
+                      :value-range="59"
                     />
                   </VCol>
                 </VRow>
@@ -880,20 +854,20 @@ function formatDate(dateString) {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
         color="warning"
         class="mx-1"
         @click="saveDraft"
       >
-        Draft
+        SAVE Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
-        color="secondary "
+        color="primary "
         class="mx-1"
-        @click="submit"
+        @click="openConfirmDialog('SUBMIT')"
       >
         Submit
       </VBtn>
@@ -902,7 +876,7 @@ function formatDate(dateString) {
         type="text"
         color="primary"
         class="mx-1"
-        @click="approve"
+        @click="openConfirmDialog('APPROVE')"
       >
         Approve
       </VBtn>
@@ -918,6 +892,16 @@ function formatDate(dateString) {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>

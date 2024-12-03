@@ -886,7 +886,16 @@ export const kumaruItemTemplate = [
     "rowSpan": 1,
     "sequence": "<strong>เสร็จสิ้นการ loading</strong>",
     "practice": "14. ทำการจดบันทึกค่าที่ต่างกันหลังจากรับ",
-    "condition": "ต้องไม่ต่างจากที่คำนวณไม่เกิน...........kg",
+    "condition": {
+      "startText": "ต้องไม่ต่างจากที่คำนวณไม่เกิน",
+      "endText": "kg",
+      "type": "kg",
+      "field": [
+        {
+          "name": "l060615",       
+        },
+      ],
+    },
     "result": {
       "type": "cb",
       "field": [
@@ -896,6 +905,5 @@ export const kumaruItemTemplate = [
       ],
     },
   },
-
 ]
 

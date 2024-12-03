@@ -348,6 +348,22 @@ function formatDate(dateString) {
                   :label="section.practice.startPracticeText"
                 />
               </div>
+              <div v-else-if="section.practice.type === 'checkbox2'">
+                <VRow>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[0].value"
+                      :label="section.practice.field[0].startPracticeText"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VCheckbox
+                      v-model="section.practice.field[1].value"
+                      :label="section.practice.field[1].startPracticeText"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
               <div v-else-if="section.practice.type === 'checkbox3'">
                 <VRow>
                   <VCol>
@@ -366,34 +382,6 @@ function formatDate(dateString) {
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :label="section.practice.field[2].startPracticeText"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-else-if="section.practice.type === 'checkbox4'">
-                <VRow>
-                  <VCol>
-                    <VCheckbox
-                      v-model="section.practice.field[0].value"
-                      :label="section.practice.field[0].startPracticeText"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCheckbox
-                      v-model="section.practice.field[1].value"
-                      :label="section.practice.field[1].startPracticeText"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCheckbox
-                      v-model="section.practice.field[2].value"
-                      :label="section.practice.field[2].startPracticeText"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCheckbox
-                      v-model="section.practice.field[3].value"
-                      :label="section.practice.field[3].startPracticeText"
                     />
                   </VCol>
                 </VRow>

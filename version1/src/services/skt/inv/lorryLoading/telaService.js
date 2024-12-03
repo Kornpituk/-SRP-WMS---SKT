@@ -1,86 +1,137 @@
 
+import { urlApi } from '@/api'
+import axios from '@axios'
 
-export const telaRequestData = {
-  "RmLorryLoadingFormJournalId": 0,
-  "ProductId": "",
-  "ProductName": "",
-  "LoadedDate": null,
-  "PurchaseOrderNo": null,
-  "WHStaff": "",
-  "WHStaffUpdatedDate": null,
-  "WHLeader": "",
-  "WHLeaderDate": null,
-  "WHSupervisor": "",
-  "WHSupervisorDate": null,
-  "l1201010101": "0",
-  "l1201020101": "0",
-  "l1201030101": "0",
-  "l1202010101": "-1",
-  "l1204010101": "-1",
-  "l1204020101": "-1",
-  "l1204030101": "-1",
-  "l1204040101": "-1",
-  "l1204050101": "-1",
-  "l1204060101": "-1",
-  "l1204070101": "-1",
-  "l1204080101": "-1",
-  "l1204090101": "-1",
-  "l1204100101": "-1",
-  "l1204110101": "-1",
-  "l1204120101": "-1",
-  "l1204130101": "-1",
-  "l1204140101": "-1",
-  "l1204150101": "0",
-  "l1204150102": "0",
-  "l1205020101": "0",
-  "l1205030101": "0",
-  "l1205040101": "-1",
-  "l1205050101": "-1",
-  "l1205060101": "-1",
-  "l1205070101": "-1",
-  "l1205080101": "-1",
-  "l1205090101": "-1",
-  "l1206100101": "0",
-  "l1206100102": "0",
-  "l1206110101": "0",
-  "l1206120101": "0",
-  "l1206130101": "-1",
-  "l1206140101": "-1",
-  "l1206150101": "-1",
-  "l120301": "0",
-  "l120302": "0",
-  "l120303": "0",
-  "l120304": "0",
-  "l120305": "0",
-  "l120306": "0",
-  "l120307": "0",
-  "l120401": "0",
-  "l120402": "0",
-  "l120403": "0",
-  "l120404": "0",
-  "l120405": "0",
-  "l120406": "0",
-  "l120407": "0",
-  "l120408": "0",
-  "l120409": "0",
-  "l120410": "0",
-  "l120411": "0",
-  "l120412": "0",
-  "l120413": "0",
-  "l120414": "0",
-  "l120415": "0",
-  "l120504": "0",
-  "l120505": "0",
-  "l120506": "0",
-  "l120507": "0",
-  "l120508": "0",
-  "l120509": "0",
-  "l120610": "0",
-  "l120612": "0",
-  "l120613": "0",
-  "l120614": "0",
-  "l120615": "0",
+export async function generate(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
 
+  await axios.post(`${urlApi.value}/api/v1/LorryFormTela/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function get(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormTela/get/${poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormTela/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
+
+export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export function currencyFormat(number) {
+  return new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(number)
+}
+
+
+export function mm2litre(mm) {
+  let litre = mm * 5.32 + 740.45
+
+  return litre.toFixed(2)
+}
+
+//----------------- Formate
+export function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
+export function passInitialData(type, params, index) {
+  if (type == "oknot" || type=="leak" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"){
+    return params == 1
+  }
+  else {
+    return params
+  }
+}
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function passSubmitData(type, params) {
+  if (type == "oknot" || type=="leak") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"){
+    if(params === true)
+      return 1
+    else
+      return 0
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
 }
 
 export const telaItemTemplate = [

@@ -4,6 +4,7 @@ import VCurrencyField from "@/components/VCurrencyField.vue"
 import {
   formatDate, generate,
   get,
+  GetByPoEtlLogDetailJournalID,
   hakuItemTemplate,
   passInitialData, passSubmitData,
   save,
@@ -29,19 +30,10 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref('')
-const bVariable = ref('')
-const cVariable = ref('')
-const dVariable = ref('')
-const bdVariable = ref('')
-const dcsBefore = ref('')
-const eVariable = ref('')
-const fVariable = ref('')
-const gVariable = ref('')
-var dcsDiff = 0
-var tankDiff = 0
-
+//------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
@@ -51,8 +43,31 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
+
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(wordForSubmit.value === "SUBMIT"){
+    submit()
+  }else if(wordForSubmit.value === "APPROVE"){
+    approve()
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
+
 
 onMounted(async () => {
 
@@ -67,7 +82,7 @@ onMounted(async () => {
   console.log(hakuItemTemplate)
   lorryRequestData.value = lorryForm.data.data
 
-  // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
+  poNo.value = lorryForm.data.data.purchaseOrderNo
   for (var i of lorryItem) {
     for (var f of i.result.field) {
       // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
@@ -81,16 +96,9 @@ onMounted(async () => {
     }
   }
 
+  const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  statusId.value = lorryFormIPAStatus.data.data.statusId
+  statusId.value = lorryFormStatus.data.data[0].statusId
 
 })
 
@@ -200,7 +208,10 @@ async function approve(e) {
   }
 }
 watchEffect(async () => {
-  lorryItem[2].result.field[0].value = currencyFormat(lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value)
+  var c = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value
+  var d =  lorryItem[34].result.field[0].value 
+  lorryItem[2].result.field[0].value = currencyFormat(c)
+  lorryItem[35].result.field[0].value = currencyFormat(c-d)
 })
 </script>
 
@@ -725,6 +736,27 @@ watchEffect(async () => {
                   </VCol>
                 </VRow>
               </div>
+              <div v-if="section.result.type === 'cdkg'">
+                <VRow>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VTextField> 
+                  </VCol>
+                </VRow>
+              </div>
               <div v-if="section.result.type === 'mpa2'">
                 <VRow>
                   <VCol>
@@ -772,147 +804,6 @@ watchEffect(async () => {
         </tbody>
       </table>
     </VCol>
-    <!-- Calculation formula -->
-    <!--
-      <VCol cols="12">
-      <div style="border: 1px solid black;">
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      <u>สูตรคำนวน</u>
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      หาเป็นลิตร = mm x 5.32 + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      หาเป็น mm = Litre - 740.45 / 5.32
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      (B) = (A) / 0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ aVariable.value }} /0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ bVariable.value }} Litre
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      (D) - ((C) X 5.32) + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = ({{ cVariable.value }}X 5.32 ) + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ dVariable.value }}Litre
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      Density IPA = 0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      </div>
-      </VCol> 
-    -->
-    <!-- Dcs Tank -->
-    <!--
-      <VCol cols="12">
-      <table class="custom-table">
-      <thead>
-      <tr>
-      <th />
-      <th class="text-center" style="font-size: 16px;">
-      DSC
-      </th>
-      <th class="text-center" style="font-size: 16px;">
-      TANK
-      </th>
-      <th />
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td style="font-size: 16px;">
-      After
-      </td>
-      <td class="py-4 text-center">
-      {{ gVariable.value }}
-      </td>
-      <td class="py-4 text-center">
-      {{ fVariable.value }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      <tr>
-      <td style="font-size: 16px;">
-      Before
-      </td>
-      <td class="py-4 text-center">
-      {{ dcsBefore.value }}
-      </td>
-      <td class="py-4 text-center">
-      {{ dVariable.value }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      <tr>
-      <td style="font-size: 16px;">
-      Diff
-      </td>
-      <td class="py-4 text-center">
-      {{ dcsDiff }}
-      </td>
-      <td class="py-4 text-center">
-      {{ tankDiff }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      </tbody>
-      </table>
-      </VCol> 
-    -->
-    <!-- Precautions -->
     <VCol cols="12">
       <table class="custom-table">
         <tr>
@@ -926,11 +817,6 @@ watchEffect(async () => {
             <br>
             : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
           </td>
-          <!--
-            <th style="font-size: 16px;" colspan="3">
-            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            </th> 
-          -->
         </tr>
       </table>
     </VCol>
@@ -1026,20 +912,20 @@ watchEffect(async () => {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
         color="warning"
         class="mx-1"
         @click="saveDraft"
       >
-        Draft
+        SAVE Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
-        color="secondary "
+        color="primary "
         class="mx-1"
-        @click="submit"
+        @click="openConfirmDialog('SUBMIT')"
       >
         Submit
       </VBtn>
@@ -1048,7 +934,7 @@ watchEffect(async () => {
         type="text"
         color="primary"
         class="mx-1"
-        @click="approve"
+        @click="openConfirmDialog('APPROVE')"
       >
         Approve
       </VBtn>
@@ -1064,6 +950,16 @@ watchEffect(async () => {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>
