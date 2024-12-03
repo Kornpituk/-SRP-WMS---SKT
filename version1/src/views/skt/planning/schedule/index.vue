@@ -106,11 +106,31 @@ const formatToMMDDYYYY = date => {
 watchEffect(async () => {
   try {
 
-    if(datePickerFilter.value){
-      const [startDate, endDate] = datePickerFilter.value.split(" to ")
+    if (datePickerFilter.value) {
+      console.log("datePickerFilter:", datePickerFilter.value)
 
-      filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
-      filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+      if (datePickerFilter.value.includes(" to ")) {
+        // กรณีเป็นช่วงวันที่
+        const [startDate, endDate] = datePickerFilter.value.split(" to ")
+
+        filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
+        filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+
+        console.log("ช่วงวันที่:")
+        console.log("ProducingDateFrom:", filterForSearchBatchProductionPlan.value.ProducingDateFrom)
+        console.log("ProducingDateTo:", filterForSearchBatchProductionPlan.value.ProducingDateTo)
+
+      } else {
+        // กรณีเป็นวันเดียว
+        const singleDate = datePickerFilter.value
+
+        filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(singleDate)
+        filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
+
+        console.log("วันเดียว:")
+        console.log("ProducingDateFrom:", filterForSearchBatchProductionPlan.value.ProducingDateFrom)
+        console.log("ProducingDateTo:", filterForSearchBatchProductionPlan.value.ProducingDateTo)
+      }
     }
 
     await fetchGetProductionplanSearch(
@@ -131,7 +151,6 @@ watchEffect(async () => {
     productionPlanItems.value = []
   }
 })
-
 
 //--------------------------- New batch -----------------------------------------------------
 

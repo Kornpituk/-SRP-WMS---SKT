@@ -52,7 +52,7 @@ onMounted(async () => {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
+  await axios.post(`${urlApi.value}/api/v1/LorryFormEkiNaOH/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,

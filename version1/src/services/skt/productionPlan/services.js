@@ -212,7 +212,6 @@ export const useGetProductionPlanService = () => {
     fetchGetProductionplan,
   }
 }
-
 export const useGetProductionPlanMasterService = () => {
   const getProductionplanMasterResult = ref(null)
   const errorMessageGetProductionPlanMaster = ref(null)
@@ -242,7 +241,6 @@ export const useGetProductionPlanMasterService = () => {
     fetchGetProductionplanMaster,
   }
 }
-
 export const useGetBatchProductionPlanService = () => {
   const getBatchProductionplanResult = ref(null)
   const errorMessageGetBatchProductionPlan = ref(null)

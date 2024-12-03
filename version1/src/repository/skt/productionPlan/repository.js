@@ -173,6 +173,27 @@ export const productionPlanRepository = {
     }
   },
 
+  async generateLotBatchProductionPlan(batchId, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/genlot??BatchID=${batchId}`, {}, {
+        headers: {
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data genlot Batch production plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
   async submitProductionPlan(planningId, urlApi, form, whereHouse, accessToken) {
     try {
       const response = await axios.post(`${urlApi}/api/v1/${form}/submit`, planningId, {

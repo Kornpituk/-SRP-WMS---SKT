@@ -62,19 +62,25 @@ const format = date => {
   return `${day}/${month}/${year}`
 }
 
-const formatYMD = date => {
-  const day = date.getDate()
-  const month = date.getMonth() + 1
-  const year = date.getFullYear()
+function formatDateToYMD(dateString) {
+  const isoDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
+  if (isoDatePattern.test(dateString)) {
+    return dateString // คืนค่าถ้าอยู่ในรูปแบบ ISO 8601
+  }else if(dateString.includes('/')){
+    const [day, month, year] = dateString.split('/')
+    
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+  }
 
-  return `${year}-${month}-${day}`
+  return dateString
+  
 }
 
-const formatDate = date => {
-  const d = new Date(date)
-  const day = d.getDate().toString().padStart(2, '0')
-  const month = (d.getMonth() + 1).toString().padStart(2, '0')
-  const year = d.getFullYear()
+const formatDate = isoDate => {
+  const date = new Date(isoDate)
+  const day = String(date.getDate()).padStart(2, '0') // เพิ่ม 0 ข้างหน้าถ้าวันน้อยกว่า 10
+  const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นจาก 0 จึงต้อง +1
+  const year = date.getFullYear()
 
   return `${day}/${month}/${year}`
 }
@@ -447,9 +453,13 @@ const dataTableCliclHighlightIsToggle = no => {
 
 const batchSale = ref(null)
 const packagingkgs1 = ref(null)
+const packagingPcs1 = ref(null)
 const packagingkgs2 = ref(null)
+const packagingPcs2 = ref(null)
 
-watchEffect(async () => {
+const textAlert = ref(false)
+
+watch(async () => {
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await fetchGetProductionplan(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
@@ -467,6 +477,12 @@ watchEffect(async () => {
     // แสดงค่าใน console
     console.log("productionPlan", productionPlan.value)
 
+    // set producing date when value is null
+    productionPlan.value = productionPlan.value.map(item => ({
+      ...item,
+      producingDate: item.producingDate && item.producingDate !== "null" ? item.producingDate : new Date().toISOString(),
+    }))
+
     //------ Item 1 Add data 
     selectedItemCode.value = productionPlan.value[0].product1SelectedCode
     selectedPackagingType.value = productionPlan.value[0].product1SelectedPackagingCode
@@ -481,22 +497,94 @@ watchEffect(async () => {
 
     //---------------------------- validate ------------------------------------
     batchSale.value = productionPlan.value[0].quantityKgs
-    packagingkgs1.value = productionPlan.value[0].product1UomCount
-    packagingkgs2.value = productionPlan.value[0].product2UomCount
+    packagingkgs1.value = productionPlan.value[0].product1PackingQtyKgs || 0
+    packagingPcs1.value = productionPlan.value[0].product1UomCount || 0
+    packagingkgs2.value = productionPlan.value[0].product2PackingQtyKgs || 0
+    packagingPcs2.value = productionPlan.value[0].product2UomCount || 0
+
+    
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error fetching production plan:", error)
   }
 })
 
-const textAlert = ref(false)
+const showDataInput = () => {
+  console.log("productionPlan.value", productionPlan.value[0].product1UomCount)
+
+  // Convert to integer
+  const batchSaleInt = parseInt(batchSale.value) || 0
+  const packagingkgs1Int = parseInt(packagingkgs1.value) || 0
+  const packagingPcs1Int = parseInt(packagingPcs1.value) || 0
+  const packagingkgs2Int = parseInt(packagingkgs2.value) || 0
+  const packagingPcs2Int = parseInt(packagingPcs2.value) || 0
+
+  // Calculate totals
+  const totalKgs1 = packagingkgs1Int * packagingPcs1Int
+  const totalKgs2 = packagingkgs2Int * packagingPcs2Int
+  const total = totalKgs1 + totalKgs2
+
+  console.log("Validated", batchSale.value, '>=', total)
+
+  if (batchSale.value >= total) {
+    textAlert.value = false
+    console.log("Validation passed: true")
+  } else {
+    textAlert.value = true
+    console.log("Validation passed: false")
+  }
+}
+
+watch(
+  () => [batchSale.value, packagingkgs1.value, packagingPcs1.value, packagingkgs2.value, packagingPcs2.value],
+  () => {
+    // Convert to integer
+    const batchSaleInt = parseInt(batchSale.value) || 0
+    const packagingkgs1Int = parseInt(packagingkgs1.value) || 0
+    const packagingPcs1Int = parseInt(packagingPcs1.value) || 0
+    const packagingkgs2Int = parseInt(packagingkgs2.value) || 0
+    const packagingPcs2Int = parseInt(packagingPcs2.value) || 0
+
+    // Calculate totals
+    const totalKgs1 = packagingkgs1Int * packagingPcs1Int
+    const totalKgs2 = packagingkgs2Int * packagingPcs2Int
+    const total = totalKgs1 + totalKgs2
+
+    console.log("Validated", batchSale.value, '>=', total)
+
+    if (batchSale.value >= total) {
+      textAlert.value = false
+      console.log("Validation passed: true")
+    } else {
+      textAlert.value = true
+      console.log("Validation passed: false")
+    }
+  },
+)
 
 watch(() => {
-  if( batchSale.value >= (packagingkgs1.value + packagingkgs2.value)){
+  // Convert to integer
+  const batchSaleInt = parseInt(batchSale.value) || 0
+  const packagingkgs1Int = parseInt(packagingkgs1.value) || 0
+  const packagingPcs1Int = parseInt(packagingPcs1.value) || 0
+  const packagingkgs2Int = parseInt(packagingkgs2.value) || 0
+  const packagingPcs2Int = parseInt(packagingPcs2.value) || 0
+
+  // Calculate totals
+  const totalKgs1 = packagingkgs1Int * packagingPcs1Int
+  const totalKgs2 = packagingkgs2Int * packagingPcs2Int
+  const total = totalKgs1 + totalKgs2
+
+  console.log("Validated", batchSale.value, '>=', total)
+
+  if (batchSale.value >= total) {
+    textAlert.value = false
+    console.log("Validation passed: true")
+  } else {
     textAlert.value = true
+    console.log("Validation passed: false")
   }
 })
-
 
 // ฟังก์ชันจัดรูปแบบวันที่
 const formatDateDMY = date => {
@@ -582,8 +670,7 @@ const saveProductionPlan = async () => {
   // ตรวจสอบฟิลด์ inputDate และ producingDate
   productionPlan.value = productionPlan.value.map(item => ({
     ...item,
-    inputDate: item.inputDate || new Date().toISOString(),
-    producingDate: item.producingDate || new Date().toISOString(),
+    producingDate: item.producingDate && item.producingDate !== "null" ? item.producingDate : new Date().toISOString(),
   }))
 
   console.log("saveProductionPlan staret in 2", productionPlan.value.producingDate)
@@ -592,7 +679,8 @@ const saveProductionPlan = async () => {
 
     const filteredData = productionPlan.value.map(item => ({
       planningID: item.planningID,
-      inputDate: (item.inputDate),
+      inputDate: formatDateToYMD(item.inputDate),
+      producingDate: item.producingDate || new Date().toISOString(),
       productionCode: item.productionCode,
 
       product1SelectedCode: item.product1SelectedCode,
@@ -1572,7 +1660,7 @@ const print = () => {
                 <h5>Item</h5>
               </div>
               <VDataTable
-                v-if="selectedProductionCode.length > 0"
+                v-if="selectedProductionCode"
                 :headers="itemCodeDataTable"
                 :items="dataMasterForSelectFilter.find(
                   (data) => data.productionCode === selectedProductionCode
@@ -1657,7 +1745,7 @@ const print = () => {
                 <h5>Packaging</h5>
               </div>
               <VDataTable
-                v-if="selectedProductionCode.length > 0"
+                v-if="selectedProductionCode"
                 :headers="packagingKgsDataTable"
                 :items="dataMasterForSelectFilter.find(
                   (data) => data.productionCode === selectedProductionCode
@@ -1999,7 +2087,6 @@ const print = () => {
                 <VTextField
                   v-if="item.raw.statusId === 101"
                   v-model="item.raw.product1UomCount"
-                  type="number"
                   style="min-width: 100px;"
                   density="compact"
                   :readonly="item.raw.status === 'Submit'"
@@ -2185,6 +2272,9 @@ const print = () => {
           </template>
         </VDataTable>
       </VCardText>
+      <VBtn v-if="false" @click="showDataInput">
+        Show
+      </VBtn>
     </VCard>
   </section>
 
