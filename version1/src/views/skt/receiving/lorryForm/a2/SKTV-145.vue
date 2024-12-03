@@ -1,17 +1,17 @@
 <script setup>
 import { urlApi } from '@/api'
+import VCurrencyField from '@/components/VCurrencyField.vue'
 import {
   formatDate,
   generate,
   get,
   GetByPoEtlLogDetailJournalID,
   ItemTemplate,
-  mm2litre,
   passInitialData,
   passSubmitData,
-} from '@/services/skt/inv/lorryLoading/skt144Service'
+  save,
+} from '@/services/skt/inv/lorryLoading/skt145Service'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
 import axios from '@axios'
 import { ref } from 'vue'
 
@@ -19,6 +19,7 @@ import { ref } from 'vue'
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
+import image01 from '@/views/skt/receiving/lorryForm/a2/EP-400 (144,145 ).png'
 
 
 const itemStore = useItemStore()
@@ -31,9 +32,9 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(lorryItems[6].result.field[0])
-const bVariable = ref(lorryItems[6].result.field[1])
-const cVariable = ref(lorryItems[7].result.field[0])
+const aVariable = ref(0)
+const bVariable = ref(0)
+const cVariable = ref(0)
 const dVariable = ref(0)
 var isReadOnly = ref(false)
 
@@ -45,7 +46,11 @@ var tankAfter = ref(0)
 var tankBefore = ref(0)
 var tankDiff = ref(0)
 
+
+//------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
@@ -57,6 +62,28 @@ const textAlertDialogFunction = (word, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(wordForSubmit.value === "SUBMIT"){
+    submit()
+  }else if(wordForSubmit.value === "APPROVE"){
+    approve()
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
 onMounted(async () => {
 
   await generate(poEtlLogDetailJournalIDQueryParameters.value)
@@ -95,16 +122,7 @@ async function saveDraft(e) {
     }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -113,13 +131,26 @@ async function saveDraft(e) {
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
+    e.preventDefault()
   }
 }
 
 async function submit(e) {
+
+  for (var i of lorryItems) {
+    for (var f of i.result.field) {
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+  }
+
+  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
+
+  if (response.status != 200) 
+    return
+
+
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
-
 
   let isValid = true
   for (var i of lorryItems) {
@@ -132,12 +163,19 @@ async function submit(e) {
 
   if(!isValid){
     alert("กรุณากรอกข้อมูลให้ครบ")
-    
+  
     return
   }
- 
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  // // เรียกใช้งาน Dialog
+  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
+
+  //if (confirmed) {
+  // if (confirmed) {
+  console.log("User confirmed:", confirmValueCheck.value)
+
+  // เรียก API หรือดำเนินการต่อ
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBeX/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -152,14 +190,20 @@ async function submit(e) {
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
+    textAlertDialogFunction(alertWordConst.submit, false)
   }
+
+  // } else {
+  //   console.log("User declined")
+  // }
+
 }
 
 async function approve(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBeX/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -178,25 +222,20 @@ async function approve(e) {
 }
 
 watchEffect(async () => {
-  var b = lorryItems[6].result.field[0].value / (0.78)
-  var d = lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.32) + 740.45
-  var f = lorryItems[42].result.field[0].value == 0 ? 0 : mm2litre(lorryItems[42].result.field[0].value)
-  lorryItems[6].result.field[1].value = currencyFormat(b)
-  lorryItems[7].result.field[1].value = currencyFormat(d)
-  lorryItems[8].result.field[0].value = currencyFormat(b+d)
-  lorryItems[42].result.field[1].value = currencyFormat(f)
-  lorryItems[44].result.field[0].value = currencyFormat(((b + d) - f))
-  lorryItems[44].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
+  var a = lorryItems[6].result.field[0].value
+  var c = lorryItems[7].result.field[1].value
+  var d = a+c
+  var e = lorryItems[45].result.field[0].value
+  lorryItems[9].result.field[0].value = currencyFormat(d)
+  lorryItems[46].result.field[0].value = currencyFormat(d-e)
 
-  dcsAfter.value = currencyFormat(lorryItems[43].result.field[0].value)
-  dcsBefore.value = currencyFormat(lorryItems[9].result.field[0].value)
-  dcsDiff = currencyFormat(lorryItems[43].result.field[0].value - lorryItems[9].result.field[0].value)
+  dcsAfter.value = currencyFormat(lorryItems[45].result.field[0].value)
+  dcsBefore.value = currencyFormat(d)
+  dcsDiff = currencyFormat(lorryItems[45].result.field[0].value - (d))
 
-  tankAfter.value = currencyFormat(f)
-  tankBefore.value = currencyFormat(d)
-  tankDiff.value = currencyFormat(f-d)
-
-
+  // tankAfter.value = currencyFormat(f)
+  tankBefore.value = currencyFormat(c)
+  tankDiff.value = currencyFormat(tankAfter.value - c)
 })
 </script>
 
@@ -345,52 +384,35 @@ watchEffect(async () => {
                     <VCurrencyField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
+                      variant="solo"
                       text-start="(B)"
-                      text-end="mm."
+                      text-end="mm. = "
                       :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
-                    <VTextField
+                    <VCurrencyField
                       v-model="section.result.field[1].value"
                       density="compact"
                       variant="solo"
-                      readonly="true"
-                    >
-                      <template #prepend>
-                        <VLabel>
-                          (C)
-                        </VLabel>
-                      </template>
-                      <template #append>
-                        <VLabel>
-                          kg
-                        </VLabel>
-                      </template>
-                    </VTextField>
+                      text-start="(C)"
+                      text-end="kg."
+                      :readonly="isReadOnly"
+                    />
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'mm'">
                 <VRow>
-                  <VCol col="9">
-                    <VTextField
+                  <VCol>
+                    <VCurrencyField
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
+                      text-start="   "
+                      text-end="mm."
                       :readonly="isReadOnly"
-                    >
-                      <template #prepend>
-                        <VLabel />
-                      </template>
-                      <template #append>
-                        <VLabel>
-                          mm.
-                        </VLabel>
-                      </template>
-                    </VTextField>
+                    />
                   </VCol>
                   <VCol col="3">
                     <VRadioGroup
@@ -418,7 +440,7 @@ watchEffect(async () => {
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
-                      :readonly="isReadOnly"
+                      readonly="true"
                     >
                       <template #prepend>
                         <VLabel>
@@ -430,9 +452,9 @@ watchEffect(async () => {
                           Kg.
                         </VLabel>
                       </template>
-                    </VTextField>
+                    </VTextField> 
                   </VCol>
-                  <VCol col="3">
+                  <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
@@ -453,24 +475,50 @@ watchEffect(async () => {
               </div>
               <div v-if="section.result.type === 'percent'">
                 <VRow>
-                  <VCol col="9">
-                    <VTextField
+                  <VCol>
+                    <VCurrencyField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="solo"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="%"
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+                  <VCol>
+                    <VRadioGroup
+                      v-model="section.result.field[1].value"
+                      inline
+                      class="justify-center"
                       :readonly="isReadOnly"
                     >
-                      <template #prepend>
-                        <VLabel />
-                      </template>
-                      <template #append>
-                        <VLabel>
-                          %
-                        </VLabel>
-                      </template>
-                    </VTextField>
+                      <VRadio
+                        label="Ok"
+                        value="1"
+                      />
+                      <VRadio
+                        label="Not"
+                        value="0"
+                      />
+                    </VRadioGroup>
                   </VCol>
-                  <VCol col="3">
+                </VRow>
+              </div>
+              <div v-if="section.result.type === '35c'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start=""
+                      text-end="C°"
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+                  <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
@@ -495,6 +543,7 @@ watchEffect(async () => {
                     <VNumberInput
                       v-model="section.result.field[0].value"
                       :max-length="2"
+                      :value-range="23"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -505,87 +554,7 @@ watchEffect(async () => {
                     <VNumberInput
                       v-model="section.result.field[1].value"
                       :max-length="2"
-                      :readonly="isReadOnly"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'mpa'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="(Mpa)"
-                      :readonly="isReadOnly"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                      :readonly="isReadOnly"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'ef'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(E)"
-                      text-end="mm."
-                      :readonly="isReadOnly"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VTextField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      readonly="true"
-                    >
-                      <template #prepend>
-                        <VLabel>
-                          (F)
-                        </VLabel>
-                      </template>
-                      <template #append>
-                        <VLabel>
-                          Litre
-                        </VLabel>
-                      </template>
-                    </VTextField> 
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'mm2'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="mm."
+                      :value-range="59"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -604,27 +573,9 @@ watchEffect(async () => {
                       :readonly="isReadOnly"
                     />
                   </VCol>
-
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
-                      :readonly="isReadOnly"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
-                  </VCol>
                 </VRow>
               </div>
-              <div v-if="section.result.type === '25c'">
+              <div v-if="section.result.type === 'mm2'">
                 <VRow>
                   <VCol>
                     <VCurrencyField
@@ -633,30 +584,28 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="mm."
                       :readonly="isReadOnly"
                     />
                   </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'e'">
+                <VRow>
                   <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="E = "
+                      text-end="Kg."
                       :readonly="isReadOnly"
-                    >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
+                    />
                   </VCol>
                 </VRow>
               </div>
-              <div v-if="section.result.type === 'litrekg'">
+              <div v-if="section.result.type === 'de'">
                 <VRow>
                   <VCol>
                     <VTextField
@@ -666,24 +615,9 @@ watchEffect(async () => {
                       readonly="true"
                     >
                       <template #prepend>
-                        <VLabel />
-                      </template>
-                      <template #append>
                         <VLabel>
-                          Litre
+                          (D)-(E) =
                         </VLabel>
-                      </template>
-                    </VTextField> 
-                  </VCol>
-                  <VCol>
-                    <VTextField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      readonly="true"
-                    >
-                      <template #prepend>
-                        <VLabel />
                       </template>
                       <template #append>
                         <VLabel>
@@ -698,80 +632,6 @@ watchEffect(async () => {
           </tr>
         </tbody>
       </table>
-    </VCol>
-    <VCol cols="12">
-      <div style="border: 1px solid black;">
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              <u>สูตรคำนวน</u>
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              หาเป็นลิตร = mm x 5.32 + 740.45
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              หาเป็น mm = Litre - 740.45 / 5.32
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              (B) = (A) / 0.78
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              = {{ aVariable.value }} /0.78
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              = {{ bVariable.value }} Litre
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              (D) = ((C) X 5.32) + 740.45
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              = ({{ cVariable.value }}X 5.32 ) + 740.45
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              = {{ dVariable }} Litre
-            </VLabel>
-          </VCol>
-        </VRow>
-        <VRow>
-          <VCol>
-            <VLabel class="d-flex justify-center">
-              Density IPA = 0.78
-            </VLabel>
-          </VCol>
-        </VRow>
-      </div>
     </VCol>
     <!-- Dcs Tank -->
     <VCol cols="12">
@@ -803,7 +663,14 @@ watchEffect(async () => {
               {{ dcsAfter }}
             </td>
             <td class="py-4 text-center">
-              {{ tankAfter }}
+              <VCurrencyField
+                v-model="tankAfter"
+                density="compact"
+                variant="solo"
+                text-start="   "
+                text-end="mm."
+                :readonly="isReadOnly"
+              />
             </td>
             <td style="font-size: 16px;">
               Ltr
@@ -840,7 +707,6 @@ watchEffect(async () => {
         </tbody>
       </table>
     </VCol>
-    <!-- Flow Chat -->
     <VCol cols="12">
       <table class="custom-table">
         <thead>
@@ -931,20 +797,20 @@ watchEffect(async () => {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
         color="warning"
         class="mx-1"
         @click="saveDraft"
       >
-        Draft
+        SAVE Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
-        color="secondary "
+        color="primary "
         class="mx-1"
-        @click="submit"
+        @click="openConfirmDialog('SUBMIT')"
       >
         Submit
       </VBtn>
@@ -953,7 +819,7 @@ watchEffect(async () => {
         type="text"
         color="primary"
         class="mx-1"
-        @click="approve"
+        @click="openConfirmDialog('APPROVE')"
       >
         Approve
       </VBtn>
@@ -969,6 +835,16 @@ watchEffect(async () => {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>

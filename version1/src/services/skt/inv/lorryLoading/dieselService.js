@@ -1,88 +1,139 @@
 
 
-export const dieselRequestData = {
-  "RmLorryLoadingFormJournalId": 0,
-  "ProductId": "",
-  "ProductName": "",
-  "LoadedDate": null,
-  "PurchaseOrderNo": null,
-  "WHStaff": "",
-  "WHStaffUpdatedDate": null,
-  "WHLeader": "",
-  "WHLeaderDate": null,
-  "WHSupervisor": "",
-  "WHSupervisorDate": null,
-  "l1101010101": "0",
-  "l1101020101": "0",
-  "l1101030101": "0",
-  "l1102010101": "-1",
-  "l1103010101": "-1",
-  "l1105010101": "-1",
-  "l1105020101": "-1",
-  "l1105030101": "-1",
-  "l1105040101": "-1",
-  "l1105050101": "-1",
-  "l1105060101": "-1",
-  "l1105070101": "-1",
-  "l1105080101": "-1",
-  "l1105090101": "-1",
-  "l1105100101": "-1",
-  "l1105110101": "0",
-  "l1105110102": "0",
-  "l1106020101": "0",
-  "l1106030101": "0",
-  "l1106040101": "-1",
-  "l1106050101": "-1",
-  "l1106060101": "-1",
-  "l1106070101": "-1",
-  "l1106080101": "-1",
-  "l1106090101": "-1",
-  "l1106100101": "-1",
-  "l1106110101": "-1",
-  "l1106120101": "-1",
-  "l1107010101": "0",
-  "l1107010102": "0",
-  "l1107020101": "-1",
-  "l1107030101": "0",
-  "l1107040101": "0",
-  "l1107050101": "-1",
-  "l1107060101": "-1",
-  "l1107070101": "-1",
-  "l110102": "0",
-  "l110401": "0",
-  "l110402": "0",
-  "l110403": "0",
-  "l110404": "0",
-  "l110405": "0",
-  "l110501": "0",
-  "l110502": "0",
-  "l110503": "0",
-  "l110504": "0",
-  "l110505": "0",
-  "l110506": "0",
-  "l110507": "0",
-  "l110508": "0",
-  "l110509": "0",
-  "l110510": "0",
-  "l110511": "0",
-  "l110604": "0",
-  "l110605": "0",
-  "l110606": "0",
-  "l110607": "0",
-  "l110608": "0",
-  "l110609": "0",
-  "l110610": "0",
-  "l110611": "0",
-  "l110612": "0",
-  "l110701": "0",
-  "l110702": "0",
-  "l110704": "0",
-  "l110705": "0",
-  "l110706": "0",
-  "l110707": "0",
+import { urlApi } from '@/api'
+import axios from '@axios'
 
+export async function generate(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  await axios.post(`${urlApi.value}/api/v1/LorryFormDiesel/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
 }
 
+export async function get(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormDiesel/get/${poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormDiesel/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
+
+export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export function currencyFormat(number) {
+  return new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(number)
+}
+
+
+export function mm2litre(mm) {
+  let litre = mm * 5.32 + 740.45
+
+  return litre.toFixed(2)
+}
+
+//----------------- Formate
+export function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
+export function passInitialData(type, params, index) {
+  if (type == "oknot" || type=="leak"  || type=="soldout" || type=="straight") {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"|| type=="checkbox2"){
+    return params == 1
+  }
+  else {
+    return params
+  }
+}
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function passSubmitData(type, params) {
+  if (type == "oknot" || type=="leak" || type=="soldout" || type=="straight") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3" || type=="checkbox2"){
+    if(params === true)
+      return 1
+    else
+      return 0
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
+}
 export const dieselItemTemplate = [
   // 1.check ใบส่งสินค้า  
   {
@@ -96,7 +147,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1101010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -111,7 +162,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l110102",
-          "value:": "",
+          
         },
       ],
     },
@@ -121,7 +172,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1101020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -136,7 +187,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1101030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -164,7 +215,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1102010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -182,7 +233,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1103010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -200,25 +251,24 @@ export const dieselItemTemplate = [
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
           "name": "l110401",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "ชุดป้องกันการกระเด็นใส่",
           "endPracticeText": "",
           "name": "l110402",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
           "name": "l110403",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "รองเท้าบูท",
           "endPracticeText": "",
           "name": "l110404",
-          "value:": "",
         },
       ],
     },
@@ -238,7 +288,6 @@ export const dieselItemTemplate = [
           "startPracticeText": "แว่นตา",
           "endPracticeText": "",
           "name": "l110405",
-          "value:": "",
         },
       ],
     },
@@ -255,13 +304,13 @@ export const dieselItemTemplate = [
     "rowSpan": 11,
     "sequence": "<strong>5. ขั้นตอนการปฏิบัติ</strong>",
     "practice": {
-      "startPracticeText": "หยุดรถบริเวณที่ปฏิบัติงาน และดับเครื่องยนต์ NO.1",
-      "endPracticeText": "",
+    
       "type": "checkbox",
       "field": [
-        {
+        { 
+          "startPracticeText": "หยุดรถบริเวณที่ปฏิบัติงาน และดับเครื่องยนต์ NO.1",
+          "endPracticeText": "",
           "name": "l110501",
-          "value:": "",
         },
       ],
     },
@@ -271,7 +320,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -280,13 +329,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อน NO.2",
-      "endPracticeText": "",
+      
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อน NO.2",
+          "endPracticeText": "",
           "name": "l110502",
-          "value:": "",
         },
       ],
     },
@@ -296,7 +345,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -305,13 +354,12 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ต่อสายกราวน์เข้ากับตัวรถ NO.3",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ต่อสายกราวน์เข้ากับตัวรถ NO.3",
+          "endPracticeText": "",
           "name": "l110503",
-          "value:": "",
         },
       ],
     },
@@ -321,7 +369,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -330,13 +378,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "นำกรวยมาวางกั้นบอกพื้นที่ปฏิบัติงาน NO.4",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "นำกรวยมาวางกั้นบอกพื้นที่ปฏิบัติงาน NO.4",
+          "endPracticeText": "",
           "name": "l110504",
-          "value:": "",
+          
         },
       ],
     },
@@ -346,7 +394,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -355,13 +403,12 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ต่อสาย NO.5 จากรถเข้า pump ",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ต่อสาย NO.5 จากรถเข้า pump ",
+          "endPracticeText": "",
           "name": "l110505",
-          "value:": "",
         },
       ],
     },
@@ -371,7 +418,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -380,13 +427,12 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิด  valve จาก Lorry ทุก Tank NO.6",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "เปิด  valve จาก Lorry ทุก Tank NO.6",
+          "endPracticeText": "",
           "name": "l110508",
-          "value:": "",
         },
       ],
     },
@@ -396,7 +442,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -405,13 +451,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิดวาล์วเข้า Pump  NO.7",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "เปิดวาล์วเข้า Pump  NO.7",
+          "endPracticeText": "",
           "name": "l110508",
-          "value:": "",
+          
         },
       ],
     },
@@ -421,7 +467,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -430,13 +476,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่  NO.5",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
-          "name": "l110509",
-          "value:": "",
+          "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่  NO.5",
+          "endPracticeText": "",
+          "name": "L110508",
+          
         },
       ],
     },
@@ -445,8 +491,8 @@ export const dieselItemTemplate = [
       "type": "leak",
       "field": [
         {
-          "name": "l1105090101",
-          "value:": "",
+          "name": "l1105080101",
+          
         },
       ],
     },
@@ -455,13 +501,35 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิดวาล์วตรง Hopper เพื่อ blow อากาศ  NO.8",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "เปิดวาล์วตรง Hopper เพื่อ blow อากาศ  NO.8",
+          "endPracticeText": "",
+          "name": "l110509",
+        },
+      ],
+    },
+    "condition": "เรียบร้อย",
+    "result": {
+      "type": "oknot",
+      "field": [
+        {
+          "name": "l1105090101",
+        },
+      ],
+    },
+  },
+  {
+    "isSection": false,
+    "sequence": "",
+    "practice": {
+      "type": "checkbox",
+      "field": [
+        {
+          "startPracticeText": "ปิด วาล์ว Hopper เมื่อไม่มีอากาศอยู่ใน line pump NO.8",
+          "endPracticeText": "",
           "name": "l110510",
-          "value:": "",
         },
       ],
     },
@@ -471,7 +539,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105100101",
-          "value:": "",
+          
         },
       ],
     },
@@ -480,38 +548,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ปิด วาล์ว Hopper เมื่อไม่มีอากาศอยู่ใน line pump NO.8",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "บันทึกเวลา start  (101P-023) NO.9",
+          "endPracticeText": "",
           "name": "l110511",
-          "value:": "",
-        },
-      ],
-    },
-    "condition": "เรียบร้อย",
-    "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1105110101",
-          "value:": "",
-        },
-      ],
-    },
-  },
-  {
-    "isSection": false,
-    "sequence": "",
-    "practice": {
-      "startPracticeText": "บันทึกเวลา start  (101P-023) NO.9",
-      "endPracticeText": "",
-      "type": "checkbox",
-      "field": [
-        {
-          "name": "l110511",
-          "value:": "",
+          
         },
       ],
     },
@@ -521,11 +564,11 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1105110101", // A
-          "value:": "",
+          
         },
         {
           "name": "l1105110102", // B
-          "value:": "",
+          
         },
       ],
     },
@@ -553,7 +596,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -568,7 +611,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -577,13 +620,14 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "หยุด Pump  เมื่อ diesel ใน lorry หมด  NO.9",
-      "endPracticeText": "",
+     
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "หยุด Pump  เมื่อ diesel ใน lorry หมด  NO.9",
+          "endPracticeText": "",
           "name": "l110604",
-          "value:": "",
+          
         },
       ],
     },
@@ -593,7 +637,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -607,8 +651,10 @@ export const dieselItemTemplate = [
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ปิดวาล์ว Lorry  NO.6",
+          "endPracticeText": "",
           "name": "l110605",
-          "value:": "",
+          
         },
       ],
     },
@@ -618,7 +664,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -627,13 +673,14 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ปิดวาล์ว Receiving  NO.7",
-      "endPracticeText": "",
+     
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ปิดวาล์ว Receiving  NO.7",
+          "endPracticeText": "",
           "name": "l110606",
-          "value:": "",
+          
         },
       ],
     },
@@ -643,7 +690,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -652,13 +699,12 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Drain น้ำมันในหม้อพักที่รถและในสาย hose ลง hopper. NO.10",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "Drain น้ำมันในหม้อพักที่รถและในสาย hose ลง hopper. NO.10",
+          "endPracticeText": "",
           "name": "l110607",
-          "value:": "",
         },
       ],
     },
@@ -668,7 +714,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -677,13 +723,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิดวาล์ว Hopper  NO.8",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "เปิดวาล์ว Hopper  NO.8",
+          "endPracticeText": "",
           "name": "l110608",
-          "value:": "",
+          
         },
       ],
     },
@@ -693,7 +739,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -702,13 +748,12 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Start pump อีกครั้ง  (101P-023). NO.9",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "Start pump อีกครั้ง  (101P-023). NO.9",
+          "endPracticeText": "",
           "name": "l110609",
-          "value:": "",
         },
       ],
     },
@@ -718,7 +763,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -727,13 +772,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "หยุด Pump เมื่อใน hopper หมด.NO.9",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "หยุด Pump เมื่อใน hopper หมด.NO.9",
+          "endPracticeText": "",
           "name": "l110610",
-          "value:": "",
+          
         },
       ],
     },
@@ -743,7 +788,6 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106100101",
-          "value:": "",
         },
       ],
     },
@@ -752,13 +796,12 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ปิดวาล์วลง Hopper NO.8",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ปิดวาล์วลง Hopper NO.8",
+          "endPracticeText": "",
           "name": "l110611",
-          "value:": "",
         },
       ],
     },
@@ -768,7 +811,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106110101",
-          "value:": "",
+          
         },
       ],
     },
@@ -777,13 +820,12 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check ใน lorry ว่าหมดแน่นอน  NO.11",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "Check ใน lorry ว่าหมดแน่นอน  NO.11",
+          "endPracticeText": "",
           "name": "l110612",
-          "value:": "",
         },
       ],
     },
@@ -793,7 +835,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1106120101",
-          "value:": "",
+          
         },
       ],
     },
@@ -804,14 +846,13 @@ export const dieselItemTemplate = [
     "isSection": true,
     "rowSpan": 7,
     "sequence": "<strong>7.ขั้นตอนเมื่อรับเสร็จ</strong>",
-    "practice": {
-      "startPracticeText": "บันทึกเวลาที่รับเสร็จ",
-      "endPracticeText": "",
+    "practice": {  
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "บันทึกเวลาที่รับเสร็จ",
+          "endPracticeText": "",
           "name": "l110701",
-          "value:": "",
         },
       ],
     },
@@ -821,11 +862,11 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1107010101",
-          "value:": "",
+          
         },
         {
           "name": "l1107010102",
-          "value:": "",
+          
         },
       ],
     },
@@ -834,13 +875,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ถอด สาย hose - สายกราวด์ ออกแล้วหรือยัง NO.5 , NO.3",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ถอด สาย hose - สายกราวด์ ออกแล้วหรือยัง NO.5 , NO.3",
+          "endPracticeText": "",
           "name": "l110702",
-          "value:": "",
+          
         },
       ],
     },
@@ -850,13 +891,13 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1107020101",
-          "value:": "",
+          
         },
       ],
     },
   },
   {
-    "isSection": true,
+    "isSection": false,
     "sequence": "",
     "practice": "(D) เช็ค Level ในแท้งค์101V-020  NO.12 ",
     "condition": "น้ำหนักที่อ่านได้",
@@ -865,7 +906,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1107030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -874,13 +915,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง                      ",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง",
+          "endPracticeText": "",
           "name": "l110704",
-          "value:": "",
+          
         },
       ],
     },
@@ -890,7 +931,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1107040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -899,13 +940,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจเช็ค valve เปิด-ปิด อีกครั้งให้อยู่ในสภาพเดิมก่อนรับ  NO.7 ,8",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "ตรวจเช็ค valve เปิด-ปิด อีกครั้งให้อยู่ในสภาพเดิมก่อนรับ  NO.7 ,8",
+          "endPracticeText": "",
           "name": "l110705",
-          "value:": "",
+          
         },
       ],
     },
@@ -915,7 +956,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1107050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -924,13 +965,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เอาหมอนลองล้อ รถออก  NO.2",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "เอาหมอนลองล้อ รถออก  NO.2",
+          "endPracticeText": "",
           "name": "l110706",
-          "value:": "",
+          
         },
       ],
     },
@@ -940,7 +981,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1107060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -949,13 +990,13 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เก็บกรวย และอุปกรณ์ PPE ทำความสะอาด  NO.4",
-      "endPracticeText": "",
       "type": "checkbox",
       "field": [
         {
+          "startPracticeText": "เก็บกรวย และอุปกรณ์ PPE ทำความสะอาด  NO.4",
+          "endPracticeText": "",
           "name": "l110707",
-          "value:": "",
+          
         },
       ],
     },
@@ -965,7 +1006,7 @@ export const dieselItemTemplate = [
       "field": [
         {
           "name": "l1107070101",
-          "value:": "",
+          
         },
       ],
     },

@@ -1,98 +1,137 @@
+import { urlApi } from '@/api'
+import axios from '@axios'
 
+export async function generate(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
 
-export const eki110RequestData = {
-  "RmLorryLoadingFormJournalId": 0,
-  "ProductId": "",
-  "ProductName": "",
-  "LoadedDate": null,
-  "PurchaseOrderNo": null,
-  "WHStaff": "",
-  "WHStaffUpdatedDate": null,
-  "WHLeader": "",
-  "WHLeaderDate": null,
-  "WHSupervisor": "",
-  "WHSupervisorDate": null,
-  "l1001010101": "0",
-  "l1001020101": "0",
-  "l1001030101": "0",
-  "l1001040101": "-1",
-  "l1001050101": "-1",
-  "l1002010101": "-1",
-  "l1004010101": "-1",
-  "l1004020101": "-1",
-  "l1004030101": "-1",
-  "l1004040101": "-1",
-  "l1004050101": "-1",
-  "l1004060101": "-1",
-  "l1004070101": "-1",
-  "l1004080101": "-1",
-  "l1004090101": "-1",
-  "l1004100101": "-1",
-  "l1004110101": "-1",
-  "l1004120101": "-1",
-  "l1004130101": "-1",
-  "l1004140101": "-1",
-  "l1004150101": "0",
-  "l1004150102": "0",
-  "l1005020101": "0",
-  "l1005030101": "0",
-  "l1005040101": "-1",
-  "l1005050101": "-1",
-  "l1005060101": "-1",
-  "l1005070101": "-1",
-  "l1005080101": "-1",
-  "l1005090101": "-1",
-  "l1006010101": "0",
-  "l1006010102": "0",
-  "l1006020101": "0",
-  "l1006030101": "0",
-  "l1006040101": "-1",
-  "l1006050101": "-1",
-  "l1006060101": "-1",
-  "l1006070101": "-1",
-  "l1006080101": "-1",
-  "l1006090101": "-1",
-  "l1006100101": "-1",
-  "l100301": "0",
-  "l100302": "0",
-  "l100303": "0",
-  "l100304": "0",
-  "l100305": "0",
-  "l100306": "0",
-  "l100307": "0",
-  "l100401": "0",
-  "l100402": "0",
-  "l100403": "0",
-  "l100404": "0",
-  "l100405": "0",
-  "l100406": "0",
-  "l100407": "0",
-  "l100408": "0",
-  "l100409": "0",
-  "l100410": "0",
-  "l100411": "0",
-  "l100412": "0",
-  "l100413": "0",
-  "l100414": "0",
-  "l100415": "0",
-  "l100504": "0",
-  "l100505": "0",
-  "l100506": "0",
-  "l100507": "0",
-  "l100508": "0",
-  "l100509": "0",
-  "l100601": "0",
-  "l100602": "0",
-  "l100603": "0",
-  "l100604": "0",
-  "l100605": "0",
-  "l100606": "0",
-  "l100607": "0",
-  "l100608": "0",
-  "l100609": "0",
-  "l100610": "0",
+  await axios.post(`${urlApi.value}/api/v1/LorryFormEkiA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
 }
 
+export async function get(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormEkiA/get/${poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormEkiA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
+
+export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export function currencyFormat(number) {
+  return new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(number)
+}
+
+
+export function mm2litre(mm) {
+  let litre = mm * 5.32 + 740.45
+
+  return litre.toFixed(2)
+}
+
+//----------------- Formate
+export function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
+export function passInitialData(type, params, index) {
+  if (type == "oknot" || type=="leak" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3"|| type=="checkbox2"){
+    return params == 1
+  }
+  else {
+    return params
+  }
+}
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function passSubmitData(type, params) {
+  if (type == "oknot" || type=="leak") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }else if(type =="checkbox4" || type=="checkbox" || type=="checkbox3" || type=="checkbox2"){
+    if(params === true)
+      return 1
+    else
+      return 0
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
+}
 export const eki110ItemTemplate = [
   // 1.check ใบส่งสินค้า  
   {
@@ -132,7 +171,7 @@ export const eki110ItemTemplate = [
     "practice": "( C ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
     "condition": "A+B",
     "result": {
-      "type": "kg",
+      "type": "abkg",
       "field": [
         {
           "name": "l1001030101",

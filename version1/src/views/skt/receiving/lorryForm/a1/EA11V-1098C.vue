@@ -3,9 +3,8 @@ import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import VNumberInput from '@/components/VNumberInput.vue'
 import {
-  currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, eaItemTemplate,
-  mm2litre, passInitialData, passSubmitData,
-  save,
+  formatDate, generate, get, GetByPoEtlLogDetailJournalID,
+  passInitialData, passSubmitData,
 } from '@/services/skt/inv/lorryLoading/eaService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
@@ -15,24 +14,22 @@ import { ref, watchEffect } from 'vue'
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
-import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
 import alertWordConst from '@/utilities/constant'
 
 const itemStore = useItemStore()
 
-var eaItems = reactive(eaItemTemplate)
-var eaRequestData = ref({})
+var lorryItems = reactive(eaItemTemplate)
+var lorryRequestData = ref({})
 const route = useRoute()
 
 const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(ipaItems[6].result.field[0])
-const bVariable = ref(ipaItems[6].result.field[1])
-const cVariable = ref(ipaItems[7].result.field[0])
+const aVariable = ref(lorryItems[6].result.field[0])
+const bVariable = ref(lorryItems[6].result.field[1])
+const cVariable = ref(lorryItems[7].result.field[0])
 const dVariable = ref(0)
-const fvariable = ref(0)
 var isReadOnly = ref(false)
 
 var dcsAfter = ref(0)
@@ -85,28 +82,27 @@ onMounted(async () => {
 
   await generate(poEtlLogDetailJournalIDQueryParameters.value)
 
-  const lorryFormIPA = await get(poEtlLogDetailJournalIDQueryParameters.value)
+  const lorryForm = await get(poEtlLogDetailJournalIDQueryParameters.value)
 
-  eaRequestData.value = lorryFormIPA.data.data
+  lorryRequestData.value = lorryForm.data.data
 
-  poNo.value = lorryFormIPA.data.data.purchaseOrderNo
+  poNo.value = lorryForm.data.data.purchaseOrderNo
 
-  for (var i of ipaItems) {
+  for (var i of lorryItems) {
     let index = 0
     for (var f of i.result.field) {
-      f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name], index)
+      f.value = passInitialData(i.result.type, lorryForm.data.data[f.name], index)
       index ++
     }
   }
 
-  const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
+  const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  console.log("statusId", lorryFormIPAStatus.data)
+  console.log("statusId", lorryFormStatus.data)
 
-  statusId.value = lorryFormIPAStatus.data.data[0].statusId
-  console.log("StatusId : ", statusId.value)
+  statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+  if(statusId.value == 15 || statusId.value == 18){
     isReadOnly.value = true
   }
 
@@ -114,13 +110,22 @@ onMounted(async () => {
 
 async function saveDraft(e) {
 
-  for (var i of ipaItems) {
+  for (var i of lorryItems) {
     for (var f of i.result.field) {
-      eaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, eaRequestData)
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -129,29 +134,16 @@ async function saveDraft(e) {
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
-    e.preventDefault()
   }
 }
 
 async function submit(e) {
-
-  for (var i of ipaItems) {
-    for (var f of i.result.field) {
-      eaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
-    }
-  }
-
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, eaRequestData)
-
-  if (response.status != 200) 
-    return
-
-
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
+
   let isValid = true
-  for (var i of ipaItems) {
+  for (var i of lorryItems) {
     for (var f of i.result.field) {
       if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
         isValid = false
@@ -164,16 +156,9 @@ async function submit(e) {
     
     return
   }
+ 
 
-  // // เรียกใช้งาน Dialog
-  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
-
-  //if (confirmed) {
-  // if (confirmed) {
-  console.log("User confirmed:", confirmValueCheck.value)
-
-  // เรียก API หรือดำเนินการต่อ
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -188,19 +173,15 @@ async function submit(e) {
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
+    textAlertDialogFunction(alertWordConst.submit, false)
   }
-
-  // } else {
-  //   console.log("User declined")
-  // }
-
 }
 
 async function approve(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -218,28 +199,27 @@ async function approve(e) {
   }
 }
 
-
 watchEffect(async () => {
-  var b = ipaItems[6].result.field[0].value / (0.78)
-  var d = ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45
-  var f = ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)
+  // var b = ipaItems[6].result.field[0].value / (0.78)
+  // var d = ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45
+  // var f = ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)
 
-  dVariable.value = currencyFormat(d)
+  // dVariable.value = currencyFormat(d)
 
-  ipaItems[6].result.field[1].value = currencyFormat(b) // B
-  ipaItems[7].result.field[1].value = currencyFormat(d) // D
-  ipaItems[46].result.field[1].value = currencyFormat(f) // F
+  // ipaItems[6].result.field[1].value = currencyFormat(b) // B
+  // ipaItems[7].result.field[1].value = currencyFormat(d) // D
+  // ipaItems[46].result.field[1].value = currencyFormat(f) // F
 
-  ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
-  ipaItems[49].result.field[0].value = currencyFormat((b + d) - f)
-  ipaItems[49].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
+  // ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
+  // ipaItems[49].result.field[0].value = currencyFormat((b + d) - f)
+  // ipaItems[49].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
 
-  dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value))
-  dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))
-  dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
-  tankAfter.value = ipaItems[46].result.field[1].value
-  tankBefore.value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45)
-  tankDiff.value = currencyFormat((ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) - (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
+  // dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value))
+  // dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))
+  // dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
+  // tankAfter.value = ipaItems[46].result.field[1].value
+  // tankBefore.value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45)
+  // tankDiff.value = currencyFormat((ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) - (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
 
   
 })
@@ -984,9 +964,11 @@ watchEffect(async () => {
             style="min-width: 150px;"
             colspan="4"
           >
-            <div v-if="ipaRequestData.whSupervisorDate">
+            <!--
+              <div v-if="ipaRequestData.whSupervisorDate">
               <span v-if="ipaRequestData.whSupervisorDate">{{ formatDate(ipaRequestData.whSupervisorDate) }}</span>
-            </div>
+              </div> 
+            -->
           </td>
         </tr>
       </table>

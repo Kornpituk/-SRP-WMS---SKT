@@ -480,6 +480,35 @@ watchEffect(async () => {
         </tbody>
       </table>
     </VCol>
+    <!-- Flow Chat -->
+    <VCol cols="12">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th style="font-size: 16px;">
+              Flow Chart
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <div class="d-flex justify-space-around align-center bg-grey-lighten-4">
+              <div class="ma-4">
+                <div class="text-subtitle-2">
+                  Default
+                </div>
+                <VImg
+                  :aspect-ratio="1"
+                  class="bg-white"
+                  :src="image01"
+                  width="500"
+                />
+              </div>
+            </div>
+          </tr>
+        </tbody>
+      </table>
+    </VCol>
     <VCol
       cols="12"
       lg="12"
@@ -530,35 +559,6 @@ watchEffect(async () => {
             </div>
           </td>
         </tr>
-      </table>
-    </VCol>
-    <!-- Flow Chat -->
-    <VCol cols="12">
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th style="font-size: 16px;">
-              Flow Chart
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <div class="d-flex justify-space-around align-center bg-grey-lighten-4">
-              <div class="ma-4">
-                <div class="text-subtitle-2">
-                  Default
-                </div>
-                <VImg
-                  :aspect-ratio="1"
-                  class="bg-white"
-                  :src="image01"
-                  width="500"
-                />
-              </div>
-            </div>
-          </tr>
-        </tbody>
       </table>
     </VCol>
   </VRow>

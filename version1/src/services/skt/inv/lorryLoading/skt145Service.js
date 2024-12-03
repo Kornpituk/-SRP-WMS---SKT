@@ -5,7 +5,7 @@ export async function generate(poEtllogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/lorryFormEpichlo/generate?poEtllogDetailJournalID=${poEtllogDetailJournalID}`, [], {
+  await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBeX/generate?poEtllogDetailJournalID=${poEtllogDetailJournalID}`, [], {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -18,7 +18,7 @@ export async function get(poEtllogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  return await axios.get(`${urlApi.value}/api/v1/lorryFormEpichlo/get/${poEtllogDetailJournalID}`, {
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormSktEpBeX/get/${poEtllogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -38,6 +38,22 @@ export async function GetByPoEtlLogDetailJournalID(poEtllogDetailJournalIDQueryP
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
   })
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBeX/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
 }
 
 export function currencyFormat(number) {
@@ -74,8 +90,54 @@ export function formatDate(dateString) {
   return 'null'
 }
 
+export function passInitialData(type, params, index) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }
+  else {
+    return params
+  }
+}
 
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function passSubmitData(type, params) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }else if(type == "percent"){
+    if(params == undefined)
+      return 0
+    else parseFloat(params)
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
+}
 
 export const ItemTemplate = [
   // ข้อควรระวัง
@@ -392,7 +454,7 @@ export const ItemTemplate = [
     "practice": "3. Temperature เท่าไหร่",
     "condition": "อุณหภูมิต้องไม่สูงกว่า  35 C' ",
     "result": {
-      "type": "25c",
+      "type": "35c",
       "field": [
         {
           "name": "l0504030101", // percen
@@ -811,46 +873,3 @@ export const ItemTemplate = [
     },
   },
 ]
-
-export function passInitialData(type, params, index) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
-    if(index == 0){
-      return params
-    }else{
-      return params.toString()
-    }
-  }
-  else {
-    return params
-  }
-}
-
-export function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else if(type == "actualCheck"){
-    return !params ? "0": params.toString()
-  }
-  else {
-    if(isNaN(Number(params))){
-      return parseFloat( params.replace(/,/g, ''))
-    }else{
-      return parseFloat(params)
-    }
-  }
-}

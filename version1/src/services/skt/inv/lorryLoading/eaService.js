@@ -1,11 +1,11 @@
 import { urlApi } from '@/api'
 import axios from '@axios'
 
-export async function generate(poEtlLogDetailJournalID) {
+export async function generate(poEtllogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+  await axios.post(`${urlApi.value}/api/v1/LorryFormEA/generate?poEtllogDetailJournalID=${poEtllogDetailJournalID}`, [], {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -14,11 +14,11 @@ export async function generate(poEtlLogDetailJournalID) {
   })
 }
 
-export async function get(poEtlLogDetailJournalID) {
+export async function get(poEtllogDetailJournalID) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  return await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalID}`, {
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormEA/get/${poEtllogDetailJournalID}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -27,27 +27,11 @@ export async function get(poEtlLogDetailJournalID) {
   })
 }
 
-export async function save(poEtlLogDetailJournalIDQueryParameters, eaRequestData) {
+export async function GetByPoEtlLogDetailJournalID(poEtllogDetailJournalIDQueryParameters) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  // eslint-disable-next-line sonarjs/prefer-immediate-return
-  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, eaRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-  
-  return response
-}
-
-export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtllogDetailJournalID/${poEtllogDetailJournalIDQueryParameters}`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -57,9 +41,11 @@ export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryP
 }
 
 export function currencyFormat(number) {
+  console.log("currencyFormat", number)
+  
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(number)
 }
@@ -88,9 +74,16 @@ export function formatDate(dateString) {
   return 'null'
 }
 
+
 export function passInitialData(type, params, index) {
-  if (type == "oknot" ) {
-    return params.toString()
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
   }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
     if(index == 0){
       return params

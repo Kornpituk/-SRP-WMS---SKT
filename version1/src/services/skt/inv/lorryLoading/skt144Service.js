@@ -91,6 +91,55 @@ export function formatDate(dateString) {
 }
 
 
+export function passInitialData(type, params, index) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }
+  else {
+    return params
+  }
+}
+
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function passSubmitData(type, params) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }else if(type == "percent"){
+    if(params == undefined)
+      return 0
+    else parseFloat(params)
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
+}
+
 
 
 export const ItemTemplate = [
@@ -790,7 +839,7 @@ export const ItemTemplate = [
     "practice": "10. Check level DCS ได้เท่าไหร่",
     "condition": "Actual  Check",
     "result": {
-      "type": "kg",
+      "type": "e",
       "field": [
         {
           "name": "l0408100101", // percen
@@ -804,7 +853,7 @@ export const ItemTemplate = [
     "practice": "11. ส่วนต่างระหว่าง ก่อนการรับ และหลังรับ จำนวนกี่กีโลกรัม",
     "condition": "ต้องไม่ต่างกันมากจากการคำนวน",
     "result": {
-      "type": "kg",
+      "type": "de",
       "field": [
         {
           "name": "l0408110101", // percen
@@ -828,50 +877,3 @@ export const ItemTemplate = [
   },
 ]
 
-export function passInitialData(type, params, index) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
-    if(index == 0){
-      return params
-    }else{
-      return params.toString()
-    }
-  }
-  else {
-    return params
-  }
-}
-
-// eslint-disable-next-line sonarjs/cognitive-complexity
-export function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else if(type == "actualCheck"){
-    return !params ? "0": params.toString()
-  }else if(type == "percent"){
-    if(params == undefined)
-      return 0
-    else parseFloat(params)
-  }
-  else {
-    if(isNaN(Number(params))){
-      return parseFloat( params.replace(/,/g, ''))
-    }else{
-      return parseFloat(params)
-    }
-  }
-}

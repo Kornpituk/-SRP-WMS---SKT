@@ -19,7 +19,7 @@ import { ref } from 'vue'
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
-
+import image01 from '@/views/skt/receiving/lorryForm/a2/EP-400 (144,145 ).png'
 
 const itemStore = useItemStore()
 
@@ -223,15 +223,18 @@ async function approve(e) {
 watchEffect(async () => {
   var a = lorryItems[6].result.field[0].value
   var c = lorryItems[7].result.field[1].value
-  lorryItems[9].result.field[0].value = currencyFormat(a+c)
+  var d = a+c
+  var e = lorryItems[45].result.field[0].value
+  lorryItems[9].result.field[0].value = currencyFormat(d)
+  lorryItems[46].result.field[0].value = currencyFormat(d-e)
 
-  // dcsAfter.value = currencyFormat(lorryItems[43].result.field[0].value)
-  // dcsBefore.value = currencyFormat(lorryItems[9].result.field[0].value)
-  // dcsDiff = currencyFormat(lorryItems[43].result.field[0].value - lorryItems[9].result.field[0].value)
+  dcsAfter.value = currencyFormat(lorryItems[45].result.field[0].value)
+  dcsBefore.value = currencyFormat(d)
+  dcsDiff = currencyFormat(lorryItems[45].result.field[0].value - (d))
 
   // tankAfter.value = currencyFormat(f)
-  // tankBefore.value = currencyFormat(d)
-  // tankDiff.value = currencyFormat(f-d)
+  tankBefore.value = currencyFormat(c)
+  tankDiff.value = currencyFormat(tankAfter.value - c)
 })
 </script>
 
@@ -586,6 +589,44 @@ watchEffect(async () => {
                   </VCol>
                 </VRow>
               </div>
+              <div v-if="section.result.type === 'e'">
+                <VRow>
+                  <VCol>
+                    <VCurrencyField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="outlined"
+                      label=""
+                      text-start="E = "
+                      text-end="Kg."
+                      :readonly="isReadOnly"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'de'">
+                <VRow>
+                  <VCol>
+                    <VTextField
+                      v-model="section.result.field[0].value"
+                      density="compact"
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          (D)-(E) =
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg.
+                        </VLabel>
+                      </template>
+                    </VTextField> 
+                  </VCol>
+                </VRow>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -621,7 +662,14 @@ watchEffect(async () => {
               {{ dcsAfter }}
             </td>
             <td class="py-4 text-center">
-              {{ tankAfter }}
+              <VCurrencyField
+                v-model="tankAfter"
+                density="compact"
+                variant="solo"
+                text-start="   "
+                text-end="mm."
+                :readonly="isReadOnly"
+              />
             </td>
             <td style="font-size: 16px;">
               Ltr
@@ -654,6 +702,34 @@ watchEffect(async () => {
             <td style="font-size: 16px;">
               Ltr
             </td>
+          </tr>
+        </tbody>
+      </table>
+    </VCol>
+    <VCol cols="12">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th style="font-size: 16px;">
+              Flow Chart
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <div class="d-flex justify-space-around align-center bg-grey-lighten-4">
+              <div class="ma-4">
+                <div class="text-subtitle-2">
+                  Default
+                </div>
+                <VImg
+                  :aspect-ratio="1"
+                  class="bg-white"
+                  :src="image01"
+                  width="500"
+                />
+              </div>
+            </div>
           </tr>
         </tbody>
       </table>
