@@ -152,6 +152,7 @@ watchEffect(async () => {
   }
 })
 
+
 //--------------------------- New batch -----------------------------------------------------
 
 const { getBatchProductionplanResult, errorMessageGetBatchProductionPlan, fetchGetBatchProductionplan } = useGetBatchProductionPlanService()

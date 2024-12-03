@@ -92,6 +92,36 @@ export const useDeleteProductionPlanService = () => {
   }
 }
 
+export const useGenerateBatchProductionPlanService = () => {
+  const responseGenerateLotBatchProductionPlan = ref(null)
+  const errorMessageGenerateLotBatchProductionPlan = ref(null)
+  
+  const generateLotBatchProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageGenerateLotBatchProductionPlan.value = null
+      console.log('Genertate Batch lot Produtcion Plan Func...')
+  
+      const result = await productionPlanRepository.generateLotBatchProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Genertate Batch lot Produtcion Plan Func result:', result)
+        responseGenerateLotBatchProductionPlan.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in generateLotBatchProdutcionPlanFunc:', error)
+      errorMessageGenerateLotBatchProductionPlan.value = error.message
+    }
+  }
+  
+  return {
+    responseGenerateLotBatchProductionPlan,
+    errorMessageGenerateLotBatchProductionPlan,
+    generateLotBatchProdutcionPlanFunc,
+  }
+}
+
 export const useSubmitProductionPlanService = () => {
   const responseSubmitProductionPlan = ref(null)
   const errorMessageSubmitProductionPlan = ref(null)
@@ -151,7 +181,6 @@ export const useApproveProductionPlanService = () => {
     approveProdutcionPlanFunc,
   }
 }
-
 
 export const useGetProductionPlanSearchService = () => {
   const getProductionplanSearchResult = ref(null)

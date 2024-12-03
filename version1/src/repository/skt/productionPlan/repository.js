@@ -175,7 +175,7 @@ export const productionPlanRepository = {
 
   async generateLotBatchProductionPlan(batchId, urlApi, form, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/genlot??BatchID=${batchId}`, {}, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/genlot?BatchID=${batchId}`, {}, {
         headers: {
           'x-location': whereHouse,
           'Authorization': `Bearer ${accessToken}`,

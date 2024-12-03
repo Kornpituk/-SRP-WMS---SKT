@@ -191,6 +191,7 @@ import { useGetProductionPlanService,
   useSaveProductionPlanService,
   useSubmitProductionPlanService,
   useApproveProductionPlanService,
+  useGenerateBatchProductionPlanService,
 } from '@/services/skt/productionPlan/services'
 
 const countItemProduction = ref(1)
@@ -309,10 +310,10 @@ watchEffect(async () => {
 
     // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
     if (getProductionplanMasterResult.value?.data && Array.isArray(getProductionplanMasterResult.value.data)) {
-      console.log("getProductionplanMasterResult", getProductionplanMasterResult.value.data)
+      // console.log("getProductionplanMasterResult", getProductionplanMasterResult.value.data)
       dataMasterForSelectFilter.value = getProductionplanMasterResult.value.data
     } else {
-      console.warn("getProductionplanMasterResult.data is not an array")
+      // console.warn("getProductionplanMasterResult.data is not an array")
       dataMasterForSelectFilter.value = []
     }
   } catch (error) {
@@ -496,11 +497,13 @@ watch(async () => {
     selectedItemCodeForPlan.value = productionPlan.value[0].product1SelectedCode
 
     //---------------------------- validate ------------------------------------
-    batchSale.value = productionPlan.value[0].quantityKgs
+    batchSale.value = productionPlan.value[0].quantityKgs || 0
     packagingkgs1.value = productionPlan.value[0].product1PackingQtyKgs || 0
     packagingPcs1.value = productionPlan.value[0].product1UomCount || 0
     packagingkgs2.value = productionPlan.value[0].product2PackingQtyKgs || 0
     packagingPcs2.value = productionPlan.value[0].product2UomCount || 0
+
+    console.log("Packaging", batchSale.value, packagingkgs1.value)
 
     
   } catch (error) {
@@ -509,81 +512,69 @@ watch(async () => {
   }
 })
 
-const showDataInput = () => {
-  console.log("productionPlan.value", productionPlan.value[0].product1UomCount)
+const realTimeValue = ref()
 
-  // Convert to integer
-  const batchSaleInt = parseInt(batchSale.value) || 0
-  const packagingkgs1Int = parseInt(packagingkgs1.value) || 0
-  const packagingPcs1Int = parseInt(packagingPcs1.value) || 0
-  const packagingkgs2Int = parseInt(packagingkgs2.value) || 0
-  const packagingPcs2Int = parseInt(packagingPcs2.value) || 0
-
-  // Calculate totals
-  const totalKgs1 = packagingkgs1Int * packagingPcs1Int
-  const totalKgs2 = packagingkgs2Int * packagingPcs2Int
-  const total = totalKgs1 + totalKgs2
-
-  console.log("Validated", batchSale.value, '>=', total)
-
-  if (batchSale.value >= total) {
-    textAlert.value = false
-    console.log("Validation passed: true")
-  } else {
-    textAlert.value = true
-    console.log("Validation passed: false")
-  }
-}
-
-watch(
-  () => [batchSale.value, packagingkgs1.value, packagingPcs1.value, packagingkgs2.value, packagingPcs2.value],
-  () => {
-    // Convert to integer
-    const batchSaleInt = parseInt(batchSale.value) || 0
-    const packagingkgs1Int = parseInt(packagingkgs1.value) || 0
-    const packagingPcs1Int = parseInt(packagingPcs1.value) || 0
-    const packagingkgs2Int = parseInt(packagingkgs2.value) || 0
-    const packagingPcs2Int = parseInt(packagingPcs2.value) || 0
-
-    // Calculate totals
-    const totalKgs1 = packagingkgs1Int * packagingPcs1Int
-    const totalKgs2 = packagingkgs2Int * packagingPcs2Int
-    const total = totalKgs1 + totalKgs2
-
-    console.log("Validated", batchSale.value, '>=', total)
-
-    if (batchSale.value >= total) {
-      textAlert.value = false
-      console.log("Validation passed: true")
-    } else {
-      textAlert.value = true
-      console.log("Validation passed: false")
-    }
-  },
-)
+// สร้างตัวแปรกลางสำหรับค่าที่ต้องการ validate
+const validationData = reactive({
+  batchSale: (batchSale.value),
+  packagingkgs1: (packagingkgs1.value),
+  packagingPcs1: (packagingPcs1.value),
+  packagingkgs2: (packagingkgs2.value),
+  packagingPcs2: (packagingPcs2.value),
+})
 
 watch(() => {
-  // Convert to integer
-  const batchSaleInt = parseInt(batchSale.value) || 0
-  const packagingkgs1Int = parseInt(packagingkgs1.value) || 0
-  const packagingPcs1Int = parseInt(packagingPcs1.value) || 0
-  const packagingkgs2Int = parseInt(packagingkgs2.value) || 0
-  const packagingPcs2Int = parseInt(packagingPcs2.value) || 0
+  validationData.packagingPcs1 = packagingPcs1.value
+  validationData.packagingPcs2 = packagingPcs2.value
+})
 
-  // Calculate totals
-  const totalKgs1 = packagingkgs1Int * packagingPcs1Int
-  const totalKgs2 = packagingkgs2Int * packagingPcs2Int
-  const total = totalKgs1 + totalKgs2
+// สถานะการ validate
+const isValid = ref(false)
 
-  console.log("Validated", batchSale.value, '>=', total)
+// ตัวแปรสำหรับเก็บค่าที่คำนวณได้
+const calculatedValues = reactive({
+  totalKgs1: 0,
+  totalKgs2: 0,
+  total: 0,
+})
 
-  if (batchSale.value >= total) {
-    textAlert.value = false
-    console.log("Validation passed: true")
-  } else {
-    textAlert.value = true
-    console.log("Validation passed: false")
-  }
+// ฟังก์ชันสำหรับ validate
+const validateBatchSale = (batchSale, kgs1, pcs1, kgs2, pcs2) => {
+  // คำนวณค่าต่าง ๆ
+  calculatedValues.totalKgs1 = (parseInt(kgs1 || 0) * parseInt(pcs1 || 0))
+  calculatedValues.totalKgs2 = (parseInt(kgs2 || 0) * parseInt(pcs2 || 0))
+  calculatedValues.total = calculatedValues.totalKgs1 + calculatedValues.totalKgs2
+
+  console.log("Batch Sale:", batchSale)
+  console.log("Total Kgs1:", kgs1, '*', pcs1, '=', calculatedValues.totalKgs1)
+  console.log("Total Kgs2:", kgs2, '*', pcs2, '=', calculatedValues.totalKgs2)
+  console.log("Total:", calculatedValues.total)
+  console.log("Result:", batchSale, '>=', calculatedValues.total)
+
+
+  return parseInt(batchSale || 0) >= calculatedValues.total
+}
+
+// Watch เพื่อทำการ validate แบบ real-time
+watch(
+  () => Object.values(validationData), // ติดตามการเปลี่ยนแปลงใน validationData
+  () => {
+    isValid.value = validateBatchSale(
+      batchSale.value,
+      validationData.packagingkgs1 || packagingkgs1.value,
+      validationData.packagingPcs1 || packagingPcs1.value,
+      validationData.packagingkgs2 || packagingkgs2.value,
+      validationData.packagingPcs2 || packagingPcs2.value,
+    )
+
+    textAlert.value = !isValid.value
+    console.log("Validation passed:", isValid.value)
+  },
+  { immediate: true }, // ให้ทำงานทันทีเมื่อ mount
+)
+
+watch(()=> {
+  console.log("realTimeValue", validationData.packagingkgs1)
 })
 
 // ฟังก์ชันจัดรูปแบบวันที่
@@ -599,6 +590,34 @@ const formatDateDMY = date => {
 
   // คืนค่าที่ไม่ได้ถูกแปลง
   return date
+}
+
+//-------------------------------- generate lot batch ------------------------
+const { responseGenerateLotBatchProductionPlan, errorMessageGenerateLotBatchProductionPlan, generateLotBatchProdutcionPlanFunc } = useGenerateBatchProductionPlanService()
+
+const handleBtnGenerateLotBatch = async () => {
+  try {
+    await generateLotBatchProdutcionPlanFunc(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+
+    if(responseGenerateLotBatchProductionPlan.value){
+      textAlertDialogFunction(alertWordConst.generateLot, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      console.error("Error API generate lot batch production plan:", error)
+      textAlertDialogFunction(alertWordConst.generateLot, false)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
+  } catch (error) {
+    console.error("Error Try generate lot batch production plan:", error)
+    textAlertDialogFunction(alertWordConst.generateLot, false)
+    setTimeout(() => {
+      // location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+  }
 }
 
 //------------------------------ func Save add data production plan service --------------------------------
@@ -683,15 +702,17 @@ const saveProductionPlan = async () => {
       producingDate: item.producingDate || new Date().toISOString(),
       productionCode: item.productionCode,
 
-      product1SelectedCode: item.product1SelectedCode,
+      product1SelectedCode: (item.product1SelectedCode),
       product1SelectedPackagingCode: item.product1SelectedPackagingCode,
-      product1PackingQtyKgs: item.product1PackingQtyKgs,
-      product1UomCount: item.product1UomCount,
+
+      product1PackingQtyKgs: parseInt(item.product1PackingQtyKgs),
+      product1UomCount: validationData.packagingPcs1 || item.product1UomCount,
 
       product2SelectedCode: item.product2SelectedCode,
       product2SelectedPackagingCode: item.product2SelectedPackagingCode,
-      product2PackingQtyKgs: item.product2PackingQtyKgs,
-      product2UomCount: item.product2UomCount,
+
+      product2PackingQtyKgs: parseInt(item.product2PackingQtyKgs),
+      product2UomCount: validationData.packagingPcs2 ||  item.product2UomCount,
 
       lotNumber: item.lotNumber,
       producingDate: formatDateYMDWhyQ(item.producingDate),
@@ -705,7 +726,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")
@@ -1530,7 +1551,7 @@ const print = () => {
                 v-if="dataMasterForSelectFilter.length > 0"
                 :headers="headerDataTableItem1"
                 :items="dataMasterForSelectFilter"
-                :items-per-page="5"
+                :items-per-page="10"
                 class="text-no-wrap"
               >
                 <template #item="{ item }">
@@ -1644,7 +1665,15 @@ const print = () => {
             <!-- ตาราง 2: Item Code -->
             <VCol
               style="border: 1px solid grey; border-radius: 20px;"
-              cols="6"
+              cols="6" 
+              :style="{
+                background:
+                  selectedProductionCode && btnSelectitem2
+                    ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                    : selectedProductionCode && btnSelectitem1
+                      ? '#D3E3FC' // เงื่อนไขแรก
+                      : '#FFFFFF', // ค่าเริ่มต้น
+              }"
             >
               <div class="d-flex justify-center">
                 <VTextField
@@ -1665,7 +1694,7 @@ const print = () => {
                 :items="dataMasterForSelectFilter.find(
                   (data) => data.productionCode === selectedProductionCode
                 ).products"
-                :items-per-page="5"
+                :items-per-page="10"
                 class="text-no-wrap"
               >
                 <template #item="{ item }">
@@ -1750,7 +1779,7 @@ const print = () => {
                 :items="dataMasterForSelectFilter.find(
                   (data) => data.productionCode === selectedProductionCode
                 ).packagings"
-                :items-per-page="5"
+                :items-per-page="10"
                 class="text-no-wrap"
               >
                 <template #item.id="{ item }">
@@ -1876,13 +1905,14 @@ const print = () => {
           class="mx-2"
           @click="deletePlan"
         >
-          <span style="font-size: 12px;">Cancel Batch</span>
+          <span style="font-size: 12px;">Cancel Plan</span>
         </VBtn>
 
         <VBtn
           color="info"
           class="mx-2"
-          disabled
+          :disabled="!productionPlan"
+          @click="handleBtnGenerateLotBatch"
         >
           <span style="font-size: 12px;">Gen Lot</span>
         </VBtn>
@@ -1895,7 +1925,6 @@ const print = () => {
         >
           <span style="font-size: 12px;">Debug Cancel Batch</span>
         </VBtn>
-        
         
         
         <VBtn
@@ -2086,15 +2115,19 @@ const print = () => {
               <td class="bg-light-blue-lighten-5 text-end">
                 <VTextField
                   v-if="item.raw.statusId === 101"
-                  v-model="item.raw.product1UomCount"
+                  v-model="validationData.packagingPcs1"
                   style="min-width: 100px;"
                   density="compact"
+                  type="number"
+                  min="0"
+                  :step="1"
                   :readonly="item.raw.status === 'Submit'"
                 >
                   <template #label>
                     <span style="font-size: 12px;">Packaging Pcs 1</span>
                   </template>
                 </VTextField>
+
                 <span
                   v-else
                   class="px-6"
@@ -2111,13 +2144,13 @@ const print = () => {
                 </div>
                 <div>
                   <span
-                    v-if="textAlert === true"
+                    v-if="textAlert"
                     class="text-red"
                   >packaging must not exceed</span>
                 </div>
                 <div class="text-start">
                   <span
-                    v-if="textAlert === true"
+                    v-if="textAlert"
                     class="text-red"
                   >the batch scale (kgs).</span>
                 </div>
@@ -2158,7 +2191,7 @@ const print = () => {
               <td class="bg-red-lighten-5 text-end">
                 <VTextField
                   v-if="item.raw.statusId === 101"
-                  v-model="item.raw.product2UomCount"
+                  v-model="validationData.packagingPcs2"
                   type="number"
                   style="min-width: 100px;"
                   density="compact"
@@ -2272,7 +2305,10 @@ const print = () => {
           </template>
         </VDataTable>
       </VCardText>
-      <VBtn v-if="false" @click="showDataInput">
+      <VBtn
+        v-if="false"
+        @click="showDataInput"
+      >
         Show
       </VBtn>
     </VCard>

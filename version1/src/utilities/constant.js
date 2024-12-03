@@ -6,6 +6,7 @@ const alertWordConst = {
   submit: 'SUBMIT',
   cancel: 'CENCEL',
   newPlan: 'NEWPLAN',
+  generateLot: 'GENERATE LOT',
 }
 
 export default alertWordConst

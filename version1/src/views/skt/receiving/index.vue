@@ -1263,10 +1263,13 @@ const findProductByJournalID = journalID => {
         typeLorryID.value = foundProduct.lorryInfos[0].lorryInfoKey
 
         itemStore.setItemDetails(typeLorryOnce, 'typeLorryInfoId')
+        sessionStorage.setItem('typeLorryInfoId', typeLorryOnce)
         
         console.log('Found Product typeLorryOnce:', typeLorryOnce)
       }else{
-        itemStore.setItemDetails(null, 'typeLorryInfoId')
+        itemStore.clearItemDetails('typeLorryInfoId')
+        sessionStorage.removeItem('typeLorryInfoId')
+        console.log('Clear typeLorryOnce:')
       }
     }else{
       console.log('No typeLorryOnce')

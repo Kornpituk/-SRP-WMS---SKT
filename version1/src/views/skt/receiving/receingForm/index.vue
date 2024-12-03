@@ -891,7 +891,7 @@ function handleCancel() {
           v-if="currentTabNew === index"
         />
       </div>
-      <div v-else>
+      <div v-else-if="!typeLorryOnce && statusId === 12">
         <VProgressLinear
           height="20"
           color="success"
@@ -899,6 +899,12 @@ function handleCancel() {
         >
           <span>Loading</span>
         </VProgressLinear>
+      </div>
+      <div v-else-if="!typeLorryOnce && statusId !== 12">
+        <Component
+          :is="tab.component"
+          v-if="currentTabNew === index"
+        />
       </div>
     </div>
   </div>

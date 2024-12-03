@@ -63,37 +63,43 @@ const closeDialog = () => {
           icon="ri-checkbox-circle-fill"
         />
         <VIcon
-          v-if="props.word === 'REJECT'"
+          v-else-if="props.word === 'REJECT'"
           size="150"
           color="error"
           icon="ri-checkbox-circle-fill"
         />
         <VIcon
-          v-if="props.word === 'ACCEPT'"
+          v-else-if="props.word === 'ACCEPT'"
           size="150"
           color="success"
           icon="ri-checkbox-circle-fill"
         />
         <VIcon
-          v-if="props.word === 'APPROVE'"
+          v-else-if="props.word === 'APPROVE'"
           size="150"
           color="success"
           icon="ri-checkbox-circle-fill"
         />
         <VIcon
-          v-if="props.word === 'CENCEL'"
+          v-else-if="props.word === 'CENCEL'"
           size="150"
           color="success"
           icon="ri-checkbox-circle-fill"
         />
         <VIcon
-          v-if="props.word === 'SUBMIT'"
+          v-else-if="props.word === 'SUBMIT'"
           size="150"
           color="success"
           icon="ri-checkbox-circle-fill"
         />
         <VIcon
-          v-if="props.word === 'NEWPLAN'"
+          v-else-if="props.word === 'NEWPLAN'"
+          size="150"
+          color="success"
+          icon="ri-checkbox-circle-fill"
+        />
+        <VIcon
+          v-else
           size="150"
           color="success"
           icon="ri-checkbox-circle-fill"

@@ -44,8 +44,8 @@ export const useItemStore = defineStore('itemStore', {
       return null // หากไม่มีข้อมูลใน cookies ก็คืนค่า null
     },
     clearItemDetails(nameCookie) {
-      this.itemDetails = null
       Cookies.remove(nameCookie) // ลบข้อมูลใน cookies
+      this.itemDetails = null
     },
   },
 })
