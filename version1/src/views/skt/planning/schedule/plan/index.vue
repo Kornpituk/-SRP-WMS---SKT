@@ -746,7 +746,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")
@@ -923,10 +923,28 @@ const submitPlan = async () => {
 
 //------------------------- approve plan
 const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approveProdutcionPlanFunc } = useApproveProductionPlanService()
+const activeBtnApprove = ref(false)
 
 const approvePlan = async () => {
 
   // console.log("selectedDataTables", selectedDataTables.value)
+
+  // ตรวจสอบฟิลด์ที่ไม่มีค่า
+  let hasErrors = false
+  selectedDataTables.value.forEach(item => {
+  // กำหนดค่าเริ่มต้น
+    if (item.statusId === 102) {
+      
+    }
+  })
+
+  // ถ้ามีฟิลด์ที่ไม่มีค่า ให้หยุดและแจ้งเตือน
+  if (hasErrors) {
+    console.warn("Some fields are missing:", selectedDataTables.value)
+    textAlertDialogFunction(alertWordConst.submit, fale)
+    
+    return // หยุดการทำงานถ้าข้อมูลไม่ครบ
+  }
 
   const body = selectedDataTables.value.map(item => item.planningID)
 
@@ -1911,6 +1929,7 @@ const print = () => {
         <VBtn
           class="mx-2"
           color="success"
+          :disabled="!selectedDataTables.length > 0"
           @click="submitPlan"
         >
           <span style="font-size: 12px;">Submit</span>

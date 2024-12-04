@@ -1550,7 +1550,7 @@ const checkTypeLorryToPrintPDF = () => {
   case '12':
     return "LorryFormTELA"
   case '13':
-    return "LorryFormHAKU-C (11V-111)"
+    return "LorryFormEKI-A TANK (432)"
   case '15':
     return "LorryFormN PAN"
   case '16':

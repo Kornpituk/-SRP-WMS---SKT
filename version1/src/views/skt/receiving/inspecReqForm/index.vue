@@ -2633,7 +2633,7 @@ const getDisabledFollowStatusNRole = () => {
           style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
         >
           <VIcon
-            v-if="statusId === 17 || statusId === 15 || statusId === 12 || statusId === 13 || statusId === 14 && isAccept"
+            v-if="isAccept"
             color="success"
             size="60"
             icon="ri-checkbox-circle-fill"
@@ -2655,7 +2655,7 @@ const getDisabledFollowStatusNRole = () => {
           style="border: 1px solid black;"
         >
           <VIcon
-            v-if="statusId === 7 || statusId === 16 || statusId === 12 || statusId === 13 || statusId === 14 && isReject"
+            v-if="isReject"
             color="red"
             size="60"
             icon="ri-close-circle-fill"
