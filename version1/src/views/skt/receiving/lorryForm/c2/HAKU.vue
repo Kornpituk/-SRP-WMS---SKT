@@ -30,6 +30,8 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
+var isReadOnly = ref(false)
+
 //------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
 const isDialogVisibleConfirmDialog = ref(false)
@@ -84,14 +86,22 @@ onMounted(async () => {
 
   poNo.value = lorryForm.data.data.purchaseOrderNo
   for (var i of lorryItem) {
+    
+    let index = 0
     for (var f of i.result.field) {
-      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
-      f.value = passInitialData(i.result.type, lorryRequestData.value[f.name])
+      console.log(f.name)
+      console.log(i.result.type)
+      f.value = passInitialData(i.result.type, lorryRequestData.value[f.name], index)
+      index++
     }
+
+    index = 0
     if(i.practice.field != undefined){
       for (var f of i.practice.field) {
-      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
-        f.value = passInitialData(i.practice.type, lorryRequestData.value[f.name])
+        console.log(f.name)
+        console.log(i.result.type)
+        f.value = passInitialData(i.practice.type, lorryRequestData.value[f.name], index)
+        index++
       }
     }
   }
@@ -100,6 +110,9 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+    isReadOnly.value = true
+  }
 })
 
 
@@ -468,7 +481,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Litre"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -476,6 +489,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -499,7 +513,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="%"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -507,6 +521,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -530,6 +545,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="C°"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -537,6 +553,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -583,6 +600,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="( Mpa )'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -590,6 +608,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -613,6 +632,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Amp'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
 
@@ -621,6 +641,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -644,6 +665,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(E)"
                       text-end="mm.'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -654,6 +676,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(F)"
                       text-end="Litre'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -669,6 +692,7 @@ watchEffect(async () => {
                       text-start="(G)"
                       text-end="Litre'"
                       type="number"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -683,6 +707,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Kg.( A )"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -697,6 +722,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Kg.( B )"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -732,6 +758,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -767,6 +794,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="( Mpa )"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -781,6 +809,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Amp"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -795,6 +824,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="C°"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>

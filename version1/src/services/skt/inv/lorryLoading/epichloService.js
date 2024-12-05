@@ -783,15 +783,9 @@ export const ItemTemplate = [
 ]
 
 export function passInitialData(type, params, index) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+  if (type == "oknot" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp' || type=="25c"){
     if(index == 0){
       return params
     }else{
@@ -802,6 +796,7 @@ export function passInitialData(type, params, index) {
     return params
   }
 }
+
 
 export function passSubmitData(type, params) {
   if (type == "oknot") {
