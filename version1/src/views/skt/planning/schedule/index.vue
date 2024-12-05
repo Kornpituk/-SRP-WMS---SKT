@@ -289,7 +289,7 @@ const rules = [v => v.length <= 150 || 'Max 25 characters']
 const itemsStatus = [
   { name: "All", id: null },
   { name: "Draft PROD plan", id: 101 },
-  { name: "Waiting for PROD APVL", id: 102 },
+  { name: "Waitting for plan APVL", id: 102 },
   { name: "Waiting for Mat. Picking", id: 103 },
   { name: "In Producing", id: 105 },
   { name: "Waiting for FG/PROD APVL", id: 107 },
@@ -302,7 +302,7 @@ const colorStatusWithId = id => {
   case 101:
     return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan' }
   case 102:
-    return { color: 'green', message: 'green', text: 'Waiting for PROD APVL' }
+    return { color: 'green', message: 'green', text: 'Waitting for plan APVL' }
   case 103:
     return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking' }
   case 105:
@@ -1125,7 +1125,7 @@ const newBatch = async batchID => {
               color="info"
               @click="viewAllData"
             >
-              <span style="font-size: 12px;">PROD Apporoved</span>
+              <span style="font-size: 12px;">PROD Approved</span>
             </VBtn>
             <VBtn
               class="mx-2"
@@ -1264,15 +1264,15 @@ const newBatch = async batchID => {
               </td>
               <td class="bg-light-blue-lighten-5 text-end">
                 <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product1PackingQtyKgs) }}</span>
-                <span v-else>0.00</span>
+                <span v-else></span>
               </td>
               <td class="bg-light-blue-lighten-5 text-end">
                 <span v-if="item.raw.product1UomCount">{{ item.raw.product1UomCount }}</span>
-                <span v-else>0</span>
+                <span v-else></span>
               </td>
 
               <td class="bg-red-lighten-5">
-                {{ item.raw.product2InBomName }}
+                {{ item.raw.product2SelectedCode }}
               </td>
               <td class="bg-red-lighten-5">
                 {{ item.raw.product2Name }}
@@ -1282,11 +1282,11 @@ const newBatch = async batchID => {
               </td>
               <td class="bg-red-lighten-5 text-end">
                 <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product2PackingQtyKgs) }}</span>
-                <span v-else>0.00</span>
+                <span v-else></span>
               </td>
               <td class="bg-red-lighten-5 text-end">
                 <span v-if="item.raw.product1UomCount">{{ item.raw.product2UomCount }}</span>
-                <span v-else>0</span>
+                <span v-else></span>
               </td>
 
               <td

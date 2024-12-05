@@ -82,6 +82,15 @@ const formatDate = isoDate => {
   const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นจาก 0 จึงต้อง +1
   const year = date.getFullYear()
 
+  return `${month}/${day}/${year}`
+}
+
+const formatDateUpdate = isoDate => {
+  const date = new Date(isoDate)
+  const day = String(date.getDate()).padStart(2, '0') // เพิ่ม 0 ข้างหน้าถ้าวันน้อยกว่า 10
+  const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นจาก 0 จึงต้อง +1
+  const year = date.getFullYear()
+
   return `${day}/${month}/${year}`
 }
 
@@ -150,7 +159,7 @@ const toDayDatePFinished = ref('NaN')
 const itemsStatus = [
   { name: "All", id: null },
   { name: "Draft PROD plan", id: 101 },
-  { name: "Waiting for PROD APVL", id: 102 },
+  { name: "Waitting for plan APVL", id: 102 },
   { name: "Waiting for Mat. Picking", id: 103 },
   { name: "In Producing", id: 105 },
   { name: "Waiting for FG/PROD APVL", id: 107 },
@@ -163,7 +172,7 @@ const colorStatusWithId = id => {
   case 101:
     return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan' }
   case 102:
-    return { color: 'green', message: 'green', text: 'Waiting for PROD APVL' }
+    return { color: 'green', message: 'green', text: 'Waitting for plan APVL' }
   case 103:
     return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking' }
   case 105:
@@ -453,6 +462,38 @@ const selectPackaging = plan => {
   }
 }
 
+const selectedDataTables = ref([])
+
+//--------------------------------- validate  ------------------------------
+const activeBtnApprove = ref(false)
+const activeBtnSubmit = ref(false)
+
+watch(()=> {
+  console.log("vselectedDataTables out func", activeBtnApprove.value)
+  activeBtnApprove.value = false
+  activeBtnSubmit.value = false
+  if(selectedDataTables.value){
+    selectedDataTables.value.forEach(item => {
+      // กำหนดค่าเริ่มต้น
+      console.log("vselectedDataTables in", activeBtnApprove.value)
+      if (item.statusId === 102 ) {
+        activeBtnApprove.value = true
+        console.log("vselectedDataTables", activeBtnApprove.value)
+      }else if(item.statusId === 101){
+        activeBtnSubmit.value = true
+      }
+      else{
+        activeBtnApprove.value = false
+        activeBtnSubmit.value = false
+      }
+
+    })
+  }else{
+    
+  }
+  
+})
+
 //------------------------------ func get production plan service --------------------------------
 const { getProductionplanResult, errorMessageGetProductionPlan, fetchGetProductionplan } = useGetProductionPlanService()
 
@@ -469,7 +510,6 @@ const dataTableCliclHighlightIsToggle = no => {
     dataTableNummberedToggle.value = no
   }
 
-  console.log("dataTableNummberedToggle.value:", dataTableNummberedToggle.value, "no:", no)
 }
 
 const batchSale = ref(null)
@@ -593,8 +633,25 @@ watch(
   { immediate: true }, // ให้ทำงานทันทีเมื่อ mount
 )
 
+const validateByRow = ref(false)
+
+const validateSpecificRow = (batchSale, kgs1, pcs1, kgs2, pcs2) =>  {
+
+  isValid.value = validateBatchSale(
+    batchSale,
+    kgs1,
+    pcs1,
+    kgs2,
+    pcs2,
+  )
+
+  return !(isValid.value)
+
+}
+
 watch(()=> {
   console.log("realTimeValue", validationData.packagingkgs1)
+  
 })
 
 // ฟังก์ชันจัดรูปแบบวันที่
@@ -746,7 +803,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")
@@ -787,7 +844,7 @@ const findProductByName = productionCode => {
 }
 
 const selectedItem = ref(null)
-const selectedDataTables = ref([])
+
 
 const { getBatchProductionplanResult, errorMessageGetBatchProductionPlan, fetchGetBatchProductionplan } = useGetBatchProductionPlanService()
 
@@ -873,7 +930,6 @@ const submitPlan = async () => {
     "lotNumber",
     "planningID",
     "producingDate",
-    "remark",
   ]
 
   // ตรวจสอบฟิลด์ที่ไม่มีค่า
@@ -924,6 +980,7 @@ const submitPlan = async () => {
 //------------------------- approve plan
 const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approveProdutcionPlanFunc } = useApproveProductionPlanService()
 
+
 const approvePlan = async () => {
 
   // console.log("selectedDataTables", selectedDataTables.value)
@@ -934,7 +991,7 @@ const approvePlan = async () => {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
     if(responseApproveProductionPlan.value){
-      textAlertDialogFunction(alertWordConst.submit, true)
+      textAlertDialogFunction(alertWordConst.approve, true)
       setTimeout(() => {
         location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
@@ -1543,7 +1600,7 @@ const print = () => {
                 </VBtn>
               </VCol>
               <VCol cols="2">
-                <VBtn @click="confirmFilterSelectProduction">
+                <VBtn color="info" @click="confirmFilterSelectProduction">
                   Confirm select
                 </VBtn>
               </VCol>
@@ -1556,8 +1613,9 @@ const print = () => {
               <div class="d-flex justify-center">
                 <h4>Production</h4>
               </div>
-              <div class="d-flex justify-center">
+              <div class="d-flex justify-start">
                 <VTextField
+                  style="max-width: 500px;"
                   v-model="searchForMasterDataPlan"
                   label="Search"
                   prepend-inner-icon="mdi-magnify"
@@ -1911,11 +1969,15 @@ const print = () => {
         <VBtn
           class="mx-2"
           color="success"
+          :disabled="!activeBtnSubmit"
           @click="submitPlan"
         >
           <span style="font-size: 12px;">Submit</span>
         </VBtn>
-        <VBtn @click="approvePlan">
+        <VBtn
+          :disabled="!activeBtnApprove"
+          @click="approvePlan"
+        >
           <span style="font-size: 12px;">Approve</span>
         </VBtn>
         <VBtn
@@ -2140,22 +2202,29 @@ const print = () => {
               <td class="bg-light-blue-lighten-5 text-end px-8">
                 {{ formatNumber(item.raw.product1PackingQtyKgs) }}
               </td>
-              <td class="bg-light-blue-lighten-5 text-end">
+              <td style="min-width: 180px;" class="bg-light-blue-lighten-5 text-end">
                 <VTextField
                   v-if="item.raw.statusId === 101"
-                  v-model="validationData.packagingPcs1"
+                  v-model="item.raw.product1UomCount"
                   style="min-width: 100px;"
                   density="compact"
                   type="number"
                   min="0"
                   :step="1"
                   :readonly="item.raw.status === 'Submit'"
+                  :rules="[
+                    value => {
+                      if (validateSpecificRow(item.raw.quantityKgs,value,item.raw.product1PackingQtyKgs,item.raw.product2UomCount,item.raw.product2PackingQtyKgs)) {
+                        return `packaging must not exceed<br>the batch scale (kgs).`
+                      }
+                      return true
+                    }
+                  ]"
                 >
                   <template #label>
                     <span style="font-size: 12px;">Packaging Pcs 1</span>
                   </template>
                 </VTextField>
-
                 <span
                   v-else
                   class="px-6"
@@ -2219,11 +2288,19 @@ const print = () => {
               <td class="bg-red-lighten-5 text-end">
                 <VTextField
                   v-if="item.raw.statusId === 101"
-                  v-model="validationData.packagingPcs2"
+                  v-model="item.raw.product2UomCount"
                   type="number"
                   style="min-width: 100px;"
                   density="compact"
                   :readonly="item.raw.status === 'Submit'"
+                  :rules="[
+                    value => {
+                      if (validateSpecificRow(item.raw.quantityKgs,item.raw.product1UomCount,item.raw.product1PackingQtyKgs,value,item.raw.product2PackingQtyKgs)) {
+                        return `packaging must not exceed<br>the batch scale (kgs).`
+                      }
+                      return true
+                    }
+                  ]"
                 >
                   <template #label>
                     <span style="font-size: 12px;">Packaging Pcs 2</span>
@@ -2293,7 +2370,8 @@ const print = () => {
                 class="px-4"
                 style="min-width: 150px;"
               >
-                {{ formatDate(item.raw.finishedDate) }}
+                <span v-if="formatDate(item.raw.finishedDate) === '01/01/1970'" />
+                <span v-else>{{ formatDateUpdate(item.raw.finishedDate) }}</span>
               </td>
               <td>
                 <VTextarea
@@ -2324,7 +2402,7 @@ const print = () => {
                 </div>
               </td>
               <td>
-                {{ formatDate(item.raw.updatedDate) }}
+                {{ formatDateUpdate(item.raw.updatedDate) }}
               </td>
               <td>
                 {{ item.raw.updatedBy }}

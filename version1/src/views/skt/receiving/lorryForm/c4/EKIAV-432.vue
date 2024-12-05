@@ -234,7 +234,7 @@ watchEffect(async () => {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        EKI
+        EKI - 433
       </div>
     </VCol>
     <VCol cols="4" />

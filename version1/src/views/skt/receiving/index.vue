@@ -1183,9 +1183,11 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
 
   itemStore.clearItemDetails()
   itemStore.setItemDetails(products.value[index-1], 'itemDataCookies')
+
   itemStore.setItemDetails(products.value[index-1].poEtlLogDetailJournalID, 'poEtlLogDetailJournalIDCookies')
   itemStore.setItemDetails(products.value[index-1].itemCode, 'itemCodeCookies')
   itemStore.setItemDetails(products.value[index-1].supplierId, 'supplierIdCookies')
+  itemStore.setItemDetails(products.value[index-1].lorryInfoKey, 'typeLorryInfoId')
 
 
   // console.log("setItemDetails", itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
@@ -1550,7 +1552,7 @@ const checkTypeLorryToPrintPDF = () => {
   case '12':
     return "LorryFormTELA"
   case '13':
-    return "LorryFormHAKU-C (11V-111)"
+    return "LorryFormEKI-A TANK (432)"
   case '15':
     return "LorryFormN PAN"
   case '16':

@@ -10,7 +10,7 @@ export const useGetCOAFormController = () => {
     
     // covertValue.value = '0.00'
       
-    return 0.00
+    return ''
   }
       
   return {
