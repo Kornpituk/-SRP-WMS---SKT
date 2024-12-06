@@ -42,6 +42,7 @@ import alertWordConst from '@/utilities/constant'
 const isDialogVisibleConfirmDialog = ref(false)
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
+const subWordForSubmit = ref('')
 const successDialAlert = ref(false)
 const confirmValueCheck = ref(false)
 
@@ -49,10 +50,33 @@ const confirmValueCheck = ref(false)
 //-- dialog 2 
 const confirmDialog2 = ref(null)
 
+watch( () => {
+ 
+})
+
 function openConfirmDialog() {
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
-  wordForSubmit.value = alertWordConst.approve
-  confirmDialog2.value.openDialog()
+
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    console.log("selectedDataTables", item.statusId)
+
+    if (item.statusId === 102 ) {
+      wordForSubmit.value = alertWordConst.approve
+      confirmDialog2.value.openDialog()
+      isDialogVisibleAlertDialog.value = false
+      console.log("selectedDataTables 102")
+    }else if(item.statusId === 101){
+      textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
+      console.log("selectedDataTables 101")
+    }
+    else{
+      console.log("selectedDataTables failded")
+      isDialogVisibleAlertDialog.value = false
+    }
+
+  })
+
 }
 
 function handleConfirmAction() {
@@ -66,6 +90,13 @@ function handleCancel() {
 
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
+const textSubAlertDialogFunction = (word, subWord, success) => {
+  wordForSubmit.value = word
+  subWordForSubmit.value = subWord
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
 }
@@ -91,52 +122,6 @@ const dataTableCliclHighlightIsToggle = no => {
   }
 
   console.log("dataTableNum", dataTableNummberedToggle.value)
-}
-
-const colorStatusWithCheckBox = id => {
-
-  switch (id) {
-  // case 0:
-  //   return { color: 'grey-lighten-1', message: 'grey-lighten-1' }
-  // case 1:
-  //   return { color: '#FFEBEE', message: 'red' }
-  // case 2:
-  //   return { color: '#FCE4EC', message: 'pink-lighten-4' }
-  // case 3:
-  //   return { color: '#EDE7F6', message: 'purple-lighten-4' }
-  // case 4:
-  //   return { color: '#D1C4E9', message: 'deep-purple-lighten-4' }
-  // case 5:
-  //   return { color: '#E8EAF6', message: 'indigo' }
-  // case 6:
-  //   return { color: '#E3F2FD', message: 'blue' }
-  case 7:
-    return { color: '#E1F5FE', message: 'light-blue' }
-
-    // case 8:
-    //   return { color: '#E0F7FA', message: 'cyan-lighten-4' }
-    // case 9:
-    //   return { color: '#E0F2F1', message: 'teal' }
-    // case 10:
-    //   return { color: '#F1F8E9', message: 'cycan' }
-    // case 11:
-    //   return { color: '#F9FBE7', message: 'cycan' }
-    // case 12:
-    //   return { color: '#FFFDE7', message: 'brown' }
-    // case 13:
-    //   return { color: '#FFF3E0', message: 'orange' }
-    // case 14:
-    //   return { color: '#FBE9E7', message: 'deep-orange-derken-4' }
-  case 15:
-    return { color: '#EFEBE9', message: 'brown' }
-
-    // case 16:
-    //   return { color: '#FFCDD2', message: 'red-lighten-2' }
-    // case 17:
-    //   return { color: '#E8F5E9', message: 'green-lighten-2' }
-  default:
-    return { color: '', message: 'grey' }
-  }
 }
 
 //----------------------------------- Get Batch Production plan ---------------------------
@@ -372,21 +357,21 @@ const itemsStatus = [
 const colorStatusWithId = id => {
   switch (id) {
   case 101:
-    return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan' }
+    return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan', bgColor: '#FFF3E0' }
   case 102:
-    return { color: 'green', message: 'green', text: 'Waitting for plan APVL' }
+    return { color: 'green', message: 'green', text: 'Waitting for plan APVL', bgColor: '#E8F5E9' }
   case 103:
-    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking' }
+    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking', bgColor: '#FCE4EC' }
   case 105:
-    return { color: 'purple', message: 'purple', text: 'In Producing' }
+    return { color: 'purple', message: 'purple', text: 'In Producing', bgColor: '#F3E5F5' }
   case 107:
-    return { color: 'brown', message: 'brown', text: 'Waiting for FG/PROD APVL' }
+    return { color: 'brown', message: 'brown', text: 'Waiting for FG/PROD APVL', bgColor: '#EFEBE9' }
   case 108:
-    return { color: 'green', message: 'green', text: 'PROD Completed' }
+    return { color: 'green', message: 'green', text: 'PROD Completed', bgColor: '#E8F5E9' }
   case 109:
-    return { color: 'red', message: 'red', text: 'Plan Rejected' }
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
   default:
-    return { color: 'grey', message: 'grey', text: 'All' }
+    return { color: 'grey', message: 'grey', text: 'All', bgColor: '#FFF3E0' }
   }
 }
 
@@ -880,6 +865,7 @@ const newBatch = async batchID => {
                       md="4"
                     >
                       <VBtn
+                        disabled
                         density="compact"
                         class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                         color="warning"
@@ -1290,12 +1276,17 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
+                  v-if="item.raw.statusId === 102"
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"
@@ -1307,8 +1298,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1324,8 +1320,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1336,8 +1337,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1348,8 +1354,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1360,8 +1371,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1372,8 +1388,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1384,8 +1405,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1397,8 +1423,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1409,42 +1440,173 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 {{ item.raw.product1SelectedCode }}
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.product1Name }}
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.product1SelectedPackagingCode }}
               </td>
-              <td class="bg-light-blue-lighten-5 text-end">
+              <td
+                class="bg-light-blue-lighten-5 text-end cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product1PackingQtyKgs) }}</span>
                 <span v-else />
               </td>
-              <td class="bg-light-blue-lighten-5 text-end">
+              <td
+                class="bg-light-blue-lighten-5 text-end cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span v-if="item.raw.product1UomCount">{{ item.raw.product1UomCount }}</span>
                 <span v-else />
               </td>
 
-              <td class="bg-red-lighten-5">
+              <td
+                class="bg-red-lighten-5 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.product2SelectedCode }}
               </td>
-              <td class="bg-red-lighten-5">
+              <td
+                class="bg-red-lighten-5 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.product2Name }}
               </td>
-              <td class="bg-red-lighten-5">
+              <td
+                class="bg-red-lighten-5  cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.product2SelectedPackagingCode }}
               </td>
-              <td class="bg-red-lighten-5 text-end">
+              <td
+                class="bg-red-lighten-5 text-end  cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product2PackingQtyKgs) }}</span>
                 <span v-else />
               </td>
-              <td class="bg-red-lighten-5 text-end">
+              <td
+                class="bg-red-lighten-5 text-end  cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span v-if="item.raw.product1UomCount">{{ item.raw.product2UomCount }}</span>
                 <span v-else />
               </td>
@@ -1455,8 +1617,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1468,8 +1635,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1481,8 +1653,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1493,8 +1670,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1505,8 +1687,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1517,8 +1704,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1529,8 +1721,13 @@ const newBatch = async batchID => {
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
-                    ''
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
@@ -1560,7 +1757,7 @@ const newBatch = async batchID => {
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.5(Last Updated 11/11/2024 ) {{ productionPlanItems.length }} Rows of Data
+          Version : 2.6(Last Updated 7/12/2024 ) {{ productionPlanItems.length }} Rows of Data
         </VAlert>
       </VCardText>
     </VCard>
@@ -1583,6 +1780,7 @@ const newBatch = async batchID => {
       <AuthenticatorDialog
         :is-dialog-visible="isDialogVisibleAlertDialog"
         :word="wordForSubmit"
+        :sub-word="subWordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
       />

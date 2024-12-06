@@ -18,6 +18,10 @@ const props = defineProps({
     type: String,
     default: 'Operation',
   },
+  subWord: {
+    type: String,
+    required: false,
+  },
 })
 
 const emit = defineEmits(['update:isDialogVisible'])
@@ -31,6 +35,7 @@ watch(() => props.isDialogVisible, newValue => {
 })
 
 const wordAlert = ref('')
+const subWordAlert = ref(props.subWord)
 
 watch(() => {
   if(props.word === 'REJECT'){
@@ -116,6 +121,7 @@ const closeDialog = () => {
       <VCardText class="d-flex justify-center">
         <span v-if="props.success" style="font-size: 22px; font-weight: bolder;">{{ wordAlert}} Completed.</span>
         <span v-if="!props.success" style="font-size: 22px; font-weight: bolder;">{{ wordAlert}} Failed.</span>
+        <span v-if="subWordAlert" style="font-size: 22px; font-weight: bolder;">{{ subWordAlert }}</span>
       </VCardText>
 
       <VCardText

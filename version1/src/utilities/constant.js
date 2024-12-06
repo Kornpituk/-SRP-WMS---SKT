@@ -7,6 +7,7 @@ const alertWordConst = {
   cancel: 'CENCEL',
   newPlan: 'NEWPLAN',
   generateLot: 'GENERATE LOT',
+  plase: 'PLASE',
 }
 
 export default alertWordConst

@@ -43,6 +43,31 @@ const batchId = ref(itemStore.getItemDetails('guIDForBatchCookie'))
 
 const planningId = ref(itemStore.getItemDetails('guIDForPlannigCookie'))
 
+//------------------------------------------- highlighter -----------------------------
+
+//----------------------------------- DBClicks hightlight --------------------------------
+const dataTableColor = ref('#E0F7FA')
+const dataTableNummberedToggle = ref(null)
+
+const isSelected = item => {
+  return selectedDataTables.value.some(
+    selectedItem => selectedItem.journalID === item.journalID,
+  )
+}
+
+const dataTableCliclHighlightIsToggle = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle.value = null
+  } else if (dataTableNummberedToggle.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle.value)
+}
+
 //------------------------------------------ Data --------------------------------
 
 const date = ref(new Date())
@@ -497,21 +522,6 @@ watch(()=> {
 //------------------------------ func get production plan service --------------------------------
 const { getProductionplanResult, errorMessageGetProductionPlan, fetchGetProductionplan } = useGetProductionPlanService()
 
-const dataTableColor = ref('#E0F7FA')
-const dataTableNummberedToggle = ref(null)
-
-const dataTableCliclHighlightIsToggle = no => {
-  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
-  if (dataTableNummberedToggle.value === no) {
-    // ถ้าตรง ให้สลับกลับเป็น null
-    dataTableNummberedToggle.value = null
-  } else if (dataTableNummberedToggle.value === null) {
-    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
-    dataTableNummberedToggle.value = no
-  }
-
-}
-
 const batchSale = ref(null)
 const packagingkgs1 = ref(null)
 const packagingPcs1 = ref(null)
@@ -526,10 +536,11 @@ watch(async () => {
     await fetchGetProductionplan(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
 
     // จัดรูปแบบข้อมูลก่อนเก็บลง productionPlan.value
-    const formattedData = getProductionplanResult.value.data.map(item => ({
+    const formattedData = getProductionplanResult.value.data.map((item, index) => ({
       ...item, // คัดลอกข้อมูลเดิมทั้งหมด
       inputDate: formatDateDMY(item.inputDate), // จัดรูปแบบ producingDate
       producingDate: formatDateDMY(item.producingDate), // จัดรูปแบบ producingDate
+      no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
     }))
 
     // อัปเดต productionPlan.value หลังจากจัดรูปแบบ
@@ -1600,7 +1611,10 @@ const print = () => {
                 </VBtn>
               </VCol>
               <VCol cols="2">
-                <VBtn color="info" @click="confirmFilterSelectProduction">
+                <VBtn
+                  color="info"
+                  @click="confirmFilterSelectProduction"
+                >
                   Confirm select
                 </VBtn>
               </VCol>
@@ -1615,8 +1629,8 @@ const print = () => {
               </div>
               <div class="d-flex justify-start">
                 <VTextField
-                  style="max-width: 500px;"
                   v-model="searchForMasterDataPlan"
+                  style="max-width: 500px;"
                   label="Search"
                   prepend-inner-icon="mdi-magnify"
                   variant="outlined"
@@ -2079,8 +2093,19 @@ const print = () => {
           <template #item="{ item, index }">
             <tr style="font-size: 14px;">
               <td
-                class="text-center px-2"
+                class="text-center px-2 cursor-pointer"
                 style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
@@ -2090,7 +2115,19 @@ const print = () => {
               </td>
               <td
                 style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
-                class="text-start"
+                class="text-start cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VChip
                   :color="colorStatusWithId(item.raw.statusId).color"
@@ -2099,8 +2136,39 @@ const print = () => {
                   {{ colorStatusWithId(item.raw.statusId).text }}
                 </VChip>
               </td>
-              <td>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</td>
-              <td style="min-width: 150px;">
+              <td 
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ (currentPageDataTable - 1) * 10 + index + 1 }}
+              </td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                style="min-width: 150px;"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <AppDateTimePicker
                   v-if="false"
                   v-model="item.raw.inputDate"
@@ -2114,7 +2182,21 @@ const print = () => {
                 </AppDateTimePicker>
                 <span>{{ formatDate(item.raw.inputDate) }}</span>
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -2138,19 +2220,73 @@ const print = () => {
                   >Missing Input Production Code</span>
                 </div>
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.reactorName }}
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.productionName }}
               </td>
               <td
-                class="px-8 text-end"
+                class="px-8 text-end cursor-pointer"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 {{ formatNumber(item.raw.quantityKgs) }}
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -2173,10 +2309,38 @@ const print = () => {
                   >Missing Input Item Code 1</span>
                 </div>
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.product1Name }}
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -2202,7 +2366,22 @@ const print = () => {
               <td class="bg-light-blue-lighten-5 text-end px-8">
                 {{ formatNumber(item.raw.product1PackingQtyKgs) }}
               </td>
-              <td style="min-width: 180px;" class="bg-light-blue-lighten-5 text-end">
+              <td
+                style="min-width: 180px;"
+                class="bg-light-blue-lighten-5 text-end cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VTextField
                   v-if="item.raw.statusId === 101"
                   v-model="item.raw.product1UomCount"
@@ -2253,7 +2432,21 @@ const print = () => {
                 </div>
               </td>
 
-              <td class="bg-red-lighten-5">
+              <td
+                class="bg-red-lighten-5 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -2266,10 +2459,38 @@ const print = () => {
                 </VBtn>
                 <span v-else>{{ (item.raw.product2SelectedCode) }}</span>
               </td>
-              <td class="bg-red-lighten-5">
+              <td
+                class="bg-red-lighten-5 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.product2Name }}
               </td>
-              <td class="bg-red-lighten-5">
+              <td
+                class="bg-red-lighten-5 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
@@ -2282,10 +2503,38 @@ const print = () => {
                 </VBtn>
                 <span v-else>{{ (item.raw.product2SelectedPackagingCode) }}</span>
               </td>
-              <td class="bg-red-lighten-5 text-end px-8">
+              <td
+                class="bg-red-lighten-5 text-end px-8 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ formatNumber(item.raw.product2PackingQtyKgs) }}
               </td>
-              <td class="bg-red-lighten-5 text-end">
+              <td
+                class="bg-red-lighten-5 text-end cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VTextField
                   v-if="item.raw.statusId === 101"
                   v-model="item.raw.product2UomCount"
@@ -2313,8 +2562,20 @@ const print = () => {
               </td>
              
               <td
-                class="px-1"
+                class="px-1 cursor-pointer"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VTextField
                   v-if="item.raw.statusId === 101"
@@ -2339,8 +2600,20 @@ const print = () => {
                 </div>
               </td>
               <td
-                class="px-1"
+                class="px-1 cursor-pointer"
                 style="max-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <AppDateTimePicker
                   v-if="item.raw.statusId === 101"
@@ -2367,13 +2640,39 @@ const print = () => {
                 </div>
               </td>
               <td
-                class="px-4"
+                class="px-4 cursor-pointer"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span v-if="formatDate(item.raw.finishedDate) === '01/01/1970'" />
                 <span v-else>{{ formatDateUpdate(item.raw.finishedDate) }}</span>
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VTextarea
                   v-if="item.raw.statusId === 101"
                   v-model="item.raw.remark"
@@ -2401,10 +2700,38 @@ const print = () => {
                   >Missing Input Remark</span>
                 </div>
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ formatDateUpdate(item.raw.updatedDate) }}
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.updatedBy }}
               </td>
             </tr>
@@ -2445,7 +2772,7 @@ const print = () => {
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.5(Last Updated 7/12/2024 ) {{ productionPlan.length }} Rows of Data 
+          Version : 2.6(Last Updated 7/12/2024 ) {{ productionPlan.length }} Rows of Data 
         </VAlert>
       </VCardText>
     </VCard>

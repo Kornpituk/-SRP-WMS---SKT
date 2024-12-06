@@ -67,7 +67,7 @@ defineExpose({
           variant="flat"
           @click="confirm"
         >
-          Confirm
+          {{ props.message }}
         </VBtn>
       </VCardActions>
     </VCard>
