@@ -34,7 +34,7 @@ export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestDat
   const whereHouse = localStorage.getItem('whereHouseName')
 
   // eslint-disable-next-line sonarjs/prefer-immediate-return
-  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -981,7 +981,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "L090604",
+          "name": "l090604",
           
         },
       ],

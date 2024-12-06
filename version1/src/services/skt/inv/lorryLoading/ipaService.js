@@ -583,9 +583,9 @@ export const ipaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "- เข็มขัดนิรภัย",
-    "condition": "-",
+    "condition": "",
     "result": {
-      "type": "oknot",
+      "type": "",
       "field": [
         {
           // "name": "l0106060101", // percen

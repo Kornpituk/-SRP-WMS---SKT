@@ -10,6 +10,7 @@ import {
   mm2litre,
   passInitialData,
   passSubmitData,
+  save,
 } from '@/services/skt/inv/lorryLoading/epichloService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/receiving/lorryForm/a1/EPICHLO.png'
@@ -109,7 +110,7 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(statusId.value == 15 || statusId.value == 18){
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
 
@@ -126,13 +127,7 @@ async function saveDraft(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -147,6 +142,17 @@ async function saveDraft(e) {
 async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
+
+  for (var i of lorryItems) {
+    for (var f of i.result.field) {
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+  }
+
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
+
+  if (response.status != 200) 
+    return
 
 
   let isValid = true
@@ -207,15 +213,15 @@ async function approve(e) {
 }
 
 watchEffect(async () => {
-  var b = lorryItems[6].result.field[0].value / (0.78)
-  var d = lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.32) + 740.45
+  var b = lorryItems[6].result.field[0].value / (1.17)
+  var d = lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.288) -172.970
   var f = lorryItems[42].result.field[0].value == 0 ? 0 : mm2litre(lorryItems[42].result.field[0].value)
   lorryItems[6].result.field[1].value = currencyFormat(b)
   lorryItems[7].result.field[1].value = currencyFormat(d)
   lorryItems[8].result.field[0].value = currencyFormat(b+d)
   lorryItems[42].result.field[1].value = currencyFormat(f)
   lorryItems[44].result.field[0].value = currencyFormat(((b + d) - f))
-  lorryItems[44].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
+  lorryItems[44].result.field[1].value = currencyFormat(((b + d) - f) * 1.17)
 
   dVariable.value = currencyFormat(d)
 
@@ -502,6 +508,7 @@ watchEffect(async () => {
                       v-model="section.result.field[0].value"
                       :max-length="2"
                       :readonly="isReadOnly"
+                      :value-range="23"
                     />
                   </VCol>
                   <VLabel>
@@ -512,6 +519,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       :max-length="2"
                       :readonly="isReadOnly"
+                      :value-range="59"
                     />
                   </VCol>
                 </VRow>
@@ -717,28 +725,28 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              หาเป็นลิตร = mm x 5.32 + 740.45
+              หาเป็นลิตร = mm x 5.288 - 172.9700
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              หาเป็น mm = Litre - 740.45 / 5.32
+              หาเป็น mm = Litre + 172.9700 / 5.288
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              (B) = (A) / 0.78
+              (B) = (A) / 1.17
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ aVariable.value }} /0.78
+              = {{ aVariable.value }} / 1.17
             </VLabel>
           </VCol>
         </VRow>
@@ -752,14 +760,14 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              (D) = ((C) X 5.32) + 740.45
+              (D) = ((C) X 5.288) - 172.970
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = ({{ cVariable.value }}X 5.32 ) + 740.45
+              = ({{ cVariable.value }}X 5.288 ) - 172.970
             </VLabel>
           </VCol>
         </VRow>
@@ -773,7 +781,7 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              Density IPA = 0.78
+              Density IPA = 1.17
             </VLabel>
           </VCol>
         </VRow>

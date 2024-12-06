@@ -130,7 +130,7 @@ async function saveDraft(e) {
     }
   }
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -158,7 +158,7 @@ async function submit(e) {
     }
   }
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
 
   if (response.status != 200) 
     return
@@ -329,6 +329,7 @@ watchEffect(async () => {
                         variant="solo"
                         text-start=""
                         text-end=""
+                        :readonly="isReadOnly"
                       /> {{ section.practice.endPracticeText }}
                     </VLabel>
                   </VCol>
@@ -338,6 +339,7 @@ watchEffect(async () => {
                 <VCheckbox
                   v-model="section.practice.field[0].value"
                   :label="section.practice.startPracticeText"
+                  :readonly="isReadOnly"
                 />
               </div>
               <div v-else-if="section.practice.type === 'checkbox3'">
@@ -346,18 +348,21 @@ watchEffect(async () => {
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :label="section.practice.field[2].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -368,24 +373,28 @@ watchEffect(async () => {
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :label="section.practice.field[2].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[3].value"
                       :label="section.practice.field[3].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>

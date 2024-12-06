@@ -947,7 +947,7 @@ export const eki110ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)             ",
+      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -959,7 +959,7 @@ export const eki110ItemTemplate = [
     },
     "condition": "",
     "result": {
-      "type": "kg",
+      "type": "cdkg",
       "field": [
         {
           "name": "l1006030101",

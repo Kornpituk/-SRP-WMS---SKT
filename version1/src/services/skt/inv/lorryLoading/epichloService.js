@@ -74,6 +74,60 @@ export function formatDate(dateString) {
   return 'null'
 }
 
+export function passInitialData(type, params, index) {
+  if (type == "oknot" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp' || type=="25c"){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }
+  else {
+    return params
+  }
+}
+
+
+export function passSubmitData(type, params) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }
+  else {
+    if(isNaN(Number(params))){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
+}
+
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
 
 
 
@@ -782,40 +836,4 @@ export const ItemTemplate = [
   },
 ]
 
-export function passInitialData(type, params, index) {
-  if (type == "oknot" ) {
-    return params.toString()
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp' || type=="25c"){
-    if(index == 0){
-      return params
-    }else{
-      return params.toString()
-    }
-  }
-  else {
-    return params
-  }
-}
 
-
-export function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else if(type == "actualCheck"){
-    return !params ? "0": params.toString()
-  }
-  else {
-    if(isNaN(Number(params))){
-      return parseFloat( params.replace(/,/g, ''))
-    }else{
-      return parseFloat(params)
-    }
-  }
-}

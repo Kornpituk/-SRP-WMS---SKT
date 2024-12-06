@@ -1,19 +1,16 @@
 <script setup>
 import { urlApi } from '@/api'
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import VNumberInput from '@/components/VNumberInput.vue'
 import { akumuruItemTemplate, currencyFormat, passInitialData, passSubmitData, save } from '@/services/skt/inv/lorryLoading/akumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import alertWordConst from '@/utilities/constant'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/akumaru/Acrylic ( 431 ).png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
-import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
-
-import alertWordConst from '@/utilities/constant'
-
-
 const itemStore = useItemStore()
 
 var lorryItem = reactive(akumuruItemTemplate)
@@ -23,21 +20,45 @@ const route = useRoute()
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
+var isReadOnly = ref(false)
 
+//------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
 const statusId = ref(0)
-var isReadOnly = ref(false)
 
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
 
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(wordForSubmit.value === "SUBMIT"){
+    submit()
+  }else if(wordForSubmit.value === "APPROVE"){
+    approve()
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
 onMounted(async () => {
 
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
@@ -992,7 +1013,7 @@ function formatDate(dateString) {
         type="text"
         color="primary "
         class="mx-1"
-        @click="submit"
+        @click="openConfirmDialog('SUBMIT')"
       >
         Submit
       </VBtn>
@@ -1001,7 +1022,7 @@ function formatDate(dateString) {
         type="text"
         color="primary"
         class="mx-1"
-        @click="approve"
+        @click="openConfirmDialog('APPROVE')"
       >
         Approve
       </VBtn>
@@ -1017,6 +1038,16 @@ function formatDate(dateString) {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>
