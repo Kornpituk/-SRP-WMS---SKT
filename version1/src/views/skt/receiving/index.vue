@@ -536,8 +536,6 @@ const dataTableCliclHighlightIsToggle = no => {
     // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
     dataTableNummberedToggle.value = no
   }
-
-  console.log("dataTableNummberedToggle.value:", dataTableNummberedToggle.value, "no:", no)
 }
 
 //--------------------------------- Convert Date To API ----------------------------------------------------------------

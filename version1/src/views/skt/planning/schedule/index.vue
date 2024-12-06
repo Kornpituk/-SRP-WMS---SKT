@@ -70,6 +70,75 @@ const textAlertDialogFunction = (word, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
+//----------------------------------- DBClicks hightlight --------------------------------
+const dataTableColor = ref('#E0F7FA')
+const dataTableNummberedToggle = ref(null)
+
+const isSelected = item => {
+  return selectedDataTables.value.some(
+    selectedItem => selectedItem.journalID === item.journalID,
+  )
+}
+
+const dataTableCliclHighlightIsToggle = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle.value = null
+  } else if (dataTableNummberedToggle.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle.value)
+}
+
+const colorStatusWithCheckBox = id => {
+
+  switch (id) {
+  // case 0:
+  //   return { color: 'grey-lighten-1', message: 'grey-lighten-1' }
+  // case 1:
+  //   return { color: '#FFEBEE', message: 'red' }
+  // case 2:
+  //   return { color: '#FCE4EC', message: 'pink-lighten-4' }
+  // case 3:
+  //   return { color: '#EDE7F6', message: 'purple-lighten-4' }
+  // case 4:
+  //   return { color: '#D1C4E9', message: 'deep-purple-lighten-4' }
+  // case 5:
+  //   return { color: '#E8EAF6', message: 'indigo' }
+  // case 6:
+  //   return { color: '#E3F2FD', message: 'blue' }
+  case 7:
+    return { color: '#E1F5FE', message: 'light-blue' }
+
+    // case 8:
+    //   return { color: '#E0F7FA', message: 'cyan-lighten-4' }
+    // case 9:
+    //   return { color: '#E0F2F1', message: 'teal' }
+    // case 10:
+    //   return { color: '#F1F8E9', message: 'cycan' }
+    // case 11:
+    //   return { color: '#F9FBE7', message: 'cycan' }
+    // case 12:
+    //   return { color: '#FFFDE7', message: 'brown' }
+    // case 13:
+    //   return { color: '#FFF3E0', message: 'orange' }
+    // case 14:
+    //   return { color: '#FBE9E7', message: 'deep-orange-derken-4' }
+  case 15:
+    return { color: '#EFEBE9', message: 'brown' }
+
+    // case 16:
+    //   return { color: '#FFCDD2', message: 'red-lighten-2' }
+    // case 17:
+    //   return { color: '#E8F5E9', message: 'green-lighten-2' }
+  default:
+    return { color: '', message: 'grey' }
+  }
+}
+
 //----------------------------------- Get Batch Production plan ---------------------------
 
 const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
@@ -140,8 +209,12 @@ watchEffect(async () => {
 
     // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
     if (getProductionplanSearchResult.value?.data && Array.isArray(getProductionplanSearchResult.value.data)) {
-      console.log("getProductionplanSearchResult", getProductionplanSearchResult.value.data)
-      productionPlanItems.value = getProductionplanSearchResult.value.data
+      
+      productionPlanItems.value = getProductionplanSearchResult.value.data.map((item, index) => ({
+        ...item,
+        no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
+      }))
+      console.log("productionPlanItems", productionPlanItems.value)
     } else {
       console.warn("getProductionplanSearchResult.data is not an array")
       productionPlanItems.value = []
@@ -151,7 +224,6 @@ watchEffect(async () => {
     productionPlanItems.value = []
   }
 })
-
 
 //--------------------------- New batch -----------------------------------------------------
 
@@ -1213,8 +1285,15 @@ const newBatch = async batchID => {
           <template #item="{ item, index }">
             <tr style="font-size: 14px;">
               <td
-                class="text-center px-2"
+                class="text-center px-2 cursor-pointer"
                 style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
                   v-model="selectedDataTables"
@@ -1224,7 +1303,14 @@ const newBatch = async batchID => {
               </td>
               <td
                 style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
-                class="text-start"
+                class="text-start cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span>
                   <VChip
@@ -1233,27 +1319,101 @@ const newBatch = async batchID => {
                   >{{ colorStatusWithId(item.raw.statusId).text }}</VChip>
                 </span>
               </td>
-              <td>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ (currentPageDataTable - 1) * 10 + index + 1 }}
+              </td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ formatDate(item.raw.inputDate) }}
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.plantName }}
               </td>
-              <td>{{ item.raw.reactorName }}</td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.reactorName }}
+              </td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.productionCode }}
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.productionName }}
               </td>
               <td
-                class="px-8 text-end"
+                class="px-8 text-end cursor-pointer"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 {{ formatNumber(item.raw.quantityKgs) }}
               </td>
-              <td class="bg-light-blue-lighten-5">
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.product1SelectedCode }}
               </td>
               <td class="bg-light-blue-lighten-5">
@@ -1264,11 +1424,11 @@ const newBatch = async batchID => {
               </td>
               <td class="bg-light-blue-lighten-5 text-end">
                 <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product1PackingQtyKgs) }}</span>
-                <span v-else></span>
+                <span v-else />
               </td>
               <td class="bg-light-blue-lighten-5 text-end">
                 <span v-if="item.raw.product1UomCount">{{ item.raw.product1UomCount }}</span>
-                <span v-else></span>
+                <span v-else />
               </td>
 
               <td class="bg-red-lighten-5">
@@ -1282,149 +1442,103 @@ const newBatch = async batchID => {
               </td>
               <td class="bg-red-lighten-5 text-end">
                 <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product2PackingQtyKgs) }}</span>
-                <span v-else></span>
+                <span v-else />
               </td>
               <td class="bg-red-lighten-5 text-end">
                 <span v-if="item.raw.product1UomCount">{{ item.raw.product2UomCount }}</span>
-                <span v-else></span>
+                <span v-else />
               </td>
 
               <td
-                class="px-1"
+                class="px-1 cursor-pointer"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 {{ item.raw.lotNumber }}
               </td>
               <td
-                class="px-1 text-center"
+                class="px-1 text-center cursor-pointer"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 {{ formatDate(item.raw.producingDate) }}
               </td>
               <td
-                class="px-1 text-center"
+                class="px-1 text-center cursor-pointer"
                 style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 {{ formatDate(item.raw.finishedDate) }}
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.remark }}
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ useFormatDateUtilities(item.raw.updatedDate) }}
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 {{ item.raw.updatedBy }}
               </td>
-              <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'">
-                <div class="d-flex justify-center">
-                  <VMenu
-                    v-if="false"
-                    transition="scale-transition"
-                  >
-                    <template #activator="{ props }">
-                      <VIcon
-                        v-bind="props"
-                        icon="ri-more-2-fill"
-                      />
-                    </template>
-                    <VList>
-                      <VListItem
-                        v-for="(itemAction, index) in itemsActionDataTable"
-                        :key="index"
-                        @click="handleAction(itemAction.value)"
-                      >
-                        {{ itemAction.title }}
-                        <template #prepend>
-                          <VIcon :icon="itemAction.icon" />
-                        </template>
-                      </VListItem>
-                    </VList>
-                  </VMenu>
-                  <VBtn
-                    color="info"
-                    @click="newBatch(item.raw.batchID)"
-                  >
-                    Action
-                  </VBtn>
-                </div>
-                <div v-if="false">
-                  <VBtn
-                    color="warning"
-                    @click="changeStatusProductPlanSaveDraft(index)"
-                  >
-                    Save Draft
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount === 'Manager'"
-                    color="red"
-                    class="mx-2"
-                    @click="rejectProduction(index)"
-                  >
-                    Reject
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount !== 'Manager'"
-                    color="red"
-                    class="mx-2"
-                    @click="cancelProduct(index)"
-                  >
-                    Cancel
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount !== 'Manager'"
-                    class="mx-2"
-                    color="green"
-                    @click="changeStatusProductPlanSubmit(index)"
-                  >
-                    Submit
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount === 'Manager'"
-                    class="mx-2"
-                    color="green"
-                    @click="changeStatusProductPlanSubmit(index)"
-                  >
-                    Approve
-                  </VBtn>
-                  <VBtn
-                    color="warning"
-                    prepend-icon="ri-printer-fill"
-                  >
-                    {{ $t('Print') }}
-                  </VBtn>
-                </div>
-              </td>
-              <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'">
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? colorStatusWithCheckBox(item.raw.statusId).color : 
+                    ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VBtn
-                  color="grey"
-                  disabled
-                  @click="changeStatusProductPlanSaveDraft(index)"
+                  color="info"
+                  @click="newBatch(item.raw.batchID)"
                 >
-                  Save Draft
-                </VBtn>
-                <VBtn
-                  color="grey"
-                  disabled
-                  class="mx-2"
-                  @click="cancelProduct(index)"
-                >
-                  Cancel
-                </VBtn>
-                <VBtn
-                  class="mx-2"
-                  color="grey"
-                  disabled
-                  @click="changeStatusProductPlanSubmit(index)"
-                >
-                  Submit
-                </VBtn>
-
-                <VBtn
-                  color="warning"
-                  prepend-icon="ri-printer-fill"
-                >
-                  {{ $t('Print') }}
+                  Action
                 </VBtn>
               </td>
             </tr>
@@ -1446,7 +1560,7 @@ const newBatch = async batchID => {
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.5(Last Updated 11/11/2024 ) {{ products.length }} Rows of Data
+          Version : 2.5(Last Updated 11/11/2024 ) {{ productionPlanItems.length }} Rows of Data
         </VAlert>
       </VCardText>
     </VCard>

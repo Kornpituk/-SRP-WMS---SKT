@@ -2445,7 +2445,7 @@ const print = () => {
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.5(Last Updated 11/11/2024 ) {{ products.length }} Rows of Data 
+          Version : 2.5(Last Updated 7/12/2024 ) {{ productionPlan.length }} Rows of Data 
         </VAlert>
       </VCardText>
     </VCard>
