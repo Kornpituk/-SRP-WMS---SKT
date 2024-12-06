@@ -435,7 +435,7 @@ watch(async () => {
     productionPlan.value = formattedData
 
     // แสดงค่าใน console
-    console.log("productionPlan", productionPlan.value)
+    
 
     // set producing date when value is null
     productionPlan.value = productionPlan.value.map(item => ({
@@ -443,6 +443,21 @@ watch(async () => {
       producingDate: item.producingDate && item.producingDate !== "null" ? item.producingDate : new Date().toISOString(),
     }))
 
+    productionPlan.value.forEach(item => {
+      // ตรวจสอบข้อผิดพลาด
+      const resultValidate = validateSpecificRow(
+        item.quantityKgs,
+        item.product1PackingQtyKgs,
+        item.product1UomCount,
+        item.product2PackingQtyKgs,
+        item.product2UomCount,
+      )
+  
+      // เพิ่มสถานะ hasError
+      item.hasError = resultValidate // true: error, false: no error
+    })
+
+    console.log("productionPlan", productionPlan.value)
     
     selectedProductionCode.value = productionPlan.value[0].productionCode
 
@@ -455,6 +470,8 @@ watch(async () => {
     packagingPcs1.value = productionPlan.value[0].product1UomCount || 0
     packagingkgs2.value = productionPlan.value[0].product2PackingQtyKgs || 0
     packagingPcs2.value = productionPlan.value[0].product2UomCount || 0
+
+
 
   } catch (error) {
     // จัดการข้อผิดพลาด
@@ -556,6 +573,7 @@ const selectedDataTables = ref([])
 //--------------------------------- validate  ------------------------------
 const activeBtnApprove = ref(false)
 const activeBtnSubmit = ref(false)
+const activeBtnError =ref('primary')
 
 watch(()=> {
   console.log("vselectedDataTables out func", activeBtnApprove.value)
@@ -580,6 +598,8 @@ watch(()=> {
   }else{
     
   }
+
+
   
 })
 
@@ -635,6 +655,9 @@ const validateBatchSale = (batchSale, kgs1, pcs1, kgs2, pcs2) => {
 
   return parseInt(batchSale || 0) >= calculatedValues.total
 }
+
+const validateBatchSaleRow = ref()
+
 
 // Watch เพื่อทำการ validate แบบ real-time
 watch(
@@ -1638,9 +1661,6 @@ const print = () => {
                 >
                   Confirm select
                 </VBtn>
-                <VBtn @click="showDebug">
-                  Show Debug
-                </VBtn>
               </VCol>
             </VRow>
             <VCol
@@ -2412,6 +2432,7 @@ const print = () => {
                   style="min-width: 100px;"
                   density="compact"
                   type="number"
+                  :color="activeBtnError"
                   min="0"
                   :step="1"
                   :readonly="item.raw.status === 'Submit'"
@@ -2423,12 +2444,14 @@ const print = () => {
                     },
                     value => {
                       if (validateSpecificRow(item.raw.quantityKgs,value,item.raw.product1PackingQtyKgs,item.raw.product2UomCount,item.raw.product2PackingQtyKgs)) {
-                        return `packaging must not exceed<br>the batch scale (kgs).`
+                        textAlert = true;
+                        item.raw.hasError = true
+                        activeBtnError = `red`
+                      }else {
+                        textAlert = false;
+                        item.raw.hasError = false
+                        activeBtnError = `primary`
                       }
-                      if (validateSpecificRow(item.raw.quantityKgs,value,item.raw.product1PackingQtyKgs,item.raw.product2UomCount,item.raw.product2PackingQtyKgs)) {
-                        return `the batch scale (kgs).`
-                      }
-                      return true
                     }
                   ]"
                 >
@@ -2451,14 +2474,26 @@ const print = () => {
                   >Missing Input Packaging Pcs 1</span>
                 </div>
                 <div>
+                  <VAlert
+                    v-if="false"
+                    type="error"
+                    class="pa-1"
+                  >
+                    <div style="font-size: 10px;">
+                      packaging must not exceed
+                    </div>
+                    <div style="font-size: 10px;">
+                      the batch scale (kgs).
+                    </div>
+                  </VAlert>
                   <span
-                    v-if="textAlert"
+                    v-if="item.raw.hasError"
                     class="text-red"
                   >packaging must not exceed</span>
                 </div>
                 <div class="text-start">
                   <span
-                    v-if="textAlert"
+                    v-if="item.raw.hasError"
                     class="text-red"
                   >the batch scale (kgs).</span>
                 </div>
@@ -2586,10 +2621,20 @@ const print = () => {
                   :readonly="item.raw.status === 'Submit'"
                   :rules="[
                     value => {
-                      if (validateSpecificRow(item.raw.quantityKgs,item.raw.product1UomCount,item.raw.product1PackingQtyKgs,value,item.raw.product2PackingQtyKgs)) {
-                        return `packaging must not exceed<br>the batch scale (kgs).`
+                      if(!value){
+                        return `Value is required!`
                       }
-                      return true
+                    },
+                    value => {
+                      if (validateSpecificRow(item.raw.quantityKgs,value,item.raw.product1PackingQtyKgs,item.raw.product2UomCount,item.raw.product2PackingQtyKgs)) {
+                        textAlert = true;
+                        item.raw.hasError = true
+                        activeBtnError = `red`
+                      }else {
+                        textAlert = false;
+                        item.raw.hasError = false
+                        activeBtnError = `primary`
+                      }
                     }
                   ]"
                 >
