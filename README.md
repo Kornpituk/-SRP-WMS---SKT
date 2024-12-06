@@ -1,6 +1,5 @@
 # skt_wms_web
 
-หฟกฟหกฟหกฟหก
 
 ## Getting started
 
