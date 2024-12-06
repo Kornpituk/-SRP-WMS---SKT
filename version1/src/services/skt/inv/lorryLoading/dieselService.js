@@ -183,7 +183,7 @@ export const dieselItemTemplate = [
     "practice": "( C ) จากการคำนวน Level (A + B)",
     "condition": "ต้องไม่เกิน 15,000 LTR",
     "result": {
-      "type": "LTR",
+      "type": "c",
       "field": [
         {
           "name": "l1101030101",
@@ -927,11 +927,10 @@ export const dieselItemTemplate = [
     },
     "condition": "(C - D)",
     "result": {
-      "type": "LTR",
+      "type": "cd",
       "field": [
         {
           "name": "l1107040101",
-          
         },
       ],
     },

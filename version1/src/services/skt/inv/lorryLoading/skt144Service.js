@@ -92,15 +92,9 @@ export function formatDate(dateString) {
 
 
 export function passInitialData(type, params, index) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+  if (type == "oknot" || type=="leak" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp' || type == "mm" || type =="ac"){
     if(index == 0){
       return params
     }else{
@@ -676,7 +670,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "7. เปิดวาล์ว 29 ",
-    "condition": "Open ( เปิด ) เวลาเริ่มโหลดสินค้า......................",
+    "condition": "Open ( เปิด ) เวลาเริ่มโหลดสินค้า",
     "result": {
       "type": "actualCheck",
       "field": [
@@ -750,7 +744,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "4. ปิดวาล์ว 29 ",
-    "condition": "Close ( ปิด ) เวลาโหลดสินค้าเสร็จ...............................",
+    "condition": "Close ( ปิด ) เวลาโหลดสินค้าเสร็จ",
     "result": {
       "type": "actualCheck",
       "field": [

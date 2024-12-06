@@ -2,6 +2,7 @@
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import {
+  currencyFormat,
   dieselItemTemplate,
   formatDate, generate,
   get,
@@ -28,6 +29,9 @@ const route = useRoute()
 const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
+
+
+var isReadOnly = ref(false)
 
 //------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
@@ -97,6 +101,10 @@ onMounted(async () => {
   const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
   statusId.value = lorryFormStatus.data.data[0].statusId
+
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+    isReadOnly.value = true
+  }
 
 })
 
@@ -206,7 +214,13 @@ async function approve(e) {
   }
 }
 watchEffect(async () => {
-  lorryItem[2].result.field[0].value = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value // A+B
+  var a = lorryItem[0].result.field[0].value
+  var b = lorryItem[1].result.field[0].value
+  var c = a+b
+  var d = lorryItem[33].result.field[0].value
+  lorryItem[2].result.field[0].value =  currencyFormat(c)
+  lorryItem[34].result.field[0].value = currencyFormat(c-d)
+
 })
 </script>
 
@@ -311,6 +325,7 @@ watchEffect(async () => {
                         variant="solo"
                         text-start=""
                         text-end=""
+                        :readonly="isReadOnly"
                       /> {{ section.practice.endPracticeText }}
                     </VLabel>
                   </VCol>
@@ -320,6 +335,7 @@ watchEffect(async () => {
                 <VCheckbox
                   v-model="section.practice.field[0].value"
                   :label="section.practice.field[0].startPracticeText"
+                  :readonly="isReadOnly"
                 />
               </div>
               <div v-else-if="section.practice.type === 'checkbox4'">
@@ -328,24 +344,28 @@ watchEffect(async () => {
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :label="section.practice.field[2].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[3].value"
                       :label="section.practice.field[3].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -375,6 +395,7 @@ watchEffect(async () => {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="Ok"
@@ -393,6 +414,7 @@ watchEffect(async () => {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="รั่ว"
@@ -411,6 +433,7 @@ watchEffect(async () => {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="ตรง"
@@ -429,6 +452,7 @@ watchEffect(async () => {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="หมด"
@@ -449,6 +473,7 @@ watchEffect(async () => {
                       variant="solo"
                       text-start="(A)"
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -458,7 +483,7 @@ watchEffect(async () => {
                       variant="solo"
                       text-start="Litre"
                       text-end="(B)"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -466,54 +491,21 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'cd'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="(C)"
-                      text-end="mm."
-                    />
-                  </VCol>
-                  <VCol>
-                    <VCurrencyField
-                      v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="solo"
-                      text-start="(D)"
-                      text-end="mm."
-                      readonly="true"
-                    />
-                  </VCol>
-                </VRow>
-              </div>
-              <div v-if="section.result.type === 'bd'">
-                <VRow>
-                  <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
-                      text-start=" (B) + (D) ="
-                      text-end="Litre"
                       readonly="true"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="d-flex justify-center"
                     >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          LTR
+                        </VLabel>
+                      </template>
+                    </VTextField> 
                   </VCol>
                 </VRow>
               </div>
@@ -527,7 +519,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Litre"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -535,6 +527,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -558,7 +551,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="%"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -582,30 +575,21 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'c'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start=""
-                      text-end="C°"
-                    />
-                  </VCol>
-                  <VCol>
-                    <VRadioGroup
-                      v-model="section.result.field[1].value"
-                      inline
-                      class="justify-center"
+                      variant="solo"
+                      readonly="true"
                     >
-                      <VRadio
-                        label="Ok"
-                        value="1"
-                      />
-                      <VRadio
-                        label="Not"
-                        value="0"
-                      />
-                    </VRadioGroup>
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          LTR
+                        </VLabel>
+                      </template>
+                    </VTextField> 
                   </VCol>
                 </VRow>
               </div>
@@ -640,6 +624,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="( Mpa )'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -647,6 +632,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -660,39 +646,7 @@ watchEffect(async () => {
                   </VCol>
                 </VRow>
               </div>
-              <!--
-                <div v-if="section.result.type === 'amp'">
-                <VRow>
-                <VCol>
-                <VCurrencyField
-                v-model="section.result.field[0].value"
-                density="compact"
-                variant="outlined"
-                label=""
-                text-start=""
-                text-end="Amp'"
-                />
-                </VCol>
-
-                <VCol>
-                <VRadioGroup
-                v-model="section.result.field[1].value"
-                inline
-                class="d-flex justify-center"
-                >
-                <VRadio
-                label="Ok"
-                value="1"
-                />
-                <VRadio
-                label="Not"
-                value="0"
-                />
-                </VRadioGroup>
-                </VCol>
-                </VRow>
-                </div> 
-              -->
+              
               <div v-if="section.result.type === 'ef'">
                 <VRow>
                   <VCol>
@@ -703,6 +657,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(E)"
                       text-end="mm.'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -713,6 +668,7 @@ watchEffect(async () => {
                       label=""
                       text-start="(F)"
                       text-end="Litre'"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -728,6 +684,7 @@ watchEffect(async () => {
                       text-start="(G)"
                       text-end="Litre'"
                       type="number"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -742,6 +699,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="LTR"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -756,6 +714,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Kg.( B )"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -770,6 +729,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -784,6 +744,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="( Mpa )"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -798,6 +759,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="Amp"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -812,6 +774,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="C°"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>

@@ -141,14 +141,22 @@ export const npanItemTemplate = [
     "isSection": true,
     "rowSpan": 1,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "จำนวนที่ระบุ ในใบส่งสินค้า    ",
+    "practice": {
+      "startPracticeText": "จำนวนที่ระบุ ในใบส่งสินค้า",
+      "endPracticeText": "",
+      "type": "checkbox",
+      "field": [
+        {
+          "name": "l150101",
+        },
+      ],
+    },
     "condition": "ทำ",
     "result": {
       "type": "kg",
       "field": [
         {
           "name": "l1501010101",
-          "value:": "",
         },
       ],
     },
@@ -166,7 +174,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1502010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -184,19 +192,19 @@ export const npanItemTemplate = [
           "startPracticeText": "ถุงมือ",
           "endPracticeText": "",
           "name": "l150301",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "ชุดป้องกันสารเคมี",
           "endPracticeText": "",
           "name": "l150302",
-          "value:": "",
+          
         },
         {
           "startPracticeText": "กระบังหน้า",
           "endPracticeText": "",
           "name": "l150303",
-          "value:": "",
+          
         },
       ],
     },
@@ -206,7 +214,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1503010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -248,7 +256,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150401",
-          "value:": "",
+          
         },
       ],
     },
@@ -258,7 +266,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -273,7 +281,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150402",
-          "value:": "",
+          
         },
       ],
     },
@@ -283,7 +291,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -298,7 +306,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150403",
-          "value:": "",
+          
         },
       ],
     },
@@ -308,7 +316,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -323,7 +331,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150404",
-          "value:": "",
+          
         },
       ],
     },
@@ -333,7 +341,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -348,7 +356,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150405",
-          "value:": "",
+          
         },
       ],
     },
@@ -358,7 +366,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -373,7 +381,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150406",
-          "value:": "",
+          
         },
       ],
     },
@@ -383,7 +391,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504060101",
-          "value:": "",
+          
         },
       ],
     },
@@ -398,7 +406,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150407",
-          "value:": "",
+          
         },
       ],
     },
@@ -408,7 +416,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504070101",
-          "value:": "",
+          
         },
       ],
     },
@@ -423,7 +431,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150408",
-          "value:": "",
+          
         },
       ],
     },
@@ -433,7 +441,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504080101",
-          "value:": "",
+          
         },
       ],
     },
@@ -448,7 +456,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150409",
-          "value:": "",
+          
         },
       ],
     },
@@ -458,7 +466,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504090101",
-          "value:": "",
+          
         },
       ],
     },
@@ -473,7 +481,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150410",
-          "value:": "",
+          
         },
       ],
     },
@@ -483,7 +491,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1504100101",
-          "value:": "",
+          
         },
       ],
     },
@@ -501,7 +509,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150501",
-          "value:": "",
+          
         },
       ],
     },
@@ -511,11 +519,11 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1505010101", // A
-          "value:": "",
+          
         },
         {
           "name": "l1505010102", // B
-          "value:": "",
+          
         },
       ],
     },
@@ -530,7 +538,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150502",
-          "value:": "",
+          
         },
       ],
     },
@@ -540,7 +548,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1505020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -555,7 +563,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150503",
-          "value:": "",
+          
         },
       ],
     },
@@ -565,7 +573,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1505030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -580,17 +588,17 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150504",
-          "value:": "",
+          
         },
       ],
     },
-    "condition": "เรียบร้อย",
+    "condition": "ทำ",
     "result": {
       "type": "oknot",
       "field": [
         {
           "name": "l1505040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -608,7 +616,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150601",
-          "value:": "",
+          
         },
       ],
     },
@@ -618,7 +626,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1506010101",
-          "value:": "",
+          
         },
       ],
     },
@@ -633,7 +641,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150602",
-          "value:": "",
+          
         },
       ],
     },
@@ -643,7 +651,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1506020101",
-          "value:": "",
+          
         },
       ],
     },
@@ -658,7 +666,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150603",
-          "value:": "",
+          
         },
       ],
     },
@@ -668,7 +676,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1506030101",
-          "value:": "",
+          
         },
       ],
     },
@@ -683,7 +691,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150604",
-          "value:": "",
+          
         },
       ],
     },
@@ -693,7 +701,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1506040101",
-          "value:": "",
+          
         },
       ],
     },
@@ -708,7 +716,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150605",
-          "value:": "",
+          
         },
       ],
     },
@@ -718,7 +726,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1506050101",
-          "value:": "",
+          
         },
       ],
     },
@@ -733,7 +741,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l150606",
-          "value:": "",
+          
         },
       ],
     },
@@ -743,7 +751,7 @@ export const npanItemTemplate = [
       "field": [
         {
           "name": "l1506060101",
-          "value:": "",
+          
         },
       ],
     },
