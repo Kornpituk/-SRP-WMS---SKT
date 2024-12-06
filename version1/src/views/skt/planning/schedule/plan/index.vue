@@ -407,12 +407,74 @@ const selectedPackagingType2 = ref(null)
 const selectedPackagingName2 = ref(null)
 const selectedPackagingKgs2 = ref(null)
 
+//------------------------------ func get production plan service --------------------------------
+const { getProductionplanResult, errorMessageGetProductionPlan, fetchGetProductionplan } = useGetProductionPlanService()
+
+const batchSale = ref(null)
+const packagingkgs1 = ref(null)
+const packagingPcs1 = ref(null)
+const packagingkgs2 = ref(null)
+const packagingPcs2 = ref(null)
+
+const textAlert = ref(false)
+
+watch(async () => {
+  try {
+    // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    await fetchGetProductionplan(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+
+    // จัดรูปแบบข้อมูลก่อนเก็บลง productionPlan.value
+    const formattedData = getProductionplanResult.value.data.map((item, index) => ({
+      ...item, // คัดลอกข้อมูลเดิมทั้งหมด
+      inputDate: formatDateDMY(item.inputDate), // จัดรูปแบบ producingDate
+      producingDate: formatDateDMY(item.producingDate), // จัดรูปแบบ producingDate
+      no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
+    }))
+
+    // อัปเดต productionPlan.value หลังจากจัดรูปแบบ
+    productionPlan.value = formattedData
+
+    // แสดงค่าใน console
+    console.log("productionPlan", productionPlan.value)
+
+    // set producing date when value is null
+    productionPlan.value = productionPlan.value.map(item => ({
+      ...item,
+      producingDate: item.producingDate && item.producingDate !== "null" ? item.producingDate : new Date().toISOString(),
+    }))
+
+    
+    selectedProductionCode.value = productionPlan.value[0].productionCode
+
+    selectedItemCodeForPlan.value = productionPlan.value[0].product1SelectedCode
+    
+
+    //---------------------------- validate ------------------------------------
+    batchSale.value = productionPlan.value[0].quantityKgs || 0
+    packagingkgs1.value = productionPlan.value[0].product1PackingQtyKgs || 0
+    packagingPcs1.value = productionPlan.value[0].product1UomCount || 0
+    packagingkgs2.value = productionPlan.value[0].product2PackingQtyKgs || 0
+    packagingPcs2.value = productionPlan.value[0].product2UomCount || 0
+
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+    console.error("Error fetching production plan:", error)
+  }
+})
+
+//------------------------- select plan --------------------
+
 const selectItemCodeSwitch = computed(() => {
   if (btnSelectitem1.value) return selectedItemCode.value
   if (btnSelectitem2.value) return selectedItemCode2.value
   
   return [] // Default empty or fallback data
 })
+
+const showDebug = () => {
+  console.log("selectedItemCode", selectedItemCode.value)
+  console.log("selectedItemCode2", selectedItemCode2.value)
+}
 
 const selectPackagingTypeSwitch = computed(() => {
   if (btnSelectitem1.value) return selectedPackagingType.value
@@ -455,6 +517,8 @@ const selectPlan = plan => {
 
   selectedPackagingType2.value = plan.itemCode
   selectedProductionCode2.value = plan.itemCode
+
+  console.log("selectedProductionCode", selectedProductionCode.value)
 
   console.log("selectedProductionCode", selectedProductionCode.value)
 }
@@ -519,69 +583,16 @@ watch(()=> {
   
 })
 
-//------------------------------ func get production plan service --------------------------------
-const { getProductionplanResult, errorMessageGetProductionPlan, fetchGetProductionplan } = useGetProductionPlanService()
-
-const batchSale = ref(null)
-const packagingkgs1 = ref(null)
-const packagingPcs1 = ref(null)
-const packagingkgs2 = ref(null)
-const packagingPcs2 = ref(null)
-
-const textAlert = ref(false)
-
-watch(async () => {
-  try {
-    // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await fetchGetProductionplan(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
-
-    // จัดรูปแบบข้อมูลก่อนเก็บลง productionPlan.value
-    const formattedData = getProductionplanResult.value.data.map((item, index) => ({
-      ...item, // คัดลอกข้อมูลเดิมทั้งหมด
-      inputDate: formatDateDMY(item.inputDate), // จัดรูปแบบ producingDate
-      producingDate: formatDateDMY(item.producingDate), // จัดรูปแบบ producingDate
-      no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
-    }))
-
-    // อัปเดต productionPlan.value หลังจากจัดรูปแบบ
-    productionPlan.value = formattedData
-
-    // แสดงค่าใน console
-    console.log("productionPlan", productionPlan.value)
-
-    // set producing date when value is null
-    productionPlan.value = productionPlan.value.map(item => ({
-      ...item,
-      producingDate: item.producingDate && item.producingDate !== "null" ? item.producingDate : new Date().toISOString(),
-    }))
-
-    //------ Item 1 Add data 
-    selectedItemCode.value = productionPlan.value[0].product1SelectedCode
-    selectedPackagingType.value = productionPlan.value[0].product1SelectedPackagingCode
-
-    //------ Item 1 Add data 
-    selectedItemCode2.value = productionPlan.value[0].product2SelectedCode
-    selectedPackagingType2.value = productionPlan.value[0].product2SelectedPackagingCode
-
-    selectedProductionCode.value = productionPlan.value[0].productionCode
-
-    selectedItemCodeForPlan.value = productionPlan.value[0].product1SelectedCode
-
-    //---------------------------- validate ------------------------------------
-    batchSale.value = productionPlan.value[0].quantityKgs || 0
-    packagingkgs1.value = productionPlan.value[0].product1PackingQtyKgs || 0
-    packagingPcs1.value = productionPlan.value[0].product1UomCount || 0
-    packagingkgs2.value = productionPlan.value[0].product2PackingQtyKgs || 0
-    packagingPcs2.value = productionPlan.value[0].product2UomCount || 0
-
-    console.log("Packaging", batchSale.value, packagingkgs1.value)
-
+const checkDisabledBtnSelectItem2 = (selectedItemCode, product2SelectedCode) => {
+  if(selectedItemCode){
+    return false
+  }else if(product2SelectedCode){
+    return false
+  }else{
     
-  } catch (error) {
-    // จัดการข้อผิดพลาด
-    console.error("Error fetching production plan:", error)
+    return true
   }
-})
+}
 
 const realTimeValue = ref()
 
@@ -616,12 +627,11 @@ const validateBatchSale = (batchSale, kgs1, pcs1, kgs2, pcs2) => {
   calculatedValues.totalKgs2 = (parseInt(kgs2 || 0) * parseInt(pcs2 || 0))
   calculatedValues.total = calculatedValues.totalKgs1 + calculatedValues.totalKgs2
 
-  console.log("Batch Sale:", batchSale)
-  console.log("Total Kgs1:", kgs1, '*', pcs1, '=', calculatedValues.totalKgs1)
-  console.log("Total Kgs2:", kgs2, '*', pcs2, '=', calculatedValues.totalKgs2)
-  console.log("Total:", calculatedValues.total)
-  console.log("Result:", batchSale, '>=', calculatedValues.total)
-
+  // console.log("Batch Sale:", batchSale)
+  // console.log("Total Kgs1:", kgs1, '*', pcs1, '=', calculatedValues.totalKgs1)
+  // console.log("Total Kgs2:", kgs2, '*', pcs2, '=', calculatedValues.totalKgs2)
+  // console.log("Total:", calculatedValues.total)
+  // console.log("Result:", batchSale, '>=', calculatedValues.total)
 
   return parseInt(batchSale || 0) >= calculatedValues.total
 }
@@ -723,6 +733,17 @@ const selectFilterProduction = (index, item) => {
     console.log("Itesm", item)
   }
   isDialogVisibleFilterSelect.value = true
+
+  selectedProductionCode.value = productionPlan.value[index].productionCode
+
+  selectedItemCode.value = productionPlan.value[index].product1SelectedCode
+  selectedPackagingType.value = productionPlan.value[index].product1SelectedPackagingCode
+
+  selectedItemCode2.value = productionPlan.value[index].product2SelectedCode
+  selectedPackagingType2.value = productionPlan.value[index].product2SelectedPackagingCode
+
+  console.log("Selected item", selectedItemCode.value)
+
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -1617,6 +1638,9 @@ const print = () => {
                 >
                   Confirm select
                 </VBtn>
+                <VBtn @click="showDebug">
+                  Show Debug
+                </VBtn>
               </VCol>
             </VRow>
             <VCol
@@ -2383,7 +2407,7 @@ const print = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VTextField
-                  v-if="item.raw.statusId === 101"
+                  v-if="item.raw.statusId === 101 && item.raw.product1UomCount >= 0"
                   v-model="item.raw.product1UomCount"
                   style="min-width: 100px;"
                   density="compact"
@@ -2393,8 +2417,16 @@ const print = () => {
                   :readonly="item.raw.status === 'Submit'"
                   :rules="[
                     value => {
+                      if(!value){
+                        return `Value is required!`
+                      }
+                    },
+                    value => {
                       if (validateSpecificRow(item.raw.quantityKgs,value,item.raw.product1PackingQtyKgs,item.raw.product2UomCount,item.raw.product2PackingQtyKgs)) {
                         return `packaging must not exceed<br>the batch scale (kgs).`
+                      }
+                      if (validateSpecificRow(item.raw.quantityKgs,value,item.raw.product1PackingQtyKgs,item.raw.product2UomCount,item.raw.product2PackingQtyKgs)) {
+                        return `the batch scale (kgs).`
                       }
                       return true
                     }
@@ -2449,6 +2481,7 @@ const print = () => {
               >
                 <VBtn
                   v-if="item.raw.statusId === 101"
+                  :disabled="checkDisabledBtnSelectItem2(selectedItemCode,item.raw.product1SelectedCode)"
                   variant="outlined"
                   @click="selectFilterProduction(index,2)"
                 >
@@ -2458,6 +2491,13 @@ const print = () => {
                   </template>
                 </VBtn>
                 <span v-else>{{ (item.raw.product2SelectedCode) }}</span>
+                <div v-if="item.raw.statusId === 101 && checkDisabledBtnSelectItem2(selectedItemCode,item.raw.product1SelectedCode)">
+                  <span class="text-warning">Invalid production or ITEM 1!</span>
+                </div>
+                <div v-if="item.raw.statusId === 101 && checkDisabledBtnSelectItem2(selectedItemCode,item.raw.product1SelectedCode)">
+                  <span class="text-warning">
+                    Please choose ITEM 1.</span>
+                </div>
               </td>
               <td
                 class="bg-red-lighten-5 cursor-pointer"
@@ -2493,6 +2533,7 @@ const print = () => {
               >
                 <VBtn
                   v-if="item.raw.statusId === 101"
+                  :disabled="checkDisabledBtnSelectItem2(selectedItemCode,item.raw.product1SelectedCode)"
                   variant="outlined"
                   @click="selectFilterProduction(index,2)"
                 >
@@ -2538,6 +2579,7 @@ const print = () => {
                 <VTextField
                   v-if="item.raw.statusId === 101"
                   v-model="item.raw.product2UomCount"
+                  :disabled="checkDisabledBtnSelectItem2(selectedItemCode,item.raw.product1SelectedCode)"
                   type="number"
                   style="min-width: 100px;"
                   density="compact"

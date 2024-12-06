@@ -213,7 +213,7 @@ const trickerLorryLoadind = ref(false)
 const isDialogVisibleSelecrLorry = ref(true)
 const checkSelectLorry = ref([])
 
-const typeLorryOnce = ref(itemStore.getItemDetails('typeLorryInfoId'))
+const typeLorryOnce = ref(sessionStorage.getItem('typeLorryInfoId'))
 const typeLorryTwo = ref(null)
 
 const generatedJournalId = async () => {
@@ -246,13 +246,22 @@ const generatedJournalId = async () => {
 
       checkSelectLorry.value = item.lorryInfos
 
-      if (checkSelectLorry.value.length > 0) {
-        if (checkSelectLorry.value.length === 1) {
-          typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
+      if(!typeLorryOnce.value){
+        
+        if (checkSelectLorry.value.length > 0) {
+          if (checkSelectLorry.value.length === 1) {
+            typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
+          }
+        } else {
+          trickerLorryLoadind.value = false
+          typeLorryTwo.value = checkSelectLorry.value
         }
-      } else {
-        trickerLorryLoadind.value = false
-        typeLorryTwo.value = checkSelectLorry.value
+      }else{
+        const filteredLorryInfos = checkSelectLorry.value.filter(
+          item => item.lorryInfoKey === typeLorryOnce.value,
+        )
+
+        checkSelectLorry.value = filteredLorryInfos
       }
 
       sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
@@ -323,13 +332,19 @@ const itemsLorrySelect = [
 const updateCurrentTab = async () => {
   // รอให้ generatedJournalId และ generated ทำงานเสร็จก่อน
   await generatedJournalId()
-  await generated()
+
+  // await generated()
+
+  testComponent()  
 
   // จากนั้นค่อยอัปเดต currentTab ด้วยค่าใหม่จาก getCurrentTabIndex(
 }
 
 // เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
-updateCurrentTab()
+onMounted(()=> {
+  updateCurrentTab()
+})
+
 
 const componentLorryForm = ref(null)
 
@@ -355,12 +370,16 @@ const matchingLorryInfoWithComponent = lorryInfoKey => {
   case '09':
     return LorryLoadingC2HAKU
   case '10':
+    console.log("case 10", lorryInfoKey)
+    
     return LorryLoadingC2EKIAA111
   case '11':
     return LorryLoadingC3DieselOil
   case '12':
     return LorryLoadingC4TELA
   case '13':
+    console.log("case 13", lorryInfoKey)
+    
     return LorryLoadingC4EKIAV432
   case '15':
     return LorryLoadingC5NPAN30
@@ -583,12 +602,21 @@ const handleSelectLorryLoading = word => {
   // location.reload()
 
   isDialogSubmitSuccessVisible.value = true
+
   
   setTimeout(() => {
     isDialogSubmitSuccessVisible.value = false
     isDialogVisibleConfirmDialog2.value?.closeDialog()
     isDialogVisibleSelecrLorry.value = false
+    if(selectLorryInfoKey.value === '13'){
+      window.location.href = 'receingForm'
+    }else if(selectLorryInfoKey.value === '10'){
+      window.location.href = 'receingForm'
+      2
+    }
   }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+
+
 
 
 }
