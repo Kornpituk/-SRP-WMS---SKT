@@ -217,6 +217,8 @@ watchEffect(async () => {
   lorryItems[44].result.field[0].value = currencyFormat(((b + d) - f))
   lorryItems[44].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
 
+  dVariable.value = currencyFormat(d)
+
   dcsAfter.value = currencyFormat(lorryItems[43].result.field[0].value)
   dcsBefore.value = currencyFormat(lorryItems[9].result.field[0].value)
   dcsDiff = currencyFormat(lorryItems[43].result.field[0].value - lorryItems[9].result.field[0].value)

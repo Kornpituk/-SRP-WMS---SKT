@@ -7,26 +7,15 @@ import {
   passInitialData, passSubmitData, save,
 } from '@/services/skt/inv/lorryLoading/kumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import alertWordConst from '@/utilities/constant'
 import image01 from '@/views/skt/receiving/lorryForm/b1/CAPOLACTUM.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
-//--------------------- alertDialog--------------------------------------------------------
-import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
-import alertWordConst from '@/utilities/constant'
-
-
-const itemStore = useItemStore()
-
-var kumaruItems = reactive(kumaruItemTemplate)
-var ipaRequestData = ref({})
-const route = useRoute()
-
-const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
-const poNo = ref('')
-var isReadOnly = ref(false)
-
+//------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
@@ -38,25 +27,39 @@ const textAlertDialogFunction = (word, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
-const textConfirmDialogFunction = async (word, success, confirm) => {
-  wordForSubmit.value = word
-  confirmValueCheck.value = confirm
-  successDialAlert.value = success
-  isDialogVisibleConfirmDialog.value = true
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
 
-  // รอคำตอบจากผู้ใช้
-  return new Promise(resolve => {
-    const unwatch = watchEffect(
-      () => isDialogVisibleConfirmDialog.value,
-      newValue => {
-        if (!newValue) { // เมื่อ Dialog ถูกปิด
-          unwatch() // ยกเลิก watch
-          resolve(confirmValueCheck.value) // คืนค่าคำตอบ
-        }
-      },
-    )
-  })
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
 }
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(wordForSubmit.value === "SUBMIT"){
+    submit()
+  }else if(wordForSubmit.value === "APPROVE"){
+    approve()
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
+
+
+const itemStore = useItemStore()
+
+var kumaruItems = reactive(kumaruItemTemplate)
+var ipaRequestData = ref({})
+const route = useRoute()
+
+const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+const poNo = ref('')
+var isReadOnly = ref(false)
 
 onMounted(async () => {
 
@@ -92,17 +95,8 @@ onMounted(async () => {
 })
 
 async function saveDraft(e) {
-
-  for (var i of kumaruItems) {
-    for (var f of i.result.field) {
-      ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
-    }
-    if(i.condition.field != undefined){
-      for (var f of i.condition.field) {
-        ipaRequestData.value[f.name] = passSubmitData(i.condition.type, f.value)
-      }
-    }
-  }
+ 
+  await passData()
 
   var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
 
@@ -116,22 +110,29 @@ async function saveDraft(e) {
   }
 }
 
-async function submit(e) {
-
+async function passData() {
   for (var i of kumaruItems) {
     for (var f of i.result.field) {
       ipaRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
+
+    if(i.condition.field != undefined){
+      for (var f of i.condition.field) {
+        ipaRequestData.value[f.name] = passSubmitData(i.condition.type, f.value)
+      }
+    }
   }
+}
+
+async function submit(e) {
+  
+  await passData()
 
   var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
-  if (response.status == 200) {
-    console.log(response.data)
-  } else {
-    console.error(response.data)
-    e.preventDefault()
-    
-  }
+
+  if (response.status != 200) 
+    return
+
 
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
@@ -140,7 +141,6 @@ async function submit(e) {
   for (var i of kumaruItems) {
     for (var f of i.result.field) {
       if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
-        debugger
         isValid = false
       }
     }
@@ -148,10 +148,18 @@ async function submit(e) {
 
   if(!isValid){
     alert("กรุณากรอกข้อมูลให้ครบ")
-    
+  
     return
   }
 
+  // // เรียกใช้งาน Dialog
+  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
+
+  //if (confirmed) {
+  // if (confirmed) {
+  console.log("User confirmed:", confirmValueCheck.value)
+
+  // เรียก API หรือดำเนินการต่อ
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
@@ -166,8 +174,14 @@ async function submit(e) {
       window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
+    console.error(response.data)
     textAlertDialogFunction(alertWordConst.submit, false)
   }
+
+  // } else {
+  //   console.log("User declined")
+  // }
+
 }
 
 async function approve(e) {
@@ -584,7 +598,7 @@ watchEffect(async () => {
         type="text"
         color="primary "
         class="mx-1"
-        @click="submit"
+        @click="openConfirmDialog('SUBMIT')"
       >
         Submit
       </VBtn>
@@ -593,14 +607,12 @@ watchEffect(async () => {
         type="text"
         color="primary"
         class="mx-1"
-        @click="approve"
+        @click="openConfirmDialog('APPROVE')"
       >
         Approve
       </VBtn>
     </VCol>
   </VRow>
-
-  <!-- Alert Dialog Success/Fiald new -->
   <section>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->
@@ -609,6 +621,16 @@ watchEffect(async () => {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>

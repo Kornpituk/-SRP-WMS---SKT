@@ -15,7 +15,6 @@ import { ref, watchEffect } from 'vue'
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
-import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
 import alertWordConst from '@/utilities/constant'
 
 const itemStore = useItemStore()
