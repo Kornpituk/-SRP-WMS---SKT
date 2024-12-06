@@ -330,6 +330,7 @@ function formatDate(dateString) {
                         variant="solo"
                         text-start=""
                         text-end=""
+                        :readonly="isReadOnly"
                       /> {{ section.practice.endPracticeText }}
                     </VLabel>
                   </VCol>
@@ -341,6 +342,7 @@ function formatDate(dateString) {
                   :label="section.practice.startPracticeText"
                   :false-value="0"
                   :true-value="1"
+                  :readonly="isReadOnly"
                 />
               </div>
               <div v-else-if="section.practice.type === 'checkbox3'">
@@ -351,6 +353,7 @@ function formatDate(dateString) {
                       :label="section.practice.field[0].startPracticeText"
                       :false-value="0"
                       :true-value="1"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -359,6 +362,7 @@ function formatDate(dateString) {
                       :label="section.practice.field[1].startPracticeText"
                       :false-value="0"
                       :true-value="1"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -367,6 +371,7 @@ function formatDate(dateString) {
                       :label="section.practice.field[2].startPracticeText"
                       :false-value="0"
                       :true-value="1"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -379,6 +384,7 @@ function formatDate(dateString) {
                       :label="section.practice.field[0].startPracticeText"
                       :false-value="0"
                       :true-value="1"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -387,6 +393,7 @@ function formatDate(dateString) {
                       :label="section.practice.field[1].startPracticeText"
                       :false-value="0"
                       :true-value="1"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -395,6 +402,7 @@ function formatDate(dateString) {
                       :label="section.practice.field[2].startPracticeText"
                       :false-value="0"
                       :true-value="1"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -403,6 +411,7 @@ function formatDate(dateString) {
                       :label="section.practice.field[3].startPracticeText"
                       :false-value="0"
                       :true-value="1"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>

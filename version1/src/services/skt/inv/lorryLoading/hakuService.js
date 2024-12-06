@@ -91,6 +91,7 @@ export function formatDate(dateString) {
 }
 
 export function passInitialData(type, params, index) {
+  console.log(params)
   if (type == "oknot" || type=="leak" ) {
     return params.toString()
   }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
@@ -980,7 +981,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "l0906040101",
+          "name": "L090604",
           
         },
       ],

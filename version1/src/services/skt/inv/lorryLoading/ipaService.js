@@ -588,8 +588,7 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0106060101", // percen
-
+          // "name": "l0106060101", // percen
         },
       ],
     },
