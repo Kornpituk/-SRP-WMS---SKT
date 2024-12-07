@@ -318,7 +318,7 @@ watchEffect(async () => {
                 <VRow>
                   <VCol>
                     <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                      {{ section.practice.startPracticeText }}
+                      <span v-html="section.practice.startPracticeText" />
                       <VCurrencyField
                         v-model="section.practice.field[0].value"
                         density="compact"
@@ -331,10 +331,16 @@ watchEffect(async () => {
                   </VCol>
                 </VRow>
               </div>
-              <div v-else-if="section.practice.type === 'center'">
+              <div
+                v-else-if="section.practice.type === 'center'"
+                style="text-align: center;"
+              >
                 <VRow>
                   <VCol>
-                    <div v-html="section.practice.field[0].startPracticeText" />
+                    <div
+                      class="justify-center"
+                      v-html="section.practice.field[0].startPracticeText"
+                    />
                   </VCol>
                 </VRow>
               </div>
@@ -379,7 +385,7 @@ watchEffect(async () => {
               </div>
               <div v-else>
                 <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                  {{ section.practice }}
+                  <div v-html="section.practice" />
                 </VLabel>
               </div>
             </td>
@@ -388,7 +394,7 @@ watchEffect(async () => {
               style="max-width: 350px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-center pa-md-2">
-                {{ section.condition }}
+                <div v-html="section.condition" />
               </VLabel>
             </td>
             <td
@@ -791,28 +797,6 @@ watchEffect(async () => {
         </tbody>
       </table>
     </VCol>
-    <!-- Precautions -->
-    <VCol cols="12">
-      <table class="custom-table">
-        <tr>
-          <td class="tr-border-right-0">
-            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-              ข้อควรระวัง
-            </VLabel>
-          </td>
-          <td class="tr-border-left-0">
-            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            <br>
-            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
-          </td>
-          <!--
-            <th style="font-size: 16px;" colspan="3">
-            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            </th> 
-          -->
-        </tr>
-      </table>
-    </VCol>
     <!-- Flow Chat -->
     <VCol cols="12">
       <table class="custom-table">
@@ -840,6 +824,28 @@ watchEffect(async () => {
             </div>
           </tr>
         </tbody>
+      </table>
+    </VCol>
+    <!-- Precautions -->
+    <VCol cols="12">
+      <table class="custom-table">
+        <tr>
+          <td class="tr-border-right-0">
+            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+              ข้อควรระวัง
+            </VLabel>
+          </td>
+          <td class="tr-border-left-0">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            <br>
+            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
+          </td>
+          <!--
+            <th style="font-size: 16px;" colspan="3">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            </th> 
+          -->
+        </tr>
       </table>
     </VCol>
     <VCol
@@ -1067,5 +1073,9 @@ watchEffect(async () => {
 .tr-border-left-0 {
   font-size: 16px;
   border-left: 0px !important;
+}
+
+.text-red {
+  color: red;
 }
 </style>

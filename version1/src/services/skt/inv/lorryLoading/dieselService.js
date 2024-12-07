@@ -140,7 +140,7 @@ export const dieselItemTemplate = [
     "isSection": true,
     "rowSpan": 4,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "( A ) จำนวนน้ำมันที่ระบุ ในใบส่งสินค้า    ",
+    "practice": "( <span class='text-red'>A</span> ) จำนวนน้ำมันที่ระบุ ในใบส่งสินค้า    ",
     "condition": "",
     "result": {
       "type": "LTR",
@@ -156,7 +156,7 @@ export const dieselItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "( B ) จำนวนน้ำมันที่คิดได้จาก Level",
+      "startPracticeText": "( <span class='text-red'>B</span> ) จำนวนน้ำมันที่คิดได้จาก Level",
       "endPracticeText": "mm.",
       "type": "d",
       "field": [
@@ -166,7 +166,7 @@ export const dieselItemTemplate = [
         },
       ],
     },
-    "condition": "B ห้ามเกิน 1,400 mm.",
+    "condition": "<span class='text-red'>B</span> ห้ามเกิน 1,400 mm.",
     "result": {
       "type": "LTR",
       "field": [
@@ -180,7 +180,7 @@ export const dieselItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "( C ) จากการคำนวน Level (A + B)",
+    "practice": "( <span class='text-red'>C</span> ) จากการคำนวน Level (A + B)",
     "condition": "ต้องไม่เกิน 15,000 LTR",
     "result": {
       "type": "c",
@@ -340,7 +340,7 @@ export const dieselItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อน NO.2",
+          "startPracticeText": "ใส่หมอนรองห้ามล้อเคลื่อน NO.2",
           "endPracticeText": "",
           "name": "l110502",
         },
@@ -486,7 +486,7 @@ export const dieselItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่  NO.5",
+          "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรือไม่  NO.5",
           "endPracticeText": "",
           "name": "L110508",
           
@@ -857,7 +857,7 @@ export const dieselItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "startPracticeText": "บันทึกเวลาที่รับเสร็จ",
+          "startPracticeText": "บันทึกเวลารับเสร็จ",
           "endPracticeText": "",
           "name": "l110701",
         },
@@ -906,7 +906,7 @@ export const dieselItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "(D) เช็ค Level ในแท้งค์101V-020  NO.12 ",
+    "practice": "<span class='text-red'>(D)</span> เช็ค Level ในแท้งค์101V-020  <span class='text-red'>NO.12</span>",
     "condition": "น้ำหนักที่อ่านได้",
     "result": {
       "type": "LTR",
@@ -974,7 +974,7 @@ export const dieselItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "startPracticeText": "เอาหมอนลองล้อ รถออก  NO.2",
+          "startPracticeText": "เอาหมอนรองล้อ รถออก  NO.2",
           "endPracticeText": "",
           "name": "l110706",
           

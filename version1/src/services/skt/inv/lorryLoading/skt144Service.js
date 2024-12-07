@@ -142,7 +142,7 @@ export const ItemTemplate = [
   {
     "isSection": true,
     "rowSpan": 6,
-    "sequence": "<strong>ข้อควรระวัง</strong>",
+    "sequence": "<strong><u>ข้อควรระวัง</u></strong>",
     "practice": " : หากมีงาน Hot work or Fire work ใกล้เคียง ให้แจ้งหัวหน้างานให้หยุดชั่วคราว",
     "condition": "",
     "result": {
@@ -157,7 +157,7 @@ export const ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": ": ให้ ปิดโทรศัพท์ขณะ Loading สาร",
+    "practice": ": ให้ <u>ปิด</u>โทรศัพท์ขณะ Loading สาร",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -172,7 +172,7 @@ export const ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": ": หากมี ของเหลว หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ ห้ามใช้น้ำล้าง ",
+    "practice": ": หากมี ของเหลว หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ <strong>ห้ามใช้น้ำล้าง</strong> ",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -339,7 +339,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "2. เอาหมอนรองล้อรถเรียบร้อย",
-    "condition": "รองล้อรถทั่งด้านหน้าและด้านหลัง",
+    "condition": "รองล้อรถทั้งด้านหน้าและด้านหลัง",
     "result": {
       "type": "oknot",
       "field": [
@@ -450,7 +450,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "3. Temperature เท่าไหร่",
-    "condition": "อุณหภูมิต้องไม่สูงกว่า  35 C' ",
+    "condition": "อุณหภูมิต้องไม่สูงกว่า  35 ℃ ",
     "result": {
       "type": "35c",
       "field": [
@@ -542,7 +542,7 @@ export const ItemTemplate = [
   {
     "isSection": true,
     "rowSpan": 3,
-    "sequence": "<strong>lorry tank</strong>",
+    "sequence": "<strong>Lorry tank</strong>",
     "practice": "1. วาล์ว 18,21,24,25,26,27,28,29",
     "condition": "Close ( ปิด )",
     "result": {
