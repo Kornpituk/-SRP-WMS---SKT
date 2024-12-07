@@ -146,7 +146,7 @@ export const ipaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "ให้<u>ปิด</u>โทรศัพท์ขณะ loading Solvent",
+    "practice": "ให้<u>ปิด</u>โทรศัพท์ขณะ Loading Solvent",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -442,7 +442,7 @@ export const ipaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "3. Temperature เท่าไหร่",
-    "condition": "อุณหภูมิต้องไม่สูงกว่า 25 C°",
+    "condition": "อุณหภูมิต้องไม่สูงกว่า 25 ℃",
     "result": {
       "type": "c",
       "field": [

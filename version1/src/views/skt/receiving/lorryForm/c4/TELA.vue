@@ -240,7 +240,7 @@ watchEffect(async () => {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        TELA
+        TELA (AMMONIA TANK   11V - 511 )
       </div>
     </VCol>
     <VCol cols="4" />
@@ -306,8 +306,16 @@ watchEffect(async () => {
               <div v-if="section.practice.type === 'checkbox'">
                 <VCheckbox
                   v-model="section.practice.field[0].value"
-                  :label="section.practice.startPracticeText"
-                />
+                  :false-value="0"
+                  :true-value="1"
+                  :readonly="isReadOnly"
+                >
+                  <template #label>
+                    <span>                  
+                      <div v-html="section.practice.startPracticeText" />
+                    </span>
+                  </template>
+                </VCheckbox>
               </div>
               
               <div v-else-if="section.practice.type === 'checkbox3'">
@@ -315,18 +323,27 @@ watchEffect(async () => {
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[0].value"
+                      :false-value="0"
+                      :true-value="1"
+                      :readonly="isReadOnly"
                       :label="section.practice.field[0].startPracticeText"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
+                      :false-value="0"
+                      :true-value="1"
+                      :readonly="isReadOnly"
                       :label="section.practice.field[1].startPracticeText"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[2].value"
+                      :false-value="0"
+                      :true-value="1"
+                      :readonly="isReadOnly"
                       :label="section.practice.field[2].startPracticeText"
                     />
                   </VCol>
@@ -337,24 +354,36 @@ watchEffect(async () => {
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[0].value"
+                      :false-value="0"
+                      :true-value="1"
+                      :readonly="isReadOnly"
                       :label="section.practice.field[0].startPracticeText"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
+                      :false-value="0"
+                      :true-value="1"
+                      :readonly="isReadOnly"
                       :label="section.practice.field[1].startPracticeText"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[2].value"
+                      :false-value="0"
+                      :true-value="1"
+                      :readonly="isReadOnly"
                       :label="section.practice.field[2].startPracticeText"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[3].value"
+                      :false-value="0"
+                      :true-value="1"
+                      :readonly="isReadOnly"
                       :label="section.practice.field[3].startPracticeText"
                     />
                   </VCol>
@@ -362,7 +391,7 @@ watchEffect(async () => {
               </div>
               <div v-else>
                 <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                  {{ section.practice }}
+                  <div v-html="section.practice" />
                 </VLabel>
               </div>
             </td>
@@ -816,28 +845,7 @@ watchEffect(async () => {
           </tr>
         </tbody>
       </table>
-    </VCol>
-    <VCol cols="12">
-      <table class="custom-table">
-        <tr>
-          <td class="tr-border-right-0">
-            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-              ข้อควรระวัง
-            </VLabel>
-          </td>
-          <td class="tr-border-left-0">
-            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            <br>
-            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
-          </td>
-          <!--
-            <th style="font-size: 16px;" colspan="3">
-            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            </th> 
-          -->
-        </tr>
-      </table>
-    </VCol>
+    </VCol> 
     <!-- Flow Chat -->
     <VCol cols="12">
       <table class="custom-table">
@@ -865,6 +873,29 @@ watchEffect(async () => {
             </div>
           </tr>
         </tbody>
+      </table>
+    </VCol>
+    <VCol cols="12">
+      <table class="custom-table">
+        <tr>
+          <td class="tr-border-right-0">
+            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+              ข้อควรระวัง
+            </VLabel>
+          </td>
+          <td class="tr-border-left-0">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            <br>
+            : แจ้งบุคคลที่ทำงานอยู่ใกล้เคียง
+            <br>
+            : Cap Lock ของข้อต่อกับวาวล์แน่นหนา ไม่หลุดง่าย หากรั่วไหลแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
+          </td>
+          <!--
+            <th style="font-size: 16px;" colspan="3">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            </th> 
+          -->
+        </tr>
       </table>
     </VCol>
     <VCol
