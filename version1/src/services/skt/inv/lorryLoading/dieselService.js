@@ -195,7 +195,15 @@ export const dieselItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที",
+    "practice": {
+      "type": "center",
+      "field": [
+        { 
+          "startPracticeText": "<strong><u>หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที</u></strong>",
+          "endPracticeText": "",
+        },
+      ],
+    },
     "condition": "",
     "result": {
       "type": "",
@@ -304,7 +312,6 @@ export const dieselItemTemplate = [
     "rowSpan": 11,
     "sequence": "<strong>5. ขั้นตอนการปฏิบัติ</strong>",
     "practice": {
-    
       "type": "checkbox",
       "field": [
         { 

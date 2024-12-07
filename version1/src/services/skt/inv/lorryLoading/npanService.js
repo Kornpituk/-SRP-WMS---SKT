@@ -275,7 +275,7 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อนด้านหน้า-หลัง No.2",
+      "startPracticeText": "ใส่หมอนรองห้ามล้อเคลื่อนด้านหน้า-หลัง No.2",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -450,7 +450,7 @@ export const npanItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่ No.4",
+      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรือไม่ No.4",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
