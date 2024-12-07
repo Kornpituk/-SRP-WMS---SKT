@@ -19,6 +19,7 @@ import { ref } from 'vue'
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/receiving/lorryForm/a2/EP-400 (144,145 ).png'
 
 const itemStore = useItemStore()
@@ -542,22 +543,18 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
-                      :value-range="23"
-                      :readonly="isReadOnly"
+                      :items="hour"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
-                      :value-range="59"
-                      :readonly="isReadOnly"
+                      :items="minute"
                     />
                   </VCol>
                 </VRow>
