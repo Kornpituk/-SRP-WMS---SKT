@@ -100,10 +100,7 @@ onMounted(async () => {
 
   const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  console.log("statusId", lorryFormIPAStatus.data)
-
   statusId.value = lorryFormIPAStatus.data.data[0].statusId
-  console.log("StatusId : ", statusId.value)
 
   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
@@ -164,14 +161,6 @@ async function submit(e) {
     return
   }
 
-  // // เรียกใช้งาน Dialog
-  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
-
-  //if (confirmed) {
-  // if (confirmed) {
-  console.log("User confirmed:", confirmValueCheck.value)
-
-  // เรียก API หรือดำเนินการต่อ
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
@@ -189,10 +178,6 @@ async function submit(e) {
     console.error(response.data)
     textAlertDialogFunction(alertWordConst.submit, false)
   }
-
-  // } else {
-  //   console.log("User declined")
-  // }
 
 }
 

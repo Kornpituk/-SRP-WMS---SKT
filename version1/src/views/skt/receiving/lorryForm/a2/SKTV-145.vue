@@ -108,7 +108,7 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(statusId.value == 15 || statusId.value == 18){
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
 
@@ -266,7 +266,7 @@ watchEffect(async () => {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        SKTV-145
+        SKT EP-400P BE 11V-145
       </div>
     </VCol>
     <VCol cols="4" />
@@ -335,9 +335,9 @@ watchEffect(async () => {
             </td>
             <td
               colspan="3"
-              style="max-width: 350px; border-left: 1px solid black; text-align: start;"
+              style="max-width: 450px; border-left: 1px solid black; text-align: start;"
             >
-              <VLabel class="d-flex justify-center pa-md-2">
+              <VLabel class="d-flex justify-center pa-md-2 text-wrap">
                 {{ section.condition }}
               </VLabel>
             </td>
@@ -673,7 +673,7 @@ watchEffect(async () => {
               />
             </td>
             <td style="font-size: 16px;">
-              Ltr
+              Kg 
             </td>
           </tr>
           <tr>
@@ -687,7 +687,7 @@ watchEffect(async () => {
               {{ tankBefore }}
             </td>
             <td style="font-size: 16px;">
-              Ltr
+              Kg 
             </td>
           </tr>
           <tr>
@@ -701,7 +701,7 @@ watchEffect(async () => {
               {{ tankDiff }}
             </td>
             <td style="font-size: 16px;">
-              Ltr
+              Kg 
             </td>
           </tr>
         </tbody>

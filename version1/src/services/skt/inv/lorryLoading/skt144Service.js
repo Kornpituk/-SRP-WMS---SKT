@@ -92,9 +92,10 @@ export function formatDate(dateString) {
 
 
 export function passInitialData(type, params, index) {
+
   if (type == "oknot" || type=="leak" ) {
     return params.toString()
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp' || type == "mm" || type =="ac"){
+  }else if(type == "bd" || type == "litre" || type == "percent" || type == "c" || type=='mpa'|| type=='amp' || type == "mm" || type =="ac" || type == "35c") {
     if(index == 0){
       return params
     }else{
@@ -403,11 +404,11 @@ export const ItemTemplate = [
       "type": "percent",
       "field": [
         {
-          "name": "l0402060101", // percent
+          "name": "l0403060101", // percent
 
         },
         {
-          "name": "l0402060102", // OkNot
+          "name": "l0403060102", // OkNot
 
         },
       ],

@@ -91,15 +91,10 @@ export function formatDate(dateString) {
 }
 
 export function passInitialData(type, params, index) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+
+  if (type == "oknot" || type=="leak" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percent" || type == "c" || type=='mpa'|| type=='amp' || type == "mm" || type =="ac" || type == "35c") {
     if(index == 0){
       return params
     }else{
@@ -406,11 +401,11 @@ export const ItemTemplate = [
       "type": "percent",
       "field": [
         {
-          "name": "l0502060101", // percent
+          "name": "l0503060101", // percent
 
         },
         {
-          "name": "l0502060102", // OkNot
+          "name": "l0503060102", // OkNot
 
         },
       ],
@@ -673,7 +668,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "7. เปิดวาล์ว 29 ",
-    "condition": "Open ( เปิด ) เวลาเริ่มโหลดสินค้า.................................",
+    "condition": "Open ( เปิด ) เวลาเริ่มโหลดสินค้า",
     "result": {
       "type": "actualCheck",
       "field": [
@@ -747,7 +742,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "4. ปิดวาล์ว 29 ",
-    "condition": "Close ( ปิด ) เวลาโหลดสินค้าเสร็จ...............................",
+    "condition": "Close ( ปิด ) เวลาโหลดสินค้าเสร็จ",
     "result": {
       "type": "actualCheck",
       "field": [
@@ -836,7 +831,7 @@ export const ItemTemplate = [
     "practice": "10. Check level DCS ได้เท่าไหร่",
     "condition": "Actual  Check",
     "result": {
-      "type": "oknot",
+      "type": "kg",
       "field": [
         {
           "name": "l0508100101", // percen
@@ -850,7 +845,7 @@ export const ItemTemplate = [
     "practice": "11. ส่วนต่างระหว่าง ก่อนการรับ และหลังรับ จำนวนกี่กีโลกรัม",
     "condition": "ต้องไม่ต่างกันมากจากการคำนวน",
     "result": {
-      "type": "kg",
+      "type": "de",
       "field": [
         {
           "name": "l0508110101", // percen
