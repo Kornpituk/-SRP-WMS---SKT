@@ -9,8 +9,8 @@ import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
-import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import {
+  currencyFormat,
   eki110ItemTemplate,
   formatDate, generate,
   get,
@@ -18,6 +18,7 @@ import {
   passInitialData, passSubmitData,
   save,
 } from '@/services/skt/inv/lorryLoading/eki110Service'
+
 import alertWordConst from '@/utilities/constant'
 
 

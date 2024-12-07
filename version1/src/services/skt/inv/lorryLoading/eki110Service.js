@@ -88,7 +88,7 @@ export function formatDate(dateString) {
   return 'null'
 }
 
-export function   InitialData(type, params, index) {
+export function passInitialData(type, params, index) {
   if (type == "oknot" || type=="leak" ) {
     return params.toString()
   }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
