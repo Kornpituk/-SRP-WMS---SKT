@@ -7,7 +7,7 @@ import {
 } from '@/services/skt/inv/lorryLoading/kumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import alertWordConst from '@/utilities/constant'
-import { hour, minute } from '@/utilities/time'
+import { minute } from '@/utilities/time'
 import image01 from '@/views/skt/receiving/lorryForm/b1/CAPOLACTUM.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
@@ -457,7 +457,16 @@ watchEffect(async () => {
                     <VSelect
                       v-model="section.result.field[0].value"
                       :items="hour"
-                    />
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          เวลาเริ่ม
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel />
+                      </template>
+                    </VSelect>
                   </VCol>
                   <VLabel>
                     :
@@ -466,7 +475,53 @@ watchEffect(async () => {
                     <VSelect
                       v-model="section.result.field[1].value"
                       :items="minute"
-                    />
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          น.
+                        </VLabel>
+                      </template>
+                    </VSelect>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'actualCheck2'">
+                <VRow>
+                  <VCol>
+                    <VSelect
+                      v-model="section.result.field[0].value"
+                      :items="hour"
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          เวลารับเสร็จ
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel />
+                      </template>
+                    </VSelect>
+                  </VCol>
+                  <VLabel>
+                    :
+                  </VLabel>
+                  <VCol>
+                    <VSelect
+                      v-model="section.result.field[1].value"
+                      :items="minute"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          น.
+                        </VLabel>
+                      </template>
+                    </VSelect>
                   </VCol>
                 </VRow>
               </div>

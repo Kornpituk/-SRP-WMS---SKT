@@ -344,7 +344,7 @@ function formatDate(dateString) {
                 <VRow>
                   <VCol>
                     <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                      {{ section.practice.startPracticeText }}
+                      <span v-html="section.practice.startPracticeText" />
                       <VCurrencyField
                         v-model="section.practice.field[0].value"
                         density="compact"
@@ -357,14 +357,32 @@ function formatDate(dateString) {
                   </VCol>
                 </VRow>
               </div>
+              <div
+                v-else-if="section.practice.type === 'center'"
+                style="text-align: center;"
+              >
+                <VRow>
+                  <VCol>
+                    <div
+                      class="justify-center"
+                      v-html="section.practice.field[0].startPracticeText"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
               <div v-else-if="section.practice.type === 'checkbox'">
                 <VCheckbox
                   v-model="section.practice.field[0].value"
-                  :label="section.practice.startPracticeText"
                   :false-value="0"
                   :true-value="1"
                   :readonly="isReadOnly"
-                />
+                >
+                  <template #label>
+                    <span>                  
+                      <div v-html="section.practice.startPracticeText" />
+                    </span>
+                  </template>
+                </VCheckbox>
               </div>
               <div v-else-if="section.practice.type === 'checkbox3'">
                 <VRow>
@@ -439,7 +457,7 @@ function formatDate(dateString) {
               </div>
               <div v-else>
                 <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                  {{ section.practice }}
+                  <div v-html="section.practice" />
                 </VLabel>
               </div>
             </td>
@@ -448,7 +466,7 @@ function formatDate(dateString) {
               style="max-width: 350px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-center pa-md-2">
-                {{ section.condition }}
+                <div v-html="section.condition" />
               </VLabel>
             </td>
             <td
@@ -872,7 +890,7 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="°C"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -894,7 +912,7 @@ function formatDate(dateString) {
           <td class="tr-border-left-0">
             : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
             <br>
-            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
+            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านข้างรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย <strong><u>ด่วน</u></strong>
           </td>
           <!--
             <th style="font-size: 16px;" colspan="3">
@@ -1158,5 +1176,9 @@ function formatDate(dateString) {
 .tr-border-left-0 {
   border-inline-start: 0 !important;
   font-size: 16px;
+}
+
+.text-red {
+  color: red;
 }
 </style>

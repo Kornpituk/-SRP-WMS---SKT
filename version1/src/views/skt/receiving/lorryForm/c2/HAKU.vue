@@ -256,7 +256,7 @@ watchEffect(async () => {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        HAKU
+        HAKU-C  TANK (11V-111)
       </div>
     </VCol>
     <VCol cols="4" />
@@ -402,7 +402,7 @@ watchEffect(async () => {
               </div>
               <div v-else>
                 <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                  {{ section.practice }}
+                  <div v-html="section.practice" />
                 </VLabel>
               </div>
             </td>
@@ -840,22 +840,6 @@ watchEffect(async () => {
         </tbody>
       </table>
     </VCol>
-    <VCol cols="12">
-      <table class="custom-table">
-        <tr>
-          <td class="tr-border-right-0">
-            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-              ข้อควรระวัง
-            </VLabel>
-          </td>
-          <td class="tr-border-left-0">
-            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            <br>
-            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
-          </td>
-        </tr>
-      </table>
-    </VCol>
     <!-- Flow Chat -->
     <VCol cols="12">
       <table class="custom-table">
@@ -883,6 +867,22 @@ watchEffect(async () => {
             </div>
           </tr>
         </tbody>
+      </table>
+    </VCol>
+    <VCol cols="12">
+      <table class="custom-table">
+        <tr>
+          <td class="tr-border-right-0">
+            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+              ข้อควรระวัง
+            </VLabel>
+          </td>
+          <td class="tr-border-left-0">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            <br>
+            : Cap Lock ของข้อต่อกับวาวล์แน่นหนา ไม่หลุดง่าย หากรั่วไหลแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
+          </td>
+        </tr>
       </table>
     </VCol>
     <VCol
