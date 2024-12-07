@@ -183,7 +183,7 @@ export const eki432ItemTemplate = [
     "practice": "( C ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
     "condition": "ต้องไม่เกิน 45,000 Kg.",
     "result": {
-      "type": "abkg",
+      "type": "kg",
       "field": [
         {
           "name": "l1301030101",
@@ -195,7 +195,7 @@ export const eki432ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที",
+    "practice": "<strong><u>หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที</u></strong>",
     "condition": "",
     "result": {
       "type": "",
@@ -325,7 +325,7 @@ export const eki432ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อนด้านหน้า-หลัง No.2",
+      "startPracticeText": "ใส่หมอนรองห้ามล้อเคลื่อนด้านหน้า-หลัง No.2",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -374,17 +374,7 @@ export const eki432ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": {
-      "startPracticeText": "นำกรวยมาวางกั้นบอกพื้นที่ปฏิบัติงาน No.1",
-      "endPracticeText": "",
-      "type": "checkbox",
-      "field": [
-        {
-          "name": "l130404",
-          
-        },
-      ],
-    },
+    "practice": "",
     "condition": "ทำ",
     "result": {
       "type": "oknot",
@@ -400,7 +390,7 @@ export const eki432ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เก็บ Sample (จาก Lorry tank บนรถ)ส่ง INSP No.4",
+      "startPracticeText": "นำกรวยมาวางกั้นบอกพื้นที่ปฏิบัติงาน No.1",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -525,7 +515,7 @@ export const eki432ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่ No.5",
+      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรือไม่ No.5",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -759,13 +749,8 @@ export const eki432ItemTemplate = [
     },
     "condition": "ปิดสวิตซ์อยู่ที่ off",
     "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1305040101",
-          
-        },
-      ],
+      "type": "",
+      "field": [],
     },
   },
   {
@@ -991,7 +976,7 @@ export const eki432ItemTemplate = [
     },
     "condition": "",
     "result": {
-      "type": "cd",
+      "type": "kg",
       "field": [
         {
           "name": "l1306030101",
@@ -1054,7 +1039,7 @@ export const eki432ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เอาหมอนลองล้อ รถออก  No.2",
+      "startPracticeText": "เอาหมอนรองล้อ รถออก  No.2",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [

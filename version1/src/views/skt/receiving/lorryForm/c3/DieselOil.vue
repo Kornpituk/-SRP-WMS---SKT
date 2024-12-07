@@ -331,6 +331,13 @@ watchEffect(async () => {
                   </VCol>
                 </VRow>
               </div>
+              <div v-else-if="section.practice.type === 'center'">
+                <VRow>
+                  <VCol>
+                    <div v-html="section.practice.field[0].startPracticeText" />
+                  </VCol>
+                </VRow>
+              </div>
               <div v-else-if="section.practice.type === 'checkbox'">
                 <VCheckbox
                   v-model="section.practice.field[0].value"
