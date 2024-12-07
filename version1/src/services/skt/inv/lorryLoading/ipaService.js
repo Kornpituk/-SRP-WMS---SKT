@@ -117,7 +117,7 @@ export function passSubmitData(type, params) {
     return !params ? "0": params.toString()
   }
   else {
-    if(isNaN(Number(params))){
+    if(isNaN(Number(params)) && type != ""){
       return parseFloat( params.replace(/,/g, ''))
     }else{
       return parseFloat(params)

@@ -3,11 +3,15 @@ import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import VNumberInput from '@/components/VNumberInput.vue'
 import {
+  currencyFormat,
+  eaItemTemplate,
   formatDate, generate, get, GetByPoEtlLogDetailJournalID,
+  mm2litre,
   passInitialData, passSubmitData,
+  save,
 } from '@/services/skt/inv/lorryLoading/eaService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
+import image01 from '@/views/skt/receiving/lorryForm/a1/EA.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
@@ -26,9 +30,9 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(lorryItems[6].result.field[0])
-const bVariable = ref(lorryItems[6].result.field[1])
-const cVariable = ref(lorryItems[7].result.field[0])
+const aVariable = ref(0)
+const bVariable = ref(0)
+const cVariable = ref(0)
 const dVariable = ref(0)
 var isReadOnly = ref(false)
 
@@ -98,8 +102,6 @@ onMounted(async () => {
 
   const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  console.log("statusId", lorryFormStatus.data)
-
   statusId.value = lorryFormStatus.data.data[0].statusId
 
   if(statusId.value == 15 || statusId.value == 18){
@@ -119,13 +121,7 @@ async function saveDraft(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -141,6 +137,17 @@ async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
+  for (var i of lorryItems) {
+    for (var f of i.result.field) {
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+  }
+
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
+
+  if (response.status != 200) 
+    return
+
 
   let isValid = true
   for (var i of lorryItems) {
@@ -153,10 +160,9 @@ async function submit(e) {
 
   if(!isValid){
     alert("กรุณากรอกข้อมูลให้ครบ")
-    
+  
     return
   }
- 
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
@@ -198,30 +204,38 @@ async function approve(e) {
     console.error(response.data)
   }
 }
-
 watchEffect(async () => {
-  // var b = ipaItems[6].result.field[0].value / (0.78)
-  // var d = ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45
-  // var f = ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)
+  var a = lorryItems[6].result.field[0].value
+  var b = a / 0.902
+  var c = lorryItems[7].result.field[0].value
+  var d = (c * 5.2) + 511.24
+  var bd = b + d
+  var e = lorryItems[46].result.field[0].value
+  var f = mm2litre(e)
+  var bdf = (b+d)-f
+  var bdfkg = bdf * 0.902
 
-  // dVariable.value = currencyFormat(d)
+  lorryItems[6].result.field[1].value = currencyFormat(b)
+  lorryItems[7].result.field[1].value = currencyFormat(d)
+  lorryItems[8].result.field[0].value = currencyFormat(bd)
+  lorryItems[46].result.field[1].value = currencyFormat(f)
+  lorryItems[49].result.field[0].value = currencyFormat(bdf)
+  lorryItems[49].result.field[1].value = currencyFormat(bdfkg)
 
-  // ipaItems[6].result.field[1].value = currencyFormat(b) // B
-  // ipaItems[7].result.field[1].value = currencyFormat(d) // D
-  // ipaItems[46].result.field[1].value = currencyFormat(f) // F
+  aVariable.value = currencyFormat(a)
+  bVariable.value = currencyFormat(b)
+  cVariable.value = currencyFormat(c)
+  dVariable.value = currencyFormat(d)
 
-  // ipaItems[8].result.field[0].value = currencyFormat((ipaItems[6].result.field[0].value / (0.78)) + (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
-  // ipaItems[49].result.field[0].value = currencyFormat((b + d) - f)
-  // ipaItems[49].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
-
-  // dcsAfter.value = currencyFormat(parseFloat(ipaItems[47].result.field[0].value))
-  // dcsBefore.value = currencyFormat(parseFloat(ipaItems[9].result.field[0].value))
-  // dcsDiff = currencyFormat(ipaItems[47].result.field[0].value - ipaItems[9].result.field[0].value)
-  // tankAfter.value = ipaItems[46].result.field[1].value
-  // tankBefore.value = currencyFormat(ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45)
-  // tankDiff.value = currencyFormat((ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)) - (ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45))
-
+  var g = lorryItems[47].result.field[0].value
+  var dcs = lorryItems[9].result.field[0].value
   
+  dcsAfter.value = currencyFormat(g)
+  dcsBefore.value = currencyFormat(dcs)
+  dcsDiff = currencyFormat(g-dcs)
+  tankAfter.value = currencyFormat(e)
+  tankBefore.value = currencyFormat(d)
+  tankDiff.value = currencyFormat(e-d)
 })
 </script>
 
@@ -299,7 +313,7 @@ watchEffect(async () => {
         </thead>
         <tbody>
           <tr
-            v-for="(section, sectionIndex) in ipaItems"
+            v-for="(section, sectionIndex) in lorryItems"
             :key="sectionIndex"
             :sectionIndex="sectionIndex"
           >
@@ -761,49 +775,49 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              หาเป็นลิตร = mm x 5.32 + 740.45
+              หาเป็นลิตร = mm x 5.2 + 511.24
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              หาเป็น mm = Litre - 740.45 / 5.32
+              หาเป็น mm = Litre - 511.24 / 5.2
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              (B) = (A) / 0.78
+              (B) = (A) / 0.902
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ aVariable.value }} /0.78
+              = {{ aVariable }} / 0.902
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ bVariable.value }} Litre
+              = {{ bVariable }} Litre
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              (D) = ((C) X 5.32) + 740.45
+              (D) = ((C) X 5.2) + 511.24
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = ({{ cVariable.value }}X 5.32 ) + 740.45
+              = ({{ cVariable }}X 5.2 ) + 511.24
             </VLabel>
           </VCol>
         </VRow>
@@ -817,7 +831,7 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              Density IPA = 0.78
+              Density IPA = 0.902
             </VLabel>
           </VCol>
         </VRow>
@@ -934,13 +948,13 @@ watchEffect(async () => {
         </tr>
         <tr>
           <td colspan="4">
-            <span>Staff: {{ eaRequestData.whStaff }}</span>
+            <span>Staff: {{ lorryRequestData.whStaff }}</span>
           </td>
           <td colspan="4">
-            <span>Leader: {{ eaRequestData.whLeader }}</span>
+            <span>Leader: {{ lorryRequestData.whLeader }}</span>
           </td>
           <td colspan="4">
-            <span>Supervisor: {{ eaRequestData.whSupervisor }}</span>
+            <span>Supervisor: {{ lorryRequestData.whSupervisor }}</span>
           </td>
         </tr>
         <tr>
@@ -948,16 +962,16 @@ watchEffect(async () => {
             style="min-width: 150px;"
             colspan="4"
           >
-            <div v-if="eaRequestData.whStaffUpdatedDate">
-              <span v-if="eaRequestData.whStaffUpdatedDate">{{ formatDate(eaRequestData.whStaffUpdatedDate) }}</span>
+            <div v-if="lorryRequestData.whStaffUpdatedDate">
+              <span v-if="lorryRequestData.whStaffUpdatedDate">{{ formatDate(lorryRequestData.whStaffUpdatedDate) }}</span>
             </div>
           </td>
           <td
             style="min-width: 150px;"
             colspan="4"
           >
-            <div v-if="eaRequestData.whLeaderDate">
-              <span v-if="eaRequestData.whLeaderDate">{{ formatDate(eaRequestData.whLeaderDate) }}</span>
+            <div v-if="lorryRequestData.whLeaderDate">
+              <span v-if="lorryRequestData.whLeaderDate">{{ formatDate(lorryRequestData.whLeaderDate) }}</span>
             </div>
           </td>
           <td

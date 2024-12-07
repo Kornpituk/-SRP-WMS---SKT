@@ -33,9 +33,9 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(lorryItems[6].result.field[0])
-const bVariable = ref(lorryItems[6].result.field[1])
-const cVariable = ref(lorryItems[7].result.field[0])
+const aVariable = ref(0)
+const bVariable = ref(0)
+const cVariable = ref(0)
 const dVariable = ref(0)
 var isReadOnly = ref(false)
 
@@ -213,22 +213,32 @@ async function approve(e) {
 }
 
 watchEffect(async () => {
-  var b = lorryItems[6].result.field[0].value / (1.17)
-  var d = lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.288) -172.970
-  var f = lorryItems[42].result.field[0].value == 0 ? 0 : mm2litre(lorryItems[42].result.field[0].value)
+  var a = lorryItems[6].result.field[0].value
+  var b = a / (1.17)
+  var c = lorryItems[7].result.field[0].value == 0 ? 0 :lorryItems[7].result.field[0].value
+  var d = (c * 5.288)-172.970
+  var bd = c+d
+  var e = lorryItems[42].result.field[0].value == 0 ? 0 : lorryItems[42].result.field[0].value
+  var f = mm2litre(e)
+  var bdf = ((b + d) - f)
+  var bdfkg = bdf * 1.17
+
   lorryItems[6].result.field[1].value = currencyFormat(b)
   lorryItems[7].result.field[1].value = currencyFormat(d)
-  lorryItems[8].result.field[0].value = currencyFormat(b+d)
+  lorryItems[8].result.field[0].value = currencyFormat(bd)
   lorryItems[42].result.field[1].value = currencyFormat(f)
-  lorryItems[44].result.field[0].value = currencyFormat(((b + d) - f))
-  lorryItems[44].result.field[1].value = currencyFormat(((b + d) - f) * 1.17)
+  lorryItems[44].result.field[0].value = currencyFormat(bdf)
+  lorryItems[44].result.field[1].value = currencyFormat(bdfkg)
 
+  aVariable.value = currencyFormat(a)
+  bVariable.value = currencyFormat(b)
+  cVariable.value = currencyFormat(c)
   dVariable.value = currencyFormat(d)
+
 
   dcsAfter.value = currencyFormat(lorryItems[43].result.field[0].value)
   dcsBefore.value = currencyFormat(lorryItems[9].result.field[0].value)
   dcsDiff = currencyFormat(lorryItems[43].result.field[0].value - lorryItems[9].result.field[0].value)
-
   tankAfter.value = currencyFormat(f)
   tankBefore.value = currencyFormat(d)
   tankDiff.value = currencyFormat(f-d)

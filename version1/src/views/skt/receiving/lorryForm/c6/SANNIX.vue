@@ -27,6 +27,7 @@ const route = useRoute()
 
 const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+
 var poNo = ref('')
 
 var isReadOnly = ref(false)
@@ -123,7 +124,6 @@ async function saveDraft(e) {
       }
     }
   }
-  debugger
   var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
 
   if (response.status == 200) {
@@ -616,24 +616,22 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      readonly="true"
+                      :max-length="2"
+                      :readonly="isReadOnly"
+                      :value-range="23"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField
+                    <VNumberInput
                       v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
-                      readonly="true"
+                      :max-length="2"
+                      :readonly="isReadOnly"
+                      :value-range="59"
                     />
                   </VCol>
                 </VRow>

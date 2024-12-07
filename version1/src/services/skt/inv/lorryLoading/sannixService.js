@@ -34,7 +34,7 @@ export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestDat
   const whereHouse = localStorage.getItem('whereHouseName')
 
   // eslint-disable-next-line sonarjs/prefer-immediate-return
-  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormSannix/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormSannix/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
