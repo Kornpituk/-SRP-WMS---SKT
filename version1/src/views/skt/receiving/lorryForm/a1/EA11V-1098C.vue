@@ -1,7 +1,6 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import VNumberInput from '@/components/VNumberInput.vue'
 import {
   currencyFormat,
   eaItemTemplate,
@@ -570,22 +569,18 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
-                      :value-range="23"
-                      :readonly="isReadOnly"
+                      :items="hour"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
-                      :value-range="59"
-                      :readonly="isReadOnly"
+                      :items="minute"
                     />
                   </VCol>
                 </VRow>

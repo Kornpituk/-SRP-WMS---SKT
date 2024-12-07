@@ -2,10 +2,10 @@
 import { urlApi } from '@/api'
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import VNumberInput from '@/components/VNumberInput.vue'
 import { akumuruItemTemplate, currencyFormat, passInitialData, passSubmitData, save } from '@/services/skt/inv/lorryLoading/akumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/akumaru/Acrylic ( 431 ).png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
@@ -642,22 +642,18 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
-                      :readonly="isReadOnly"
-                      :value-range="23"
+                      :items="hour"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
-                      :readonly="isReadOnly"
-                      :value-range="59"
+                      :items="minute"
                     />
                   </VCol>
                 </VRow>

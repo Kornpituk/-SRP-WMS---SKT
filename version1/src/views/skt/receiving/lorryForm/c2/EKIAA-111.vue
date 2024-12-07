@@ -1,7 +1,6 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import VNumberInput from '@/components/VNumberInput.vue'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/receiving/lorryForm/c2/EKI-A ( 110 ).png'
 import axios from '@axios'
@@ -20,6 +19,7 @@ import {
 } from '@/services/skt/inv/lorryLoading/eki110Service'
 
 import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 
 
 const itemStore = useItemStore()
@@ -578,22 +578,18 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
-                      :readonly="isReadOnly"
-                      :value-range="23"
+                      :items="hour"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
-                      :readonly="isReadOnly"
-                      :value-range="59"
+                      :items="minute"
                     />
                   </VCol>
                 </VRow>

@@ -18,6 +18,7 @@ import {
   save,
 } from '@/services/skt/inv/lorryLoading/eki432Service'
 import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 
 
 const itemStore = useItemStore()
@@ -546,22 +547,18 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
-                      :readonly="isReadOnly"
-                      :value-range="23"
+                      :items="hour"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
-                      :readonly="isReadOnly"
-                      :value-range="59"
+                      :items="minute"
                     />
                   </VCol>
                 </VRow>
