@@ -108,7 +108,7 @@ export function passSubmitData(type, params) {
       return -1
     }
   }
-  else if(type == "actualCheck"){
+  else if(type == "actualCheck" || type == "actualCheck2"){
     return !params ? "0": params.toString()
   }
   else {
@@ -825,7 +825,7 @@ export const kumaruItemTemplate = [
     "practice": "10. หลังจากตรวจสอบแล้วว่าไม่มีของเหลวค้างภายในท่อให้ทำการปิดไนโตรเจนและปิดวาล์วที่ขึ้นไป 21V-306",
     "condition": "ตรวจเช็คว่า valve ปิดจริง",
     "result": {
-      "type": "actualCheck",
+      "type": "actualCheck2",
       "field": [
         {
           "name": "l0606110101",
