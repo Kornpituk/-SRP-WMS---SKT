@@ -688,7 +688,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
-                      :readonly="isReadOnly"
+                      readonly="true"
                     >
                       <template #prepend>
                         <VLabel />
