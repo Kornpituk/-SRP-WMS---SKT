@@ -1,7 +1,6 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import VNumberInput from '@/components/VNumberInput.vue'
 import {
   currencyFormat, formatDate, generate, get, GetByPoEtlLogDetailJournalID, ipaItemTemplate,
   mm2litre, passInitialData, passSubmitData,
@@ -16,6 +15,7 @@ import { ref, watchEffect } from 'vue'
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 
 const itemStore = useItemStore()
 
@@ -100,10 +100,7 @@ onMounted(async () => {
 
   const lorryFormIPAStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  console.log("statusId", lorryFormIPAStatus.data)
-
   statusId.value = lorryFormIPAStatus.data.data[0].statusId
-  console.log("StatusId : ", statusId.value)
 
   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
@@ -132,6 +129,28 @@ async function saveDraft(e) {
   }
 }
 
+async function validateField(){
+  var isValid = true
+  for (const i of ipaItems) {
+    for (const f of i.result.field) {
+      const element = document.querySelector("[field-name='"+f.name+"']")
+      if(element){
+        if((f.value) == null || (f.value) == undefined){     
+          element.classList.add('d-flex') // Adds the class to hide the element
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          isValid =false
+        }else{
+          element.classList.remove('d-flex') // Adds the class to hide the element  
+          element.classList.add('d-none') // Adds the class to hide the element  
+        }
+      }   
+    }
+  }
+  
+  return isValid
+}
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
 async function submit(e) {
 
   for (var i of ipaItems) {
@@ -140,59 +159,34 @@ async function submit(e) {
     }
   }
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+  var isValid = await validateField()
 
-  if (response.status != 200) 
-    return
+  if(isValid){
+    var saveDraftResponse = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+    if (saveDraftResponse.status != 200) 
+      return
 
+    const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+    const whereHouse = localStorage.getItem('whereHouseName')
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
 
-  let isValid = true
-  for (var i of ipaItems) {
-    for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
-        isValid = false
-      }
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
+      textAlertDialogFunction(alertWordConst.submit, false)
     }
   }
-
-  if(!isValid){
-    alert("กรุณากรอกข้อมูลให้ครบ")
-    
-    return
-  }
-
-  // // เรียกใช้งาน Dialog
-  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
-
-  //if (confirmed) {
-  // if (confirmed) {
-  console.log("User confirmed:", confirmValueCheck.value)
-
-  // เรียก API หรือดำเนินการต่อ
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-  } else {
-    console.error(response.data)
-    textAlertDialogFunction(alertWordConst.submit, false)
-  }
-
-  // } else {
-  //   console.log("User declined")
-  // }
 
 }
 
@@ -336,7 +330,7 @@ watchEffect(async () => {
               style="max-width: 400px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                {{ section.practice }}
+                <div v-html="section.practice" />
               </VLabel>
             </td>
             <td
@@ -369,6 +363,11 @@ watchEffect(async () => {
                     value="0"
                   />
                 </VRadioGroup>
+                <span
+                  class="text-red justify-center d-none"
+                  :field-name="section.result.field[0].name"
+                >This field is required. <span />
+                </span>
               </div>
               <div v-if="section.result.type === 'ab'">
                 <VRow>
@@ -378,9 +377,14 @@ watchEffect(async () => {
                       density="compact"
                       variant="solo"
                       text-start="(A)"
-                      text-end="Kg."
+                      text-end="Kg. = "
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -400,6 +404,11 @@ watchEffect(async () => {
                         </VLabel>
                       </template>
                     </VTextField>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -412,9 +421,14 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start="(C)"
-                      text-end="mm."
+                      text-end="mm.  = "
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -434,6 +448,11 @@ watchEffect(async () => {
                         </VLabel>
                       </template>
                     </VTextField>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -457,6 +476,11 @@ watchEffect(async () => {
                         </VLabel>
                       </template>
                     </VTextField>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol col="3">
                     <VRadioGroup
@@ -474,6 +498,11 @@ watchEffect(async () => {
                         value="0"
                       />
                     </VRadioGroup>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -489,6 +518,11 @@ watchEffect(async () => {
                       text-end="Litre"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -506,6 +540,11 @@ watchEffect(async () => {
                         value="0"
                       />
                     </VRadioGroup>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -521,13 +560,18 @@ watchEffect(async () => {
                       text-end="%"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
-                      class="justify-center"
                       :readonly="isReadOnly"
+                      class="d-flex justify-center"
                     >
                       <VRadio
                         label="Ok"
@@ -538,6 +582,11 @@ watchEffect(async () => {
                         value="0"
                       />
                     </VRadioGroup>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -550,15 +599,20 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="℃"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
-                      class="justify-center"
+                      class="d-flex justify-center"
                       :readonly="isReadOnly"
                     >
                       <VRadio
@@ -570,16 +624,20 @@ watchEffect(async () => {
                         value="0"
                       />
                     </VRadioGroup>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
-                      :value-range="23"
+                      :items="hour"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -587,10 +645,9 @@ watchEffect(async () => {
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
-                      :value-range="59"
+                      :items="minute"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -608,6 +665,11 @@ watchEffect(async () => {
                       text-end="(Mpa)"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -625,6 +687,11 @@ watchEffect(async () => {
                         value="0"
                       />
                     </VRadioGroup>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -640,6 +707,11 @@ watchEffect(async () => {
                       text-end="Amp"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
 
                   <VCol>
@@ -658,6 +730,11 @@ watchEffect(async () => {
                         value="0"
                       />
                     </VRadioGroup>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -673,6 +750,11 @@ watchEffect(async () => {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -692,6 +774,11 @@ watchEffect(async () => {
                         </VLabel>
                       </template>
                     </VTextField> 
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -707,6 +794,11 @@ watchEffect(async () => {
                       text-end="Litre"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -728,6 +820,11 @@ watchEffect(async () => {
                         </VLabel>
                       </template>
                     </VTextField> 
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -745,6 +842,11 @@ watchEffect(async () => {
                         </VLabel>
                       </template>
                     </VTextField> 
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[1].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -752,7 +854,7 @@ watchEffect(async () => {
                 <VRow>
                   <VCol>
                     <VCurrencyField
-                      v-model="section.result.field[1].value"
+                      v-model="section.result.field[0].value"
                       density="compact"
                       variant="outlined"
                       label=""
@@ -760,6 +862,11 @@ watchEffect(async () => {
                       text-end="Kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>

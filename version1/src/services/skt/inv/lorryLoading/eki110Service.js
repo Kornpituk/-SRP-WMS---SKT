@@ -198,7 +198,7 @@ export const eki110ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "ตรวจสอบไฟสถานะอนุญาติ ติดหรือดับ ( Y )",
+    "practice": "ตรวจสอบไฟสถานะอนุญาต ติดหรือดับ ( Y )",
     "condition": "ไฟดับ",
     "result": {
       "type": "oknot",
@@ -231,7 +231,7 @@ export const eki110ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที",
+    "practice": "<strong><u>หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที</u></strong>",
     "condition": "",
     "result": {
       "type": "",
@@ -343,7 +343,7 @@ export const eki110ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อนด้านหน้า-หลัง No.2",
+      "startPracticeText": "ใส่หมอนรองห้ามล้อเคลื่อนด้านหน้า-หลัง No.2",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -518,7 +518,7 @@ export const eki110ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่ No.5",
+      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรือไม่ No.5",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -618,7 +618,7 @@ export const eki110ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาติ ดับหรือติด ( Y )",
+      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาต ดับหรือติด ( Y )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -752,13 +752,8 @@ export const eki110ItemTemplate = [
     },
     "condition": "ปิดสวิตซ์อยู่ที่ off",
     "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l1005040101",
-          
-        },
-      ],
+      "type": "",
+      "field": [],
     },
   },
   {
@@ -790,7 +785,7 @@ export const eki110ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ปิดสวตซ์ Pump  ไปตำแหน่ง OFF",
+      "startPracticeText": "ปิดสวิตซ์ Pump  ไปตำแหน่ง OFF",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -947,7 +942,7 @@ export const eki110ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)             ",
+      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -959,7 +954,7 @@ export const eki110ItemTemplate = [
     },
     "condition": "",
     "result": {
-      "type": "kg",
+      "type": "cdkg",
       "field": [
         {
           "name": "l1006030101",
@@ -1097,7 +1092,7 @@ export const eki110ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เอาหมอนลองล้อ รถออก  No.2",
+      "startPracticeText": "เอาหมอนรองล้อ รถออก  No.2",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [

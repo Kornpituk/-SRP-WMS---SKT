@@ -10,4 +10,6 @@ const alertWordConst = {
   plase: 'PLASE',
 }
 
+
+
 export default alertWordConst

@@ -27,6 +27,22 @@ export async function get(poEtllogDetailJournalID) {
   })
 }
 
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormEA/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
 export async function GetByPoEtlLogDetailJournalID(poEtllogDetailJournalIDQueryParameters) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
@@ -52,9 +68,7 @@ export function currencyFormat(number) {
 
 
 export function mm2litre(mm) {
-  let litre = mm * 5.32 + 740.45
-
-  return litre.toFixed(2)
+  return mm * 5.2 + 511.24
 }
 
 //----------------- Formate
@@ -77,13 +91,7 @@ export function formatDate(dateString) {
 
 export function passInitialData(type, params, index) {
   if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
+    return params.toString()
   }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
     if(index == 0){
       return params

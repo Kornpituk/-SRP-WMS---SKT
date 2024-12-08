@@ -1,9 +1,17 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import { sannixItemTemplate } from '@/services/skt/inv/lorryLoading/sannixService'
+import {
+  formatDate, generate,
+  get,
+  GetByPoEtlLogDetailJournalID,
+  passInitialData, passSubmitData,
+  sannixItemTemplate,
+  save,
+} from '@/services/skt/inv/lorryLoading/sannixService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import image01 from '@/views/skt/inv/lorryLoading/calculate/iPA/IPA 1.png'
+import { hour, minute } from '@/utilities/time'
+import image01 from '@/views/skt/receiving/lorryForm/c6/FA-703V.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
@@ -20,21 +28,15 @@ const route = useRoute()
 
 const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
-const poNo = ref('')
 
-const aVariable = ref('')
-const bVariable = ref('')
-const cVariable = ref('')
-const dVariable = ref('')
-const bdVariable = ref('')
-const dcsBefore = ref('')
-const eVariable = ref('')
-const fVariable = ref('')
-const gVariable = ref('')
-var dcsDiff = 0
-var tankDiff = 0
+var poNo = ref('')
 
+var isReadOnly = ref(false)
+
+//------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
@@ -44,136 +46,172 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
+
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(wordForSubmit.value === "SUBMIT"){
+    submit()
+  }else if(wordForSubmit.value === "APPROVE"){
+    approve()
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
+
 
 onMounted(async () => {
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
+  await generate(poEtlLogDetailJournalIDQueryParameters.value)
 
-  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var lorryForm =  await get(poEtlLogDetailJournalIDQueryParameters.value)
 
-  // const lorryFormIPA = await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-  //   headers: {
-  //     'accept': '*/*',
-  //     'x-location': `${whereHouse}`,
-  //     Authorization: `Bearer ${accessTokenAtStore}`,
-  //   },
-  // })
-  console.log(sannixItemTemplate)
-  lorryRequestData.value = akumaruRequestData //lorryFormIPA.data.data
-  // poNo.value = lorryFormIPA.data.data.purchaseOrderNo
+  lorryRequestData.value = lorryForm.data.data
+
+  poNo.value = lorryForm.data.data.purchaseOrderNo
   for (var i of lorryItem) {
+    
+    let index = 0
     for (var f of i.result.field) {
-      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
-      f.value = passInitialData(i.result.type, lorryRequestData.value[f.name])
+      console.log(f.name)
+      console.log(i.result.type)
+      f.value = passInitialData(i.result.type, lorryRequestData.value[f.name], index)
+      index++
     }
+
+    index = 0
     if(i.practice.field != undefined){
       for (var f of i.practice.field) {
-      // f.value = passInitialData(i.result.type, lorryFormIPA.data.data[f.name])
-        f.value = passInitialData(i.practice.type, lorryRequestData.value[f.name])
+        console.log(f.name)
+        console.log(i.result.type)
+        f.value = passInitialData(i.practice.type, lorryRequestData.value[f.name], index)
+        index++
       }
     }
   }
 
+  const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  const lorryFormIPAStatus = await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  statusId.value = lorryFormStatus.data.data[0].statusId
 
-  statusId.value = lorryFormIPAStatus.data.data.statusId
-
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+    isReadOnly.value = true
+  }
 })
 
-function passInitialData(type, params) {
-  if (type == "oknot") {
-    if (params == 0) {
-      return "0"
-    } else if (params == 1) {
-      return "1"
-    } else {
-      return "-1"
-    }
-  } else {
-    return params
-  }
-}
-
-function passSubmitData(type, params) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }
-  else {
-    return params
-  }
-}
 
 async function saveDraft(e) {
+
   for (var i of lorryItem) {
     for (var f of i.result.field) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
+
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+      }
+    }
   }
-
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
+    setTimeout(() => {
+      location.reload()
+    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)
+    e.preventDefault()
   }
 }
 
-async function submit(e) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-  } else {
-    console.error(response.data)
+async function validateField(){
+  var isValid = true
+  for (const i of lorryItem) {
+    for (const f of i.result.field) {
+      const element = document.querySelector("[field-name='"+f.name+"']")
+      if(element){
+        if((f.value) == null || (f.value) == undefined){     
+          element.classList.add('d-flex') // Adds the class to hide the element
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          isValid =false
+    
+          return isValid
+        }else{
+          element.classList.remove('d-flex') // Adds the class to hide the element  
+          element.classList.add('d-none') // Adds the class to hide the element  
+        }
+      }   
+    }
   }
+  
+  return isValid
+}
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+async function submit(e) {
+
+  for (var i of lorryItem) {
+    for (var f of i.result.field) {
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+    }
+
+    if(i.practice.field != undefined){
+      for (var f of i.practice.field) {
+        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+      }
+    }
+  }
+
+  var isValid = await validateField()
+
+  if(isValid){
+
+    var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
+    if (response.status != 200) 
+      return
+
+    const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+    const whereHouse = localStorage.getItem('whereHouseName')
+
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormSannix/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
+    }
+  }
+
 }
 
 async function approve(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormSannix/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -183,25 +221,11 @@ async function approve(e) {
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.approve, true)
-    location.reload()
+    window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
   } else {
     console.error(response.data)
   }
 }
-
-// watch(lorryItem[6].result.field[0], async x => {// A
-//   let b = x.value / (0.78)
-//   lorryItem[6].result.field[1].value = b.toFixed(2)
-// })
-
-// watch(lorryItem[7].result.field[0], async x => {// C
-//   let d = (x.value * 5.32) + 740.45
-//   lorryItem[7].result.field[1].value = d.toFixed(2) // D
-// })
-
-// watch(lorryItem[46].result.field[0], async x => { // E
-//   lorryItem[46].result.field[1].value = mm2litre(x.value)// F
-// })
 
 watchEffect(async () => {
   // dcsDiff = (lorryItem[47].result.field[0].value - lorryItem[9].result.field[0].value).toFixed(2)
@@ -210,30 +234,6 @@ watchEffect(async () => {
   // lorryItem[49].result.field[0].value = (parseFloat(lorryItem[8].result.field[0].value) - parseFloat(lorryItem[46].result.field[1].value)).toFixed(2)
   // lorryItem[49].result.field[1].value = (parseFloat(lorryItem[49].result.field[0].value) * 0.78).toFixed(2)
 })
-
-
-// function mm2litre(mm) {
-//   let litre = mm * 5.32 + 740.45
-
-//   return litre.toFixed(2)
-// }
-
-//----------------- Formate
-function formatDate(dateString) {
-  if (dateString === null || dateString === '' || dateString === undefined) {
-    return 'Null'
-  } else if (dateString.length > 0) {
-    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
-    const year = date.getFullYear()
-
-    return `${day}/${month}/${year}`
-
-  }
-
-  return 'null'
-}
 </script>
 
 <template>
@@ -263,7 +263,7 @@ function formatDate(dateString) {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        SANNIX
+        SANNIX FA-703V  TANK  
       </div>
     </VCol>
     <VCol cols="4" />
@@ -337,6 +337,7 @@ function formatDate(dateString) {
                         variant="solo"
                         text-start=""
                         text-end=""
+                        :readonly="isReadOnly"
                       /> {{ section.practice.endPracticeText }}
                     </VLabel>
                   </VCol>
@@ -346,6 +347,7 @@ function formatDate(dateString) {
                 <VCheckbox
                   v-model="section.practice.field[0].value"
                   :label="section.practice.startPracticeText"
+                  :readonly="isReadOnly"
                 />
               </div>
               <div v-else-if="section.practice.type === 'checkbox2'">
@@ -354,12 +356,14 @@ function formatDate(dateString) {
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -370,18 +374,21 @@ function formatDate(dateString) {
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :label="section.practice.field[2].startPracticeText"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -411,6 +418,7 @@ function formatDate(dateString) {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="Ok"
@@ -429,6 +437,7 @@ function formatDate(dateString) {
                   inline
                   class="d-flex justify-center"
                   :fieldname="section.result.field[0].name"
+                  :readonly="isReadOnly"
                 >
                   <VRadio
                     label="รั่ว"
@@ -449,7 +458,13 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start="(A)"
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VCurrencyField
@@ -458,8 +473,13 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start="Litre"
                       text-end="(B)"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -473,7 +493,13 @@ function formatDate(dateString) {
                       label=""
                       text-start="(C)"
                       text-end="mm."
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VCurrencyField
@@ -482,8 +508,13 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start="(D)"
                       text-end="mm."
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -496,7 +527,7 @@ function formatDate(dateString) {
                       variant="solo"
                       text-start=" (B) + (D) ="
                       text-end="Litre"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VCol>
@@ -504,6 +535,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -527,14 +559,20 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Litre"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -558,14 +596,20 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="%"
-                      readonly="true"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -589,13 +633,20 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="C°"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -612,22 +663,20 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VTextField
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :items="hour"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VTextField
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      density="compact"
-                      variant="outlined"
-                      label=""
+                      :items="minute"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -642,13 +691,20 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="( Mpa )'"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -672,7 +728,13 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Amp'"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
 
                   <VCol>
@@ -680,6 +742,7 @@ function formatDate(dateString) {
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -703,7 +766,13 @@ function formatDate(dateString) {
                       label=""
                       text-start="(E)"
                       text-end="mm.'"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VCurrencyField
@@ -713,7 +782,13 @@ function formatDate(dateString) {
                       label=""
                       text-start="(F)"
                       text-end="Litre'"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -728,7 +803,13 @@ function formatDate(dateString) {
                       text-start="(G)"
                       text-end="Litre'"
                       type="number"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -742,7 +823,13 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Kg.( A )"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -756,7 +843,13 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Kg.( B )"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -770,7 +863,13 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Kg."
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -784,7 +883,13 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="( Mpa )"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -798,7 +903,13 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="Amp"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -812,175 +923,19 @@ function formatDate(dateString) {
                       label=""
                       text-start=""
                       text-end="C°"
+                      :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
             </td>
           </tr>
         </tbody>
-      </table>
-    </VCol>
-    <!-- Calculation formula -->
-    <!--
-      <VCol cols="12">
-      <div style="border: 1px solid black;">
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      <u>สูตรคำนวน</u>
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      หาเป็นลิตร = mm x 5.32 + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      หาเป็น mm = Litre - 740.45 / 5.32
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      (B) = (A) / 0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ aVariable.value }} /0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ bVariable.value }} Litre
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      (D) - ((C) X 5.32) + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = ({{ cVariable.value }}X 5.32 ) + 740.45
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      = {{ dVariable.value }}Litre
-      </VLabel>
-      </VCol>
-      </VRow>
-      <VRow>
-      <VCol>
-      <VLabel class="d-flex justify-center">
-      Density IPA = 0.78
-      </VLabel>
-      </VCol>
-      </VRow>
-      </div>
-      </VCol> 
-    -->
-    <!-- Dcs Tank -->
-    <!--
-      <VCol cols="12">
-      <table class="custom-table">
-      <thead>
-      <tr>
-      <th />
-      <th class="text-center" style="font-size: 16px;">
-      DSC
-      </th>
-      <th class="text-center" style="font-size: 16px;">
-      TANK
-      </th>
-      <th />
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td style="font-size: 16px;">
-      After
-      </td>
-      <td class="py-4 text-center">
-      {{ gVariable.value }}
-      </td>
-      <td class="py-4 text-center">
-      {{ fVariable.value }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      <tr>
-      <td style="font-size: 16px;">
-      Before
-      </td>
-      <td class="py-4 text-center">
-      {{ dcsBefore.value }}
-      </td>
-      <td class="py-4 text-center">
-      {{ dVariable.value }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      <tr>
-      <td style="font-size: 16px;">
-      Diff
-      </td>
-      <td class="py-4 text-center">
-      {{ dcsDiff }}
-      </td>
-      <td class="py-4 text-center">
-      {{ tankDiff }}
-      </td>
-      <td style="font-size: 16px;">
-      Ltr
-      </td>
-      </tr>
-      </tbody>
-      </table>
-      </VCol> 
-    -->
-    <!-- Precautions -->
-    <VCol cols="12">
-      <table class="custom-table">
-        <tr>
-          <td class="tr-border-right-0">
-            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-              ข้อควรระวัง
-            </VLabel>
-          </td>
-          <td class="tr-border-left-0">
-            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            <br>
-            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
-          </td>
-          <!--
-            <th style="font-size: 16px;" colspan="3">
-            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
-            </th> 
-          -->
-        </tr>
       </table>
     </VCol>
     <!-- Flow Chat -->
@@ -1010,6 +965,27 @@ function formatDate(dateString) {
             </div>
           </tr>
         </tbody>
+      </table>
+    </VCol>
+    <VCol cols="12">
+      <table class="custom-table">
+        <tr>
+          <td class="tr-border-right-0">
+            <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+              ข้อควรระวัง
+            </VLabel>
+          </td>
+          <td class="tr-border-left-0">
+            : ให้สวมหน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            <br>
+            : Cap Lock ของข้อต่อกับวาล์วแน่นหนา ไม่หลุดง่าย หากรั่วไหลแจ้งหัวหน้างานหรือผู้ที่เกี่ยวข้องโดยด่วน
+          </td>
+          <!--
+            <th style="font-size: 16px;" colspan="3">
+            : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
+            </th> 
+          -->
+        </tr>
       </table>
     </VCol>
     <VCol
@@ -1075,20 +1051,20 @@ function formatDate(dateString) {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
         color="warning"
         class="mx-1"
         @click="saveDraft"
       >
-        Draft
+        SAVE Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18)"
+        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
         type="text"
-        color="secondary "
+        color="primary "
         class="mx-1"
-        @click="submit"
+        @click="openConfirmDialog('SUBMIT')"
       >
         Submit
       </VBtn>
@@ -1097,7 +1073,7 @@ function formatDate(dateString) {
         type="text"
         color="primary"
         class="mx-1"
-        @click="approve"
+        @click="openConfirmDialog('APPROVE')"
       >
         Approve
       </VBtn>
@@ -1113,6 +1089,16 @@ function formatDate(dateString) {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>

@@ -10,6 +10,7 @@ import {
   mm2litre,
   passInitialData,
   passSubmitData,
+  save,
 } from '@/services/skt/inv/lorryLoading/epichloService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/receiving/lorryForm/a1/EPICHLO.png'
@@ -20,6 +21,7 @@ import { ref } from 'vue'
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 
 
 const itemStore = useItemStore()
@@ -32,9 +34,9 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(lorryItems[6].result.field[0])
-const bVariable = ref(lorryItems[6].result.field[1])
-const cVariable = ref(lorryItems[7].result.field[0])
+const aVariable = ref(0)
+const bVariable = ref(0)
+const cVariable = ref(0)
 const dVariable = ref(0)
 var isReadOnly = ref(false)
 
@@ -109,11 +111,34 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(statusId.value == 15 || statusId.value == 18){
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
 
 })
+
+async function validateField(){
+  var isValid = true
+  for (const i of lorryItems) {
+    for (const f of i.result.field) {
+      const element = document.querySelector("[field-name='"+f.name+"']")
+      if(element){
+        if((f.value) == null || (f.value) == undefined){     
+          element.classList.add('d-flex') // Adds the class to hide the element
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          isValid =false
+    
+          return isValid
+        }else{
+          element.classList.remove('d-flex') // Adds the class to hide the element  
+          element.classList.add('d-none') // Adds the class to hide the element  
+        }
+      }   
+    }
+  }
+  
+  return isValid
+}
 
 async function saveDraft(e) {
 
@@ -123,17 +148,7 @@ async function saveDraft(e) {
     }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
     setTimeout(() => {
@@ -148,39 +163,37 @@ async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-
-  let isValid = true
   for (var i of lorryItems) {
     for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
-        isValid = false
-      }
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
 
-  if(!isValid){
-    alert("กรุณากรอกข้อมูลให้ครบ")
-    
-    return
-  }
- 
+  var isValid = await validateField()
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
+  if(isValid){
 
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-  } else {
-    console.error(response.data)
-    textAlertDialogFunction(alertWordConst.submit, false)
+    var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
+    if (response.status != 200) 
+      return
+
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
+      textAlertDialogFunction(alertWordConst.submit, false)
+    }
   }
 }
 
@@ -206,23 +219,35 @@ async function approve(e) {
   }
 }
 
+
+
 watchEffect(async () => {
-  var b = lorryItems[6].result.field[0].value / (0.78)
-  var d = lorryItems[7].result.field[0].value == 0 ? 0 : (lorryItems[7].result.field[0].value * 5.32) + 740.45
-  var f = lorryItems[42].result.field[0].value == 0 ? 0 : mm2litre(lorryItems[42].result.field[0].value)
+  var a = lorryItems[6].result.field[0].value == 0 ? 0: lorryItems[6].result.field[0].value
+  var b = a / (1.17)
+  var c = lorryItems[7].result.field[0].value == 0 ? 0 :lorryItems[7].result.field[0].value
+  var d = c == 0 ? 0 : (c * 5.288)-172.970
+  var bd = c+d
+  var e = lorryItems[42].result.field[0].value == 0 ? 0 : lorryItems[42].result.field[0].value
+  var f = e == 0 ? 0: mm2litre(e)
+  var bdf = ((b + d) - f)
+  var bdfkg = bdf * 1.17
+
   lorryItems[6].result.field[1].value = currencyFormat(b)
   lorryItems[7].result.field[1].value = currencyFormat(d)
-  lorryItems[8].result.field[0].value = currencyFormat(b+d)
+  lorryItems[8].result.field[0].value = currencyFormat(bd)
   lorryItems[42].result.field[1].value = currencyFormat(f)
-  lorryItems[44].result.field[0].value = currencyFormat(((b + d) - f))
-  lorryItems[44].result.field[1].value = currencyFormat(((b + d) - f) * 0.78)
+  lorryItems[44].result.field[0].value = currencyFormat(bdf)
+  lorryItems[44].result.field[1].value = currencyFormat(bdfkg)
 
+  aVariable.value = currencyFormat(a)
+  bVariable.value = currencyFormat(b)
+  cVariable.value = currencyFormat(c)
   dVariable.value = currencyFormat(d)
+
 
   dcsAfter.value = currencyFormat(lorryItems[43].result.field[0].value)
   dcsBefore.value = currencyFormat(lorryItems[9].result.field[0].value)
   dcsDiff = currencyFormat(lorryItems[43].result.field[0].value - lorryItems[9].result.field[0].value)
-
   tankAfter.value = currencyFormat(f)
   tankBefore.value = currencyFormat(d)
   tankDiff.value = currencyFormat(f-d)
@@ -322,7 +347,7 @@ watchEffect(async () => {
               style="max-width: 400px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                {{ section.practice }}
+                <div v-html="section.practice" />
               </VLabel>
             </td>
             <td
@@ -367,6 +392,11 @@ watchEffect(async () => {
                       text-end="Kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -401,6 +431,11 @@ watchEffect(async () => {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -475,6 +510,11 @@ watchEffect(async () => {
                       text-end="Litre"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -498,9 +538,9 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
+                      :items="hour"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -508,9 +548,9 @@ watchEffect(async () => {
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
+                      :items="minute"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -528,6 +568,11 @@ watchEffect(async () => {
                       text-end="(Mpa)"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -560,6 +605,11 @@ watchEffect(async () => {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -594,6 +644,11 @@ watchEffect(async () => {
                       text-end="Litre"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -609,6 +664,11 @@ watchEffect(async () => {
                       text-end="Amp"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
 
                   <VCol>
@@ -639,9 +699,14 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="°C"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -717,49 +782,49 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              หาเป็นลิตร = mm x 5.32 + 740.45
+              หาเป็นลิตร = mm x 5.288 - 172.9700
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              หาเป็น mm = Litre - 740.45 / 5.32
+              หาเป็น mm = Litre + 172.9700 / 5.288
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              (B) = (A) / 0.78
+              (B) = (A) / 1.17
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ aVariable.value }} /0.78
+              = {{ aVariable }} / 1.17
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ bVariable.value }} Litre
+              = {{ bVariable }} Litre
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              (D) = ((C) X 5.32) + 740.45
+              (D) = ((C) X 5.288) - 172.970
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = ({{ cVariable.value }}X 5.32 ) + 740.45
+              = ({{ cVariable }}X 5.288 ) - 172.970
             </VLabel>
           </VCol>
         </VRow>
@@ -773,7 +838,7 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              Density IPA = 0.78
+              Density IPA = 1.17
             </VLabel>
           </VCol>
         </VRow>

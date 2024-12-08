@@ -117,7 +117,7 @@ export function passSubmitData(type, params) {
     return !params ? "0": params.toString()
   }
   else {
-    if(isNaN(Number(params))){
+    if(isNaN(Number(params)) && type != ""){
       return parseFloat( params.replace(/,/g, ''))
     }else{
       return parseFloat(params)
@@ -146,7 +146,7 @@ export const ipaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "ให้<u>ปิด</u>โทรศัพท์ขณะ loading Solvent",
+    "practice": "ให้<u>ปิด</u>โทรศัพท์ขณะ Loading Solvent",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -442,7 +442,7 @@ export const ipaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "3. Temperature เท่าไหร่",
-    "condition": "อุณหภูมิต้องไม่สูงกว่า 25 C°",
+    "condition": "อุณหภูมิต้องไม่สูงกว่า 25 ℃",
     "result": {
       "type": "c",
       "field": [
@@ -583,9 +583,9 @@ export const ipaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "- เข็มขัดนิรภัย",
-    "condition": "-",
+    "condition": "",
     "result": {
-      "type": "oknot",
+      "type": "",
       "field": [
         {
           // "name": "l0106060101", // percen

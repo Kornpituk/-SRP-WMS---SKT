@@ -1,19 +1,16 @@
 <script setup>
 import { urlApi } from '@/api'
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import VNumberInput from '@/components/VNumberInput.vue'
 import { akumuruItemTemplate, currencyFormat, passInitialData, passSubmitData, save } from '@/services/skt/inv/lorryLoading/akumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/inv/lorryLoading/calculate/akumaru/Acrylic ( 431 ).png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
 //--------------------- alertDialog--------------------------------------------------------
-import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
-
-import alertWordConst from '@/utilities/constant'
-
-
 const itemStore = useItemStore()
 
 var lorryItem = reactive(akumuruItemTemplate)
@@ -23,21 +20,45 @@ const route = useRoute()
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
+var isReadOnly = ref(false)
 
+//------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmDialog = ref(false)
+const confirmValueCheck = ref(false)
 const wordForSubmit = ref('')
 const successDialAlert = ref(false)
 
 const statusId = ref(0)
-var isReadOnly = ref(false)
 
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
 
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+
+  if(wordForSubmit.value === "SUBMIT"){
+    submit()
+  }else if(wordForSubmit.value === "APPROVE"){
+    approve()
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
 onMounted(async () => {
 
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
@@ -116,6 +137,30 @@ async function saveDraft(e) {
   }
 }
 
+async function validateField(){
+  var isValid = true
+  for (const i of lorryItem) {
+    for (const f of i.result.field) {
+      const element = document.querySelector("[field-name='"+f.name+"']")
+      if(element){
+        if((f.value) == null || (f.value) == undefined){     
+          element.classList.add('d-flex') // Adds the class to hide the element
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          isValid =false
+    
+          return isValid
+        }else{
+          element.classList.remove('d-flex') // Adds the class to hide the element  
+          element.classList.add('d-none') // Adds the class to hide the element  
+        }
+      }   
+    }
+  }
+  
+  return isValid
+}
+
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 async function submit(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
@@ -132,44 +177,30 @@ async function submit(e) {
       }
     }
   }
+
+  var isValid = await validateField()
+
+  if(isValid){
+    var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
+    if (response.status != 200)
+      return
   
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
-  if (response.status == 200) {
-    console.log(response.data)
-  } else {
-    e.preventDefault()
-  }
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
 
-  let isValid = true
-  for (var i of lorryItem) {
-    for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
-        isValid = false
-      }
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
     }
-  }
-
-  if(!isValid){
-    alert("กรุณากรอกข้อมูลให้ครบ")
-    
-    return
-  }
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-  } else {
-    console.error(response.data)
   }
 }
 
@@ -323,7 +354,7 @@ function formatDate(dateString) {
                 <VRow>
                   <VCol>
                     <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                      {{ section.practice.startPracticeText }}
+                      <span v-html="section.practice.startPracticeText" />
                       <VCurrencyField
                         v-model="section.practice.field[0].value"
                         density="compact"
@@ -336,14 +367,32 @@ function formatDate(dateString) {
                   </VCol>
                 </VRow>
               </div>
+              <div
+                v-else-if="section.practice.type === 'center'"
+                style="text-align: center;"
+              >
+                <VRow>
+                  <VCol>
+                    <div
+                      class="justify-center"
+                      v-html="section.practice.field[0].startPracticeText"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
               <div v-else-if="section.practice.type === 'checkbox'">
                 <VCheckbox
                   v-model="section.practice.field[0].value"
-                  :label="section.practice.startPracticeText"
                   :false-value="0"
                   :true-value="1"
                   :readonly="isReadOnly"
-                />
+                >
+                  <template #label>
+                    <span>                  
+                      <div v-html="section.practice.startPracticeText" />
+                    </span>
+                  </template>
+                </VCheckbox>
               </div>
               <div v-else-if="section.practice.type === 'checkbox3'">
                 <VRow>
@@ -418,7 +467,7 @@ function formatDate(dateString) {
               </div>
               <div v-else>
                 <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                  {{ section.practice }}
+                  <div v-html="section.practice" />
                 </VLabel>
               </div>
             </td>
@@ -427,7 +476,7 @@ function formatDate(dateString) {
               style="max-width: 350px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-center pa-md-2">
-                {{ section.condition }}
+                <div v-html="section.condition" />
               </VLabel>
             </td>
             <td
@@ -464,6 +513,11 @@ function formatDate(dateString) {
                       text-end="Kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VCurrencyField
@@ -474,6 +528,11 @@ function formatDate(dateString) {
                       text-end="(B)"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -489,6 +548,11 @@ function formatDate(dateString) {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VCurrencyField
@@ -499,6 +563,11 @@ function formatDate(dateString) {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -513,6 +582,11 @@ function formatDate(dateString) {
                       text-end="Litre"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -545,6 +619,11 @@ function formatDate(dateString) {
                       text-end="Litre"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -577,6 +656,11 @@ function formatDate(dateString) {
                       text-end="%"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -621,22 +705,20 @@ function formatDate(dateString) {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
+                      :items="hour"
                       :readonly="isReadOnly"
-                      :value-range="23"
                     />
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
+                      :items="minute"
                       :readonly="isReadOnly"
-                      :value-range="59"
                     />
                   </VCol>
                 </VRow>
@@ -653,6 +735,11 @@ function formatDate(dateString) {
                       text-end="( Mpa )'"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -685,6 +772,11 @@ function formatDate(dateString) {
                       text-end="Amp'"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
 
                   <VCol>
@@ -718,6 +810,11 @@ function formatDate(dateString) {
                       text-end="mm.'"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VCurrencyField
@@ -729,6 +826,11 @@ function formatDate(dateString) {
                       text-end="Litre'"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -745,6 +847,11 @@ function formatDate(dateString) {
                       type="number"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -760,6 +867,11 @@ function formatDate(dateString) {
                       text-end="Litre'"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VCurrencyField
@@ -777,6 +889,11 @@ function formatDate(dateString) {
                         </VLabel>
                       </template>
                     </VCurrencyField>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -792,6 +909,11 @@ function formatDate(dateString) {
                       text-end="Kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -828,6 +950,11 @@ function formatDate(dateString) {
                       text-end="( Mpa )"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -843,6 +970,11 @@ function formatDate(dateString) {
                       text-end="Amp"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -855,9 +987,14 @@ function formatDate(dateString) {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="°C"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -877,7 +1014,7 @@ function formatDate(dateString) {
           <td class="tr-border-left-0">
             : ให้สวมชุด-หน้ากาก ตลอดเวลา เพื่อป้องกันเหตุได้ทันท่วงที
             <br>
-            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านขางรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย ด่วน
+            : ขณะ หากเกิดเคมีรั่วไหล ที่ข้อต่อวาล์วท้ายรถให้ทำการดึงสายปิดวาล์วที่อยู่ด้านข้างรถ เป็นวาล์ว ฉุกเฉิน และแจ้งหัวหน้างาน หรือผู้ที่เกี่ยวข้องโดย <strong><u>ด่วน</u></strong>
           </td>
           <!--
             <th style="font-size: 16px;" colspan="3">
@@ -992,7 +1129,7 @@ function formatDate(dateString) {
         type="text"
         color="primary "
         class="mx-1"
-        @click="submit"
+        @click="openConfirmDialog('SUBMIT')"
       >
         Submit
       </VBtn>
@@ -1001,7 +1138,7 @@ function formatDate(dateString) {
         type="text"
         color="primary"
         class="mx-1"
-        @click="approve"
+        @click="openConfirmDialog('APPROVE')"
       >
         Approve
       </VBtn>
@@ -1017,6 +1154,16 @@ function formatDate(dateString) {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>
@@ -1131,5 +1278,9 @@ function formatDate(dateString) {
 .tr-border-left-0 {
   border-inline-start: 0 !important;
   font-size: 16px;
+}
+
+.text-red {
+  color: red;
 }
 </style>

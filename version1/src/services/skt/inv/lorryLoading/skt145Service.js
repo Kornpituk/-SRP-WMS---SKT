@@ -91,15 +91,10 @@ export function formatDate(dateString) {
 }
 
 export function passInitialData(type, params, index) {
-  if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
-  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+
+  if (type == "oknot" || type=="leak" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percent" || type == "c" || type=='mpa'|| type=='amp' || type == "mm" || type =="ac" || type == "35c") {
     if(index == 0){
       return params
     }else{
@@ -144,7 +139,7 @@ export const ItemTemplate = [
   {
     "isSection": true,
     "rowSpan": 6,
-    "sequence": "<strong>ข้อควรระวัง</strong>",
+    "sequence": "<strong><u>ข้อควรระวัง</u></strong>",
     "practice": " : หากมีงาน Hot work or Fire work ใกล้เคียง ให้แจ้งหัวหน้างานให้หยุดชั่วคราว",
     "condition": "",
     "result": {
@@ -159,7 +154,7 @@ export const ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": ": ให้ ปิดโทรศัพท์ขณะ Loading สาร",
+    "practice": ": ให้ <u>ปิด</u>โทรศัพท์ขณะ Loading สาร",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -174,7 +169,7 @@ export const ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": ": หากมี ของเหลว หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ ห้ามใช้น้ำล้าง ",
+    "practice": ": หากมี ของเหลว หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ <strong>ห้ามใช้น้ำล้าง</strong> ",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -341,7 +336,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "2. เอาหมอนรองล้อรถเรียบร้อย",
-    "condition": "รองล้อรถทั่งด้านหน้าและด้านหลัง",
+    "condition": "รองล้อรถทั้งด้านหน้าและด้านหลัง",
     "result": {
       "type": "oknot",
       "field": [
@@ -406,11 +401,11 @@ export const ItemTemplate = [
       "type": "percent",
       "field": [
         {
-          "name": "l0502060101", // percent
+          "name": "l0503060101", // percent
 
         },
         {
-          "name": "l0502060102", // OkNot
+          "name": "l0503060102", // OkNot
 
         },
       ],
@@ -452,7 +447,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "3. Temperature เท่าไหร่",
-    "condition": "อุณหภูมิต้องไม่สูงกว่า  35 C' ",
+    "condition": "อุณหภูมิต้องไม่สูงกว่า  35 ℃ ",
     "result": {
       "type": "35c",
       "field": [
@@ -528,23 +523,9 @@ export const ItemTemplate = [
     },
   },
   {
-    "isSection": false,
-    "sequence": "",
-    "practice": "",
-    "condition": "",
-    "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l0505050101", // percen
-        },
-      ],
-    },
-  },
-  {
     "isSection": true,
     "rowSpan": 3,
-    "sequence": "<strong>lorry tank</strong>",
+    "sequence": "<strong>Lorry tank</strong>",
     "practice": "1. วาล์ว 18,21,24,25,26,27,28,29",
     "condition": "Close ( ปิด )",
     "result": {
@@ -673,7 +654,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "7. เปิดวาล์ว 29 ",
-    "condition": "Open ( เปิด ) เวลาเริ่มโหลดสินค้า.................................",
+    "condition": "Open ( เปิด ) เวลาเริ่มโหลดสินค้า",
     "result": {
       "type": "actualCheck",
       "field": [
@@ -747,7 +728,7 @@ export const ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "4. ปิดวาล์ว 29 ",
-    "condition": "Close ( ปิด ) เวลาโหลดสินค้าเสร็จ...............................",
+    "condition": "Close ( ปิด ) เวลาโหลดสินค้าเสร็จ",
     "result": {
       "type": "actualCheck",
       "field": [
@@ -836,7 +817,7 @@ export const ItemTemplate = [
     "practice": "10. Check level DCS ได้เท่าไหร่",
     "condition": "Actual  Check",
     "result": {
-      "type": "oknot",
+      "type": "kg",
       "field": [
         {
           "name": "l0508100101", // percen
@@ -850,7 +831,7 @@ export const ItemTemplate = [
     "practice": "11. ส่วนต่างระหว่าง ก่อนการรับ และหลังรับ จำนวนกี่กีโลกรัม",
     "condition": "ต้องไม่ต่างกันมากจากการคำนวน",
     "result": {
-      "type": "kg",
+      "type": "de",
       "field": [
         {
           "name": "l0508110101", // percen
