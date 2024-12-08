@@ -120,13 +120,9 @@ export function passSubmitData(type, params) {
   }
   else if(type == "actualCheck"){
     return !params ? "0": params.toString()
-  }else if(type == "percent"){
-    if(params == undefined)
-      return 0
-    else parseFloat(params)
   }
   else {
-    if(isNaN(Number(params))){
+    if(isNaN(Number(params)) && type != ""){
       return parseFloat( params.replace(/,/g, ''))
     }else{
       return parseFloat(params)
@@ -464,7 +460,7 @@ export const ItemTemplate = [
   },
   {
     "isSection": true,
-    "rowSpan": 5,
+    "rowSpan": 4,
     "sequence": "<strong>Operator ทำการสวมใส่อุปกรณ์ PPE </strong>",
     "practice": " - ถุงมือ",
     "condition": "ใส่ถุงมือยาง",
@@ -817,7 +813,7 @@ export const ItemTemplate = [
     "practice": "10. Check level DCS ได้เท่าไหร่",
     "condition": "Actual  Check",
     "result": {
-      "type": "kg",
+      "type": "e",
       "field": [
         {
           "name": "l0508100101", // percen

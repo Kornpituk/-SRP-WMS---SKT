@@ -10,6 +10,7 @@ import {
   save,
 } from '@/services/skt/inv/lorryLoading/eaService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/receiving/lorryForm/a1/EA.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
@@ -103,9 +104,10 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(statusId.value == 15 || statusId.value == 18){
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
+
 
 })
 
@@ -218,12 +220,12 @@ async function approve(e) {
 }
 watchEffect(async () => {
   var a = lorryItems[6].result.field[0].value
-  var b = a / 0.902
+  var b = a == 0 ? 0 : a / 0.902
   var c = lorryItems[7].result.field[0].value
-  var d = (c * 5.2) + 511.24
+  var d = c == 0 ? 0 : (c * 5.2) + 511.24
   var bd = b + d
   var e = lorryItems[46].result.field[0].value
-  var f = mm2litre(e)
+  var f = e == 0 ? 0 :  mm2litre(e)
   var bdf = (b+d)-f
   var bdfkg = bdf * 0.902
 
@@ -245,7 +247,7 @@ watchEffect(async () => {
   dcsAfter.value = currencyFormat(g)
   dcsBefore.value = currencyFormat(dcs)
   dcsDiff = currencyFormat(g-dcs)
-  tankAfter.value = currencyFormat(e)
+  tankAfter.value = currencyFormat(f)
   tankBefore.value = currencyFormat(d)
   tankDiff.value = currencyFormat(e-d)
 })
@@ -342,7 +344,7 @@ watchEffect(async () => {
               style="max-width: 400px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                {{ section.practice }}
+                <div v-html="section.practice" />
               </VLabel>
             </td>
             <td
@@ -384,7 +386,7 @@ watchEffect(async () => {
                       density="compact"
                       variant="solo"
                       text-start="(A)"
-                      text-end="Kg."
+                      text-end="Kg. = "
                       :readonly="isReadOnly"
                     />
                     <span
@@ -423,7 +425,7 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start="(C)"
-                      text-end="mm."
+                      text-end="mm. ="
                       :readonly="isReadOnly"
                     />
                     <span
@@ -576,7 +578,7 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="℃"
                       :readonly="isReadOnly"
                     />
                     <span

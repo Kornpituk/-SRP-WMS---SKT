@@ -172,7 +172,8 @@ async function submit(e) {
 
     if(i.practice.field != undefined){
       for (var f of i.practice.field) {
-        lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
+        if(f.name != undefined)
+          lorryRequestData.value[f.name] = passSubmitData(i.practice.type, f.value)
       }
     }
   }

@@ -119,6 +119,8 @@ async function saveDraft(e) {
 
   for (var i of lorryItems) {
     for (var f of i.result.field) {
+      if(i.result.type == "percent")
+        debugger
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
@@ -230,13 +232,16 @@ watchEffect(async () => {
   var a = lorryItems[6].result.field[0].value
   var c = lorryItems[7].result.field[1].value
   var d = a+c
-  var e = lorryItems[45].result.field[0].value
+  var e = lorryItems[44].result.field[0].value
+  var de = d-e
   lorryItems[9].result.field[0].value = currencyFormat(d)
-  lorryItems[46].result.field[0].value = currencyFormat(d-e)
+  lorryItems[45].result.field[0].value = currencyFormat(de)
 
-  dcsAfter.value = currencyFormat(lorryItems[45].result.field[0].value)
+  
+
+  dcsAfter.value = currencyFormat(e)
   dcsBefore.value = currencyFormat(d)
-  dcsDiff = currencyFormat(lorryItems[45].result.field[0].value - (d))
+  dcsDiff = currencyFormat(e - (d))
 
   // tankAfter.value = currencyFormat(f)
   tankBefore.value = currencyFormat(c)
@@ -271,7 +276,7 @@ watchEffect(async () => {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        SKT EP-400P BE 11V-145
+        EP-400BE 11V-145
       </div>
     </VCol>
     <VCol cols="4" />
@@ -340,7 +345,7 @@ watchEffect(async () => {
             </td>
             <td
               colspan="3"
-              style="max-width: 450px; border-left: 1px solid black; text-align: start;"
+              style="max-width: 400px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-center pa-md-2 text-wrap">
                 {{ section.condition }}
@@ -716,7 +721,7 @@ watchEffect(async () => {
                 density="compact"
                 variant="solo"
                 text-start="   "
-                text-end="mm."
+                text-end=""
                 :readonly="isReadOnly"
               />
             </td>

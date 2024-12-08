@@ -2,6 +2,7 @@
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import {
+  currencyFormat,
   formatDate, generate, get, GetByPoEtlLogDetailJournalID, kumaruItemTemplate,
   passInitialData, passSubmitData, save,
 } from '@/services/skt/inv/lorryLoading/kumaruService'
@@ -159,7 +160,7 @@ async function submit(e) {
 
   if(isValid){
 
-    var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+    var response = await save(poEtlLogDetailJournalIDQueryParameters.value, ipaRequestData.value)
 
     if (response.status != 200) 
       return
@@ -215,8 +216,12 @@ async function approve(e) {
 
 
 watchEffect(async () => {
-  kumaruItems[8].result.field[0].value = kumaruItems[6].result.field[0].value + kumaruItems[7].result.field[0].value 
-  kumaruItems[50].result.field[0].value = kumaruItems[49].result.field[0].value - kumaruItems[7].result.field[0].value
+  var a  = kumaruItems[6].result.field[0].value
+  var b = kumaruItems[7].result.field[0].value 
+  var c = kumaruItems[49].result.field[0].value
+  var ab = a+b
+  kumaruItems[8].result.field[0].value = currencyFormat(ab)
+  kumaruItems[50].result.field[0].value = currencyFormat(c-b)
 })
 </script>
 
