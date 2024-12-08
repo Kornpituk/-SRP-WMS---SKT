@@ -7,7 +7,7 @@ import {
 } from '@/services/skt/inv/lorryLoading/kumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import alertWordConst from '@/utilities/constant'
-import { minute } from '@/utilities/time'
+import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/receiving/lorryForm/b1/CAPOLACTUM.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
@@ -124,63 +124,66 @@ async function passData() {
   }
 }
 
+async function validateField(){
+  var isValid = true
+  for (const i of kumaruItems) {
+    for (const f of i.result.field) {
+      const element = document.querySelector("[field-name='"+f.name+"']")
+      if(element){
+        if((f.value) == null || (f.value) == undefined){     
+          element.classList.add('d-flex') // Adds the class to hide the element
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          isValid =false
+    
+          return isValid
+        }else{
+          element.classList.remove('d-flex') // Adds the class to hide the element  
+          element.classList.add('d-none') // Adds the class to hide the element  
+        }
+      }   
+    }
+  }
+  
+  return isValid
+}
+
 async function submit(e) {
   
   await passData()
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+  var isValid = validateField()
 
-  if (response.status != 200) 
-    return
+  if(isValid){
 
+    var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
+    if (response.status != 200) 
+      return
+  
+    const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+    const whereHouse = localStorage.getItem('whereHouseName')
 
-  let isValid = true
-  for (var i of kumaruItems) {
-    for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
-        isValid = false
-      }
+    console.log("User confirmed:", confirmValueCheck.value)
+
+    // เรียก API หรือดำเนินการต่อ
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
+      textAlertDialogFunction(alertWordConst.submit, false)
     }
   }
-
-  if(!isValid){
-    alert("กรุณากรอกข้อมูลให้ครบ")
-  
-    return
-  }
-
-  // // เรียกใช้งาน Dialog
-  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
-
-  //if (confirmed) {
-  // if (confirmed) {
-  console.log("User confirmed:", confirmValueCheck.value)
-
-  // เรียก API หรือดำเนินการต่อ
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-  } else {
-    console.error(response.data)
-    textAlertDialogFunction(alertWordConst.submit, false)
-  }
-
-  // } else {
-  //   console.log("User declined")
-  // }
 
 }
 
@@ -368,6 +371,11 @@ watchEffect(async () => {
                       text-end="kg"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
@@ -384,6 +392,11 @@ watchEffect(async () => {
                       text-end="kg"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
@@ -399,6 +412,11 @@ watchEffect(async () => {
                       text-end="Kg"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -429,9 +447,14 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="℃"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
@@ -448,6 +471,11 @@ watchEffect(async () => {
                       text-end="kg"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
@@ -457,6 +485,7 @@ watchEffect(async () => {
                     <VSelect
                       v-model="section.result.field[0].value"
                       :items="hour"
+                      :readonly="isReadOnly"
                     >
                       <template #prepend>
                         <VLabel>
@@ -475,6 +504,7 @@ watchEffect(async () => {
                     <VSelect
                       v-model="section.result.field[1].value"
                       :items="minute"
+                      :readonly="isReadOnly"
                     >
                       <template #prepend>
                         <VLabel />
@@ -494,6 +524,7 @@ watchEffect(async () => {
                     <VSelect
                       v-model="section.result.field[0].value"
                       :items="hour"
+                      :readonly="isReadOnly"
                     >
                       <template #prepend>
                         <VLabel>
@@ -512,6 +543,7 @@ watchEffect(async () => {
                     <VSelect
                       v-model="section.result.field[1].value"
                       :items="minute"
+                      :readonly="isReadOnly"
                     >
                       <template #prepend>
                         <VLabel />
@@ -538,6 +570,11 @@ watchEffect(async () => {
                       text-end="kg"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>

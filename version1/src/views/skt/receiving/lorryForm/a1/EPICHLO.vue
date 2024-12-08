@@ -117,6 +117,29 @@ onMounted(async () => {
 
 })
 
+async function validateField(){
+  var isValid = true
+  for (const i of lorryItems) {
+    for (const f of i.result.field) {
+      const element = document.querySelector("[field-name='"+f.name+"']")
+      if(element){
+        if((f.value) == null || (f.value) == undefined){     
+          element.classList.add('d-flex') // Adds the class to hide the element
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          isValid =false
+    
+          return isValid
+        }else{
+          element.classList.remove('d-flex') // Adds the class to hide the element  
+          element.classList.add('d-none') // Adds the class to hide the element  
+        }
+      }   
+    }
+  }
+  
+  return isValid
+}
+
 async function saveDraft(e) {
 
   for (var i of lorryItems) {
@@ -125,11 +148,7 @@ async function saveDraft(e) {
     }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
   var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
-
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
     setTimeout(() => {
@@ -150,44 +169,31 @@ async function submit(e) {
     }
   }
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
+  var isValid = await validateField()
 
-  if (response.status != 200) 
-    return
+  if(isValid){
 
+    var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
+    if (response.status != 200) 
+      return
 
-  let isValid = true
-  for (var i of lorryItems) {
-    for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
-        isValid = false
-      }
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
+      textAlertDialogFunction(alertWordConst.submit, false)
     }
-  }
-
-  if(!isValid){
-    alert("กรุณากรอกข้อมูลให้ครบ")
-    
-    return
-  }
- 
-
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEpichlo/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-  } else {
-    console.error(response.data)
-    textAlertDialogFunction(alertWordConst.submit, false)
   }
 }
 
@@ -213,14 +219,16 @@ async function approve(e) {
   }
 }
 
+
+
 watchEffect(async () => {
-  var a = lorryItems[6].result.field[0].value
+  var a = lorryItems[6].result.field[0].value == 0 ? 0: lorryItems[6].result.field[0].value
   var b = a / (1.17)
   var c = lorryItems[7].result.field[0].value == 0 ? 0 :lorryItems[7].result.field[0].value
-  var d = (c * 5.288)-172.970
+  var d = c == 0 ? 0 : (c * 5.288)-172.970
   var bd = c+d
   var e = lorryItems[42].result.field[0].value == 0 ? 0 : lorryItems[42].result.field[0].value
-  var f = mm2litre(e)
+  var f = e == 0 ? 0: mm2litre(e)
   var bdf = ((b + d) - f)
   var bdfkg = bdf * 1.17
 
@@ -384,6 +392,11 @@ watchEffect(async () => {
                       text-end="Kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -418,6 +431,11 @@ watchEffect(async () => {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -492,6 +510,11 @@ watchEffect(async () => {
                       text-end="Litre"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -518,6 +541,7 @@ watchEffect(async () => {
                     <VSelect
                       v-model="section.result.field[0].value"
                       :items="hour"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                   <VLabel>
@@ -527,6 +551,7 @@ watchEffect(async () => {
                     <VSelect
                       v-model="section.result.field[1].value"
                       :items="minute"
+                      :readonly="isReadOnly"
                     />
                   </VCol>
                 </VRow>
@@ -543,6 +568,11 @@ watchEffect(async () => {
                       text-end="(Mpa)"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -575,6 +605,11 @@ watchEffect(async () => {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VTextField
@@ -609,6 +644,11 @@ watchEffect(async () => {
                       text-end="Litre"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -624,6 +664,11 @@ watchEffect(async () => {
                       text-end="Amp"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
 
                   <VCol>
@@ -657,6 +702,11 @@ watchEffect(async () => {
                       text-end="°C"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -753,14 +803,14 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ aVariable.value }} / 1.17
+              = {{ aVariable }} / 1.17
             </VLabel>
           </VCol>
         </VRow>
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = {{ bVariable.value }} Litre
+              = {{ bVariable }} Litre
             </VLabel>
           </VCol>
         </VRow>
@@ -774,7 +824,7 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              = ({{ cVariable.value }}X 5.288 ) - 172.970
+              = ({{ cVariable }}X 5.288 ) - 172.970
             </VLabel>
           </VCol>
         </VRow>

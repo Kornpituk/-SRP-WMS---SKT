@@ -34,6 +34,8 @@ export function passSubmitData(type, params) {
     } else {
       return -1
     }
+  }else if(type == "center"){
+    return 0
   }
   else if(type == "actualCheck"){
     return !params ? "0": params.toString()
