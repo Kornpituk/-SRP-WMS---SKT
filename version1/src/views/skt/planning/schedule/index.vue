@@ -1781,7 +1781,7 @@ const newBatch = async batchID => {
       <AuthenticatorDialog
         :is-dialog-visible="isDialogVisibleAlertDialog"
         :word="wordForSubmit"
-        :sub-word="subWordForSubmit"
+        :subword="subWordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
       />
