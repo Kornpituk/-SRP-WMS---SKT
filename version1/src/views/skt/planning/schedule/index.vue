@@ -1715,7 +1715,6 @@ const newBatch = async batchID => {
                 {{ item.raw.updatedBy }}
               </td>
               <td
-                class="cursor-pointer"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1730,6 +1729,7 @@ const newBatch = async batchID => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VBtn
+                  v-if="item.raw.statusId == 101 || item.raw.statusId === 102"
                   color="info"
                   @click="newBatch(item.raw.batchID)"
                 >
