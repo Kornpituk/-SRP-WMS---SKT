@@ -582,30 +582,35 @@ const selectedDataTables = ref([])
 //--------------------------------- validate  ------------------------------
 const activeBtnApprove = ref(false)
 const activeBtnSubmit = ref(false)
+const activeBtnCancelPlan = ref(false)
 const activeBtnError =ref('primary')
 
 watch(()=> {
   console.log("vselectedDataTables out func", activeBtnApprove.value)
   activeBtnApprove.value = false
   activeBtnSubmit.value = false
+  activeBtnCancelPlan.value = false
   if(selectedDataTables.value){
     selectedDataTables.value.forEach(item => {
       // กำหนดค่าเริ่มต้น
       console.log("vselectedDataTables in", activeBtnApprove.value)
       if (item.statusId === 102 ) {
         activeBtnApprove.value = true
+        activeBtnCancelPlan.value = true
         console.log("vselectedDataTables", activeBtnApprove.value)
       }else if(item.statusId === 101){
+        activeBtnCancelPlan.value = true
         activeBtnSubmit.value = true
       }
       else{
         activeBtnApprove.value = false
         activeBtnSubmit.value = false
+        activeBtnCancelPlan.value = false
       }
 
     })
   }else{
-    
+    activeBtnCancelPlan.value = false
   }
 
 
@@ -2090,6 +2095,7 @@ const print = () => {
 
         <VBtn
           color="error"
+          :disabled="!activeBtnCancelPlan"
           class="mx-2"
           @click="deletePlan"
         >
