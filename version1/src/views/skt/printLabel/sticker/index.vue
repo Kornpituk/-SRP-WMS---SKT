@@ -189,25 +189,40 @@ const clearModel = () => {
 }
 
 const fetchData = async () => {
+  try {
+    const hasValue = Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
 
-  const result = await printLabelFormViewService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
+    if (!hasValue) {
+      dataPrintLabel.value = []
+      progressLinearNoData.value = true
+      throw new Error('Invalid paramsFetchDataPrintLabel')
+    }
 
-  progressLinearNoData.value = true
-  if (result) {
-    // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
-    dataPrintLabel.value = result.data.map((item, index) => ({
-      ...item, // คงข้อมูลเดิมใน item
-      no: index + 1, // เพิ่มฟิลด์ number โดยเริ่มจาก 1
-    }))
+    progressLinearNoData.value = false // เริ่มแสดง Progress
 
-    // dataPrintLabel.value = result
+    const result = await printLabelFormViewService(
+      urlApi.value,
+      whereHouse,
+      accessTokenAtStore,
+      paramsFetchDataPrintLabel.value,
+    )
 
-    progressLinearNoData.value = true
-    console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
-
-    // console.log("printLabelFormViewResult successfully view", printLabelFormViewResult.value)
-  } else {
-    console.log("printLabelFormViewService failed view")
+    if (result && result.data) {
+      // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
+      dataPrintLabel.value = result.data.map((item, index) => ({
+        ...item,
+        no: index + 1, // เพิ่มฟิลด์ลำดับ
+      }))
+      console.log('printLabelFormViewService successfully fetched data', dataPrintLabel.value)
+    } else {
+      console.log('No data found in API response')
+      dataPrintLabel.value = []
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error.message || error)
+    dataPrintLabel.value = [] // ตั้งค่าเป็นค่าว่างเมื่อเกิดข้อผิดพลาด
+  } finally {
+    progressLinearNoData.value = true // ซ่อน Progress เมื่อการทำงานเสร็จสิ้น
   }
 }
 
@@ -441,7 +456,7 @@ const dataTableColor = ref('#E0F7FA')
                 <span
                   style="font-size: 22px; font-weight: bold;"
                   class="text-center"
-                >{{ $t('Sticker') }}</span>
+                >{{ $t('Sticker Label') }}</span>
               </div>
             </VCol>
             <VCol
