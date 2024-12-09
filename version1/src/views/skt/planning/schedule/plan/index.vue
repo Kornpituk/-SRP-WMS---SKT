@@ -12,11 +12,13 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import alertWordConst from '@/utilities/constant'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
 const subWordForSubmit = ref('')
 const successDialAlert = ref(false)
+const confirmDialog2 = ref(null)
 
 const statusId = ref(0)
 
@@ -32,6 +34,36 @@ const textAlertSubDialogFunction = (word, subWord, success) => {
   console.log(subWord, subWordForSubmit.value)
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
+}
+
+function openConfirmDialog() {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    console.log("selectedDataTables", item.statusId)
+
+    if (item.statusId === 102 ) {
+      wordForSubmit.value = alertWordConst.approve
+      confirmDialog2.value.openDialog()
+      isDialogVisibleAlertDialog.value = false
+      console.log("selectedDataTables 102")
+    }else if(item.statusId === 101){
+      textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
+      console.log("selectedDataTables 101")
+    }
+    else{
+      console.log("selectedDataTables failded")
+      isDialogVisibleAlertDialog.value = false
+    }
+
+  })
+
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+  approvePlan()
 }
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
@@ -2059,27 +2091,47 @@ const print = () => {
   >
     <VCard>
       <VCardText class="pa-2">
-        <VBtn @click="addEmptyRowToPlan">
+        <VBtn
+          color="orange-darken-3"
+          @click="addEmptyRowToPlan"
+        >
           <span style="font-size: 12px;">New Plan</span>
         </VBtn>
         <VBtn
-          class="mx-2"
+          class="mx-1"
           color="warning"
           @click="saveProductionPlan"
         >
           <span style="font-size: 12px;">Save Draft</span>
         </VBtn>
         <VBtn
-          class="mx-2"
-          color="success"
+          color="info"
+          class="mx-1"
+          :disabled="!productionPlan"
+          @click="handleBtnGenerateLotBatch"
+        >
+          <span style="font-size: 12px;">Gen Lot</span>
+        </VBtn>
+        <VBtn
+          class="mx-1"
+          color="light-green-darken-1"
           :disabled="!activeBtnSubmit"
           @click="submitPlan"
         >
           <span style="font-size: 12px;">Submit</span>
         </VBtn>
         <VBtn
+          color="error"
+          :disabled="!activeBtnCancelPlan"
+          class="mx-1"
+          @click="deletePlan"
+        >
+          <span style="font-size: 12px;">Reject Plan</span>
+        </VBtn>
+        <VBtn
+          class="mx-1"
           :disabled="!activeBtnApprove"
-          @click="approvePlan"
+          @click="openConfirmDialog"
         >
           <span style="font-size: 12px;">Approve</span>
         </VBtn>
@@ -2090,25 +2142,6 @@ const print = () => {
           @click="addEmptyRowToPlan"
         >
           <span style="font-size: 12px;">Add Item</span>
-        </VBtn>
-
-
-        <VBtn
-          color="error"
-          :disabled="!activeBtnCancelPlan"
-          class="mx-2"
-          @click="deletePlan"
-        >
-          <span style="font-size: 12px;">Cancel Plan</span>
-        </VBtn>
-
-        <VBtn
-          color="info"
-          class="mx-2"
-          :disabled="!productionPlan"
-          @click="handleBtnGenerateLotBatch"
-        >
-          <span style="font-size: 12px;">Gen Lot</span>
         </VBtn>
 
         <VBtn
@@ -2873,6 +2906,16 @@ const print = () => {
         :subword="subWordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="confirmDialog2"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>

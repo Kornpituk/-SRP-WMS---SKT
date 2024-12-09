@@ -50,9 +50,6 @@ const confirmValueCheck = ref(false)
 //-- dialog 2 
 const confirmDialog2 = ref(null)
 
-watch( () => {
- 
-})
 
 function openConfirmDialog() {
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
@@ -258,7 +255,7 @@ const approvePlan = async () => {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
     if(responseApproveProductionPlan.value){
-      textAlertDialogFunction(alertWordConst.submit, true)
+      textAlertDialogFunction(alertWordConst.approve, true)
       setTimeout(() => {
         location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
@@ -1175,7 +1172,7 @@ const newBatch = async batchID => {
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
-            <VBtn @click="openConfirmDialog">
+            <VBtn :disabled="!selectedDataTables.length > 0" @click="openConfirmDialog">
               <span style="font-size: 12px;">Approve</span>
             </VBtn>
             <VBtn
