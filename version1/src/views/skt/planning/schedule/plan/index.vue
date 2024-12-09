@@ -2549,12 +2549,14 @@ const print = () => {
                     </div>
                   </VAlert>
                   <span
+                  style="font-size: 12px;"
                     v-if="item.raw.hasError"
                     class=""
                   >packaging exceed</span>
                 </div>
                 <div class="text-start">
                   <span
+                  style="font-size: 12px;"
                     v-if="item.raw.hasError"
                     class=""
                   >the batch scale (kgs).</span>

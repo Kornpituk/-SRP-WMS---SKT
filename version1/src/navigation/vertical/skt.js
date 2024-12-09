@@ -240,11 +240,11 @@ export default [
 
   },
 
-  {
-    title: 'Shipment Plan',
-    icon: { icon: 'ri-truck-fill' },
-    to: 'skt-shipping',
-  },
+  // {
+  //   title: 'Shipment Plan',
+  //   icon: { icon: 'ri-truck-fill' },
+  //   to: 'skt-shipping',
+  // },
   {
     title: 'Print Label',
     icon: { icon: 'ri-printer-fill' },

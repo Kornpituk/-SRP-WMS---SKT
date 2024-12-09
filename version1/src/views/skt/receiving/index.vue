@@ -725,8 +725,6 @@ const headers = [
   },
 ]
 
-const customSortIcon = ref('mdi-swap-vertical')
-
 const tableDataPerpage = ref(15)
 const tableDataHeight = ref(550)
 

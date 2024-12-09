@@ -1020,6 +1020,8 @@ const dataTableColor = ref('#E0F7FA')
           :items-per-page="10"
           class="text-no-wrap"
           expand-on-click
+          fixed-header
+          height="550"
           show-expand
           show-select
         >

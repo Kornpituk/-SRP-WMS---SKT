@@ -20,6 +20,9 @@ const selectedDataTables = ref([])
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
+//------------------------------------------- compoennt ----------------------------------------------------------------
+import GeridTable from '@/pages/skt/planning/schedule/gridTable/index.vue'
+
 //------------------------------------------ Data --------------------------------
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
@@ -154,7 +157,7 @@ const formatToMMDDYYYY = date => {
   return `${month}/${day}/${year}`
 }
 
-watchEffect(async () => {
+watch(async () => {
   try {
 
     if (datePickerFilter.value) {
@@ -467,6 +470,8 @@ const headersDataTable = [
     key: 'Action',
   },
 ]
+
+const sortBy = [{ key: 'calories', order: 'asc' }]
 
 const headersDataTableNew = [
   {
@@ -1172,7 +1177,10 @@ const newBatch = async batchID => {
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
-            <VBtn :disabled="!selectedDataTables.length > 0" @click="openConfirmDialog">
+            <VBtn
+              :disabled="!selectedDataTables.length > 0"
+              @click="openConfirmDialog"
+            >
               <span style="font-size: 12px;">Approve</span>
             </VBtn>
             <VBtn
@@ -1256,6 +1264,8 @@ const newBatch = async batchID => {
           :headers="headersDataTableNew"
           :items="productionPlanItems"
           :items-per-page="10"
+          fixed-header
+          height="550"
           show-select
           class="text-no-wrap"
         >
@@ -1742,6 +1752,12 @@ const newBatch = async batchID => {
       </VCardText>
     </VCard>
   </section>
+
+  <section v-if="false">
+    <h3>GridTable</h3>
+    <GeridTable />
+  </section>
+
 
   <!-- Footer -->
   <section class="mt-3">
