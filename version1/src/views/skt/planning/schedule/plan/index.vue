@@ -2488,13 +2488,13 @@ const print = () => {
                   </VAlert>
                   <span
                     v-if="item.raw.hasError"
-                    class="text-red"
+                    class=""
                   >packaging must not exceed</span>
                 </div>
                 <div class="text-start">
                   <span
                     v-if="item.raw.hasError"
-                    class="text-red"
+                    class=""
                   >the batch scale (kgs).</span>
                 </div>
               </td>
