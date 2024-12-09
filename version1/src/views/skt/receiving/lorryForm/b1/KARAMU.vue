@@ -1,18 +1,22 @@
 <script setup>
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
-import VNumberInput from '@/components/VNumberInput.vue'
 import {
+  currencyFormat,
   formatDate, generate, get, GetByPoEtlLogDetailJournalID, kumaruItemTemplate,
   passInitialData, passSubmitData, save,
 } from '@/services/skt/inv/lorryLoading/kumaruService'
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/receiving/lorryForm/b1/CAPOLACTUM.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
-//------------------------------ Dialog --------------------------------
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+
 const isDialogVisibleAlertDialog = ref(false)
 const isDialogVisibleConfirmDialog = ref(false)
 const confirmValueCheck = ref(false)
@@ -94,11 +98,11 @@ onMounted(async () => {
 
 })
 
+
 async function saveDraft(e) {
- 
   await passData()
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, ipaRequestData.value)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -106,7 +110,8 @@ async function saveDraft(e) {
       location.reload()
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
-    console.log(response.data)
+    console.error(response.data)
+    e.preventDefault()
   }
 }
 
@@ -124,63 +129,66 @@ async function passData() {
   }
 }
 
+async function validateField(){
+  var isValid = true
+  for (const i of kumaruItems) {
+    for (const f of i.result.field) {
+      const element = document.querySelector("[field-name='"+f.name+"']")
+      if(element){
+        if((f.value) == null || (f.value) == undefined){     
+          element.classList.add('d-flex') // Adds the class to hide the element
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          isValid =false
+    
+          return isValid
+        }else{
+          element.classList.remove('d-flex') // Adds the class to hide the element  
+          element.classList.add('d-none') // Adds the class to hide the element  
+        }
+      }   
+    }
+  }
+  
+  return isValid
+}
+
 async function submit(e) {
   
   await passData()
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+  var isValid = validateField()
 
-  if (response.status != 200) 
-    return
+  if(isValid){
 
+    var response = await save(poEtlLogDetailJournalIDQueryParameters.value, ipaRequestData.value)
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
+    if (response.status != 200) 
+      return
+  
+    const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+    const whereHouse = localStorage.getItem('whereHouseName')
 
-  let isValid = true
-  for (var i of kumaruItems) {
-    for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
-        isValid = false
-      }
+    console.log("User confirmed:", confirmValueCheck.value)
+
+    // เรียก API หรือดำเนินการต่อ
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
+      textAlertDialogFunction(alertWordConst.submit, false)
     }
   }
-
-  if(!isValid){
-    alert("กรุณากรอกข้อมูลให้ครบ")
-  
-    return
-  }
-
-  // // เรียกใช้งาน Dialog
-  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
-
-  //if (confirmed) {
-  // if (confirmed) {
-  console.log("User confirmed:", confirmValueCheck.value)
-
-  // เรียก API หรือดำเนินการต่อ
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-  } else {
-    console.error(response.data)
-    textAlertDialogFunction(alertWordConst.submit, false)
-  }
-
-  // } else {
-  //   console.log("User declined")
-  // }
 
 }
 
@@ -208,8 +216,12 @@ async function approve(e) {
 
 
 watchEffect(async () => {
-  kumaruItems[8].result.field[0].value = kumaruItems[6].result.field[0].value + kumaruItems[7].result.field[0].value 
-  kumaruItems[50].result.field[0].value = kumaruItems[49].result.field[0].value - kumaruItems[7].result.field[0].value
+  var a  = kumaruItems[6].result.field[0].value
+  var b = kumaruItems[7].result.field[0].value 
+  var c = kumaruItems[49].result.field[0].value
+  var ab = a+b
+  kumaruItems[8].result.field[0].value = currencyFormat(ab)
+  kumaruItems[50].result.field[0].value = currencyFormat(c-b)
 })
 </script>
 
@@ -304,7 +316,7 @@ watchEffect(async () => {
               style="max-width: 400px; border-left: 1px solid black; text-align: start;"
             >
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                {{ section.practice }}
+                <div v-html="section.practice" />
               </VLabel>
             </td>
             <td
@@ -327,7 +339,7 @@ watchEffect(async () => {
                 </vrow>
               </div>
               <div v-else>
-                <VLabel class="d-flex justify-left pa-md-2 text-wrap">
+                <VLabel class="d-flex justify-center pa-md-2 text-wrap">
                   {{ section.condition }}
                 </VLabel>
               </div>
@@ -368,6 +380,11 @@ watchEffect(async () => {
                       text-end="kg"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
@@ -384,27 +401,46 @@ watchEffect(async () => {
                       text-end="kg"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
               <div v-if="section.result.type === 'ab'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="A) + (B) ="
-                      text-end="Kg"
-                      :readonly="isReadOnly"
-                    />
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          (A) + (B) = 
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg
+                        </VLabel>
+                      </template>
+                    </VTextField>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
                       v-model="section.result.field[1].value"
                       inline
                       class="d-flex justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="Ok"
@@ -428,9 +464,14 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="℃"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
@@ -447,45 +488,117 @@ watchEffect(async () => {
                       text-end="kg"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
+                      :items="hour"
                       :readonly="isReadOnly"
-                      :value-range="23"
-                    />
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          เวลาเริ่ม
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel />
+                      </template>
+                    </VSelect>
                   </VCol>
                   <VLabel>
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
+                      :items="minute"
                       :readonly="isReadOnly"
-                      :value-range="59"
-                    />
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          น.
+                        </VLabel>
+                      </template>
+                    </VSelect>
+                  </VCol>
+                </VRow>
+              </div>
+              <div v-if="section.result.type === 'actualCheck2'">
+                <VRow>
+                  <VCol>
+                    <VSelect
+                      v-model="section.result.field[0].value"
+                      :items="hour"
+                      :readonly="isReadOnly"
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          เวลารับเสร็จ
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel />
+                      </template>
+                    </VSelect>
+                  </VCol>
+                  <VLabel>
+                    :
+                  </VLabel>
+                  <VCol>
+                    <VSelect
+                      v-model="section.result.field[1].value"
+                      :items="minute"
+                      :readonly="isReadOnly"
+                    >
+                      <template #prepend>
+                        <VLabel />
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          น.
+                        </VLabel>
+                      </template>
+                    </VSelect>
                   </VCol>
                 </VRow>
               </div>
               <div v-if="section.result.type === 'cb'">
-                <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="( C )-( B )"
-                      text-end="kg"
-                      :readonly="isReadOnly"
-                    />
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          ( C )-( B )
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg
+                        </VLabel>
+                      </template>
+                    </VTextField>
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </vrow>
               </div>
@@ -613,6 +726,8 @@ watchEffect(async () => {
       </VBtn>
     </VCol>
   </VRow>
+  
+  <!-- Alert Dialog Success/Fiald new -->
   <section>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->

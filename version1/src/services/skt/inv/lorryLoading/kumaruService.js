@@ -44,7 +44,7 @@ export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestDat
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  return await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+  return await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -108,7 +108,7 @@ export function passSubmitData(type, params) {
       return -1
     }
   }
-  else if(type == "actualCheck"){
+  else if(type == "actualCheck" || type == "actualCheck2"){
     return !params ? "0": params.toString()
   }
   else {
@@ -125,7 +125,7 @@ export const kumaruItemTemplate = [
   {
     "isSection": true,
     "rowSpan": 6,
-    "sequence": "<strong>ข้อควรระวัง</strong>",
+    "sequence": "<strong><u>ข้อควรระวัง</u></strong>",
     "practice": "หากมีงาน Hot work or Fire work ใกล้เคียง ให้แจ้งหัวหน้างานให้หยุดชั่วคราว",
     "condition": "",
     "result": {
@@ -141,7 +141,7 @@ export const kumaruItemTemplate = [
     "isSection": false,
     "rowSpan": 1,
     "sequence": "<strong>ข้อควรระวัง</strong>",
-    "practice": "ให้ปิดโทรศัพท์ขณะ Loading สาร",
+    "practice": "ให้<u>ปิด</u>โทรศัพท์ขณะ Loading สาร",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -156,7 +156,7 @@ export const kumaruItemTemplate = [
     "isSection": false,
     "rowSpan": 1,
     "sequence": "<strong>ข้อควรระวัง</strong>",
-    "practice": "หากมีสารหยดลงพื้น ให้ใช้ผ้าหรือ ตัวดูดซับ ห้ามใช้น้ำล้าง",
+    "practice": "หากมีสารหยดลงพื้น ให้ใช้ผ้าหรือ ตัวดูดซับ <strong>ห้ามใช้น้ำล้าง</strong>",
     "condition": "",
     "result": {
       "type": "oknot",
@@ -825,7 +825,7 @@ export const kumaruItemTemplate = [
     "practice": "10. หลังจากตรวจสอบแล้วว่าไม่มีของเหลวค้างภายในท่อให้ทำการปิดไนโตรเจนและปิดวาล์วที่ขึ้นไป 21V-306",
     "condition": "ตรวจเช็คว่า valve ปิดจริง",
     "result": {
-      "type": "actualCheck",
+      "type": "actualCheck2",
       "field": [
         {
           "name": "l0606110101",

@@ -34,7 +34,7 @@ export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestDat
   const whereHouse = localStorage.getItem('whereHouseName')
 
   // eslint-disable-next-line sonarjs/prefer-immediate-return
-  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -202,7 +202,7 @@ export const hakuItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "ตรวจสอบไฟสถานะอนุญาติ ติดหรือดับ ( Y )",
+    "practice": "ตรวจสอบไฟสถานะอนุญาต ติดหรือดับ ( Y )",
     "condition": "ไฟดับ",
     "result": {
       "type": "oknot",
@@ -235,7 +235,7 @@ export const hakuItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที",
+    "practice": "<strong><u>หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที</u></strong>",
     "condition": "",
     "result": {
       "type": "",
@@ -347,7 +347,7 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อนด้านหน้า-หลัง No.2",
+      "startPracticeText": "ใส่หมอนรองห้ามล้อเคลื่อนด้านหน้า-หลัง No.2",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -522,7 +522,7 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่ No.5",
+      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรือไม่ No.5",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -622,7 +622,7 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาติ ดับหรือติด ( Y )/ ตัว Scrubber ต้องทำงาน",
+      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาต ดับหรือติด ( Y )/ ตัว Scrubber ต้องทำงาน",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -756,13 +756,8 @@ export const hakuItemTemplate = [
     },
     "condition": "ปิดสวิตซ์อยู่ที่ off",
     "result": {
-      "type": "oknot",
-      "field": [
-        {
-          "name": "l0905040101",
-          
-        },
-      ],
+      "type": "",
+      "field": [],
     },
   },
   {
@@ -794,7 +789,7 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ปิดสวตซ์ Pump  ไปตำแหน่ง OFF",
+      "startPracticeText": "ปิดสวิตซ์ Pump  ไปตำแหน่ง OFF",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -869,7 +864,7 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิดNo.13 ไล่อากาศออกถอดสาย Hose และล้างหัววาลว์ ปิด cap เรียบร้อย No.5",
+      "startPracticeText": "เปิดNo.13 ไล่อากาศออกถอดสาย Hose และล้างหัววาล์ว ปิด cap เรียบร้อย No.5",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -926,7 +921,7 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "(D)  เช็ค Level ในแท้งค์11V-111 เท่ากับ",
+      "startPracticeText": "(D)  เช็ค Level ในแท๊งค์11V-111 เท่ากับ",
       "endPracticeText": "%     ( X )     ",
       "type": "d",
       "field": [
@@ -981,7 +976,7 @@ export const hakuItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "name": "L090604",
+          "name": "l090604",
           
         },
       ],
@@ -1101,7 +1096,7 @@ export const hakuItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาติ ติดหรือดับ ( Y )",
+      "startPracticeText": "ตรวจสอบไฟสถานะอนุญาต ติดหรือดับ ( Y )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [

@@ -34,6 +34,8 @@ export function passSubmitData(type, params) {
     } else {
       return -1
     }
+  }else if(type == "center"){
+    return 0
   }
   else if(type == "actualCheck"){
     return !params ? "0": params.toString()
@@ -66,7 +68,7 @@ export const akumuruItemTemplate = [
     "isSection": true,
     "rowSpan": 4,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า ",
+    "practice": "( <span class='text-red'>A</span> ) จำนวนที่ระบุ ในใบส่งสินค้า ",
     "condition": "",
     "result": {
       "type": "kg",
@@ -82,7 +84,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "( B ) จำนวนที่คิดได้จาก Level ก่อนรับ ",
+      "startPracticeText": "( <span class='text-red'>B</span> ) จำนวนที่คิดได้จาก Level ก่อนรับ ",
       "endPracticeText": "mm.",
       "type": "d",
       "field": [
@@ -106,7 +108,7 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "( C ) จากการคำนวนค่าที่ได้( A + B )",
+    "practice": "( <span class='text-red'>C</span> ) จากการคำนวนค่าที่ได้( A + B )",
     "condition": "ต้องไม่เกิน 40,000  Kg.",
     "result": {
       "type": "c",
@@ -120,7 +122,15 @@ export const akumuruItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที",
+    "practice": {
+      "type": "center",
+      "field": [
+        { 
+          "startPracticeText": "<strong><u>หากพบว่าไม่ตรงให้แจ้งหัวหน้างานทันที</u></strong>",
+          "endPracticeText": "",
+        },
+      ],
+    },
     "condition": "",
     "result": {
       "type": "",
@@ -133,7 +143,7 @@ export const akumuruItemTemplate = [
     "isSection": true,
     "rowSpan": 1,
     "sequence": "<strong>2.Seal check</strong>",
-    "practice": "Check Seal ที่ล็อกวาล์วและฝาถังว่าล็อกสนิดหรือไม่",
+    "practice": "Check Seal ที่ล็อกวาล์วและฝาถังว่าล็อกสนิทหรือไม่",
     "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
@@ -167,7 +177,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": " Checkอุณหภูมิ ในlorry tank ",
-    "condition": "ต้องไม่เกิน 25 C°",
+    "condition": "<span class='text-indigo-darken-4'>ต้องไม่เกิน 25 °C</span>",
     "result": {
       "type": "c2",
       "field": [
@@ -298,7 +308,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อนทั้งด้านหน้า - หลัง",
+      "startPracticeText": "ใส่หมอนรองห้ามล้อเคลื่อนทั้งด้านหน้า - หลัง",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -398,7 +408,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ต่อสายจากรถเข้า pump (ในวงกลม) พร้อมล็อกให้เรียบร้อย",
+      "startPracticeText": "ต่อสายจากรถเข้า pump <span class='text-red'>(ในวงกลม)</span> พร้อมล็อกให้เรียบร้อย",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -448,7 +458,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เปิดวาล์วท้ายรถ Check leak ที่สายต่อว่ารั่วหรื่อไม่",
+      "startPracticeText": "เปิดวาล์วท้ายรถ Check leak ที่สายต่อว่ารั่วหรือไม่",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -548,7 +558,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "หากมีสิ่งแปลกปลอมเข้า pump ให้หยุดทันที(สังเกตแผ่นกระจกใส No. 5)",
+      "startPracticeText": "หากมีสิ่งแปลกปลอมเข้า pump ให้หยุดทันที<span class='text-indigo-darken-4'>(สังเกตแผ่นกระจกใส No. 5)</span>",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -837,7 +847,7 @@ export const akumuruItemTemplate = [
         },
       ],
     },
-    "condition": "ปิด",
+    "condition": "เรียบร้อย",
     "result": {
       "type": "oknot",
       "field": [
@@ -927,7 +937,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "(D)  เช็ค Level ในแท้งค์11V-431 เท่ากับ ",
+      "startPracticeText": "(<span class='text-red'>D</span>)  เช็ค Level ในแท้งค์11V-431 เท่ากับ ",
       "endPracticeText": "mm.",
       "type": "d",
       "field": [
@@ -952,7 +962,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)",
+      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง ( <span class='text-red'>C</span> - <span class='text-red'>D</span> )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -976,7 +986,7 @@ export const akumuruItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "อุปกรณ์  ทำความสะอาด และหมอน ลองล้อรถออก",
+      "startPracticeText": "อุปกรณ์  ทำความสะอาด และหมอน รองล้อรถออก",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -988,7 +998,7 @@ export const akumuruItemTemplate = [
     },
     "condition": "เรียบร้อย",
     "result": {
-      "type": "oknot",
+      "type": "",
       "field": [
         {
           "name": "l0707080101",

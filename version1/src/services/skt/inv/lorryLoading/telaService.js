@@ -140,7 +140,7 @@ export const telaItemTemplate = [
     "isSection": true,
     "rowSpan": 4,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า  ",
+    "practice": "( <span class='text-red'>A</span> ) จำนวนที่ระบุ ในใบส่งสินค้า  ",
     "condition": "",
     "result": {
       "type": "kg",
@@ -155,7 +155,7 @@ export const telaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "( B ) จำนวนสารเคมีที่ดูได้จาก DCS           ",
+    "practice": "( <span class='text-red'>B</span> ) จำนวนสารเคมีที่ดูได้จาก DCS           ",
     "condition": "",
     "result": {
       "type": "kg",
@@ -170,8 +170,8 @@ export const telaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "( C ) จำนวนใน DCS + จำนวนที่รับจริง  (A +B )   Kg.        ",
-    "condition": "ต้องไม่เกิน 8,500 Kg.",
+    "practice": "( <span class='text-red'>C</span> ) จำนวนใน DCS + จำนวนที่รับจริง <span class='text-red'>(A +B )</span> Kg.",
+    "condition": "<u>ต้องไม่เกิน 8,500 Kg.</u>",
     "result": {
       "type": "c",
       "field": [
@@ -315,7 +315,7 @@ export const telaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ใส่หมอนลองห้ามล้อเคลื่อน",
+      "startPracticeText": "ใส่หมอนรองห้ามล้อเคลื่อน",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -390,7 +390,7 @@ export const telaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ให้เปิดวาวล์วตูดถัง 11V-511 จาก DCS ",
+      "startPracticeText": "ให้เปิดวาล์วตูดถัง 11V-511 จาก DCS ",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -515,7 +515,7 @@ export const telaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรื่อไม่  NO.4",
+      "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรือไม่  NO.4",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -812,7 +812,7 @@ export const telaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ถอดสาย Hose และล้างหัววาลว์ ปิด cap เรียบร้อย No.6",
+      "startPracticeText": "ถอดสาย Hose และล้างหัววาล์ว ปิด cap เรียบร้อย No.6",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -893,7 +893,7 @@ export const telaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "(D)  เช็คปริมาณ ในแท้งค์11V-511 จาก DCS ห้อง control room ",
+    "practice": "(<span class='text-red'>D</span>)  เช็คปริมาณ ในแท็งค์11V-511 จาก DCS ห้อง control room ",
     "condition": "ปริมาณที่ DCS ",
     "result": {
       "type": "kg",
@@ -909,7 +909,7 @@ export const telaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  (C - D)                    ",
+      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง  <span class='text-red'>(C - D)</span>",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [
@@ -959,7 +959,7 @@ export const telaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "เอาหมอนลองล้อ รถออก  NO.1",
+      "startPracticeText": "เอาหมอนรองล้อ รถออก  NO.1",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [

@@ -27,6 +27,22 @@ export async function get(poEtllogDetailJournalID) {
   })
 }
 
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormEA/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
 export async function GetByPoEtlLogDetailJournalID(poEtllogDetailJournalIDQueryParameters) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
@@ -45,16 +61,14 @@ export function currencyFormat(number) {
   
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(number)
 }
 
 
 export function mm2litre(mm) {
-  let litre = mm * 5.32 + 740.45
-
-  return litre.toFixed(2)
+  return mm * 5.2 + 511.24
 }
 
 //----------------- Formate
@@ -77,13 +91,7 @@ export function formatDate(dateString) {
 
 export function passInitialData(type, params, index) {
   if (type == "oknot") {
-    if (params == "0") {
-      return 0
-    } else if (params == "1") {
-      return 1
-    } else {
-      return -1
-    }
+    return params.toString()
   }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
     if(index == 0){
       return params
@@ -110,7 +118,7 @@ export function passSubmitData(type, params) {
     return !params ? "0": params.toString()
   }
   else {
-    if(isNaN(Number(params))){
+    if(isNaN(Number(params)) && type != ""){
       return parseFloat( params.replace(/,/g, ''))
     }else{
       return parseFloat(params)
@@ -370,7 +378,7 @@ export const eaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "5. นำลูกกุญแจมาเปิดล็อกวาล์ว 11",
-    "condition": "EA กุญแจใช้รหัสล็อค",
+    "condition": "EA กุญแจใช้ล็อครหัส",
     "result": {
       "type": "oknot",
       "field": [
@@ -578,12 +586,8 @@ export const eaItemTemplate = [
     "practice": "- เข็มขัดนิรภัย",
     "condition": "-",
     "result": {
-      "type": "oknot",
+      "type": "",
       "field": [
-        {
-          "name": "l0206060101", // percen
-
-        },
       ],
     },
   },

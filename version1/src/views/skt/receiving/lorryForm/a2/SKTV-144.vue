@@ -19,6 +19,7 @@ import { ref } from 'vue'
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
+import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/receiving/lorryForm/a2/EP-400 (144,145 ).png'
 
 const itemStore = useItemStore()
@@ -31,12 +32,6 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(0)
-const bVariable = ref(0)
-const cVariable = ref(0)
-const dVariable = ref(0)
-var isReadOnly = ref(false)
-
 var dcsAfter = ref(0)
 var dcsBefore = ref(0)
 var dcsDiff = 0
@@ -45,6 +40,7 @@ var tankAfter = ref(0)
 var tankBefore = ref(0)
 var tankDiff = ref(0)
 
+var isReadOnly = ref(false)
 
 //------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
@@ -101,13 +97,16 @@ onMounted(async () => {
     }
   }
 
+  tankAfter.value = lorryForm.data.data["l04000001"]
+
   const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
   console.log("statusId", lorryFormStatus.data)
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(statusId.value == 15 || statusId.value == 18){
+ 
+  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
 
@@ -120,6 +119,7 @@ async function saveDraft(e) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
+  lorryRequestData.value["l04000001"] = tankAfter.value
 
   var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
@@ -134,6 +134,30 @@ async function saveDraft(e) {
   }
 }
 
+async function validateField(){
+  var isValid = true
+  for (const i of lorryItems) {
+    for (const f of i.result.field) {
+      const element = document.querySelector("[field-name='"+f.name+"']")
+      if(element){
+        if((f.value) == null || (f.value) == undefined){     
+          element.classList.add('d-flex') // Adds the class to hide the element
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          isValid =false
+    
+          return isValid
+        }else{
+          element.classList.remove('d-flex') // Adds the class to hide the element  
+          element.classList.add('d-none') // Adds the class to hide the element  
+        }
+      }   
+    }
+  }
+  
+  return isValid
+}
+
+
 async function submit(e) {
 
   for (var i of lorryItems) {
@@ -141,61 +165,41 @@ async function submit(e) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
+  lorryRequestData.value["l04000001"] = tankAfter.value
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
+  var isValid = await validateField()
 
-  if (response.status != 200) 
-    return
+  if(isValid){
 
+    var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
+    if (response.status != 200) 
+      return
 
-  let isValid = true
-  for (var i of lorryItems) {
-    for (var f of i.result.field) {
-      if((i.result.type, f.value) == null || (i.result.type, f.value) == undefined || (i.result.type, f.value) == "-1"){     
-        isValid = false
-      }
+    const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+    const whereHouse = localStorage.getItem('whereHouseName')
+
+    console.log("User confirmed:", confirmValueCheck.value)
+
+    // เรียก API หรือดำเนินการต่อ
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBe/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    if (response.status == 200) {
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+    } else {
+      console.error(response.data)
+      textAlertDialogFunction(alertWordConst.submit, false)
     }
   }
-
-  if(!isValid){
-    alert("กรุณากรอกข้อมูลให้ครบ")
-  
-    return
-  }
-
-  // // เรียกใช้งาน Dialog
-  // const confirmed = await textConfirmDialogFunction(alertWordConst.accept, true, false)
-
-  //if (confirmed) {
-  // if (confirmed) {
-  console.log("User confirmed:", confirmValueCheck.value)
-
-  // เรียก API หรือดำเนินการต่อ
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBe/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-
-  if (response.status == 200) {
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-    }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-  } else {
-    console.error(response.data)
-    textAlertDialogFunction(alertWordConst.submit, false)
-  }
-
-  // } else {
-  //   console.log("User declined")
-  // }
-
 }
 
 async function approve(e) {
@@ -265,7 +269,7 @@ watchEffect(async () => {
         style="font-size: 22px; font-weight: bolder;"
         class="d-flex justify-center align-center"
       >
-        SKTV-144
+        EP-400BE 11V-144
       </div>
     </VCol>
     <VCol cols="4" />
@@ -327,16 +331,17 @@ watchEffect(async () => {
             <td
               colspan="3"
               style="max-width: 400px; border-left: 1px solid black; text-align: start;"
+              class="text-wrap"
             >
               <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                {{ section.practice }}
+                <div v-html="section.practice" />
               </VLabel>
             </td>
             <td
               colspan="3"
-              style="max-width: 350px; border-left: 1px solid black; text-align: start;"
+              style="max-width: 450px; border-left: 1px solid black; text-align: start;"
             >
-              <VLabel class="d-flex justify-center pa-md-2">
+              <VLabel class="d-flex justify-center pa-md-2 text-wrap">
                 {{ section.condition }}
               </VLabel>
             </td>
@@ -374,6 +379,11 @@ watchEffect(async () => {
                       text-end="Kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -388,6 +398,11 @@ watchEffect(async () => {
                       text-end="mm. = "
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VCurrencyField
@@ -398,6 +413,11 @@ watchEffect(async () => {
                       text-end="kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -412,6 +432,11 @@ watchEffect(async () => {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol col="3">
                     <VRadioGroup
@@ -484,6 +509,11 @@ watchEffect(async () => {
                       text-end="%"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -513,9 +543,14 @@ watchEffect(async () => {
                       variant="outlined"
                       label=""
                       text-start=""
-                      text-end="C°"
+                      text-end="℃"
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                   <VCol>
                     <VRadioGroup
@@ -539,10 +574,9 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'actualCheck'">
                 <VRow>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[0].value"
-                      :max-length="2"
-                      :value-range="23"
+                      :items="hour"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -550,10 +584,9 @@ watchEffect(async () => {
                     :
                   </VLabel>
                   <VCol>
-                    <VNumberInput
+                    <VSelect
                       v-model="section.result.field[1].value"
-                      :max-length="2"
-                      :value-range="59"
+                      :items="minute"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -571,6 +604,11 @@ watchEffect(async () => {
                       text-end="Kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -586,6 +624,11 @@ watchEffect(async () => {
                       text-end="mm."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -601,6 +644,11 @@ watchEffect(async () => {
                       text-end="Kg."
                       :readonly="isReadOnly"
                     />
+                    <span
+                      class="text-red justify-center d-none"
+                      :field-name="section.result.field[0].name"
+                    >This field is required. <span />
+                    </span>
                   </VCol>
                 </VRow>
               </div>
@@ -667,12 +715,12 @@ watchEffect(async () => {
                 density="compact"
                 variant="solo"
                 text-start="   "
-                text-end="mm."
+                text-end=""
                 :readonly="isReadOnly"
               />
             </td>
             <td style="font-size: 16px;">
-              Ltr
+              Kg
             </td>
           </tr>
           <tr>
@@ -686,7 +734,7 @@ watchEffect(async () => {
               {{ tankBefore }}
             </td>
             <td style="font-size: 16px;">
-              Ltr
+              Kg
             </td>
           </tr>
           <tr>
@@ -700,7 +748,7 @@ watchEffect(async () => {
               {{ tankDiff }}
             </td>
             <td style="font-size: 16px;">
-              Ltr
+              Kg
             </td>
           </tr>
         </tbody>
