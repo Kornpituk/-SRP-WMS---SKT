@@ -153,10 +153,11 @@ const itemsTypeLabel = ref([
   },
 ])
 
-const typePrintLabel = ref('Semi Label')
+const typePrintLabel = ref('')
 
 //----------------------- Filter Status 
 const progressLinearNoData = ref(false)
+const activeBtnprint = ref(false)
 
 //------------------------- Get Label ------------------------
 
@@ -166,7 +167,7 @@ const itemsCategories = [
   { name: 'Packaging', value: 'Packaging' },
   { name: 'Raw material', value: 'Raw material' },
   { name: 'Lorry', value: 'Lorry' },
-  { name: 'All', value: '' },
+  { name: 'Semi', value: 'Semi' },
 ]
 
 const paramsFetchDataPrintLabel = ref({
@@ -188,25 +189,40 @@ const clearModel = () => {
 }
 
 const fetchData = async () => {
+  try {
+    const hasValue = Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
 
-  const result = await printLabelFormViewService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
+    if (!hasValue) {
+      dataPrintLabel.value = []
+      progressLinearNoData.value = true
+      throw new Error('Invalid paramsFetchDataPrintLabel')
+    }
 
-  progressLinearNoData.value = true
-  if (result) {
-    // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
-    dataPrintLabel.value = result.data.map((item, index) => ({
-      ...item, // คงข้อมูลเดิมใน item
-      no: index + 1, // เพิ่มฟิลด์ number โดยเริ่มจาก 1
-    }))
+    progressLinearNoData.value = false // เริ่มแสดง Progress
 
-    // dataPrintLabel.value = result
+    const result = await printLabelFormViewService(
+      urlApi.value,
+      whereHouse,
+      accessTokenAtStore,
+      paramsFetchDataPrintLabel.value,
+    )
 
-    progressLinearNoData.value = true
-    console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
-
-    // console.log("printLabelFormViewResult successfully view", printLabelFormViewResult.value)
-  } else {
-    console.log("printLabelFormViewService failed view")
+    if (result && result.data) {
+      // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
+      dataPrintLabel.value = result.data.map((item, index) => ({
+        ...item,
+        no: index + 1, // เพิ่มฟิลด์ลำดับ
+      }))
+      console.log('printLabelFormViewService successfully fetched data', dataPrintLabel.value)
+    } else {
+      console.log('No data found in API response')
+      dataPrintLabel.value = []
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error.message || error)
+    dataPrintLabel.value = [] // ตั้งค่าเป็นค่าว่างเมื่อเกิดข้อผิดพลาด
+  } finally {
+    progressLinearNoData.value = true // ซ่อน Progress เมื่อการทำงานเสร็จสิ้น
   }
 }
 
@@ -257,125 +273,40 @@ const successPrintLabel = ref(null)
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const printLabel = async () => {
   console.log("12355", typePrintLabel.value)
-  if(typePrintLabel.value === 'Raw Mat Label'){
-    console.log('Raw Mat Label print start .....')
+  console.log('Raw Mat Label print start .....')
 
-    const barcodes = Array.isArray(selectedDataTables.value)
-      ? selectedDataTables.value.flatMap(item => 
-        Array.isArray(item.barcodes) 
-          ? item.barcodes.map(b => b.barcode)   // กรณีที่ `barcodes` เป็นอาเรย์ ให้ดึง `barcode`
-          : [item.barcode],                      // กรณีที่ `barcode` เป็นตัวเดียว ให้เก็บค่า `barcode`
-      )
-      : [selectedDataTables.value.barcode]  // ถ้า `selectedDataTables.value` ไม่ใช่อาเรย์ ให้ใช้ `barcode` ตรง ๆ
+  const barcodes = Array.isArray(selectedDataTables.value)
+    ? selectedDataTables.value.flatMap(item => 
+      Array.isArray(item.barcodes) 
+        ? item.barcodes.map(b => b.barcode)   // กรณีที่ `barcodes` เป็นอาเรย์ ให้ดึง `barcode`
+        : [item.barcode],                      // กรณีที่ `barcode` เป็นตัวเดียว ให้เก็บค่า `barcode`
+    )
+    : [selectedDataTables.value.barcode]  // ถ้า `selectedDataTables.value` ไม่ใช่อาเรย์ ให้ใช้ `barcode` ตรง ๆ
 
-    console.log('Semi Label print start .....', barcodes)
+  console.log('Semi Label print start .....', barcodes)
 
-    isLoadingPrintLabel.value = true
-    successPrintLabel.value = null
-    await saveToPrintLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, barcodes)
-    if(saveToPrintLabelFormBarcodeResult.value){
-      await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore)
+  isLoadingPrintLabel.value = true
+  successPrintLabel.value = null
+  await saveToPrintLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, barcodes)
+  if(saveToPrintLabelFormBarcodeResult.value){
+    await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore)
+    isLoadingPrintLabel.value = false
+    if(printLabelBarcodeFormViewResult.value){
+      console.log('print label by barcode success', printLabelBarcodeFormViewResult)
       isLoadingPrintLabel.value = false
-      if(printLabelBarcodeFormViewResult.value){
-        console.log('print label by barcode success', printLabelBarcodeFormViewResult)
-        isLoadingPrintLabel.value = false
-        successPrintLabel.value = true
-      }else {
-        successPrintLabel.value = false
-      }
+      successPrintLabel.value = true
     }else {
-      isLoadingPrintLabel.value = false
       successPrintLabel.value = false
-      throw 'Could not save to print label form'
     }
+  }else {
+    isLoadingPrintLabel.value = false
+    successPrintLabel.value = false
+    throw 'Could not save to print label form'
+  }
 
-    // await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
-  }
-  if(typePrintLabel.value === 'Semi Label'){
-    console.log('Semi Label print start .....')
-  }
-  if(typePrintLabel.value === 'Product Label'){
-    console.log('Product Label print start .....')
-  }
+  // await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
+
 }
-
-const dataTableExpanded = ref([])
-
-const headers = [
-  {
-    title: 'data-table-select',
-    key: 'data-table-select',
-    align: "center",
-    fixed: true,
-    readonly: true,
-  },
-  {
-    title: 'No.',
-    key: 'no',
-  },
-  {
-    title: 'Category',
-    key: 'category',
-  },
-  {
-    title: 'Lot',
-    key: 'lot',
-  },
-  {
-    title: 'Lot QTY',
-    key: 'lotQty',
-  },
-  {
-    title: 'Barcode',
-    key: 'barcode',
-  },
-  {
-    title: 'NO/RCVD(PCS)',
-    key: 'lotDescription',
-  },
-  {
-    title: 'RCVD Date',
-    key: 'receivedDate',
-    
-  },
-  {
-    title: 'P/O No',
-    key: 'purchaseOrderNo',
-  },
-  {
-    title: 'Item Code',
-    key: 'productId',
-  },
-  {
-    title: 'Item Name',
-    key: 'productName',
-  },
-  
-  {
-    title: 'Location',
-    key: 'locationName',
-  },
-  {
-    title: 'RCVD(PCS)',
-    key: 'qtyPcs',
-  },
-  {
-    title: 'RCVD(KGS)',
-    key: 'qtyKgs',
-  },
-  {
-    title: 'Update By',
-    key: 'updatedBy',
-  },
-  {
-    title: 'Update Date',
-    key: 'updatedDate',
-  },
-]
-
-const dataTableGroupBy = [
-  { key: 'lot' },
-]
 
 const expanded = ref([])
 
@@ -449,39 +380,6 @@ const headersNewEx = [
     title: 'Update Date',
     key: 'updatedDate',
   },
-]
-
-const headersSubNewEx = [
-  {
-    title: 'Barcode',
-    key: 'barcode',
-  },
-  {
-    title: 'NO/RCVD(PCS)',
-    key: 'lotDescription',
-  },
-  {
-    title: 'Item Code',
-    key: 'productId',
-  },
-  {
-    title: 'Item Name',
-    key: 'productName',
-  },
-]
-
-const dessertHeaders = [
-  { title: '', key: 'data-table-expand' },
-  {
-    title: 'Dessert (100g serving)',
-    align: 'start',
-    sortable: false,
-    key: 'name',
-  },
-  { title: 'Calories', key: 'calories' },
-  { title: 'Fat (g)', key: 'fat' },
-  { title: 'Carbs (g)', key: 'carbs' },
-  
 ]
 
 const headerSubtitle = [
@@ -558,7 +456,7 @@ const dataTableColor = ref('#E0F7FA')
                 <span
                   style="font-size: 22px; font-weight: bold;"
                   class="text-center"
-                >{{ $t('Sticker') }}</span>
+                >{{ $t('Sticker Label') }}</span>
               </div>
             </VCol>
             <VCol
@@ -766,16 +664,29 @@ const dataTableColor = ref('#E0F7FA')
                     md="4"
                   >
                     <VBtn
-                      density="compact"
-                      class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
+                      :disabled="!selectedDataTables.length > 0"
                       color="warning"
-                      style="width: 100%; height: 40px;"
-                      @click="isDialogPrintLabelVisible = true"
+                      style="width: 100%; height: 50px;"
+                      @click="printLabel"
                     >
                       <VIcon
-                        style="width: 27px;"
+                        v-if="!isLoadingPrintLabel"
+                        size="20"
                         icon="ri-printer-fill"
                       />
+                      <VProgressCircular
+                        v-if="isLoadingPrintLabel"
+                        :rotate="360"
+                        indeterminate
+                        :size="40"
+                        :width="6"
+                        color="primary"
+                      >
+                        <VIcon
+                          size="20"
+                          icon="ri-printer-fill"
+                        />
+                      </VProgressCircular>
                       <span style="font-size: 12px;">{{ $t('Print') }}</span>
                     </VBtn>
                   </VCol>

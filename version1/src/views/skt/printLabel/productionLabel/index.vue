@@ -523,7 +523,6 @@ const isSelected = (item, type) => {
     )
   }
 
-  
 }
 
 const dataTableColor = ref('#E0F7FA')
@@ -558,7 +557,7 @@ const dataTableColor = ref('#E0F7FA')
                 <span
                   style="font-size: 22px; font-weight: bold;"
                   class="text-center"
-                >{{ $t('Prodcut Label') }}</span>
+                >{{ $t('Product Label') }}</span>
               </div>
             </VCol>
             <VCol

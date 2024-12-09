@@ -250,8 +250,8 @@ export default [
     icon: { icon: 'ri-printer-fill' },
     to: 'skt-printLabel',
     children: [
-      { title: 'Sticker', to: 'skt-printLabel-sticker' },
-      { title: 'Product Label', to: 'skt-printLabel-productionLabel' },
+      { title: 'Sticker Label', to: 'skt-printLabel-sticker' },
+      { title: 'Product Label', to: null },
     ],
   },
 ]
