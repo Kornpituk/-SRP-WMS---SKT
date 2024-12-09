@@ -558,7 +558,7 @@ const dataTableColor = ref('#E0F7FA')
                 <span
                   style="font-size: 22px; font-weight: bold;"
                   class="text-center"
-                >{{ $t('Print Sticker') }}</span>
+                >{{ $t('Sticker') }}</span>
               </div>
             </VCol>
             <VCol

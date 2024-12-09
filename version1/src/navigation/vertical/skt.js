@@ -240,18 +240,18 @@ export default [
 
   },
 
-  // {
-  //   title: 'Shipment Plan',
-  //   icon: { icon: 'ri-truck-fill' },
-  //   to: 'skt-shipping',
-  // },
+  {
+    title: 'Shipment Plan',
+    icon: { icon: 'ri-truck-fill' },
+    to: 'skt-shipping',
+  },
   {
     title: 'Print Label',
     icon: { icon: 'ri-printer-fill' },
     to: 'skt-printLabel',
     children: [
-      { title: 'Sticker', to: 'skt-printLabel-productionLabel' },
-      { title: 'Product Label', to: 'skt-printLabel-sticker' },
+      { title: 'Sticker', to: 'skt-printLabel-sticker' },
+      { title: 'Product Label', to: 'skt-printLabel-productionLabel' },
     ],
   },
 ]

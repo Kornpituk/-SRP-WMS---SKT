@@ -1181,6 +1181,7 @@ const newBatch = async batchID => {
             <VBtn
               class="mx-2"
               color="info"
+              disabled
               @click="viewAllData"
             >
               <span style="font-size: 12px;">PROD Approved</span>
