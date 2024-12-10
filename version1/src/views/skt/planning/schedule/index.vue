@@ -20,6 +20,9 @@ const selectedDataTables = ref([])
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
+//------------------------------------------- compoennt ----------------------------------------------------------------
+import GeridTable from '@/pages/skt/planning/schedule/gridTable/index.vue'
+
 //------------------------------------------ Data --------------------------------
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
@@ -50,9 +53,6 @@ const confirmValueCheck = ref(false)
 //-- dialog 2 
 const confirmDialog2 = ref(null)
 
-watch( () => {
- 
-})
 
 function openConfirmDialog() {
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
@@ -157,7 +157,7 @@ const formatToMMDDYYYY = date => {
   return `${month}/${day}/${year}`
 }
 
-watchEffect(async () => {
+watch(async () => {
   try {
 
     if (datePickerFilter.value) {
@@ -258,7 +258,7 @@ const approvePlan = async () => {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
     if(responseApproveProductionPlan.value){
-      textAlertDialogFunction(alertWordConst.submit, true)
+      textAlertDialogFunction(alertWordConst.approve, true)
       setTimeout(() => {
         location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
@@ -470,6 +470,8 @@ const headersDataTable = [
     key: 'Action',
   },
 ]
+
+const sortBy = [{ key: 'calories', order: 'asc' }]
 
 const headersDataTableNew = [
   {
@@ -1175,12 +1177,16 @@ const newBatch = async batchID => {
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
-            <VBtn @click="openConfirmDialog">
+            <VBtn
+              :disabled="!selectedDataTables.length > 0"
+              @click="openConfirmDialog"
+            >
               <span style="font-size: 12px;">Approve</span>
             </VBtn>
             <VBtn
               class="mx-2"
               color="info"
+              disabled
               @click="viewAllData"
             >
               <span style="font-size: 12px;">PROD Approved</span>
@@ -1258,6 +1264,8 @@ const newBatch = async batchID => {
           :headers="headersDataTableNew"
           :items="productionPlanItems"
           :items-per-page="10"
+          fixed-header
+          height="550"
           show-select
           class="text-no-wrap"
         >
@@ -1717,7 +1725,6 @@ const newBatch = async batchID => {
                 {{ item.raw.updatedBy }}
               </td>
               <td
-                class="cursor-pointer"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1732,6 +1739,7 @@ const newBatch = async batchID => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VBtn
+                  v-if="item.raw.statusId == 101 || item.raw.statusId === 102"
                   color="info"
                   @click="newBatch(item.raw.batchID)"
                 >
@@ -1744,6 +1752,12 @@ const newBatch = async batchID => {
       </VCardText>
     </VCard>
   </section>
+
+  <section v-if="false">
+    <h3>GridTable</h3>
+    <GeridTable />
+  </section>
+
 
   <!-- Footer -->
   <section class="mt-3">
@@ -1780,7 +1794,7 @@ const newBatch = async batchID => {
       <AuthenticatorDialog
         :is-dialog-visible="isDialogVisibleAlertDialog"
         :word="wordForSubmit"
-        :sub-word="subWordForSubmit"
+        :subword="subWordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
       />

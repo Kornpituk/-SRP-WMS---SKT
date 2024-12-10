@@ -2,6 +2,7 @@
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import {
+  currencyFormat,
   formatDate, generate, get, GetByPoEtlLogDetailJournalID, kumaruItemTemplate,
   passInitialData, passSubmitData, save,
 } from '@/services/skt/inv/lorryLoading/kumaruService'
@@ -12,7 +13,10 @@ import image01 from '@/views/skt/receiving/lorryForm/b1/CAPOLACTUM.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
-//------------------------------ Dialog --------------------------------
+//--------------------- alertDialog--------------------------------------------------------
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+
 const isDialogVisibleAlertDialog = ref(false)
 const isDialogVisibleConfirmDialog = ref(false)
 const confirmValueCheck = ref(false)
@@ -94,11 +98,11 @@ onMounted(async () => {
 
 })
 
+
 async function saveDraft(e) {
- 
   await passData()
 
-  var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+  var response = await save(poEtlLogDetailJournalIDQueryParameters.value, ipaRequestData.value)
 
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -106,7 +110,8 @@ async function saveDraft(e) {
       location.reload()
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
-    console.log(response.data)
+    console.error(response.data)
+    e.preventDefault()
   }
 }
 
@@ -155,7 +160,7 @@ async function submit(e) {
 
   if(isValid){
 
-    var response = await save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData)
+    var response = await save(poEtlLogDetailJournalIDQueryParameters.value, ipaRequestData.value)
 
     if (response.status != 200) 
       return
@@ -211,8 +216,12 @@ async function approve(e) {
 
 
 watchEffect(async () => {
-  kumaruItems[8].result.field[0].value = kumaruItems[6].result.field[0].value + kumaruItems[7].result.field[0].value 
-  kumaruItems[50].result.field[0].value = kumaruItems[49].result.field[0].value - kumaruItems[7].result.field[0].value
+  var a  = kumaruItems[6].result.field[0].value
+  var b = kumaruItems[7].result.field[0].value 
+  var c = kumaruItems[49].result.field[0].value
+  var ab = a+b
+  kumaruItems[8].result.field[0].value = currencyFormat(ab)
+  kumaruItems[50].result.field[0].value = currencyFormat(c-b)
 })
 </script>
 
@@ -403,15 +412,23 @@ watchEffect(async () => {
               <div v-if="section.result.type === 'ab'">
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="A) + (B) ="
-                      text-end="Kg"
-                      :readonly="isReadOnly"
-                    />
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          (A) + (B) = 
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg
+                        </VLabel>
+                      </template>
+                    </VTextField>
                     <span
                       class="text-red justify-center d-none"
                       :field-name="section.result.field[0].name"
@@ -558,18 +575,25 @@ watchEffect(async () => {
                 </VRow>
               </div>
               <div v-if="section.result.type === 'cb'">
-                <!-- <VRadioGroup inline class="d-flex justify-center" v-model="section.result.field[0].value"> -->
                 <VRow>
                   <VCol>
-                    <VCurrencyField
+                    <VTextField
                       v-model="section.result.field[0].value"
                       density="compact"
-                      variant="outlined"
-                      label=""
-                      text-start="( C )-( B )"
-                      text-end="kg"
-                      :readonly="isReadOnly"
-                    />
+                      variant="solo"
+                      readonly="true"
+                    >
+                      <template #prepend>
+                        <VLabel>
+                          ( C )-( B )
+                        </VLabel>
+                      </template>
+                      <template #append>
+                        <VLabel>
+                          Kg
+                        </VLabel>
+                      </template>
+                    </VTextField>
                     <span
                       class="text-red justify-center d-none"
                       :field-name="section.result.field[0].name"
@@ -702,6 +726,8 @@ watchEffect(async () => {
       </VBtn>
     </VCol>
   </VRow>
+  
+  <!-- Alert Dialog Success/Fiald new -->
   <section>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->

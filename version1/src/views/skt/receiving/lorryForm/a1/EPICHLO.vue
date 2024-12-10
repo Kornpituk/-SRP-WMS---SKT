@@ -7,7 +7,6 @@ import {
   get,
   GetByPoEtlLogDetailJournalID,
   ItemTemplate,
-  mm2litre,
   passInitialData,
   passSubmitData,
   save,
@@ -228,7 +227,7 @@ watchEffect(async () => {
   var d = c == 0 ? 0 : (c * 5.288)-172.970
   var bd = c+d
   var e = lorryItems[42].result.field[0].value == 0 ? 0 : lorryItems[42].result.field[0].value
-  var f = e == 0 ? 0: mm2litre(e)
+  var f = e == 0 ? 0: (e * 5.288) - 172.970
   var bdf = ((b + d) - f)
   var bdfkg = bdf * 1.17
 
@@ -465,7 +464,7 @@ watchEffect(async () => {
                       v-model="section.result.field[0].value"
                       density="compact"
                       variant="solo"
-                      :readonly="isReadOnly"
+                      readonly="true"
                     >
                       <template #prepend>
                         <VLabel>

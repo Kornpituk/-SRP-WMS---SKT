@@ -12,10 +12,13 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import alertWordConst from '@/utilities/constant'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
+const subWordForSubmit = ref('')
 const successDialAlert = ref(false)
+const confirmDialog2 = ref(null)
 
 const statusId = ref(0)
 
@@ -23,6 +26,44 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
+}
+
+const textAlertSubDialogFunction = (word, subWord, success) => {
+  wordForSubmit.value = word
+  subWordForSubmit.value = subWord
+  console.log(subWord, subWordForSubmit.value)
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
+function openConfirmDialog() {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    console.log("selectedDataTables", item.statusId)
+
+    if (item.statusId === 102 ) {
+      wordForSubmit.value = alertWordConst.approve
+      confirmDialog2.value.openDialog()
+      isDialogVisibleAlertDialog.value = false
+      console.log("selectedDataTables 102")
+    }else if(item.statusId === 101){
+      textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
+      console.log("selectedDataTables 101")
+    }
+    else{
+      console.log("selectedDataTables failded")
+      isDialogVisibleAlertDialog.value = false
+    }
+
+  })
+
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+  approvePlan()
 }
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
@@ -573,30 +614,35 @@ const selectedDataTables = ref([])
 //--------------------------------- validate  ------------------------------
 const activeBtnApprove = ref(false)
 const activeBtnSubmit = ref(false)
+const activeBtnCancelPlan = ref(false)
 const activeBtnError =ref('primary')
 
 watch(()=> {
   console.log("vselectedDataTables out func", activeBtnApprove.value)
   activeBtnApprove.value = false
   activeBtnSubmit.value = false
+  activeBtnCancelPlan.value = false
   if(selectedDataTables.value){
     selectedDataTables.value.forEach(item => {
       // กำหนดค่าเริ่มต้น
       console.log("vselectedDataTables in", activeBtnApprove.value)
       if (item.statusId === 102 ) {
         activeBtnApprove.value = true
+        activeBtnCancelPlan.value = true
         console.log("vselectedDataTables", activeBtnApprove.value)
       }else if(item.statusId === 101){
+        activeBtnCancelPlan.value = true
         activeBtnSubmit.value = true
       }
       else{
         activeBtnApprove.value = false
         activeBtnSubmit.value = false
+        activeBtnCancelPlan.value = false
       }
 
     })
   }else{
-    
+    activeBtnCancelPlan.value = false
   }
 
 
@@ -665,10 +711,10 @@ watch(
   () => {
     isValid.value = validateBatchSale(
       batchSale.value,
-      validationData.packagingkgs1 || packagingkgs1.value,
-      validationData.packagingPcs1 || packagingPcs1.value,
-      validationData.packagingkgs2 || packagingkgs2.value,
-      validationData.packagingPcs2 || packagingPcs2.value,
+      validationData.packagingkgs1,
+      validationData.packagingPcs1 || selectedPackagingKgs.value,
+      validationData.packagingkgs2,
+      validationData.packagingPcs2 || selectedPackagingKgs2.value,
     )
 
     textAlert.value = !isValid.value
@@ -678,6 +724,36 @@ watch(
 )
 
 const validateByRow = ref(false)
+
+const validateRequired = value => {
+  if (!value) {
+    return 'Value is required!'
+  }
+  
+  return true // Return `true` explicitly
+}
+
+const validateRow = item => {
+  const isError = validateSpecificRow(
+    item.raw.quantityKgs,
+    item.raw.product1UomCount,
+    item.raw.product1PackingQtyKgs,
+    item.raw.product2UomCount,
+    item.raw.product2PackingQtyKgs,
+  )
+
+  if (isError) {
+    item.raw.hasError = true
+    activeBtnError.value = 'red' // Update color
+    
+    return false // Return error message
+  } else {
+    item.raw.hasError = false
+    activeBtnError.value = 'primary' // Reset color
+    
+    return true // Return `true` explicitly
+  }
+}
 
 const validateSpecificRow = (batchSale, kgs1, pcs1, kgs2, pcs2) =>  {
 
@@ -838,13 +914,13 @@ const saveProductionPlan = async () => {
       product1SelectedPackagingCode: item.product1SelectedPackagingCode,
 
       product1PackingQtyKgs: parseInt(item.product1PackingQtyKgs),
-      product1UomCount: validationData.packagingPcs1 || item.product1UomCount,
+      product1UomCount: item.product1UomCount,
 
       product2SelectedCode: item.product2SelectedCode,
       product2SelectedPackagingCode: item.product2SelectedPackagingCode,
 
       product2PackingQtyKgs: parseInt(item.product2PackingQtyKgs),
-      product2UomCount: validationData.packagingPcs2 ||  item.product2UomCount,
+      product2UomCount: item.product2UomCount,
 
       lotNumber: item.lotNumber,
       producingDate: formatDateYMDWhyQ(item.producingDate),
@@ -1005,8 +1081,9 @@ const submitPlan = async () => {
 
   // ถ้ามีฟิลด์ที่ไม่มีค่า ให้หยุดและแจ้งเตือน
   if (hasErrors) {
-    console.warn("Some fields are missing:", selectedDataTables.value)
-    textAlertDialogFunction(alertWordConst.submit, fale)
+    textAlertSubDialogFunction(alertWordConst.submit, "Plases check input.", false)
+    console.warn("Some fields are missing:", selectedDataTables.value, subWordForSubmit.value)
+    
     
     return // หยุดการทำงานถ้าข้อมูลไม่ครบ
   }
@@ -2014,27 +2091,47 @@ const print = () => {
   >
     <VCard>
       <VCardText class="pa-2">
-        <VBtn @click="addEmptyRowToPlan">
+        <VBtn
+          color="orange-darken-3"
+          @click="addEmptyRowToPlan"
+        >
           <span style="font-size: 12px;">New Plan</span>
         </VBtn>
         <VBtn
-          class="mx-2"
+          class="mx-1"
           color="warning"
           @click="saveProductionPlan"
         >
           <span style="font-size: 12px;">Save Draft</span>
         </VBtn>
         <VBtn
-          class="mx-2"
-          color="success"
+          color="info"
+          class="mx-1"
+          :disabled="!productionPlan"
+          @click="handleBtnGenerateLotBatch"
+        >
+          <span style="font-size: 12px;">Gen Lot</span>
+        </VBtn>
+        <VBtn
+          class="mx-1"
+          color="light-green-darken-1"
           :disabled="!activeBtnSubmit"
           @click="submitPlan"
         >
           <span style="font-size: 12px;">Submit</span>
         </VBtn>
         <VBtn
+          color="error"
+          :disabled="!activeBtnCancelPlan"
+          class="mx-1"
+          @click="deletePlan"
+        >
+          <span style="font-size: 12px;">Reject Plan</span>
+        </VBtn>
+        <VBtn
+          class="mx-1"
           :disabled="!activeBtnApprove"
-          @click="approvePlan"
+          @click="openConfirmDialog"
         >
           <span style="font-size: 12px;">Approve</span>
         </VBtn>
@@ -2045,24 +2142,6 @@ const print = () => {
           @click="addEmptyRowToPlan"
         >
           <span style="font-size: 12px;">Add Item</span>
-        </VBtn>
-
-
-        <VBtn
-          color="error"
-          class="mx-2"
-          @click="deletePlan"
-        >
-          <span style="font-size: 12px;">Cancel Plan</span>
-        </VBtn>
-
-        <VBtn
-          color="info"
-          class="mx-2"
-          :disabled="!productionPlan"
-          @click="handleBtnGenerateLotBatch"
-        >
-          <span style="font-size: 12px;">Gen Lot</span>
         </VBtn>
 
         <VBtn
@@ -2436,24 +2515,7 @@ const print = () => {
                   min="0"
                   :step="1"
                   :readonly="item.raw.status === 'Submit'"
-                  :rules="[
-                    value => {
-                      if(!value){
-                        return `Value is required!`
-                      }
-                    },
-                    value => {
-                      if (validateSpecificRow(item.raw.quantityKgs,value,item.raw.product1PackingQtyKgs,item.raw.product2UomCount,item.raw.product2PackingQtyKgs)) {
-                        textAlert = true;
-                        item.raw.hasError = true
-                        activeBtnError = `red`
-                      }else {
-                        textAlert = false;
-                        item.raw.hasError = false
-                        activeBtnError = `primary`
-                      }
-                    }
-                  ]"
+                  :rules="[value => validateRequired(value), value => validateRow(item)]"
                 >
                   <template #label>
                     <span style="font-size: 12px;">Packaging Pcs 1</span>
@@ -2473,28 +2535,30 @@ const print = () => {
                     class="text-red"
                   >Missing Input Packaging Pcs 1</span>
                 </div>
-                <div>
+                <div class="text-start">
                   <VAlert
                     v-if="false"
                     type="error"
                     class="pa-1"
                   >
                     <div style="font-size: 10px;">
-                      packaging must not exceed
+                      packaging exceed
                     </div>
                     <div style="font-size: 10px;">
                       the batch scale (kgs).
                     </div>
                   </VAlert>
                   <span
+                  style="font-size: 12px;"
                     v-if="item.raw.hasError"
-                    class="text-red"
-                  >packaging must not exceed</span>
+                    class=""
+                  >packaging exceed</span>
                 </div>
                 <div class="text-start">
                   <span
+                  style="font-size: 12px;"
                     v-if="item.raw.hasError"
-                    class="text-red"
+                    class=""
                   >the batch scale (kgs).</span>
                 </div>
               </td>
@@ -2841,8 +2905,19 @@ const print = () => {
       <AuthenticatorDialog
         :is-dialog-visible="isDialogVisibleAlertDialog"
         :word="wordForSubmit"
+        :subword="subWordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="confirmDialog2"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>

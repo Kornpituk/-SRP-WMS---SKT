@@ -725,8 +725,6 @@ const headers = [
   },
 ]
 
-const customSortIcon = ref('mdi-swap-vertical')
-
 const tableDataPerpage = ref(15)
 const tableDataHeight = ref(550)
 
@@ -1542,27 +1540,27 @@ const checkTypeLorryToPrintPDF = () => {
   case '03':
     return "LorryFormEPICHLO"
   case '04':
-    return 'LorryFormSKT EP-400BE 11V-144'
+    return 'LorryFormSKTEP-400BE11V-144'
   case '05':
-    return "LorryFormSKT EP-400BE 11V-145"
+    return "LorryFormSKTEP-400BE11V-145"
   case '06':
     return "LorryFormKARAMU"
   case '07':
     return "LorryFormAKUMARU"
   case '09':
-    return "LorryFormHAKU-C (11V-111)"
+    return "LorryFormHAKU-C(11V-111)"
   case '10':
-    return "LorryFormEKI-A (11V-110)"
+    return "LorryFormEKI-A(11V-110)"
   case '11':
-    return "LorryFormDIESEL OIL"
+    return "LorryFormDIESELOIL"
   case '12':
     return "LorryFormTELA"
   case '13':
-    return "LorryFormEKI-A TANK (432)"
+    return "LorryFormEKI-ATANK(11V-432)"
   case '15':
-    return "LorryFormN PAN"
+    return "LorryFormNPAN"
   case '16':
-    return "LorryFormSANNIX FA-703V"
+    return "LorryFormSANNIXFA-703V"
   default:
     console.warn(`No component found for key: ${typeID.value}`)
     

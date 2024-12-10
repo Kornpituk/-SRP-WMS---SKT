@@ -171,7 +171,7 @@ export const telaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "( <span class='text-red'>C</span> ) จำนวนใน DCS + จำนวนที่รับจริง <span class='text-red'>(A +B )</span> Kg.",
-    "condition": "ต้องไม่เกิน 8,500 Kg.",
+    "condition": "<u>ต้องไม่เกิน 8,500 Kg.</u>",
     "result": {
       "type": "c",
       "field": [
@@ -812,7 +812,7 @@ export const telaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ถอดสาย Hose และล้างหัววาลว์ ปิด cap เรียบร้อย No.6",
+      "startPracticeText": "ถอดสาย Hose และล้างหัววาล์ว ปิด cap เรียบร้อย No.6",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [

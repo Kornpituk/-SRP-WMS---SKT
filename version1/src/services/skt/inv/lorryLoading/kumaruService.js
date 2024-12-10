@@ -44,7 +44,7 @@ export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestDat
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  return await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+  return await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,

@@ -61,7 +61,7 @@ export function currencyFormat(number) {
   
   return new Intl.NumberFormat("th-TH", {
     style: 'decimal',
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(number)
 }
@@ -118,7 +118,7 @@ export function passSubmitData(type, params) {
     return !params ? "0": params.toString()
   }
   else {
-    if(isNaN(Number(params))){
+    if(isNaN(Number(params)) && type != ""){
       return parseFloat( params.replace(/,/g, ''))
     }else{
       return parseFloat(params)
@@ -378,7 +378,7 @@ export const eaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "5. นำลูกกุญแจมาเปิดล็อกวาล์ว 11",
-    "condition": "EA กุญแจใช้รหัสล็อค",
+    "condition": "EA กุญแจใช้ล็อครหัส",
     "result": {
       "type": "oknot",
       "field": [
@@ -586,12 +586,8 @@ export const eaItemTemplate = [
     "practice": "- เข็มขัดนิรภัย",
     "condition": "-",
     "result": {
-      "type": "oknot",
+      "type": "",
       "field": [
-        {
-          "name": "l0206060101", // percen
-
-        },
       ],
     },
   },

@@ -183,7 +183,7 @@ export const eki432ItemTemplate = [
     "practice": "( C ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
     "condition": "ต้องไม่เกิน 45,000 Kg.",
     "result": {
-      "type": "kg",
+      "type": "abkg",
       "field": [
         {
           "name": "l1301030101",
@@ -976,7 +976,7 @@ export const eki432ItemTemplate = [
     },
     "condition": "",
     "result": {
-      "type": "kg",
+      "type": "cd",
       "field": [
         {
           "name": "l1306030101",

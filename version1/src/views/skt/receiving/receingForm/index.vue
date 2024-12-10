@@ -573,11 +573,9 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
 
 const btnApprove = word => {
-  console.log("Apporved Start!!")
   isDialogVisibleConfirmDialog2.value.openDialog()
   isDialogConfirmVisible.value = true
   wordForSubmit.value = word
@@ -590,7 +588,6 @@ const textConfirmDialogFunction = async (word, success, confirm) => {
   successDialAlert.value = success
   isDialogConfirmVisible.value = true
 
-  console.log("User textConfirmDialogFunction", isDialogVisibleConfirmDialog.value)
 
 }
 
@@ -671,7 +668,6 @@ function openConfirmDialog(word) {
 }
 
 function handleConfirmAction() {
-  console.log('Confirmed! Executing action...')
 
   if(selectLorryInfoKey.value){
     console.log('Action selectLorryInfoKey.', selectLorryInfoKey.value)
@@ -872,7 +868,7 @@ function handleCancel() {
                   <td class="text-center">
                     <VBtn
                       color="info"
-                      @click="btnSelectLorry('LORRY LOADING', itemLorry.title, itemLorry.lorryInfoKey)"
+                      @click="btnSelectLorry('LORRY LOADING ', itemLorry.title, itemLorry.lorryInfoKey)"
                     >
                       Action
                     </VBtn>

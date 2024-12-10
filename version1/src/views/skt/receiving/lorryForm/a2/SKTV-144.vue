@@ -32,12 +32,6 @@ const data = ref(JSON.parse(route.query.Data || '[]'))
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 const poNo = ref('')
 
-const aVariable = ref(0)
-const bVariable = ref(0)
-const cVariable = ref(0)
-const dVariable = ref(0)
-var isReadOnly = ref(false)
-
 var dcsAfter = ref(0)
 var dcsBefore = ref(0)
 var dcsDiff = 0
@@ -103,6 +97,8 @@ onMounted(async () => {
     }
   }
 
+  tankAfter.value = lorryForm.data.data["l04000001"]
+
   const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
   console.log("statusId", lorryFormStatus.data)
@@ -123,6 +119,7 @@ async function saveDraft(e) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
+  lorryRequestData.value["l04000001"] = tankAfter.value
 
   var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
@@ -168,6 +165,7 @@ async function submit(e) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
+  lorryRequestData.value["l04000001"] = tankAfter.value
 
   var isValid = await validateField()
 
