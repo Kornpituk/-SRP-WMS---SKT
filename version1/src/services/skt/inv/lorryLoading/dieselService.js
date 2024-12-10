@@ -437,9 +437,9 @@ export const dieselItemTemplate = [
       "type": "checkbox",
       "field": [
         {
-          "startPracticeText": "เปิด  valve จาก Lorry ทุก Tank NO.6",
+          "startPracticeText": "เปิด  valve จาก   Lorry ทุก Tank NO.6",
           "endPracticeText": "",
-          "name": "l110508",
+          "name": "l110506",
         },
       ],
     },
@@ -448,7 +448,7 @@ export const dieselItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1105080101",
+          "name": "l1105060101",
           
         },
       ],
@@ -463,7 +463,7 @@ export const dieselItemTemplate = [
         {
           "startPracticeText": "เปิดวาล์วเข้า Pump  NO.7",
           "endPracticeText": "",
-          "name": "l110508",
+          "name": "l110507",
           
         },
       ],
@@ -473,7 +473,7 @@ export const dieselItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l1105080101",
+          "name": "l1105070101",
           
         },
       ],
@@ -488,7 +488,7 @@ export const dieselItemTemplate = [
         {
           "startPracticeText": "Check leak ที่สายต่อว่ารั่วหรือไม่  NO.5",
           "endPracticeText": "",
-          "name": "L110508",
+          "name": "l110508",
           
         },
       ],

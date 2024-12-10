@@ -103,6 +103,8 @@ onMounted(async () => {
     }
   }
 
+  tankAfter.value = lorryForm.data.data["l05000001"]
+
   const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
   console.log("statusId", lorryFormStatus.data)
@@ -120,10 +122,11 @@ async function saveDraft(e) {
   for (var i of lorryItems) {
     for (var f of i.result.field) {
       if(i.result.type == "percent")
-        debugger
-      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+        lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
+
+  lorryRequestData.value["l05000001"] = tankAfter.value
 
   var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
@@ -168,6 +171,8 @@ async function submit(e) {
       lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
+
+  lorryRequestData.value["l05000001"] = tankAfter.value
 
   var isValid = await validateField()
 
