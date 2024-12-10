@@ -679,7 +679,7 @@ export const ItemTemplate = [
           "name": "l0407070101", // percen
         },
         {
-          "name": "l0407070101", // percen
+          "name": "l0407070102", // percen
         },
       ],
     },
