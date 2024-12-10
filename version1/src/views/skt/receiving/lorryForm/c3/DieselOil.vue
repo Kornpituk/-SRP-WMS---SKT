@@ -20,6 +20,7 @@ import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import alertWordConst from '@/utilities/constant'
 import { hour, minute } from '@/utilities/time'
 
+console.log('Test Jenkins')
 
 const itemStore = useItemStore()
 
