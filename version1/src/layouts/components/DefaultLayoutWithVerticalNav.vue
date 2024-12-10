@@ -151,7 +151,6 @@ const removeUserCheck = () => {
           <VIcon icon="mdi-menu" />
         </IconBtn>
 
-
         <VSpacer />
         <NavBarI18n
           v-if="false"
@@ -163,13 +162,10 @@ const removeUserCheck = () => {
           class="d-flex justify-end"
         />
 
-
         <VChip color="white">
           <span class="text-black">WH:&nbsp;&nbsp;</span> <span v-if="false" class="text-primary">{{ wareHouseName }}</span>&nbsp;<span style="text-transform: capitalize;" class="text-primary">{{ NameUser }}</span>
         </VChip>
 
-        
-        
         <NavbarThemeSwitcher v-if="true" class="me-1" />
         <UserProfile v-if="false" />
 
@@ -217,7 +213,7 @@ const removeUserCheck = () => {
     </template>
 
     <!-- 👉 Customizer -->
-    <TheCustomizer  v-if="false" />
+    <TheCustomizer v-if="false" />
   </VerticalNavLayout>
 </template>
 
