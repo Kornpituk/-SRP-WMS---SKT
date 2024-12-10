@@ -21,7 +21,8 @@ const selectedDataTables = ref([])
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 //------------------------------------------- compoennt ----------------------------------------------------------------
-import GeridTable from '@/pages/skt/planning/schedule/gridTable/index.vue'
+import GTable from '@/pages/skt/planning/schedule/gridTable/index.vue'
+import TestTable from '@/pages/skt/planning/schedule/gridTable/tableTest.vue'
 
 //------------------------------------------ Data --------------------------------
 
@@ -1755,7 +1756,17 @@ const newBatch = async batchID => {
 
   <section v-if="false">
     <h3>GridTable</h3>
-    <GeridTable />
+    <VCard>
+      <VCardText>
+        <GTable />
+      </VCardText>
+    </VCard>
+
+    <VCard>
+      <VCardText>
+        <TestTable />
+      </VCardText>
+    </VCard>
   </section>
 
 
