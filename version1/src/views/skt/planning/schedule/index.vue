@@ -137,7 +137,7 @@ const filterForSearchBatchProductionPlan = ref({
   LotTextSearch: "",
 })
 
-const clearModelFolter = () => {
+const clearModelFolter = async () => {
   filterForSearchBatchProductionPlan.value.StatusID = null,
   filterForSearchBatchProductionPlan.value.ProductionTextSearch = "",
   filterForSearchBatchProductionPlan.value.ItemTextSearch = "",
@@ -145,7 +145,22 @@ const clearModelFolter = () => {
   filterForSearchBatchProductionPlan.value.ProducingDateTo = "",
   filterForSearchBatchProductionPlan.value.LotTextSearch = "",
   datePickerFilter.value = ''
+
+  await fetchDataProductingPlan()
 }
+
+const progressLinearNoData = ref(false)
+
+const searchFilters = ref({ ...filterForSearchBatchProductionPlan.value }) // ฟิลเตอร์จริงที่จะส่งไป API
+
+const handleSearch = async () => {
+  searchFilters.value = { ...filterForSearchBatchProductionPlan.value } // คัดลอกค่าฟิลเตอร์ที่กรอกเสร็จแล้ว
+  await fetchDataProductingPlan() // เรียก API ด้วยฟิลเตอร์ที่ผู้ใช้กรอก
+}
+
+onMounted( async () => {
+  await fetchDataProductingPlan()
+})
 
 const searchResult = ref([]) // ตัวแปรสำหรับเก็บผลลัพธ์
 const datePickerFilter = ref(null)
@@ -157,9 +172,9 @@ const formatToMMDDYYYY = date => {
   return `${month}/${day}/${year}`
 }
 
-watch(async () => {
+const fetchDataProductingPlan = async () => {
   try {
-
+    progressLinearNoData.value = false
     if (datePickerFilter.value) {
       console.log("datePickerFilter:", datePickerFilter.value)
 
@@ -178,29 +193,84 @@ watch(async () => {
         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
       }
     }
+    productionPlanItems.value = []
 
-    await fetchGetProductionplanSearch(
+    const resultFetchGet = await fetchGetProductionplanSearch(
       filterForSearchBatchProductionPlan.value, 
       urlApi.value, 'ProductionPlan', whereHouse, 
       accessTokenAtStore)
 
-    // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
-    if (getProductionplanSearchResult.value?.data && Array.isArray(getProductionplanSearchResult.value.data)) {
-      
-      productionPlanItems.value = getProductionplanSearchResult.value.data.map((item, index) => ({
-        ...item,
-        no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
-      }))
-      console.log("productionPlanItems", productionPlanItems.value)
-    } else {
-      console.warn("getProductionplanSearchResult.data is not an array")
+    if(resultFetchGet){
+      // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
+      if (getProductionplanSearchResult.value?.data && Array.isArray(getProductionplanSearchResult.value.data)) {
+  
+        productionPlanItems.value = getProductionplanSearchResult.value.data.map((item, index) => ({
+          ...item,
+          no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
+        }))
+        console.log("productionPlanItems", productionPlanItems.value)
+      } else {
+        console.warn("getProductionplanSearchResult.data is not an array")
+        productionPlanItems.value = []
+        progressLinearNoData.value = true
+      }
+    }else{
       productionPlanItems.value = []
+      progressLinearNoData.value = true
     }
+
+    
   } catch (error) {
     console.error("Error fetching production plan master data:", error)
+    progressLinearNoData.value = true
     productionPlanItems.value = []
   }
-})
+}
+
+// watch(async () => {
+//   try {
+
+//     if (datePickerFilter.value) {
+//       console.log("datePickerFilter:", datePickerFilter.value)
+
+//       if (datePickerFilter.value.includes(" to ")) {
+//         // กรณีเป็นช่วงวันที่
+//         const [startDate, endDate] = datePickerFilter.value.split(" to ")
+
+//         filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
+//         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+
+//       } else {
+//         // กรณีเป็นวันเดียว
+//         const singleDate = datePickerFilter.value
+
+//         filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(singleDate)
+//         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
+//       }
+//     }
+
+//     await fetchGetProductionplanSearch(
+//       filterForSearchBatchProductionPlan.value, 
+//       urlApi.value, 'ProductionPlan', whereHouse, 
+//       accessTokenAtStore)
+
+//     // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
+//     if (getProductionplanSearchResult.value?.data && Array.isArray(getProductionplanSearchResult.value.data)) {
+      
+//       productionPlanItems.value = getProductionplanSearchResult.value.data.map((item, index) => ({
+//         ...item,
+//         no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
+//       }))
+//       console.log("productionPlanItems", productionPlanItems.value)
+//     } else {
+//       console.warn("getProductionplanSearchResult.data is not an array")
+//       productionPlanItems.value = []
+//     }
+//   } catch (error) {
+//     console.error("Error fetching production plan master data:", error)
+//     productionPlanItems.value = []
+//   }
+// })
 
 //--------------------------- New batch -----------------------------------------------------
 
@@ -839,6 +909,7 @@ const newBatch = async batchID => {
                         color="primary"
                         density="compact"
                         class="mx-0"
+                        @click="handleSearch"
                       >
                         <span style="font-size: 12px;">{{ $t('Search') }}</span>
                       </VBtn>
@@ -1249,6 +1320,23 @@ const newBatch = async batchID => {
     <!-- VData table -->
     <VCard>
       <VCardText>
+        <VProgressLinear
+          v-if="progressLinearNoData"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="!productionPlanItems.length > 0 && progressLinearNoData === false"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data....</span>
+        </VProgressLinear>
         <VDataTable 
           v-if="productionPlanItems.length > 0"
           v-model:page="currentPageDataTable"

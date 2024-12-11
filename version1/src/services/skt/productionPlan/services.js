@@ -196,11 +196,13 @@ export const useGetProductionPlanSearchService = () => {
       if (result) {
         console.log('Fetching data getProductionPlanSearch:', result)
         getProductionplanSearchResult.value = result
+        
+        return result
       } else {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.error('Error in fetchGetProductionplanSearch:', error)
+      console.log('Error in fetchGetProductionplanSearch:', error)
       errorMessageGetProductionPlanSearch.value = error.message
     }
   }
