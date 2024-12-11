@@ -1129,20 +1129,7 @@ const dataTableCliclHighlightIsToggle = no => {
           </template>
 
           <template #item.no="{item}">
-            <tr
-              :style="{ 
-                backgroundColor: 
-                  dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                  isSelected(item.raw) ? '#E0F7FA' : 
-                  '',
-                borderTop:
-                  dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
-                borderBottom:
-                  dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
-                    
-              }"
-              @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
-            >
+            <tr>
               <td>
                 <span class="text-capitalize">{{ item.raw.no }}</span>
               </td>
