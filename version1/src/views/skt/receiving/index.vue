@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watch, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -118,18 +118,39 @@ const supplierName = ref(sessionStorage.getItem('supplierName') || '')
 const purchaseOrderNo = ref(sessionStorage.getItem('purchaseOrderNo') || '')
 const fileterStatusInPAI = ref(sessionStorage.getItem('fileterStatusInPAI') || '')
 
+const tempFilters = ref({
+  deliveryDateRange: sessionStorage.getItem('deliveryDateFrom') || '',
+  deliveryDateTo: sessionStorage.getItem('deliveryDateTo') || '',
+  productId: sessionStorage.getItem('productId') || '',
+  productName: sessionStorage.getItem('productName') || '',
+  supplierId: sessionStorage.getItem('supplierId') || '',
+  supplierName: sessionStorage.getItem('supplierName') || '',
+  purchaseOrderNo: sessionStorage.getItem('purchaseOrderNo') || '',
+  fileterStatusInPAI: sessionStorage.getItem('fileterStatusInPAI') || '',
+})
+
 const disBtnExoport = ref(true)
 
 const validateFields = () => {
   const fields = {
-    deliveryDateFrom: deliveryDateFrom.value,
-    deliveryDateTo: deliveryDateTo.value,
-    productId: productId.value,
-    productName: productName.value,
-    supplierId: supplierId.value,
-    supplierName: supplierName.value,
-    purchaseOrderNo: purchaseOrderNo.value,
-    statusName: fileterStatusInPAI.value,
+    // deliveryDateFrom: deliveryDateFrom.value,
+    // deliveryDateTo: deliveryDateTo.value,
+    // productId: productId.value,
+    // productName: productName.value,
+    // supplierId: supplierId.value,
+    // supplierName: supplierName.value,
+    // purchaseOrderNo: purchaseOrderNo.value,
+    // statusName: fileterStatusInPAI.value,
+
+    deliveryDateFrom: tempFilters.value.deliveryDateRange || '',
+    deliveryDateTo: tempFilters.value.deliveryDateTo || '',
+    productId: tempFilters.value.productId || '',
+    productName: tempFilters.value.productName || '',
+    supplierId: tempFilters.value.supplierId || '',
+    supplierName: tempFilters.value.supplierName || '',
+    purchaseOrderNo: tempFilters.value.purchaseOrderNo || '',
+    statusName: tempFilters.value.fileterStatusInPAI || '',
+
   }
 
   // ตรวจสอบว่ามีฟิลด์ใดที่ไม่ใช่ค่าว่างอย่างน้อย 1 ค่า
@@ -148,40 +169,40 @@ const validateFields = () => {
 }
 
 // ใช้ watch function เพื่ออัปเดต sessionStorage เมื่อแต่ละค่าถูกเปลี่ยนแปลง
-watch(deliveryDateFrom, newValue => {
+watch(tempFilters.value.deliveryDateRange, newValue => {
   sessionStorage.setItem('deliveryDateFrom', newValue)
 })
-watch(deliveryDateTo, newValue => {
+watch(tempFilters.value.deliveryDateTo, newValue => {
   sessionStorage.setItem('deliveryDateTo', newValue)
 })
-watch(productId, newValue => {
+watch(tempFilters.value.productId, newValue => {
   sessionStorage.setItem('productId', newValue)
 })
-watch(productName, newValue => {
+watch(tempFilters.value.productName, newValue => {
   sessionStorage.setItem('productName', newValue)
 })
-watch(supplierId, newValue => {
+watch(tempFilters.value.supplierId, newValue => {
   sessionStorage.setItem('supplierId', newValue)
 })
-watch(supplierName, newValue => {
+watch(tempFilters.value.supplierName, newValue => {
   sessionStorage.setItem('supplierName', newValue)
 })
-watch(purchaseOrderNo, newValue => {
+watch(tempFilters.value.purchaseOrderNo, newValue => {
   sessionStorage.setItem('purchaseOrderNo', newValue)
 })
-watch(fileterStatusInPAI, newValue => {
+watch(tempFilters.value.fileterStatusInPAI, newValue => {
   sessionStorage.setItem('fileterStatusInPAI', newValue)
 })
 
 onMounted(() => {
-  deliveryDateFrom.value = sessionStorage.getItem('deliveryDateFrom') || ''
-  deliveryDateTo.value = sessionStorage.getItem('deliveryDateTo') || ''
-  productId.value = sessionStorage.getItem('productId') || ''
-  productName.value = sessionStorage.getItem('productName') || ''
-  supplierId.value = sessionStorage.getItem('supplierId') || ''
-  supplierName.value = sessionStorage.getItem('supplierName') || ''
-  fileterStatusInPAI.value = sessionStorage.getItem('fileterStatusInPAI') || ''
-  purchaseOrderNo.value = sessionStorage.getItem('purchaseOrderNo') || ''
+  tempFilters.value.deliveryDateRange = sessionStorage.getItem('deliveryDateFrom') || ''
+  tempFilters.value.deliveryDateTo = sessionStorage.getItem('deliveryDateTo') || ''
+  tempFilters.value.productId = sessionStorage.getItem('productId') || ''
+  tempFilters.value.productName = sessionStorage.getItem('productName') || ''
+  tempFilters.value.supplierId = sessionStorage.getItem('supplierId') || ''
+  tempFilters.value.supplierName = sessionStorage.getItem('supplierName') || ''
+  tempFilters.value.fileterStatusInPAI = sessionStorage.getItem('fileterStatusInPAI') || ''
+  tempFilters.value.purchaseOrderNo = sessionStorage.getItem('purchaseOrderNo') || ''
 })
 
 watch(() => {
@@ -292,7 +313,7 @@ const serialProductCode = ref(null)
 
 //------------------------------- Function Get StockUpdate Need Enter Search -----------------
 
-const clearModel = () => {
+const clearModel = async () => {
   deliveryDateFrom.value = ''
   deliveryDateTo.value = ''
   productId.value = ''
@@ -306,7 +327,17 @@ const clearModel = () => {
   serialProductCode.value = ''
   fileterStatusInPAI.value = ''
   statusFilter.value = []
-  purchaseOrderNo.value = ''
+
+  tempFilters.value.deliveryDateRange = ''
+  tempFilters.value.deliveryDateTo = ''
+  tempFilters.value.productId = ''
+  tempFilters.value.productName = ''
+  tempFilters.value.supplierId = ''
+  tempFilters.value.supplierName = ''
+  tempFilters.value.purchaseOrderNo = ''
+  tempFilters.value.fileterStatusInPAI = ''
+
+  await handleSearch()
 }
 
 const searchParams = {
@@ -549,108 +580,90 @@ const handleSelection = (selected, item) => {
   }
 }
 
-const GetStockUpdate = () => {
-  progressLinearNoData.value = false
-  if (deliveryDateRange.value) {
-    const [fromDate, toDate] = deliveryDateRange.value.split(" to ")
-    if(deliveryDateRange.value === '' || deliveryDateRange.value === null || deliveryDateRange.value === undefined){
-      deliveryDateFrom.value = ''
+const searchFilters = ref({ ...tempFilters.value }) // ฟิลเตอร์จริงที่จะส่งไป API
 
+const handleSearch = async () => {
+  searchFilters.value = { ...tempFilters.value } // คัดลอกค่าฟิลเตอร์ที่กรอกเสร็จแล้ว
+  await GetStockUpdate() // เรียก API ด้วยฟิลเตอร์ที่ผู้ใช้กรอก
+}
+
+onMounted( async () => {
+  await GetStockUpdate()
+})
+
+const GetStockUpdate = async () => {
+  try {
+    progressLinearNoData.value = false
+
+    const { deliveryDateRange, productId, productName, supplierId, supplierName, purchaseOrderNo } = searchFilters.value
+
+    // จัดการวันที่
+    if (deliveryDateRange) {
+      const [fromDate, toDate] = deliveryDateRange.split(" to ")
+
+      deliveryDateFrom.value = fromDate || ''
+      deliveryDateTo.value = toDate || ''
+    } else {
+      deliveryDateFrom.value = ''
       deliveryDateTo.value = ''
     }
 
-    deliveryDateFrom.value = fromDate
+    // จัดการสถานะ
+    fileterStatusInPAI.value = statusFilter.value === 'All' ? '' : statusFilter.value
 
-    deliveryDateTo.value = toDate
-  }else {
-    deliveryDateFrom.value = ''
+    // แปลงสถานะเป็น String
+    const fileterStatusInApiStr = typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null
+      ? fileterStatusInPAI.value.join(',')
+      : fileterStatusInPAI.value
 
-    deliveryDateTo.value = ''
-  }
+    // เรียก API ด้วย await
+    progressLinearNoData.value = false
 
-  if(statusFilter.value === 'All'){
-    fileterStatusInPAI.value = ''
-  } else {
-    fileterStatusInPAI.value = statusFilter.value
-  }
+    products.value = []
 
-  const fileterStatusInApiStr = ref('')
-
-  if (typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null) {
-  // แปลงเป็น string
-    fileterStatusInApiStr.value = fileterStatusInPAI.value.join(',')
-  }else{
-    fileterStatusInApiStr.value = fileterStatusInPAI.value
-  }
-
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/View?`, {
-    params: {
-      deliveryDateFrom: deliveryDateFrom.value,
-      deliveryDateTo: deliveryDateTo.value,
-      productId: productId.value,
-      productName: productName.value,
-      supplierId: supplierId.value,
-      supplierName: supplierName.value,
-      statusName: fileterStatusInApiStr.value || '',
-      purchaseOrderNo: purchaseOrderNo.value,
-
-    // ... and so on with other parameters
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${searchByWareHouseId.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }, {})
-    .then(response => {
-
-      const data = response.data.datas
-
-      console.log("Product Data base", data)
-
-      // Add No. field to each product
-      // Filter out items where receiveTypeId is 1
-      // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
-
-      const filteredData = data.filter(item => item.receiveTypeId !== 33)
-
-      // Add No. field to each product (after filtering)
-      products.value = filteredData.map((item, index) => ({
-        ...item,
-        no: index + 1, // Add "no" field starting from 1
-        selectable: item.statusId === 15 ? true : false, // Set selectable based on statusId
-      }))
-
-
-      // totalCount.value = response.data.totalCount
-      // currentPage.value = response.data.page
-      // totalPage.value = response.data.totalPages
-      // rowPerPage.value = response.data.perPage
-
-      console.log('[products.value]!!: ', products.value)
-
-      console.log('[statusName.value Type]!!: ', typeof  fileterStatusInPAI.value)
-
-      // console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
-
-      // console.log('perPage: ',perPage)
-      // console.log('currentPage: ',currentPage)
-      // console.log('totalCount: ',totalCount)
-      // console.log('totalPages: ',totalPage)
-
-      // console.log('subTypeId',searchBySubTypeId.value)
-
-    
-    })
-    .catch(error => {
-    // Handle errors
-      products.value = []
-      progressLinearNoData.value = true
-      console.error('Error:', error)
+    const response = await axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/View`, {
+      params: {
+        deliveryDateFrom: deliveryDateFrom.value,
+        deliveryDateTo: deliveryDateTo.value,
+        productId: productId,
+        productName: productName,
+        supplierId: supplierId,
+        supplierName: supplierName,
+        statusName: fileterStatusInApiStr || '',
+        purchaseOrderNo: purchaseOrderNo,
+      },
+      headers: {
+        accept: '*/*',
+        'x-location': `${searchByWareHouseId.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
     })
 
+    progressLinearNoData.value = false
+
+    const data = response.data.datas
+
+    // กรองข้อมูล
+
+    const filteredData = data.filter(item => item.receiveTypeId !== 33)
+
+    // เพิ่ม field no และ selectable
+    products.value = filteredData.map((item, index) => ({
+      ...item,
+      no: index + 1,
+      selectable: item.statusId === 15,
+    }))
+
+    console.log('[products.value]:', products.value)
+
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+    products.value = []
+    progressLinearNoData.value = true
+    console.error('Error:', error)
+  }
 }
+
 
 //--------------------------------------- Data Model Table Data ----------------------------
 const headers = [
@@ -734,22 +747,6 @@ onMounted(() => {
 
   tableDataPerpage.value = savedItemsPerPage ? parseInt(savedItemsPerPage, 10) : 10 // ค่าเริ่มต้นเป็น 10 ถ้าไม่มีใน session
 
-  // switch (tableDataPerpage.value) {
-  // case 10:
-  //   tableDataHeight.value = 550
-  //   break
-  // case 25:
-  //   tableDataHeight.value = 700
-  //   break
-  // case 50:
-  //   tableDataHeight.value = 850
-  //   break
-  // case 100:
-  //   tableDataHeight.value = 850
-  //   break
-  // default:
-  //   tableDataHeight.value = 550
-  // }
 })
 
 
@@ -773,13 +770,9 @@ const resetSearchKey = () => {
 //------------------------------- Function Get StockUpdate Auto Search -----------------
 
 watch(() => {
-  GetStockUpdate()
   getStatusReceiving()
 })
 
-const searchFilter = () => {
-  GetStockUpdate()
-}
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
@@ -833,10 +826,6 @@ function customFilter(item, queryText, itemText) {
   const searchText = queryText.toLocaleLowerCase()
   
   return textOne.includes(searchText) || textTwo.includes(searchText)
-}
-
-const submitSearchButton = () => {
-  GetStockUpdate()
 }
 
 // -------------------------------------- Export Bar Excel - --------------------------------
@@ -2111,7 +2100,7 @@ const insetSwitch1 = ref('')
                 class="py-2"
               >
                 <VTextField
-                  v-model="productId"
+                  v-model="tempFilters.productId"
                   density="compact"
                   height="20px"
                   class="py-0"
@@ -2135,7 +2124,7 @@ const insetSwitch1 = ref('')
                 class="py-2"
               >
                 <VTextField
-                  v-model="productName"
+                  v-model="tempFilters.productName"
                   density="compact"
                   height="20px"
                   class="py-0"
@@ -2154,7 +2143,7 @@ const insetSwitch1 = ref('')
                 class="py-1"
               >
                 <AppDateTimePicker
-                  v-model="deliveryDateRange"
+                  v-model="tempFilters.deliveryDateRange"
                   placeholder="Select Date"
                   density="compact"
                   :config="{ mode: 'range',dateFormat: 'd/m/Y' }"
@@ -2173,7 +2162,7 @@ const insetSwitch1 = ref('')
                 class="py-1"
               >
                 <VTextField
-                  v-model="purchaseOrderNo"
+                  v-model="tempFilters.purchaseOrderNo"
                   density="compact"
                 >
                   <template #label>
@@ -2190,7 +2179,7 @@ const insetSwitch1 = ref('')
                 class="py-1"
               >
                 <VTextField
-                  v-model="supplierName"
+                  v-model="tempFilters.supplierName"
                   :label="$t('Supplier Name')"
                   type="Supplier Name"
                   density="compact"
@@ -2234,7 +2223,7 @@ const insetSwitch1 = ref('')
                       density="compact"
                       class="mx-0"
                       style="font-size: 12px;"
-                      @click="searchFilter"
+                      @click="handleSearch"
                     >
                       {{ $t('Search') }}
                     </VBtn>

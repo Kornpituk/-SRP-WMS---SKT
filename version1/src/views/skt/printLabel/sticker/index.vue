@@ -21,6 +21,11 @@ const panel = ref(['filter']) //---------------- variable for
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
+//------------------- 
+//----------------------------------- DBClicks hightlight --------------------------------
+
+const dataTableNummberedToggle = ref(null)
+
 //---------------- format
 function convertDate(dateString) {
   const date = new Date(dateString)
@@ -401,30 +406,27 @@ const headerSubtitle = [
 ]
 
 //------------------- Highlighter --------------------------------
-
+const dataTableColor = ref('#E0F7FA')
 const selectedItemIdForColotRow = ref(null)
 
-watch(() => {
-  console.log('selected', selectedDataTables.value)
-})
-
-const isSelected = (item, type) => {
-  if(type === 1){
-    return selectedDataTables.value.some(
-      selectedItem => selectedItem.lot === item,
-    )
-  }
-
-  if(type === 2){
-    return selectedDataTables.value.some(
-      selectedItem => selectedItem.barcode === item,
-    )
-  }
-
-  
+const isSelected = item => {
+  return selectedDataTables.value.some(
+    selectedItem => selectedItem.journalID === item.journalID,
+  )
 }
 
-const dataTableColor = ref('#E0F7FA')
+const dataTableCliclHighlightIsToggle = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle.value = null
+  } else if (dataTableNummberedToggle.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle.value)
+}
 </script>
 
 <template>
@@ -1108,7 +1110,20 @@ const dataTableColor = ref('#E0F7FA')
           </template>
 
           <template #item.no="{item}">
-            <tr>
+            <tr
+              :style="{ 
+                backgroundColor: 
+                  dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                  isSelected(item.raw) ? '#E0F7FA' : 
+                  '',
+                borderTop:
+                  dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                borderBottom:
+                  dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+              }"
+              @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+            >
               <td>
                 <span class="text-capitalize">{{ item.raw.no }}</span>
               </td>

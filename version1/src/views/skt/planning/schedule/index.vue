@@ -54,7 +54,6 @@ const confirmValueCheck = ref(false)
 //-- dialog 2 
 const confirmDialog2 = ref(null)
 
-
 function openConfirmDialog() {
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
 
@@ -171,20 +170,12 @@ watch(async () => {
         filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
 
-        console.log("ช่วงวันที่:")
-        console.log("ProducingDateFrom:", filterForSearchBatchProductionPlan.value.ProducingDateFrom)
-        console.log("ProducingDateTo:", filterForSearchBatchProductionPlan.value.ProducingDateTo)
-
       } else {
         // กรณีเป็นวันเดียว
         const singleDate = datePickerFilter.value
 
         filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(singleDate)
         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
-
-        console.log("วันเดียว:")
-        console.log("ProducingDateFrom:", filterForSearchBatchProductionPlan.value.ProducingDateFrom)
-        console.log("ProducingDateTo:", filterForSearchBatchProductionPlan.value.ProducingDateTo)
       }
     }
 

@@ -704,7 +704,6 @@ const validateBatchSale = (batchSale, kgs1, pcs1, kgs2, pcs2) => {
 
 const validateBatchSaleRow = ref()
 
-
 // Watch เพื่อทำการ validate แบบ real-time
 watch(
   () => Object.values(validationData), // ติดตามการเปลี่ยนแปลงใน validationData
