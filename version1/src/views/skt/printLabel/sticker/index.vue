@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watch, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -184,17 +184,33 @@ const paramsFetchDataPrintLabel = ref({
   category: '',
 })
 
-const clearModel = () => {
+const searchFilters = ref({ ...paramsFetchDataPrintLabel.value }) // ฟิลเตอร์จริงที่จะส่งไป API
+
+const handleSearch = async () => {
+  searchFilters.value = { ...paramsFetchDataPrintLabel.value } // คัดลอกค่าฟิลเตอร์ที่กรอกเสร็จแล้ว
+  await fetchData() // เรียก API ด้วยฟิลเตอร์ที่ผู้ใช้กรอก
+}
+
+const clearModel = async () => {
   paramsFetchDataPrintLabel.value.lot = ''
   paramsFetchDataPrintLabel.value.productId = ''
   paramsFetchDataPrintLabel.value.productName = ''
   paramsFetchDataPrintLabel.value.purchaseOrderNo = ''
   paramsFetchDataPrintLabel.value.receivedDate = ''
   paramsFetchDataPrintLabel.value.category = ''
+
+  await fetchData()
 }
+
+onMounted( async () => {
+  await fetchData()
+})
+
 
 const fetchData = async () => {
   try {
+    progressLinearNoData.value = false
+
     const hasValue = Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
 
     if (!hasValue) {
@@ -205,12 +221,16 @@ const fetchData = async () => {
 
     progressLinearNoData.value = false // เริ่มแสดง Progress
 
+    dataPrintLabel.value = []
+
     const result = await printLabelFormViewService(
       urlApi.value,
       whereHouse,
       accessTokenAtStore,
       paramsFetchDataPrintLabel.value,
     )
+
+    dataPrintLabel.value = []
 
     if (result && result.data) {
       // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
@@ -219,9 +239,11 @@ const fetchData = async () => {
         no: index + 1, // เพิ่มฟิลด์ลำดับ
       }))
       console.log('printLabelFormViewService successfully fetched data', dataPrintLabel.value)
+      progressLinearNoData.value = true
     } else {
       console.log('No data found in API response')
       dataPrintLabel.value = []
+      progressLinearNoData.value = true
     }
   } catch (error) {
     console.error('Error fetching data:', error.message || error)
@@ -231,9 +253,6 @@ const fetchData = async () => {
   }
 }
 
-watchEffect(() => {
-  fetchData()
-})
 
 const groupDataByLot = data => {
   let previousLot = null
@@ -641,7 +660,7 @@ const dataTableCliclHighlightIsToggle = no => {
                       density="compact"
                       class="mx-0"
                       style="font-size: 12px;"
-                      @click="searchFilter"
+                      @click="handleSearch"
                     >
                       {{ $t('Search') }}
                     </VBtn>
@@ -997,7 +1016,7 @@ const dataTableCliclHighlightIsToggle = no => {
     <VCard>
       <VCardText>
         <VProgressLinear
-          v-if="!dataPrintLabel"
+          v-if="progressLinearNoData && dataPrintLabel.length <= 0"
           height="20"
           color="secondary"
           class="elevation-1"
@@ -1005,7 +1024,7 @@ const dataTableCliclHighlightIsToggle = no => {
           <span>No Data....</span>
         </VProgressLinear>
         <VProgressLinear
-          v-if="progressLinearNoData === false"
+          v-if="!dataPrintLabel.length > 0 && progressLinearNoData === false"
           height="20"
           indeterminate
           color="primary"
@@ -1014,7 +1033,7 @@ const dataTableCliclHighlightIsToggle = no => {
           <span>Loading Data....</span>
         </VProgressLinear>
         <VDataTable
-          v-if="dataPrintLabel && progressLinearNoData === true"
+          v-if="dataPrintLabel.length > 0 && progressLinearNoData === true"
           v-model:expanded="expanded"
           v-model="selectedDataTables"
           :headers="headersNewEx"

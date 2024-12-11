@@ -1848,7 +1848,6 @@ const newBatch = async batchID => {
     </VCard>
   </section>
 
-
   <!-- Footer -->
   <section class="mt-3">
     <VCard>
