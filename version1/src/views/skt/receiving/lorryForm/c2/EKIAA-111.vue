@@ -340,9 +340,14 @@ watchEffect(async () => {
               <div v-else-if="section.practice.type === 'checkbox'">
                 <VCheckbox
                   v-model="section.practice.field[0].value"
-                  :label="section.practice.startPracticeText"
                   :readonly="isReadOnly"
-                />
+                >
+                  <template #label>
+                    <span>                  
+                      <div v-html="section.practice.startPracticeText" />
+                    </span>
+                  </template>
+                </VCheckbox>
               </div>
               <div v-else-if="section.practice.type === 'checkbox3'">
                 <VRow>
