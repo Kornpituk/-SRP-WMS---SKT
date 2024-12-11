@@ -26,6 +26,7 @@ const itemStore = useItemStore()
 
 var lorryItem = reactive(dieselItemTemplate)
 var lorryRequestData = ref({})
+var unMountedState = ref(false)
 const route = useRoute()
 
 const data = ref(JSON.parse(route.query.Data || '[]'))
@@ -76,12 +77,8 @@ function handleCancel() {
 
 onMounted(async () => {
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
-  const whereHouse = localStorage.getItem('whereHouseName')
-
   await generate(poEtlLogDetailJournalIDQueryParameters.value)
 
- 
   var lorryForm =  await get(poEtlLogDetailJournalIDQueryParameters.value)
 
   lorryRequestData.value = lorryForm.data.data
@@ -100,6 +97,8 @@ onMounted(async () => {
     }
   }
 
+  console.log("onUnmounted Load Finish")
+
   const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
   statusId.value = lorryFormStatus.data.data[0].statusId
@@ -107,6 +106,8 @@ onMounted(async () => {
   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
+
+  unMountedState.value = true
 
 })
 
@@ -232,12 +233,17 @@ async function approve(e) {
   }
 }
 watchEffect(async () => {
-  var a = lorryItem[0].result.field[0].value
-  var b = lorryItem[1].result.field[0].value
-  var c = a+b
-  var d = lorryItem[33].result.field[0].value
-  lorryItem[2].result.field[0].value =  currencyFormat(c)
-  lorryItem[34].result.field[0].value = currencyFormat(c-d)
+
+  if(unMountedState.value === true){
+    var a = lorryItem[0].result.field[0].value
+    var b = lorryItem[1].result.field[0].value
+    var c = a+b
+    var d = lorryItem[33].result.field[0].value
+    lorryItem[2].result.field[0].value =  currencyFormat(c)
+    lorryItem[34].result.field[0].value = currencyFormat(c-d)
+
+    console.log("watchEffect Load Finish")
+  }
 
 })
 </script>

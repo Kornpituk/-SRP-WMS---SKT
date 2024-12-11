@@ -409,7 +409,6 @@ export const ItemTemplate = [
         },
         {
           "name": "l0403060102", // OkNot
-
         },
       ],
     },
