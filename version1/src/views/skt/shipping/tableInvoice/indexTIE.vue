@@ -1075,7 +1075,7 @@ const viewAllData = () => {
       </VCardTitle>
     </VCard>
   </div>
-<!-- Expansion -->
+  <!-- Expansion -->
   <section>
     <div>
       <VExpansionPanels
@@ -1824,59 +1824,59 @@ const viewAllData = () => {
               scope="row"
               class="text-center px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('No.') }}</span>
+              <span style="font-weight: bold;">{{ $t('No.') }}</span>
             </th>
             <th class="text-center">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Status') }}</span>
+              <span style="font-weight: bold;">{{ $t('Status') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Sale Order No.') }}</span>
+              <span style="font-weight: bold;">{{ $t('Sale Order No.') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountAll"
               class="text-center"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('SO attachment') }}</span>
+              <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('SAP Invoice no') }}</span>
+              <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Payer Name') }}</span>
+              <span style="font-weight: bold;">{{ $t('Payer Name') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountINSP || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('User') }}</span>
+              <span style="font-weight: bold;">{{ $t('User') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Shipper') }}</span>
+              <span style="font-weight: bold;">{{ $t('Shipper') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Shipper location') }}</span>
+              <span style="font-weight: bold;">{{ $t('Shipper location') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-center"
             >
               <div>
-                <span style="padding-right: 60px; font-size: 16px; text-transform: capitalize;">
+                <span style="padding-right: 60px; font-weight: bold;">
                   {{ $t('Shipping Mark maean') }}
                 </span>
               </div>
@@ -1890,41 +1890,41 @@ const viewAllData = () => {
               </VRow>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountINSP || accountAll">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('End User') }}</span>
+              <span style="font-weight: bold;">{{ $t('End User') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Consignee') }}</span>
+              <span style="font-weight: bold;">{{ $t('Consignee') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Item') }}</span>
+              <span style="font-weight: bold;">{{ $t('Item') }}</span>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Lot number') }}</span>
+              <span style="font-weight: bold;">{{ $t('Lot number') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-end px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Qty. (Kg.)') }}</span>
+              <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-center"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('COA') }}</span>
+              <span style="font-weight: bold;">{{ $t('COA') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="bg-green-lighten-3"
             >
               <span
-                style="font-size: 16px; text-transform: capitalize;"
+                style="font-weight: bold;"
                 class="text-black"
               >{{ $t('Freight forwarder') }}</span>
             </th>
@@ -1934,7 +1934,7 @@ const viewAllData = () => {
               style="min-width: 150px;"
             >
               <span
-                style="min-width: 250px; font-size: 16px; text-transform: capitalize;"
+                style="min-width: 250px; font-weight: bold;"
                 class="text-center"
               >{{ $t('Carrier') }}</span>
             </th>
@@ -1943,13 +1943,13 @@ const viewAllData = () => {
               class="bg-green-lighten-3"
             >
               <span
-                style="font-size: 16px; text-transform: capitalize;"
+                style="font-weight: bold;"
                 class="text-black"
               >{{ $t('Vessel name') }}</span>
             </th>
             <th class="bg-yellow-lighten-3">
               <span
-                style="font-size: 16px; text-transform: capitalize;"
+                style="font-weight: bold;"
                 class="text-black"
               >{{ $t('Voy') }}</span>
             </th>
@@ -1957,35 +1957,35 @@ const viewAllData = () => {
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="bg-green-lighten-3"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Truck') }}</span>
+              <span style="font-weight: bold;">{{ $t('Truck') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="bg-yellow-lighten-3 texct-end"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Truck Reserving Number') }}</span>
+              <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}</span>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountWH || accountAll">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Truck fee') }}</span>
+              <span style="font-weight: bold;">{{ $t('Truck fee') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
               class="text-center"
               style="min-width: 300px;"
             >
-              <span style="padding-left: 1px; font-size: 16px; text-transform: capitalize;">{{ $t('Truck Order') }}</span>
+              <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
               <VRow>
                 <VCol
                   class="px-1"
                   cols="6"
                 >
-                  <span style="font-size: 16px; text-transform: capitalize;">Print</span> 
+                  <span style="font-weight: bold;">Print</span> 
                 </VCol>
                 <VCol
                   class="px-1"
                   cols="6"
                 >
-                  <span style="font-size: 16px; text-transform: capitalize;">Attach File</span>
+                  <span style="font-weight: bold;">Attach File</span>
                 </VCol>
               </VRow>
             </th>
@@ -1993,24 +1993,24 @@ const viewAllData = () => {
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="px-4"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('DO/EX') }}</span>
+              <span style="font-weight: bold;">{{ $t('DO/EX') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="px-2"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Country') }}</span>
+              <span style="font-weight: bold;">{{ $t('Country') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-center"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Loading date') }}</span>
+              <span style="font-weight: bold;">{{ $t('Loading date') }}</span>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll">
               <VRow>
                 <VCol cols="6">
-                  <span style="font-size: 16px; text-transform: capitalize;">{{ $t('ETD') }}</span>
+                  <span style="font-weight: bold;">{{ $t('ETD') }}</span>
                 </VCol>
                 <VCol
                   class="d-flex justify-end"
@@ -2026,7 +2026,7 @@ const viewAllData = () => {
             <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll">
               <VRow>
                 <VCol cols="6">
-                  <span style="font-size: 16px; text-transform: capitalize;">{{ $t('ETA') }}</span>
+                  <span style="font-weight: bold;">{{ $t('ETA') }}</span>
                 </VCol>
                 <VCol
                   class="d-flex justify-end"
@@ -2043,37 +2043,37 @@ const viewAllData = () => {
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-center"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Delivery note') }}</span>
+              <span style="font-weight: bold;">{{ $t('Delivery note') }}</span>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Remark (SAL)') }}</span>
+              <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}</span>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Remark (WH)') }}</span>
+              <span style="font-weight: bold;">{{ $t('Remark (WH)') }}</span>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountWH || accountAll">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Remark (LOG)') }}</span>
+              <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Update By') }}</span>
+              <span style="font-weight: bold;">{{ $t('Update By') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="px-1"
             >
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Update On') }}</span>
+              <span style="font-weight: bold;">{{ $t('Update On') }}</span>
             </th>
             <th class="text-center">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Save Draft') }}</span>
+              <span style="font-weight: bold;">{{ $t('Save Draft') }}</span>
             </th>
             <th class="text-center">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Submit') }}</span>
+              <span style="font-weight: bold;">{{ $t('Submit') }}</span>
             </th>
             <th class="text-center">
-              <span style="font-size: 16px; text-transform: capitalize;">{{ $t('Action') }}</span>
+              <span style="font-weight: bold;">{{ $t('Action') }}</span>
             </th>
           </tr>
         </thead>
@@ -2107,6 +2107,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ product.saleOrderNo }}
             </td>
@@ -2115,7 +2116,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountAll"
               class="text-start px-1"
-              style="min-width: 200px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               <VRow>
                 <VCol
@@ -2202,6 +2203,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-2"
+              style="font-size: 12px;"
             >
               {{ product.sapInvoiceNo }}
             </td>
@@ -2210,6 +2212,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ (product.payerName) }}
             </td>
@@ -2218,6 +2221,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountINSP || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ (product.user) }}
               User
@@ -2227,6 +2231,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ (product.shipper) }}
               Shipper
@@ -2235,6 +2240,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ (product.shipperLocation) }}
               shipperLocation
@@ -2244,7 +2250,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 300px;"
+              style="min-width: 300px; font-size: 12px;"
             >
               <VRow>
                 <VCol
@@ -2271,7 +2277,11 @@ const viewAllData = () => {
                     rows="2"
                     clearable="false"
                     placeholder="Shipping Mark"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Shipping Mark</span>
+                    </template>
+                  </VTextarea>
                 </VCol>
               </VRow>
             </td>
@@ -2279,23 +2289,31 @@ const viewAllData = () => {
             <td
               v-if="false"
               class="text-end px-1"
+              style="font-size: 12px;"
             >
               {{ product.endUser }}
             </td>
 
-            <td class="text-start px-1">
+            <td
+              class="text-start px-1"
+              style="font-size: 12px;"
+            >
               <VTextField
                 v-model="product.endUser"
                 density="compact"
-                label="End User"
                 style=" min-width: 150px;"
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">End User</span>
+                </template>
+              </VTextField>
             </td>
 
             <!-- 👉 Product Name -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ (product.consignee) }}
               consignee
@@ -2305,6 +2323,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ (product.product) }}
               item
@@ -2314,11 +2333,11 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               <VSelect
                 v-model="product.lotNumber"
                 :items="items"
-                label="Lot Number"
                 placeholder="Select Lot"
                 density="compact"
                 eager
@@ -2329,6 +2348,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ (product.qty) }}
             </td>
@@ -2337,7 +2357,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 200px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               <VRow>
                 <VCol
@@ -2377,6 +2397,9 @@ const viewAllData = () => {
                           {{ fileName }}
                         </VChip>
                       </template>
+                    </template>
+                    <template #label>
+                      <span style="font-size: 12px;">Attach File</span>
                     </template>
                   </VFileInput>
                 </VCol>
@@ -2424,20 +2447,26 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               <VSelect
                 :items="items"
-                label="Freight Forwarder"
-                placeholder="Select Item"
                 density="compact"
                 eager
-              />
+              >
+                <template #label>
+                  <span>
+                    Freight Forwarder
+                  </span>
+                </template>
+              </VSelect>
             </td>
 
             <!-- 👉 Product Name -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               <VSelect
                 v-model="product.carrier"
@@ -2453,6 +2482,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               <VSelect
                 v-model="product.vesselName"
@@ -2463,7 +2493,10 @@ const viewAllData = () => {
                 eager
               />
             </td>
-            <td class="text-start px-1">
+            <td
+              style="font-size: 12px;"
+              class="text-start px-1"
+            >
               <VTextField
                 v-model="product.voy"
                 density="compact"
@@ -2478,6 +2511,7 @@ const viewAllData = () => {
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
               :class="checkBgTruck(product.freightForwarder)"
+              style="font-size: 12px;"
             >
               {{ (product.freightForwarder) }}
             </td>
@@ -2485,6 +2519,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-center px-1"
+              style="font-size: 12px;"
             >
               <VTextField
                 v-model="product.truckReserving"
@@ -2498,6 +2533,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               <VTextField
                 v-model="product.truckFee"
@@ -2510,7 +2546,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
               class="text-start px-1"
-              style="min-width: 400px;"
+              style="min-width: 400px; font-size: 12px;"
             >
               <VRow>
                 <VCol
@@ -2621,6 +2657,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-4"
+              style="font-size: 12px;"
             >
               {{ (product.doEx) }}
               doEx
@@ -2630,6 +2667,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ (product.country) }}
             </td>
@@ -2638,7 +2676,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 150px;"
+              style="min-width: 150px; font-size: 12px;"
             >
               <AppDateTimePicker
                 v-model="product.loadingDate"
@@ -2654,7 +2692,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 150px;"
+              style="min-width: 150px; font-size: 12px;"
             >
               <AppDateTimePicker
                 v-model="product.etd"
@@ -2670,7 +2708,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 150px;"
+              style="min-width: 150px; font-size: 12px;"
             >
               <AppDateTimePicker
                 v-model="product.eta"
@@ -2686,7 +2724,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 200px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               <VRow>
                 <VCol
@@ -2773,6 +2811,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               <VTextarea
                 v-model="product.remarkSa"
@@ -2790,6 +2829,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               <VTextarea
                 v-model="product.remarkWh"
@@ -2807,6 +2847,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               <VTextarea
                 v-model="product.remarkLog"
@@ -2823,6 +2864,7 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ product.byWhow }}
             </td>
@@ -2830,29 +2872,30 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
+              style="font-size: 12px;"
             >
               {{ getRandomDate('2022-01-01', '2023-12-31') }}
             </td>
             
             <!-- 👉 Actions -->
             <td
-              style="width: 8rem;"
+              style="width: 8rem; font-size: 12px;"
               class="text-center px-1"
             >
               <VBtn color="warning">
-                Save Draft
+                <span style="font-size: 12px;">Save Draft</span>
               </VBtn>
             </td>
             <td
-              style="width: 8rem;"
+              style="width: 8rem; font-size: 12px;"
               class="text-center px-1"
             >
               <VBtn class="mx-2">
-                Submit
+                <span style="font-size: 12px;">Submit</span>
               </VBtn>
             </td>
             <td
-              style="width: 8rem;"
+              style="width: 8rem; font-size: 12px;"
               class="text-center px-1"
             >
               <VBtn
@@ -2861,7 +2904,7 @@ const viewAllData = () => {
                 }"
                 color="info"
               >
-                Action
+                <span style="font-size: 12px;">Action</span>
               </VBtn>
             </td>
           </tr>
@@ -2973,6 +3016,10 @@ const viewAllData = () => {
   border-collapse: collapse;
   border-spacing: 0;
   inline-size: 100%;
+}
+
+.v-text-field >>> input {
+  font-size: 12px;
 }
 
 .custom-table,

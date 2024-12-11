@@ -1039,7 +1039,7 @@ const isDialogVisiblePrintTruck = ref(false)
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
     <VCard class="mt-6">
-      <VTable class="text-no-wrap rounded-0">
+      <VTable class="rounded-0">
         <!-- 👉 table head -->
         <thead>
           <tr>

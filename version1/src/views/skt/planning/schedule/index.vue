@@ -125,6 +125,7 @@ const dataTableCliclHighlightIsToggle = no => {
 }
 
 //----------------------------------- Get Batch Production plan ---------------------------
+import { ProductionDataModel } from '@/model/skt/planning/production/model'
 
 const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
 
@@ -164,12 +165,75 @@ onMounted( async () => {
 
 const searchResult = ref([]) // ตัวแปรสำหรับเก็บผลลัพธ์
 const datePickerFilter = ref(null)
-const productionPlanItems = ref([]) // กำหนดค่าเริ่มต้นเป็น array ว่าง
+
+// ฟังก์ชันสร้างโครงสร้างข้อมูล
+function createProductionPlanItem() {
+  return {
+    actualFgEntryBy: '',
+    actualFgEntryDate: '',
+    actualFinishedBy: '',
+    actualFinishedDate: '',
+    actualStartBy: '',
+    actualStartDate: '',
+    batchID: '',
+    finishedDate: '',
+    inputDate: '',
+    journalID: '',
+    linkedJournalID: '',
+    lotNumber: '',
+    no: 0,
+    planningApprovedBy: '',
+    planningApprovedDate: '',
+    planningID: '',
+    plantName: '',
+    producingDate: '',
+    product1InBomName: '',
+    product1Name: '',
+    product1PackagingName: '',
+    product1PackingQtyKgs: 0,
+    product1SelectedCode: '',
+    product1SelectedPackagingCode: '',
+    product1UomCount: 0,
+    product2InBomName: '',
+    product2Name: '',
+    product2PackagingName: '',
+    product2PackingQtyKgs: 0,
+    product2SelectedCode: '',
+    product2SelectedPackagingCode: '',
+    product2UomCount: 0,
+    productionCode: '',
+    productionName: '',
+    quantityKgs: 0,
+    reactorName: '',
+    remark: '',
+    seqNo: '',
+    statusComments: '',
+    statusId: 0,
+    submitedBy: '',
+    submitedDate: '',
+    updatedBy: '',
+    updatedDate: '',
+  }
+}
+
+// ใช้ฟังก์ชันเพื่อกำหนดค่าเริ่มต้น
+const productionPlanItems = ref([createProductionPlanItem()])
 
 const formatToMMDDYYYY = date => {
   const [day, month, year] = date.split("/")
   
   return `${month}/${day}/${year}`
+}
+
+const sortBy = ref([{ key: 'planningID', order: 'asc' }, { key: 'batchID', order: 'desc' }])
+
+function transformNullToDefault(item) {
+  const transformedItem = {}
+  for (const key in item) {
+    transformedItem[key] = item[key] === null ? (typeof item[key] === "number" ? 0 : "") : item[key]
+  }
+  
+  return transformedItem
 }
 
 const fetchDataProductingPlan = async () => {
@@ -532,8 +596,6 @@ const headersDataTable = [
     key: 'Action',
   },
 ]
-
-const sortBy = [{ key: 'calories', order: 'asc' }]
 
 const headersDataTableNew = [
   {
@@ -1341,6 +1403,7 @@ const newBatch = async batchID => {
           v-if="productionPlanItems.length > 0"
           v-model:page="currentPageDataTable"
           v-model="selectedDataTables"
+          :sort-by="[{ key: 'planningID', order: 'asc' }, { key: 'batchID', order: 'desc' }]"
           :headers="headersDataTableNew"
           :items="productionPlanItems"
           :items-per-page="10"

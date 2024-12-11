@@ -1,7 +1,6 @@
 import { productionPlanRepository,
 } from '@/repository/skt/productionPlan/repository'
 
-
 export const useNewProductionPlanService = () => {
   const responseNewProductionPlan = ref(null)
   const errorMessageNewProductionPlan = ref(null)
