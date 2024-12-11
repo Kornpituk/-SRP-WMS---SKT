@@ -140,7 +140,7 @@ export const eki432ItemTemplate = [
     "isSection": true,
     "rowSpan": 4,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "( A ) จำนวนที่ระบุ ในใบส่งสินค้า    ",
+    "practice": "( <span class='text-red'>A</span>  ) จำนวนที่ระบุ ในใบส่งสินค้า    ",
     "condition": "",
     "result": {
       "type": "kg",
@@ -156,7 +156,7 @@ export const eki432ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "( B ) จำนวนที่คิดได้จาก Level",
+      "startPracticeText": "( <span class='text-red'>B</span>  ) จำนวนที่คิดได้จาก Level",
       "endPracticeText": "mm.",
       "type": "d",
       "field": [
@@ -180,7 +180,7 @@ export const eki432ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "( C ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
+    "practice": "( <span class='text-red'>C</span>  ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
     "condition": "ต้องไม่เกิน 45,000 Kg.",
     "result": {
       "type": "abkg",
@@ -939,7 +939,7 @@ export const eki432ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "(D)  เช็ค Level ในแท้งค์11V-432 เท่ากับ",
+      "startPracticeText": "( <span class='text-red'>D</span> )  เช็ค Level ในแท้งค์11V-432 เท่ากับ",
       "endPracticeText": "mm.",
       "type": "d",
       "field": [
@@ -964,7 +964,7 @@ export const eki432ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง(C - D)",
+      "startPracticeText": "ส่วนต่างระหว่างจำนวนที่คำนวณได้และจำนวนที่รับจริง(<span class='text-red'>C - D</span> )",
       "endPracticeText": "",
       "type": "checkbox",
       "field": [

@@ -249,7 +249,7 @@ watchEffect(async () => {
   dcsDiff = currencyFormat(g-dcs)
   tankAfter.value = currencyFormat(f)
   tankBefore.value = currencyFormat(d)
-  tankDiff.value = currencyFormat(e-d)
+  tankDiff.value = currencyFormat(f-d)
 })
 </script>
 
