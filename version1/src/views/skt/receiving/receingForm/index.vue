@@ -279,7 +279,7 @@ const generatedJournalId = async () => {
   }
 }
 
-onMounted(async () => {
+watch(async () => {
   await generatedJournalId()
 })
 

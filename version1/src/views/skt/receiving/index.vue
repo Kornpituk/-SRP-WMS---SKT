@@ -129,8 +129,53 @@ const tempFilters = ref({
   fileterStatusInPAI: sessionStorage.getItem('fileterStatusInPAI') || '',
 })
 
+const setValueFilter = () => {
+  
+}
+
 const disBtnExoport = ref(true)
 
+// ดึงค่าจาก sessionStorage
+const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
+
+// ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
+const statusFilter = ref([])
+
+// ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
+const addStoredStatus = () => {
+  console.log("statusFilter addStoredStatus", statusFilter.value)
+  if (storedStatus && storedStatus !== null && storedStatus !== '') {
+    const newItems = storedStatus.split(',')
+
+    // newItems.forEach(item => {
+    //   if (!statusFilter.value.includes(item.trim())) { // เช็คว่าค่าไม่มีใน array
+    //     statusFilter.value.push(item.trim()) // เพิ่มค่าใหม่เข้าไป
+    //   }
+    // })
+
+    // อัปเดต sessionStorage
+    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value)
+    sessionStorage.setItem('statusFilter', statusFilter.value)
+
+    console.log("statusFilter if", sessionStorage.getItem('fileterStatusInPAI', statusFilter.value))
+  }else if(statusFilter.value){
+    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value)
+    console.log("statusFilter addStoredStatus else", statusFilter.value)
+  }
+}
+
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+    sessionStorage.setItem('fileterStatusInPAI', '')
+  }
+  if(sessionStorage.getItem('statusFilter') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+    sessionStorage.setItem('statusFilter', '')
+  }
+
+  addStoredStatus()
+})
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const validateFields = () => {
   const fields = {
     // deliveryDateFrom: deliveryDateFrom.value,
@@ -163,10 +208,34 @@ const validateFields = () => {
   } else {
     disBtnExoport.value = false
     console.log("filter Validate", fields)
+
+    sessionStorage.setItem('deliveryDateFrom', fields.deliveryDateRange || '')
+    sessionStorage.setItem('deliveryDateTo', fields.deliveryDateTo || '')
+    sessionStorage.setItem('productId', fields.productId || '')
+    sessionStorage.setItem('productName', fields.productName || '')
+    sessionStorage.setItem('supplierId', fields.supplierId || '')
+    sessionStorage.setItem('supplierName', fields.supplierName || '')
+    sessionStorage.setItem('purchaseOrderNo', fields.purchaseOrderNo || '')
+    sessionStorage.setItem('fileterStatusInPAI', fields.fileterStatusInPAI || '')
+
+    addStoredStatus()
+
+    sessionStorage.setItem('productId', fields.productId)
     
     return true // คืนค่า true ถ้ามีข้อมูลในฟิลด์อย่างน้อย 1 ฟิลด์
   }
 }
+
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === 'null'){
+    sessionStorage.setItem('fileterStatusInPAI', '')
+  }
+  if(sessionStorage.getItem('statusFilter') === 'null'){
+    sessionStorage.setItem('statusFilter', '')
+  }
+
+  validateFields()
+})
 
 // ใช้ watch function เพื่ออัปเดต sessionStorage เมื่อแต่ละค่าถูกเปลี่ยนแปลง
 watch(tempFilters.value.deliveryDateRange, newValue => {
@@ -177,6 +246,7 @@ watch(tempFilters.value.deliveryDateTo, newValue => {
 })
 watch(tempFilters.value.productId, newValue => {
   sessionStorage.setItem('productId', newValue)
+  console.log("Update Filter", tempFilters.value.productId, newValue)
 })
 watch(tempFilters.value.productName, newValue => {
   sessionStorage.setItem('productName', newValue)
@@ -205,51 +275,7 @@ onMounted(() => {
   tempFilters.value.purchaseOrderNo = sessionStorage.getItem('purchaseOrderNo') || ''
 })
 
-watch(() => {
-  if(sessionStorage.getItem('fileterStatusInPAI') === 'null'){
-    sessionStorage.setItem('fileterStatusInPAI', '')
-  }
-  if(sessionStorage.getItem('statusFilter') === 'null'){
-    sessionStorage.setItem('statusFilter', '')
-  }
-
-  validateFields()
-})
-
-// ดึงค่าจาก sessionStorage
-const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
-
-// ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
-const statusFilter = ref([])
-
-// ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
-const addStoredStatus = () => {
-  if (storedStatus && storedStatus !== null && storedStatus !== '') {
-    const newItems = storedStatus.split(',')
-
-    newItems.forEach(item => {
-      if (!statusFilter.value.includes(item.trim())) { // เช็คว่าค่าไม่มีใน array
-        statusFilter.value.push(item.trim()) // เพิ่มค่าใหม่เข้าไป
-      }
-    })
-
-    // อัปเดต sessionStorage
-    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value.join(',') || '')
-    sessionStorage.setItem('statusFilter', statusFilter.value.join(',') || '')
-  }
-}
-
-watch(() => {
-  if(sessionStorage.getItem('fileterStatusInPAI') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
-    sessionStorage.setItem('fileterStatusInPAI', '')
-  }
-  if(sessionStorage.getItem('statusFilter') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
-    sessionStorage.setItem('statusFilter', '')
-  }
-})
-
 // เรียกใช้ฟังก์ชันเพื่อเพิ่มค่าใหม่
-addStoredStatus()
 
 //------------------------ Model Name for search ------------------------------
 const searchByCategoryName = ref(null)
@@ -336,6 +362,15 @@ const clearModel = async () => {
   tempFilters.value.supplierName = ''
   tempFilters.value.purchaseOrderNo = ''
   tempFilters.value.fileterStatusInPAI = ''
+
+  sessionStorage.setItem('deliveryDateFrom', '')
+  sessionStorage.setItem('deliveryDateTo', '')
+  sessionStorage.setItem('productId', '')
+  sessionStorage.setItem('productName', '')
+  sessionStorage.setItem('supplierId', '')
+  sessionStorage.setItem('supplierName', '')
+  sessionStorage.setItem('purchaseOrderNo', '')
+  sessionStorage.setItem('fileterStatusInPAI', '')
 
   await handleSearch()
 }
@@ -584,11 +619,22 @@ const searchFilters = ref({ ...tempFilters.value }) // ฟิลเตอร์�
 
 const handleSearch = async () => {
   searchFilters.value = { ...tempFilters.value } // คัดลอกค่าฟิลเตอร์ที่กรอกเสร็จแล้ว
+
+  sessionStorage.setItem('deliveryDateFrom', tempFilters.value.deliveryDateRange || '')
+  sessionStorage.setItem('deliveryDateTo', tempFilters.value.deliveryDateTo || '')
+  sessionStorage.setItem('productId', tempFilters.value.productId || '')
+  sessionStorage.setItem('productName', tempFilters.value.productName || '')
+  sessionStorage.setItem('supplierId', tempFilters.value.supplierId || '')
+  sessionStorage.setItem('supplierName', tempFilters.value.supplierName || '')
+  sessionStorage.setItem('purchaseOrderNo', tempFilters.value.purchaseOrderNo || '')
+  sessionStorage.setItem('fileterStatusInPAI', tempFilters.value.fileterStatusInPAI || '')
+
   await GetStockUpdate() // เรียก API ด้วยฟิลเตอร์ที่ผู้ใช้กรอก
 }
 
 onMounted( async () => {
   await GetStockUpdate()
+  addStoredStatus()
 })
 
 const GetStockUpdate = async () => {
@@ -620,6 +666,8 @@ const GetStockUpdate = async () => {
     progressLinearNoData.value = false
 
     products.value = []
+
+    addStoredStatus()
 
     const response = await axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/View`, {
       params: {
