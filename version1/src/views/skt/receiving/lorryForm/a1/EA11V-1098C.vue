@@ -107,8 +107,6 @@ onMounted(async () => {
   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
-
-
 })
 
 async function validateField(){
@@ -1040,11 +1038,9 @@ watchEffect(async () => {
             style="min-width: 150px;"
             colspan="4"
           >
-            <!--
-              <div v-if="ipaRequestData.whSupervisorDate">
-              <span v-if="ipaRequestData.whSupervisorDate">{{ formatDate(ipaRequestData.whSupervisorDate) }}</span>
-              </div> 
-            -->
+            <div v-if="lorryRequestData.whSupervisorDate">
+              <span v-if="lorryRequestData.whSupervisorDate">{{ formatDate(lorryRequestData.whSupervisorDate) }}</span>
+            </div>
           </td>
         </tr>
       </table>
