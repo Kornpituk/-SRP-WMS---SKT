@@ -225,7 +225,7 @@ watchEffect(async () => {
   var b = a / (1.17)
   var c = lorryItems[7].result.field[0].value == 0 ? 0 :lorryItems[7].result.field[0].value
   var d = c == 0 ? 0 : (c * 5.288)-172.970
-  var bd = c+d
+  var bd = b+d
   var e = lorryItems[42].result.field[0].value == 0 ? 0 : lorryItems[42].result.field[0].value
   var f = e == 0 ? 0: (e * 5.288) - 172.970
   var bdf = ((b + d) - f)
@@ -837,7 +837,7 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              Density IPA = 1.17
+              EPICHLO Density = 1.17
             </VLabel>
           </VCol>
         </VRow>

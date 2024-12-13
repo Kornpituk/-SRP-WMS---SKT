@@ -214,6 +214,7 @@ async function approve(e) {
 
 
 watchEffect(async () => {
+
   var b = ipaItems[6].result.field[0].value / (0.78)
   var d = ipaItems[7].result.field[0].value == 0 ? 0 : (ipaItems[7].result.field[0].value * 5.32) + 740.45
   var f = ipaItems[46].result.field[0].value == 0 ? 0 : mm2litre(ipaItems[46].result.field[0].value)

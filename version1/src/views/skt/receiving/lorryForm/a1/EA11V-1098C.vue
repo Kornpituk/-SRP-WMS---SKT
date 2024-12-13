@@ -891,7 +891,7 @@ watchEffect(async () => {
         <VRow>
           <VCol>
             <VLabel class="d-flex justify-center">
-              Density IPA = 0.902
+              Density EA = 0.902
             </VLabel>
           </VCol>
         </VRow>
