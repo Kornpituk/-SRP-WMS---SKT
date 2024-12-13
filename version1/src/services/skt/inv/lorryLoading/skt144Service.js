@@ -124,7 +124,8 @@ export function passSubmitData(type, params) {
   }else if(type == "percent"){
     if(params == undefined)
       return 0
-    else parseFloat(params)
+    else
+      return parseFloat(params)
   }
   else {
     if(isNaN(Number(params))){

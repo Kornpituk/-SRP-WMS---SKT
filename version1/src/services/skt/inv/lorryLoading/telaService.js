@@ -170,7 +170,7 @@ export const telaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "( <span class='text-red'>C</span> ) จำนวนใน DCS + จำนวนที่รับจริง <span class='text-red'>(A +B )</span> Kg.",
+    "practice": "( <span class='text-red'>C</span> ) จำนวนใน DCS + จำนวนที่รับจริง (<span class='text-red'> A + B </span>) Kg.",
     "condition": "<u>ต้องไม่เกิน 8,500 Kg.</u>",
     "result": {
       "type": "c",

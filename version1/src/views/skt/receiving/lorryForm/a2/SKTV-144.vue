@@ -24,6 +24,8 @@ import image01 from '@/views/skt/receiving/lorryForm/a2/EP-400 (144,145 ).png'
 
 const itemStore = useItemStore()
 
+var unMountedState = ref(false)
+
 var lorryItems = reactive(ItemTemplate)
 var lorryRequestData = ref({})
 const route = useRoute()
@@ -101,16 +103,11 @@ onMounted(async () => {
 
   const lorryFormStatus = await GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters.value)
 
-  console.log("statusId", lorryFormStatus.data)
-
   statusId.value = lorryFormStatus.data.data[0].statusId
 
- 
   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
     isReadOnly.value = true
   }
-
-  
 
 })
 
@@ -122,7 +119,6 @@ async function saveDraft(e) {
     }
   }
   lorryRequestData.value["l04000001"] = tankAfter.value
-
   var response = await save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData)
 
   if (response.status == 200) {

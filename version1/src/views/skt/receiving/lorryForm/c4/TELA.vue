@@ -15,6 +15,7 @@ import alertWordConst from '@/utilities/constant'
 import { hour, minute } from '@/utilities/time'
 
 const itemStore = useItemStore()
+var unMountedState = ref(false)
 
 var lorryItem = reactive(telaItemTemplate)
 var lorryRequestData = ref({})
@@ -26,6 +27,7 @@ const poNo = ref('')
 
 
 var isReadOnly = ref(false)
+
 
 //------------------------------ Dialog --------------------------------
 const isDialogVisibleAlertDialog = ref(false)
@@ -106,6 +108,8 @@ onMounted(async () => {
     isReadOnly.value = true
   }
 
+  unMountedState.value = true
+
 })
 
 async function saveDraft(e) {
@@ -184,7 +188,7 @@ async function submit(e) {
     const whereHouse = localStorage.getItem('whereHouseName')
 
     // เรียก API หรือดำเนินการต่อ
-    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+    var response = await axios.post(`${urlApi.value}/api/v1/LorryFormTela/submit/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
       headers: {
         'accept': '*/*',
         'x-location': `${whereHouse}`,
@@ -208,7 +212,7 @@ async function approve(e) {
   const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
-  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
+  var response = await axios.post(`${urlApi.value}/api/v1/LorryFormTela/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -224,10 +228,12 @@ async function approve(e) {
   }
 }
 watchEffect(async () => {
-  var c = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value
-  var d = lorryItem[32].result.field[0].value
-  lorryItem[2].result.field[0].value = currencyFormat(c) // A+B
-  lorryItem[33].result.field[0].value = currencyFormat(c-d) // C-D
+  if(unMountedState.value === true){
+    var c = lorryItem[0].result.field[0].value + lorryItem[1].result.field[0].value
+    var d = lorryItem[32].result.field[0].value
+    lorryItem[2].result.field[0].value = currencyFormat(c) // A+B
+    lorryItem[33].result.field[0].value = currencyFormat(c-d) // C-D
+  }
 })
 </script>
 

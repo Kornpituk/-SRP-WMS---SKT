@@ -140,7 +140,7 @@ export const eki432ItemTemplate = [
     "isSection": true,
     "rowSpan": 4,
     "sequence": "<strong>1.check ใบส่งสินค้า  </strong>",
-    "practice": "( <span class='text-red'>A</span>  ) จำนวนที่ระบุ ในใบส่งสินค้า    ",
+    "practice": "( <span class='text-red'>A</span> ) จำนวนที่ระบุ ในใบส่งสินค้า    ",
     "condition": "",
     "result": {
       "type": "kg",
@@ -156,7 +156,7 @@ export const eki432ItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": {
-      "startPracticeText": "( <span class='text-red'>B</span>  ) จำนวนที่คิดได้จาก Level",
+      "startPracticeText": "( <span class='text-red'>ฺB</span> ) จำนวนที่คิดได้จาก Level",
       "endPracticeText": "mm.",
       "type": "d",
       "field": [
@@ -172,7 +172,6 @@ export const eki432ItemTemplate = [
       "field": [
         {
           "name": "l1301020101",
-          
         },
       ],
     },
@@ -180,7 +179,7 @@ export const eki432ItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "( <span class='text-red'>C</span>  ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
+    "practice": "( <span class='text-red'>C</span> ) ปริมาณที่คำนวณได้ก่อนการรับ (A + B) ",
     "condition": "ต้องไม่เกิน 45,000 Kg.",
     "result": {
       "type": "abkg",

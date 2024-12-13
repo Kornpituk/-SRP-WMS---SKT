@@ -25,6 +25,8 @@ import image01 from '@/views/skt/receiving/lorryForm/a2/EP-400 (144,145 ).png'
 
 const itemStore = useItemStore()
 
+var unMountedState = ref(false)
+
 var lorryItems = reactive(ItemTemplate)
 var lorryRequestData = ref({})
 const route = useRoute()
@@ -115,14 +117,15 @@ onMounted(async () => {
     isReadOnly.value = true
   }
 
+  unMountedState.value = true
+
 })
 
 async function saveDraft(e) {
 
   for (var i of lorryItems) {
     for (var f of i.result.field) {
-      if(i.result.type == "percent")
-        lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
+      lorryRequestData.value[f.name] = passSubmitData(i.result.type, f.value)
     }
   }
 
@@ -234,23 +237,26 @@ async function approve(e) {
 }
 
 watchEffect(async () => {
-  var a = lorryItems[6].result.field[0].value
-  var c = lorryItems[7].result.field[1].value
-  var d = a+c
-  var e = lorryItems[44].result.field[0].value
-  var de = d-e
-  lorryItems[9].result.field[0].value = currencyFormat(d)
-  lorryItems[45].result.field[0].value = currencyFormat(de)
+
+  if(unMountedState.value === true){
+    var a = lorryItems[6].result.field[0].value
+    var c = lorryItems[7].result.field[1].value
+    var d = a+c
+    var e = lorryItems[44].result.field[0].value
+    var de = d-e
+    lorryItems[9].result.field[0].value = currencyFormat(d)
+    lorryItems[45].result.field[0].value = currencyFormat(de)
 
   
 
-  dcsAfter.value = currencyFormat(e)
-  dcsBefore.value = currencyFormat(d)
-  dcsDiff = currencyFormat(e - (d))
+    dcsAfter.value = currencyFormat(e)
+    dcsBefore.value = currencyFormat(d)
+    dcsDiff = currencyFormat(e - (d))
 
-  // tankAfter.value = currencyFormat(f)
-  tankBefore.value = currencyFormat(c)
-  tankDiff.value = currencyFormat(tankAfter.value - c)
+    // tankAfter.value = currencyFormat(f)
+    tankBefore.value = currencyFormat(c)
+    tankDiff.value = currencyFormat(tankAfter.value - c)
+  }
 })
 </script>
 

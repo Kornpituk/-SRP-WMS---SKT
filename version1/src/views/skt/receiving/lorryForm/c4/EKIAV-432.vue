@@ -2,7 +2,7 @@
 import { urlApi } from '@/api'
 import VCurrencyField from "@/components/VCurrencyField.vue"
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import image01 from '@/views/skt/receiving/lorryForm/c2/EKI-A ( 432 ).png'
+import image01 from '@/views/skt/receiving/lorryForm/c4/EKI-A ( 432 ).png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
@@ -323,7 +323,7 @@ watchEffect(async () => {
                 <VRow>
                   <VCol>
                     <VLabel class="d-flex justify-left pa-md-2 text-wrap">
-                      {{ section.practice.startPracticeText }}
+                      <span v-html="section.practice.startPracticeText" />
                       <VCurrencyField
                         v-model="section.practice.field[0].value"
                         density="compact"
@@ -331,7 +331,8 @@ watchEffect(async () => {
                         text-start=""
                         text-end=""
                         :readonly="isReadOnly"
-                      /> {{ section.practice.endPracticeText }}
+                      /> 
+                      <span v-html="section.practice.endPracticeText" />
                     </VLabel>
                   </VCol>
                 </VRow>
