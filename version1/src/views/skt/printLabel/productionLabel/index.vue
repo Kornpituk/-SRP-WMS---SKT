@@ -598,6 +598,7 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-2"
               >
                 <VSelect
+                  v-if="false"
                   v-model="paramsFetchDataPrintLabel.category"
                   :items="itemsCategories"
                   density="compact"
@@ -609,6 +610,22 @@ const dataTableColor = ref('#E0F7FA')
                     <span>Categories</span>
                   </template>
                 </VSelect>
+
+                <VTextField
+                  v-model="paramsFetchDataPrintLabel.productId"
+                  density="compact"
+                  height="20px"
+                  class="py-0"
+                >
+                  <template #label>
+                    <span
+                      class="d-flex align-center"
+                      style="font-size: 12px;"
+                    >
+                      Plant
+                    </span>
+                  </template>
+                </VTextField>
               </VCol>
 
               <!-- 👉 Select Product code -->
@@ -663,7 +680,7 @@ const dataTableColor = ref('#E0F7FA')
               >
                 <AppDateTimePicker
                   v-model="paramsFetchDataPrintLabel.receivedDate"
-                  placeholder="Received Date"
+                  placeholder="Production Date"
                   density="compact"
                   :config="{ dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -686,7 +703,7 @@ const dataTableColor = ref('#E0F7FA')
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      P/O No.
+                      Reactor
                     </span>
                   </template>
                 </VTextField>

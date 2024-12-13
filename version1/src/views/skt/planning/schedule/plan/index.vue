@@ -704,7 +704,6 @@ const validateBatchSale = (batchSale, kgs1, pcs1, kgs2, pcs2) => {
 
 const validateBatchSaleRow = ref()
 
-
 // Watch เพื่อทำการ validate แบบ real-time
 watch(
   () => Object.values(validationData), // ติดตามการเปลี่ยนแปลงใน validationData
@@ -2207,6 +2206,7 @@ const print = () => {
         <VDataTable
           v-if="productionPlan"
           v-model="selectedDataTables"
+          v-model:sort-by="sortBy"
           :headers="headersDataTableNew"
           :items="productionPlan"
           :items-per-page="10"
@@ -2292,18 +2292,7 @@ const print = () => {
                 style="min-width: 150px;"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                <AppDateTimePicker
-                  v-if="false"
-                  v-model="item.raw.inputDate"
-                  density="compact"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                >
-                  <template #label>
-                    <span>Input Data</span>
-                  </template>
-                </AppDateTimePicker>
-                <span>{{ formatDate(item.raw.inputDate) }}</span>
+                <span>{{ (item.raw.inputDate) }}</span>
               </td>
               <td
                 class="cursor-pointer"
@@ -2896,6 +2885,7 @@ const print = () => {
         Show
       </VBtn>
     </VCard>
+    <pre>{{ sortBy }}</pre>
   </section>
 
   <!-- Alert Dialog Success/Fiald new -->

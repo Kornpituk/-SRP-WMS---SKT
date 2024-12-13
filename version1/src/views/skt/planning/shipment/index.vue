@@ -1039,7 +1039,7 @@ const isDialogVisiblePrintTruck = ref(false)
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
     <VCard class="mt-6">
-      <VTable class="text-no-wrap table-header-bg rounded-0">
+      <VTable class="rounded-0">
         <!-- 👉 table head -->
         <thead>
           <tr>
@@ -1194,6 +1194,7 @@ const isDialogVisiblePrintTruck = ref(false)
 
             <!-- 👉 Secondary product categories -->
             <td
+              style="font-size: 12px;"
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
             >
@@ -1597,6 +1598,7 @@ const isDialogVisiblePrintTruck = ref(false)
         </div>
       </VCardText>
     </VCard>
+    <pre>{{ sortBy }}</pre>
   </section>
 
   <!-- Footer -->
@@ -1648,6 +1650,7 @@ const isDialogVisiblePrintTruck = ref(false)
 .custom-table th,
 .custom-table td {
   border: 1px solid black;
+  font-size: 12px;
 }
 
 .custom-table th,
