@@ -625,6 +625,7 @@ const headersDataTableNew = [
   {
     title: 'Reactor',
     key: 'reactor',
+    class: 'my-header-style',
   },
   {
     title: 'Production Code',
@@ -712,6 +713,27 @@ const headersDataTableNew = [
     key: 'action',
   },
 ]
+
+const iconsSort = ref({
+  sortColumn10: true,
+  sortColumn11: true,
+  sortColumn12: true,
+  sortColumn13: true,
+  sortColumn14: true,
+})
+
+// ฟังก์ชันสำหรับสลับสถานะของไอคอนแต่ละตัว
+const toggleDirection = index => {
+  if(index === 10){
+    iconsSort.value.sortColumn10 = false
+  }
+}
+
+const getColumnClass = index => {
+  const colorClasses = ["red-bg", "blue-bg", "yellow-bg", "green-bg"]
+  
+  return colorClasses[index] || "" // กำหนดสีตาม index
+}
 
 //--------------------- Menu
 
@@ -1411,13 +1433,227 @@ const newBatch = async batchID => {
           show-select
           class="text-no-wrap"
         >
-          <template #column.action="{ column }">
+          <template #column.status="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.column }} action
+                {{ column.title }} c
               </th>
             </tr>
           </template>
+          <template #column.no="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.inputDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.plants="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.reactor="{ column }">
+            <tr class="d-flex justify-center">
+              <th :class="getColumnClass(1)">
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.productCode="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.productName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.batchScaleKgs="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+
+          <template #column.productCode1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <div>
+              <tr class="d-flex justify-center">
+                <th>
+                  <span style="background: #e0f7fa;">{{ column.title }}<VIcon
+                    :icon="iconsSort.sortColumn10 ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                    class="clickable-icon"
+                    @click="toggleDirection(10)"
+                  /></span>
+                </th>
+              </tr>
+            </div>
+          </template>
+          <template #column.productName1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingType1="{ column }">
+            <tr class="d-flex justify-center py-0">
+              <th>
+                <span style="background: #e0f7fa;">Item 1 </span>
+              </th>
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingKgs1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingPcs1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+
+          <template #column.productCode2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.productName2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingType2="{ column }">
+            <tr class="d-flex justify-center py-0">
+              <th>
+                <span style="background: #ffebee;">Item 2 </span>
+              </th>
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingKgs2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingPcs2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+
+          <template #column.lotNumber="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.producingDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.finishedDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.remark="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.updateDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.byWho="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+
+          <template #column.action="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+
+
           <template #item="{ item, index }">
             <tr style="font-size: 14px;">
               <td
@@ -1954,6 +2190,46 @@ const newBatch = async batchID => {
 </template>
 
 <style lang="scss">
+.v-data-table th:nth-child(10) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(11) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(12) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(13) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(14) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(15) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(16) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(17) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(18) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(19) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
 .text-capitalize {
   text-transform: capitalize;
 }
