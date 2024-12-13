@@ -225,7 +225,7 @@ const formatToMMDDYYYY = date => {
   return `${month}/${day}/${year}`
 }
 
-const sortBy = ref([{ key: 'planningID', order: 'asc' }, { key: 'batchID', order: 'desc' }])
+const sortBy = ref([{ key: 'planningID', order: 'asc' }])
 
 function transformNullToDefault(item) {
   const transformedItem = {}
@@ -1403,7 +1403,6 @@ const newBatch = async batchID => {
           v-if="productionPlanItems.length > 0"
           v-model:page="currentPageDataTable"
           v-model="selectedDataTables"
-          :sort-by="[{ key: 'planningID', order: 'asc' }, { key: 'batchID', order: 'desc' }]"
           :headers="headersDataTableNew"
           :items="productionPlanItems"
           :items-per-page="10"

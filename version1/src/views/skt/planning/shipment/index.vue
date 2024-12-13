@@ -1598,6 +1598,7 @@ const isDialogVisiblePrintTruck = ref(false)
         </div>
       </VCardText>
     </VCard>
+    <pre>{{ sortBy }}</pre>
   </section>
 
   <!-- Footer -->
