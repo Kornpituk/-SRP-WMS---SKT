@@ -131,20 +131,20 @@ const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetc
 
 const filterForSearchBatchProductionPlan = ref({
   StatusID: null,
-  ProductionTextSearch: "",
-  ItemTextSearch: "",
-  ProducingDateFrom: "",
-  ProducingDateTo: "",
-  LotTextSearch: "",
+  ProductionTextSearch: sessionStorage.getItem("ProductionTextSearchProductionFilter"),
+  ItemTextSearch: sessionStorage.getItem("ItemTextSearchProductionFilter"),
+  ProducingDateFrom: sessionStorage.getItem("ProducingDateFromProductionFilter"),
+  ProducingDateTo: sessionStorage.getItem("ProducingDateToProductionFilter"),
+  LotTextSearch: sessionStorage.getItem("LotTextSearchProductionFilter"),
 })
 
 const clearModelFolter = async () => {
   filterForSearchBatchProductionPlan.value.StatusID = null,
-  filterForSearchBatchProductionPlan.value.ProductionTextSearch = "",
-  filterForSearchBatchProductionPlan.value.ItemTextSearch = "",
-  filterForSearchBatchProductionPlan.value.ProducingDateFrom = "",
-  filterForSearchBatchProductionPlan.value.ProducingDateTo = "",
-  filterForSearchBatchProductionPlan.value.LotTextSearch = "",
+  filterForSearchBatchProductionPlan.value.ProductionTextSearch = '',
+  filterForSearchBatchProductionPlan.value.ItemTextSearch = '',
+  filterForSearchBatchProductionPlan.value.ProducingDateFrom = '',
+  filterForSearchBatchProductionPlan.value.ProducingDateTo = '',
+  filterForSearchBatchProductionPlan.value.LotTextSearch = '',
   datePickerFilter.value = ''
 
   await fetchDataProductingPlan()
@@ -156,6 +156,7 @@ const searchFilters = ref({ ...filterForSearchBatchProductionPlan.value }) // �
 
 const handleSearch = async () => {
   searchFilters.value = { ...filterForSearchBatchProductionPlan.value } // คัดลอกค่าฟิลเตอร์ที่กรอกเสร็จแล้ว
+  saveHistoryFilterSearch()
   await fetchDataProductingPlan() // เรียก API ด้วยฟิลเตอร์ที่ผู้ใช้กรอก
 }
 
@@ -234,6 +235,15 @@ function transformNullToDefault(item) {
   }
   
   return transformedItem
+}
+
+const saveHistoryFilterSearch = () => {
+  sessionStorage.setItem("StatusIDProductionFilter", filterForSearchBatchProductionPlan.value.StatusID)
+  sessionStorage.setItem("ProductionTextSearchProductionFilter", filterForSearchBatchProductionPlan.value.ProductionTextSearch)
+  sessionStorage.setItem("ItemTextSearchProductionFilter", filterForSearchBatchProductionPlan.value.ItemTextSearch)
+  sessionStorage.setItem("ProducingDateFromProductionFilter", filterForSearchBatchProductionPlan.value.ProducingDateFrom)
+  sessionStorage.setItem("ProducingDateToProductionFilter", filterForSearchBatchProductionPlan.value.ProducingDateTo)
+  sessionStorage.setItem("LotTextSearchProductionFilter", filterForSearchBatchProductionPlan.value.LotTextSearch)
 }
 
 const fetchDataProductingPlan = async () => {
