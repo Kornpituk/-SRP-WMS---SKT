@@ -139,7 +139,12 @@ const disBtnExoport = ref(true)
 const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
 
 // ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
-const statusFilter = ref([])
+const statusFilter = ref(sessionStorage.getItem('fileterStatusInPAI'))
+
+
+if(sessionStorage.getItem('fileterStatusInPAI') === ''){
+  statusFilter.value = 'All'
+}
 
 // ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
 const addStoredStatus = () => {
@@ -1349,7 +1354,11 @@ const processingPrintLabel = ref(false)
 const successGetPrintLabelView = ref(false)
 
 const disabledBtnLebal = () => {
-  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16, 12, 13, 14].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16, 13].includes(idStatusDialogAction.value)
+}
+
+const disabledBtnLebalLorry = () => {
+  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16, 13].includes(idStatusDialogAction.value)
 }
 
 const disabledTypeReceiving = ref(itemStore.getItemDetails('typeLorryInfoId'))
@@ -3309,7 +3318,7 @@ const insetSwitch1 = ref('')
                 class="mt-4"
               >
                 <VBtn
-                  v-if="!disabledTypeReceiving"
+                  v-if="!disabledBtnLebalLorry()"
                   style="width: 100%;"
                   :disabled="checkPersistent"
                   @click="btnPrintLabel"
