@@ -977,7 +977,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")
@@ -1047,7 +1047,7 @@ const addEmptyRowToPlan = async () => {
     console.log("New Plan Not Success")
     textAlertDialogFunction(alertWordConst.newPlan, false)
     setTimeout(() => {
-      location.reload()
+      // location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
   }
   
@@ -1151,7 +1151,7 @@ const submitPlan = async () => {
     }else if(errorMessageSubmitProductionPlan.value){
       textAlertSubDialogFunction(alertWordConst.submit, errorMessageSubmitProductionPlan.value, false)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500)
 
       console.log("AlertDialog Submit", errorMessageSubmitProductionPlan.value, responseSubmitProductionPlan.value)
