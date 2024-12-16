@@ -1,95 +1,144 @@
-import { ref } from 'vue'
+import { urlApi } from '@/api'
+import axios from '@axios'
+
+export async function generate(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function get(poEtlLogDetailJournalID) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/LorryFormIPA/get/${poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  var response =  await axios.post(`${urlApi.value}/api/v1/LorryFormIPA/save/${poEtlLogDetailJournalIDQueryParameters.value}`, ipaRequestData.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+  
+  return response
+}
+
+export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
+  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+
+  return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  })
+}
+
+export function currencyFormat(number) {
+  return new Intl.NumberFormat("th-TH", {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(number)
+}
 
 
-// export const ipaRequestData = {
-//   "RmLorryLoadingFormJournalId": 0,
-//   "ProductId": "",
-//   "ProductName": "",
-//   "LoadedDate": null,
-//   "PurchaseOrderNo": null,
-//   "WHStaff": "",
-//   "WHStaffUpdatedDate": null,
-//   "WHLeader": "",
-//   "WHLeaderDate": null,
-//   "WHSupervisor": "",
-//   "WHSupervisorDate": null,
-//   "L0101010001": "1",
-//   "L0101020001": "1",
-//   "L0101030001": "1",
-//   "L0101040001": "1",
-//   "L0101050001": "",
-//   "L0101060001": "",
-//   "L0102010101": "",
-//   "L0102010102": "",
-//   "L0102020101": "",
-//   "L0102020102": "",
-//   "L0102030101": "",
-//   "L0102030102": "",
-//   "L0102040101": "",
-//   "L0102040102": "",
-//   "L0102050101": "",
-//   "L0103010101": "",
-//   "L0103020101": "",
-//   "L0103030101": "",
-//   "L0103040101": "",
-//   "L0103050101": "",
-//   "L0103060101": "",
-//   "L0103060102": "",
-//   "L0104010101": "",
-//   "L0104020101": "",
-//   "L0104030101": "",
-//   "L0104030102": "",
-//   "L0105010101": "",
-//   "L0105020101": "",
-//   "L0105030101": "",
-//   "L0106010101": "",
-//   "L0106020101": "",
-//   "L0106030101": "",
-//   "L0106040101": "",
-//   "L0106050101": "",
-//   "L0106060101": "",
-//   "L0107010101": "",
-//   "L0107020101": "",
-//   "L0107030101": "",
-//   "L0107040101": "",
-//   "L0108010101": "",
-//   "L0108020101": "",
-//   "L0108030101": "",
-//   "L0108030102": "",
-//   "L0108040101": "",
-//   "L0108040102": "",
-//   "L0108050101": "",
-//   "L0109010101": "",
-//   "L0109020101": "",
-//   "L0109030101": "",
-//   "L0109040101": "",
-//   "L0109050101": "",
-//   "L0109060101": "",
-//   "L0109060102": "",
-//   "L0109070101": "",
-//   "L0109080101": "",
-//   "L0109090101": "",
-//   "L0109090102": "",
-//   "L0109100101": "",
-//   "L0109110101": "",
-//   "L0109120101": "",
-//   "L0109120102": ""
-// }
+export function mm2litre(mm) {
+  let litre = mm * 5.32 + 740.45
+
+  return litre.toFixed(2)
+}
+
+//----------------- Formate
+export function formatDate(dateString) {
+  if (dateString === null || dateString === '' || dateString === undefined) {
+    return 'Null'
+  } else if (dateString.length > 0) {
+    const date = new Date(dateString) // แปลงสตริงเป็นวัตถุ Date
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // เดือนเริ่มต้นที่ 0, ดังนั้นต้อง +1
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+
+  }
+
+  return 'null'
+}
+
+export function passInitialData(type, params, index) {
+  if (type == "oknot" ) {
+    return params.toString()
+  }else if(type == "bd" || type == "litre" || type == "percen" || type == "c" || type=='mpa'|| type=='amp'){
+    if(index == 0){
+      return params
+    }else{
+      return params.toString()
+    }
+  }
+  else {
+    return params
+  }
+}
+
+export function passSubmitData(type, params) {
+  if (type == "oknot") {
+    if (params == "0") {
+      return 0
+    } else if (params == "1") {
+      return 1
+    } else {
+      return -1
+    }
+  }
+  else if(type == "actualCheck"){
+    return !params ? "0": params.toString()
+  }
+  else {
+    if(isNaN(Number(params)) && type != ""){
+      return parseFloat( params.replace(/,/g, ''))
+    }else{
+      return parseFloat(params)
+    }
+  }
+}
+
 
 export const ipaItemTemplate = [
   // ข้อควรระวัง
   {
     "isSection": true,
     "rowSpan": 6,
-    "sequence": "<strong>ข้อควรระวัง</strong>",
+    "sequence": "<strong><u>ข้อควรระวัง</u></strong>",
     "practice": "หากมีงาน Hot work or Fire work ใกล้เคียง ให้แจ้งหัวหน้างานให้หยุดชั่วคราว",
     "condition": "",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l0101010001",
-          "value:": "",
+          "name": "l0101010101",
         },
       ],
     },
@@ -97,14 +146,14 @@ export const ipaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "ให้ปิดโทรศัพท์ขณะ loading Solvent",
+    "practice": "ให้<u>ปิด</u>โทรศัพท์ขณะ Loading Solvent",
     "condition": "",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l0101020001",
-          "value:": "",
+          "name": "l0101020101",
+
         },
       ],
     },
@@ -112,14 +161,14 @@ export const ipaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "หากมี Solvent หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ ห้ามใช้น้ำล้าง",
+    "practice": "หากมี Solvent หยดลงพื้น ให้ใช้ผ้า หรือ ตัวดูดซับ <strong>ห้ามใช้น้ำล้าง</strong>",
     "condition": "",
     "result": {
       "type": "oknot",
       "field": [
         {
-          "name": "l0101030001",
-          "value:": "",
+          "name": "l0101030101",
+
         },
       ],
     },
@@ -133,8 +182,8 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101040001",
-          "value:": "",
+          "name": "l0101040101",
+
         },
       ],
     },
@@ -148,8 +197,8 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101050001",
-          "value:": "",
+          "name": "l0101050101",
+
         },
       ],
     },
@@ -163,8 +212,8 @@ export const ipaItemTemplate = [
       "type": "oknot",
       "field": [
         {
-          "name": "l0101060001",
-          "value:": "",
+          "name": "l0101060101",
+
         },
       ],
     },
@@ -174,7 +223,7 @@ export const ipaItemTemplate = [
   {
     "isSection": true,
     "rowSpan": 5,
-    "sequence": "<strong>Document Check</strong>",
+    "sequence": "Document Check",
     "practice": "1. จำนวนที่ระบุ ในใบส่งสินค้า",
     "condition": "ตามเอกสารใบส่ง",
     "result": {
@@ -182,11 +231,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102010101", // A
-          "value:": "",
+
         },
         {
           "name": "l0102010102", // B
-          "value:": "",
+
         },
       ],
     },
@@ -201,11 +250,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102020101", // C
-          "value:": "",
+
         },
         {
           "name": "l0102020102", // D
-          "value:": "",
+
         },
       ],
     },
@@ -220,11 +269,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102030101", // BD
-          "value:": "",
+
         },
         {
           "name": "l0102030102", // OkNot
-          "value:": "",
+
         },
       ],
     },
@@ -239,11 +288,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0102040101", // litre
-          "value:": "",
+
         },
         {
           "name": "l0102040102", // OkNot
-          "value:": "",
+
         },
       ],
     },
@@ -254,15 +303,11 @@ export const ipaItemTemplate = [
     "practice": "5. Check Seal No. ที่รถส่งของ และ แป้นในถัง lorry ว่าตรง 10,000 ลิตร หรือไม่",
     "condition": "Seal ล็อกวาล์วไม่ขาดตรงตามใบส่ง",
     "result": {
-      "type": "litre",
+      "type": "oknot",
       "field": [
         {
           "name": "l0102050101", // litre
-          "value:": "",
-        },
-        {
-          "name": "l0102050101", // litre
-          "value:": "",
+
         },
       ],
     },
@@ -278,7 +323,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103010101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -293,7 +338,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103020101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -308,7 +353,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103030101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -323,7 +368,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103040101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -338,7 +383,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0103050101", // oknot
-          "value:": "",
+
         },
       ],
     },
@@ -349,7 +394,7 @@ export const ipaItemTemplate = [
     "practice": "6. Moisture เท่าไหร่",
     "condition": "0.100 Max",
     "result": {
-      "type": "oknot",
+      "type": "percen",
       "field": [
         {
           "name": "l0103060101", // percen
@@ -357,7 +402,7 @@ export const ipaItemTemplate = [
         },
         {
           "name": "l0103060102", // ok
-          "value:": "",
+
         },
       ],
     },
@@ -373,7 +418,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -388,7 +433,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0104020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -397,17 +442,17 @@ export const ipaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "3. Temperature เท่าไหร่",
-    "condition": "อุณหภูมิต้องไม่สูงกว่า 25 C'",
+    "condition": "อุณหภูมิต้องไม่สูงกว่า 25 ℃",
     "result": {
-      "type": "oknot",
+      "type": "c",
       "field": [
         {
           "name": "l0104030101", // percen
-          "value:": "",
+
         },
         {
           "name": "l0104030102", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -423,7 +468,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -438,7 +483,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -453,7 +498,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0105030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -469,7 +514,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -484,7 +529,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -499,7 +544,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -514,7 +559,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106040101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -529,7 +574,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0106050101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -538,13 +583,12 @@ export const ipaItemTemplate = [
     "isSection": false,
     "sequence": "",
     "practice": "- เข็มขัดนิรภัย",
-    "condition": "-",
+    "condition": "",
     "result": {
-      "type": "oknot",
+      "type": "",
       "field": [
         {
-          "name": "l0106060101", // percen
-          "value:": "",
+          // "name": "l0106060101", // percen
         },
       ],
     },
@@ -560,7 +604,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107010101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -575,7 +619,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107020101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -583,14 +627,14 @@ export const ipaItemTemplate = [
   {
     "isSection": false,
     "sequence": "",
-    "practice": "3. เปิดวาล์วจาก Lorry No.14",
-    "condition": "Open (เปิด)",
+    "practice": "3. เปิดวาล์วจาก Lorry ",
+    "condition": "No.14 Open (เปิด)",
     "result": {
       "type": "oknot",
       "field": [
         {
           "name": "l0107030101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -605,7 +649,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0107040101", // percen
-          "value:": "",
+
         },
       ],
     },
@@ -621,7 +665,6 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108010101", // percen
-          "value:": "",
         },
       ],
     },
@@ -636,11 +679,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108020101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0108020102", // 2
-          "value:": "",
+
         },
       ],
     },
@@ -655,10 +698,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108030101", // 1
-          "value:": "",
+
         }, {
           "name": "l0108030102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -673,10 +716,10 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108040101", // 1
-          "value:": "",
+
         }, {
           "name": "l0108040102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -691,7 +734,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0108050101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -707,7 +750,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109010101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -722,7 +765,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109020101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -737,11 +780,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109030101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0109030102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -756,7 +799,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109040101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -771,7 +814,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109050101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -786,11 +829,11 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109060101", // 1
-          "value:": "",
+
         },
         {
           "name": "l0109060102", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -805,7 +848,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109070101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -820,7 +863,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109080101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -835,11 +878,9 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109090101", // 1
-          "value:": "",
         },
         {
           "name": "l0109090102", // 1
-          "value:": "",
         },
       ],
     },
@@ -854,7 +895,6 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109100101", // 1
-          "value:": "",
         },
       ],
     },
@@ -869,7 +909,7 @@ export const ipaItemTemplate = [
       "field": [
         {
           "name": "l0109110101", // 1
-          "value:": "",
+
         },
       ],
     },
@@ -883,15 +923,15 @@ export const ipaItemTemplate = [
       "type": "litrekg",
       "field": [
         {
-          "name": "l0109120101", // 1
-          "value:": "",
+          "name": "l0109120101", // 1    
         },
         {
-          "name": "l0109120102", // 1
-          "value:": "",
+          "name": "l0109120102", // 1         
         },
       ],
     },
   },
 
 ]
+
+

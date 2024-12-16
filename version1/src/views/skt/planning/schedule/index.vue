@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -15,14 +15,403 @@ const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
 
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
+const selectedDataTables = ref([])
 
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
+//------------------------------------------- compoennt ----------------------------------------------------------------
+import GTable from '@/pages/skt/planning/schedule/gridTable/index.vue'
+import TestTable from '@/pages/skt/planning/schedule/gridTable/tableTest.vue'
+
 //------------------------------------------ Data --------------------------------
+
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+import { useGetBatchProductionPlanService, useGetProductionPlanSearchService, useApproveProductionPlanService } from '@/services/skt/productionPlan/services'
+
+import { useFormatDateUtilities } from '@/utilities/utilities'
+
+import { useGetCOAFormController } from '@/utilities/format'
+
+const { formatNumber } = useGetCOAFormController()
+
+//----------------------------------- Dialog -------------------------------------------
+//------------------------ Dialog Confirm --------------------------------
+import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import alertWordConst from '@/utilities/constant'
+
+const isDialogVisibleConfirmDialog = ref(false)
+const isDialogVisibleAlertDialog = ref(false)
+const wordForSubmit = ref('')
+const subWordForSubmit = ref('')
+const successDialAlert = ref(false)
+const confirmValueCheck = ref(false)
+
+//--------------------- model --------------------------------
+//-- dialog 2 
+const confirmDialog2 = ref(null)
+
+function openConfirmDialog() {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    console.log("selectedDataTables", item.statusId)
+
+    if (item.statusId === 102 ) {
+      wordForSubmit.value = alertWordConst.approve
+      confirmDialog2.value.openDialog()
+      isDialogVisibleAlertDialog.value = false
+      console.log("selectedDataTables 102")
+    }else if(item.statusId === 101){
+      textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
+      console.log("selectedDataTables 101")
+    }
+    else{
+      console.log("selectedDataTables failded")
+      isDialogVisibleAlertDialog.value = false
+    }
+
+  })
+
+}
+
+function handleConfirmAction() {
+  console.log('Confirmed! Executing action...')
+  approvePlan()
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
+
+const textAlertDialogFunction = (word, success) => {
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
+const textSubAlertDialogFunction = (word, subWord, success) => {
+  wordForSubmit.value = word
+  subWordForSubmit.value = subWord
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
+//----------------------------------- DBClicks hightlight --------------------------------
+const dataTableColor = ref('#E0F7FA')
+const dataTableNummberedToggle = ref(null)
+
+const isSelected = item => {
+  return selectedDataTables.value.some(
+    selectedItem => selectedItem.journalID === item.journalID,
+  )
+}
+
+const dataTableCliclHighlightIsToggle = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle.value = null
+  } else if (dataTableNummberedToggle.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle.value)
+}
+
+//----------------------------------- Get Batch Production plan ---------------------------
+import { ProductionDataModel } from '@/model/skt/planning/production/model'
+
+const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
+
+const filterForSearchBatchProductionPlan = ref({
+  StatusID: null,
+  ProductionTextSearch: sessionStorage.getItem("ProductionTextSearchProductionFilter"),
+  ItemTextSearch: sessionStorage.getItem("ItemTextSearchProductionFilter"),
+  ProducingDateFrom: sessionStorage.getItem("ProducingDateFromProductionFilter"),
+  ProducingDateTo: sessionStorage.getItem("ProducingDateToProductionFilter"),
+  LotTextSearch: sessionStorage.getItem("LotTextSearchProductionFilter"),
+})
+
+const clearModelFolter = async () => {
+  filterForSearchBatchProductionPlan.value.StatusID = null,
+  filterForSearchBatchProductionPlan.value.ProductionTextSearch = '',
+  filterForSearchBatchProductionPlan.value.ItemTextSearch = '',
+  filterForSearchBatchProductionPlan.value.ProducingDateFrom = '',
+  filterForSearchBatchProductionPlan.value.ProducingDateTo = '',
+  filterForSearchBatchProductionPlan.value.LotTextSearch = '',
+  datePickerFilter.value = ''
+
+  await fetchDataProductingPlan()
+}
+
+const progressLinearNoData = ref(false)
+
+const searchFilters = ref({ ...filterForSearchBatchProductionPlan.value }) // ฟิลเตอร์จริงที่จะส่งไป API
+
+const handleSearch = async () => {
+  searchFilters.value = { ...filterForSearchBatchProductionPlan.value } // คัดลอกค่าฟิลเตอร์ที่กรอกเสร็จแล้ว
+  saveHistoryFilterSearch()
+  await fetchDataProductingPlan() // เรียก API ด้วยฟิลเตอร์ที่ผู้ใช้กรอก
+}
+
+onMounted( async () => {
+  await fetchDataProductingPlan()
+})
+
+const searchResult = ref([]) // ตัวแปรสำหรับเก็บผลลัพธ์
+const datePickerFilter = ref(null)
+
+// ฟังก์ชันสร้างโครงสร้างข้อมูล
+function createProductionPlanItem() {
+  return {
+    actualFgEntryBy: '',
+    actualFgEntryDate: '',
+    actualFinishedBy: '',
+    actualFinishedDate: '',
+    actualStartBy: '',
+    actualStartDate: '',
+    batchID: '',
+    finishedDate: '',
+    inputDate: '',
+    journalID: '',
+    linkedJournalID: '',
+    lotNumber: '',
+    no: 0,
+    planningApprovedBy: '',
+    planningApprovedDate: '',
+    planningID: '',
+    plantName: '',
+    producingDate: '',
+    product1InBomName: '',
+    product1Name: '',
+    product1PackagingName: '',
+    product1PackingQtyKgs: 0,
+    product1SelectedCode: '',
+    product1SelectedPackagingCode: '',
+    product1UomCount: 0,
+    product2InBomName: '',
+    product2Name: '',
+    product2PackagingName: '',
+    product2PackingQtyKgs: 0,
+    product2SelectedCode: '',
+    product2SelectedPackagingCode: '',
+    product2UomCount: 0,
+    productionCode: '',
+    productionName: '',
+    quantityKgs: 0,
+    reactorName: '',
+    remark: '',
+    seqNo: '',
+    statusComments: '',
+    statusId: 0,
+    submitedBy: '',
+    submitedDate: '',
+    updatedBy: '',
+    updatedDate: '',
+  }
+}
+
+// ใช้ฟังก์ชันเพื่อกำหนดค่าเริ่มต้น
+const productionPlanItems = ref([createProductionPlanItem()])
+
+const formatToMMDDYYYY = date => {
+  const [day, month, year] = date.split("/")
+  
+  return `${month}/${day}/${year}`
+}
+
+const sortBy = ref([{ key: 'planningID', order: 'asc' }])
+
+function transformNullToDefault(item) {
+  const transformedItem = {}
+  for (const key in item) {
+    transformedItem[key] = item[key] === null ? (typeof item[key] === "number" ? 0 : "") : item[key]
+  }
+  
+  return transformedItem
+}
+
+const saveHistoryFilterSearch = () => {
+  sessionStorage.setItem("StatusIDProductionFilter", filterForSearchBatchProductionPlan.value.StatusID)
+  sessionStorage.setItem("ProductionTextSearchProductionFilter", filterForSearchBatchProductionPlan.value.ProductionTextSearch)
+  sessionStorage.setItem("ItemTextSearchProductionFilter", filterForSearchBatchProductionPlan.value.ItemTextSearch)
+  sessionStorage.setItem("ProducingDateFromProductionFilter", filterForSearchBatchProductionPlan.value.ProducingDateFrom)
+  sessionStorage.setItem("ProducingDateToProductionFilter", filterForSearchBatchProductionPlan.value.ProducingDateTo)
+  sessionStorage.setItem("LotTextSearchProductionFilter", filterForSearchBatchProductionPlan.value.LotTextSearch)
+}
+
+const fetchDataProductingPlan = async () => {
+  try {
+    progressLinearNoData.value = false
+    if (datePickerFilter.value) {
+      console.log("datePickerFilter:", datePickerFilter.value)
+
+      if (datePickerFilter.value.includes(" to ")) {
+        // กรณีเป็นช่วงวันที่
+        const [startDate, endDate] = datePickerFilter.value.split(" to ")
+
+        filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
+        filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+
+      } else {
+        // กรณีเป็นวันเดียว
+        const singleDate = datePickerFilter.value
+
+        filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(singleDate)
+        filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
+      }
+    }
+    productionPlanItems.value = []
+
+    const resultFetchGet = await fetchGetProductionplanSearch(
+      filterForSearchBatchProductionPlan.value, 
+      urlApi.value, 'ProductionPlan', whereHouse, 
+      accessTokenAtStore)
+
+    if(resultFetchGet){
+      // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
+      if (getProductionplanSearchResult.value?.data && Array.isArray(getProductionplanSearchResult.value.data)) {
+  
+        productionPlanItems.value = getProductionplanSearchResult.value.data.map((item, index) => ({
+          ...item,
+          no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
+        }))
+        console.log("productionPlanItems", productionPlanItems.value)
+      } else {
+        console.warn("getProductionplanSearchResult.data is not an array")
+        productionPlanItems.value = []
+        progressLinearNoData.value = true
+      }
+    }else{
+      productionPlanItems.value = []
+      progressLinearNoData.value = true
+    }
+
+    
+  } catch (error) {
+    console.error("Error fetching production plan master data:", error)
+    progressLinearNoData.value = true
+    productionPlanItems.value = []
+  }
+}
+
+// watch(async () => {
+//   try {
+
+//     if (datePickerFilter.value) {
+//       console.log("datePickerFilter:", datePickerFilter.value)
+
+//       if (datePickerFilter.value.includes(" to ")) {
+//         // กรณีเป็นช่วงวันที่
+//         const [startDate, endDate] = datePickerFilter.value.split(" to ")
+
+//         filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
+//         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+
+//       } else {
+//         // กรณีเป็นวันเดียว
+//         const singleDate = datePickerFilter.value
+
+//         filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(singleDate)
+//         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
+//       }
+//     }
+
+//     await fetchGetProductionplanSearch(
+//       filterForSearchBatchProductionPlan.value, 
+//       urlApi.value, 'ProductionPlan', whereHouse, 
+//       accessTokenAtStore)
+
+//     // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
+//     if (getProductionplanSearchResult.value?.data && Array.isArray(getProductionplanSearchResult.value.data)) {
+      
+//       productionPlanItems.value = getProductionplanSearchResult.value.data.map((item, index) => ({
+//         ...item,
+//         no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
+//       }))
+//       console.log("productionPlanItems", productionPlanItems.value)
+//     } else {
+//       console.warn("getProductionplanSearchResult.data is not an array")
+//       productionPlanItems.value = []
+//     }
+//   } catch (error) {
+//     console.error("Error fetching production plan master data:", error)
+//     productionPlanItems.value = []
+//   }
+// })
+
+//--------------------------- New batch -----------------------------------------------------
+
+const { getBatchProductionplanResult, errorMessageGetBatchProductionPlan, fetchGetBatchProductionplan } = useGetBatchProductionPlanService()
+
+const itemStore = useItemStore()
 
 const date = ref(new Date())
 
+const guidForBatch = ref(null)
+
+const batchIDDataPlan = ref()
+
+const newBatchGenBatch = async () => {
+  try {
+    if(batchIDDataPlan.value){
+      itemStore.setItemDetails(batchIDDataPlan.value, 'guIDForBatchCookie')
+
+      console.log("getBatchProductionplanResult", itemStore.getItemDetails('guIDForBatchCookie'))
+    }else{
+      // เรียกใช้ fetch และรอให้ทำงานเสร็จ
+      await fetchGetBatchProductionplan(urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+
+      // ตรวจสอบว่าผลลัพธ์ไม่เป็น undefined หรือ null
+      if (getBatchProductionplanResult.value) {
+        itemStore.setItemDetails(getBatchProductionplanResult.value, 'guIDForBatchCookie')
+
+        console.log("getBatchProductionplanResult", itemStore.getItemDetails('guIDForBatchCookie'))
+      } else {
+        console.error("getBatchProductionplanResult.value is undefined or null")
+      }
+    }
+    
+  } catch (error) {
+    console.error("Error in newBatchGenBatch:", error)
+  }
+}
+
+//------------------------------- approved ----------------------------------------------------------------
+const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approveProdutcionPlanFunc } = useApproveProductionPlanService()
+
+const approvePlan = async () => {
+
+  const body = selectedDataTables.value.map(item => item.planningID)
+
+  try {
+  // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    if(responseApproveProductionPlan.value){
+      textAlertDialogFunction(alertWordConst.approve, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      textAlertDialogFunction(alertWordConst.approve, false)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
+  } catch (error) {
+  // จัดการข้อผิดพลาด
+    
+    console.error("Error approved production plan:", error)
+  }
+
+  console.log("body selectedDataTables", body)
+}
 
 // In case of a range picker, you'll receive [Date, Date]
 const format = date => {
@@ -55,7 +444,7 @@ const indexSubmit = ref('')
 const changeStatusProductPlanSubmit = index => {
   isDialogSubmitVisible.value = true
   indexSubmit.value = index
-  
+
 }
 
 const submitProductionPlan = index => {
@@ -71,11 +460,11 @@ function getRandomDate(start, end) {
   const endDate = new Date(end)
   const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime())
   const randomDate = new Date(randomTime)
-  
+
   const year = randomDate.getFullYear()
   const month = String(randomDate.getMonth() + 1).padStart(2, '0') // Months are zero-based
   const day = String(randomDate.getDate()).padStart(2, '0')
-  
+
   return `${day}/${month}/${year}`
 }
 
@@ -85,153 +474,42 @@ const toDayDatePFinished = ref('NaN')
 //------------------------------------------ Mock Data --------------------------------
 const countItemProduction = ref(1)
 
-const mockData = ref([
-  {
-    
-    status: 'Working',
-    inputDate: toDayDate,
-    plants: "Plant A",
-    reactor: "R-101",
-    productionCode: "porduction Code",
-    productionName: "porduction Name",
-    batchScaleKgs: 500,
-    productCode1: "PC2311001",
-    productName1: "Chemical X",
-    quantityKgs1: 1000,
-    quantityPcs1: 1,
-    packagingType1: "Drum",
-    productCode2: "PC2311001",
-    productName2: "Chemical X",
-    quantityKgs2: 1000,
-    quantityPcs2: 1,
-    packagingType2: "Drum",
-    uom: "kg",
-    lotNumber: "LT12345",
-    producingDate: date,
-    finishedDate: toDayDatePFinished.value,
-    storageCondition: "Cool, Dry Place",
-    checkBy: "John",
-    remark: "Urgent",
-    byWho: 'John',
-    statusDate: getRandomDate('2023/01/01', '2023/12/31'),
-  },
-])
-
-//---------------------------- Add Mock Data --------------------------------
-const isDialogAddVisible = ref(false)
-
-const selectedItemNamePD = ref(null)
-
-// computed property to extract product names
-const productNamesMockItems = computed(() => mockData.value.map(item => item.productName))
-
-const findProductByName = productName => {
-  return mockData.value.find(item => item.productName === productName) || {}
-}
-
-const productionPlan = ref([])
-const selectedItem = ref(null)
-const selectedDataTables = ref([])
-
-const addProductToPlantrue = () => {
-  if (selectedItem.value) {
-    const product = findProductByName(selectedItem.value)
-    if (product) {
-      const formattedProducingDate = formatDate(product.producingDate) // แปลงเป็น string ตาม format ที่ต้องการ
-
-      productionPlan.value.push({ ...product, producingDate: formattedProducingDate })
-    }
-    isDialogAddVisible.value = false
-  }
-}
-
-// ฟังก์ชันสำหรับเพิ่มแถวว่างใน productionPlan
-const addEmptyRowToPlan = () => {
-  
-  productionPlan.value.push({
-    no: countItemProduction.value,
-    
-    producingDate: '',
-
-    // เพิ่มคอลัมน์อื่นๆ ตามข้อมูลใน mockData
-    inputDate: '',
-    plants: '',
-    reactor: '',
-    productionName: '',
-    productionCode: '',
-    batchScaleKgs: '',
-
-    productName1: '',
-    productCode1: '',
-    packagingType1: '',
-    packagingKgs1: '',
-    packagingPcs1: '',
-
-    productName2: '',
-    productCode2: '',
-    packagingType2: '',
-    packagingKgs2: '',
-    packagingPcs2: '',
-
-    uom: '',
-    lotNumber: '',
-    storageCondition: '',
-    remark: '',
-    byWho: '',
-    statusDate: '',
-    status: 'Working',
-    updateDate: '',
-  })
-  countItemProduction.value+= 1
-}
-
-// Watch สำหรับอัพเดทข้อมูลเมื่อเลือกชื่อสินค้า
-watch(productionPlan, newPlan => {
-  newPlan.forEach((item, index) => {
-    if ((item.plants || item.productCode) && item.status === 'Working') {
-      const product = findProductByName(item.productCode || item.plants)
-      if (product && (product.plants || product.productCode)) {
-        const formattedProducingDate = formatDate(product.producingDate)
-
-        // ตรวจสอบสถานะปัจจุบันและอัพเดทเฉพาะเมื่อจำเป็น
-        if (item.producingDate !== formattedProducingDate) {
-          productionPlan.value[index] = { 
-            ...product, 
-            producingDate: formattedProducingDate, 
-            status: item.status, 
-          }
-        }
-      }
-    }
-  })
-}, { deep: true })
-
-// ฟังก์ชันสำหรับอัพเดทข้อมูลเมื่อเลือกชื่อสินค้า
-
-const cancelProduct = index => {
-  productionPlan.value.splice(index, 1) ; ''
-  isDialogRejectVisible.value = false
-}
-
-const cancelAllProducts = () => {
-  productionPlan.value = []
-}
-
-const viewAllData = () => {
-  console.log('ALl Data Date', productionPlan.value)
-}
-
 const selectedDateInput = ref(toDayDate)
 const rules = [v => v.length <= 150 || 'Max 25 characters']
 
 //---------------------------------
 
-const items = [
-  'Programming',
-  'Design',
-  'Vue',
-  'Vuetify',
+const itemsStatus = [
+  { name: "All", id: null },
+  { name: "Draft PROD plan", id: 101 },
+  { name: "Waitting for plan APVL", id: 102 },
+  { name: "Waiting for Mat. Picking", id: 103 },
+  { name: "In Producing", id: 105 },
+  { name: "Waiting for FG/PROD APVL", id: 107 },
+  { name: "PROD Completed", id: 108 },
+  { name: "Plan Rejected", id: 109 },
 ]
+
+const colorStatusWithId = id => {
+  switch (id) {
+  case 101:
+    return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan', bgColor: '#FFF3E0' }
+  case 102:
+    return { color: 'green', message: 'green', text: 'Waitting for plan APVL', bgColor: '#E8F5E9' }
+  case 103:
+    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking', bgColor: '#FCE4EC' }
+  case 105:
+    return { color: 'purple', message: 'purple', text: 'In Producing', bgColor: '#F3E5F5' }
+  case 107:
+    return { color: 'brown', message: 'brown', text: 'Waiting for FG/PROD APVL', bgColor: '#EFEBE9' }
+  case 108:
+    return { color: 'green', message: 'green', text: 'PROD Completed', bgColor: '#E8F5E9' }
+  case 109:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  default:
+    return { color: 'grey', message: 'grey', text: 'All', bgColor: '#FFF3E0' }
+  }
+}
 
 ///------------------------------------------------------------------------------
 const panel = ref(['filter'])
@@ -244,7 +522,7 @@ const refeshPage = () => {
   isSpinning.value = true
   setTimeout(() => {
     isSpinning.value = false
-  }, 10*1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+  }, 10 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   location.reload()
 }
 
@@ -357,6 +635,7 @@ const headersDataTableNew = [
   {
     title: 'Reactor',
     key: 'reactor',
+    class: 'my-header-style',
   },
   {
     title: 'Production Code',
@@ -413,7 +692,7 @@ const headersDataTableNew = [
     title: 'Packaging Pcs2',
     key: 'packagingPcs2',
   },
-  
+
   {
     title: 'Lot',
     key: 'lotNumber',
@@ -426,7 +705,7 @@ const headersDataTableNew = [
     title: 'Finished Date',
     key: 'finishedDate',
   },
-  
+
   {
     title: 'Remark',
     key: 'remark',
@@ -445,8 +724,26 @@ const headersDataTableNew = [
   },
 ]
 
+const iconsSort = ref({
+  sortColumn10: true,
+  sortColumn11: true,
+  sortColumn12: true,
+  sortColumn13: true,
+  sortColumn14: true,
+})
 
+// ฟังก์ชันสำหรับสลับสถานะของไอคอนแต่ละตัว
+const toggleDirection = index => {
+  if(index === 10){
+    iconsSort.value.sortColumn10 = false
+  }
+}
 
+const getColumnClass = index => {
+  const colorClasses = ["red-bg", "blue-bg", "yellow-bg", "green-bg"]
+  
+  return colorClasses[index] || "" // กำหนดสีตาม index
+}
 
 //--------------------- Menu
 
@@ -511,6 +808,19 @@ const submit = () => {
 const print = () => {
   console.log('Printed')
 }
+
+const newBatch = async batchID => {
+  batchIDDataPlan.value = batchID
+  try {
+    // รอให้ newBatchGenBatch ทำงานเสร็จ
+    await newBatchGenBatch()
+
+    // เปลี่ยนเส้นทางหลังจากทำงานเสร็จ
+    window.location.href = '/skt/planning/schedule/plan'
+  } catch (error) {
+    console.error("Error in newBatch:", error)
+  }
+}
 </script>
 
 <template>
@@ -525,7 +835,8 @@ const print = () => {
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'dashboards-main',
+                :to="{
+                  name: 'dashboards-main',
                 }"
               >
                 <VIcon
@@ -574,37 +885,57 @@ const print = () => {
             <VForm @submit.prevent="submitSearchButton">
               <!-- Barcode | Product code | Product Name | Button Export -->
               <VRow>
-                <!-- 👉 Select Product code -->
                 <VCol
                   cols="12"
                   lg="4"
                   sm="6"
                   class="py-1"
                 >
-                  <AppDateTimePicker
-                    v-model="date"
-                    label="Producing Date"
-                    placeholder="Select date"
+                  <VAutocomplete
+                    v-model="filterForSearchBatchProductionPlan.StatusID"
+                    :items="itemsStatus"
+                    item-title="name"
+                    item-value="id"
                     density="compact"
-                    prepend-inner-icon="ri-calendar-schedule-fill"
-                    :config="{ dateFormat: 'd/m/Y' }"
-                  />
+                  >
+                    <template #label>
+                      <span
+                        class="d-flex align-center"
+                        style="font-size: 12px;"
+                      >
+                        Select Status
+                      </span>
+                    </template>
+
+                    <template #selection="{ item }">
+                      <VChip
+                        variant="elevated"
+                        :style="{ color: colorStatusWithId(item.raw.id).message }"
+                        size="x-small"
+                        style="min-height: 20px;"
+                        :color="colorStatusWithId(item.raw.id).color"
+                      >
+                        <span class="text-white">{{ colorStatusWithId(item.raw.id).text }}</span>
+                      </VChip>
+                    </template>
+                  </VAutocomplete>
                 </VCol>
-                
+
                 <VCol
                   cols="12"
                   lg="4"
                   sm="6"
                   class="py-1"
                 >
-                  <AppDateTimePicker
-                    v-model="date"
-                    label="Finished Date"
-                    placeholder="Select date"
+                  <VTextField
+                    v-model="filterForSearchBatchProductionPlan.ProductionTextSearch"
+                    type="Product Name"
                     density="compact"
-                    prepend-inner-icon="ri-calendar-schedule-fill"
-                    :config="{ dateFormat: 'd/m/Y' }"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Production Code/Name</span>
+                    </template>
+                  </VTextField>
                 </VCol>
 
                 <!-- 👉 Select Product Name -->
@@ -615,33 +946,32 @@ const print = () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
-                    :label="$t('Lot Number')"
+                    v-model="filterForSearchBatchProductionPlan.ItemTextSearch"
                     type="Product Name"
                     density="compact"
                   >
                     <template #label>
-                      <span style="font-size: 12px;">Lot Number</span>
+                      <span style="font-size: 12px;">Item Code/Name</span>
                     </template>
                   </VTextField>
                 </VCol>
+
+                <!-- 👉 Select Product code -->
                 <VCol
                   cols="12"
                   lg="4"
                   sm="6"
                   class="py-1"
                 >
-                  <VAutocomplete
-                    label="Status"
-                    :items="items"
+                  <AppDateTimePicker
+                    v-model="datePickerFilter"
+                    placeholder="Producing date"
                     density="compact"
-                    placeholder="Select State"
-                  >
-                    <template #label>
-                      <span style="font-size: 12px;">Status</span>
-                    </template>
-                  </VAutocomplete> 
+                    prepend-inner-icon="ri-calendar-schedule-fill"
+                    :config="{ dateFormat: 'd/m/Y', mode: 'range' }"
+                  />
                 </VCol>
+
                 <VCol
                   cols="12"
                   lg="4"
@@ -649,13 +979,11 @@ const print = () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
-                    :label="$t('Product Name')"
-                    type="Product Name"
+                    v-model="filterForSearchBatchProductionPlan.LotTextSearch"
                     density="compact"
                   >
                     <template #label>
-                      <span style="font-size: 12px;">Product Name</span>
+                      <span style="font-size: 12px;">Lot</span>
                     </template>
                   </VTextField>
                 </VCol>
@@ -675,8 +1003,7 @@ const print = () => {
                         color="primary"
                         density="compact"
                         class="mx-0"
-                      
-                        @click="isDialogPrintLabelVisible = true"
+                        @click="handleSearch"
                       >
                         <span style="font-size: 12px;">{{ $t('Search') }}</span>
                       </VBtn>
@@ -687,7 +1014,7 @@ const print = () => {
                         height="100%"
                         width="100%"
                         density="compact"
-                        @click="clearModel"
+                        @click="clearModelFolter"
                       >
                         <span style="font-size: 12px;">{{ $t('Clear') }}</span>
                       </VBtn>
@@ -697,6 +1024,7 @@ const print = () => {
                       md="4"
                     >
                       <VBtn
+                        disabled
                         density="compact"
                         class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                         color="warning"
@@ -804,7 +1132,8 @@ const print = () => {
                     }}:&nbsp;</span>&nbsp;{{ groupSupProduct }}<br>
                     <span style="font-size: large; font-weight: 900;">{{
                       $t("Total")
-                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{ (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
+                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{
+                      (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
                   </VCol>
                 </VRow>
                 <span style="font-size: large; font-weight: 900;">{{
@@ -996,50 +1325,63 @@ const print = () => {
     </VDialog>
   </section>
 
+  <!-- Btn Approve / PROD APPROVE / NEW BATCH -->
   <div
     v-if="RoleAccount === 'User'"
     class="my-2"
   >
     <VCard>
       <VCardText class="pa-2">
-        <VBtn @click="addBatch = true">
-          <span style="font-size: 12px;">Add Batch</span>
-        </VBtn>
-        <VBtn
-          color="error"
-          class="mx-2"
-          @click="addBatch = false"
-        >
-          <span style="font-size: 12px;">Cancel Batch</span>
-        </VBtn>
-        <VBtn
-          class="mx-2"
-          color="warning"
-          @click="viewAllData"
-        >
-          <span style="font-size: 12px;">Save Draft</span>
-        </VBtn>
-        <VBtn @click="viewAllData">
-          <span style="font-size: 12px;">Approve</span>
-        </VBtn>
-        <VBtn
-          color="info"
-          class="mx-2"
-          @click="addEmptyRowToPlan"
-        >
-          <span style="font-size: 12px;">Add Item</span>
-        </VBtn>
-        <VBtn
-          icon
-          size="small"
-          @click="refeshPage"
-        >
-          <VIcon
-            size="20"
-            icon="ri-restart-line"
-            :class="{ spinning: isSpinning }"
-          />
-        </VBtn>
+        <VRow>
+          <VCol cols="10">
+            <VBtn
+              :disabled="!selectedDataTables.length > 0"
+              @click="openConfirmDialog"
+            >
+              <span style="font-size: 12px;">Approve</span>
+            </VBtn>
+            <VBtn
+              class="mx-2"
+              color="info"
+              disabled
+              @click="viewAllData"
+            >
+              <span style="font-size: 12px;">PROD Approved</span>
+            </VBtn>
+            <VBtn
+              class="mx-2"
+              color="warning"
+              @click="newBatch(null)"
+            >
+              <span style="font-size: 12px;">New Batch</span>
+            </VBtn>
+
+            <VBtn
+              v-if="false"
+              color="info"
+              class="mx-2"
+              @click="addEmptyRowToPlan"
+            >
+              <span style="font-size: 12px;">Add Item</span>
+            </VBtn>
+          </VCol>
+          <VCol
+            cols="2"
+            class="d-flex justify-end"
+          >
+            <VBtn
+              icon
+              size="small"
+              @click="refeshPage"
+            >
+              <VIcon
+                size="20"
+                icon="ri-restart-line"
+                :class="{ spinning: isSpinning }"
+              />
+            </VBtn>
+          </VCol>
+        </VRow>
       </VCardText>
     </VCard>
   </div>
@@ -1048,7 +1390,7 @@ const print = () => {
     v-if="RoleAccount === 'Manager'"
     class="mt-4"
   >
-    <VBtn @click="viewAllData">
+    <VBtn @click="showConfirmDialog">
       Approve
     </VBtn>
     <VBtn
@@ -1069,923 +1411,278 @@ const print = () => {
 
   <!-- ----------             Production plan                                ------------------------------------ -->
   <section>
-    <VCard
-      v-if="false"
-      class="mt-4"
-    >
-      <VTable class=" table-header-bg rounded-0">
-        <!-- 👉 table head -->
-        <thead class="text-no-wrap">
-          <tr>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('No.') }}</span>
-            </th>
-            <th
-              scope="row"
-              class="text-start "
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Status') }}</span>
-            </th>
-            <th
-              scope="row"
-              class="text-center"
-              style="padding-inline: 50px;"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Input Date') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Plants') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Reactor') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Product code') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Product name') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Qty. (Kg)') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('UOM (Packaging)') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Packaging type') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Lot number') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Producing date') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Finished date') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start"
-              style="padding-inline: 100px;"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Remark') }}</span>
-            </th>
-            
-            <th
-              scope="row"
-              class="text-start "
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Update By') }}</span>
-              <VMenu
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Update On') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Action') }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody class="text-no-wrap">
-          <tr
-            v-for="(item, index) in productionPlan"
-            :key="index"
-            style="font-size: 14px;"
-          >
-            <td>{{ index + 1 }}</td>
-            <td class="text-start">
-              <span v-if="item.status === 'Aprove'">
-                <VChip color="success">{{ item.status }}</VChip>
-              </span>
-              <span v-if="item.status === 'Submit'">
-                <VChip color="success">{{ item.status }}</VChip>
-              </span>
-              <span v-else-if="item.status === 'Back to Edit'">
-                <VChip color="warning">{{ item.status }}</VChip>
-              </span>
-              <span v-else-if="item.status === 'Working'">
-                <VChip color="info">{{ item.status }}</VChip>
-              </span>
-              <span v-else-if="item.status === 'Save Draft'">
-                <VChip color="warning">{{ item.status }}</VChip>
-              </span>
-              <span v-else-if="item.status === 'Reject'">
-                <VChip color="error">{{ item.status }}</VChip>
-              </span>
-            </td>
-            <td>
-              <AppDateTimePicker
-                v-model="item.inputDate"
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              >
-                <template #label>
-                  <span>Input Data</span>
-                </template>
-              </AppDateTimePicker>
-            </td>
-            <td>
-              <VCombobox
-                v-model="item.plants"
-                :readonly="item.status === 'Submit'"
-                :items="productNamesMockItems"
-                placeholder="deployment"
-                density="compact"
-                label="Plants Type"
-                style="width: 150px;"
-              />
-            </td>
-            <td>{{ item.reactor }}</td>
-            <td>
-              <VCombobox
-                v-model="item.productCode"
-                :items="productNamesMockItems"
-                placeholder="deployment"
-                density="compact"
-                label="Plants Code"
-                style="width: 150px;"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td>
-              <VCombobox
-                v-model="item.productName"
-                :items="productNamesMockItems"
-                placeholder="deployment"
-                density="compact"
-                label="Plants Name"
-                style="width: 150px;"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <VTextField
-                v-model="item.quantity"
-                label="Qty."
-                type="number"
-                placeholder="Select UOM"
-                style="min-width: 100px;"
-                density="compact"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <VSelect
-                v-model="item.uom"
-                density="compact"
-                :items="items"
-                label="UOM"
-                placeholder="Select UOM"
-                eager
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <VCombobox
-                v-model="item.packagingType"
-                :items="productNamesMockItems"
-                placeholder="deployment"
-                density="compact"
-                label="Packaging Type"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <VTextField
-                v-model="item.lotNumber"
-                density="compact"
-                style="min-width: 150px;"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <AppDateTimePicker
-                v-model="item.producingDate"
-                label="Producing Date"
-                placeholder="Producing date"
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              />
-            </td>
-            <td
-              class="px-1"
-              style="min-width: 150px;"
-            >
-              <AppDateTimePicker
-                v-model="item.finishedDate"
-                label="Finished Date"
-                placeholder="Finished date"
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              />
-            </td>
-            <td style="width: 35px;">
-              <VTextarea
-                v-model="item.remark"
-                class="pa-2"
-                label="Remark"
-                :rules="rules"
-                rows="2"
-                clearable
-                placeholder="Placeholder Text"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td>
-              <VTextField
-                v-model="item.byWho"
-                density="compact"
-                style="min-width: 150px;"
-                :readonly="item.status === 'Submit'"
-              />
-            </td>
-            <td>
-              {{ item.statusDate }}
-            </td>
-            <td v-if="item.status !== 'Submit' || RoleAccount === 'Manager'"> 
-              <VBtn
-                color="warning"
-                @click="changeStatusProductPlanSaveDraft(index)"
-              >
-                Save Draft
-              </VBtn>
-              <VBtn
-                v-if="RoleAccount === 'Manager'"
-                color="red"
-                class="mx-2"
-                @click="rejectProduction(index)"
-              >
-                Reject
-              </VBtn>
-              <VBtn
-                v-if="RoleAccount !== 'Manager'"
-                color="red"
-                class="mx-2"
-                @click="cancelProduct(index)"
-              >
-                Cancel
-              </VBtn>
-              <VBtn
-                v-if="RoleAccount !== 'Manager'"
-                class="mx-2"
-                color="green"
-                @click="changeStatusProductPlanSubmit(index)"
-              >
-                Submit
-              </VBtn>
-              <VBtn
-                v-if="RoleAccount === 'Manager'"
-                class="mx-2"
-                color="green"
-                @click="changeStatusProductPlanSubmit(index)"
-              >
-                Approve
-              </VBtn>
-             
-              
-              <VBtn
-                color="warning"
-                prepend-icon="ri-printer-fill"
-              >
-                {{ $t('Print') }}
-              </VBtn>
-            </td>
-            <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'"> 
-              <VBtn
-                color="grey"
-                disabled
-                @click="changeStatusProductPlanSaveDraft(index)"
-              >
-                Save Draft
-              </VBtn>
-              <VBtn
-                color="grey"
-                disabled
-                class="mx-2"
-                @click="cancelProduct(index)"
-              >
-                Cancel
-              </VBtn>
-              <VBtn
-                class="mx-2"
-                color="grey"
-                disabled
-                @click="changeStatusProductPlanSubmit(index)"
-              >
-                Submit
-              </VBtn>
-              
-              <VBtn
-                color="warning"
-                prepend-icon="ri-printer-fill"
-              >
-                {{ $t('Print') }}
-              </VBtn>
-            </td>
-          </tr>
-        </tbody>
-      </VTable>
-      <VDivider />
-      <VCardText class="d-flex align-center flex-wrap justify-end gap-4 pa-2">
-        <div
-          class="d-flex align-center me-3"
-          style="width: 171px;"
-        >
-          <span class="text-no-wrap me-3">Rows per page:</span>
-
-          <VSelect
-            v-model="rowPerPage"
-            density="compact"
-            variant="plain"
-            class="mt-n4"
-            :items="[10, 20, 30, 50]"
-          />
-        </div>
-
-        <div class="d-flex align-center">
-          <h6 class="text-sm font-weight-regular">
-            {{ paginationData }}
-          </h6>
-
-          <VPagination
-            v-model="currentPage"
-            :length="totalPage"
-            :total-visible="$vuetify.display.mdAndUp ? 7 : 3"
-            @next="selectedRows = []"
-            @prev="selectedRows = []"
-          />
-        </div>
-      </VCardText>
-    </VCard>
-
     <!-- VData table -->
     <VCard>
       <VCardText>
-        <VDataTable
+        <VProgressLinear
+          v-if="progressLinearNoData"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="!productionPlanItems.length > 0 && progressLinearNoData === false"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data....</span>
+        </VProgressLinear>
+        <VDataTable 
+          v-if="productionPlanItems.length > 0"
           v-model:page="currentPageDataTable"
           v-model="selectedDataTables"
           :headers="headersDataTableNew"
-          :items="productionPlan"
-          :items-per-page="5"
+          :items="productionPlanItems"
+          :items-per-page="10"
+          fixed-header
+          height="550"
           show-select
           class="text-no-wrap"
         >
-          <template #column.action="{ column }">
-            <tr style="background-color: aqua !important;">
+          <template #column.status="{ column }">
+            <tr class="d-flex justify-center">
               <th>
-                {{ column.column }} action custom
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.no="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.inputDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.plants="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.reactor="{ column }">
+            <tr class="d-flex justify-center">
+              <th :class="getColumnClass(1)">
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.productCode="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.productName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.batchScaleKgs="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
               </th>
             </tr>
           </template>
 
-          <!--
-            <template #column.item1="{ column }">
-            <tr class="bg-light-blue-lighten-4">
-            <th class="bg-light-blue-lighten-4">
-            {{ column.column }} Item 1
-            <tr class="bg-light-blue-lighten-4">
-            <td class="px-2">Item Code</td>
-            <td class="px-2">Item Name1</td>
-            <td class="px-2">Packaging Type1</td>
-            <td class="px-2">Packaging Kgs1</td>
-            <td class="px-2">Packaging Pcs1</td>
+          <template #column.productCode1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
             </tr>
-            </th>
+            <div>
+              <tr class="d-flex justify-center">
+                <th>
+                  <span style="background: #e0f7fa;">{{ column.title }}<VIcon
+                    :icon="iconsSort.sortColumn10 ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                    class="clickable-icon"
+                    @click="toggleDirection(10)"
+                  /></span>
+                </th>
+              </tr>
+            </div>
+          </template>
+          <template #column.productName1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
             </tr>
-            </template>
-          -->
-          <template #item="{ item }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingType1="{ column }">
+            <tr class="d-flex justify-center py-0">
+              <th>
+                <span style="background: #e0f7fa;">Item 1 </span>
+              </th>
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingKgs1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingPcs1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+
+          <template #column.productCode2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.productName2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingType2="{ column }">
+            <tr class="d-flex justify-center py-0">
+              <th>
+                <span style="background: #ffebee;">Item 2 </span>
+              </th>
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingKgs2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.packagingPcs2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+
+          <template #column.lotNumber="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.producingDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.finishedDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.remark="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.updateDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+          <template #column.byWho="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+
+          <template #column.action="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                {{ column.title }} c
+              </th>
+            </tr>
+          </template>
+
+
+          <template #item="{ item, index }">
             <tr style="font-size: 14px;">
               <td
-                class="text-center px-2"
+                class="text-center px-2 cursor-pointer"
                 style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
+                  v-if="item.raw.statusId === 102"
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"
@@ -1993,321 +1690,468 @@ const print = () => {
               </td>
               <td
                 style="position: sticky; z-index: 1; left: 40px; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
-                class="text-start"
+                class="text-start cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                <span v-if="item.raw.status === 'Aprove'">
-                  <VChip color="success">{{ item.raw.status }}</VChip>
+                <span>
+                  <VChip
+                    :color="colorStatusWithId(item.raw.statusId).color"
+                    :style="{ color: colorStatusWithId(item.raw.statusId).color }"
+                  >{{ colorStatusWithId(item.raw.statusId).text }}</VChip>
                 </span>
-                <span v-if="item.raw.status === 'Submit'">
-                  <VChip color="success">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Back to Edit'">
-                  <VChip color="warning">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Working'">
-                  <VChip color="info">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Save Draft'">
-                  <VChip color="warning">{{ item.raw.status }}</VChip>
-                </span>
-                <span v-else-if="item.raw.status === 'Reject'">
-                  <VChip color="error">{{ item.raw.status }}</VChip>
-                </span>
-              </td>
-              <td>{{ item.raw.no }}</td>
-              <td>
-                <AppDateTimePicker
-                  v-model="item.raw.inputDate"
-                  density="compact"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                >
-                  <template #label>
-                    <span>Input Data</span>
-                  </template>
-                </AppDateTimePicker>
-              </td>
-              <td>
-                <VCombobox
-                  v-model="item.raw.plants"
-                  :readonly="item.raw.status === 'Submit'"
-                  :items="productNamesMockItems"
-                  placeholder="deployment"
-                  density="compact"
-                  label="Plants Type"
-                  style="width: 150px;"
-                />
-              </td>
-              <td>{{ item.raw.reactor }}</td>
-              <td>
-                <VCombobox
-                  v-model="item.raw.productionCode"
-                  :items="productNamesMockItems"
-                  placeholder="deployment"
-                  density="compact"
-                  label="Plants Code"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                />
-              </td>
-              <td>
-                {{ productionName }}
               </td>
               <td
-                class="px-1"
-                style="min-width: 150px;"
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                batchScaleKgs
+                {{ (currentPageDataTable - 1) * 10 + index + 1 }}
               </td>
-              <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-model="item.raw.productCode1"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 1</span>
-                  </template>
-                </VCombobox>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ formatDate(item.raw.inputDate) }}
               </td>
-              <td class="bg-light-blue-lighten-5">
-                {{ productName1 }}
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.plantName }}
               </td>
-              <td class="bg-light-blue-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingType1"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type</span>
-                  </template>
-                </VCombobox>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.reactorName }}
               </td>
-              <td class="bg-light-blue-lighten-5">
-                {{ packagingKgs1 }}
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.productionCode }}
               </td>
-              <td class="bg-light-blue-lighten-5">
-                <VTextField
-                  v-model="item.raw.packagingPcs1"
-                  type="number"
-                  style="min-width: 100px;"
-                  density="compact"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 1</span>
-                  </template>
-                </VTextField>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.productionName }}
+              </td>
+              <td
+                class="px-8 text-end cursor-pointer"
+                style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ formatNumber(item.raw.quantityKgs) }}
+              </td>
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.product1SelectedCode }}
+              </td>
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.product1Name }}
+              </td>
+              <td
+                class="bg-light-blue-lighten-5 cursor-pointer" 
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.product1SelectedPackagingCode }}
+              </td>
+              <td
+                class="bg-light-blue-lighten-5 text-end cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product1PackingQtyKgs) }}</span>
+                <span v-else />
+              </td>
+              <td
+                class="bg-light-blue-lighten-5 text-end cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                <span v-if="item.raw.product1UomCount">{{ item.raw.product1UomCount }}</span>
+                <span v-else />
               </td>
 
-              <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.productCode2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Item Code 2</span>
-                  </template>
-                </VCombobox>
-              </td>
-              <td class="bg-red-lighten-5">
-                {{ productName2 }}
-              </td>
-              <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingType2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Type 2</span>
-                  </template>
-                </VCombobox>
-              </td>
-              <td class="bg-red-lighten-5">
-                {{ packagingKgs2 }}
-              </td>
-              <td class="bg-red-lighten-5">
-                <VCombobox
-                  v-model="item.raw.packagingPcs2"
-                  :items="productNamesMockItems"
-                  density="compact"
-                  style="width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Packaging Pcs 2</span>
-                  </template>
-                </VCombobox>
-              </td>
-             
               <td
-                class="px-1"
-                style="min-width: 150px;"
+                class="bg-red-lighten-5 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                <VTextField
-                  v-model="item.raw.lotNumber"
-                  density="compact"
-                  style="min-width: 150px;"
-                  :readonly="item.raw.status === 'Submit'"
-                />
+                {{ item.raw.product2SelectedCode }}
               </td>
               <td
-                class="px-1"
-                style="min-width: 150px;"
+                class="bg-red-lighten-5 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                <AppDateTimePicker
-                  v-model="item.raw.producingDate"
-                  placeholder="Producing date"
-                  density="compact"
-                  style="font-size: 12px;"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                />
+                {{ item.raw.product2Name }}
               </td>
               <td
-                class="px-1"
-                style="min-width: 150px;"
+                class="bg-red-lighten-5  cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                {{ item.raw.finishedDate }}
+                {{ item.raw.product2SelectedPackagingCode }}
               </td>
-              <td>
-                <VTextarea
-                  v-model="item.raw.remark"
-                  style="min-width: 200px;"
-                  class="pa-2"
-                  label="Remark"
-                  :rules="rules"
-                  rows="2"
-                  clearable
-                  :readonly="item.raw.status === 'Submit'"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">Remark</span>
-                  </template>
-                </VTextarea>
+              <td
+                class="bg-red-lighten-5 text-end  cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                <span v-if="item.raw.product1PackingQtyKgs">{{ formatNumber(item.raw.product2PackingQtyKgs) }}</span>
+                <span v-else />
               </td>
-              <td>
-                {{ item.raw.statusDate }}
+              <td
+                class="bg-red-lighten-5 text-end  cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                <span v-if="item.raw.product1UomCount">{{ item.raw.product2UomCount }}</span>
+                <span v-else />
               </td>
-              <td>
-                {{ item.raw.byWho }}
+
+              <td
+                class="px-1 cursor-pointer"
+                style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.lotNumber }}
               </td>
-              <td v-if="item.raw.status !== 'Submit' || RoleAccount === 'Manager'"> 
-                <div class="d-flex justify-center">
-                  <VMenu transition="scale-transition">
-                    <template #activator="{ props }">
-                      <VIcon
-                        v-bind="props"
-                        icon="ri-more-2-fill"
-                      />
-                    </template>
-                    <VList>
-                      <VListItem
-                        v-for="(itemAction, index) in itemsActionDataTable"
-                        :key="index"
-                        @click="handleAction(itemAction.value)"
-                      >
-                        {{ itemAction.title }}
-                        <template #prepend>
-                          <VIcon :icon="itemAction.icon" />
-                        </template>
-                      </VListItem>
-                    </VList>
-                  </VMenu>
-                </div>
-                <div v-if="false">
-                  <VBtn
-                    color="warning"
-                    @click="changeStatusProductPlanSaveDraft(index)"
-                  >
-                    Save Draft
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount === 'Manager'"
-                    color="red"
-                    class="mx-2"
-                    @click="rejectProduction(index)"
-                  >
-                    Reject
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount !== 'Manager'"
-                    color="red"
-                    class="mx-2"
-                    @click="cancelProduct(index)"
-                  >
-                    Cancel
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount !== 'Manager'"
-                    class="mx-2"
-                    color="green"
-                    @click="changeStatusProductPlanSubmit(index)"
-                  >
-                    Submit
-                  </VBtn>
-                  <VBtn
-                    v-if="RoleAccount === 'Manager'"
-                    class="mx-2"
-                    color="green"
-                    @click="changeStatusProductPlanSubmit(index)"
-                  >
-                    Approve
-                  </VBtn>
-                  <VBtn
-                    color="warning"
-                    prepend-icon="ri-printer-fill"
-                  >
-                    {{ $t('Print') }}
-                  </VBtn>
-                </div>
+              <td
+                class="px-1 text-center cursor-pointer"
+                style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ formatDate(item.raw.producingDate) }}
               </td>
-              <td v-if="item.status === 'Submit' && RoleAccount !== 'Manager'"> 
+              <td
+                class="px-1 text-center cursor-pointer"
+                style="min-width: 150px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ formatDate(item.raw.finishedDate) }}
+              </td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.remark }}
+              </td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ useFormatDateUtilities(item.raw.updatedDate) }}
+              </td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ item.raw.updatedBy }}
+              </td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VBtn
-                  color="grey"
-                  disabled
-                  @click="changeStatusProductPlanSaveDraft(index)"
+                  v-if="item.raw.statusId == 101 || item.raw.statusId === 102"
+                  color="info"
+                  @click="newBatch(item.raw.batchID)"
                 >
-                  Save Draft
-                </VBtn>
-                <VBtn
-                  color="grey"
-                  disabled
-                  class="mx-2"
-                  @click="cancelProduct(index)"
-                >
-                  Cancel
-                </VBtn>
-                <VBtn
-                  class="mx-2"
-                  color="grey"
-                  disabled
-                  @click="changeStatusProductPlanSubmit(index)"
-                >
-                  Submit
-                </VBtn>
-              
-                <VBtn
-                  color="warning"
-                  prepend-icon="ri-printer-fill"
-                >
-                  {{ $t('Print') }}
+                  Action
                 </VBtn>
               </td>
             </tr>
           </template>
         </VDataTable>
+      </VCardText>
+    </VCard>
+  </section>
+
+  <section v-if="false">
+    <h3>GridTable</h3>
+    <VCard>
+      <VCardText>
+        <GTable />
+      </VCardText>
+    </VCard>
+
+    <VCard>
+      <VCardText>
+        <TestTable />
       </VCardText>
     </VCard>
   </section>
@@ -2324,14 +2168,78 @@ const print = () => {
           style="font-size: 12px;"
           class="pa-1"
         >
-          Version : 2.5(Last Updated 11/11/2024 ) {{ products.length }} Rows of Data 
+          Version : 2.6(Last Updated 7/12/2024 ) {{ productionPlanItems.length }} Rows of Data
         </VAlert>
       </VCardText>
     </VCard>
   </section>
+
+  <!-- Alert Dialog Component -->
+  <section>
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="confirmDialog2"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ AuthenticatorDialog component -->
+      <AuthenticatorDialog
+        :is-dialog-visible="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :subword="subWordForSubmit"
+        :success="successDialAlert"
+        @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+  </section>
 </template>
 
 <style lang="scss">
+.v-data-table th:nth-child(10) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(11) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(12) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(13) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(14) {
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(15) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(16) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(17) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(18) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(19) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
 .text-capitalize {
   text-transform: capitalize;
 }
@@ -2360,4 +2268,3 @@ const print = () => {
   background: aquamarine;
 }
 </style>
-

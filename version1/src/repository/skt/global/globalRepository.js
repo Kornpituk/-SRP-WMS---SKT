@@ -26,10 +26,10 @@ export const  globalService = {
     }
   },
 
-  async printReceivingFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+  async printReceivingFormPDF(typeReceiving, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
     try {
       const response = await axios.post(
-        `${urlApi}/api/v1/PrintForm/ReceivingForm/Pdf/${poEtlLogDetailJournalID}`,
+        `${urlApi}/api/v1/PrintForm/${typeReceiving}/Pdf/${poEtlLogDetailJournalID}`,
         {},
         {
           headers: {

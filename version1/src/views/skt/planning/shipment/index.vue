@@ -49,24 +49,8 @@ const searchByProductCodeName = ref(null)
 const searchByProductNameFilter = ref(null)
 const searchByUnitName = ref(null)
 
-//----- Search Filter Icon Header Table[Product Category, Group, Sub Group, Barcode, Product Category Code, Product Name]
-const menuCategory= ref( false)
-const menuGroup = ref( false)
-const menuSubGroup = ref( false)
-const menuBarcode = ref( false)
-const menuProductCode = ref( false)
-const menuProductName = ref( false)
-const menuUoM = ref( false)
-
 //------------------------ item ID for search ------------------------------
 const itemsSearchByCategoryId = ref([])
-const typeItemsSearchById = ref([])
-const subTypeItemsSearchById = ref([])
-const itemsSearchByUOMId = ref([])
-const wareHouseItemsSearchById = ref([])
-const zoneItemsSearchById = ref([])
-const areaItemsSearchById = ref([])
-const subAreaItemsSearchById = ref([])
 
 //----------------------  Variable for SortBy -------------------------------------
 const sortByCategory = ref('')
@@ -152,19 +136,6 @@ const sortParams = {
   sortByNonTags,
 }
 
-// Clear function to reset all values
-const clearValuesNeo = () => {
-  // Reset search parameters
-  for (const key in searchParams) {
-    searchParams[key].value = null
-  }
-
-  // Reset sort parameters
-  for (const key in sortParams) {
-    sortParams[key].value = null
-  }
-}
-
 const GetStockUpdate = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
@@ -236,17 +207,6 @@ const GetStockUpdate = () => {
   
 }
 
-//----------------------------------- Function Reset search Key word ---------------
-const resetSearchKey = () => {
-  searchByCategoryName.value = ('')
-  searchByTypeName.value = ('')
-  searchBySubTypeName.value = ('')
-  searchByBarcodeName.value = ('')
-  searchByProductCodeName.value = ('')
-  searchByProductNameFilter.value = ('')
-  searchByUnitName.value = ('')
-}
-
 //------------------------------- Function Get StockUpdate Auto Search -----------------
 
 watch(GetStockUpdate)
@@ -277,300 +237,12 @@ const selectedRows = ref([])
 
 ///--------------------------------------- FetchItems for Search Box ----------------------------------------------
 
-const fetchItemsSearchBy = nameSearch => {
-  return axiosIns.get(`${urlApi.value}/api/v1/Product/${nameSearch}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }).then(response => {
-    return response.data
-  }).catch(error => {
-    console.error('Error:', error)
-    
-    return null
-  })
-}
-
 fetchItemsSearchBy('categories').then(data => {
   itemsSearchByCategoryId.value = data
 })
 
-function customFilter(item, queryText, itemText) {
-  const textOne = itemText.title.toLowerCase()
-  const textTwo = itemText.value.toLowerCase()
-  const searchText = queryText.toLocaleLowerCase()
-  
-  return textOne.includes(searchText) || textTwo.includes(searchText)
-}
-
 const submitSearchButton = () => {
   GetStockUpdate()
-}
-
-//--------------------------------------- FetchItems for Search WareHouse  ----------------------------------------
-
-const fetchItemsWareHouse = () => {
-  axiosIns.get(`${urlApi.value}/api/Auth/GetLocation`, {
-    headers: {
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      wareHouseItemsSearchById.value = response.data
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-}
-
-watch(fetchItemsWareHouse)
-
-//--------------------------------------- FetchItems for Search  Unit  ----------------------------------------
-
-const getItemsProductUnit = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/`+searchByCategoryId.value+'/Unit', {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      itemsSearchByUOMId.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('itemsSearchByUOMId.value At index',itemsSearchByUOMId.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductUnit)
-
-//--------------------------------------- FetchItems for Search  Type(Group) ----------------------------------------
-
-const getItemsProductType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/Types`, {
-    params: {
-      'CategoryId': searchByCategoryId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      typeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductType)
-
-//--------------------------------------- FetchItems for Search Sub Type(Sub Group) ----------------------------------------
-
-const getItemsProductSubType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/SubTypes/All`, {
-    params: {
-      'TypeId': searchByTypeId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subTypeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductSubType)
-
-//--------------------------------------- FetchItems for Search  Zone  ----------------------------------------
-
-const getItemLocalZone = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/zone/all`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      zoneItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('zoneItemsSearchById At index',zoneItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watch(getItemLocalZone)
-
-//--------------------------------------- FetchItems for Search  Area ----------------------------------------
-
-const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}api/v1/Locations/area/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      areaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemLocalArea)
-
-//--------------------------------------- FetchItems for Search Sub Area ----------------------------------------
-
-const getItemLocalSubArea = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/subArea/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-      'areaCode': searchByAreaId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subAreaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemLocalSubArea)
-
-// -------------------------------------- Export Bar Excel - --------------------------------
-
-const stockUpdateExcel = () => {
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    responseType: 'blob', // ให้เซิร์ฟเวอร์รีเทิร์น blob สำหรับไฟล์ Excel
-  })
-    .then(response => {
-      // สร้าง URL ของไฟล์ Excel จาก binary data
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-
-      const currentDate = new Date() // สร้างวัตถุ Date ปัจจุบัน
-      const year = currentDate.getFullYear() // ดึงปีปัจจุบัน
-      let fileYear
-      const threshold = 2500 // กำหนดจุดแบ่ง พ.ศ. กับ ค.ศ.
-
-      if (year > threshold) {
-        // พ.ศ. เปลี่ยนเป็น ค.ศ.
-        fileYear = year - 543
-      } else {
-        // ค.ศ.
-        fileYear = year
-      }
-
-      const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
-
-      const fileName = `stock_update_Tag_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
-
-      // สร้างลิงก์สำหรับดาวน์โหลดไฟล์ Excel
-      const link = document.createElement('a')
-
-      link.href = url
-      link.setAttribute('download', fileName) // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
-      document.body.appendChild(link)
-      link.click()
-
-      // ลบ URL หลังจากดาวน์โหลดเสร็จเรียบร้อยแล้ว
-      window.URL.revokeObjectURL(url)
-    })
-    .catch(error => {
-      // จัดการข้อผิดพลาด
-      console.error('Error:', error)
-    })
 }
 
 //-------------------------- format decimal -------------------
@@ -601,9 +273,6 @@ checkConfigUser(nameUser)
 
 //------------------------ Dialog Image ----------------------------
 const isDialogImageVisible = ref(false)
-const urlImage = ref('')
-const nameImage = ref('')
-
 const checkRFID = ref ('')
 
 watchEffect(() =>{
@@ -616,11 +285,6 @@ watchEffect(() =>{
     checkRFID.value = false
   }
 })
-
-const nameProductDialog = ref('')
-const qtyProductDialog = ref('')
-const unitProductDialog = ref('')
-const barcodeProductDialog = ref('')
 
 const codeProduct = ref('')
 const nameProduct = ref('')
@@ -655,7 +319,6 @@ const showExpansionDialog = ref(false)
 const colorStatus = ref('grey')
 const bgStatus = ref('bg-grey')
 
-
 const checkColorTextStatus = status => {
   if(status === 'Received'){
     return 'bg-green-lighten-4'
@@ -680,7 +343,6 @@ function getRandomStatus() {
   
   return statuses[randomIndex]
 }
-
 
 function getRandomDate(start, end) {
   const startDate = new Date(start)
@@ -723,7 +385,6 @@ const mockData = ref([
   { no: 23, saleOrderNo: '1100078356', soAttachment: '', sapInvoiceNo: 'TIX2406023', payerName: 'SCI', user: '', shipper: '', shipperLocation: '', shippingMark: 'BEAULIGHT LCA-30D', endUser: '', consignee: '', product: '', lotNumber: '', qty: '16,000.00', coa: '', freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'JAPAN', loadingDate: '30-มิ.ย.-24', etd: '11-ก.ค.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: 'BE30D(1)2407' },
   { no: 24, saleOrderNo: '1100078454', soAttachment: '', sapInvoiceNo: 'TIX2406024', payerName: 'SKK-SAN NOPCO', user: '', shipper: '', shipperLocation: '', shippingMark: 'SND-01', endUser: '', consignee: '', product: '', lotNumber: '', qty: '500.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'SOUTH KOREA', loadingDate: '30-มิ.ย.-24', etd: '9-ก.ค.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '' },
 ])
-
 
 const accountAmin = ref (false)
 const accountViewerKK = ref (false)
@@ -788,7 +449,6 @@ const setAccount = role => {
 
   // สามารถเพิ่มเงื่อนไขสำหรับ role อื่นๆ ได้ที่นี่
 }
-
 
 //-------------------
 //----- Rune
@@ -1379,7 +1039,7 @@ const isDialogVisiblePrintTruck = ref(false)
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
     <VCard class="mt-6">
-      <VTable class="text-no-wrap table-header-bg rounded-0">
+      <VTable class="rounded-0">
         <!-- 👉 table head -->
         <thead>
           <tr>
@@ -1534,6 +1194,7 @@ const isDialogVisiblePrintTruck = ref(false)
 
             <!-- 👉 Secondary product categories -->
             <td
+              style="font-size: 12px;"
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
             >
@@ -1937,6 +1598,7 @@ const isDialogVisiblePrintTruck = ref(false)
         </div>
       </VCardText>
     </VCard>
+    <pre>{{ sortBy }}</pre>
   </section>
 
   <!-- Footer -->
@@ -1988,6 +1650,7 @@ const isDialogVisiblePrintTruck = ref(false)
 .custom-table th,
 .custom-table td {
   border: 1px solid black;
+  font-size: 12px;
 }
 
 .custom-table th,

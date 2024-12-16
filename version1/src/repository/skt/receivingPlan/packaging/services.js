@@ -268,29 +268,6 @@ const saveSingleLotDetail = async (item, url, warehouse, token) => {
   }
 }
 
-// export const saveDraftLotItemsBatch = async (items, urlApi, whereHouse, accessTokenAtStore) => {
-//   try {
-//     const body = items.map(item => ({
-//       inspReqLotJournalId: item.pkgInspReqFormAnalyticalItemsJournalId,
-//       actualAnalysis: item.sqnText,
-//       okState: 0,
-//     }))
-
-//     const response = await axios.post(`${urlApi}/api/v1/Packaging/SaveLotDetails`, body, {
-//       headers: {
-//         'accept': '*/*',
-//         'x-location': whereHouse,
-//         Authorization: `Bearer ${accessTokenAtStore}`,
-//       },
-//     })
-
-//     return { success: true, data: response.data }
-//   } catch (error) {
-//     console.error('Error:', error)
-    
-//     return { success: false }
-//   }
-// }
 
 export const saveDraftLotItemsBatch = async (item, urlApi, whereHouse, accessTokenAtStore) => {
   const body = {

@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watch, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -118,18 +118,89 @@ const supplierName = ref(sessionStorage.getItem('supplierName') || '')
 const purchaseOrderNo = ref(sessionStorage.getItem('purchaseOrderNo') || '')
 const fileterStatusInPAI = ref(sessionStorage.getItem('fileterStatusInPAI') || '')
 
+const tempFilters = ref({
+  deliveryDateRange: sessionStorage.getItem('deliveryDateFrom') || '',
+  deliveryDateTo: sessionStorage.getItem('deliveryDateTo') || '',
+  productId: sessionStorage.getItem('productId') || '',
+  productName: sessionStorage.getItem('productName') || '',
+  supplierId: sessionStorage.getItem('supplierId') || '',
+  supplierName: sessionStorage.getItem('supplierName') || '',
+  purchaseOrderNo: sessionStorage.getItem('purchaseOrderNo') || '',
+  fileterStatusInPAI: sessionStorage.getItem('fileterStatusInPAI') || '',
+})
+
+const setValueFilter = () => {
+  
+}
+
 const disBtnExoport = ref(true)
 
+// ดึงค่าจาก sessionStorage
+const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
+
+// ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
+const statusFilter = ref(sessionStorage.getItem('fileterStatusInPAI'))
+
+
+if(sessionStorage.getItem('fileterStatusInPAI') === ''){
+  statusFilter.value = 'All'
+}
+
+// ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
+const addStoredStatus = () => {
+  console.log("statusFilter addStoredStatus", statusFilter.value)
+  if (storedStatus && storedStatus !== null && storedStatus !== '') {
+    const newItems = storedStatus.split(',')
+
+    // newItems.forEach(item => {
+    //   if (!statusFilter.value.includes(item.trim())) { // เช็คว่าค่าไม่มีใน array
+    //     statusFilter.value.push(item.trim()) // เพิ่มค่าใหม่เข้าไป
+    //   }
+    // })
+
+    // อัปเดต sessionStorage
+    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value)
+    sessionStorage.setItem('statusFilter', statusFilter.value)
+
+    console.log("statusFilter if", sessionStorage.getItem('fileterStatusInPAI', statusFilter.value))
+  }else if(statusFilter.value){
+    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value)
+    console.log("statusFilter addStoredStatus else", statusFilter.value)
+  }
+}
+
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+    sessionStorage.setItem('fileterStatusInPAI', '')
+  }
+  if(sessionStorage.getItem('statusFilter') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+    sessionStorage.setItem('statusFilter', '')
+  }
+
+  addStoredStatus()
+})
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const validateFields = () => {
   const fields = {
-    deliveryDateFrom: deliveryDateFrom.value,
-    deliveryDateTo: deliveryDateTo.value,
-    productId: productId.value,
-    productName: productName.value,
-    supplierId: supplierId.value,
-    supplierName: supplierName.value,
-    purchaseOrderNo: purchaseOrderNo.value,
-    statusName: fileterStatusInPAI.value,
+    // deliveryDateFrom: deliveryDateFrom.value,
+    // deliveryDateTo: deliveryDateTo.value,
+    // productId: productId.value,
+    // productName: productName.value,
+    // supplierId: supplierId.value,
+    // supplierName: supplierName.value,
+    // purchaseOrderNo: purchaseOrderNo.value,
+    // statusName: fileterStatusInPAI.value,
+
+    deliveryDateFrom: tempFilters.value.deliveryDateRange || '',
+    deliveryDateTo: tempFilters.value.deliveryDateTo || '',
+    productId: tempFilters.value.productId || '',
+    productName: tempFilters.value.productName || '',
+    supplierId: tempFilters.value.supplierId || '',
+    supplierName: tempFilters.value.supplierName || '',
+    purchaseOrderNo: tempFilters.value.purchaseOrderNo || '',
+    statusName: tempFilters.value.fileterStatusInPAI || '',
+
   }
 
   // ตรวจสอบว่ามีฟิลด์ใดที่ไม่ใช่ค่าว่างอย่างน้อย 1 ค่า
@@ -142,47 +213,23 @@ const validateFields = () => {
   } else {
     disBtnExoport.value = false
     console.log("filter Validate", fields)
+
+    sessionStorage.setItem('deliveryDateFrom', fields.deliveryDateRange || '')
+    sessionStorage.setItem('deliveryDateTo', fields.deliveryDateTo || '')
+    sessionStorage.setItem('productId', fields.productId || '')
+    sessionStorage.setItem('productName', fields.productName || '')
+    sessionStorage.setItem('supplierId', fields.supplierId || '')
+    sessionStorage.setItem('supplierName', fields.supplierName || '')
+    sessionStorage.setItem('purchaseOrderNo', fields.purchaseOrderNo || '')
+    sessionStorage.setItem('fileterStatusInPAI', fields.fileterStatusInPAI || '')
+
+    addStoredStatus()
+
+    sessionStorage.setItem('productId', fields.productId)
     
     return true // คืนค่า true ถ้ามีข้อมูลในฟิลด์อย่างน้อย 1 ฟิลด์
   }
 }
-
-// ใช้ watch function เพื่ออัปเดต sessionStorage เมื่อแต่ละค่าถูกเปลี่ยนแปลง
-watch(deliveryDateFrom, newValue => {
-  sessionStorage.setItem('deliveryDateFrom', newValue)
-})
-watch(deliveryDateTo, newValue => {
-  sessionStorage.setItem('deliveryDateTo', newValue)
-})
-watch(productId, newValue => {
-  sessionStorage.setItem('productId', newValue)
-})
-watch(productName, newValue => {
-  sessionStorage.setItem('productName', newValue)
-})
-watch(supplierId, newValue => {
-  sessionStorage.setItem('supplierId', newValue)
-})
-watch(supplierName, newValue => {
-  sessionStorage.setItem('supplierName', newValue)
-})
-watch(purchaseOrderNo, newValue => {
-  sessionStorage.setItem('purchaseOrderNo', newValue)
-})
-watch(fileterStatusInPAI, newValue => {
-  sessionStorage.setItem('fileterStatusInPAI', newValue)
-})
-
-onMounted(() => {
-  deliveryDateFrom.value = sessionStorage.getItem('deliveryDateFrom') || ''
-  deliveryDateTo.value = sessionStorage.getItem('deliveryDateTo') || ''
-  productId.value = sessionStorage.getItem('productId') || ''
-  productName.value = sessionStorage.getItem('productName') || ''
-  supplierId.value = sessionStorage.getItem('supplierId') || ''
-  supplierName.value = sessionStorage.getItem('supplierName') || ''
-  fileterStatusInPAI.value = sessionStorage.getItem('fileterStatusInPAI') || ''
-  purchaseOrderNo.value = sessionStorage.getItem('purchaseOrderNo') || ''
-})
 
 watch(() => {
   if(sessionStorage.getItem('fileterStatusInPAI') === 'null'){
@@ -195,40 +242,45 @@ watch(() => {
   validateFields()
 })
 
-// ดึงค่าจาก sessionStorage
-const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
+// ใช้ watch function เพื่ออัปเดต sessionStorage เมื่อแต่ละค่าถูกเปลี่ยนแปลง
+watch(tempFilters.value.deliveryDateRange, newValue => {
+  sessionStorage.setItem('deliveryDateFrom', newValue)
+})
+watch(tempFilters.value.deliveryDateTo, newValue => {
+  sessionStorage.setItem('deliveryDateTo', newValue)
+})
+watch(tempFilters.value.productId, newValue => {
+  sessionStorage.setItem('productId', newValue)
+  console.log("Update Filter", tempFilters.value.productId, newValue)
+})
+watch(tempFilters.value.productName, newValue => {
+  sessionStorage.setItem('productName', newValue)
+})
+watch(tempFilters.value.supplierId, newValue => {
+  sessionStorage.setItem('supplierId', newValue)
+})
+watch(tempFilters.value.supplierName, newValue => {
+  sessionStorage.setItem('supplierName', newValue)
+})
+watch(tempFilters.value.purchaseOrderNo, newValue => {
+  sessionStorage.setItem('purchaseOrderNo', newValue)
+})
+watch(tempFilters.value.fileterStatusInPAI, newValue => {
+  sessionStorage.setItem('fileterStatusInPAI', newValue)
+})
 
-// ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
-const statusFilter = ref([])
-
-// ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
-const addStoredStatus = () => {
-  if (storedStatus && storedStatus !== null && storedStatus !== '') {
-    const newItems = storedStatus.split(',')
-
-    newItems.forEach(item => {
-      if (!statusFilter.value.includes(item.trim())) { // เช็คว่าค่าไม่มีใน array
-        statusFilter.value.push(item.trim()) // เพิ่มค่าใหม่เข้าไป
-      }
-    })
-
-    // อัปเดต sessionStorage
-    sessionStorage.setItem('fileterStatusInPAI', statusFilter.value.join(',') || '')
-    sessionStorage.setItem('statusFilter', statusFilter.value.join(',') || '')
-  }
-}
-
-watch(() => {
-  if(sessionStorage.getItem('fileterStatusInPAI') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
-    sessionStorage.setItem('fileterStatusInPAI', '')
-  }
-  if(sessionStorage.getItem('statusFilter') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
-    sessionStorage.setItem('statusFilter', '')
-  }
+onMounted(() => {
+  tempFilters.value.deliveryDateRange = sessionStorage.getItem('deliveryDateFrom') || ''
+  tempFilters.value.deliveryDateTo = sessionStorage.getItem('deliveryDateTo') || ''
+  tempFilters.value.productId = sessionStorage.getItem('productId') || ''
+  tempFilters.value.productName = sessionStorage.getItem('productName') || ''
+  tempFilters.value.supplierId = sessionStorage.getItem('supplierId') || ''
+  tempFilters.value.supplierName = sessionStorage.getItem('supplierName') || ''
+  tempFilters.value.fileterStatusInPAI = sessionStorage.getItem('fileterStatusInPAI') || ''
+  tempFilters.value.purchaseOrderNo = sessionStorage.getItem('purchaseOrderNo') || ''
 })
 
 // เรียกใช้ฟังก์ชันเพื่อเพิ่มค่าใหม่
-addStoredStatus()
 
 //------------------------ Model Name for search ------------------------------
 const searchByCategoryName = ref(null)
@@ -292,7 +344,7 @@ const serialProductCode = ref(null)
 
 //------------------------------- Function Get StockUpdate Need Enter Search -----------------
 
-const clearModel = () => {
+const clearModel = async () => {
   deliveryDateFrom.value = ''
   deliveryDateTo.value = ''
   productId.value = ''
@@ -306,7 +358,26 @@ const clearModel = () => {
   serialProductCode.value = ''
   fileterStatusInPAI.value = ''
   statusFilter.value = []
-  purchaseOrderNo.value = ''
+
+  tempFilters.value.deliveryDateRange = ''
+  tempFilters.value.deliveryDateTo = ''
+  tempFilters.value.productId = ''
+  tempFilters.value.productName = ''
+  tempFilters.value.supplierId = ''
+  tempFilters.value.supplierName = ''
+  tempFilters.value.purchaseOrderNo = ''
+  tempFilters.value.fileterStatusInPAI = ''
+
+  sessionStorage.setItem('deliveryDateFrom', '')
+  sessionStorage.setItem('deliveryDateTo', '')
+  sessionStorage.setItem('productId', '')
+  sessionStorage.setItem('productName', '')
+  sessionStorage.setItem('supplierId', '')
+  sessionStorage.setItem('supplierName', '')
+  sessionStorage.setItem('purchaseOrderNo', '')
+  sessionStorage.setItem('fileterStatusInPAI', '')
+
+  await handleSearch()
 }
 
 const searchParams = {
@@ -411,7 +482,7 @@ const colorStatusWithId = id => {
   case 11:
     return { color: 'lime-lighten-4', message: 'cycan' }
   case 12:
-    return { color: 'yellow-lighten-4', message: 'brown' }
+    return { color: 'yellow-darken-3', message: 'brown' }
   case 13:
     return { color: 'orange-lighten-4', message: 'orange' }
   case 14:
@@ -422,6 +493,8 @@ const colorStatusWithId = id => {
     return { color: 'red-darken-2', message: 'red-darken-2' }
   case 17:
     return { color: 'green-darken-2', message: 'green-darken-2' }
+  case 18:
+    return { color: 'orange-darken-4', message: 'green-darken-2' }
   default:
     return { color: 'grey', message: 'grey' }
   }
@@ -454,7 +527,7 @@ const colorStatusWithId2 = id => {
   case 11:
     return { color: 'lime', message: 'cycan' }
   case 12:
-    return { color: 'yellow', message: 'brown' }
+    return { color: 'yellow-darken-4', message: 'brown' }
   case 13:
     return { color: 'orange', message: 'orange' }
   case 14:
@@ -465,6 +538,8 @@ const colorStatusWithId2 = id => {
     return { color: 'red-darken-2', message: 'red-darken-2' }
   case 17:
     return { color: 'green-darken-2', message: 'green-darken-2' }
+  case 18:
+    return { color: 'orange-darken-4', message: 'green-darken-2' }
   default:
     return { color: 'grey', message: 'grey' }
   }
@@ -532,8 +607,6 @@ const dataTableCliclHighlightIsToggle = no => {
     // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
     dataTableNummberedToggle.value = no
   }
-
-  console.log("dataTableNummberedToggle.value:", dataTableNummberedToggle.value, "no:", no)
 }
 
 //--------------------------------- Convert Date To API ----------------------------------------------------------------
@@ -547,108 +620,103 @@ const handleSelection = (selected, item) => {
   }
 }
 
-const GetStockUpdate = () => {
-  progressLinearNoData.value = false
-  if (deliveryDateRange.value) {
-    const [fromDate, toDate] = deliveryDateRange.value.split(" to ")
-    if(deliveryDateRange.value === '' || deliveryDateRange.value === null || deliveryDateRange.value === undefined){
-      deliveryDateFrom.value = ''
+const searchFilters = ref({ ...tempFilters.value }) // ฟิลเตอร์จริงที่จะส่งไป API
 
+const handleSearch = async () => {
+  searchFilters.value = { ...tempFilters.value } // คัดลอกค่าฟิลเตอร์ที่กรอกเสร็จแล้ว
+
+  sessionStorage.setItem('deliveryDateFrom', tempFilters.value.deliveryDateRange || '')
+  sessionStorage.setItem('deliveryDateTo', tempFilters.value.deliveryDateTo || '')
+  sessionStorage.setItem('productId', tempFilters.value.productId || '')
+  sessionStorage.setItem('productName', tempFilters.value.productName || '')
+  sessionStorage.setItem('supplierId', tempFilters.value.supplierId || '')
+  sessionStorage.setItem('supplierName', tempFilters.value.supplierName || '')
+  sessionStorage.setItem('purchaseOrderNo', tempFilters.value.purchaseOrderNo || '')
+  sessionStorage.setItem('fileterStatusInPAI', tempFilters.value.fileterStatusInPAI || '')
+
+  await GetStockUpdate() // เรียก API ด้วยฟิลเตอร์ที่ผู้ใช้กรอก
+}
+
+onMounted( async () => {
+  await GetStockUpdate()
+  addStoredStatus()
+})
+
+const GetStockUpdate = async () => {
+  try {
+    progressLinearNoData.value = false
+
+    const { deliveryDateRange, productId, productName, supplierId, supplierName, purchaseOrderNo } = searchFilters.value
+
+    // จัดการวันที่
+    if (deliveryDateRange) {
+      const [fromDate, toDate] = deliveryDateRange.split(" to ")
+
+      deliveryDateFrom.value = fromDate || ''
+      deliveryDateTo.value = toDate || ''
+    } else {
+      deliveryDateFrom.value = ''
       deliveryDateTo.value = ''
     }
 
-    deliveryDateFrom.value = fromDate
+    // จัดการสถานะ
+    fileterStatusInPAI.value = statusFilter.value === 'All' ? '' : statusFilter.value
 
-    deliveryDateTo.value = toDate
-  }else {
-    deliveryDateFrom.value = ''
+    // แปลงสถานะเป็น String
+    const fileterStatusInApiStr = typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null
+      ? fileterStatusInPAI.value.join(',')
+      : fileterStatusInPAI.value
 
-    deliveryDateTo.value = ''
-  }
+    // เรียก API ด้วย await
+    progressLinearNoData.value = false
 
-  if(statusFilter.value === 'All'){
-    fileterStatusInPAI.value = ''
-  } else {
-    fileterStatusInPAI.value = statusFilter.value
-  }
+    products.value = []
 
-  const fileterStatusInApiStr = ref('')
+    addStoredStatus()
 
-  if (typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null) {
-  // แปลงเป็น string
-    fileterStatusInApiStr.value = fileterStatusInPAI.value.join(',')
-  }else{
-    fileterStatusInApiStr.value = fileterStatusInPAI.value
-  }
-
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/View?`, {
-    params: {
-      deliveryDateFrom: deliveryDateFrom.value,
-      deliveryDateTo: deliveryDateTo.value,
-      productId: productId.value,
-      productName: productName.value,
-      supplierId: supplierId.value,
-      supplierName: supplierName.value,
-      statusName: fileterStatusInApiStr.value || '',
-      purchaseOrderNo: purchaseOrderNo.value,
-
-    // ... and so on with other parameters
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${searchByWareHouseId.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }, {})
-    .then(response => {
-
-      const data = response.data.datas
-
-      console.log("Product Data base", data)
-
-      // Add No. field to each product
-      // Filter out items where receiveTypeId is 1
-      // const filteredData = data.filter(item => item.receiveTypeId !== 1 && item.receiveTypeId !== 3)
-
-      const filteredData = data.filter(item => item.receiveTypeId !== 33)
-
-      // Add No. field to each product (after filtering)
-      products.value = filteredData.map((item, index) => ({
-        ...item,
-        no: index + 1, // Add "no" field starting from 1
-        selectable: item.statusId === 15 ? true : false, // Set selectable based on statusId
-      }))
-
-
-      // totalCount.value = response.data.totalCount
-      // currentPage.value = response.data.page
-      // totalPage.value = response.data.totalPages
-      // rowPerPage.value = response.data.perPage
-
-      console.log('[products.value]!!: ', products.value)
-
-      console.log('[statusName.value Type]!!: ', typeof  fileterStatusInPAI.value)
-
-      // console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
-
-      // console.log('perPage: ',perPage)
-      // console.log('currentPage: ',currentPage)
-      // console.log('totalCount: ',totalCount)
-      // console.log('totalPages: ',totalPage)
-
-      // console.log('subTypeId',searchBySubTypeId.value)
-
-    
-    })
-    .catch(error => {
-    // Handle errors
-      products.value = []
-      progressLinearNoData.value = true
-      console.error('Error:', error)
+    const response = await axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/View`, {
+      params: {
+        deliveryDateFrom: deliveryDateFrom.value,
+        deliveryDateTo: deliveryDateTo.value,
+        productId: productId,
+        productName: productName,
+        supplierId: supplierId,
+        supplierName: supplierName,
+        statusName: fileterStatusInApiStr || '',
+        purchaseOrderNo: purchaseOrderNo,
+      },
+      headers: {
+        accept: '*/*',
+        'x-location': `${searchByWareHouseId.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
     })
 
+    progressLinearNoData.value = false
+
+    const data = response.data.datas
+
+    // กรองข้อมูล
+
+    const filteredData = data.filter(item => item.receiveTypeId !== 33)
+
+    // เพิ่ม field no และ selectable
+    products.value = filteredData.map((item, index) => ({
+      ...item,
+      no: index + 1,
+      selectable: item.statusId === 15,
+    }))
+
+    console.log('[products.value]:', products.value)
+
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+    products.value = []
+    progressLinearNoData.value = true
+    console.error('Error:', error)
+  }
 }
+
 
 //--------------------------------------- Data Model Table Data ----------------------------
 const headers = [
@@ -723,8 +791,6 @@ const headers = [
   },
 ]
 
-const customSortIcon = ref('mdi-swap-vertical')
-
 const tableDataPerpage = ref(15)
 const tableDataHeight = ref(550)
 
@@ -734,22 +800,6 @@ onMounted(() => {
 
   tableDataPerpage.value = savedItemsPerPage ? parseInt(savedItemsPerPage, 10) : 10 // ค่าเริ่มต้นเป็น 10 ถ้าไม่มีใน session
 
-  // switch (tableDataPerpage.value) {
-  // case 10:
-  //   tableDataHeight.value = 550
-  //   break
-  // case 25:
-  //   tableDataHeight.value = 700
-  //   break
-  // case 50:
-  //   tableDataHeight.value = 850
-  //   break
-  // case 100:
-  //   tableDataHeight.value = 850
-  //   break
-  // default:
-  //   tableDataHeight.value = 550
-  // }
 })
 
 
@@ -773,13 +823,9 @@ const resetSearchKey = () => {
 //------------------------------- Function Get StockUpdate Auto Search -----------------
 
 watch(() => {
-  GetStockUpdate()
   getStatusReceiving()
 })
 
-const searchFilter = () => {
-  GetStockUpdate()
-}
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
@@ -833,10 +879,6 @@ function customFilter(item, queryText, itemText) {
   const searchText = queryText.toLocaleLowerCase()
   
   return textOne.includes(searchText) || textTwo.includes(searchText)
-}
-
-const submitSearchButton = () => {
-  GetStockUpdate()
 }
 
 // -------------------------------------- Export Bar Excel - --------------------------------
@@ -1178,9 +1220,12 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   detailsReceiv.value = products.value[index-1]
 
   itemStore.clearItemDetails()
+  itemStore.setItemDetails(products.value[index-1], 'itemDataCookies')
+
   itemStore.setItemDetails(products.value[index-1].poEtlLogDetailJournalID, 'poEtlLogDetailJournalIDCookies')
   itemStore.setItemDetails(products.value[index-1].itemCode, 'itemCodeCookies')
   itemStore.setItemDetails(products.value[index-1].supplierId, 'supplierIdCookies')
+  itemStore.setItemDetails(products.value[index-1].lorryInfoKey, 'typeLorryInfoId')
 
 
   // console.log("setItemDetails", itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
@@ -1251,6 +1296,32 @@ const findProductByJournalID = journalID => {
   
   if (foundProduct) {
     console.log('Found Product:', foundProduct)
+
+    const typeLorryIDOld = ref(sessionStorage.getItem('typeLorryInfoId'))
+    if(foundProduct.lorryInfos.length > 0){
+      if(foundProduct.lorryInfos.length === 1){
+        const typeLorryOnce = foundProduct.lorryInfos[0].lorryInfoKey
+
+        typeLorryID.value = foundProduct.lorryInfos[0].lorryInfoKey
+
+        itemStore.setItemDetails(typeLorryOnce, 'typeLorryInfoId')
+        sessionStorage.setItem('typeLorryInfoId', typeLorryOnce)
+        
+        console.log('Found Product typeLorryOnce:', typeLorryOnce)
+      }
+      else if(foundProduct.lorryInfos.length >= 1 && typeLorryIDOld.value){
+        itemStore.clearItemDetails('typeLorryInfoId')
+        sessionStorage.removeItem('typeLorryInfoId')
+        console.log('Clear typeLorryOnce2:', sessionStorage.getItem('typeLorryInfoId'), typeLorryIDOld.value)
+      }
+      else{
+        itemStore.clearItemDetails('typeLorryInfoId')
+        sessionStorage.removeItem('typeLorryInfoId')
+        console.log('Clear typeLorryOnce:', sessionStorage.getItem('typeLorryInfoId'), typeLorryIDOld.value)
+      }
+    }else{
+      console.log('No typeLorryOnce')
+    }
     resultDetailsAvtion.value = foundProduct
     
     return foundProduct
@@ -1272,15 +1343,25 @@ const dataPrintlabel = ref([])
 
 //------------------------ Print Label------------------------------------------
 // const success = ref(false)
-import { useViewPrintLabelFormService, usePrintReceivingFormService, usePrintInspectionFormService, usePrintPackagingFormService, usePrintExportExcelService  }  from '@/services/skt/global/gloBalService'
+import { useViewPrintLabelFormService, usePrintReceivingFormService, 
+  usePrintInspectionFormService, usePrintPackagingFormService, 
+  usePrintExportExcelService }  from '@/services/skt/global/gloBalService'
+
+import { usePrintIPAFormService } from '@/services/skt/receivingFrom/lorry/ipaServices'
 
 const { printLabelFormViewResult, printLabelFormViewService } = useViewPrintLabelFormService()
 const processingPrintLabel = ref(false)
 const successGetPrintLabelView = ref(false)
 
 const disabledBtnLebal = () => {
-  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16, 13].includes(idStatusDialogAction.value)
 }
+
+const disabledBtnLebalLorry = () => {
+  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16, 13].includes(idStatusDialogAction.value)
+}
+
+const disabledTypeReceiving = ref(itemStore.getItemDetails('typeLorryInfoId'))
 
 const getPrintLabelView = async lot => {
   // console.log('searchByCategoryName: ',searchByCategoryName)
@@ -1466,11 +1547,15 @@ const { errorMessageInspection, printInspectionFormService } = usePrintInspectio
 
 const { errorMessagePackaging, printPackagingFormService } = usePrintPackagingFormService()
 
+const { printIPAFormResult, errorMessageIPAPrintPDF, printIPAFormService } = usePrintIPAFormService()
+
 const processingPrint = ref(false)
 
 const processingPrintForm1 = ref(false)
 const processingPrintForm2 = ref(false)
 const processingPrintForm3 = ref(false)
+
+const processingPrintForm4 = ref(false)
 
 const disabledCheckboxListRawM = () => {
   // ถ้า idStatusDialogAction.value มีค่าเป็น 0, 1, 2 หรือ 3 จะคืนค่าเป็น true
@@ -1485,17 +1570,69 @@ const disabledCheckboxListPk = () => {
   return [0, 1, 2, 3, 4, 5, 10].includes(idStatusDialogAction.value)
 }
 
+const disabledCheckboxListLorry = () => {
+  return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].includes(idStatusDialogAction.value)
+}
+
+const typeLorryID = ref(null)
+
+const checkTypeLorryToPrintPDF = () => {
+  const typeID = ref(sessionStorage.getItem('typeLorryInfoId'))
+  switch (typeLorryID.value) {
+  case '01':
+    return 'LorryFormIPA'
+  case '02':
+    return "LorryFormEA"
+  case '03':
+    return "LorryFormEPICHLO"
+  case '04':
+    return 'LorryFormSKTEP-400BE11V-144'
+  case '05':
+    return "LorryFormSKTEP-400BE11V-145"
+  case '06':
+    return "LorryFormKARAMU"
+  case '07':
+    return "LorryFormAKUMARU"
+  case '09':
+    return "LorryFormHAKU-C(11V-111)"
+  case '10':
+    return "LorryFormEKI-A(11V-110)"
+  case '11':
+    return "LorryFormDIESELOIL"
+  case '12':
+    return "LorryFormTELA"
+  case '13':
+    return "LorryFormEKI-ATANK(11V-432)"
+  case '15':
+    return "LorryFormNPAN"
+  case '16':
+    return "LorryFormSANNIXFA-703V"
+  default:
+    console.warn(`No component found for key: ${typeID.value}`)
+    
+    return null
+  }
+}
+
 const printFormAll = async () => {
   // ตั้งค่าสถานะการประมวลผลให้เป็น true
   processingPrint.value = true
+
+  const typeReceiving = ref('ReceivingForm')
 
   const printPromises = selectedPrintLabel.value.map(async label => {
     if (label === 'Receiving Form') {
       processingPrintForm1.value = true // เริ่มพิมพ์
       console.log('Printing Receiving Form...')
 
+      if(receivingTypeAction.value === 2){
+        typeReceiving.value = 'ReceivingForm'
+      }else if(receivingTypeAction.value === 3){
+        typeReceiving.value = 'ReceivingFormByLorry'
+      }
+
       try {
-        return await printReceivingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) // คืนค่าผลลัพธ์
+        return await printReceivingFormService(typeReceiving.value, poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) // คืนค่าผลลัพธ์
       } finally {
         processingPrintForm1.value = false // เสร็จสิ้นการพิมพ์
       }
@@ -1518,6 +1655,21 @@ const printFormAll = async () => {
         return await printPackagingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
       } finally {
         processingPrintForm3.value = false // เสร็จสิ้นการพิมพ์
+      }
+    }
+
+    if (label === 'Lorry Loading Checklist') {
+      processingPrintForm4.value = true // เริ่มพิมพ์
+      console.log('Printing Lorry Loading Checklist...')
+
+      const typeLorryID = ref(checkTypeLorryToPrintPDF())
+
+      try {
+        console.log('Printing Lorry Loading Checklist...', typeLorryID.value)
+        
+        return await printIPAFormService(typeLorryID.value, poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
+      } finally {
+        processingPrintForm4.value = false // เสร็จสิ้นการพิมพ์
       }
     }
   })
@@ -1611,7 +1763,6 @@ const printExportExcelFunction = async () => {
     return
   }
   
-
   try {
     // รอให้ printExportExcel ทำงานและได้ผลลัพธ์กลับมา
     await printExportExcelService(urlApi.value, whereHouse, accessTokenAtStore, params)
@@ -2006,7 +2157,7 @@ const insetSwitch1 = ref('')
                 class="py-2"
               >
                 <VTextField
-                  v-model="productId"
+                  v-model="tempFilters.productId"
                   density="compact"
                   height="20px"
                   class="py-0"
@@ -2030,7 +2181,7 @@ const insetSwitch1 = ref('')
                 class="py-2"
               >
                 <VTextField
-                  v-model="productName"
+                  v-model="tempFilters.productName"
                   density="compact"
                   height="20px"
                   class="py-0"
@@ -2049,7 +2200,7 @@ const insetSwitch1 = ref('')
                 class="py-1"
               >
                 <AppDateTimePicker
-                  v-model="deliveryDateRange"
+                  v-model="tempFilters.deliveryDateRange"
                   placeholder="Select Date"
                   density="compact"
                   :config="{ mode: 'range',dateFormat: 'd/m/Y' }"
@@ -2068,7 +2219,7 @@ const insetSwitch1 = ref('')
                 class="py-1"
               >
                 <VTextField
-                  v-model="purchaseOrderNo"
+                  v-model="tempFilters.purchaseOrderNo"
                   density="compact"
                 >
                   <template #label>
@@ -2085,7 +2236,7 @@ const insetSwitch1 = ref('')
                 class="py-1"
               >
                 <VTextField
-                  v-model="supplierName"
+                  v-model="tempFilters.supplierName"
                   :label="$t('Supplier Name')"
                   type="Supplier Name"
                   density="compact"
@@ -2129,7 +2280,7 @@ const insetSwitch1 = ref('')
                       density="compact"
                       class="mx-0"
                       style="font-size: 12px;"
-                      @click="searchFilter"
+                      @click="handleSearch"
                     >
                       {{ $t('Search') }}
                     </VBtn>
@@ -3081,7 +3232,7 @@ const insetSwitch1 = ref('')
             <VCol cols="6">
               <!-- Align VCheckbox items to the right -->
               <VCheckbox
-                v-if="receivingTypeAction === 2"
+                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListRawM()"
                 label="Receiving Form"
@@ -3098,7 +3249,7 @@ const insetSwitch1 = ref('')
                 </template>
               </VCheckbox>
               <VCheckbox
-                v-if="receivingTypeAction === 2"
+                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListInsp()"
                 label="Inspection Request Form"
@@ -3108,6 +3259,23 @@ const insetSwitch1 = ref('')
                 <template #append>
                   <VProgressCircular
                     v-if="processingPrintForm2"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
+              <VCheckbox
+                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListLorry()"
+                label="Lorry Loading Checklist"
+                value="Lorry Loading Checklist"
+                class="ms-auto"
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm4"
                     :size="10"
                     color="primary"
                     indeterminate
@@ -3150,6 +3318,7 @@ const insetSwitch1 = ref('')
                 class="mt-4"
               >
                 <VBtn
+                  v-if="!disabledBtnLebalLorry()"
                   style="width: 100%;"
                   :disabled="checkPersistent"
                   @click="btnPrintLabel"
@@ -3258,1161 +3427,6 @@ const insetSwitch1 = ref('')
       </VCard>
     </VDialog>
   </section>
-
-  <!-- ----------   Product  SKT                                  ------------------------------------ -->
-  <section
-    v-if="false"
-    class="table-fix "
-  >
-    <VCard>
-      <VTable
-        fixed-header
-        class="rounded-0"
-        dark
-        @keyup="uppercase"
-      >
-        <!-- 👉 table head -->
-        <thead class="text-no-wrap table-header-fix">
-          <tr>
-            <th
-              class="px-1 d-flex justify-center"
-              scope="row"
-            >
-              <VCheckbox class="d-flex justify-center" />
-            </th>
-            <th
-              text-lowercase
-              scope="row"
-              class="text-center px-1 text-lowercase"
-            >
-              <span
-                v-if="true"
-                style="font-size: 12px; text-transform: capitalize;"
-              >Status</span>
-              <VMenu
-                v-if="false"
-                transition="slide-y-transition"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    end
-                    icon="ri-arrow-down-s-fill"
-                    color="primary"
-                    size="30"
-                  />
-                </template>
-
-                <VList
-                  v-model="statusFilter"
-                  height="250px"
-                  lines="one"
-                >
-                  <VListItem
-                    v-for="(item, index) in itemStatus"
-                    :key="index"
-                    @click="selectStatus(item)"
-                  >
-                    <template #default="{ }">
-                      <VChip
-                        :color="colorStatusWithId(item.statusID)"
-                        style="font-size: 12px;"
-                      >
-                        {{ item.statusText === '' ? 'All' : item.statusText }}
-                      </VChip>
-                    </template>
-                  </VListItem>
-                </VList>
-              </VMenu>
-              <VAutocomplete
-                v-if="false"
-                label="States"
-                :items="items"
-                density="compact"
-                placeholder="Select State"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">No.</span>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1 text-lowercase"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">Item Code</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Item Name') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Trade Name') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Supplier Code') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Supplier Name') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('P/O No.') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-end px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Delivery Date') }}</span>
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; font-size: 12px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Lot') }}</span>
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-                disabled
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-end px-4 text-wrap"
-            >
-              <VIcon
-                v-if="false"
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; font-size: 12px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-              <VRow>
-                <VCol
-                  class="pa-1 pt-2 text-center"
-                  cols="12"
-                >
-                  <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Purchasing') }}</span>
-                </VCol>
-                <VCol
-                  class="pa-1 px-1 text-end"
-                  cols="6"
-                >
-                  <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Qty (PCS)') }}</span>
-                </VCol>
-                <VCol
-                  class="pa-1 px-1 text-end"
-                  cols="6"
-                >
-                  <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Qty (Kgs)') }}</span>
-                </VCol>
-              </VRow>
-            </th>
-            <th
-              scope="row"
-              class="text-end py-2 px-4 text-wrap"
-            >
-              <VIcon
-                v-if="false"
-                color="primary"
-                icon="mdi-pan-vertical"
-                style="font-size: 14px; font-size: 12px; text-transform: capitalize;"
-                @click="toggleSortType('sortByQty')"
-              />
-              <VRow>
-                <VCol
-                  class="pa-1 pt-2 text-center"
-                  cols="12"
-                >
-                  <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Receiving') }}</span>
-                </VCol>
-                <VCol
-                  class="pa-1 px-1 text-end"
-                  cols="6"
-                >
-                  <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Qty (PCS)') }}</span>
-                </VCol>
-                <VCol
-                  class="pa-1 px-1 text-end"
-                  cols="6"
-                >
-                  <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Qty (Kgs)') }}</span>
-                </VCol>
-              </VRow>
-            </th>
-            <th
-              scope="row"
-              class="text-end px-1"
-            />
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Updated By') }}</span>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Updated On') }}</span>
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-size: 12px; text-transform: capitalize;">{{ $t('Action') }}</span>
-            </th>
-          </tr>
-        </thead>
-        <!-- 👉 table body -->
-        <tbody class="text-wrap ">
-          <tr
-            v-for="(product, index) in products"
-            :key="index"
-            style="font-size: 12px;"
-          >
-            <td
-              style="min-width: 36px; min-height: 55px;"
-              scope="row"
-              class="px-2 d-flex justify-center"
-            >
-              <VCheckbox
-                v-if="product.statusText === 'Waiting for Warehouse Approval'"
-                style="min-width: 27px; max-height: 55px;"
-                class="d-flex justify-center"
-              />
-            </td>
-            <td
-              style="min-width: 150px;"
-              class="text-center px-1"
-            >
-              <span>
-                <VChip
-                  :color="colorStatusWithId(product.statusId).color"
-                  class="font-weight-medium"
-                  style="min-height: 50px;"
-                  :style="{ color: colorStatusWithId(product.statusId).message }"
-                >
-                  <span
-                    style="font-size: 12px;"
-                    class="text-wrap"
-                  >{{ product.statusText }}</span>
-                </VChip>
-                <VChip
-                  v-if="false"
-                  style="min-height: 50px; font-size: 12px;"
-                  :color="checkStatus(product.statusText)"
-                >
-                  <span
-                    class="text-wrap"
-                    style="text-transform: capitalize;"
-                  >{{ product.status }}</span>
-                </VChip>
-              </span>
-            </td>
-
-            <td
-              v-if="false"
-              style="position: sticky; z-index: 2; left: 0; min-width: 200px;"
-              class="text-center px-1"
-            >
-              <VCard>
-                <VCardText class="pa-0">
-                  <span>
-                    <VChip
-                      style="min-height: 40px;"
-                      :color="checkStatus(product.statusText)"
-                    >
-                      <span
-                        class="text-wrap"
-                        style="font-size: 16px; text-transform: capitalize;"
-                      >{{ product.statusText }}</span>
-                    </VChip>
-                    <VChip
-                      v-if="false"
-                      style="min-height: 40px; font-size: 16px;"
-                      :color="checkStatus(product.statusText)"
-                    >
-                      <span
-                        class="text-wrap"
-                        style="text-transform: capitalize;"
-                      >{{ product.status }}</span>
-                    </VChip>
-                  </span>
-                </VCardText>
-              </VCard>
-            </td>
-
-            <!-- 👉 Ordinal Number -->
-            <td class="text-center px-1">
-              {{ index + 1 }}
-            </td>
-
-            <!-- 👉 Product categories -->
-           
-
-            <!-- 👉 Secondary product categories -->
-            <td class="text-start px-1">
-              {{ product.itemCode }}
-            </td>
-
-            <!-- 👉 Sub product categories -->
-            <td
-              style="min-width: 180px;"
-              class="text-start px-1"
-            >
-              {{ product.itemName }}
-            </td>
-
-            <!-- 👉 Product code -->
-            <td
-              style="min-width: 180px;"
-              class="text-start px-1"
-            >
-              {{ product.concatTradename }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td class="text-start px-1">
-              {{ (product.supplierId) }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td
-              style="min-width: 180px;"
-              class="text-start px-1"
-            >
-              {{ (product.supplierName) }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td class="text-start px-1">
-              {{ (product.purchaseOrderNo) }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td class="text-start px-1">
-              {{ convertDate(product.deliveryDate) }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td class="text-start px-1">
-              {{ (product.batch) }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td
-              class="text-end px-2"
-              style="min-width: 200px;"
-            >
-              <VRow>
-                <VCol
-                  class="pa-2 text-end"
-                  col="6"
-                >
-                  {{ ((product.purchasingQuantityPcs)) }}
-                </VCol>
-                <VCol
-                  class="pa-2 text-end"
-                  col="6"
-                >
-                  {{ formatNumber(product.purchasingAmountKgs) }}
-                </VCol>
-              </VRow>
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td
-              class="text-end px-1"
-              style="min-width: 200px;"
-            >
-              <VRow>
-                <VCol
-                  class="pa-2 text-end"
-                  col="6"
-                >
-                  {{ ((product.purchasingQuantityRcvdPcs)) }}
-                </VCol>
-                <VCol
-                  class="pa-2 text-end"
-                  col="6"
-                >
-                  {{ formatNumber(product.purchasingAmountRcvdKgs) }}
-                </VCol>
-              </VRow>
-            </td>
-
-            <td class="px-1">
-              <VIcon
-                v-if="product.status === 'Receiving Completed'" 
-                class="mx-2"
-                icon="ri-eye-line"
-                @click="showDialogItemDetails(product.productId)"
-              />
-            </td>
-
-            <td class="px-1">
-              {{ product.updatedBy }}
-            </td>
-
-            <td class="px-1">
-              {{ convertDate(product.updatedDate) }}
-            </td>
-
-            <td
-              style="width: 8rem;"
-              class="text-center px-1"
-            >
-              <VBtn
-                color="info"
-                @click="viewDetailsReceive(index, product.journalID, product.updatedBy)"
-              >
-                <div style="font-size: 12px;">
-                  Action
-                </div>
-              </VBtn>
-            </td>
-          </tr>
-        </tbody>
-      </VTable>
-      <VDivider />
-      <VCardText
-        v-if="false"
-        class="d-flex align-center justify-end gap-4 pa-2"
-      >
-        <div
-          class="d-flex align-center me-3"
-          style="width: 171px;"
-        >
-          <span class="text-no-wrap me-3">Rows per page:</span>
-
-          <VSelect
-            v-model="rowPerPage"
-            density="compact"
-            variant="plain"
-            class="mt-n4"
-            :items="[10, 20, 30, 50]"
-          />
-        </div>
-
-        <div class="d-flex align-center">
-          <h6 class="text-sm font-weight-regular">
-            {{ paginationData }}
-          </h6>
-
-          <VPagination
-            v-model="currentPage"
-            :length="totalPage"
-            :total-visible="$vuetify.display.mdAndUp ? 7 : 3"
-            @next="selectedRows = []"
-            @prev="selectedRows = []"
-          />
-        </div>
-      </VCardText>
-    </VCard>
-  </section>
-
-  <!-- data Table -->
-  <section v-if="false">
-    <VCard>
-      <CardText>
-        <VProgressLinear
-          v-if="progressLinearNoData"
-          height="20"
-          color="secondary"
-          class="elevation-1"
-        >
-          <span>No Data....</span>
-        </VProgressLinear>
-        <VProgressLinear
-          v-if="!products.length > 0 && progressLinearNoData === false"
-          height="20"
-          indeterminate
-          color="primary"
-          class="elevation-1"
-        >
-          <span>Loading Data....</span>
-        </VProgressLinear>
-        <VDataTable
-          v-if="Array.isArray(products) && products.length > 0 && progressLinearNoData === false"
-          v-model="selectedDataTables"
-          show-select
-          :headers="headers"
-          :items="products"
-          :items-per-page="10"
-          item-selectable="selectable"
-          class="elevation-1"
-          :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
-          :item-class="row_classes" 
-        >
-          <template #item.statusText="{ item }">
-            <td
-              class="text-center px-0"
-              style="display: flex; min-width: 150px;  justify-content: center; padding-block: 2px !important;"
-            >
-              <VChip
-                :color="colorStatusWithId2(item.raw.statusId).color"
-                class="font-weight-medium"
-                style="min-height: 50px;"
-                :style="{ color: colorStatusWithId(item.raw.statusId).message }"
-              >
-                <span
-                  v-if="debugMode === false"
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ item.raw.statusText }}</span>
-                <span
-                  v-if="debugMode === true"
-                  style="font-size: 12px;"
-                  class="text-wrap"
-                >{{ debugMode }} {{ item.raw.statusText }}[{{ item.raw.poEtlLogDetailJournalID }}]({{ item.raw.receiveTypeName }})</span>
-              </VChip>
-            </td>
-          </template>
-
-          <template #item.no="{ item }">
-            <td
-              class="px-0"
-              style="min-width: 30px;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-center "
-              >{{ item.raw.no }}</span>
-            </td>
-          </template>
-
-          <template #item.itemCode="{ item }">
-            <div
-              class="px-0"
-              style="display: flex; min-width: 30px;  justify-content: start;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ item.raw.itemCode }}</span>
-            </div>
-          </template>
-
-          <template #item.itemName="{ item }">
-            <td
-              class="px-0"
-              style="min-width: 200px;  justify-content: start;"
-            >
-              <span
-                style="max-width: 200px; font-size: 12px;"
-                class="text-wrap"
-                v-html="item.raw.itemName.replace(/\s/g, '&nbsp;')"
-              />
-            </td>
-          </template>
-
-          <template #item.concatTradename="{ item }">
-            <div
-              class="px-0 "
-              style="display: flex; width: 100%; min-width: 250px;"
-            >
-              <span
-                style="max-width: 200px; font-size: 12px;"
-                class="text-wrap"
-                v-html="item.raw.concatTradename.replace(/\s/g, '&nbsp;')"
-              />
-            </div>
-          </template>
-
-          <template #item.supplierId="{ item }">
-            <div
-              class="px-0"
-              style="display: flex; min-width: 30px;  justify-content: start;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ item.raw.supplierId }}</span>
-            </div>
-          </template>
-
-          <template #item.supplierName="{ item }">
-            <div
-              class="px-0"
-              style="display: flex; min-width: 200px; justify-content: start;"
-            >
-              <span
-                style="max-width: 200px; font-size: 12px;"
-                class="text-wrap"
-                v-html="item.raw.supplierName.replace(/\s/g, '&nbsp;')"
-              />
-            </div>
-          </template>
-
-          <template #item.purchaseOrderNo="{ item }">
-            <div
-              class="text-start px-0"
-              style="display: flex;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ item.raw.purchaseOrderNo }}</span>
-            </div>
-          </template>
-
-          <template #item.deliveryDate="{ item }">
-            <div class="text-center px-0">
-              <span
-                style="font-size: 12px;"
-                class=""
-              >{{ convertDate(item.raw.deliveryDate) }}</span>
-            </div>
-          </template>
-
-          <template #item.batch="{ item }">
-            <div
-              class="text-start px-0"
-              style="display: flex;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ item.raw.batch }}</span>
-            </div>
-          </template>
-
-          <template #item.purchasingQuantityPcs="{ item }">
-            <div
-              class="text-end px-0"
-              style="display: flex;  justify-content: end;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ (item.raw.purchasingQuantityPcs.toLocaleString()) }}</span>
-            </div>
-          </template>
-
-          <template #item.purchasingAmountKgs="{ item }">
-            <div
-              class="text-end px-0"
-              style="display: flex;  justify-content: end;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ formatNumber(item.raw.purchasingAmountKgs) }}</span>
-            </div>
-          </template>
-
-          <template #item.purchasingQuantityRcvdPcs="{ item }">
-            <div
-              class="text-end px-0"
-              style="display: flex;  justify-content: end;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ (item.raw.purchasingQuantityRcvdPcs.toLocaleString()) }}</span>
-            </div>
-          </template>
-
-          <template #item.purchasingAmountRcvdKgs="{ item }">
-            <div
-              class="text-end px-0"
-              style="display: flex;  justify-content: end;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ formatNumber(item.raw.purchasingAmountRcvdKgs) }}</span>
-            </div>
-          </template>
-
-          <template #item.updatedBy="{ item }">
-            <div
-              class="text-start px-0"
-              style="display: flex;"
-            >
-              <span
-                style="font-size: 12px;"
-                class="text-wrap"
-              >{{ item.raw.updatedBy }}</span>
-            </div>
-          </template>
-
-          <template #item.updatedDate="{ item }">
-            <div class="text-center">
-              <span style="font-size: 12px;">{{ convertDate(item.raw.updatedDate) }}</span>
-            </div>
-          </template>
-
-          <template #item.action="{ item }">
-            <div
-              class="text-start px-0"
-              style="display: flex;  justify-content: center;"
-            >
-              <VBtn
-                color="info"
-                @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode)"
-              >
-                <div style="font-size: 12px;">
-                  Action
-                </div>
-              </VBtn>
-            </div>
-          </template>
-        </VDataTable>
-      </CardText>
-    </VCard>
-  </section> 
 
   <!-- Data Table Beta1.0 -->
   <section>

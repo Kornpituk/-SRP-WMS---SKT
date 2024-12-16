@@ -11,13 +11,13 @@ const route = useRoute()
 
 // const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
-// const data = ref(JSON.parse(route.query.Data || '[]'))
-
 // console.log('Data**', data)
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
+
+const data = ref(itemStore.getItemDetails('itemDataCookies'))
 
 const whereHouse = ref(localStorage.getItem('whereHouseName'))
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
@@ -201,6 +201,8 @@ const dataPO = ref('')
 const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const isReject = ref(null)
+const isAccept = ref(null)
 const frozeCheck = ref(true)
 const poEiLog = ref()
 
@@ -297,6 +299,9 @@ const getHearderInsp = async () => {
       headerInsp.value.lastUpdatedSuperWH = data[0].whSupervisorDate
       headerInsp.value.lastUpdatedStaffInsp = data[0].inspStaffUpdatedDate
       headerInsp.value.lastUpdatedSuperInsp = data[0].inspSupervisorDate
+
+      isReject.value = data[0].isReject // เก็บค่า statusId
+      isAccept.value = data[0].isAccept // เก็บค่า statusId
 
       // reject
       headerInsp.value.remarkReject = data[0].statusComments
@@ -2628,7 +2633,7 @@ const getDisabledFollowStatusNRole = () => {
           style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
         >
           <VIcon
-            v-if="statusId === 17 || statusId === 15"
+            v-if="isAccept"
             color="success"
             size="60"
             icon="ri-checkbox-circle-fill"
@@ -2650,7 +2655,7 @@ const getDisabledFollowStatusNRole = () => {
           style="border: 1px solid black;"
         >
           <VIcon
-            v-if="statusId === 7 || statusId === 16"
+            v-if="isReject"
             color="red"
             size="60"
             icon="ri-close-circle-fill"
@@ -2669,7 +2674,7 @@ const getDisabledFollowStatusNRole = () => {
               class="text-center"
             >Comment:</span>
             <VTextarea
-              v-if="statusId === 7 || statusId === 16"
+              v-if="statusId === 7 || statusId === 16 || statusId === 12 || statusId === 13 || statusId === 14"
               v-model="headerInsp.remarkReject"
               rows="2"
               readonly

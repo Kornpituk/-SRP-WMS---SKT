@@ -10,6 +10,13 @@ const props = defineProps({
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
+import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
+import alertWordConst from '@/utilities/constant'
+
+const isDialogVisibleConfirmDialog = ref(false)
+const isDialogVisibleConfirmDialog2 = ref(false)
+const confirmValueCheck = ref(false)
+
 const itemStore = useItemStore()
 const poEtlLogDetailJournalID = itemStore.getItemDetails('poEtlLogDetailJournalIDCookies')
 
@@ -35,6 +42,8 @@ import RawMatInspec from '../inspecReqForm/index.vue'
 import PackagingInspec from '../packagingForm/index.vue'
 import PackagingInspec2 from '../packagingForm/index.vue'
 import PackagingInspec3 from '../packagingForm/index.vue'
+
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 
 //---------------- Import Lorry -------------------------------
 //--- A1
@@ -204,60 +213,74 @@ const trickerLorryLoadind = ref(false)
 const isDialogVisibleSelecrLorry = ref(true)
 const checkSelectLorry = ref([])
 
-const typeLorryOnce = ref(null)
+const typeLorryOnce = ref(sessionStorage.getItem('typeLorryInfoId'))
 const typeLorryTwo = ref(null)
 
 const generatedJournalId = async () => {
-  console.log("generatedJournalId")
-  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
-    },
-  },
-  {})
-    .then(response => {
-      console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+  console.log("generatedJournalId 0")
 
-      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+  try {
+    // ใช้ await เพื่อรอการส่ง API เสร็จ
+    const response = await axiosIns.get(
+      `${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalID}`,
+      {
+        headers: {
+          accept: '*/*',
+          'x-location': `${whereHouse.value}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      },
+    )
 
-        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+    console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+    console.log("generatedJournalId 1")
 
-        receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
-        statusId.value = item.statusId
+    // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+    if (response.data && response.data.data && response.data.data.length > 0) {
+      responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
 
-        checkSelectLorry.value = item.lorryInfos
+      const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
-        if(checkSelectLorry.value.length > 0){
-          if(checkSelectLorry.value.length === 1){
+      receivedTypeId.value = item.receiveTypeId // เก็บค่า statusId
+      statusId.value = item.statusId
+
+      checkSelectLorry.value = item.lorryInfos
+
+      if(!typeLorryOnce.value){
+        
+        if (checkSelectLorry.value.length > 0) {
+          if (checkSelectLorry.value.length === 1) {
             typeLorryOnce.value = checkSelectLorry.value[0].lorryInfoKey
-          } 
-        }else{
+          }
+        } else {
           trickerLorryLoadind.value = false
           typeLorryTwo.value = checkSelectLorry.value
         }
+      }else{
+        const filteredLorryInfos = checkSelectLorry.value.filter(
+          item => item.lorryInfoKey === typeLorryOnce.value,
+        )
 
-        sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
-
-        currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
-
-        console.log("lorryInfos", checkSelectLorry.value)
-
-      } else {
-        console.error("ไม่มีข้อมูลใน responseGener")
+        checkSelectLorry.value = filteredLorryInfos
       }
 
-    })
-    .catch(error => {
-      console.error('Error:', error)
-    })
+      sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
+      currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
+
+      console.log("lorryInfos", checkSelectLorry.value)
+    } else {
+      console.error("ไม่มีข้อมูลใน responseGener")
+    }
+
+    console.log("generatedJournalId 3")
+  } catch (error) {
+    console.log("generatedJournalId 4")
+    console.error("Error:", error)
+  }
 }
 
-watch(() => {
-  generatedJournalId()
+watch(async () => {
+  await generatedJournalId()
 })
 
 const resultSelectLorry = ref([])
@@ -289,6 +312,7 @@ const checkCurrentTabBeforIn = status => {
   case 12:
   case 13:
   case 14:
+  case 18:
     tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
     break
     
@@ -308,13 +332,19 @@ const itemsLorrySelect = [
 const updateCurrentTab = async () => {
   // รอให้ generatedJournalId และ generated ทำงานเสร็จก่อน
   await generatedJournalId()
-  await generated()
+
+  // await generated()
+
+  testComponent()  
 
   // จากนั้นค่อยอัปเดต currentTab ด้วยค่าใหม่จาก getCurrentTabIndex(
 }
 
 // เรียกฟังก์ชันเพื่อให้ทุกขั้นตอนทำงานเสร็จก่อน
-updateCurrentTab()
+onMounted(()=> {
+  updateCurrentTab()
+})
+
 
 const componentLorryForm = ref(null)
 
@@ -340,12 +370,16 @@ const matchingLorryInfoWithComponent = lorryInfoKey => {
   case '09':
     return LorryLoadingC2HAKU
   case '10':
+    console.log("case 10", lorryInfoKey)
+    
     return LorryLoadingC2EKIAA111
   case '11':
     return LorryLoadingC3DieselOil
   case '12':
     return LorryLoadingC4TELA
   case '13':
+    console.log("case 13", lorryInfoKey)
+    
     return LorryLoadingC4EKIAV432
   case '15':
     return LorryLoadingC5NPAN30
@@ -375,22 +409,31 @@ const checkSelectLorryLoadingForItem = () => {
 }
 
 const testComponent = () => {
-  const result = ref('02')
+  const result = ref('00')
+  
   if(typeLorryOnce.value){
     result.value = typeLorryOnce.value
-    sessionStorage.setItem('typeLorryInfoId', typeLorryOnce.value)
+    sessionStorage.setItem('typeLorryInfoId', result.value)
     console.log("Component type lorry result", result.value)
   }else{
     result.value = null
+    console.log("Component typeLorryOnce.value", typeLorryOnce.value)
   }
 
   return matchingLorryInfoWithComponent(sessionStorage.getItem('typeLorryInfoId'))
   
 }
 
-watchEffect(() => {
+watch(() => {
   testComponent()
   checkSelectLorryLoadingForItem()
+
+  if(typeLorryOnce.value === null){
+    testComponent()
+    checkSelectLorryLoadingForItem()
+  }else{
+    console.log("find typeLorryOnce.value", typeLorryOnce.value)
+  }
 })
 
 const tabs = [
@@ -482,6 +525,7 @@ const tabIndexConfig = {
   12: 2,
   13: 2,
   14: 2,
+  18: 2,
 
   // Add more statuses and indices as needed
 }
@@ -521,31 +565,57 @@ const isDialogConfirmVisible = ref(false)
 const isDialogSubmitSuccessVisible = ref(false)
 const isDialogSubmitFailedVisible = ref(false)
 
+const selectLorryInfoKey = ref(null)
+
 const successDialAlert = ref(false)
 
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
 }
 
 const btnApprove = word => {
+  isDialogVisibleConfirmDialog2.value.openDialog()
   isDialogConfirmVisible.value = true
   wordForSubmit.value = word
 
 }
 
-const btnSelectLorry = (word, lorry) => {
-  isDialogConfirmVisible.value = true
+const textConfirmDialogFunction = async (word, success, confirm) => {
   wordForSubmit.value = word
-  resultSelectLorry.value = lorry
+  confirmValueCheck.value = confirm
+  successDialAlert.value = success
+  isDialogConfirmVisible.value = true
+
 
 }
 
 const handleSelectLorryLoading = word => {
-  isDialogConfirmVisible.value = false
+  confirmValueCheck.value = true
+  sessionStorage.setItem('typeLorryInfoId', selectLorryInfoKey.value)
+  typeLorryOnce.value = selectLorryInfoKey.value
+
+  // location.reload()
+
   isDialogSubmitSuccessVisible.value = true
+
+  
+  setTimeout(() => {
+    isDialogSubmitSuccessVisible.value = false
+    isDialogVisibleConfirmDialog2.value?.closeDialog()
+    isDialogVisibleSelecrLorry.value = false
+    if(selectLorryInfoKey.value === '13'){
+      window.location.href = 'receingForm'
+    }else if(selectLorryInfoKey.value === '10'){
+      window.location.href = 'receingForm'
+      2
+    }
+  }, 1000) // 10000 มิลลิวินาที = 10 วินาที
+
+
+
+
 }
 
 const handleAcceptPackaging = word => {
@@ -577,6 +647,42 @@ const handleAcceptPackaging = word => {
       console.error('Error:', error)
       isDialogSubmitFailedVisible.value = true
     })
+}
+
+const btnSelectLorry = async (word, word2, lorryInfoKey) => {
+  isDialogVisibleConfirmDialog2.value.openDialog()
+  selectLorryInfoKey.value = lorryInfoKey
+
+  const confirmed = await textConfirmDialogFunction(word+word2, true, false)
+
+  
+}
+
+//----------------------------------- select lorry
+function openConfirmDialog(word) {
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+
+  wordForSubmit.value = word
+  isDialogVisibleConfirmDialog.value.openDialog()
+  
+}
+
+function handleConfirmAction() {
+
+  if(selectLorryInfoKey.value){
+    console.log('Action selectLorryInfoKey.', selectLorryInfoKey.value)
+    handleSelectLorryLoading(selectLorryInfoKey.value)
+  }else if(wordForSubmit.value === 'APPROVE'){
+    handleAcceptPackaging()
+  }
+  else {
+    console.log('Action failed.', wordForSubmit.value)
+  }
+
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
 }
 </script>
 
@@ -734,7 +840,10 @@ const handleAcceptPackaging = word => {
             <VTable>
               <thead>
                 <tr>
-                  <th class="bg-grey-lighten-3">
+                  <th
+                    v-if="false"
+                    class="bg-grey-lighten-3"
+                  >
                     Lorry Key
                   </th>
                   <th class="bg-grey-lighten-3">
@@ -750,7 +859,7 @@ const handleAcceptPackaging = word => {
                   v-for="(itemLorry, index) in checkSelectLorry"
                   :key="index"
                 >
-                  <td>
+                  <td v-if="false">
                     {{ itemLorry.lorryInfoKey }}
                   </td>
                   <td>
@@ -759,7 +868,7 @@ const handleAcceptPackaging = word => {
                   <td class="text-center">
                     <VBtn
                       color="info"
-                      @click="btnSelectLorry('LORRY LOADING', itemLorry.title)"
+                      @click="btnSelectLorry('LORRY LOADING ', itemLorry.title, itemLorry.lorryInfoKey)"
                     >
                       Action
                     </VBtn>
@@ -780,6 +889,7 @@ const handleAcceptPackaging = word => {
         </VCard>
       </VDialog>
       <div
+        v-if="!typeLorryOnce"
         class=" d-flex align-center justify-center mt-4"
         @click="isDialogVisibleSelecrLorry = true"
       >
@@ -800,6 +910,21 @@ const handleAcceptPackaging = word => {
       class="mt-20"
     >
       <div v-if="typeLorryOnce">
+        <Component
+          :is="tab.component"
+          v-if="currentTabNew === index"
+        />
+      </div>
+      <div v-else-if="!typeLorryOnce && statusId === 12">
+        <VProgressLinear
+          height="20"
+          color="success"
+          indeterminate 
+        >
+          <span>Loading</span>
+        </VProgressLinear>
+      </div>
+      <div v-else-if="!typeLorryOnce && statusId !== 12">
         <Component
           :is="tab.component"
           v-if="currentTabNew === index"
@@ -865,64 +990,6 @@ const handleAcceptPackaging = word => {
     </VRow>
   </section>
 
-  <!-- Dialog Submit -->
-  <section>
-    <VDialog
-      v-model="isDialogConfirmVisible"
-      width="500"
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardText>
-          <div class="d-flex justify-center">
-            <VIcon
-              size="100"
-              color="warning"
-              icon="ri-question-line"
-            />
-          </div>
-          <div
-            v-if="wordForSubmit === 'LORRY LOADING'"
-            class="text-center"
-          >
-            <span style="font-size: 22px; font-weight: bolder;">Would you like to selcet {{ wordForSubmit }}
-              from {{ resultSelectLorry }}?</span>
-          </div>
-          <div
-            v-else
-            class="text-center"
-          >
-            <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ wordForSubmit }}
-              Transaction?</span>
-          </div>
-        </VCardText>
-
-        <VCardAction class="d-flex justify-space-between pa-4">
-          <VBtn
-            color="error"
-            @click="isDialogConfirmVisible = false"
-          >
-            Cancel
-          </VBtn>
-          
-          <VBtn
-            v-if="wordForSubmit === 'APPROVE'"
-            color="green"
-            @click="handleAcceptPackaging"
-          >
-            {{ wordForSubmit }}
-          </VBtn>
-          <VBtn
-            v-if="wordForSubmit === 'LORRY LOADING'"
-            color="green"
-            @click="handleSelectLorryLoading"
-          >
-            Confirm
-          </VBtn>
-        </VCardAction>
-      </VCard>
-    </VDialog>
-  </section>
   <!-- Dialog Submit Success -->
   <section>
     <VDialog
@@ -1009,6 +1076,15 @@ const handleAcceptPackaging = word => {
         :word="wordForSubmit"
         :success="successDialAlert"
         @update:isDialogVisible="(val) => isDialogVisibleAlertDialog.value = val"
+      />
+    </div>
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="isDialogVisibleConfirmDialog2"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
   </section>
