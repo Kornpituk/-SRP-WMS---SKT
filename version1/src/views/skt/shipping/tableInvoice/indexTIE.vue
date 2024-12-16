@@ -25,231 +25,63 @@ const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPage = ref(1)
 
-//------------------- Model ID For search ------------------------------------
-const searchByCategoryId = ref(null)
-const searchByTypeId = ref(null)
-const searchBySubTypeId = ref(null)
-const searchByBarcode = ref(null)
-const searchByProductId = ref(null)
-const searchByProductName = ref(null)
-const searchByUOMId = ref(null)
-
-const searchByWareHouseId = ref([whereHouse])
-
-const searchByZoneId = ref(null)
-const searchByAreaId = ref(null)
-const searchBySubAreaId = ref(null)
-
-//------------------------ Model Name for search ------------------------------
-const searchByCategoryName = ref(null)
-const searchByTypeName = ref(null)
-const searchBySubTypeName = ref(null)
-const searchByBarcodeName = ref(null)
-const searchByProductCodeName = ref(null)
-const searchByProductNameFilter = ref(null)
-const searchByUnitName = ref(null)
-
-//----- Search Filter Icon Header Table[Product Category, Group, Sub Group, Barcode, Product Category Code, Product Name]
-const menuCategory= ref( false)
-const menuGroup = ref( false)
-const menuSubGroup = ref( false)
-const menuBarcode = ref( false)
-const menuProductCode = ref( false)
-const menuProductName = ref( false)
-const menuUoM = ref( false)
-
-//------------------------ item ID for search ------------------------------
-const itemsSearchByCategoryId = ref([])
-const typeItemsSearchById = ref([])
-const subTypeItemsSearchById = ref([])
-const itemsSearchByUOMId = ref([])
-const wareHouseItemsSearchById = ref([])
-const zoneItemsSearchById = ref([])
-const areaItemsSearchById = ref([])
-const subAreaItemsSearchById = ref([])
-
-//----------------------  Variable for SortBy -------------------------------------
-const sortByCategory = ref('')
-const sortByType = ref('')
-const sortBySubType = ref('')
-const sortByBarcode = ref('')
-const sortByProductId = ref('')
-const sortByProductName = ref('')
-const sortByUnit = ref('')
-const sortByQty = ref('')
-const sortByTags = ref('')
-const sortByNonTags = ref('')
-
-
-const toggleSortType = sortBy => {
-  const sortRefs = { sortByCategory, sortByType, sortBySubType, sortByBarcode, sortByProductId, sortByProductName, sortByUnit, sortByQty, sortByTags, sortByNonTags }
-
-  for (const key in sortRefs) {
-    if (key === sortBy) {
-      sortRefs[key].value = sortRefs[key].value === 'asc' ? 'desc' : 'asc'
-    } else {
-      sortRefs[key].value = '' // ล้างค่าที่ไม่เกี่ยวข้อง
-    }
-
-    // console.log("Sort type:",sortRefs[key],'Key',[key])
-  }
-
-  // console.log("Sort type:",sortRefs[key],'Key',[key])
-}
-
 const router = useRouter()
 
 const serialProductCode = ref(null)
 
+/// ------------------------------ Import Component --------------------------------
+// --- Dialog Text Area --------------------------------
+
+import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue'
+
+const dialogDataTextArea = ref('')
+const dialogVisible = ref(false)
+
+// --- define Model
+
+const shipmentModel = ref([])
+
+const shippingCondition = ref('')
+const shippingmark = ref('')
+const typeDialogTextArea = ref('')
+
+const sapInValueView = ref('')
+const lotValueView = ref('')
+const typeDialogView = ref('')
+const typeBtnView = ref('')
+const titleDialogView = ref('')
+
+//------ function for dialog text area -----
+
+const textAreaDialogActive = (type, data) => {
+  typeDialogTextArea.value = type
+
+  if (typeDialogTextArea.value === 'ShipCon') {
+    titleDialogView.value = 'Shipping Condition'
+    typeDialogView.value = 'ShipCon'
+  } else if (typeDialogTextArea.value === 'ShipMark') {
+    titleDialogView.value = 'Shipping Mark'
+    typeDialogView.value = 'ShipMark'
+    sapInValueView.value = 'TIX2406001'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }
+  dialogVisible.value = true
+}
+
+const handleDialogSubmit = data => {
+  dialogDataTextArea.value = data
+
+  if (typeDialogTextArea.value === 'ShipCon') {
+    shippingCondition.value = dialogDataTextArea.value
+    console.log('Data shippingCondition Dialog:', data)
+  } else if (typeDialogTextArea.value === 'ShipMark') {
+    shippingmark.value = dialogDataTextArea.value
+    console.log('Data shippingMark Dialog:', data)
+  }
+  console.log('Data from Dialog:', data)
+}
+
 //------------------------------- Function Get StockUpdate Need Enter Search -----------------
-
-const clearModel = () => {
-  searchByCategoryId.value = null
-  searchByTypeId.value = null
-  searchBySubTypeId.value = null
-  searchByBarcode.value = null
-  searchByProductId.value = null
-  searchByProductName.value = null
-  searchByUOMId.value = null
-  searchByZoneId.value = null
-  searchByAreaId.value = null
-  searchBySubAreaId.value = null
-  serialProductCode.value = null
-}
-
-const searchParams = {
-  searchByCategoryId,
-  searchByTypeId,
-  searchBySubTypeId,
-  searchByBarcode,
-  searchByProductId,
-  searchByProductName,
-  searchByUOMId,
-  searchByZoneId,
-  searchByAreaId,
-  searchBySubAreaId,
-  serialProductCode,
-
-  searchByCategoryName,
-  searchByTypeName,
-  searchBySubTypeName,
-  searchByBarcodeName,
-  searchByProductCodeName,
-  searchByProductNameFilter,
-  searchByUnitName,
-}
-
-const sortParams = {
-  sortByCategory,
-  sortByType,
-  sortBySubType,
-  sortByBarcode,
-  sortByProductId,
-  sortByProductName,
-  sortByUnit,
-  sortByQty,
-  sortByTags,
-  sortByNonTags,
-}
-
-// Clear function to reset all values
-const clearValuesNeo = () => {
-  // Reset search parameters
-  for (const key in searchParams) {
-    searchParams[key].value = null
-  }
-
-  // Reset sort parameters
-  for (const key in sortParams) {
-    sortParams[key].value = null
-  }
-}
-
-const GetStockUpdate = () => {
-
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
-    params: {
-      categoryId: searchByCategoryId.value,
-      typeId: searchByTypeId.value,
-      subTypeId: searchBySubTypeId.value,
-      barcode: searchByBarcode.value,
-      productId: searchByProductId.value,
-      productName: searchByProductName.value,
-      unitId: searchByUOMId.value,
-      zoneId: searchByZoneId.value,
-      areaId: searchByAreaId.value,
-      subAreaId: searchBySubAreaId.value,
-      serialNo: serialProductCode.value,
-
-      searchByCategory: searchByCategoryName.value,
-      searchByType: searchByTypeName.value,
-      searchBySubType: searchBySubTypeName.value,
-      searchByBarcode: searchByBarcodeName.value,
-      searchByProductId: searchByProductCodeName.value,
-      searchByProductName: searchByProductNameFilter.value,
-      searchByUnit: searchByUnitName.value,
-
-      'sortByCategory': sortByCategory.value,
-      'sortByType': sortByType.value,
-      'sortBySubType': sortBySubType.value,
-      'sortByBarcode': sortByBarcode.value,
-      'sortByProductId': sortByProductId.value,
-      'sortByProductName': sortByProductName.value,
-      'sortByUnit': sortByUnit.value,
-      'sortByQty': sortByQty.value,
-      'sortByTags': sortByTags.value,
-      'sortByNonTags': sortByNonTags.value,
-
-      // ... and so on with other parameters
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${searchByWareHouseId.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }, {})
-    .then(response => {
-
-      products.value = response.data.items
-      totalCount.value = response.data.totalCount
-      currentPage.value = response.data.page
-      totalPage.value = response.data.totalPages
-      rowPerPage.value = response.data.perPage
-
-      console.log('[products.value]!!: ', products)
-      console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
-
-      // console.log('perPage: ',perPage)
-      // console.log('currentPage: ',currentPage)
-      // console.log('totalCount: ',totalCount)
-      // console.log('totalPages: ',totalPage)
-
-      // console.log('subTypeId',searchBySubTypeId.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      console.error('Error:', error)
-    })
-  
-}
-
-//----------------------------------- Function Reset search Key word ---------------
-const resetSearchKey = () => {
-  searchByCategoryName.value = ('')
-  searchByTypeName.value = ('')
-  searchBySubTypeName.value = ('')
-  searchByBarcodeName.value = ('')
-  searchByProductCodeName.value = ('')
-  searchByProductNameFilter.value = ('')
-  searchByUnitName.value = ('')
-}
-
-//------------------------------- Function Get StockUpdate Auto Search -----------------
-
-watch(GetStockUpdate)
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
@@ -268,306 +100,6 @@ const paginationData = computed(() => {
 
 // SECTION Checkbox toggle
 const selectedRows = ref([])
-
-//----------------------------------- End Function Pagination -----------------------------------------------
-
-///--------------------------------------- FetchItems for Search Box ----------------------------------------------
-
-const fetchItemsSearchBy = nameSearch => {
-  return axiosIns.get(`${urlApi.value}/api/v1/Product/${nameSearch}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }).then(response => {
-    return response.data
-  }).catch(error => {
-    console.error('Error:', error)
-    
-    return null
-  })
-}
-
-fetchItemsSearchBy('categories').then(data => {
-  itemsSearchByCategoryId.value = data
-})
-
-function customFilter(item, queryText, itemText) {
-  const textOne = itemText.title.toLowerCase()
-  const textTwo = itemText.value.toLowerCase()
-  const searchText = queryText.toLocaleLowerCase()
-  
-  return textOne.includes(searchText) || textTwo.includes(searchText)
-}
-
-const submitSearchButton = () => {
-  GetStockUpdate()
-}
-
-//--------------------------------------- FetchItems for Search WareHouse  ----------------------------------------
-
-const fetchItemsWareHouse = () => {
-  axiosIns.get(`${urlApi.value}/api/Auth/GetLocation`, {
-    headers: {
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      wareHouseItemsSearchById.value = response.data
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-}
-
-watch(fetchItemsWareHouse)
-
-//--------------------------------------- FetchItems for Search  Unit  ----------------------------------------
-
-const getItemsProductUnit = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/`+searchByCategoryId.value+'/Unit', {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      itemsSearchByUOMId.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('itemsSearchByUOMId.value At index',itemsSearchByUOMId.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductUnit)
-
-//--------------------------------------- FetchItems for Search  Type(Group) ----------------------------------------
-
-const getItemsProductType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/Types`, {
-    params: {
-      'CategoryId': searchByCategoryId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      typeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductType)
-
-//--------------------------------------- FetchItems for Search Sub Type(Sub Group) ----------------------------------------
-
-const getItemsProductSubType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/SubTypes/All`, {
-    params: {
-      'TypeId': searchByTypeId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subTypeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemsProductSubType)
-
-//--------------------------------------- FetchItems for Search  Zone  ----------------------------------------
-
-const getItemLocalZone = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/zone/all`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      zoneItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('zoneItemsSearchById At index',zoneItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watch(getItemLocalZone)
-
-//--------------------------------------- FetchItems for Search  Area ----------------------------------------
-
-const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}api/v1/Locations/area/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      areaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemLocalArea)
-
-//--------------------------------------- FetchItems for Search Sub Area ----------------------------------------
-
-const getItemLocalSubArea = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/subArea/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-      'areaCode': searchByAreaId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subAreaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-watchEffect(getItemLocalSubArea)
-
-// -------------------------------------- Export Bar Excel - --------------------------------
-
-const stockUpdateExcel = () => {
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    responseType: 'blob', // ให้เซิร์ฟเวอร์รีเทิร์น blob สำหรับไฟล์ Excel
-  })
-    .then(response => {
-      // สร้าง URL ของไฟล์ Excel จาก binary data
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-
-      const currentDate = new Date() // สร้างวัตถุ Date ปัจจุบัน
-      const year = currentDate.getFullYear() // ดึงปีปัจจุบัน
-      let fileYear
-      const threshold = 2500 // กำหนดจุดแบ่ง พ.ศ. กับ ค.ศ.
-
-      if (year > threshold) {
-        // พ.ศ. เปลี่ยนเป็น ค.ศ.
-        fileYear = year - 543
-      } else {
-        // ค.ศ.
-        fileYear = year
-      }
-
-      const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
-
-      const fileName = `stock_update_Tag_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
-
-      // สร้างลิงก์สำหรับดาวน์โหลดไฟล์ Excel
-      const link = document.createElement('a')
-
-      link.href = url
-      link.setAttribute('download', fileName) // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
-      document.body.appendChild(link)
-      link.click()
-
-      // ลบ URL หลังจากดาวน์โหลดเสร็จเรียบร้อยแล้ว
-      window.URL.revokeObjectURL(url)
-    })
-    .catch(error => {
-      // จัดการข้อผิดพลาด
-      console.error('Error:', error)
-    })
-}
 
 //-------------------------- format decimal -------------------
 
@@ -699,21 +231,6 @@ const checkBgTruck = truck => {
 }
 
 //------------------------------------------ Mock Data --------------------------------
-
-
-const DataMockFull = ref([
-  { no: 1, status: getRandomStatus(), saleOrderNo: '1100078117', soAttachment: '', sapInvoiceNo: 'TIX2406001', payerName: 'TORAY SG', user: '', shipper: '', shipperLocation: '', shippingMark: 'MAT-105T', endUser: '', consignee: '', product: '', lotNumber: '', qty: '16,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'SINGAPORE', loadingDate: '4-มิ.ย.-24', etd: '7-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: 'Shipping complete', remarkLog: '5501354541', byWhow: 'ธนาธิป' },
-  { no: 2, status: getRandomStatus(), saleOrderNo: '1100078116', soAttachment: '', sapInvoiceNo: 'TIX2406002', payerName: 'SCI', user: '', shipper: '', shipperLocation: '', shippingMark: 'OSMORIN DA-50', endUser: '', consignee: '', product: '', lotNumber: '', qty: '14,400.00', coa: '', freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'JAPAN', loadingDate: '6-มิ.ย.-24', etd: '18-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'กาญจนา' },
-  { no: 3, status: getRandomStatus(), saleOrderNo: '1100078128', soAttachment: '', sapInvoiceNo: 'TIX2406003', payerName: 'RESONAC', user: '', shipper: '', shipperLocation: '', shippingMark: 'CHEMICLEAN PR-084CT', endUser: '', consignee: '', product: '', lotNumber: '', qty: '5,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'MALAYSIA', loadingDate: '6-มิ.ย.-24', etd: '10-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400', byWhow: 'สมชาย' },
-  { no: 4, status: getRandomStatus(), saleOrderNo: '1100078129', soAttachment: '', sapInvoiceNo: 'TIX2406004', payerName: 'RESONAC', user: '', shipper: '', shipperLocation: '', shippingMark: 'CHEMICLEAN AS-S142T', endUser: '', consignee: '', product: '', lotNumber: '', qty: '15,000.00', coa: '', freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'MALAYSIA', loadingDate: '7-มิ.ย.-24', etd: '10-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400', byWhow: 'สมชาย' },
-  { no: 5, status: getRandomStatus(), saleOrderNo: '1100078158', soAttachment: '', sapInvoiceNo: 'TIX2406005', payerName: 'SKK-YOUNGJIN TECH', user: '', shipper: '', shipperLocation: '', shippingMark: 'PELESTAT 6500', endUser: '', consignee: '', product: '', lotNumber: '', qty: '5,000.00', coa: '', freightForwarder: 'BTS', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'SOUTH KOREA', loadingDate: '8-มิ.ย.-24', etd: '19-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '', byWhow: 'ศิริพร' },
-  { no: 6, status: getRandomStatus(), saleOrderNo: '1100077998', soAttachment: '', sapInvoiceNo: 'TIX2406006', payerName: 'INABATA PH', user: '', shipper: '', shipperLocation: '', shippingMark: 'SANPRENE BS-4', endUser: '', consignee: '', product: '', lotNumber: '', qty: '32,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'PHILIPPINES', loadingDate: '9-มิ.ย.-24', etd: '15-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '', byWhow: 'จิรายุ' },
-  { no: 7, status: getRandomStatus(), saleOrderNo: '1100078232', soAttachment: '', sapInvoiceNo: 'TIX2406007', payerName: 'SCI', user: '', shipper: '', shipperLocation: '', shippingMark: 'BEAULIGHT LCA-25F', endUser: '', consignee: '', product: '', lotNumber: '', qty: '16,000.00', coa: '', freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'JAPAN', loadingDate: '10-มิ.ย.-24', etd: '22-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: 'BEAU(1)2406 F', byWhow: 'อรอนงค์' },
-  { no: 8, status: getRandomStatus(), saleOrderNo: '1100077971', soAttachment: '', sapInvoiceNo: 'TIX2406008', payerName: 'PT HITECH', user: '', shipper: '', shipperLocation: '', shippingMark: 'SANPRENE IB-967T', endUser: '', consignee: '', product: '', lotNumber: '', qty: '13,600.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'INDONESIA', loadingDate: '11-มิ.ย.-24', etd: '15-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '679', byWhow: 'อภิชาติ' },
-  { no: 9, status: getRandomStatus(), saleOrderNo: '1100077972', soAttachment: '', sapInvoiceNo: 'TIX2406009', payerName: 'PT HITECH', user: '', shipper: '', shipperLocation: '', shippingMark: 'SANPRENE IB-967T', endUser: '', consignee: '', product: '', lotNumber: '', qty: '13,600.00', coa: '', freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'INDONESIA', loadingDate: '11-มิ.ย.-24', etd: '15-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '680', byWhow: 'มนัสนันท์' },
-  { no: 10, status: getRandomStatus(), saleOrderNo: '1100078230', soAttachment: '', sapInvoiceNo: 'TIX2406010', payerName: 'SCI', user: '', shipper: '', shipperLocation: '', shippingMark: 'LEBON CIB GSS', endUser: '', consignee: '', product: '', lotNumber: '', qty: '16,000.00', coa: '', freightForwarder: 'BTS', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'JAPAN', loadingDate: '12-มิ.ย.-24', etd: '26-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: 'LEBO(1)2407', byWhow: 'วีระชัย' },
-  { no: 11, status: getRandomStatus(), saleOrderNo: '1100078219', soAttachment: '', sapInvoiceNo: 'TIX2406011', payerName: 'SCI', user: '', shipper: '', shipperLocation: '', shippingMark: 'BEAULIGHT LCA-25N', endUser: '', consignee: '', product: '', lotNumber: '', qty: '32,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', doEx: '', country: 'JAPAN', loadingDate: '17-มิ.ย.-24', etd: '26-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: 'BEAU(1)2407 N', byWhow: 'พรพรรณ' },
-])
 
 const mockData = ref([
   { no: 1, status: getRandomStatus(), saleOrderNo: '1100078117', soAttachment: '', sapInvoiceNo: 'TIX2406001', payerName: 'TORAY SG', user: '', shipper: '', shipperLocation: '', shippingMark: 'MAT-105T', endUser: '', consignee: '', product: '', lotNumber: '', qty: '16,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'SINGAPORE', loadingDate: '4-มิ.ย.-24', etd: '7-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: 'Shipping complete', remarkLog: '5501354541', byWhow: 'ธนาธิป' },
@@ -1871,17 +1388,19 @@ const viewAllData = () => {
             >
               <div>
                 <span style="padding-right: 60px; font-weight: bold;">
-                  {{ $t('Shipping Mark maean') }}
+                  {{ $t('Shipping Condition') }}
                 </span>
               </div>
-              <VRow>
-                <VCol cols="3">
-                  {{ $t('print') }}
-                </VCol>
-                <VCol cols="9">
+            </th>
+            <th
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              class="text-center"
+            >
+              <div>
+                <span style="padding-right: 60px; font-weight: bold;">
                   {{ $t('Shipping Mark') }}
-                </VCol>
-              </VRow>
+                </span>
+              </div>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountINSP || accountAll">
               <span style="font-weight: bold;">{{ $t('End User') }}</span>
@@ -1899,7 +1418,7 @@ const viewAllData = () => {
               <span style="font-weight: bold;">{{ $t('Item') }}</span>
             </th>
             <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll">
-              <span style="font-weight: bold;">{{ $t('Lot number') }}</span>
+              <span style="font-weight: bold;">{{ $t('Lot') }}</span>
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
@@ -2061,13 +1580,13 @@ const viewAllData = () => {
               <span style="font-weight: bold;">{{ $t('Update On') }}</span>
             </th>
             <th class="text-center">
-              <span style="font-weight: bold;">{{ $t('Save Draft') }}</span>
-            </th>
-            <th class="text-center">
-              <span style="font-weight: bold;">{{ $t('Submit') }}</span>
+              <span style="font-weight: bold;" />
             </th>
             <th class="text-center">
               <span style="font-weight: bold;">{{ $t('Action') }}</span>
+            </th>
+            <th class="text-center">
+              <span style="font-weight: bold;" />
             </th>
           </tr>
         </thead>
@@ -2084,7 +1603,7 @@ const viewAllData = () => {
             <td class="text-center px-1">
               {{ index + 1 }}
             </td>
-
+            <!-- 👉 status -->
             <td class="text-start px-1">
               <span v-if="product.status === 'Approve'">
                 <VChip color="success">{{ product.status }}</VChip>
@@ -2097,7 +1616,7 @@ const viewAllData = () => {
               </span>
             </td>
 
-            <!-- 👉 Secondary product categories -->
+            <!-- 👉 saleOrderNo -->
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2106,7 +1625,7 @@ const viewAllData = () => {
               {{ product.saleOrderNo }}
             </td>
 
-            <!-- 👉 Attach File -->
+            <!-- 👉 soAttachment -->
             <td
               v-if="accountAmin || accountViewerKK || accountAll"
               class="text-start px-1"
@@ -2193,7 +1712,7 @@ const viewAllData = () => {
               </VRow>
             </td>
 
-            <!-- 👉 Product code -->
+            <!-- 👉 sapInvoiceNo -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-2"
@@ -2202,7 +1721,7 @@ const viewAllData = () => {
               {{ product.sapInvoiceNo }}
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 payerName -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2211,7 +1730,7 @@ const viewAllData = () => {
               {{ (product.payerName) }}
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 user -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountINSP || accountAll"
               class="text-start px-1"
@@ -2221,7 +1740,7 @@ const viewAllData = () => {
               User
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 shipper -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2231,6 +1750,7 @@ const viewAllData = () => {
               Shipper
             </td>
 
+            <!-- 👉 shipperLocation -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2240,54 +1760,70 @@ const viewAllData = () => {
               shipperLocation
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 Shipping Condition -->
+            <td
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              class="text-start px-2"
+              style="min-width: 300px; font-size: 12px;"
+            >
+              <div class="d-flex justify-space-between">
+                <VBtn
+                  style="min-width: 196px;"
+                  variant="outlined"
+                  @click="textAreaDialogActive('ShipCon')"
+                >
+                  <span
+                    v-if="shippingCondition"
+                    style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  >{{ shippingCondition }}</span>
+                  <span v-else>Shipping Condition</span>
+                </VBtn>
+                <VBtn
+                  class="mx-2"
+                  color="warning"
+                  @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
+                >
+                  <VIcon
+                    size="30"
+                    icon="ri-printer-fill"
+                    @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
+                  />
+                </VBtn>
+              </div>
+            </td>
+
+            <!-- 👉 Shipping Mark -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
               style="min-width: 300px; font-size: 12px;"
             >
-              <VRow>
-                <VCol
-                  class="d-flex align-center justify-center px-1"
-                  cols="3"
+              <div class="d-flex justify-space-between">
+                <VBtn
+                  style="min-width: 196px;"
+                  variant="outlined"
+                  @click="textAreaDialogActive('ShipMark', product.shippingMark)"
                 >
-                  <VBtn
-                    color="warning"
+                  <span
+                    v-if="product.shippingMark"
+                    style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  >{{ product.shippingMark }}</span>
+                  <span v-else>Shipping Mark</span>
+                </VBtn>
+                <VBtn
+                  class="mx-2"
+                  color="warning"
+                  @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
+                >
+                  <VIcon
+                    size="30"
+                    icon="ri-printer-fill"
                     @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
-                  >
-                    <VIcon
-                      size="30"
-                      icon="ri-printer-fill"
-                      @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
-                    />
-                  </VBtn>
-                </VCol>
-                <VCol cols="9">
-                  <VTextarea
-                    v-model="product.shippingMark"
-                    label="Shipping Mark"
-                    style="min-width: 220px;"
-                    :rules="rules"
-                    rows="2"
-                    clearable="false"
-                    placeholder="Shipping Mark"
-                  >
-                    <template #label>
-                      <span style="font-size: 12px;">Shipping Mark</span>
-                    </template>
-                  </VTextarea>
-                </VCol>
-              </VRow>
+                  />
+                </VBtn>
+              </div>
             </td>
-            <!-- 👉 Product Name -->
-            <td
-              v-if="false"
-              class="text-end px-1"
-              style="font-size: 12px;"
-            >
-              {{ product.endUser }}
-            </td>
-
+            <!-- 👉 endUser -->
             <td
               class="text-start px-1"
               style="font-size: 12px;"
@@ -2303,7 +1839,7 @@ const viewAllData = () => {
               </VTextField>
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 consignee -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2313,7 +1849,7 @@ const viewAllData = () => {
               consignee
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 product -->
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2323,31 +1859,34 @@ const viewAllData = () => {
               item
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 Lot Number -->
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
-              <VSelect
-                v-model="product.lotNumber"
-                :items="items"
-                placeholder="Select Lot"
-                density="compact"
-                eager
-              />
+              <VBtn
+                style="min-width: 177px;"
+                variant="outlined"
+              >
+                <span
+                  v-if="product.lotNumber"
+                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                >{{ product.lotNumber }}</span>
+                <span v-else>Lot Number</span>
+              </VBtn>
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 qty -->
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
-              class="text-start px-1"
+              class="text-end px-1"
               style="font-size: 12px;"
             >
               {{ (product.qty) }}
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 coa -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2364,6 +1903,7 @@ const viewAllData = () => {
                     color="blue"
                     text-color="blue"
                     hide-details
+                    multiple
                     placeholder="Upload your documents"
                     density="compact"
                     label="Attach File"
@@ -2437,7 +1977,7 @@ const viewAllData = () => {
               </VRow>
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 Freight Forwarder -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2456,7 +1996,7 @@ const viewAllData = () => {
               </VSelect>
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 carrier -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2472,7 +2012,7 @@ const viewAllData = () => {
               />
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 vesselName -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2487,6 +2027,8 @@ const viewAllData = () => {
                 eager
               />
             </td>
+
+            <!-- 👉 voy -->
             <td
               style="font-size: 12px;"
               class="text-start px-1"
@@ -2500,7 +2042,7 @@ const viewAllData = () => {
             </td>
 
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 freightForwarder -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2510,6 +2052,7 @@ const viewAllData = () => {
               {{ (product.freightForwarder) }}
             </td>
 
+            <!-- 👉 truckReserving -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-center px-1"
@@ -2523,7 +2066,7 @@ const viewAllData = () => {
               />
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 truckFee -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2537,6 +2080,7 @@ const viewAllData = () => {
               />
             </td>
 
+            <!-- 👉 truckOrder -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2647,7 +2191,7 @@ const viewAllData = () => {
               <div class="d-flex justify-space-evenly" />
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 doEx -->
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-4"
@@ -2657,7 +2201,7 @@ const viewAllData = () => {
               doEx
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 country -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2666,23 +2210,16 @@ const viewAllData = () => {
               {{ (product.country) }}
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 loadingDate -->
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
               style="min-width: 150px; font-size: 12px;"
             >
-              <AppDateTimePicker
-                v-model="product.loadingDate"
-                label="Input Date"
-                placeholder="Input date"
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              />
+              {{ (product.loadingDate) }}
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 etd -->
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2698,7 +2235,7 @@ const viewAllData = () => {
               />
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 eta -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2714,7 +2251,7 @@ const viewAllData = () => {
               />
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 deliveryNote -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
@@ -2801,60 +2338,61 @@ const viewAllData = () => {
               </VRow>
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 remarkWh -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
-              <VTextarea
-                v-model="product.remarkSa"
-                class="pa-2"
-                label="Remark (SAL)"
-                style="min-width: 250px;"
-                :rules="rules"
-                rows="2"
-                clearable
-                placeholder="Placeholder Text"
-              />
+              <VBtn
+                style="min-width: 177px;"
+                variant="outlined"
+              >
+                <span
+                  v-if="product.remarkWh"
+                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                >{{ product.remarkSal }}</span>
+                <span v-else>remark(SAL)</span>
+              </VBtn>
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 remarkWh -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
             >
-              <VTextarea
-                v-model="product.remarkWh"
-                class="pa-2"
-                label="Remark (WH)"
-                style="min-width: 250px;"
-                :rules="rules"
-                rows="2"
-                clearable
-                placeholder="Placeholder Text"
-              />
+              <VBtn
+                style="min-width: 177px;"
+                variant="outlined"
+              >
+                <span
+                  v-if="product.remarkWh"
+                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                >{{ product.remarkWh }}</span>
+                <span v-else>remark(WH)</span>
+              </VBtn>
             </td>
 
-            <!-- 👉 Product Name -->
+            <!-- 👉 remarkWh -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
-              <VTextarea
-                v-model="product.remarkLog"
-                class="pa-2"
-                label="Remark (LOG)"
-                style="min-width: 250px;"
-                :rules="rules"
-                rows="2"
-                clearable
-                placeholder="Placeholder Text"
-              />
+              <VBtn
+                style="min-width: 177px;"
+                variant="outlined"
+              >
+                <span
+                  v-if="product.remarkWh"
+                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                >{{ product.remarkLog }}</span>
+                <span v-else>remark(LOG)</span>
+              </VBtn>
             </td>
 
+            <!-- 👉 byWhow -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
@@ -2863,6 +2401,7 @@ const viewAllData = () => {
               {{ product.byWhow }}
             </td>
 
+            <!-- 👉 Update now -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
@@ -2896,9 +2435,9 @@ const viewAllData = () => {
                 :to="{ 
                   name: 'skt-shipping-resale',  
                 }"
-                color="info"
+                color="pink-lighten-2"
               >
-                <span style="font-size: 12px;">Action</span>
+                <span style="font-size: 12px;">Check Sheet</span>
               </VBtn>
             </td>
           </tr>
@@ -2982,6 +2521,33 @@ const viewAllData = () => {
         </VAlert>
       </VCardText>
     </VCard>
+  </section>
+
+  <!-- Dialog Text area -->
+  <section>
+    <div>
+      <h1>Parent View</h1>
+      <p><strong>Received Data:</strong> {{ dialogDataTextArea }}</p>
+
+      <VBtn
+        variant="outlined"
+        color="primary"
+        @click="dialogVisible = true"
+      >
+        Open Dialog view
+      </VBtn>
+
+      <TextAreaDialog
+        v-model="dialogVisible"
+        :sap-in-value="sapInValueView"
+        :lot-value="lotValueView"
+        :text-area-value="dialogDataTextArea"
+        :type-dialog="typeDialogView"
+        :type-btn="typeBtnView"
+        :title-dialog="titleDialogView"
+        @submit="handleDialogSubmit"
+      />
+    </div>
   </section>
 </template>
 
