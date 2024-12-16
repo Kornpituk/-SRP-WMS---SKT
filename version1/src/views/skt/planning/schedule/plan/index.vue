@@ -512,8 +512,6 @@ watch(async () => {
     packagingkgs2.value = productionPlan.value[0].product2PackingQtyKgs || 0
     packagingPcs2.value = productionPlan.value[0].product2UomCount || 0
 
-
-
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error fetching production plan:", error)
@@ -846,26 +844,60 @@ const selectFilterProduction = (index, item) => {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const addSelectProdutionCode = index => {
-  // อัปเดตค่าที่เลือกในตำแหน่งของแถวที่กด
-  productionPlan.value[index].productionCode = selectedProductionCode.value || null
-  productionPlan.value[index].productionName = selectedProductionName.value || null
-  productionPlan.value[index].reactorName = selectedProductionReactorName.value || null
-  productionPlan.value[index].quantityKgs = selectedProductionbatchScaleKgs.value || null
-  productionPlan.value[index].plantName = selectedProductionPlanName.value || null
-    
-  productionPlan.value[index].product1SelectedCode = selectedItemCode.value || null
-  productionPlan.value[index].product1Name = selectedItemName.value || null
-  productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value || null
-  productionPlan.value[index].product1PackagingName = selectedPackagingName.value || null
-  productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value || null
-  productionPlan.value[index].product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value/selectedPackagingKgs.value) || null
+  // ตรวจสอบและอัปเดตค่าที่เลือกในตำแหน่งของแถวที่กด
+  if (selectedProductionCode.value) {
+    productionPlan.value[index].productionCode = selectedProductionCode.value
+  }
+  if (selectedProductionName.value) {
+    productionPlan.value[index].productionName = selectedProductionName.value
+  }
+  if (selectedProductionReactorName.value) {
+    productionPlan.value[index].reactorName = selectedProductionReactorName.value
+  }
+  if (selectedProductionbatchScaleKgs.value) {
+    productionPlan.value[index].quantityKgs = selectedProductionbatchScaleKgs.value
+  }
+  if (selectedProductionPlanName.value) {
+    productionPlan.value[index].plantName = selectedProductionPlanName.value
+  }
 
-  productionPlan.value[index].product2SelectedCode = selectedItemCode2.value || null
-  productionPlan.value[index].product2Name = selectedItemName2.value || null
-  productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value || null
-  productionPlan.value[index].product2PackagingName = selectedPackagingName2.value || null
-  productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value || null
-  productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value/selectedPackagingKgs2.value) || null
+  if (selectedItemCode.value) {
+    productionPlan.value[index].product1SelectedCode = selectedItemCode.value
+  }
+  if (selectedItemName.value) {
+    productionPlan.value[index].product1Name = selectedItemName.value
+  }
+  if (selectedPackagingType.value) {
+    productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value
+  }
+  if (selectedPackagingName.value) {
+    productionPlan.value[index].product1PackagingName = selectedPackagingName.value
+  }
+  if (selectedPackagingKgs.value) {
+    productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value
+    if (selectedProductionbatchScaleKgs.value) {
+      productionPlan.value[index].product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs.value)
+    }
+  }
+
+  if (selectedItemCode2.value) {
+    productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
+  }
+  if (selectedItemName2.value) {
+    productionPlan.value[index].product2Name = selectedItemName2.value
+  }
+  if (selectedPackagingType2.value) {
+    productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
+  }
+  if (selectedPackagingName2.value) {
+    productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
+  }
+  if (selectedPackagingKgs2.value) {
+    productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
+    if (selectedProductionbatchScaleKgs.value) {
+      productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
+    }
+  }
 
   console.log("Updated row:", productionPlan.value[index])
 }
@@ -873,10 +905,22 @@ const addSelectProdutionCode = index => {
 const confirmFilterSelectProduction = () => {
   dataPlanningForSave.value.productionCode = selectedProductionCode.value
 
-  dataPlanningForSave.value.product1SelectedCode = selectedItemCode.value
-  dataPlanningForSave.value.product1SelectedPackagingCode = selectedPackagingType.value
-  dataPlanningForSave.value.product2SelectedCode = selectedItemCode2.value
-  dataPlanningForSave.value.product2SelectedPackagingCode = selectedPackagingType2.value
+  if(selectedItemCode.value){
+    dataPlanningForSave.value.product1SelectedCode = selectedItemCode.value  
+  }
+
+  if(selectedPackagingType.value){
+    dataPlanningForSave.value.product1SelectedPackagingCode = selectedPackagingType.value
+  }
+
+  if(selectedItemCode2.value){
+    dataPlanningForSave.value.product2SelectedCode = selectedItemCode2.value
+  }
+  
+  if(selectedPackagingType2.value){
+    dataPlanningForSave.value.product2SelectedPackagingCode = selectedPackagingType2.value
+  }
+
 
   const index = indexSelectBoxFilter.value
   if (index !== null) {
@@ -912,13 +956,13 @@ const saveProductionPlan = async () => {
       product1SelectedCode: (item.product1SelectedCode),
       product1SelectedPackagingCode: item.product1SelectedPackagingCode,
 
-      product1PackingQtyKgs: parseInt(item.product1PackingQtyKgs),
+      product1PackingQtyKgs: parseInt(item.product1PackingQtyKgs) || item.product1PackingQtyKgs,
       product1UomCount: item.product1UomCount,
 
       product2SelectedCode: item.product2SelectedCode,
       product2SelectedPackagingCode: item.product2SelectedPackagingCode,
 
-      product2PackingQtyKgs: parseInt(item.product2PackingQtyKgs),
+      product2PackingQtyKgs: parseInt(item.product2PackingQtyKgs)  || item.product2PackingQtyKgs,
       product2UomCount: item.product2UomCount,
 
       lotNumber: item.lotNumber,
@@ -933,7 +977,7 @@ const saveProductionPlan = async () => {
     if(responseSaveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       console.log("saveProductionPlan staret in 3")

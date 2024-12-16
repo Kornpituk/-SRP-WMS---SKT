@@ -528,85 +528,6 @@ const refeshPage = () => {
 
 const isSpinning = ref(false)
 
-const headersDataTable = [
-  {
-    title: 'data-table-select',
-    key: 'data-table-select',
-    align: "center",
-    fixed: true,
-    readonly: true,
-  },
-  {
-    title: 'Status',
-    key: 'status',
-    fixed: true,
-  },
-  {
-    title: 'No.',
-    key: 'no',
-  },
-  {
-    title: 'Input Date',
-    key: 'inputDate',
-  },
-  {
-    title: 'Plants',
-    key: 'plants',
-  },
-  {
-    title: 'Reactor',
-    key: 'reactor',
-  },
-  {
-    title: 'Item Code',
-    key: 'productCode',
-  },
-  {
-    title: 'Item Name',
-    key: 'productName',
-  },
-  {
-    title: 'Qty(Kg.)',
-    key: 'quantity',
-  },
-  {
-    title: 'UOM(Packaging)',
-    key: 'uom',
-  },
-  {
-    title: 'Packaging Type',
-    key: 'packagingType',
-  },
-  {
-    title: 'Lot Number',
-    key: 'lotNumber',
-  },
-  {
-    title: 'Producing Date',
-    key: 'producingDate',
-  },
-  {
-    title: 'Finished Date',
-    key: 'finishedDate',
-  },
-  {
-    title: 'Remark',
-    key: 'remark',
-  },
-  {
-    title: 'Update By',
-    key: 'byWho',
-  },
-  {
-    title: 'Update Date',
-    key: 'updateDate',
-  },
-  {
-    title: 'Action',
-    key: 'Action',
-  },
-]
-
 const headersDataTableNew = [
   {
     title: 'data-table-select',
@@ -670,6 +591,10 @@ const headersDataTableNew = [
     title: 'Packaging Pcs1',
     key: 'packagingPcs1',
   },
+  {
+    title: 'Actual Pcs 1',
+    key: 'actualPcs1',
+  },
 
   //---------------
   {
@@ -691,6 +616,10 @@ const headersDataTableNew = [
   {
     title: 'Packaging Pcs2',
     key: 'packagingPcs2',
+  },
+  {
+    title: 'Actual Pcs 2',
+    key: 'actualPcs2',
   },
 
   {
@@ -1558,6 +1487,16 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
+          <template #column.actualPcs1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #e0f7fa;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
 
           <template #column.productCode2="{ column }">
             <tr class="d-flex justify-center">
@@ -1602,6 +1541,16 @@ const newBatch = async batchID => {
             </tr>
           </template>
           <template #column.packagingPcs2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span style="background: #ffebee;">{{ column.title }} </span>
+              </th>
+            </tr>
+          </template>
+          <template #column.actualPcs2="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1918,6 +1867,24 @@ const newBatch = async batchID => {
                 <span v-if="item.raw.product1UomCount">{{ item.raw.product1UomCount }}</span>
                 <span v-else />
               </td>
+              <td
+                class="bg-light-blue-lighten-5 text-end cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                <span v-if="item.raw.actualPcs1">{{ item.raw.actualPcs1 }}</span>
+                <span v-else />
+              </td>
 
               <td
                 class="bg-red-lighten-5 cursor-pointer"
@@ -2004,6 +1971,24 @@ const newBatch = async batchID => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <span v-if="item.raw.product1UomCount">{{ item.raw.product2UomCount }}</span>
+                <span v-else />
+              </td>
+              <td
+                class="bg-red-lighten-5 text-end  cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #EF9A9A' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                <span v-if="item.raw.actualPcs2">{{ item.raw.actualPcs2 }}</span>
                 <span v-else />
               </td>
 
@@ -2221,7 +2206,7 @@ const newBatch = async batchID => {
 }
 
 .v-data-table th:nth-child(15) {
-  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
 }
 
 .v-data-table th:nth-child(16) {
@@ -2237,6 +2222,14 @@ const newBatch = async batchID => {
 }
 
 .v-data-table th:nth-child(19) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(20) {
+  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+}
+
+.v-data-table th:nth-child(21) {
   background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
 }
 
