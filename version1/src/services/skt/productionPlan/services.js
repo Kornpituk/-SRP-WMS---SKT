@@ -134,7 +134,12 @@ export const useSubmitProductionPlanService = () => {
         
       if (result) {
         console.log('Submit Produtcion Plan Func result:', result)
-        responseSubmitProductionPlan.value = result
+        if(result.success){
+          responseSubmitProductionPlan.value = result
+        }else{
+          errorMessageSubmitProductionPlan.value = result.error
+        }
+        
       } else {
         console.warn('No data returned from the API')
       }

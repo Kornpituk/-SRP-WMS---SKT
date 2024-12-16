@@ -262,10 +262,6 @@ watch(() => {
 const paginationData = computed(() => {
   const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
   const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
-
-  // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
-  // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
-  // console.log('products.value.length: ',products.value.length)
   
   return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
 })
@@ -681,7 +677,6 @@ function getRandomStatus() {
   return statuses[randomIndex]
 }
 
-
 function getRandomDate(start, end) {
   const startDate = new Date(start)
   const endDate = new Date(end)
@@ -790,7 +785,6 @@ const setAccount = role => {
 
   // สามารถเพิ่มเงื่อนไขสำหรับ role อื่นๆ ได้ที่นี่
 }
-
 
 //-------------------
 //----- Rune

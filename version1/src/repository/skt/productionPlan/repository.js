@@ -205,13 +205,38 @@ export const productionPlanRepository = {
   
       if (response && response.data) {
         console.log('Repo Response data submit Batch production plan:', response.data.data)
-        
+  
         return { data: response.data.data, success: true }
       } else {
-        throw new Error('No data received from the server')
+        return { success: false, error: 'Unexpected response format.' }
       }
     } catch (error) {
-      throw { success: false, error }
+      // จัดการข้อผิดพลาดและระบุข้อความที่ส่งกลับ
+      if (error.response && error.response.data) {
+        // กรณี API ส่งข้อผิดพลาดพร้อม response
+        console.error('API Error:', error.response.data.message || 'Unknown API error')
+        
+        return { 
+          success: false, 
+          error: error.response.data.message || 'Unknown error from server.', 
+        }
+      } else if (error.request) {
+        // กรณีข้อผิดพลาดเกี่ยวกับการเชื่อมต่อเครือข่าย
+        console.error('Network Error:', error.message)
+        
+        return { 
+          success: false, 
+          error: 'Network error. Please check your internet connection.', 
+        }
+      } else {
+        // กรณีข้อผิดพลาดทั่วไป เช่น การตั้งค่าผิดพลาด
+        console.error('Unexpected Error:', error.message)
+        
+        return { 
+          success: false, 
+          error: 'An unexpected error occurred. Please try again.', 
+        }
+      }
     }
   },
 

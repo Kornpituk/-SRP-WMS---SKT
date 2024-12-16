@@ -1098,10 +1098,22 @@ const submitPlan = async () => {
       whereHouse,
       accessTokenAtStore,
     )
-    textAlertDialogFunction(alertWordConst.submit, true)
-    setTimeout(() => {
-      location.reload()
-    }, 500)
+
+    if(responseSubmitProductionPlan.value){
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500)
+    }else if(errorMessageSubmitProductionPlan.value){
+      textAlertSubDialogFunction(alertWordConst.submit, errorMessageSubmitProductionPlan.value, false)
+      setTimeout(() => {
+        location.reload()
+      }, 500)
+
+      console.log("AlertDialog Submit", errorMessageSubmitProductionPlan.value, responseSubmitProductionPlan.value)
+    }
+
+    
   } catch (error) {
     console.error("Error submitting production plan:", error)
     textAlertDialogFunction(alertWordConst.submit, false)
@@ -1396,7 +1408,7 @@ const print = () => {
                 <span
                   style="font-size: 22px; font-weight: bold;"
                   class="text-center"
-                >{{ $t('Production Plan ฺBatch') }}</span>
+                >{{ $t('Production Plan') }}</span>
               </div>
             </VCol>
             <VCol
@@ -1700,7 +1712,7 @@ const print = () => {
       <!-- Dialog Content -->
       <VCard>
         <VCardTitle class="d-flex justify-center">
-          <h3>Select Plan</h3>
+          <h3>Production Plan Setting</h3>
         </VCardTitle>
         <DialogCloseBtn
           variant="text"
@@ -2906,6 +2918,7 @@ const print = () => {
       <ConfirmDialog2
         ref="confirmDialog2"
         :message="wordForSubmit"
+        :subword="subWordForSubmit"
         @confirm="handleConfirmAction"
         @cancel="handleCancel"
       />
