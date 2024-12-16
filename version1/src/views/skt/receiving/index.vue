@@ -1860,22 +1860,6 @@ const isSelected = item => {
   )
 }
 
-const row_classes = item => {
-  console.log('itemdd', item)
-
-  // const classes = []
-  // if (item.statusId === 'active') {
-  //   classes.push('active-row')
-  // } else {
-  //   classes.push('inactive-row')
-  // }
-
-  const rowClass = 'active-row'
-  
-  return rowClass
-  
-  return classes
-}
 
 const testBtn = () => {
   console.log('selectedDataTables', selectedDataTables.value)
@@ -3461,7 +3445,6 @@ const insetSwitch1 = ref('')
           item-selectable="selectable"
           class="elevation-1"
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"
-          :item-class="row_classes"
           @update:items-per-page="updateItemsPerPage"
         >
           <!-- 
@@ -3960,14 +3943,6 @@ const insetSwitch1 = ref('')
   overflow-wrap: break-word; /* ให้ข้อความตัดบรรทัดเมื่อยาวเกิน */
   white-space: normal; /* ให้ข้อความสามารถตัดบรรทัดได้ */
   word-wrap: break-word; /* รองรับข้อความตัดบรรทัด */
-}
-
-.active-row {
-  background-color: lightgreen;
-}
-
-.inactive-row {
-  background-color: lightcoral;
 }
 
 /* กำหนด CSS สำหรับคอลัมน์ที่ต้องการให้ sticky ด้านซ้าย */

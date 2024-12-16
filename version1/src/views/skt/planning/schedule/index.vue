@@ -570,19 +570,30 @@ const headersDataTableNew = [
     title: 'Batch Scale(Kgs)',
     key: 'batchScaleKgs',
   },
+
   {
-    title: 'Item Code1',
-    key: 'productCode1',
-    class: 'my-header-style',
+    title: 'Dimensions',
+    align: 'center',
+    children: [
+      { title: 'Item Code1', key: 'productCode1' },
+      { title: 'Item Name1', key: 'productName1' },
+      { title: 'Packaging Type1', key: 'packagingType1' },
+    ],
   },
-  {
-    title: 'Item Name1',
-    key: 'productName1',
-  },
-  {
-    title: 'Packaging Type1',
-    key: 'packagingType1',
-  },
+
+  // {
+  //   title: 'Item Code1',
+  //   key: 'productCode1',
+  //   class: 'my-header-style',
+  // },
+  // {
+  //   title: 'Item Name1',
+  //   key: 'productName1',
+  // },
+  // {
+  //   title: 'Packaging Type1',
+  //   key: 'packagingType1',
+  // },
   {
     title: 'Packaging Kgs1',
     key: 'packagingKgs1',
@@ -652,6 +663,23 @@ const headersDataTableNew = [
     key: 'action',
   },
 ]
+
+const row_classes = item => {
+  console.log('itemdd', item)
+
+  // const classes = []
+  // if (item.statusId === 'active') {
+  //   classes.push('active-row')
+  // } else {
+  //   classes.push('inactive-row')
+  // }
+
+  const rowClass = 'active-row'
+  
+  return rowClass
+  
+  return classes
+}
 
 const iconsSort = ref({
   sortColumn10: true,
@@ -1366,6 +1394,7 @@ const newBatch = async batchID => {
           v-model="selectedDataTables"
           :headers="headersDataTableNew"
           :items="productionPlanItems"
+          :item-class="row_classes"
           :items-per-page="10"
           fixed-header
           height="550"
@@ -1436,7 +1465,7 @@ const newBatch = async batchID => {
             <div>
               <tr class="d-flex justify-center">
                 <th>
-                  <span style="background: #e0f7fa;">{{ column.title }}<VIcon
+                  <span>{{ column.title }}<VIcon
                     :icon="iconsSort.sortColumn10 ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
                     class="clickable-icon"
                     @click="toggleDirection(10)"
@@ -1451,19 +1480,19 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #e0f7fa;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
           <template #column.packagingType1="{ column }">
             <tr class="d-flex justify-center py-0">
               <th>
-                <span style="background: #e0f7fa;">Item 1 </span>
+                <span />
               </th>
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #e0f7fa;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -1473,7 +1502,7 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #e0f7fa;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -1483,7 +1512,7 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #e0f7fa;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -1493,7 +1522,7 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #e0f7fa;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -1504,7 +1533,7 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #ffebee;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -1514,19 +1543,19 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #ffebee;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
           <template #column.packagingType2="{ column }">
             <tr class="d-flex justify-center py-0">
               <th>
-                <span style="background: #ffebee;">Item 2 </span>
+                <span />
               </th>
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #ffebee;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -1536,7 +1565,7 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #ffebee;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -1546,7 +1575,7 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #ffebee;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -1556,7 +1585,7 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span style="background: #ffebee;">{{ column.title }} </span>
+                <span>{{ column.title }} </span>
               </th>
             </tr>
           </template>
@@ -2133,12 +2162,6 @@ const newBatch = async batchID => {
         <GTable />
       </VCardText>
     </VCard>
-
-    <VCard>
-      <VCardText>
-        <TestTable />
-      </VCardText>
-    </VCard>
   </section>
 
   <!-- Footer -->
@@ -2184,53 +2207,13 @@ const newBatch = async batchID => {
   </section>
 </template>
 
-<style lang="scss">
-.v-data-table th:nth-child(10) {
-  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
+<style scoped>
+.active-row {
+  background-color: lightgreen;
 }
 
-.v-data-table th:nth-child(11) {
-  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(12) {
-  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(13) {
-  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(14) {
-  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(15) {
-  background: #e0f7fa !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(16) {
-  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(17) {
-  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(18) {
-  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(19) {
-  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(20) {
-  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
-}
-
-.v-data-table th:nth-child(21) {
-  background: #ffebee !important; /* สีสำหรับคอลัมน์ที่ 2 */
+.inactive-row {
+  background-color: lightcoral;
 }
 
 .text-capitalize {
@@ -2239,11 +2222,6 @@ const newBatch = async batchID => {
 
 .user-list-name:not(:hover) {
   color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
-}
-
-// Hover For Image Product
-.image-transition {
-  transition: inline-size 0.2s, inline-size 0.2s;
 }
 
 .fixed-bottom {
