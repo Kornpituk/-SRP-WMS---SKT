@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
+  fileName: { type: String, required: true },
   typeFileInput: { type: String, default: '' },
   typeBtn: { type: String, default: '' },
   titleDialog: { type: String, default: 'Dialog Title' },
@@ -10,8 +11,16 @@ const props = defineProps({
 const emit = defineEmits(['updateFiles']) // กำหนด event ชื่อ updateFiles
 
 const files = ref([]) // เก็บข้อมูลไฟล์
+const filesModel = ref([]) // เก็บข้อมูลไฟล์
 const dialogVisible = ref(false) // สถานะเปิด/ปิด Dialog
 const selectedIndex = ref(0) // ใช้กำหนด Index สำหรับ Carousel
+
+const emitUpdateFiles = () => {
+  emit('updateFiles', {
+    name: props.fileName,
+    files: files.value, // หรือข้อมูลไฟล์ที่ต้องการส่งออก
+  })
+}
 
 // ฟังก์ชันจัดการการอัปโหลดไฟล์
 const handleFileUpload = event => {
@@ -24,7 +33,12 @@ const handleFileUpload = event => {
     files.value.push({ file, objectUrl, type: fileType, name: file.name })
   })
 
-  emit('updateFiles', files.value) // ส่งข้อมูลไปยัง parent
+  emitUpdateFiles() // ส่งข้อมูลไปยัง parent
+}
+
+// ฟังก์ชันเปิด Dialog พร้อมตั้งค่า Index ของไฟล์ที่ต้องการแสดง
+const openDialogWithoutIndex = () => {
+  openDialog() // เปิด Dialog โดยไม่ต้องตั้งค่า Index
 }
 
 // ฟังก์ชันเปิด Dialog
@@ -44,20 +58,70 @@ const removeFile = index => {
   URL.revokeObjectURL(file.objectUrl) // ล้าง Object URL เพื่อป้องกัน Memory Leak
   files.value.splice(index, 1)
 
-  emit('updateFiles', files.value) // อัปเดตข้อมูลไปยัง parent
+  emitUpdateFiles() // อัปเดตข้อมูลไปยัง parent
 }
 </script>
 
 <template>
   <div>
-    <!-- อัปโหลดไฟล์ -->
-    <VFileInput
-      multiple
-      label="Upload Files"
-      accept="image/*,.pdf"
-      @change="handleFileUpload"
-    />
+    <VRow class="d-flex align-center">
+      <VCol
+        class="px-2"
+        cols="8"
+      >
+        <!-- อัปโหลดไฟล์ -->
+        <VFileInput
+          v-model="filesModel"
+          multiple
+          clearable
+          accept="image/*,.pdf"
+          style="max-width: 200px;"
+          density="compact"
+          @change="handleFileUpload"
+        >
+          <template #selection="{ fileNames }">
+            <template
+              v-for="(fileName, index) in fileNames"
+              :key="fileName"
+            >
+              <VChip
+                v-if="index < 1"
+                class="me-2"
+                color="deep-purple-accent-4"
+                size="small"
+                label
+              >
+                {{ fileName }}
+              </VChip>
 
+              <span
+                v-else-if="index === 1"
+                class="text-overline text-grey-darken-3 mx-2"
+              >
+                +{{ files.length - 1 }} File(s)
+              </span>
+            </template>
+          </template>
+        </VFileInput>
+      </VCol>
+      <VCol
+        class="d-flex align-center px-2"
+        cols="4"
+      >
+        <!-- ปุ่มเปิด Carousel Dialog -->
+        <VBtn
+          :disabled="!files.length || !filesModel.length"
+          class="d-flex justify-center"
+          :color="files.length && filesModel.length? 'primary' : 'grey'"
+          style="max-width: 70px;"
+          @click="openDialog"
+        >
+          <div><VIcon icon="ri-gallery-fill" /></div>
+          <div v-if="files.length && filesModel.length">{{ files.length }}+</div>
+        </VBtn>
+      </VCol>
+    </VRow>
+    
     <!-- แสดงไฟล์ -->
     <div v-if="props.typeFileInput !== 'hideInput'">
       <VRow
@@ -104,29 +168,30 @@ const removeFile = index => {
       </VRow>
     </div>
 
-    <!-- ปุ่มเปิด Carousel Dialog -->
-    <VBtn
-      v-if="files.length"
-      class="mt-4 d-flex justify-center"
-      color="primary"
-      @click="openDialog"
-    >
-      <div><VIcon icon="ri-gallery-fill" /></div>
-      <div>{{ files.length }}+</div>
-    </VBtn>
-
     <!-- Dialog สำหรับ Carousel -->
     <VDialog
       v-model="dialogVisible"
       max-width="80%"
     >
       <VCard>
-        <VCardTitle class="d-flex text center align-center justify-space-between">
-          Preview Files<VIcon
-            icon="ri-close-circle-fill"
-            color="red"
-            @click="closeDialog"
-          />
+        <VCardTitle class="">
+          <VRow>
+            <VCol
+              class="d-flex justify-center align-center"
+              cols="11"
+            >
+              <span style="margin-left: 70px;">{{ props.titleDialog }}</span>
+            </VCol>
+            <VCol
+              class="d-flex justify-end align-center"
+              cols="1"
+            >
+              <VIcon
+                icon="ri-close-circle-fill"
+                @click="closeDialog"
+              />
+            </VCol>
+          </VRow>
         </VCardTitle>
         
         <VCardText>
@@ -147,11 +212,11 @@ const removeFile = index => {
                 v-else
                 class="d-flex justify-center align-center"
               >
-                <embed
+                <iframe 
                   :src="file.objectUrl"
                   type="application/pdf"
-                  style="width: 100%; height: 100%;"
-                >
+                  style="width: 80%; height: 500px;"
+                />
               </div>
             </VCarouselItem>
           </VCarousel>

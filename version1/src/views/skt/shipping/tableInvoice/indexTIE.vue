@@ -639,11 +639,17 @@ const viewAllData = () => {
 const typeFileInput = ref('hideInput')
 
 const filesFromUploader = ref([])
+const typeNameFileInput = ref('')
+
+const addNameTypeFileInput = name => {
+  typeNameFileInput.value = name
+}
 
 // ฟังก์ชันจัดการข้อมูลที่ส่งมาจาก FileUploader
 const handleFileUpdates = updatedFiles => {
   filesFromUploader.value = updatedFiles
   console.log('Updated Files:', filesFromUploader.value)
+  console.log('Name Files:', typeNameFileInput.value)
 }
 </script>
 
@@ -1739,97 +1745,16 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountAll"
               class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
+              style="min-width: 300px; font-size: 12px;"
             >
-              <VRow>
-                <VCol
-                  cols="9"
-                  class="px-2"
-                >
-                  <VFileInput
-                    v-if="!product.soAttachment"
-                    v-model="product.soAttachment"
-                    base-color="blue"
-                    color="blue"
-                    text-color="blue"
-                    hide-details
-                    multiple
-                    placeholder="Upload your documents"
-                    density="compact"
-                    label="Attach File"
-                    prepend-icon=""
-                    prepend-icon-color="red"
-                    style="overflow: hidden; min-width: 150px; max-width: 159px; text-overflow: ellipsis;"
-                  >
-                    <template #prepend>
-                      <VIcon color="blue">
-                        ri-attachment-line
-                      </VIcon>
-                    </template>
-                    <template #selection="{ fileNames }">
-                      <template
-                        v-for="fileName in fileNames"
-                        :key="fileName"
-                      >
-                        <VChip
-                          label
-                          size="small"
-                          variant="outlined"
-                          color="blue"
-                          class="me-2"
-                        >
-                          {{ fileName }}
-                        </VChip>
-                      </template>
-                    </template>
-                  </VFileInput>
-                  <div class="d-flex justify-space-between align-center" v-if="product.soAttachment">
-                    <VIcon
-                      color="info"
-                      icon="ri-attachment-line"
-                    /><VBtn style="max-width: 110px;" variant="outlined">
-                      File Input
-                    </VBtn>
-                  </div>
-                </VCol>
-                <VCol
-                  v-for="(itemCore, index) in product.soAttachment"
-                  :key="index"
-                  cols="3"
-                  class="pa-2"
-                >
-                  <VCard
-                    v-if="itemCore.type === 'pdf' || itemCore.type === 'image'"
-                    class="pa-1"
-                    @click="showDialogPDF(itemCore.url, itemCore.type)"
-                  >
-                    <VCardText class="pa-1">
-                      <div
-                       
-                        style="display: inline-block; cursor: pointer;"
-                        class="d-flex justify-center"
-                      >
-                        <!-- Display PDF if available -->
-                        <iframe
-                          v-if="itemCore.type === 'pdf'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                        <!-- Display Image if available -->
-                        <VImg
-                          v-else-if="itemCore.type === 'image'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                      </div>
-                    </VCardText>
-                  </VCard>
-                </VCol>
-              </VRow>
+              <div>
+                <FileInputDialogCarousels
+                  title-dialog="So Attachment"
+                  :type-file-input="typeFileInput"
+                  file-name="So Attachment" 
+                  @updateFiles="handleFileUpdates"
+                />
+              </div>
             </td>
 
             <!-- 👉 sapInvoiceNo -->
@@ -2014,91 +1939,16 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
+              style="min-width: 300px; font-size: 12px;"
             >
-              <VRow>
-                <VCol
-                  cols="9"
-                  class="px-2"
-                >
-                  <VFileInput
-                    v-model="product.coa"
-                    base-color="blue"
-                    color="blue"
-                    text-color="blue"
-                    hide-details
-                    multiple
-                    placeholder="Upload your documents"
-                    density="compact"
-                    label="Attach File"
-                    prepend-icon=""
-                    prepend-icon-color="red"
-                    style="min-width: 150px;"
-                  >
-                    <template #prepend>
-                      <VIcon color="blue">
-                        ri-attachment-line
-                      </VIcon>
-                    </template>
-                    <template #selection="{ fileNames }">
-                      <template
-                        v-for="fileName in fileNames"
-                        :key="fileName"
-                      >
-                        <VChip
-                          label
-                          size="small"
-                          variant="outlined"
-                          color="blue"
-                          class="me-2"
-                        >
-                          {{ fileName }}
-                        </VChip>
-                      </template>
-                    </template>
-                    <template #label>
-                      <span style="font-size: 12px;">Attach File</span>
-                    </template>
-                  </VFileInput>
-                </VCol>
-                <VCol
-                  v-for="(itemCore, index) in product.coa"
-                  :key="index"
-                  cols="3"
-                  class="pa-2"
-                >
-                  <VCard
-                    v-if="itemCore.type === 'pdf' || itemCore.type === 'image'"
-                    class="pa-1"
-                    @click="showDialogPDF(itemCore.url, itemCore.type)"
-                  >
-                    <VCardText class="pa-1">
-                      <div
-                       
-                        style="display: inline-block; cursor: pointer;"
-                        class="d-flex justify-center"
-                      >
-                        <!-- Display PDF if available -->
-                        <iframe
-                          v-if="itemCore.type === 'pdf'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                        <!-- Display Image if available -->
-                        <VImg
-                          v-else-if="itemCore.type === 'image'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                      </div>
-                    </VCardText>
-                  </VCard>
-                </VCol>
-              </VRow>
+              <div>
+                <FileInputDialogCarousels
+                  title-dialog="COA"
+                  :type-file-input="typeFileInput"
+                  file-name="COA" 
+                  @updateFiles="handleFileUpdates"
+                />
+              </div>
             </td>
 
             <!-- 👉 Freight Forwarder -->
@@ -2208,7 +2058,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
               class="text-start px-1"
-              style="min-width: 400px; font-size: 12px;"
+              style="min-width: 450px; font-size: 12px;"
             >
               <VRow>
                 <VCol
@@ -2230,85 +2080,14 @@ const handleFileUpdates = updatedFiles => {
                   cols="6"
                   class="px-2"
                 >
-                  <VRow>
-                    <VCol
-                      cols="9"
-                      class="px-2"
-                    >
-                      <VFileInput
-                        v-model="product.truckOrder"
-                        base-color="blue"
-                        color="blue"
-                        text-color="blue"
-                        hide-details
-                        placeholder="Upload your documents"
-                        density="compact"
-                        label="Attach File"
-                        prepend-icon=""
-                        prepend-icon-color="red"
-                        style="min-width: 150px;"
-                      >
-                        <template #prepend>
-                          <VIcon color="blue">
-                            ri-attachment-line
-                          </VIcon>
-                        </template>
-                        <template #selection="{ fileNames }">
-                          <template
-                            v-for="fileName in fileNames"
-                            :key="fileName"
-                          >
-                            <VChip
-                              label
-                              size="small"
-                              variant="outlined"
-                              color="blue"
-                              class="me-2"
-                            >
-                              {{ fileName }}
-                            </VChip>
-                          </template>
-                        </template>
-                      </VFileInput>
-                    </VCol>
-                    <VCol
-                      v-for="(itemCore, index) in product.truckOrder"
-                      :key="index"
-                      cols="3"
-                      class="pa-2"
-                    >
-                      <VCard
-                        v-if="itemCore.type === 'pdf' || itemCore.type === 'image'"
-                        class="pa-1"
-                        @click="showDialogPDF(itemCore.url, itemCore.type)"
-                      >
-                        <VCardText class="pa-1">
-                          <div
-                       
-                            style="display: inline-block; cursor: pointer;"
-                            class="d-flex justify-center"
-                          >
-                            <!-- Display PDF if available -->
-                            <iframe
-                              v-if="itemCore.type === 'pdf'"
-                              :src="itemCore.url"
-                              width="60px"
-                              height="30px"
-                              style="pointer-events: none;"
-                            />
-                            <!-- Display Image if available -->
-                            <VImg
-                              v-else-if="itemCore.type === 'image'"
-                              :src="itemCore.url"
-                              width="60px"
-                              height="30px"
-                              style="pointer-events: none;"
-                            />
-                          </div>
-                        </VCardText>
-                      </VCard>
-                    </VCol>
-                  </VRow>
+                  <div>
+                    <FileInputDialogCarousels
+                      title-dialog="Truck Order"
+                      :type-file-input="typeFileInput"
+                      file-name="Truck Order" 
+                      @updateFiles="handleFileUpdates"
+                    />
+                  </div>
                 </VCol>
               </VRow>
               
@@ -2379,87 +2158,16 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
+              style="min-width: 300px; font-size: 12px;"
             >
-              <VRow>
-                <VCol
-                  cols="9"
-                  class="px-2"
-                >
-                  <VFileInput
-                    v-model="product.deliveryNote"
-                    base-color="blue"
-                    color="blue"
-                    text-color="blue"
-                    hide-details
-                    placeholder="Upload your documents"
-                    density="compact"
-                    label="Attach File"
-                    prepend-icon=""
-                    prepend-icon-color="red"
-                    style="min-width: 150px;"
-                  >
-                    <template #prepend>
-                      <VIcon color="blue">
-                        ri-attachment-line
-                      </VIcon>
-                    </template>
-                    <template #selection="{ fileNames }">
-                      <template
-                        v-for="fileName in fileNames"
-                        :key="fileName"
-                      >
-                        <VChip
-                          label
-                          size="small"
-                          variant="outlined"
-                          color="blue"
-                          class="me-2"
-                        >
-                          {{ fileName }}
-                        </VChip>
-                      </template>
-                    </template>
-                  </VFileInput>
-                </VCol>
-                <VCol
-                  v-for="(itemCore, index) in product.deliveryNote"
-                  :key="index"
-                  cols="3"
-                  class="pa-2"
-                >
-                  <VCard
-                    v-if="itemCore.type === 'pdf' || itemCore.type === 'image'"
-                    class="pa-1"
-                    @click="showDialogPDF(itemCore.url, itemCore.type)"
-                  >
-                    <VCardText class="pa-1">
-                      <div
-                       
-                        style="display: inline-block; cursor: pointer;"
-                        class="d-flex justify-center"
-                      >
-                        <!-- Display PDF if available -->
-                        <iframe
-                          v-if="itemCore.type === 'pdf'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                        <!-- Display Image if available -->
-                        <VImg
-                          v-else-if="itemCore.type === 'image'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                      </div>
-                    </VCardText>
-                  </VCard>
-                </VCol>
-              </VRow>
+              <div>
+                <FileInputDialogCarousels
+                  title-dialog="Delivery Note"
+                  :type-file-input="typeFileInput"
+                  file-name="Delivery Note" 
+                  @updateFiles="handleFileUpdates"
+                />
+              </div>
             </td>
 
             <!-- 👉 remarkSAL -->
@@ -2667,11 +2375,6 @@ const handleFileUpdates = updatedFiles => {
         @submit="handleDialogSubmit"
       />
     </div>
-  </section>
-
-  <!-- Component Input File -->
-  <section>
-    <FileInputDialogCarousels @updateFiles="handleFileUpdates" :typeFileInput="typeFileInput" ></FileInputDialogCarousels>
   </section>
 </template>
 

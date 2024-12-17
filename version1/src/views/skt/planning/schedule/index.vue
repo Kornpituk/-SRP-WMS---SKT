@@ -129,8 +129,8 @@ import { ProductionDataModel } from '@/model/skt/planning/production/model'
 
 const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
 
-const sortColumn = ref('asc')
-const sortDirection = ref(null)
+const sortColumn = ref('producingDate')
+const sortDirection = ref('desc')
 
 const filterForSearchBatchProductionPlan = ref({
   StatusID: '',
@@ -667,8 +667,6 @@ const iconsSort = ref({
   sortColumn13: true,
   sortColumn14: true,
 })
-
-
 
 // ฟังก์ชันสำหรับสลับสถานะของไอคอนแต่ละตัว
 const toggleDirection = async key => {
@@ -1389,7 +1387,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1407,7 +1405,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1418,7 +1416,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1429,7 +1427,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th :class="getColumnClass(1)">
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1440,7 +1438,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1451,7 +1449,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1462,7 +1460,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1478,7 +1476,7 @@ const newBatch = async batchID => {
               <tr class="d-flex justify-center">
                 <th>
                   <span>{{ column.title }}<VIcon
-                    :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                    :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                     class="clickable-icon"
                     @click="toggleDirection(column.key)"
                   /></span>
@@ -1493,7 +1491,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1509,7 +1507,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1523,7 +1521,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1537,7 +1535,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1551,7 +1549,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1566,7 +1564,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1580,7 +1578,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1596,7 +1594,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1610,7 +1608,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1624,7 +1622,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1638,7 +1636,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1650,7 +1648,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1661,7 +1659,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1672,7 +1670,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1683,7 +1681,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1694,7 +1692,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
@@ -1705,7 +1703,7 @@ const newBatch = async batchID => {
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
