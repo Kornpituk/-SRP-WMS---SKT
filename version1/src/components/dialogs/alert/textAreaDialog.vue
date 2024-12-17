@@ -51,7 +51,7 @@ const submitDialog = () => {
   >
     <VCard class="d-flex justify-center">
       <VCardTitle class="text-center">
-        {{ titleDialogCom }}
+        {{ titleDialog }}
       </VCardTitle>
       <DialogCloseBtn
         variant="text"

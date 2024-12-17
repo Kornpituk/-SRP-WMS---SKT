@@ -571,29 +571,29 @@ const headersDataTableNew = [
     key: 'batchScaleKgs',
   },
 
-  {
-    title: 'Dimensions',
-    align: 'center',
-    children: [
-      { title: 'Item Code1', key: 'productCode1' },
-      { title: 'Item Name1', key: 'productName1' },
-      { title: 'Packaging Type1', key: 'packagingType1' },
-    ],
-  },
+  // {
+  //   title: 'Dimensions',
+  //   align: 'center',
+  //   children: [
+  //     { title: 'Item Code1', key: 'productCode1' },
+  //     { title: 'Item Name1', key: 'productName1' },
+  //     { title: 'Packaging Type1', key: 'packagingType1' },
+  //   ],
+  // },
 
-  // {
-  //   title: 'Item Code1',
-  //   key: 'productCode1',
-  //   class: 'my-header-style',
-  // },
-  // {
-  //   title: 'Item Name1',
-  //   key: 'productName1',
-  // },
-  // {
-  //   title: 'Packaging Type1',
-  //   key: 'packagingType1',
-  // },
+  {
+    title: 'Item Code1',
+    key: 'productCode1',
+    class: 'my-header-style',
+  },
+  {
+    title: 'Item Name1',
+    key: 'productName1',
+  },
+  {
+    title: 'Packaging Type1',
+    key: 'packagingType1',
+  },
   {
     title: 'Packaging Kgs1',
     key: 'packagingKgs1',

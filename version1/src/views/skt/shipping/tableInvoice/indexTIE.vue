@@ -59,10 +59,18 @@ const textAreaDialogActive = (type, data) => {
   if (typeDialogTextArea.value === 'ShipCon') {
     titleDialogView.value = 'Shipping Condition'
     typeDialogView.value = 'ShipCon'
+    sapInValueView.value = ''
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   } else if (typeDialogTextArea.value === 'ShipMark') {
     titleDialogView.value = 'Shipping Mark'
     typeDialogView.value = 'ShipMark'
     sapInValueView.value = 'TIX2406001'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if(typeDialogTextArea.value === 'ShipMarkPrint'){
+    titleDialogView.value = 'Shipping Mark'
+    typeDialogView.value = 'ShipMark'
+    sapInValueView.value = 'TIX240602'
+    typeBtnView.value = 'print'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   }
   dialogVisible.value = true
@@ -1770,7 +1778,7 @@ const viewAllData = () => {
                 <VBtn
                   style="min-width: 196px;"
                   variant="outlined"
-                  @click="textAreaDialogActive('ShipCon')"
+                  @click="textAreaDialogActive('ShipCon', shippingCondition)"
                 >
                   <span
                     v-if="shippingCondition"
@@ -1813,12 +1821,11 @@ const viewAllData = () => {
                 <VBtn
                   class="mx-2"
                   color="warning"
-                  @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
+                  @click="textAreaDialogActive('ShipMarkPrint', product.shippingMark)"
                 >
                   <VIcon
                     size="30"
                     icon="ri-printer-fill"
-                    @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
                   />
                 </VBtn>
               </div>
