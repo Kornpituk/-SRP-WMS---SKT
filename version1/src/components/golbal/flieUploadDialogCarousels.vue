@@ -2,10 +2,12 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  typeDialog: { type: String, default: '' },
+  typeFileInput: { type: String, default: '' },
   typeBtn: { type: String, default: '' },
   titleDialog: { type: String, default: 'Dialog Title' },
 })
+
+const emit = defineEmits(['updateFiles']) // กำหนด event ชื่อ updateFiles
 
 const files = ref([]) // เก็บข้อมูลไฟล์
 const dialogVisible = ref(false) // สถานะเปิด/ปิด Dialog
@@ -21,6 +23,8 @@ const handleFileUpload = event => {
 
     files.value.push({ file, objectUrl, type: fileType, name: file.name })
   })
+
+  emit('updateFiles', files.value) // ส่งข้อมูลไปยัง parent
 }
 
 // ฟังก์ชันเปิด Dialog
@@ -39,6 +43,8 @@ const removeFile = index => {
 
   URL.revokeObjectURL(file.objectUrl) // ล้าง Object URL เพื่อป้องกัน Memory Leak
   files.value.splice(index, 1)
+
+  emit('updateFiles', files.value) // อัปเดตข้อมูลไปยัง parent
 }
 </script>
 
@@ -53,7 +59,7 @@ const removeFile = index => {
     />
 
     <!-- แสดงไฟล์ -->
-    <div>
+    <div v-if="props.typeFileInput !== 'hideInput'">
       <VRow
         v-if="files.length"
         class="mt-4"
@@ -101,11 +107,12 @@ const removeFile = index => {
     <!-- ปุ่มเปิด Carousel Dialog -->
     <VBtn
       v-if="files.length"
-      class="mt-4"
+      class="mt-4 d-flex justify-center"
       color="primary"
       @click="openDialog"
     >
-      View Files in Carousel
+      <div><VIcon icon="ri-gallery-fill" /></div>
+      <div>{{ files.length }}+</div>
     </VBtn>
 
     <!-- Dialog สำหรับ Carousel -->
@@ -143,7 +150,7 @@ const removeFile = index => {
                 <embed
                   :src="file.objectUrl"
                   type="application/pdf"
-                  style="width: 100%; height: 80%;"
+                  style="width: 100%; height: 100%;"
                 >
               </div>
             </VCarouselItem>

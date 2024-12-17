@@ -635,6 +635,16 @@ import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarous
 const viewAllData = () => {
   console.log(mockData.value)
 }
+
+const typeFileInput = ref('hideInput')
+
+const filesFromUploader = ref([])
+
+// ฟังก์ชันจัดการข้อมูลที่ส่งมาจาก FileUploader
+const handleFileUpdates = updatedFiles => {
+  filesFromUploader.value = updatedFiles
+  console.log('Updated Files:', filesFromUploader.value)
+}
 </script>
 
 <template>
@@ -2661,7 +2671,7 @@ const viewAllData = () => {
 
   <!-- Component Input File -->
   <section>
-    <FileInputDialogCarousels ></FileInputDialogCarousels>
+    <FileInputDialogCarousels @updateFiles="handleFileUpdates" :typeFileInput="typeFileInput" ></FileInputDialogCarousels>
   </section>
 </template>
 

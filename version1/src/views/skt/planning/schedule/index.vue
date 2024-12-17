@@ -500,7 +500,7 @@ const headersDataTableNew = [
   },
   {
     title: 'Status',
-    key: 'status',
+    key: 'statusId',
     fixed: true,
     sortable: false,
   },
@@ -517,64 +517,54 @@ const headersDataTableNew = [
   {
     title: 'Plants',
     sortable: false,
-    key: 'plants',
+    key: 'plantName',
   },
   {
     title: 'Reactor',
-    key: 'reactor',
+    key: 'reactorName',
     sortable: false,
     class: 'my-header-style',
   },
   {
     title: 'Production Code',
-    key: 'productCode',
+    key: 'productionCode',
     sortable: false,
   },
   {
     title: 'Production Name',
-    key: 'productName',
+    key: 'productionName',
     sortable: false,
   },
   {
     title: 'Batch Scale(Kgs)',
-    key: 'batchScaleKgs',
+    key: 'quantityKgs',
     sortable: false,
   },
 
-  // {
-  //   title: 'Dimensions',
-  //   align: 'center',
-  //   children: [
-  //     { title: 'Item Code1', key: 'productCode1' },
-  //     { title: 'Item Name1', key: 'productName1' },
-  //     { title: 'Packaging Type1', key: 'packagingType1' },
-  //   ],
-  // },
-
   {
     title: 'Item Code1',
-    key: 'productCode1',
+    key: 'product1SelectedCode',
     class: 'my-header-style',
     sortable: false,
   },
   {
     title: 'Item Name1',
-    key: 'productName1',
+    key: 'product1Name',
     sortable: false,
   },
   {
     title: 'Packaging Type1',
-    key: 'packagingType1',
+    key: 'product1SelectedPackagingCode',
     sortable: false,
   },
   {
     title: 'Packaging Kgs1',
-    key: 'packagingKgs1',
+    key: 'product1PackingQtyKgs',
     sortable: false,
   },
   {
     title: 'Packaging Pcs1',
-    key: 'packagingPcs1',
+    key: 'product1UomCount',
     sortable: false,
   },
   {
@@ -586,27 +576,27 @@ const headersDataTableNew = [
   //---------------
   {
     title: 'Item Code2',
-    key: 'productCode2',
+    key: 'product2SelectedCode',
     sortable: false,
   },
   {
     title: 'Item Name2',
-    key: 'productName2',
+    key: 'product2Name',
     sortable: false,
   },
   {
     title: 'Packaging Type2',
-    key: 'packagingType2',
+    key: 'product2SelectedPackagingCode',
     sortable: false,
   },
   {
     title: 'Packaging Kgs2',
-    key: 'packagingKgs2',
+    key: 'product2PackingQtyKgs',
     sortable: false,
   },
   {
     title: 'Packaging Pcs2',
-    key: 'packagingPcs2',
+    key: 'product2UomCount',
     sortable: false,
   },
   {
@@ -638,12 +628,12 @@ const headersDataTableNew = [
   },
   {
     title: 'Update Date',
-    key: 'updateDate',
+    key: 'updatedDate',
     sortable: false,
   },
   {
     title: 'Update By',
-    key: 'byWho',
+    key: 'updatedBy',
     sortable: false,
   },
   {
@@ -1395,7 +1385,7 @@ const newBatch = async batchID => {
           show-select
           class="text-no-wrap"
         >
-          <template #column.status="{ column }">
+          <template #column.statusId="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -1424,7 +1414,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.plants="{ column }">
+          <template #column.plantName="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -1435,7 +1425,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.reactor="{ column }">
+          <template #column.reactorName="{ column }">
             <tr class="d-flex justify-center">
               <th :class="getColumnClass(1)">
                 <span>{{ column.title }}<VIcon
@@ -1446,7 +1436,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.productCode="{ column }">
+          <template #column.productionCode="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -1457,7 +1447,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.productName="{ column }">
+          <template #column.productionName="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -1468,7 +1458,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.batchScaleKgs="{ column }">
+          <template #column.quantityKgs="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -1480,7 +1470,7 @@ const newBatch = async batchID => {
             </tr>
           </template>
 
-          <template #column.productCode1="{ column }">
+          <template #column.product1SelectedCode="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1496,7 +1486,7 @@ const newBatch = async batchID => {
               </tr>
             </div>
           </template>
-          <template #column.productName1="{ column }">
+          <template #column.product1Name="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1510,7 +1500,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.packagingType1="{ column }">
+          <template #column.product1SelectedPackagingCode="{ column }">
             <tr class="d-flex justify-center py-0">
               <th>
                 <span />
@@ -1526,7 +1516,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.packagingKgs1="{ column }">
+          <template #column.product1PackingQtyKgs="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1540,7 +1530,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.packagingPcs1="{ column }">
+          <template #column.product1UomCount="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1569,7 +1559,7 @@ const newBatch = async batchID => {
             </tr>
           </template>
 
-          <template #column.productCode2="{ column }">
+          <template #column.product2SelectedCode="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1583,7 +1573,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.productName2="{ column }">
+          <template #column.product2Name="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1597,7 +1587,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.packagingType2="{ column }">
+          <template #column.product2SelectedPackagingCode="{ column }">
             <tr class="d-flex justify-center py-0">
               <th>
                 <span />
@@ -1613,7 +1603,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.packagingKgs2="{ column }">
+          <template #column.product2PackingQtyKgs="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1627,7 +1617,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.packagingPcs2="{ column }">
+          <template #column.product2UomCount="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1700,7 +1690,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.updateDate="{ column }">
+          <template #column.updatedDate="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -1711,7 +1701,7 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.byWho="{ column }">
+          <template #column.updatedBy="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
