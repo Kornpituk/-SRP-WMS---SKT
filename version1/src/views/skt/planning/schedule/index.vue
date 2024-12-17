@@ -1726,11 +1726,7 @@ const newBatch = async batchID => {
           <template #column.action="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === 'desc' ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
-                  class="clickable-icon"
-                  @click="toggleDirection(column.key)"
-                /></span>
+                <span>{{ column.title }}</span>
               </th>
             </tr>
           </template>
