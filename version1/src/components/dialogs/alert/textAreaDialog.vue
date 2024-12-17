@@ -58,22 +58,47 @@ const submitDialog = () => {
         size="default"
         @click="closeDialog"
       />
-      <VCardText>
+      <VCardText v-if="props.typeDialog !== 'Lot'">
         <div v-if="props.typeDialog === 'ShipMark'">
           SAP Invoice No.: {{ props.sapInValue }}
         </div>
         <VTextarea
           v-model="localText"
+          counter
+          :readonly="props.typeBtn === 'print'"
           class="text-center"
           rows="4"
           outlined
         />
       </VCardText>
+      <VCardText v-else>
+        <VCard>
+          <VCardText>
+            <VTable>
+              <thead class="bg-grey-lighten-3">
+                <tr>
+                  <th>No.</th>
+                  <th>Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(item, index) in localText"
+                  :key="index"
+                >
+                  <td>{{ index+1 }}</td>
+                  <td>{{ item.lotNUmber }}</td>
+                </tr>
+              </tbody>
+            </VTable>
+          </VCardText>
+        </VCard>
+      </VCardText>
       <VCardActions class="d-flex justify-center">
         <VBtn
           v-if="props.typeBtn === 'print'"
-          variant="outlined"
-          color="primary"
+          variant="flat"
+          color="warning"
           @click="submitDialog"
         >
           <VIcon icon="ri-printer-fill" />Print

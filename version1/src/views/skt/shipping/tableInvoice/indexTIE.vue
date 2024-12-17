@@ -51,26 +51,61 @@ const typeDialogView = ref('')
 const typeBtnView = ref('')
 const titleDialogView = ref('')
 
+const indexDataDialogTextArea = ref('')
+
 //------ function for dialog text area -----
 
-const textAreaDialogActive = (type, data) => {
+const textAreaDialogActive = (type, data, index) => {
   typeDialogTextArea.value = type
+  indexDataDialogTextArea.value = index
 
   if (typeDialogTextArea.value === 'ShipCon') {
     titleDialogView.value = 'Shipping Condition'
     typeDialogView.value = 'ShipCon'
     sapInValueView.value = ''
+    typeBtnView.value = 'nonPrint'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   } else if (typeDialogTextArea.value === 'ShipMark') {
     titleDialogView.value = 'Shipping Mark'
     typeDialogView.value = 'ShipMark'
     sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if (typeDialogTextArea.value === 'Lot') {
+    titleDialogView.value = 'Lot'
+    typeDialogView.value = 'Lot'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   }else if(typeDialogTextArea.value === 'ShipMarkPrint'){
     titleDialogView.value = 'Shipping Mark'
     typeDialogView.value = 'ShipMark'
     sapInValueView.value = 'TIX240602'
     typeBtnView.value = 'print'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if(typeDialogTextArea.value === 'ShipConPrint'){
+    titleDialogView.value = 'Shipping Condition'
+    typeDialogView.value = 'ShipCon'
+    sapInValueView.value = 'TIX240602'
+    typeBtnView.value = 'print'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if (typeDialogTextArea.value === 'RemarkWH') {
+    titleDialogView.value = 'Remark WH'
+    typeDialogView.value = 'RemarkWH'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if (typeDialogTextArea.value === 'RemarkSAL') {
+    titleDialogView.value = 'Remark SAL'
+    typeDialogView.value = 'RemarkSAL'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if (typeDialogTextArea.value === 'RemarkLOG') {
+    titleDialogView.value = 'Remark LOG'
+    typeDialogView.value = 'RemarkLOG'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   }
   dialogVisible.value = true
@@ -79,14 +114,31 @@ const textAreaDialogActive = (type, data) => {
 const handleDialogSubmit = data => {
   dialogDataTextArea.value = data
 
-  if (typeDialogTextArea.value === 'ShipCon') {
-    shippingCondition.value = dialogDataTextArea.value
-    console.log('Data shippingCondition Dialog:', data)
-  } else if (typeDialogTextArea.value === 'ShipMark') {
-    shippingmark.value = dialogDataTextArea.value
-    console.log('Data shippingMark Dialog:', data)
+  const index = indexDataDialogTextArea.value
+
+  if (index >= 0 && index < mockData.value.length) {
+    const item = mockData.value[index]
+
+    // อัปเดตค่าของ item
+    item.value = data
+
+    // ใช้งานข้อมูลตาม type
+    if (typeDialogTextArea.value  === 'ShipCon') {
+      item.shippingCondition = data
+    } else if (typeDialogTextArea.value === 'ShipMark') {
+      item.shippingMark = data
+    } else if (typeDialogTextArea.value === 'RemarkSAL') {
+      item.remarkSal = data
+    }else if (typeDialogTextArea.value === 'RemarkWH') {
+      item.remarkWh = data
+    }else if (typeDialogTextArea.value === 'RemarkLOG') {
+      item.remarkLog = data
+    }
+  } else {
+    console.warn(`Index ${index} is out of range for mockData.`)
   }
-  console.log('Data from Dialog:', data)
+
+  console.log('Updated mockData:', data)
 }
 
 //------------------------------- Function Get StockUpdate Need Enter Search -----------------
@@ -241,9 +293,45 @@ const checkBgTruck = truck => {
 //------------------------------------------ Mock Data --------------------------------
 
 const mockData = ref([
-  { no: 1, status: getRandomStatus(), saleOrderNo: '1100078117', soAttachment: '', sapInvoiceNo: 'TIX2406001', payerName: 'TORAY SG', user: '', shipper: '', shipperLocation: '', shippingMark: 'MAT-105T', endUser: '', consignee: '', product: '', lotNumber: '', qty: '16,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'SINGAPORE', loadingDate: '4-มิ.ย.-24', etd: '7-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: 'Shipping complete', remarkLog: '5501354541', byWhow: 'ธนาธิป' },
-  { no: 2, status: getRandomStatus(), saleOrderNo: '1100078116', soAttachment: '', sapInvoiceNo: 'TIX2406002', payerName: 'SCI', user: '', shipper: '', shipperLocation: '', shippingMark: 'OSMORIN DA-50', endUser: '', consignee: '', product: '', lotNumber: '', qty: '14,400.00', coa: '', freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'JAPAN', loadingDate: '6-มิ.ย.-24', etd: '18-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'กาญจนา' },
-  { no: 3, status: getRandomStatus(), saleOrderNo: '1100078128', soAttachment: '', sapInvoiceNo: 'TIX2406003', payerName: 'RESONAC', user: '', shipper: '', shipperLocation: '', shippingMark: 'CHEMICLEAN PR-084CT', endUser: '', consignee: '', product: '', lotNumber: '', qty: '5,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', truckFee: '', truckPrint: '', doEx: '', country: 'MALAYSIA', loadingDate: '6-มิ.ย.-24', etd: '10-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400', byWhow: 'สมชาย' },
+  { no: 1, status: getRandomStatus(), saleOrderNo: '1100078117', soAttachment: '', 
+    sapInvoiceNo: 'TIX2406001', payerName: 'TORAY SG', user: '', shipper: '', 
+    shipperLocation: '', shippingCondition: `1 SHIPPING MARK REQUIRE  SANPRENE IB-D20
+2 COA 1 SET
+3 DRIVER LICENSE CLASS 4
+4 Please mention “This item compliance to RoHS and 
+REACH requirements” in COA
+5 On Plastic pallet (for not full container)`, shippingMark: `CHEMICLEAN PR-084CT
+NO.1: PO. No....SHM400000XXXX
+MM02P02023
+MADE IN THAILAND`, endUser: '', consignee: '', product: '', 
+    lotNumber: [{ id: '01', lotNUmber: 'PC23110006' }, 
+      { id: '01', lotNUmber: 'PC23110007' }], qty: '16,000.00', coa: '', 
+    freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', 
+    truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'SINGAPORE', 
+    loadingDate: '4-มิ.ย.-24', etd: '7-มิ.ย.-24', eta: '', deliveryNote: '', 
+    remarkSal: '', remarkWh: 'Shipping complete', remarkLog: '5501354541', 
+    byWhow: 'ธนาธิป' },
+  { no: 2, status: getRandomStatus(), saleOrderNo: '1100078116', 
+    soAttachment: '', sapInvoiceNo: 'TIX2406002', payerName: 'SCI', 
+    user: '', shipper: '', shipperLocation: '', shippingCondition: `MAT-105T`, 
+    shippingMark: '', endUser: '', consignee: '', product: '', 
+    lotNumber: [{ id: '01', lotNUmber: 'PC23110041' }, 
+      { id: '01', lotNUmber: 'PC23110007' }, 
+      { id: '01', lotNUmber: 'PC23110008' }], qty: '14,400.00', coa: '', 
+    freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', 
+    truckPrint: '', truckOrder: '', doEx: '', country: 'JAPAN', 
+    loadingDate: '6-มิ.ย.-24', etd: '18-มิ.ย.-24', eta: '', deliveryNote: '', 
+    remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'กาญจนา' },
+  { no: 3, status: getRandomStatus(), saleOrderNo: '1100078128', soAttachment: '', 
+    sapInvoiceNo: 'TIX2406003', payerName: 'RESONAC', user: '', shipper: '', 
+    shipperLocation: '', shippingCondition: ``, shippingMark: 'CHEMICLEAN PR-084CT', 
+    endUser: '', consignee: '', product: '', 
+    lotNumber: [{ id: '01', lotNUmber: 'PC231151561' }], 
+    qty: '5,000.00', coa: '', freightForwarder: 'LCL', carrier: '', 
+    vesselName: '', truck: '', truckFee: '', truckFee: '', truckPrint: '',
+    doEx: '', country: 'MALAYSIA', loadingDate: '6-มิ.ย.-24', etd: '10-มิ.ย.-24', 
+    eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400',
+    byWhow: 'สมชาย' },
   
 ])
 
@@ -539,6 +627,10 @@ mockData.value.forEach(product => {
     }
   })
 })
+
+//--------------------------- File INput --------------------------------
+
+import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue'
 
 const viewAllData = () => {
   console.log(mockData.value)
@@ -1645,17 +1737,19 @@ const viewAllData = () => {
                   class="px-2"
                 >
                   <VFileInput
+                    v-if="!product.soAttachment"
                     v-model="product.soAttachment"
                     base-color="blue"
                     color="blue"
                     text-color="blue"
                     hide-details
+                    multiple
                     placeholder="Upload your documents"
                     density="compact"
                     label="Attach File"
                     prepend-icon=""
                     prepend-icon-color="red"
-                    style="min-width: 150px;"
+                    style="overflow: hidden; min-width: 150px; max-width: 159px; text-overflow: ellipsis;"
                   >
                     <template #prepend>
                       <VIcon color="blue">
@@ -1679,6 +1773,14 @@ const viewAllData = () => {
                       </template>
                     </template>
                   </VFileInput>
+                  <div class="d-flex justify-space-between align-center" v-if="product.soAttachment">
+                    <VIcon
+                      color="info"
+                      icon="ri-attachment-line"
+                    /><VBtn style="max-width: 110px;" variant="outlined">
+                      File Input
+                    </VBtn>
+                  </div>
                 </VCol>
                 <VCol
                   v-for="(itemCore, index) in product.soAttachment"
@@ -1778,23 +1880,24 @@ const viewAllData = () => {
                 <VBtn
                   style="min-width: 196px;"
                   variant="outlined"
-                  @click="textAreaDialogActive('ShipCon', shippingCondition)"
+                  :color="product.shippingCondition ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('ShipCon', product.shippingCondition, index)"
                 >
                   <span
-                    v-if="shippingCondition"
-                    style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
-                  >{{ shippingCondition }}</span>
+                    v-if="product.shippingCondition"
+                    style="overflow: hidden; max-width: 159px; text-overflow: ellipsis;"
+                  >{{ product.shippingCondition }}</span>
                   <span v-else>Shipping Condition</span>
                 </VBtn>
                 <VBtn
                   class="mx-2"
                   color="warning"
-                  @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
+                  @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
                 >
                   <VIcon
                     size="30"
                     icon="ri-printer-fill"
-                    @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
+                    @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
                   />
                 </VBtn>
               </div>
@@ -1810,18 +1913,19 @@ const viewAllData = () => {
                 <VBtn
                   style="min-width: 196px;"
                   variant="outlined"
-                  @click="textAreaDialogActive('ShipMark', product.shippingMark)"
+                  :color="product.shippingMark ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('ShipMark', product.shippingMark, index)"
                 >
                   <span
                     v-if="product.shippingMark"
-                    style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
                   >{{ product.shippingMark }}</span>
                   <span v-else>Shipping Mark</span>
                 </VBtn>
                 <VBtn
                   class="mx-2"
                   color="warning"
-                  @click="textAreaDialogActive('ShipMarkPrint', product.shippingMark)"
+                  @click="textAreaDialogActive('ShipMarkPrint', product.shippingMark, index)"
                 >
                   <VIcon
                     size="30"
@@ -1873,15 +1977,18 @@ const viewAllData = () => {
               style="font-size: 12px;"
             >
               <VBtn
+                v-if="product.lotNumber.length > 1"
                 style="min-width: 177px;"
                 variant="outlined"
+                @click="textAreaDialogActive('Lot', product.lotNumber)"
               >
                 <span
                   v-if="product.lotNumber"
                   style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
-                >{{ product.lotNumber }}</span>
+                >{{ product.lotNumber[0].lotNUmber }}...</span>
                 <span v-else>Lot Number</span>
               </VBtn>
+              <span v-else>{{ product.lotNumber[0].lotNUmber }}</span>
             </td>
 
             <!-- 👉 qty -->
@@ -2345,7 +2452,7 @@ const viewAllData = () => {
               </VRow>
             </td>
 
-            <!-- 👉 remarkWh -->
+            <!-- 👉 remarkSAL -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2354,34 +2461,38 @@ const viewAllData = () => {
               <VBtn
                 style="min-width: 177px;"
                 variant="outlined"
+                :color="product.remarkSal ? 'primary' : 'grey'"
+                @click="textAreaDialogActive('RemarkSAL', product.remarkSal, index)"
               >
                 <span
-                  v-if="product.remarkWh"
-                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  v-if="product.remarkSal"
+                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
                 >{{ product.remarkSal }}</span>
                 <span v-else>remark(SAL)</span>
               </VBtn>
             </td>
 
-            <!-- 👉 remarkWh -->
+            <!-- 👉 remarkWH -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
               style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
             >
               <VBtn
-                style="min-width: 177px;"
+                style="min-width: 177px; max-width: 177px;"
                 variant="outlined"
+                :color="product.remarkWh ? 'primary' : 'grey'"
+                @click="textAreaDialogActive('RemarkWH', product.remarkWh, index)"
               >
                 <span
                   v-if="product.remarkWh"
-                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
                 >{{ product.remarkWh }}</span>
                 <span v-else>remark(WH)</span>
               </VBtn>
             </td>
 
-            <!-- 👉 remarkWh -->
+            <!-- 👉 remarkLOG -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
@@ -2390,10 +2501,12 @@ const viewAllData = () => {
               <VBtn
                 style="min-width: 177px;"
                 variant="outlined"
+                :color="product.remarkLog ? 'primary' : 'grey'"
+                @click="textAreaDialogActive('RemarkLOG', product.remarkLog, index)"
               >
                 <span
-                  v-if="product.remarkWh"
-                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  v-if="product.remarkLog"
+                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
                 >{{ product.remarkLog }}</span>
                 <span v-else>remark(LOG)</span>
               </VBtn>
@@ -2533,17 +2646,6 @@ const viewAllData = () => {
   <!-- Dialog Text area -->
   <section>
     <div>
-      <h1>Parent View</h1>
-      <p><strong>Received Data:</strong> {{ dialogDataTextArea }}</p>
-
-      <VBtn
-        variant="outlined"
-        color="primary"
-        @click="dialogVisible = true"
-      >
-        Open Dialog view
-      </VBtn>
-
       <TextAreaDialog
         v-model="dialogVisible"
         :sap-in-value="sapInValueView"
@@ -2555,6 +2657,11 @@ const viewAllData = () => {
         @submit="handleDialogSubmit"
       />
     </div>
+  </section>
+
+  <!-- Component Input File -->
+  <section>
+    <FileInputDialogCarousels ></FileInputDialogCarousels>
   </section>
 </template>
 
