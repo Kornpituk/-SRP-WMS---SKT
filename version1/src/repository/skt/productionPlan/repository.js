@@ -46,6 +46,8 @@ export const productionPlanRepository = {
           ProducingDateFrom: filter.ProducingDateFrom,
           ProducingDateTo: filter.ProducingDateTo,
           LotTextSearch: filter.LotTextSearch,
+          SortColumn: filter.SortColumn,
+          SortDirection: filter.SortDirection,
         },
       })
 
