@@ -129,13 +129,18 @@ import { ProductionDataModel } from '@/model/skt/planning/production/model'
 
 const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
 
+const sortColumn = ref('producingDate')
+const sortDirection = ref('desc')
+
 const filterForSearchBatchProductionPlan = ref({
-  StatusID: null,
+  StatusID: '',
   ProductionTextSearch: sessionStorage.getItem("ProductionTextSearchProductionFilter"),
   ItemTextSearch: sessionStorage.getItem("ItemTextSearchProductionFilter"),
   ProducingDateFrom: sessionStorage.getItem("ProducingDateFromProductionFilter"),
   ProducingDateTo: sessionStorage.getItem("ProducingDateToProductionFilter"),
   LotTextSearch: sessionStorage.getItem("LotTextSearchProductionFilter"),
+  SortColumn: '',
+  SortDirection: '',
 })
 
 const clearModelFolter = async () => {
@@ -267,6 +272,8 @@ const fetchDataProductingPlan = async () => {
         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
       }
     }
+    filterForSearchBatchProductionPlan.value.SortColumn = sortColumn.value
+    filterForSearchBatchProductionPlan.value.SortDirection = sortDirection.value
     productionPlanItems.value = []
 
     const resultFetchGet = await fetchGetProductionplanSearch(
@@ -300,51 +307,6 @@ const fetchDataProductingPlan = async () => {
     productionPlanItems.value = []
   }
 }
-
-// watch(async () => {
-//   try {
-
-//     if (datePickerFilter.value) {
-//       console.log("datePickerFilter:", datePickerFilter.value)
-
-//       if (datePickerFilter.value.includes(" to ")) {
-//         // กรณีเป็นช่วงวันที่
-//         const [startDate, endDate] = datePickerFilter.value.split(" to ")
-
-//         filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
-//         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
-
-//       } else {
-//         // กรณีเป็นวันเดียว
-//         const singleDate = datePickerFilter.value
-
-//         filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(singleDate)
-//         filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
-//       }
-//     }
-
-//     await fetchGetProductionplanSearch(
-//       filterForSearchBatchProductionPlan.value, 
-//       urlApi.value, 'ProductionPlan', whereHouse, 
-//       accessTokenAtStore)
-
-//     // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
-//     if (getProductionplanSearchResult.value?.data && Array.isArray(getProductionplanSearchResult.value.data)) {
-      
-//       productionPlanItems.value = getProductionplanSearchResult.value.data.map((item, index) => ({
-//         ...item,
-//         no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
-//       }))
-//       console.log("productionPlanItems", productionPlanItems.value)
-//     } else {
-//       console.warn("getProductionplanSearchResult.data is not an array")
-//       productionPlanItems.value = []
-//     }
-//   } catch (error) {
-//     console.error("Error fetching production plan master data:", error)
-//     productionPlanItems.value = []
-//   }
-// })
 
 //--------------------------- New batch -----------------------------------------------------
 
@@ -538,129 +500,146 @@ const headersDataTableNew = [
   },
   {
     title: 'Status',
-    key: 'status',
+    key: 'statusId',
     fixed: true,
+    sortable: false,
   },
   {
     title: 'No.',
     key: 'no',
+    sortable: false,
   },
   {
     title: 'Input Date',
     key: 'inputDate',
+    sortable: false,
   },
   {
     title: 'Plants',
-    key: 'plants',
+    sortable: false,
+    key: 'plantName',
   },
   {
     title: 'Reactor',
-    key: 'reactor',
+    key: 'reactorName',
+    sortable: false,
     class: 'my-header-style',
   },
   {
     title: 'Production Code',
-    key: 'productCode',
+    key: 'productionCode',
+    sortable: false,
   },
   {
     title: 'Production Name',
-    key: 'productName',
+    key: 'productionName',
+    sortable: false,
   },
   {
     title: 'Batch Scale(Kgs)',
-    key: 'batchScaleKgs',
+    key: 'quantityKgs',
+    sortable: false,
   },
-
-  // {
-  //   title: 'Dimensions',
-  //   align: 'center',
-  //   children: [
-  //     { title: 'Item Code1', key: 'productCode1' },
-  //     { title: 'Item Name1', key: 'productName1' },
-  //     { title: 'Packaging Type1', key: 'packagingType1' },
-  //   ],
-  // },
 
   {
     title: 'Item Code1',
-    key: 'productCode1',
+    key: 'product1SelectedCode',
     class: 'my-header-style',
+    sortable: false,
   },
   {
     title: 'Item Name1',
-    key: 'productName1',
+    key: 'product1Name',
+    sortable: false,
   },
   {
     title: 'Packaging Type1',
-    key: 'packagingType1',
+    key: 'product1SelectedPackagingCode',
+    sortable: false,
   },
   {
     title: 'Packaging Kgs1',
-    key: 'packagingKgs1',
+    key: 'product1PackingQtyKgs',
+    sortable: false,
   },
   {
     title: 'Packaging Pcs1',
-    key: 'packagingPcs1',
+    key: 'product1UomCount',
+    sortable: false,
   },
   {
     title: 'Actual Pcs 1',
     key: 'actualPcs1',
+    sortable: false,
   },
 
   //---------------
   {
     title: 'Item Code2',
-    key: 'productCode2',
+    key: 'product2SelectedCode',
+    sortable: false,
   },
   {
     title: 'Item Name2',
-    key: 'productName2',
+    key: 'product2Name',
+    sortable: false,
   },
   {
     title: 'Packaging Type2',
-    key: 'packagingType2',
+    key: 'product2SelectedPackagingCode',
+    sortable: false,
   },
   {
     title: 'Packaging Kgs2',
-    key: 'packagingKgs2',
+    key: 'product2PackingQtyKgs',
+    sortable: false,
   },
   {
     title: 'Packaging Pcs2',
-    key: 'packagingPcs2',
+    key: 'product2UomCount',
+    sortable: false,
   },
   {
     title: 'Actual Pcs 2',
     key: 'actualPcs2',
+    sortable: false,
   },
 
   {
     title: 'Lot',
     key: 'lotNumber',
+    sortable: false,
   },
   {
     title: 'Producing Date',
     key: 'producingDate',
+    sortable: false,
   },
   {
     title: 'Finished Date',
     key: 'finishedDate',
+    sortable: false,
   },
 
   {
     title: 'Remark',
     key: 'remark',
+    sortable: false,
   },
   {
     title: 'Update Date',
-    key: 'updateDate',
+    key: 'updatedDate',
+    sortable: false,
   },
   {
     title: 'Update By',
-    key: 'byWho',
+    key: 'updatedBy',
+    sortable: false,
   },
   {
     title: 'Action',
     key: 'action',
+    sortable: false,
   },
 ]
 
@@ -690,10 +669,13 @@ const iconsSort = ref({
 })
 
 // ฟังก์ชันสำหรับสลับสถานะของไอคอนแต่ละตัว
-const toggleDirection = index => {
-  if(index === 10){
-    iconsSort.value.sortColumn10 = false
+const toggleDirection = async key => {
+  if (key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
   }
+  sortColumn.value = key
+  await fetchDataProductingPlan()
 }
 
 const getColumnClass = index => {
@@ -1401,64 +1383,92 @@ const newBatch = async batchID => {
           show-select
           class="text-no-wrap"
         >
-          <template #column.status="{ column }">
+          <template #column.statusId="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
           <template #column.no="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon class="clickable-icon" /></span>
               </th>
             </tr>
           </template>
           <template #column.inputDate="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.plants="{ column }">
+          <template #column.plantName="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.reactor="{ column }">
+          <template #column.reactorName="{ column }">
             <tr class="d-flex justify-center">
               <th :class="getColumnClass(1)">
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.productCode="{ column }">
+          <template #column.productionCode="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.productName="{ column }">
+          <template #column.productionName="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.batchScaleKgs="{ column }">
+          <template #column.quantityKgs="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
 
-          <template #column.productCode1="{ column }">
+          <template #column.product1SelectedCode="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
@@ -1466,25 +1476,29 @@ const newBatch = async batchID => {
               <tr class="d-flex justify-center">
                 <th>
                   <span>{{ column.title }}<VIcon
-                    :icon="iconsSort.sortColumn10 ? 'ri-arrow-up-double-fill' : 'ri-arrow-down-double-fill'"
+                    :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
                     class="clickable-icon"
-                    @click="toggleDirection(10)"
+                    @click="toggleDirection(column.key)"
                   /></span>
                 </th>
               </tr>
             </div>
           </template>
-          <template #column.productName1="{ column }">
+          <template #column.product1Name="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.packagingType1="{ column }">
+          <template #column.product1SelectedPackagingCode="{ column }">
             <tr class="d-flex justify-center py-0">
               <th>
                 <span />
@@ -1492,27 +1506,39 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.packagingKgs1="{ column }">
+          <template #column.product1PackingQtyKgs="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.packagingPcs1="{ column }">
+          <template #column.product1UomCount="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
@@ -1522,32 +1548,44 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
 
-          <template #column.productCode2="{ column }">
+          <template #column.product2SelectedCode="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.productName2="{ column }">
+          <template #column.product2Name="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.packagingType2="{ column }">
+          <template #column.product2SelectedPackagingCode="{ column }">
             <tr class="d-flex justify-center py-0">
               <th>
                 <span />
@@ -1555,27 +1593,39 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.packagingKgs2="{ column }">
+          <template #column.product2PackingQtyKgs="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.packagingPcs2="{ column }">
+          <template #column.product2UomCount="{ column }">
             <tr class="d-flex justify-center">
               <th />
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
@@ -1585,7 +1635,11 @@ const newBatch = async batchID => {
             </tr>
             <tr class="d-flex justify-center">
               <th>
-                <span>{{ column.title }} </span>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
@@ -1593,42 +1647,66 @@ const newBatch = async batchID => {
           <template #column.lotNumber="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
           <template #column.producingDate="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
           <template #column.finishedDate="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
           <template #column.remark="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.updateDate="{ column }">
+          <template #column.updatedDate="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
-          <template #column.byWho="{ column }">
+          <template #column.updatedBy="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
               </th>
             </tr>
           </template>
@@ -1636,7 +1714,7 @@ const newBatch = async batchID => {
           <template #column.action="{ column }">
             <tr class="d-flex justify-center">
               <th>
-                {{ column.title }} c
+                <span>{{ column.title }}</span>
               </th>
             </tr>
           </template>

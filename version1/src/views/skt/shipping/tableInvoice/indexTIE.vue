@@ -32,7 +32,7 @@ const serialProductCode = ref(null)
 /// ------------------------------ Import Component --------------------------------
 // --- Dialog Text Area --------------------------------
 
-import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue'
+import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue' //--------- import component
 
 const dialogDataTextArea = ref('')
 const dialogVisible = ref(false)
@@ -51,26 +51,61 @@ const typeDialogView = ref('')
 const typeBtnView = ref('')
 const titleDialogView = ref('')
 
-//------ function for dialog text area -----
+const indexDataDialogTextArea = ref('')
 
-const textAreaDialogActive = (type, data) => {
+//------ function for dialog text area ----------------------------------------------
+
+const textAreaDialogActive = (type, data, index) => {
   typeDialogTextArea.value = type
+  indexDataDialogTextArea.value = index
 
   if (typeDialogTextArea.value === 'ShipCon') {
     titleDialogView.value = 'Shipping Condition'
     typeDialogView.value = 'ShipCon'
     sapInValueView.value = ''
+    typeBtnView.value = 'nonPrint'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   } else if (typeDialogTextArea.value === 'ShipMark') {
     titleDialogView.value = 'Shipping Mark'
     typeDialogView.value = 'ShipMark'
     sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if (typeDialogTextArea.value === 'Lot') {
+    titleDialogView.value = 'Lot'
+    typeDialogView.value = 'Lot'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   }else if(typeDialogTextArea.value === 'ShipMarkPrint'){
     titleDialogView.value = 'Shipping Mark'
     typeDialogView.value = 'ShipMark'
     sapInValueView.value = 'TIX240602'
     typeBtnView.value = 'print'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if(typeDialogTextArea.value === 'ShipConPrint'){
+    titleDialogView.value = 'Shipping Condition'
+    typeDialogView.value = 'ShipCon'
+    sapInValueView.value = 'TIX240602'
+    typeBtnView.value = 'print'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if (typeDialogTextArea.value === 'RemarkWH') {
+    titleDialogView.value = 'Remark WH'
+    typeDialogView.value = 'RemarkWH'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if (typeDialogTextArea.value === 'RemarkSAL') {
+    titleDialogView.value = 'Remark SAL'
+    typeDialogView.value = 'RemarkSAL'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }else if (typeDialogTextArea.value === 'RemarkLOG') {
+    titleDialogView.value = 'Remark LOG'
+    typeDialogView.value = 'RemarkLOG'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'nonPrint'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   }
   dialogVisible.value = true
@@ -79,14 +114,31 @@ const textAreaDialogActive = (type, data) => {
 const handleDialogSubmit = data => {
   dialogDataTextArea.value = data
 
-  if (typeDialogTextArea.value === 'ShipCon') {
-    shippingCondition.value = dialogDataTextArea.value
-    console.log('Data shippingCondition Dialog:', data)
-  } else if (typeDialogTextArea.value === 'ShipMark') {
-    shippingmark.value = dialogDataTextArea.value
-    console.log('Data shippingMark Dialog:', data)
+  const index = indexDataDialogTextArea.value
+
+  if (index >= 0 && index < mockData.value.length) {
+    const item = mockData.value[index]
+
+    // อัปเดตค่าของ item
+    item.value = data
+
+    // ใช้งานข้อมูลตาม type
+    if (typeDialogTextArea.value  === 'ShipCon') {
+      item.shippingCondition = data
+    } else if (typeDialogTextArea.value === 'ShipMark') {
+      item.shippingMark = data
+    } else if (typeDialogTextArea.value === 'RemarkSAL') {
+      item.remarkSal = data
+    }else if (typeDialogTextArea.value === 'RemarkWH') {
+      item.remarkWh = data
+    }else if (typeDialogTextArea.value === 'RemarkLOG') {
+      item.remarkLog = data
+    }
+  } else {
+    console.warn(`Index ${index} is out of range for mockData.`)
   }
-  console.log('Data from Dialog:', data)
+
+  console.log('Updated mockData:', data)
 }
 
 //------------------------------- Function Get StockUpdate Need Enter Search -----------------
@@ -120,21 +172,6 @@ const formatDecimal = decimal => {
   }
 }
 
-/// ----------------------- check config Barcode / Tag ----------------
-const nameUser = localStorage.getItem('userCheck')
-
-const checkConfigUser = nameUser => {
-  if (nameUser == 'Chutimon') {
-    return false
-  } else if (nameUser == 'Tamma'){
-    return true
-  } else {
-    return true
-  }
-}
-
-checkConfigUser(nameUser)
-
 //------------------------ Dialog Image ----------------------------
 const isDialogImageVisible = ref(false)
 const urlImage = ref('')
@@ -153,11 +190,6 @@ watchEffect(() =>{
   }
 })
 
-const nameProductDialog = ref('')
-const qtyProductDialog = ref('')
-const unitProductDialog = ref('')
-const barcodeProductDialog = ref('')
-
 const codeProduct = ref('')
 const nameProduct = ref('')
 const imgProduct = ref('')
@@ -168,21 +200,6 @@ const groupSupProduct = ref('')
 const totalProduct = ref('')
 const unitNameProduct = ref('')
 const detailsProduct = ref('')
-
-const showDialogImage = (code, name, img, barcode, categories, group, groupSup, total, unitName, details) => {
-  codeProduct.value = code
-  nameProduct.value = name
-  imgProduct.value = img
-  barcodeProduct.value = barcode
-  categoriesProduct.value = categories
-  groupProduct.value = group
-  groupSupProduct.value = groupSup
-  totalProduct.value = total
-  unitNameProduct.value = unitName
-  detailsProduct.value = details
-  isDialogImageVisible.value = true
-  console.log('showImageFunction!!')
-}
 
 const showExpansionDialog = ref(false)
 
@@ -241,12 +258,49 @@ const checkBgTruck = truck => {
 //------------------------------------------ Mock Data --------------------------------
 
 const mockData = ref([
-  { no: 1, status: getRandomStatus(), saleOrderNo: '1100078117', soAttachment: '', sapInvoiceNo: 'TIX2406001', payerName: 'TORAY SG', user: '', shipper: '', shipperLocation: '', shippingMark: 'MAT-105T', endUser: '', consignee: '', product: '', lotNumber: '', qty: '16,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'SINGAPORE', loadingDate: '4-มิ.ย.-24', etd: '7-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: 'Shipping complete', remarkLog: '5501354541', byWhow: 'ธนาธิป' },
-  { no: 2, status: getRandomStatus(), saleOrderNo: '1100078116', soAttachment: '', sapInvoiceNo: 'TIX2406002', payerName: 'SCI', user: '', shipper: '', shipperLocation: '', shippingMark: 'OSMORIN DA-50', endUser: '', consignee: '', product: '', lotNumber: '', qty: '14,400.00', coa: '', freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'JAPAN', loadingDate: '6-มิ.ย.-24', etd: '18-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'กาญจนา' },
-  { no: 3, status: getRandomStatus(), saleOrderNo: '1100078128', soAttachment: '', sapInvoiceNo: 'TIX2406003', payerName: 'RESONAC', user: '', shipper: '', shipperLocation: '', shippingMark: 'CHEMICLEAN PR-084CT', endUser: '', consignee: '', product: '', lotNumber: '', qty: '5,000.00', coa: '', freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', truckFee: '', truckFee: '', truckPrint: '', doEx: '', country: 'MALAYSIA', loadingDate: '6-มิ.ย.-24', etd: '10-มิ.ย.-24', eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400', byWhow: 'สมชาย' },
+  { no: 1, status: getRandomStatus(), saleOrderNo: '1100078117', soAttachment: '', 
+    sapInvoiceNo: 'TIX2406001', payerName: 'TORAY SG', user: '', shipper: '', 
+    shipperLocation: '', shippingCondition: `1 SHIPPING MARK REQUIRE  SANPRENE IB-D20
+2 COA 1 SET
+3 DRIVER LICENSE CLASS 4
+4 Please mention “This item compliance to RoHS and 
+REACH requirements” in COA
+5 On Plastic pallet (for not full container)`, shippingMark: `CHEMICLEAN PR-084CT
+NO.1: PO. No....SHM400000XXXX
+MM02P02023
+MADE IN THAILAND`, endUser: '', consignee: '', product: '', 
+    lotNumber: [{ id: '01', lotNUmber: 'PC23110006' }, 
+      { id: '01', lotNUmber: 'PC23110007' }], qty: '16,000.00', coa: '', 
+    freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', 
+    truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'SINGAPORE', 
+    loadingDate: '07/05/2024', etd: '07/05/2024', eta: '', deliveryNote: '', 
+    remarkSal: '', remarkWh: 'Shipping complete', remarkLog: '5501354541', 
+    byWhow: 'ธนาธิป' },
+  { no: 2, status: getRandomStatus(), saleOrderNo: '1100078116', 
+    soAttachment: '', sapInvoiceNo: 'TIX2406002', payerName: 'SCI', 
+    user: '', shipper: '', shipperLocation: '', shippingCondition: `MAT-105T`, 
+    shippingMark: '', endUser: '', consignee: '', product: '', 
+    lotNumber: [{ id: '01', lotNUmber: 'PC23110041' }, 
+      { id: '01', lotNUmber: 'PC23110007' }, 
+      { id: '01', lotNUmber: 'PC23110008' }], qty: '14,400.00', coa: '', 
+    freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', 
+    truckPrint: '', truckOrder: '', doEx: '', country: 'JAPAN', 
+    loadingDate: '06/07/2024', etd: '18/06/2024', eta: '', deliveryNote: '', 
+    remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'กาญจนา' },
+  { no: 3, status: getRandomStatus(), saleOrderNo: '1100078128', soAttachment: '', 
+    sapInvoiceNo: 'TIX2406003', payerName: 'RESONAC', user: '', shipper: '', 
+    shipperLocation: '', shippingCondition: ``, shippingMark: 'CHEMICLEAN PR-084CT', 
+    endUser: '', consignee: '', product: '', 
+    lotNumber: [{ id: '01', lotNUmber: 'PC231151561' }], 
+    qty: '5,000.00', coa: '', freightForwarder: 'LCL', carrier: '', 
+    vesselName: '', truck: '', truckFee: '', truckFee: '', truckPrint: '',
+    doEx: '', country: 'MALAYSIA', loadingDate: '06/02/2024', etd: '10/03/2024', 
+    eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400',
+    byWhow: 'สมชาย' },
   
 ])
 
+//------------------------ Set Permissions (Hiden and Show Column) ------------------------
 const accountAmin = ref (false)
 const accountViewerKK = ref (false)
 const accountINSP = ref (false)
@@ -317,7 +371,6 @@ const rules = [v => v.length <= 150 || 'Max 25 characters']
 
 //--------- new expention
 const panel = ref(['filter'])
-const files = ref([])
 
 ///---------------- Dialog 
 const isDialogVisiblePrintTruck = ref(false)
@@ -329,219 +382,28 @@ const isDialogPDFViewVisible = ref(false)
 const imgDialogPDF = ref('')
 const imgDialogPng = ref('')
 
-const showDialogPDF = (imageUrl, typeUrl) => {
-  console.log('Start PDF or Image!', typeUrl)
+//--------------------------- File INput --------------------------------
 
-  if (typeUrl === 'pdf') {
-    imgDialogPDF.value = imageUrl
-    imgDialogPng.value = ''
-    isDialogPDFViewVisible.value = true
-  } else if (typeUrl === 'image') {
-    imgDialogPng.value = imageUrl
-    isDialogPDFViewVisible.value = true
-    imgDialogPDF.value = ''
-  }
-  
-  isDialogPDFViewVisible.value = true
-}
-
-//------------------- Dialog Print Truck --------------------------------
-const exmpleShippingMark = ref('')
-const exmpleSaleOrder = ref('')
-const isDialogVisiblePrintShippingMark = ref(false)
-
-const showDialogPrintShippingMark = (saleOrder, shippingMark) => {
-  isDialogVisiblePrintShippingMark.value = true
-  exmpleShippingMark.value = shippingMark
-  exmpleSaleOrder.value = saleOrder
-}
-
-
-// Watch for changes in soAttachment for each product
-mockData.value.forEach(product => {
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  watch(() => product.soAttachment, newAttachment => {
-    // Clean up the old URL if exists
-    if (product.pdfPreview) {
-      URL.revokeObjectURL(product.pdfPreview)
-    }
-    if (product.imagePreview) {
-      URL.revokeObjectURL(product.imagePreview)
-    }
-
-    if (newAttachment && newAttachment.length > 0) {
-      const file = newAttachment[0] // Assuming single file upload
-      const fileType = file.type
-
-      if (fileType === 'application/pdf') {
-        const fileURL = URL.createObjectURL(file)
-
-        product.imagePreview = null // Clear image preview if any
-        product.soAttachment = product.soAttachment.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'pdf' } // Add type
-            : att,
-        )
-      } else if (fileType.startsWith('image/')) {
-        const fileURL = URL.createObjectURL(file)
-
-        product.pdfPreview = null // Clear PDF preview if any
-        product.soAttachment = product.soAttachment.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'image' } // Add type
-            : att,
-        )
-      } else {
-        product.pdfPreview = null
-        product.imagePreview = null
-      }
-
-      // Add URL and other file details
-      
-    } else {
-      product.pdfPreview = null
-      product.imagePreview = null
-    }
-  })
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  watch(() => product.coa, newCoa => {
-    // Clean up the old URL if exists
-    if (product.pdfPreview) {
-      URL.revokeObjectURL(product.pdfPreview)
-    }
-    if (product.imagePreview) {
-      URL.revokeObjectURL(product.imagePreview)
-    }
-
-    if (newCoa && newCoa.length > 0) {
-      const file = newCoa[0] // Assuming single file upload
-      const fileType = file.type
-
-      if (fileType === 'application/pdf') {
-        const fileURL = URL.createObjectURL(file)
-
-        product.imagePreview = null // Clear image preview if any
-        product.coa = product.coa.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'pdf' } // Add type
-            : att,
-        )
-      } else if (fileType.startsWith('image/')) {
-        const fileURL = URL.createObjectURL(file)
-
-        product.pdfPreview = null // Clear PDF preview if any
-        product.coa = product.coa.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'image' } // Add type
-            : att,
-        )
-      } else {
-        product.pdfPreview = null
-        product.imagePreview = null
-      }
-
-      // Add URL and other file details
-      
-    } else {
-      product.pdfPreview = null
-      product.imagePreview = null
-    }
-  })
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  watch(() => product.truckOrder, newTruckOrder => {
-    // Clean up the old URL if exists
-    if (product.pdfPreview) {
-      URL.revokeObjectURL(product.pdfPreview)
-    }
-    if (product.imagePreview) {
-      URL.revokeObjectURL(product.imagePreview)
-    }
-
-    if (newTruckOrder && newTruckOrder.length > 0) {
-      const file = newTruckOrder[0] // Assuming single file upload
-      const fileType = file.type
-
-      if (fileType === 'application/pdf') {
-        const fileURL = URL.createObjectURL(file)
-
-        product.imagePreview = null // Clear image preview if any
-        product.truckOrder = product.truckOrder.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'pdf' } // Add type
-            : att,
-        )
-      } else if (fileType.startsWith('image/')) {
-        const fileURL = URL.createObjectURL(file)
-
-        product.pdfPreview = null // Clear PDF preview if any
-        product.truckOrder = product.truckOrder.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'image' } // Add type
-            : att,
-        )
-      } else {
-        product.pdfPreview = null
-        product.imagePreview = null
-      }
-
-      // Add URL and other file details
-      
-    } else {
-      product.pdfPreview = null
-      product.imagePreview = null
-    }
-  })
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  watch(() => product.deliveryNote, newDeliveryNote => {
-    // Clean up the old URL if exists
-    if (product.pdfPreview) {
-      URL.revokeObjectURL(product.pdfPreview)
-    }
-    if (product.imagePreview) {
-      URL.revokeObjectURL(product.imagePreview)
-    }
-
-    if (newDeliveryNote && newDeliveryNote.length > 0) {
-      const file = newDeliveryNote[0] // Assuming single file upload
-      const fileType = file.type
-
-      if (fileType === 'application/pdf') {
-        const fileURL = URL.createObjectURL(file)
-
-        product.imagePreview = null // Clear image preview if any
-        product.deliveryNote = product.deliveryNote.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'pdf' } // Add type
-            : att,
-        )
-      } else if (fileType.startsWith('image/')) {
-        const fileURL = URL.createObjectURL(file)
-
-        product.pdfPreview = null // Clear PDF preview if any
-        product.deliveryNote = product.deliveryNote.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'image' } // Add type
-            : att,
-        )
-      } else {
-        product.pdfPreview = null
-        product.imagePreview = null
-      }
-
-      // Add URL and other file details
-      
-    } else {
-      product.pdfPreview = null
-      product.imagePreview = null
-    }
-  })
-})
+import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
 
 const viewAllData = () => {
   console.log(mockData.value)
+}
+
+const typeFileInput = ref('hideInput')
+
+const filesFromUploader = ref([])
+const typeNameFileInput = ref('')
+
+const addNameTypeFileInput = name => {
+  typeNameFileInput.value = name
+}
+
+// ฟังก์ชันจัดการข้อมูลที่ส่งมาจาก FileUploader
+const handleFileUpdates = updatedFiles => {
+  filesFromUploader.value = updatedFiles
+  console.log('Updated Files:', filesFromUploader.value)
+  console.log('Name Files:', typeNameFileInput.value)
 }
 </script>
 
@@ -1637,87 +1499,16 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountAll"
               class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
+              style="min-width: 300px; font-size: 12px;"
             >
-              <VRow>
-                <VCol
-                  cols="9"
-                  class="px-2"
-                >
-                  <VFileInput
-                    v-model="product.soAttachment"
-                    base-color="blue"
-                    color="blue"
-                    text-color="blue"
-                    hide-details
-                    placeholder="Upload your documents"
-                    density="compact"
-                    label="Attach File"
-                    prepend-icon=""
-                    prepend-icon-color="red"
-                    style="min-width: 150px;"
-                  >
-                    <template #prepend>
-                      <VIcon color="blue">
-                        ri-attachment-line
-                      </VIcon>
-                    </template>
-                    <template #selection="{ fileNames }">
-                      <template
-                        v-for="fileName in fileNames"
-                        :key="fileName"
-                      >
-                        <VChip
-                          label
-                          size="small"
-                          variant="outlined"
-                          color="blue"
-                          class="me-2"
-                        >
-                          {{ fileName }}
-                        </VChip>
-                      </template>
-                    </template>
-                  </VFileInput>
-                </VCol>
-                <VCol
-                  v-for="(itemCore, index) in product.soAttachment"
-                  :key="index"
-                  cols="3"
-                  class="pa-2"
-                >
-                  <VCard
-                    v-if="itemCore.type === 'pdf' || itemCore.type === 'image'"
-                    class="pa-1"
-                    @click="showDialogPDF(itemCore.url, itemCore.type)"
-                  >
-                    <VCardText class="pa-1">
-                      <div
-                       
-                        style="display: inline-block; cursor: pointer;"
-                        class="d-flex justify-center"
-                      >
-                        <!-- Display PDF if available -->
-                        <iframe
-                          v-if="itemCore.type === 'pdf'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                        <!-- Display Image if available -->
-                        <VImg
-                          v-else-if="itemCore.type === 'image'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                      </div>
-                    </VCardText>
-                  </VCard>
-                </VCol>
-              </VRow>
+              <div>
+                <FileInputDialogCarousels
+                  title-dialog="So Attachment"
+                  :type-file-input="typeFileInput"
+                  file-name="So Attachment" 
+                  @updateFiles="handleFileUpdates"
+                />
+              </div>
             </td>
 
             <!-- 👉 sapInvoiceNo -->
@@ -1778,23 +1569,25 @@ const viewAllData = () => {
                 <VBtn
                   style="min-width: 196px;"
                   variant="outlined"
-                  @click="textAreaDialogActive('ShipCon', shippingCondition)"
+                  :color="product.shippingCondition ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('ShipCon', product.shippingCondition, index)"
                 >
                   <span
-                    v-if="shippingCondition"
-                    style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
-                  >{{ shippingCondition }}</span>
+                    v-if="product.shippingCondition"
+                    style="overflow: hidden; max-width: 159px; text-overflow: ellipsis;"
+                  >{{ product.shippingCondition }}</span>
                   <span v-else>Shipping Condition</span>
                 </VBtn>
                 <VBtn
                   class="mx-2"
-                  color="warning"
-                  @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
+                  :color="product.shippingCondition ? 'warning' : 'grey'"
+                  :disabled="!product.shippingCondition"
+                  @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
                 >
                   <VIcon
                     size="30"
                     icon="ri-printer-fill"
-                    @click="showDialogPrintShippingMark(product.saleOrderNo, product.shippingMark)"
+                    @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
                   />
                 </VBtn>
               </div>
@@ -1810,18 +1603,20 @@ const viewAllData = () => {
                 <VBtn
                   style="min-width: 196px;"
                   variant="outlined"
-                  @click="textAreaDialogActive('ShipMark', product.shippingMark)"
+                  :color="product.shippingMark ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('ShipMark', product.shippingMark, index)"
                 >
                   <span
                     v-if="product.shippingMark"
-                    style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
                   >{{ product.shippingMark }}</span>
                   <span v-else>Shipping Mark</span>
                 </VBtn>
                 <VBtn
                   class="mx-2"
-                  color="warning"
-                  @click="textAreaDialogActive('ShipMarkPrint', product.shippingMark)"
+                  :color="product.shippingMark ? 'warning' : 'grey'"
+                  :disabled="!product.shippingMark"
+                  @click="textAreaDialogActive('ShipMarkPrint', product.shippingMark, index)"
                 >
                   <VIcon
                     size="30"
@@ -1873,15 +1668,18 @@ const viewAllData = () => {
               style="font-size: 12px;"
             >
               <VBtn
+                v-if="product.lotNumber.length > 1"
                 style="min-width: 177px;"
                 variant="outlined"
+                @click="textAreaDialogActive('Lot', product.lotNumber)"
               >
                 <span
                   v-if="product.lotNumber"
                   style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
-                >{{ product.lotNumber }}</span>
+                >{{ product.lotNumber[0].lotNUmber }}...</span>
                 <span v-else>Lot Number</span>
               </VBtn>
+              <span v-else>{{ product.lotNumber[0].lotNUmber }}</span>
             </td>
 
             <!-- 👉 qty -->
@@ -1897,91 +1695,16 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
+              style="min-width: 300px; font-size: 12px;"
             >
-              <VRow>
-                <VCol
-                  cols="9"
-                  class="px-2"
-                >
-                  <VFileInput
-                    v-model="product.coa"
-                    base-color="blue"
-                    color="blue"
-                    text-color="blue"
-                    hide-details
-                    multiple
-                    placeholder="Upload your documents"
-                    density="compact"
-                    label="Attach File"
-                    prepend-icon=""
-                    prepend-icon-color="red"
-                    style="min-width: 150px;"
-                  >
-                    <template #prepend>
-                      <VIcon color="blue">
-                        ri-attachment-line
-                      </VIcon>
-                    </template>
-                    <template #selection="{ fileNames }">
-                      <template
-                        v-for="fileName in fileNames"
-                        :key="fileName"
-                      >
-                        <VChip
-                          label
-                          size="small"
-                          variant="outlined"
-                          color="blue"
-                          class="me-2"
-                        >
-                          {{ fileName }}
-                        </VChip>
-                      </template>
-                    </template>
-                    <template #label>
-                      <span style="font-size: 12px;">Attach File</span>
-                    </template>
-                  </VFileInput>
-                </VCol>
-                <VCol
-                  v-for="(itemCore, index) in product.coa"
-                  :key="index"
-                  cols="3"
-                  class="pa-2"
-                >
-                  <VCard
-                    v-if="itemCore.type === 'pdf' || itemCore.type === 'image'"
-                    class="pa-1"
-                    @click="showDialogPDF(itemCore.url, itemCore.type)"
-                  >
-                    <VCardText class="pa-1">
-                      <div
-                       
-                        style="display: inline-block; cursor: pointer;"
-                        class="d-flex justify-center"
-                      >
-                        <!-- Display PDF if available -->
-                        <iframe
-                          v-if="itemCore.type === 'pdf'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                        <!-- Display Image if available -->
-                        <VImg
-                          v-else-if="itemCore.type === 'image'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                      </div>
-                    </VCardText>
-                  </VCard>
-                </VCol>
-              </VRow>
+              <div>
+                <FileInputDialogCarousels
+                  title-dialog="COA"
+                  :type-file-input="typeFileInput"
+                  file-name="COA" 
+                  @updateFiles="handleFileUpdates"
+                />
+              </div>
             </td>
 
             <!-- 👉 Freight Forwarder -->
@@ -1996,7 +1719,7 @@ const viewAllData = () => {
                 eager
               >
                 <template #label>
-                  <span>
+                  <span style="font-size: 12px;">
                     Freight Forwarder
                   </span>
                 </template>
@@ -2012,11 +1735,15 @@ const viewAllData = () => {
               <VSelect
                 v-model="product.carrier"
                 :items="items"
-                label="Carrier"
-                placeholder="Select Carrier"
                 density="compact"
                 eager
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Carrier
+                  </span>
+                </template>
+              </VSelect>
             </td>
 
             <!-- 👉 vesselName -->
@@ -2028,11 +1755,15 @@ const viewAllData = () => {
               <VSelect
                 v-model="product.vesselName"
                 :items="items"
-                label="Vessel Name"
-                placeholder="Select Vessel"
                 density="compact"
                 eager
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Vessel Name
+                  </span>
+                </template>
+              </VSelect>
             </td>
 
             <!-- 👉 voy -->
@@ -2043,9 +1774,14 @@ const viewAllData = () => {
               <VTextField
                 v-model="product.voy"
                 density="compact"
-                label="Voy"
                 style=" min-width: 150px;"
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Voy
+                  </span>
+                </template>
+              </VTextField>
             </td>
 
 
@@ -2068,9 +1804,14 @@ const viewAllData = () => {
               <VTextField
                 v-model="product.truckReserving"
                 density="compact"
-                label="Truck Reserving Number"
                 style=" min-width: 150px;"
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Truck Reserving Number
+                  </span>
+                </template>
+              </VTextField>
             </td>
 
             <!-- 👉 truckFee -->
@@ -2082,16 +1823,21 @@ const viewAllData = () => {
               <VTextField
                 v-model="product.truckFee"
                 density="compact"
-                label="Truck Fee"
                 style=" min-width: 150px;"
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Truck Fee
+                  </span>
+                </template>
+              </VTextField>
             </td>
 
             <!-- 👉 truckOrder -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
               class="text-start px-1"
-              style="min-width: 400px; font-size: 12px;"
+              style="min-width: 450px; font-size: 12px;"
             >
               <VRow>
                 <VCol
@@ -2113,85 +1859,14 @@ const viewAllData = () => {
                   cols="6"
                   class="px-2"
                 >
-                  <VRow>
-                    <VCol
-                      cols="9"
-                      class="px-2"
-                    >
-                      <VFileInput
-                        v-model="product.truckOrder"
-                        base-color="blue"
-                        color="blue"
-                        text-color="blue"
-                        hide-details
-                        placeholder="Upload your documents"
-                        density="compact"
-                        label="Attach File"
-                        prepend-icon=""
-                        prepend-icon-color="red"
-                        style="min-width: 150px;"
-                      >
-                        <template #prepend>
-                          <VIcon color="blue">
-                            ri-attachment-line
-                          </VIcon>
-                        </template>
-                        <template #selection="{ fileNames }">
-                          <template
-                            v-for="fileName in fileNames"
-                            :key="fileName"
-                          >
-                            <VChip
-                              label
-                              size="small"
-                              variant="outlined"
-                              color="blue"
-                              class="me-2"
-                            >
-                              {{ fileName }}
-                            </VChip>
-                          </template>
-                        </template>
-                      </VFileInput>
-                    </VCol>
-                    <VCol
-                      v-for="(itemCore, index) in product.truckOrder"
-                      :key="index"
-                      cols="3"
-                      class="pa-2"
-                    >
-                      <VCard
-                        v-if="itemCore.type === 'pdf' || itemCore.type === 'image'"
-                        class="pa-1"
-                        @click="showDialogPDF(itemCore.url, itemCore.type)"
-                      >
-                        <VCardText class="pa-1">
-                          <div
-                       
-                            style="display: inline-block; cursor: pointer;"
-                            class="d-flex justify-center"
-                          >
-                            <!-- Display PDF if available -->
-                            <iframe
-                              v-if="itemCore.type === 'pdf'"
-                              :src="itemCore.url"
-                              width="60px"
-                              height="30px"
-                              style="pointer-events: none;"
-                            />
-                            <!-- Display Image if available -->
-                            <VImg
-                              v-else-if="itemCore.type === 'image'"
-                              :src="itemCore.url"
-                              width="60px"
-                              height="30px"
-                              style="pointer-events: none;"
-                            />
-                          </div>
-                        </VCardText>
-                      </VCard>
-                    </VCol>
-                  </VRow>
+                  <div>
+                    <FileInputDialogCarousels
+                      title-dialog="Truck Order"
+                      :type-file-input="typeFileInput"
+                      file-name="Truck Order" 
+                      @updateFiles="handleFileUpdates"
+                    />
+                  </div>
                 </VCol>
               </VRow>
               
@@ -2262,90 +1937,19 @@ const viewAllData = () => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
+              style="min-width: 300px; font-size: 12px;"
             >
-              <VRow>
-                <VCol
-                  cols="9"
-                  class="px-2"
-                >
-                  <VFileInput
-                    v-model="product.deliveryNote"
-                    base-color="blue"
-                    color="blue"
-                    text-color="blue"
-                    hide-details
-                    placeholder="Upload your documents"
-                    density="compact"
-                    label="Attach File"
-                    prepend-icon=""
-                    prepend-icon-color="red"
-                    style="min-width: 150px;"
-                  >
-                    <template #prepend>
-                      <VIcon color="blue">
-                        ri-attachment-line
-                      </VIcon>
-                    </template>
-                    <template #selection="{ fileNames }">
-                      <template
-                        v-for="fileName in fileNames"
-                        :key="fileName"
-                      >
-                        <VChip
-                          label
-                          size="small"
-                          variant="outlined"
-                          color="blue"
-                          class="me-2"
-                        >
-                          {{ fileName }}
-                        </VChip>
-                      </template>
-                    </template>
-                  </VFileInput>
-                </VCol>
-                <VCol
-                  v-for="(itemCore, index) in product.deliveryNote"
-                  :key="index"
-                  cols="3"
-                  class="pa-2"
-                >
-                  <VCard
-                    v-if="itemCore.type === 'pdf' || itemCore.type === 'image'"
-                    class="pa-1"
-                    @click="showDialogPDF(itemCore.url, itemCore.type)"
-                  >
-                    <VCardText class="pa-1">
-                      <div
-                       
-                        style="display: inline-block; cursor: pointer;"
-                        class="d-flex justify-center"
-                      >
-                        <!-- Display PDF if available -->
-                        <iframe
-                          v-if="itemCore.type === 'pdf'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                        <!-- Display Image if available -->
-                        <VImg
-                          v-else-if="itemCore.type === 'image'"
-                          :src="itemCore.url"
-                          width="60px"
-                          height="30px"
-                          style="pointer-events: none;"
-                        />
-                      </div>
-                    </VCardText>
-                  </VCard>
-                </VCol>
-              </VRow>
+              <div>
+                <FileInputDialogCarousels
+                  title-dialog="Delivery Note"
+                  :type-file-input="typeFileInput"
+                  file-name="Delivery Note" 
+                  @updateFiles="handleFileUpdates"
+                />
+              </div>
             </td>
 
-            <!-- 👉 remarkWh -->
+            <!-- 👉 remarkSAL -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
@@ -2354,34 +1958,38 @@ const viewAllData = () => {
               <VBtn
                 style="min-width: 177px;"
                 variant="outlined"
+                :color="product.remarkSal ? 'primary' : 'grey'"
+                @click="textAreaDialogActive('RemarkSAL', product.remarkSal, index)"
               >
                 <span
-                  v-if="product.remarkWh"
-                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  v-if="product.remarkSal"
+                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
                 >{{ product.remarkSal }}</span>
                 <span v-else>remark(SAL)</span>
               </VBtn>
             </td>
 
-            <!-- 👉 remarkWh -->
+            <!-- 👉 remarkWH -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
               class="text-start px-1"
               style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
             >
               <VBtn
-                style="min-width: 177px;"
+                style="min-width: 177px; max-width: 177px;"
                 variant="outlined"
+                :color="product.remarkWh ? 'primary' : 'grey'"
+                @click="textAreaDialogActive('RemarkWH', product.remarkWh, index)"
               >
                 <span
                   v-if="product.remarkWh"
-                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
                 >{{ product.remarkWh }}</span>
                 <span v-else>remark(WH)</span>
               </VBtn>
             </td>
 
-            <!-- 👉 remarkWh -->
+            <!-- 👉 remarkLOG -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
@@ -2390,10 +1998,12 @@ const viewAllData = () => {
               <VBtn
                 style="min-width: 177px;"
                 variant="outlined"
+                :color="product.remarkLog ? 'primary' : 'grey'"
+                @click="textAreaDialogActive('RemarkLOG', product.remarkLog, index)"
               >
                 <span
-                  v-if="product.remarkWh"
-                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  v-if="product.remarkLog"
+                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
                 >{{ product.remarkLog }}</span>
                 <span v-else>remark(LOG)</span>
               </VBtn>
@@ -2454,14 +2064,14 @@ const viewAllData = () => {
           <tr>
             <td class="bg-green-lighten-5" />
             <td class="bg-green-lighten-5 px-1">
-              TOTAL
+              <span style="font-size: 12px;">TOTAL</span>
             </td>
             <td class="bg-green-lighten-5" />
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="bg-green-lighten-5 px-1"
             >
-              {{ mockData.length }} INVOICES
+              <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
             </td>
             <td
               v-if="accountAmin || accountViewerKK || accountAll"
@@ -2471,7 +2081,7 @@ const viewAllData = () => {
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="bg-green-lighten-5"
             >
-              {{ mockData.length }} INVOICES
+              <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
             </td>
           </tr>
         </tbody>
@@ -2533,17 +2143,6 @@ const viewAllData = () => {
   <!-- Dialog Text area -->
   <section>
     <div>
-      <h1>Parent View</h1>
-      <p><strong>Received Data:</strong> {{ dialogDataTextArea }}</p>
-
-      <VBtn
-        variant="outlined"
-        color="primary"
-        @click="dialogVisible = true"
-      >
-        Open Dialog view
-      </VBtn>
-
       <TextAreaDialog
         v-model="dialogVisible"
         :sap-in-value="sapInValueView"
