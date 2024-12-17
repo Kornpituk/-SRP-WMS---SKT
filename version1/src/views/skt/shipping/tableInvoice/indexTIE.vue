@@ -32,7 +32,7 @@ const serialProductCode = ref(null)
 /// ------------------------------ Import Component --------------------------------
 // --- Dialog Text Area --------------------------------
 
-import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue'
+import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue' //--------- import component
 
 const dialogDataTextArea = ref('')
 const dialogVisible = ref(false)
@@ -53,7 +53,7 @@ const titleDialogView = ref('')
 
 const indexDataDialogTextArea = ref('')
 
-//------ function for dialog text area -----
+//------ function for dialog text area ----------------------------------------------
 
 const textAreaDialogActive = (type, data, index) => {
   typeDialogTextArea.value = type
@@ -172,21 +172,6 @@ const formatDecimal = decimal => {
   }
 }
 
-/// ----------------------- check config Barcode / Tag ----------------
-const nameUser = localStorage.getItem('userCheck')
-
-const checkConfigUser = nameUser => {
-  if (nameUser == 'Chutimon') {
-    return false
-  } else if (nameUser == 'Tamma'){
-    return true
-  } else {
-    return true
-  }
-}
-
-checkConfigUser(nameUser)
-
 //------------------------ Dialog Image ----------------------------
 const isDialogImageVisible = ref(false)
 const urlImage = ref('')
@@ -205,11 +190,6 @@ watchEffect(() =>{
   }
 })
 
-const nameProductDialog = ref('')
-const qtyProductDialog = ref('')
-const unitProductDialog = ref('')
-const barcodeProductDialog = ref('')
-
 const codeProduct = ref('')
 const nameProduct = ref('')
 const imgProduct = ref('')
@@ -220,21 +200,6 @@ const groupSupProduct = ref('')
 const totalProduct = ref('')
 const unitNameProduct = ref('')
 const detailsProduct = ref('')
-
-const showDialogImage = (code, name, img, barcode, categories, group, groupSup, total, unitName, details) => {
-  codeProduct.value = code
-  nameProduct.value = name
-  imgProduct.value = img
-  barcodeProduct.value = barcode
-  categoriesProduct.value = categories
-  groupProduct.value = group
-  groupSupProduct.value = groupSup
-  totalProduct.value = total
-  unitNameProduct.value = unitName
-  detailsProduct.value = details
-  isDialogImageVisible.value = true
-  console.log('showImageFunction!!')
-}
 
 const showExpansionDialog = ref(false)
 
@@ -335,6 +300,7 @@ MADE IN THAILAND`, endUser: '', consignee: '', product: '',
   
 ])
 
+//------------------------ Set Permissions (Hiden and Show Column) ------------------------
 const accountAmin = ref (false)
 const accountViewerKK = ref (false)
 const accountINSP = ref (false)
@@ -418,7 +384,7 @@ const imgDialogPng = ref('')
 
 //--------------------------- File INput --------------------------------
 
-import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue'
+import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
 
 const viewAllData = () => {
   console.log(mockData.value)
