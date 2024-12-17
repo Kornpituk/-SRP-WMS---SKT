@@ -54,6 +54,7 @@ const submitDialog = () => {
         {{ titleDialog }}
       </VCardTitle>
       <DialogCloseBtn
+        v-if="false"
         variant="text"
         size="default"
         @click="closeDialog"

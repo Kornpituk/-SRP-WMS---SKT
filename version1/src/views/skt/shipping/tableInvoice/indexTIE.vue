@@ -405,7 +405,6 @@ const rules = [v => v.length <= 150 || 'Max 25 characters']
 
 //--------- new expention
 const panel = ref(['filter'])
-const files = ref([])
 
 ///---------------- Dialog 
 const isDialogVisiblePrintTruck = ref(false)
@@ -416,217 +415,6 @@ const isDialogPDFViewVisible = ref(false)
 
 const imgDialogPDF = ref('')
 const imgDialogPng = ref('')
-
-const showDialogPDF = (imageUrl, typeUrl) => {
-  console.log('Start PDF or Image!', typeUrl)
-
-  if (typeUrl === 'pdf') {
-    imgDialogPDF.value = imageUrl
-    imgDialogPng.value = ''
-    isDialogPDFViewVisible.value = true
-  } else if (typeUrl === 'image') {
-    imgDialogPng.value = imageUrl
-    isDialogPDFViewVisible.value = true
-    imgDialogPDF.value = ''
-  }
-  
-  isDialogPDFViewVisible.value = true
-}
-
-//------------------- Dialog Print Truck --------------------------------
-const exmpleShippingMark = ref('')
-const exmpleSaleOrder = ref('')
-const isDialogVisiblePrintShippingMark = ref(false)
-
-const showDialogPrintShippingMark = (saleOrder, shippingMark) => {
-  isDialogVisiblePrintShippingMark.value = true
-  exmpleShippingMark.value = shippingMark
-  exmpleSaleOrder.value = saleOrder
-}
-
-
-// Watch for changes in soAttachment for each product
-mockData.value.forEach(product => {
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  watch(() => product.soAttachment, newAttachment => {
-    // Clean up the old URL if exists
-    if (product.pdfPreview) {
-      URL.revokeObjectURL(product.pdfPreview)
-    }
-    if (product.imagePreview) {
-      URL.revokeObjectURL(product.imagePreview)
-    }
-
-    if (newAttachment && newAttachment.length > 0) {
-      const file = newAttachment[0] // Assuming single file upload
-      const fileType = file.type
-
-      if (fileType === 'application/pdf') {
-        const fileURL = URL.createObjectURL(file)
-
-        product.imagePreview = null // Clear image preview if any
-        product.soAttachment = product.soAttachment.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'pdf' } // Add type
-            : att,
-        )
-      } else if (fileType.startsWith('image/')) {
-        const fileURL = URL.createObjectURL(file)
-
-        product.pdfPreview = null // Clear PDF preview if any
-        product.soAttachment = product.soAttachment.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'image' } // Add type
-            : att,
-        )
-      } else {
-        product.pdfPreview = null
-        product.imagePreview = null
-      }
-
-      // Add URL and other file details
-      
-    } else {
-      product.pdfPreview = null
-      product.imagePreview = null
-    }
-  })
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  watch(() => product.coa, newCoa => {
-    // Clean up the old URL if exists
-    if (product.pdfPreview) {
-      URL.revokeObjectURL(product.pdfPreview)
-    }
-    if (product.imagePreview) {
-      URL.revokeObjectURL(product.imagePreview)
-    }
-
-    if (newCoa && newCoa.length > 0) {
-      const file = newCoa[0] // Assuming single file upload
-      const fileType = file.type
-
-      if (fileType === 'application/pdf') {
-        const fileURL = URL.createObjectURL(file)
-
-        product.imagePreview = null // Clear image preview if any
-        product.coa = product.coa.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'pdf' } // Add type
-            : att,
-        )
-      } else if (fileType.startsWith('image/')) {
-        const fileURL = URL.createObjectURL(file)
-
-        product.pdfPreview = null // Clear PDF preview if any
-        product.coa = product.coa.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'image' } // Add type
-            : att,
-        )
-      } else {
-        product.pdfPreview = null
-        product.imagePreview = null
-      }
-
-      // Add URL and other file details
-      
-    } else {
-      product.pdfPreview = null
-      product.imagePreview = null
-    }
-  })
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  watch(() => product.truckOrder, newTruckOrder => {
-    // Clean up the old URL if exists
-    if (product.pdfPreview) {
-      URL.revokeObjectURL(product.pdfPreview)
-    }
-    if (product.imagePreview) {
-      URL.revokeObjectURL(product.imagePreview)
-    }
-
-    if (newTruckOrder && newTruckOrder.length > 0) {
-      const file = newTruckOrder[0] // Assuming single file upload
-      const fileType = file.type
-
-      if (fileType === 'application/pdf') {
-        const fileURL = URL.createObjectURL(file)
-
-        product.imagePreview = null // Clear image preview if any
-        product.truckOrder = product.truckOrder.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'pdf' } // Add type
-            : att,
-        )
-      } else if (fileType.startsWith('image/')) {
-        const fileURL = URL.createObjectURL(file)
-
-        product.pdfPreview = null // Clear PDF preview if any
-        product.truckOrder = product.truckOrder.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'image' } // Add type
-            : att,
-        )
-      } else {
-        product.pdfPreview = null
-        product.imagePreview = null
-      }
-
-      // Add URL and other file details
-      
-    } else {
-      product.pdfPreview = null
-      product.imagePreview = null
-    }
-  })
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  watch(() => product.deliveryNote, newDeliveryNote => {
-    // Clean up the old URL if exists
-    if (product.pdfPreview) {
-      URL.revokeObjectURL(product.pdfPreview)
-    }
-    if (product.imagePreview) {
-      URL.revokeObjectURL(product.imagePreview)
-    }
-
-    if (newDeliveryNote && newDeliveryNote.length > 0) {
-      const file = newDeliveryNote[0] // Assuming single file upload
-      const fileType = file.type
-
-      if (fileType === 'application/pdf') {
-        const fileURL = URL.createObjectURL(file)
-
-        product.imagePreview = null // Clear image preview if any
-        product.deliveryNote = product.deliveryNote.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'pdf' } // Add type
-            : att,
-        )
-      } else if (fileType.startsWith('image/')) {
-        const fileURL = URL.createObjectURL(file)
-
-        product.pdfPreview = null // Clear PDF preview if any
-        product.deliveryNote = product.deliveryNote.map(att =>
-          att === file
-            ? { ...file, url: fileURL, name: file.name, size: (file.size / 1024).toFixed(2), type: 'image' } // Add type
-            : att,
-        )
-      } else {
-        product.pdfPreview = null
-        product.imagePreview = null
-      }
-
-      // Add URL and other file details
-      
-    } else {
-      product.pdfPreview = null
-      product.imagePreview = null
-    }
-  })
-})
 
 //--------------------------- File INput --------------------------------
 
@@ -1826,7 +1614,8 @@ const handleFileUpdates = updatedFiles => {
                 </VBtn>
                 <VBtn
                   class="mx-2"
-                  color="warning"
+                  :color="product.shippingCondition ? 'warning' : 'grey'"
+                  :disabled="!product.shippingCondition"
                   @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
                 >
                   <VIcon
@@ -1859,7 +1648,8 @@ const handleFileUpdates = updatedFiles => {
                 </VBtn>
                 <VBtn
                   class="mx-2"
-                  color="warning"
+                  :color="product.shippingMark ? 'warning' : 'grey'"
+                  :disabled="!product.shippingMark"
                   @click="textAreaDialogActive('ShipMarkPrint', product.shippingMark, index)"
                 >
                   <VIcon
@@ -2308,14 +2098,14 @@ const handleFileUpdates = updatedFiles => {
           <tr>
             <td class="bg-green-lighten-5" />
             <td class="bg-green-lighten-5 px-1">
-              TOTAL
+              <span style="font-size: 12px;">TOTAL</span>
             </td>
             <td class="bg-green-lighten-5" />
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
               class="bg-green-lighten-5 px-1"
             >
-              {{ mockData.length }} INVOICES
+              <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
             </td>
             <td
               v-if="accountAmin || accountViewerKK || accountAll"
@@ -2325,7 +2115,7 @@ const handleFileUpdates = updatedFiles => {
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
               class="bg-green-lighten-5"
             >
-              {{ mockData.length }} INVOICES
+              <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
             </td>
           </tr>
         </tbody>
