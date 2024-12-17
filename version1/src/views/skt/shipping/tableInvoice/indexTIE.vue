@@ -1963,7 +1963,7 @@ const handleFileUpdates = updatedFiles => {
                 eager
               >
                 <template #label>
-                  <span>
+                  <span style="font-size: 12px;">
                     Freight Forwarder
                   </span>
                 </template>
@@ -1979,11 +1979,15 @@ const handleFileUpdates = updatedFiles => {
               <VSelect
                 v-model="product.carrier"
                 :items="items"
-                label="Carrier"
-                placeholder="Select Carrier"
                 density="compact"
                 eager
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Carrier
+                  </span>
+                </template>
+              </VSelect>
             </td>
 
             <!-- 👉 vesselName -->
@@ -1995,11 +1999,15 @@ const handleFileUpdates = updatedFiles => {
               <VSelect
                 v-model="product.vesselName"
                 :items="items"
-                label="Vessel Name"
-                placeholder="Select Vessel"
                 density="compact"
                 eager
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Vessel Name
+                  </span>
+                </template>
+              </VSelect>
             </td>
 
             <!-- 👉 voy -->
@@ -2010,9 +2018,14 @@ const handleFileUpdates = updatedFiles => {
               <VTextField
                 v-model="product.voy"
                 density="compact"
-                label="Voy"
                 style=" min-width: 150px;"
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Voy
+                  </span>
+                </template>
+              </VTextField>
             </td>
 
 
@@ -2035,9 +2048,14 @@ const handleFileUpdates = updatedFiles => {
               <VTextField
                 v-model="product.truckReserving"
                 density="compact"
-                label="Truck Reserving Number"
                 style=" min-width: 150px;"
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Truck Reserving Number
+                  </span>
+                </template>
+              </VTextField>
             </td>
 
             <!-- 👉 truckFee -->
@@ -2049,9 +2067,14 @@ const handleFileUpdates = updatedFiles => {
               <VTextField
                 v-model="product.truckFee"
                 density="compact"
-                label="Truck Fee"
                 style=" min-width: 150px;"
-              />
+              >
+                <template #label>
+                  <span style="font-size: 12px;">
+                    Truck Fee
+                  </span>
+                </template>
+              </VTextField>
             </td>
 
             <!-- 👉 truckOrder -->
