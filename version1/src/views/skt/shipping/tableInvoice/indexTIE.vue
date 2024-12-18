@@ -71,7 +71,13 @@ const textAreaDialogActive = (type, data, index) => {
     sapInValueView.value = 'TIX2406001'
     typeBtnView.value = 'nonPrint'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
-  }else if (typeDialogTextArea.value === 'Lot') {
+  } else if (typeDialogTextArea.value === 'ShipMC') {
+    titleDialogView.value = 'Shipping Mark Con'
+    typeDialogView.value = 'ShipMC'
+    sapInValueView.value = 'TIX2406001'
+    typeBtnView.value = 'twinPrint'
+    dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  } else if (typeDialogTextArea.value === 'Lot') {
     titleDialogView.value = 'Lot'
     typeDialogView.value = 'Lot'
     sapInValueView.value = 'TIX2406001'
@@ -305,7 +311,10 @@ const accountAmin = ref (false)
 const accountViewerKK = ref (false)
 const accountINSP = ref (false)
 const accountSALLOG = ref (false)
+const accountSAL = ref (false)
+const accountLOG = ref (false)
 const accountWH = ref (false)
+const accountWHSub = ref (false)
 const accountAll = ref (true)
 
 const setAccount = role => {
@@ -313,8 +322,14 @@ const setAccount = role => {
   accountViewerKK.value = false
   accountINSP.value = false
   accountSALLOG.value = false
+
+  accountSAL.value = false
+  accountLOG.value = false
+
   accountWH.value = false
   accountAll.value = false
+
+  accountWHSub.value = false
 
   if (role === 'Amin') {
     accountAmin.value = true
@@ -322,6 +337,7 @@ const setAccount = role => {
     accountINSP.value = false
     accountSALLOG.value = false
     accountWH.value = false
+    accountWHSub.value = false
     accountAll.value = false
   } else if (role === 'ViewerKK') {
     accountAmin.value = false
@@ -329,6 +345,7 @@ const setAccount = role => {
     accountINSP.value = false
     accountSALLOG.value = false
     accountWH.value = false
+    accountWHSub.value = false
     accountAll.value = false
   } else if (role === 'INSP') {
     accountAmin.value = false
@@ -336,6 +353,7 @@ const setAccount = role => {
     accountINSP.value = true
     accountSALLOG.value = false
     accountWH.value = false
+    accountWHSub.value = false
     accountAll.value = false
   } else if (role === 'SALLOG') {
     accountAmin.value = false
@@ -343,20 +361,58 @@ const setAccount = role => {
     accountINSP.value = false
     accountSALLOG.value = true
     accountWH.value = false
+    accountWHSub.value = false
     accountAll.value = false
-  } else if (role === 'WH') {
+  } 
+
+  else if (role === 'SAL') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSAL.value = true
+    accountLOG.value = false
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = false
+  } 
+
+  else if (role === 'LOG') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSAL.value = false
+    accountLOG.value = true
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = false
+  } 
+  
+  else if (role === 'WH') {
     accountAmin.value = false
     accountViewerKK.value = false
     accountINSP.value = false
     accountSALLOG.value = false
     accountWH.value = true
+    accountWHSub.value = false
     accountAll.value = false
-  } else if (role === 'All') {
+    
+  } else if (role === 'WHSub') {
     accountAmin.value = false
     accountViewerKK.value = false
     accountINSP.value = false
     accountSALLOG.value = false
     accountWH.value = false
+    accountWHSub.value = true
+    accountAll.value = false
+    
+  }  
+  else if (role === 'All') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSALLOG.value = false
+    accountWH.value = false
+    accountWHSub.value = false
     accountAll.value = true
   }
 
@@ -816,6 +872,18 @@ const handleFileUpdates = updatedFiles => {
             </VBtn>
             <VBtn
               color="light-blue"
+              @click="setAccount('SAL')"
+            >
+              SAL
+            </VBtn>
+            <VBtn
+              color="light-blue"
+              @click="setAccount('LOG')"
+            >
+              LOG
+            </VBtn>
+            <VBtn
+              color="light-blue"
               @click="setAccount('SALLOG')"
             >
               SAL/LOG
@@ -825,6 +893,12 @@ const handleFileUpdates = updatedFiles => {
               @click="setAccount('WH')"
             >
               WH
+            </VBtn>
+            <VBtn
+              color="deep-purple"
+              @click="setAccount('WHSub')"
+            >
+              WH Sub
             </VBtn>
             <VBtn @click="setAccount('All')">
               All
@@ -1211,49 +1285,59 @@ const handleFileUpdates = updatedFiles => {
               <span style="font-weight: bold;">{{ $t('Status') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Sale Order No.') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="text-center"
             >
               <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Payer Name') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountINSP || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountINSP || accountAll"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('User') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Shipper') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Shipper location') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              class="text-center"
+            >
+              <div>
+                <span style="padding-right: 60px; font-weight: bold;">
+                  {{ $t('Shipping Mark/Cound.') }}
+                </span>
+              </div>
+            </th>
+            <th
+              v-if="false"
               class="text-center"
             >
               <div>
@@ -1263,7 +1347,7 @@ const handleFileUpdates = updatedFiles => {
               </div>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="false"
               class="text-center"
             >
               <div>
@@ -1272,38 +1356,38 @@ const handleFileUpdates = updatedFiles => {
                 </span>
               </div>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountINSP || accountAll">
+            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll">
               <span style="font-weight: bold;">{{ $t('End User') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Consignee') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="px-2"
             >
-              <span style="font-weight: bold;">{{ $t('Item') }}</span>
+              <span style="font-weight: bold;">{{ $t('Item Name') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll">
+            <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll">
               <span style="font-weight: bold;">{{ $t('Lot') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-end px-2"
             >
               <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-center"
             >
               <span style="font-weight: bold;">{{ $t('COA') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="bg-green-lighten-3"
             >
               <span
@@ -1312,7 +1396,7 @@ const handleFileUpdates = updatedFiles => {
               >{{ $t('Freight forwarder') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="bg-green-lighten-3 text-center"
               style="min-width: 150px;"
             >
@@ -1322,7 +1406,7 @@ const handleFileUpdates = updatedFiles => {
               >{{ $t('Carrier') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="bg-green-lighten-3"
             >
               <span
@@ -1330,29 +1414,32 @@ const handleFileUpdates = updatedFiles => {
                 class="text-black"
               >{{ $t('Vessel name') }}</span>
             </th>
-            <th class="bg-yellow-lighten-3">
+            <th
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
+              class="bg-yellow-lighten-3"
+            >
               <span
                 style="font-weight: bold;"
                 class="text-black"
               >{{ $t('Voy') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="bg-green-lighten-3"
             >
               <span style="font-weight: bold;">{{ $t('Truck') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="bg-yellow-lighten-3 texct-end"
             >
               <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountWH || accountAll">
+            <th v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll">
               <span style="font-weight: bold;">{{ $t('Truck fee') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
               class="text-center"
               style="min-width: 300px;"
             >
@@ -1373,24 +1460,24 @@ const handleFileUpdates = updatedFiles => {
               </VRow>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountLOG || accountWH || accountWHSub || accountAll"
               class="px-4"
             >
               <span style="font-weight: bold;">{{ $t('DO/EX') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Country') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-center"
             >
               <span style="font-weight: bold;">{{ $t('Loading date') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll">
+            <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll">
               <VRow>
                 <VCol cols="6">
                   <span style="font-weight: bold;">{{ $t('ETD') }}</span>
@@ -1406,7 +1493,7 @@ const handleFileUpdates = updatedFiles => {
                 </VCol>
               </VRow>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll">
+            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll">
               <VRow>
                 <VCol cols="6">
                   <span style="font-weight: bold;">{{ $t('ETA') }}</span>
@@ -1423,31 +1510,25 @@ const handleFileUpdates = updatedFiles => {
               </VRow>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-center"
             >
               <span style="font-weight: bold;">{{ $t('Delivery note') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll">
+            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountAll">
               <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll">
+            <th v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll">
               <span style="font-weight: bold;">{{ $t('Remark (WH)') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountWH || accountAll">
+            <th v-if="accountAmin || accountViewerKK || accountAll || accountLOG">
               <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}</span>
             </th>
-            <th
-              v-if="accountAmin || accountViewerKK || accountWH || accountAll"
-              class="px-1"
-            >
-              <span style="font-weight: bold;">{{ $t('Update By') }}</span>
+            <th class="px-1">
+              <span style="font-weight: bold;">{{ $t('Updated By') }}</span>
             </th>
-            <th
-              v-if="accountAmin || accountViewerKK || accountWH || accountAll"
-              class="px-1"
-            >
-              <span style="font-weight: bold;">{{ $t('Update On') }}</span>
+            <th class="px-1">
+              <span style="font-weight: bold;">{{ $t('Updated Date') }}</span>
             </th>
             <th class="text-center">
               <span style="font-weight: bold;" />
@@ -1488,7 +1569,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 saleOrderNo -->
             <td
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1497,7 +1578,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 soAttachment -->
             <td
-              v-if="accountAmin || accountViewerKK || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="text-start px-1"
               style="min-width: 300px; font-size: 12px;"
             >
@@ -1513,7 +1594,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 sapInvoiceNo -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-2"
               style="font-size: 12px;"
             >
@@ -1522,7 +1603,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 payerName -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1531,7 +1612,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 user -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountINSP || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountINSP || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1541,7 +1622,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 shipper -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1551,7 +1632,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 shipperLocation -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1561,7 +1642,41 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 Shipping Condition -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              class="text-start px-2"
+              style="min-width: 300px; font-size: 12px;"
+            >
+              <div class="d-flex justify-space-between">
+                <VBtn
+                  style="min-width: 196px;"
+                  variant="outlined"
+                  :color="product.shippingCondition ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('ShipMC', product.shippingCondition, index)"
+                >
+                  <span
+                    v-if="product.shippingCondition"
+                    style="overflow: hidden;min-width: 180px; max-width: 180px; text-overflow: ellipsis;"
+                  >{{ product.shippingCondition }}</span>
+                  <span v-else>Shipping Mark/Cound.</span>
+                </VBtn>
+                <VBtn
+                  class="mx-2"
+                  :color="product.shippingCondition ? 'warning' : 'grey'"
+                  :disabled="!product.shippingCondition"
+                  @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
+                >
+                  <VIcon
+                    size="30"
+                    icon="ri-printer-fill"
+                    @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
+                  />
+                </VBtn>
+              </div>
+            </td>
+
+            <!-- 👉 Shipping Condition -->
+            <td
+              v-if="false"
               class="text-start px-2"
               style="min-width: 300px; font-size: 12px;"
             >
@@ -1595,7 +1710,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 Shipping Mark -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="false"
               class="text-start px-1"
               style="min-width: 300px; font-size: 12px;"
             >
@@ -1627,6 +1742,7 @@ const handleFileUpdates = updatedFiles => {
             </td>
             <!-- 👉 endUser -->
             <td
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1643,7 +1759,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 consignee -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1653,7 +1769,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 product -->
             <td
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1663,7 +1779,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 Lot Number -->
             <td
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1684,7 +1800,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 qty -->
             <td
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-end px-1"
               style="font-size: 12px;"
             >
@@ -1693,7 +1809,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 coa -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="min-width: 300px; font-size: 12px;"
             >
@@ -1709,7 +1825,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 Freight Forwarder -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1728,7 +1844,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 carrier -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1748,7 +1864,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 vesselName -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1768,6 +1884,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 voy -->
             <td
+              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               style="font-size: 12px;"
               class="text-start px-1"
             >
@@ -1787,7 +1904,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 freightForwarder -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               :class="checkBgTruck(product.freightForwarder)"
               style="font-size: 12px;"
@@ -1797,7 +1914,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 truckReserving -->
             <td
-              v-if="accountAmin || accountViewerKK || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
               class="text-center px-1"
               style="font-size: 12px;"
             >
@@ -1816,7 +1933,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 truckFee -->
             <td
-              v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountLOG || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1835,7 +1952,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 truckOrder -->
             <td
-              v-if="accountAmin || accountViewerKK || accountWH || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="min-width: 450px; font-size: 12px;"
             >
@@ -1875,7 +1992,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 doEx -->
             <td
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-4"
               style="font-size: 12px;"
             >
@@ -1885,7 +2002,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 country -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1894,7 +2011,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 loadingDate -->
             <td
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="min-width: 150px; font-size: 12px;"
             >
@@ -1903,7 +2020,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 etd -->
             <td
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="min-width: 150px; font-size: 12px;"
             >
@@ -1919,7 +2036,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 eta -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="min-width: 150px; font-size: 12px;"
             >
@@ -1935,7 +2052,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 deliveryNote -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style="min-width: 300px; font-size: 12px;"
             >
@@ -1951,7 +2068,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 remarkSAL -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -1971,7 +2088,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 remarkWH -->
             <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountAll"
+              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
               style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
             >
@@ -1991,7 +2108,7 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 remarkLOG -->
             <td
-              v-if="accountAmin || accountViewerKK || accountWH || accountAll"
+              v-if="accountAmin || accountViewerKK || accountAll || accountLOG"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -2011,7 +2128,6 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 byWhow -->
             <td
-              v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -2020,7 +2136,6 @@ const handleFileUpdates = updatedFiles => {
 
             <!-- 👉 Update now -->
             <td
-              v-if="accountAmin || accountViewerKK || accountWH || accountAll"
               class="text-start px-1"
               style="font-size: 12px;"
             >
@@ -2029,19 +2144,40 @@ const handleFileUpdates = updatedFiles => {
             
             <!-- 👉 Actions -->
             <td
+              v-if="!accountWHSub"
               style="width: 8rem; font-size: 12px;"
               class="text-center px-1"
             >
-              <VBtn color="warning">
+              <VBtn
+                :disabled="accountINSP"
+                :color="accountINSP ? 'grey' : 'warning'"
+              >
                 <span style="font-size: 12px;">Save Draft</span>
               </VBtn>
             </td>
             <td
+              v-if="!accountWHSub"
               style="width: 8rem; font-size: 12px;"
               class="text-center px-1"
             >
-              <VBtn class="mx-2">
+              <VBtn
+                :disabled="accountINSP"
+                class="mx-2"
+                :color="accountINSP ? 'grey' : 'primary'"
+              >
                 <span style="font-size: 12px;">Submit</span>
+              </VBtn>
+            </td>
+            <td
+              v-if="accountWHSub"
+              style="width: 8rem; font-size: 12px;"
+              class="text-center px-1"
+            >
+              <VBtn
+                class="mx-2"
+                :color="accountINSP ? 'grey' : 'primary'"
+              >
+                <span style="font-size: 12px;">Approve</span>
               </VBtn>
             </td>
             <td
@@ -2049,10 +2185,11 @@ const handleFileUpdates = updatedFiles => {
               class="text-center px-1"
             >
               <VBtn
+                :disabled="accountINSP"
                 :to="{ 
                   name: 'skt-shipping-resale',  
                 }"
-                color="pink-lighten-2"
+                :color="accountINSP ? 'grey' : 'pink-lighten-2'"
               >
                 <span style="font-size: 12px;">Check Sheet</span>
               </VBtn>
@@ -2060,7 +2197,7 @@ const handleFileUpdates = updatedFiles => {
           </tr>
         </tbody>
         <!-- Total -->
-        <tbody>
+        <tbody v-if="false">
           <tr>
             <td class="bg-green-lighten-5" />
             <td class="bg-green-lighten-5 px-1">

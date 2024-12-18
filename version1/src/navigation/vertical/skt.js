@@ -251,7 +251,7 @@ export default [
     to: 'skt-printLabel',
     children: [
       { title: 'Sticker Label', to: 'skt-printLabel-sticker' },
-      { title: 'Product Label', to: null },
+      { title: 'Product Label', to: 'skt-printLabel-productionLabel' },
     ],
   },
 ]

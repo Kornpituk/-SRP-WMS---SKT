@@ -6,6 +6,7 @@ const props = defineProps({
   sapInValue: { type: String, default: '' },
   lotValue: { type: Array, default: () => [] },
   textAreaValue: { type: String, default: '' },
+  textArea2Value: { type: String, default: '' },
   typeDialog: { type: String, default: '' },
   typeBtn: { type: String, default: '' },
   titleDialog: { type: String, default: 'Dialog Title' },
@@ -47,19 +48,38 @@ const submitDialog = () => {
   <VDialog
     v-model="localDialog"
     persistent
-    max-width="600px"
+    max-width="900px"
   >
     <VCard class="d-flex justify-center">
-      <VCardTitle class="text-center">
+      <VRow
+        v-if="props.typeDialog === 'ShipMC'"
+        class="mt-5"
+      >
+        <VCol cols="6">
+          <VCardTitle class="text-center">
+            Shipping Mark
+          </VCardTitle>
+        </VCol>
+        <VCol cols="6">
+          <VCardTitle class="text-center">
+            Shipping Condition
+          </VCardTitle>
+        </VCol>
+      </VRow>
+      <VCardTitle
+        v-else
+        class="text-center"
+      >
         {{ titleDialog }}
       </VCardTitle>
+
       <DialogCloseBtn
         v-if="false"
         variant="text"
         size="default"
         @click="closeDialog"
       />
-      <VCardText v-if="props.typeDialog !== 'Lot'">
+      <VCardText v-if="props.typeDialog !== 'Lot' && props.typeDialog !== 'ShipMC'">
         <div v-if="props.typeDialog === 'ShipMark'">
           SAP Invoice No.: {{ props.sapInValue }}
         </div>
@@ -72,14 +92,52 @@ const submitDialog = () => {
           outlined
         />
       </VCardText>
+      <VCardText v-else-if="props.typeDialog === 'ShipMC'">
+        <div v-if="props.typeDialog === 'ShipMark'">
+          SAP Invoice No.: {{ props.sapInValue }}
+        </div>
+        <VRow>
+          <VCol cols="6">
+            <div v-if="props.typeDialog === 'ShipMark'">
+              SAP Invoice No.: {{ props.sapInValue }}
+            </div>
+            <VTextarea
+              v-model="localText"
+              auto-grow
+              rows="7"
+              counter
+              :readonly="props.typeBtn === 'print'"
+              class="text-center"
+              outlined
+            />
+          </VCol>
+          <VCol cols="6">
+            <div v-if="props.typeDialog === 'ShipMark'">
+              SAP Invoice No.: {{ props.sapInValue }}
+            </div>
+            <VTextarea
+              v-model="localText"
+              counter
+              :readonly="props.typeBtn === 'print'"
+              class="text-center"
+              rows="15"
+              outlined
+            />
+          </VCol>
+        </VRow>
+      </VCardText>
       <VCardText v-else>
-        <VCard>
+        <VCard class="d-flex justify-center text-center">
           <VCardText>
             <VTable>
-              <thead class="bg-grey-lighten-3">
+              <thead class="bg-grey-lighten-3 ">
                 <tr>
-                  <th>No.</th>
-                  <th>Name</th>
+                  <th class="text-center">
+                    No.
+                  </th>
+                  <th class="text-center">
+                    Name
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -104,6 +162,33 @@ const submitDialog = () => {
         >
           <VIcon icon="ri-printer-fill" />Print
         </VBtn>
+        <VRow v-if="props.typeBtn === 'twinPrint'">
+          <VCol
+            cols="6"
+            class="d-flex justify-center"
+          >
+            <VBtn
+              variant="flat"
+              color="warning"
+              @click="submitDialog"
+            >
+              <VIcon icon="ri-printer-fill" />Print
+            </VBtn>
+          </VCol>
+          <VCol
+            cols="6"
+            class="d-flex justify-center"
+          >
+            <VBtn
+              
+              variant="flat"
+              color="warning"
+              @click="submitDialog"
+            >
+              <VIcon icon="ri-printer-fill" />Print
+            </VBtn>
+          </VCol>
+        </VRow>
         <VBtn
           v-else
           variant="flat"
