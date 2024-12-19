@@ -1374,14 +1374,14 @@ const headersDataTableNew = [
     key: 'remark',
   },
   {
-    title: 'Update Date',
-    sortable: false,
-    key: 'updateDate',
-  },
-  {
     title: 'Update By',
     sortable: false,
     key: 'updatedBy',
+  },
+  {
+    title: 'Update Date',
+    sortable: false,
+    key: 'updateDate',
   },
 
   // {
@@ -2611,7 +2611,8 @@ const print = () => {
               </th>
             </tr>
           </template>
-          <template #column.updatedDate="{ column }">
+          
+          <template #column.updatedBy="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -2622,7 +2623,8 @@ const print = () => {
               </th>
             </tr>
           </template>
-          <template #column.updatedBy="{ column }">
+
+          <template #column.updatedDate="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -3285,7 +3287,7 @@ const print = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                {{ formatDateUpdate(item.raw.updatedDate) }}
+                {{ item.raw.updatedBy }}
               </td>
               <td
                 class="cursor-pointer"
@@ -3302,7 +3304,7 @@ const print = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                {{ item.raw.updatedBy }}
+                {{ formatDateUpdate(item.raw.updatedDate) }}
               </td>
             </tr>
           </template>

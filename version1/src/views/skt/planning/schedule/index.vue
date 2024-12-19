@@ -627,15 +627,16 @@ const headersDataTableNew = [
     sortable: false,
   },
   {
-    title: 'Update Date',
-    key: 'updatedDate',
-    sortable: false,
-  },
-  {
     title: 'Update By',
     key: 'updatedBy',
     sortable: false,
   },
+  {
+    title: 'Update Date',
+    key: 'updatedDate',
+    sortable: false,
+  },
+  
   {
     title: 'Action',
     key: 'action',
@@ -1688,17 +1689,6 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
-          <template #column.updatedDate="{ column }">
-            <tr class="d-flex justify-center">
-              <th>
-                <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection(column.key)"
-                /></span>
-              </th>
-            </tr>
-          </template>
           <template #column.updatedBy="{ column }">
             <tr class="d-flex justify-center">
               <th>
@@ -1710,6 +1700,18 @@ const newBatch = async batchID => {
               </th>
             </tr>
           </template>
+          <template #column.updatedDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          
 
           <template #column.action="{ column }">
             <tr class="d-flex justify-center">
@@ -2170,7 +2172,7 @@ const newBatch = async batchID => {
               >
                 {{ item.raw.remark }}
               </td>
-              
+
               <td
                 class="cursor-pointer"
                 :style="{ 
@@ -2188,6 +2190,7 @@ const newBatch = async batchID => {
               >
                 {{ item.raw.updatedBy }}
               </td>
+
               <td
                 class="cursor-pointer"
                 :style="{ 
@@ -2205,6 +2208,9 @@ const newBatch = async batchID => {
               >
                 {{ useFormatDateUtilities(item.raw.updatedDate) }}
               </td>
+              
+              
+              
               <td
                 :style="{ 
                   backgroundColor: 

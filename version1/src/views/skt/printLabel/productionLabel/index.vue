@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watch, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -135,18 +135,10 @@ import { useFetchPrintLabelData, usePrintLabelBarcodeFormService, useSavePrintBa
 const { printLabelFormViewResult, errorMessagePrintLabelView, printLabelFormViewService } = useFetchPrintLabelData()
 
 const dataPrintLabel = ref([])
-const selectedDataTables = ref([])
+const selectedDataTables = ref(['Product Label'])
 const isDialogPrintLabelVisible = ref(false)
 
 const itemsTypeLabel = ref([
-  {
-    title: 'Raw Material Label',
-    value: 'Raw Mat Label',
-  },
-  {
-    title: 'Semi Label',
-    value: 'Semi Label',
-  },
   {
     title: 'Product Label',
     value: 'Product Label',
@@ -176,6 +168,7 @@ const paramsFetchDataPrintLabel = ref({
   purchaseOrderNo: '',
   receivedDate: '',
   category: '',
+  plant: '',
 })
 
 const clearModel = () => {
@@ -185,6 +178,7 @@ const clearModel = () => {
   paramsFetchDataPrintLabel.value.purchaseOrderNo = ''
   paramsFetchDataPrintLabel.value.receivedDate = ''
   paramsFetchDataPrintLabel.value.category = ''
+  paramsFetchDataPrintLabel.value.plant = ''
 }
 
 const fetchData = async () => {
@@ -210,9 +204,10 @@ const fetchData = async () => {
   }
 }
 
-watchEffect(() => {
+onMounted(() => {
   fetchData()
 })
+
 
 const groupDataByLot = data => {
   let previousLot = null
@@ -599,7 +594,7 @@ const dataTableColor = ref('#E0F7FA')
               >
                 <VSelect
                   v-if="false"
-                  v-model="paramsFetchDataPrintLabel.category"
+                  v-model="paramsFetchDataPrintLabel.plant"
                   :items="itemsCategories"
                   density="compact"
                   item-title="name"
@@ -1007,37 +1002,6 @@ const dataTableColor = ref('#E0F7FA')
                 <VListItemTitle>Korea</VListItemTitle>
               </VListItem>
             </VList>
-          </div>
-          <div
-            v-if="false"
-            class="d-flex justify-spance-between align-center"
-          >
-            <VRow>
-              <VCol
-                cols="6"
-
-                class="d-flex justify-end align-center"
-              >
-                <span>Print Coppy:</span>
-              </VCol>
-              <VCol
-                cols="6"
-                class="d-flex justify-start"
-              >
-                <VTextField
-                  density="compact"
-                  
-                  type="number"
-                  min="0"
-                >
-                  <template #append-inner>
-                    <span>
-                      Copy
-                    </span>
-                  </template>
-                </VTextField>
-              </VCol>
-            </VRow>
           </div>
         </VCardText>
 
