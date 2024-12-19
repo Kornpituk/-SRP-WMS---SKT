@@ -179,11 +179,13 @@ const clearModel = () => {
   paramsFetchDataPrintLabel.value.receivedDate = ''
   paramsFetchDataPrintLabel.value.category = ''
   paramsFetchDataPrintLabel.value.plant = ''
+
+  fetchData()
 }
 
 const fetchData = async () => {
 
-  const result = await printLabelFormViewService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
+  const result = await printLabelFormViewService('GetProductLabels', urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
 
   progressLinearNoData.value = true
   if (result) {
@@ -207,6 +209,10 @@ const fetchData = async () => {
 onMounted(() => {
   fetchData()
 })
+
+const searchFilter = () => {
+  fetchData()
+}
 
 
 const groupDataByLot = data => {
@@ -283,8 +289,6 @@ const printLabel = async () => {
       successPrintLabel.value = false
       throw 'Could not save to print label form'
     }
-
-    // await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
   }
   if(typePrintLabel.value === 'Semi Label'){
     console.log('Semi Label print start .....')
@@ -389,7 +393,6 @@ const eXprtreeNode = () => {
 }
 
 const headersNewEx = [
-  { title: '', key: 'data-table-expand' },
   {
     title: 'No.',
     key: 'no',
@@ -1082,98 +1085,14 @@ const dataTableColor = ref('#E0F7FA')
         </VProgressLinear>
         <VDataTable
           v-if="dataPrintLabel && progressLinearNoData === true"
-          v-model:expanded="expanded"
           v-model="selectedDataTables"
           :headers="headersNewEx"
           :items="dataPrintLabel"
           :items-per-page="10"
           class="text-no-wrap"
           expand-on-click
-          show-expand
           show-select
         >
-          <!-- Expanded Row Data -->
-          <!-- Expanded Row Data -->
-          <template #expanded-row="{ item }">
-            <tr>
-              <th
-                v-for="(headerSub, index) in headerSubtitle"
-                :key="index"
-                class="px-2"
-              >
-                {{ headerSub.title }}
-              </th>
-            </tr>
-            <tr>
-              <td />
-              <td />
-              <td />
-              <td />
-              <td class="px-2">
-                <div
-                  v-for="(sub, index) in item.raw.barcodes"
-                  :key="sub.name + '-checkbox-' + index"
-                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
-                >
-                  <VCheckbox
-                    v-model="sub.selected" 
-                    @change="updateSelectedData(sub)" 
-                  />
-                </div>
-              </td>
-              <td class="px-2">
-                <div
-                  v-for="(sub, index) in item.raw.barcodes"
-                  :key="sub.productId +index"
-                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
-                  class="d-flex align-center"
-                >
-                  {{ sub.productId }}
-                </div>
-              </td>
-              <td class="px-2">
-                <div
-                  v-for="(sub, index) in item.raw.barcodes"
-                  :key="sub.productName + index"
-                  class="d-flex align-center"
-                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
-                >
-                  {{ sub.productName }}
-                </div>
-              </td>
-              <td class="px-2">
-                <div
-                  v-for="(sub, index) in item.raw.barcodes"
-                  :key="sub.lotId + index"
-                  class="d-flex align-center"
-                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
-                >
-                  {{ sub.lotId }}
-                </div>
-              </td>
-              <td class="px-2">
-                <div
-                  v-for="(sub, index) in item.raw.barcodes"
-                  :key="sub.barcode + index"
-                  class="d-flex align-center"
-                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
-                >
-                  {{ sub.barcode }}
-                </div>
-              </td>
-              <td class="px-2">
-                <div
-                  v-for="(sub, index) in item.raw.barcodes"
-                  :key="sub.lotDescription + index"
-                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
-                  class="d-flex align-center"
-                >
-                  {{ sub.lotDescription }}
-                </div>
-              </td>
-            </tr>
-          </template>
-
           <template #item.no="{item}">
             <tr>
               <td>
@@ -1185,7 +1104,7 @@ const dataTableColor = ref('#E0F7FA')
           <template #item.lotQty="{ item}">
             <tr>
               <td>
-                <span class="text-capitalize">{{ item.raw.barcodes.length }}</span>
+                <span class="text-capitalize">{{ item.raw.barcodes }}</span>
               </td>
             </tr>
           </template>
@@ -1225,7 +1144,14 @@ const dataTableColor = ref('#E0F7FA')
           <template #item.updatedDate="{ item}">
             <tr>
               <td>
-                <span class="text-capitalize">{{ convertDate(item.raw.updatedDate) }}</span>
+                <span
+                  v-if="item.raw.updatedDate"
+                  class="text-capitalize"
+                >{{ convertDate(item.raw.updatedDate) }}</span>
+                <span
+                  v-else
+                  class="text-capitalize"
+                />
               </td>
             </tr>
           </template>

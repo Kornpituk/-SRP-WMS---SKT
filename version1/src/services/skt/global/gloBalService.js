@@ -199,12 +199,12 @@ export const useFetchPrintLabelData = () => {
   const printLabelFormViewResult = ref(null)
   const errorMessagePrintLabelView = ref(null)
 
-  const printLabelFormViewService = async (urlApi, whereHouse, accessToken, params = {}) => {
+  const printLabelFormViewService = async (form, urlApi, whereHouse, accessToken, params = {}) => {
     try {
       errorMessagePrintLabelView.value = null
       console.log('Print Inspection Form Service Starting...')
   
-      const result = await globalService.getPrintLabel(urlApi, whereHouse, accessToken, params)
+      const result = await globalService.getPrintLabel(form, urlApi, whereHouse, accessToken, params)
         
       if (result) {
         console.log('Print Inspection Form Service Complete:', result)

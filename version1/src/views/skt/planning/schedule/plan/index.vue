@@ -1381,7 +1381,7 @@ const headersDataTableNew = [
   {
     title: 'Update Date',
     sortable: false,
-    key: 'updateDate',
+    key: 'updateDated',
   },
 
   // {
@@ -2624,7 +2624,7 @@ const print = () => {
             </tr>
           </template>
 
-          <template #column.updatedDate="{ column }">
+          <template #column.updateDated="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
@@ -2632,14 +2632,6 @@ const print = () => {
                   class="clickable-icon"
                   @click="toggleDirection(column.key)"
                 /></span>
-              </th>
-            </tr>
-          </template>
-
-          <template #column.action="{ column }">
-            <tr class="d-flex justify-center">
-              <th>
-                <span>{{ column.title }}</span>
               </th>
             </tr>
           </template>

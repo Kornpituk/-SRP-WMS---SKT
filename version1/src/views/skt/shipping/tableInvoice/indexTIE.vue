@@ -42,6 +42,12 @@ const dialogVisible = ref(false)
 
 const shipmentModel = ref([])
 
+const itemsTruck = [
+  'LEO',
+  'BTS',
+  'LCL',
+]
+
 const shippingCondition = ref('')
 const shippingmark = ref('')
 const typeDialogTextArea = ref('')
@@ -288,11 +294,11 @@ PO NO.
 MADE IN THAILAND`, endUser: '', consignee: 'SHANGHAI NAGASE TRADING CO., LTD.', product: 'SANPRENE IB-967T Do 1st-Org2', 
     lotNumber: [{ id: '01', lotNUmber: 'PC23110006' }, 
       { id: '01', lotNUmber: 'PC23110007' }], qty: '16,000.00', coa: '', 
-    freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', 
+    freightForwarder: '', carrier: '', vesselName: '', truck: 'LCL', truckResNo: '', 
     truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'SINGAPORE', 
-    loadingDate: '07/05/2024', etd: '07/05/2024', eta: '', deliveryNote: '', 
+    loadingDate: '07/05/2024', etd: '07/05/2024', eta: '25/05/2024', deliveryNote: '', 
     remarkSal: '', remarkWh: 'Shipping complete', remarkLog: '5501354541', 
-    byWhow: 'ธนาธิป' },
+    byWhow: 'admin' },
   { no: 2, status: getRandomStatus(), saleOrderNo: '1100077646', 
     soAttachment: '', sapInvoiceNo: 'TIX2406002', payerName: 'MC INDUSTRIAL CHEMICAL CO., LTD.', 
     user: 'MC INDUSTRIAL CHEMICAL CO., LTD.', shipper: 'CHALERM CHAICHAN CO., LTD.', shipperLocation: '536 Ekkachai Rd, Khlong Bang Phran, Bang Bon, Bangkok 10150', shippingCondition: `1) COA 1 Set
@@ -305,10 +311,10 @@ MADE IN THAILAND`, endUser: '', consignee: 'PT. SHINTO PAINT MANUFACTURING INDO'
     lotNumber: [{ id: '01', lotNUmber: 'PC23110041' }, 
       { id: '01', lotNUmber: 'PC23110007' }, 
       { id: '01', lotNUmber: 'PC23110008' }], qty: '14,400.00', coa: '', 
-    freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', 
+    freightForwarder: '', carrier: '', vesselName: '', truck: 'LEO', truckResNo: '',  truckFee: '', 
     truckPrint: '', truckOrder: '', doEx: '', country: 'JAPAN', 
-    loadingDate: '06/07/2024', etd: '18/06/2024', eta: '', deliveryNote: '', 
-    remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'กาญจนา' },
+    loadingDate: '06/07/2024', etd: '18/06/2024', eta: '20/06/2024', deliveryNote: '', 
+    remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'WH1' },
   { no: 3, status: getRandomStatus(), saleOrderNo: '1100077647', soAttachment: '', 
     sapInvoiceNo: 'TIX2406003', payerName: 'TOA PAINT (THAILAND) PCL.', user: 'TOA PAINT (THAILAND) PCL.', shipper: 'TOA PAINT (THAILAND) PCL.', 
     shipperLocation: '31/2 Moo 3 Bang Na-Trat Frontage Rd, Bang Sao Thong, Bang Sao Thong District, Samut Prakan 10570', shippingCondition: `1) On plastic pallet with wrapping
@@ -326,11 +332,11 @@ MM02P02031
 MADE IN THAILAND`, 
     endUser: '', consignee: 'PT. HI-TECH INK INDONESIA', product: 'GLYCI-ALE PP-300P (DO) 1st-org2', 
     lotNumber: [{ id: '01', lotNUmber: 'PC231151561' }], 
-    qty: '5,000.00', coa: '', freightForwarder: 'LCL', carrier: '', 
-    vesselName: '', truck: '', truckFee: '', truckFee: '', truckPrint: '',
+    qty: '5,000.00', coa: '', freightForwarder: '', carrier: '', 
+    vesselName: '', truck: 'BTS', truckResNo: '',  truckFee: '', truckFee: '', truckPrint: '',
     doEx: '', country: 'MALAYSIA', loadingDate: '06/02/2024', etd: '10/03/2024', 
-    eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400',
-    byWhow: 'สมชาย' },
+    eta: '29/03/2024', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400',
+    byWhow: 'WH2' },
   
 ])
 
@@ -1858,13 +1864,7 @@ const handleFileUpdates = updatedFiles => {
                 :items="items"
                 density="compact"
                 eager
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Freight Forwarder
-                  </span>
-                </template>
-              </VSelect>
+              />
             </td>
 
             <!-- 👉 carrier -->
@@ -1878,13 +1878,7 @@ const handleFileUpdates = updatedFiles => {
                 :items="items"
                 density="compact"
                 eager
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Carrier
-                  </span>
-                </template>
-              </VSelect>
+              />
             </td>
 
             <!-- 👉 vesselName -->
@@ -1898,13 +1892,7 @@ const handleFileUpdates = updatedFiles => {
                 :items="items"
                 density="compact"
                 eager
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Vessel Name
-                  </span>
-                </template>
-              </VSelect>
+              />
             </td>
 
             <!-- 👉 voy -->
@@ -1917,13 +1905,7 @@ const handleFileUpdates = updatedFiles => {
                 v-model="product.voy"
                 density="compact"
                 style=" min-width: 150px;"
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Voy
-                  </span>
-                </template>
-              </VTextField>
+              />
             </td>
 
 
@@ -1931,10 +1913,15 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
-              :class="checkBgTruck(product.freightForwarder)"
-              style="font-size: 12px;"
+              :class="checkBgTruck(product.truck)"
+              style="min-width: 120px; font-size: 12px;"
             >
-              {{ (product.freightForwarder) }}
+              <VSelect
+                v-model="product.truck"
+                :items="itemsTruck"
+                density="compact"
+                eager
+              />
             </td>
 
             <!-- 👉 truckReserving -->
@@ -1944,16 +1931,12 @@ const handleFileUpdates = updatedFiles => {
               style="min-width: 250px; font-size: 12px;"
             >
               <VTextField
+                v-if="false"
                 v-model="product.truckReserving"
                 density="compact"
                 style=" min-width: 150px;"
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Truck Reserving Number
-                  </span>
-                </template>
-              </VTextField>
+              />
+              {{ product.truckReserving }}
             </td>
 
             <!-- 👉 truckFee -->
@@ -1966,13 +1949,7 @@ const handleFileUpdates = updatedFiles => {
                 v-model="product.truckFee"
                 density="compact"
                 style=" min-width: 150px;"
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Truck Fee
-                  </span>
-                </template>
-              </VTextField>
+              />
             </td>
 
             <!-- 👉 truckOrder -->
@@ -2051,8 +2028,6 @@ const handleFileUpdates = updatedFiles => {
             >
               <AppDateTimePicker
                 v-model="product.etd"
-                label="Input Date"
-                placeholder="Input date"
                 density="compact"
                 prepend-inner-icon="ri-calendar-schedule-fill"
                 :config="{ dateFormat: 'd/m/Y' }"
@@ -2067,8 +2042,6 @@ const handleFileUpdates = updatedFiles => {
             >
               <AppDateTimePicker
                 v-model="product.eta"
-                label="Input Date"
-                placeholder="Input date"
                 density="compact"
                 prepend-inner-icon="ri-calendar-schedule-fill"
                 :config="{ dateFormat: 'd/m/Y' }"

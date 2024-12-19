@@ -209,9 +209,9 @@ export const  globalService = {
 
 
   //-----
-  async getPrintLabel (urlApi, warehouseId, accessToken, params = {}) {
+  async getPrintLabel (form, urlApi, warehouseId, accessToken, params = {}) {
     try {
-      const response = await axios.get(`${urlApi}/api/v1/PrintLabel/Label`, {
+      const response = await axios.get(`${urlApi}/api/v1/PrintLabel/${form}`, {
         headers: {
           'accept': '*/*',
           'x-location': warehouseId,
@@ -420,7 +420,7 @@ export const  globalService = {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-      
+
       if (response && response.data) {
         console.log('success get repo getTempateByItemCode...')
         console.log('Service Response data getTempateByItemCode:', response.data.data)
