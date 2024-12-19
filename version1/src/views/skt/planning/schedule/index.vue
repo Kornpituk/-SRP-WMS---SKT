@@ -2170,23 +2170,7 @@ const newBatch = async batchID => {
               >
                 {{ item.raw.remark }}
               </td>
-              <td
-                class="cursor-pointer"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? '#E0F7FA' : 
-                    '',
-                  borderTop:
-                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
-                  borderBottom:
-                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
-                    
-                }"
-                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
-              >
-                {{ useFormatDateUtilities(item.raw.updatedDate) }}
-              </td>
+              
               <td
                 class="cursor-pointer"
                 :style="{ 
@@ -2203,6 +2187,23 @@ const newBatch = async batchID => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 {{ item.raw.updatedBy }}
+              </td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                {{ useFormatDateUtilities(item.raw.updatedDate) }}
               </td>
               <td
                 :style="{ 

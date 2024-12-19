@@ -1667,7 +1667,7 @@ const handleFileUpdates = updatedFiles => {
                 >
                   <VIcon
                     size="30"
-                    icon="ri-printer-fill"
+                    icon="ri-eye-fill"
                     @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
                   />
                 </VBtn>
