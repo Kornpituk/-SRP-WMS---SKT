@@ -2,7 +2,7 @@ import axios from '@axios'
 
 export const productionPlanRepository = {
 
-  async getProductionPlan(batchId, urlApi, form, whereHouse, accessToken) {
+  async getProductionPlan(batchId, sortColumn, sortDirection, urlApi, form, whereHouse, accessToken) {
     console.log('get repo Production Plan...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${form}/get/${batchId}`, {
@@ -10,6 +10,10 @@ export const productionPlanRepository = {
           'accept': '*/*',
           'x-location': whereHouse,
           Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          SortColumn: sortColumn,
+          SortDirection: sortDirection,
         },
       })
 
