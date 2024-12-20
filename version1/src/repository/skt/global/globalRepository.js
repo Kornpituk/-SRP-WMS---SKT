@@ -423,9 +423,9 @@ export const  globalService = {
 
       if (response && response.data) {
         console.log('success get repo getTempateByItemCode...')
-        console.log('Service Response data getTempateByItemCode:', response.data.data)
+        console.log('Service Response data getTempateByItemCode:', response.data)
         
-        return { data: response.data.data, success: true }
+        return { data: response.data, success: true }
       } else {
         console.log('Error repo Error If getTempateByItemCode...')
         throw new Error('No data received from the server')
@@ -434,6 +434,80 @@ export const  globalService = {
       console.log('Error repo Error Try getTempateByItemCode...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getTempateByItemCode ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async getTempateByFileCode(FileCode, urlApi, form, whereHouse, accessToken) {
+    console.log('get repo getTempateByFileCode...')
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/GetSettingsByFileCode/${FileCode}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (response && response.data) {
+        console.log('success get repo getTempateByFileCode...')
+        console.log('Service Response data getTempateByFileCode:', response.data)
+        
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getTempateByFileCode...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getTempateByFileCode...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getTempateByFileCode ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async printExportPDFProductLabel(fileCode, LotNo, urlApi, whereHouse, accessToken) {
+    console.log("Authorization", urlApi, whereHouse, accessToken)
+    try {
+      const response = await axios.post(
+        `${urlApi}/api/v1/PrintLabel/Label/Product/Pdf/${fileCode}?LotNo=${LotNo}`,
+        {},
+        {
+          headers: {
+            accept: 'application/pdf', // รับ response เป็น PDF
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response export PDF:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // สร้างลิงก์สำหรับดาวน์โหลดหรือพิมพ์ PDF
+        const link = document.createElement('a')
+
+        link.href = blobUrl
+        link.download = 'exported_file.pdf' // ตั้งชื่อไฟล์ที่ต้องการให้ดาวน์โหลด
+        document.body.appendChild(link)
+        link.click()
+  
+        // ลบลิงก์ออกหลังการดาวน์โหลด
+        document.body.removeChild(link)
+        URL.revokeObjectURL(blobUrl) // ปิด URL Blob
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data generated for export PDF')
+      }
+    } catch (error) {
+      console.error('Error in export PDF:', error)
+      throw new Error(`Failed to export PDF file: ${error.response?.data?.message || error.message}`)
     }
   },
 }

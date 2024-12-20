@@ -213,11 +213,10 @@ const fetchData = async () => {
 
     const hasValue = Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
 
-    if (!hasValue) {
-      dataPrintLabel.value = []
-      progressLinearNoData.value = true
-      throw new Error('Invalid paramsFetchDataPrintLabel')
-    }
+    // if (!hasValue) {
+    //   progressLinearNoData.value = true
+    //   throw new Error('Invalid paramsFetchDataPrintLabel')
+    // }
 
     progressLinearNoData.value = false // เริ่มแสดง Progress
 
