@@ -3,6 +3,8 @@ import { ref, watch } from 'vue'
 
 const props = defineProps({
   modelValue: String, // รับค่าจาก v-model
+  modelValueText: { type: String, default: '' }, // ค่าแรก
+  modelValueText2: { type: String, default: '' }, // ค่าที่สอง
   sapInValue: { type: String, default: '' },
   lotValue: { type: Array, default: () => [] },
   textAreaValue: { type: String, default: '' },
@@ -14,21 +16,38 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'submit'])
 
-const localText = ref(props.modelValue || '')  // ใช้ค่าเริ่มต้นจาก modelValue
+const isShipMC = computed(() => props.typeDialog === 'ShipMC')
+const isShipMark = computed(() => props.typeDialog === 'ShipMark')
+const isLotType = computed(() => props.typeDialog === 'Lot')
+
+const localText = ref(props.modelValueText)  // ใช้ค่าเริ่มต้นจาก modelValue
+const localText2 = ref(props.modelValueText2)  // ใช้ค่าเริ่มต้นจาก modelValue
 const localDialog = ref(false)
 const sapInValueText = ref(props.sapInValue)
 const typeDialogCom = ref(props.typeDialog)
 const titleDialogCom = ref(props.titleDialog)
 
 // Sync localText เมื่อ props.textAreaValue เปลี่ยน
-watch(() => props.textAreaValue, newVal => {
-  localText.value = newVal || '' // ซิงค์ค่า localText กับ props.textAreaValue (ค่าที่ส่งจาก Parent)
-})
+watch(
+  () => props.modelValue,
+  newVal => {
+    localDialog.value = newVal
+  },
+)
 
-// Sync localDialog กับ modelValue
-watch(() => props.modelValue, newVal => {
-  localDialog.value = newVal ? true : false // ถ้า modelValue เป็นค่าที่ไม่ใช่ false จะเปิด Dialog
-})
+watch(
+  () => props.modelValueText,
+  newVal => {
+    localText.value = newVal
+  },
+)
+
+watch(
+  () => props.modelValueText2,
+  newVal => {
+    localText2.value = newVal
+  },
+)
 
 // ปิด Dialog
 const closeDialog = () => {
@@ -38,8 +57,7 @@ const closeDialog = () => {
 
 // ส่งข้อมูลกลับ Parent
 const submitDialog = () => {
-  emit('submit', localText.value) // ส่งค่าไปยัง Parent
-  emit('update:modelValue', localText.value) // อัพเดต modelValue
+  emit('update:modelValue', { text1: localText.value, text2: localText2.value }) // ส่งค่ากลับ Parent
   closeDialog()
 }
 </script>
@@ -74,10 +92,10 @@ const submitDialog = () => {
       </VCardTitle>
 
       <DialogCloseBtn
-        v-if="false"
+        v-if="true"
         variant="text"
         size="default"
-        @click="closeDialog"
+        @click="submitDialog"
       />
       <VCardText v-if="props.typeDialog !== 'Lot' && props.typeDialog !== 'ShipMC'">
         <div v-if="props.typeDialog === 'ShipMark'">
@@ -116,7 +134,7 @@ const submitDialog = () => {
               SAP Invoice No.: {{ props.sapInValue }}
             </div>
             <VTextarea
-              v-model="localText"
+              v-model="localText2"
               counter
               :readonly="props.typeBtn === 'print'"
               class="text-center"
@@ -170,7 +188,6 @@ const submitDialog = () => {
             <VBtn
               variant="flat"
               color="warning"
-              @click="submitDialog"
             >
               <VIcon icon="ri-printer-fill" />Print
             </VBtn>
@@ -183,7 +200,6 @@ const submitDialog = () => {
               
               variant="flat"
               color="warning"
-              @click="submitDialog"
             >
               <VIcon icon="ri-printer-fill" />Print
             </VBtn>

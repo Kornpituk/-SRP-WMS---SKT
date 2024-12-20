@@ -224,6 +224,7 @@ const fetchData = async () => {
     dataPrintLabel.value = []
 
     const result = await printLabelFormViewService(
+      'Label',
       urlApi.value,
       whereHouse,
       accessTokenAtStore,

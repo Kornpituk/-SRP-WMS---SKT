@@ -209,9 +209,9 @@ export const  globalService = {
 
 
   //-----
-  async getPrintLabel (urlApi, warehouseId, accessToken, params = {}) {
+  async getPrintLabel (form, urlApi, warehouseId, accessToken, params = {}) {
     try {
-      const response = await axios.get(`${urlApi}/api/v1/PrintLabel/Label`, {
+      const response = await axios.get(`${urlApi}/api/v1/PrintLabel/${form}`, {
         headers: {
           'accept': '*/*',
           'x-location': warehouseId,
@@ -407,6 +407,34 @@ export const  globalService = {
       throw new Error(`Failed to export Excel file: ${error.response?.data?.message || error.message}`)
     }
   },
+
+  //---------------------- Pritn Production --------------------------------
   
+  async getTempateByItemCode(ItemCode, urlApi, form, whereHouse, accessToken) {
+    console.log('get repo getTempateByItemCode...')
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/GetTemplatesByItemCode/${ItemCode}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (response && response.data) {
+        console.log('success get repo getTempateByItemCode...')
+        console.log('Service Response data getTempateByItemCode:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        console.log('Error repo Error If getTempateByItemCode...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getTempateByItemCode...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getTempateByItemCode ${error.response?.data?.message || error.message}`)
+    }
+  },
 }
   

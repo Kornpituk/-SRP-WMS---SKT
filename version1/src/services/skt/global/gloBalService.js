@@ -199,12 +199,12 @@ export const useFetchPrintLabelData = () => {
   const printLabelFormViewResult = ref(null)
   const errorMessagePrintLabelView = ref(null)
 
-  const printLabelFormViewService = async (urlApi, whereHouse, accessToken, params = {}) => {
+  const printLabelFormViewService = async (form, urlApi, whereHouse, accessToken, params = {}) => {
     try {
       errorMessagePrintLabelView.value = null
       console.log('Print Inspection Form Service Starting...')
   
-      const result = await globalService.getPrintLabel(urlApi, whereHouse, accessToken, params)
+      const result = await globalService.getPrintLabel(form, urlApi, whereHouse, accessToken, params)
         
       if (result) {
         console.log('Print Inspection Form Service Complete:', result)
@@ -351,4 +351,36 @@ export const usePrintExportExcelService = () => {
   }
 }
 
+///------------------------- Pritn Production --------------------------------
 
+export const useGetTemplatesByItemCodeSearchService = () => {
+  const getTemplateByItemCodeResult = ref(null)
+  const errorMessageGetTemplatesByItemCodeSearch = ref(null)
+  
+  const fetchGetTemplateByItemCode = async (ItemCode, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageGetTemplatesByItemCodeSearch.value = null
+      console.log('Fetching getTemplatesByItemCodeSearch...')
+  
+      const result = await globalService.getTempateByItemCode(ItemCode, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Fetching data getTemplatesByItemCodeSearch:', result)
+        getTemplateByItemCodeResult.value = result
+        
+        return result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchGetTemplateByItemCode:', error)
+      errorMessageGetTemplatesByItemCodeSearch.value = error.message
+    }
+  }
+  
+  return {
+    getTemplateByItemCodeResult,
+    errorMessageGetTemplatesByItemCodeSearch,
+    fetchGetTemplateByItemCode,
+  }
+}

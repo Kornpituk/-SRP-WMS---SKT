@@ -397,6 +397,15 @@ watchEffect(async () => {
   }
 })
 
+const toggleDirection = async key => {
+  if (key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+  }
+  sortColumn.value = key
+  await fetchGetProductionplan()
+}
+
 // สถานะที่เก็บข้อมูล itemCode และ packagingtype ของแผนที่เลือก
 const btnSelectitem1 = ref(true)
 const btnSelectitem2 = ref(false)
@@ -459,10 +468,13 @@ const packagingPcs2 = ref(null)
 
 const textAlert = ref(false)
 
+const sortColumn = ref('producingDate')
+const sortDirection = ref('desc')
+
 watch(async () => {
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await fetchGetProductionplan(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    await fetchGetProductionplan(batchId.value, sortColumn.value, sortDirection.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
 
     // จัดรูปแบบข้อมูลก่อนเก็บลง productionPlan.value
     const formattedData = getProductionplanResult.value.data.map((item, index) => ({
@@ -1241,19 +1253,23 @@ const headersDataTableNew = [
     align: "center",
     fixed: true,
     readonly: true,
+    sortable: false,
   },
   {
     title: 'Status',
-    key: 'status',
+    key: 'statusId',
     fixed: true,
+    sortable: false,
   },
   {
     title: 'No.',
     key: 'no',
+    sortable: false,
   },
   {
     title: 'Input Date',
     key: 'inputDate',
+    sortable: false,
   },
 
   // {
@@ -1262,89 +1278,110 @@ const headersDataTableNew = [
   // },
   {
     title: 'Production Code',
-    key: 'productCode',
+    sortable: false,
+    key: 'productionCode',
   },
   {
     title: 'Reactor',
-    key: 'reactor',
+    key: 'reactorName',
+    sortable: false,
   },
  
   {
     title: 'Production Name',
-    key: 'productName',
+    key: 'productionName',
+    sortable: false,
   },
   {
     title: 'Batch Scale(Kgs)',
-    key: 'batchScaleKgs',
+    sortable: false,
+    key: 'quantityKgs',
   },
   {
     title: 'Item Code1',
-    key: 'productCode1',
+    sortable: false,
+    key: 'product1SelectedCode',
     class: 'my-header-style',
   },
   {
     title: 'Item Name1',
-    key: 'productName1',
+    key: 'product1Name',
+    sortable: false,
   },
   {
     title: 'Packaging Type1',
-    key: 'packagingType1',
+    sortable: false,
+    key: 'product1SelectedPackagingCode',
   },
   {
     title: 'Packaging Kgs1',
-    key: 'packagingKgs1',
+    sortable: false,
+    key: 'product1PackingQtyKgs',
   },
   {
     title: 'Packaging Pcs1',
-    key: 'packagingPcs1',
+    sortable: false,
+    key: 'product1UomCount',
   },
 
   //---------------
   {
     title: 'Item Code2',
-    key: 'productCode2',
+    sortable: false,
+    key: 'product2SelectedCode',
   },
   {
     title: 'Item Name2',
-    key: 'productName2',
+    sortable: false,
+    key: 'product2Name',
   },
   {
     title: 'Packaging Type2',
-    key: 'packagingType2',
+    sortable: false,
+    key: 'product2SelectedPackagingCode',
   },
   {
     title: 'Packaging Kgs2',
-    key: 'packagingKgs2',
+    sortable: false,
+    key: 'product2PackingQtyKgs',
   },
   {
     title: 'Packaging Pcs2',
-    key: 'packagingPcs2',
+    sortable: false,
+    key: 'product2UomCount',
   },
-  
+
+  //----------------------------
   {
     title: 'Lot',
+    sortable: false,
     key: 'lotNumber',
   },
   {
     title: 'Producing Date',
+    sortable: false,
     key: 'producingDate',
   },
   {
     title: 'Finished Date',
+    sortable: false,
     key: 'finishedDate',
   },
   
   {
     title: 'Remark',
+    sortable: false,
     key: 'remark',
   },
   {
-    title: 'Update Date',
-    key: 'updateDate',
+    title: 'Update By',
+    sortable: false,
+    key: 'updatedBy',
   },
   {
-    title: 'Update By',
-    key: 'byWho',
+    title: 'Update Date',
+    sortable: false,
+    key: 'updateDated',
   },
 
   // {
@@ -2269,6 +2306,337 @@ const print = () => {
           show-select
           class="text-no-wrap"
         >
+          <template #column.statusId="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.no="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon class="clickable-icon" /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.inputDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.plantName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.reactorName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.productionCode="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.productionName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.quantityKgs="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+
+          <template #column.product1SelectedCode="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <div>
+              <tr class="d-flex justify-center">
+                <th>
+                  <span>{{ column.title }}<VIcon
+                    :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection(column.key)"
+                  /></span>
+                </th>
+              </tr>
+            </div>
+          </template>
+          <template #column.product1Name="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.product1SelectedPackagingCode="{ column }">
+            <tr class="d-flex justify-center py-0">
+              <th>
+                <span />
+              </th>
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.product1PackingQtyKgs="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.product1UomCount="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.actualPcs1="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+
+          <template #column.product2SelectedCode="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.product2Name="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.product2SelectedPackagingCode="{ column }">
+            <tr class="d-flex justify-center py-0">
+              <th>
+                <span />
+              </th>
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.product2PackingQtyKgs="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.product2UomCount="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.actualPcs2="{ column }">
+            <tr class="d-flex justify-center">
+              <th />
+            </tr>
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+
+          <template #column.lotNumber="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.producingDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.finishedDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.remark="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          
+          <template #column.updatedBy="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+
+          <template #column.updateDated="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+
+
           <template #item="{ item, index }">
             <tr style="font-size: 14px;">
               <td
@@ -2911,7 +3279,7 @@ const print = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                {{ formatDateUpdate(item.raw.updatedDate) }}
+                {{ item.raw.updatedBy }}
               </td>
               <td
                 class="cursor-pointer"
@@ -2928,7 +3296,7 @@ const print = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                {{ item.raw.updatedBy }}
+                {{ formatDateUpdate(item.raw.updatedDate) }}
               </td>
             </tr>
           </template>

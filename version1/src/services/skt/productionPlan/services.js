@@ -222,12 +222,12 @@ export const useGetProductionPlanService = () => {
   const getProductionplanResult = ref(null)
   const errorMessageGetProductionPlan = ref(null)
   
-  const fetchGetProductionplan = async (batchId, urlApi, form, whereHouse, accessToke) => {
+  const fetchGetProductionplan = async (batchId, sortColumn, sortDirection, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetProductionPlan.value = null
       console.log('Fetching getProductionplan...')
   
-      const result = await productionPlanRepository.getProductionPlan(batchId, urlApi, form, whereHouse, accessToke)
+      const result = await productionPlanRepository.getProductionPlan(batchId, sortColumn, sortDirection, urlApi, form, whereHouse, accessToke)
         
       if (result) {
         console.log('Fetching data getProductionplan:', result)

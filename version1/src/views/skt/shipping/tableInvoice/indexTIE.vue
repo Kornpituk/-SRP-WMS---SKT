@@ -35,11 +35,18 @@ const serialProductCode = ref(null)
 import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue' //--------- import component
 
 const dialogDataTextArea = ref('')
+const dialogData2TextArea = ref('')
 const dialogVisible = ref(false)
 
 // --- define Model
 
 const shipmentModel = ref([])
+
+const itemsTruck = [
+  'LEO',
+  'BTS',
+  'LCL',
+]
 
 const shippingCondition = ref('')
 const shippingmark = ref('')
@@ -114,6 +121,19 @@ const textAreaDialogActive = (type, data, index) => {
     typeBtnView.value = 'nonPrint'
     dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   }
+  dialogVisible.value = true
+}
+
+const textAreaShipDialogActive = (type, data, data2, index) => {
+  typeDialogTextArea.value = type
+  indexDataDialogTextArea.value = index
+
+  titleDialogView.value = 'Shipping Mark Con'
+  typeDialogView.value = 'ShipMC'
+  sapInValueView.value = 'TIX2406001'
+  typeBtnView.value = 'twinPrint'
+  dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  dialogData2TextArea.value = data2 // 
   dialogVisible.value = true
 }
 
@@ -264,45 +284,59 @@ const checkBgTruck = truck => {
 //------------------------------------------ Mock Data --------------------------------
 
 const mockData = ref([
-  { no: 1, status: getRandomStatus(), saleOrderNo: '1100078117', soAttachment: '', 
-    sapInvoiceNo: 'TIX2406001', payerName: 'TORAY SG', user: '', shipper: '', 
-    shipperLocation: '', shippingCondition: `1 SHIPPING MARK REQUIRE  SANPRENE IB-D20
-2 COA 1 SET
-3 DRIVER LICENSE CLASS 4
-4 Please mention “This item compliance to RoHS and 
-REACH requirements” in COA
-5 On Plastic pallet (for not full container)`, shippingMark: `CHEMICLEAN PR-084CT
-NO.1: PO. No....SHM400000XXXX
-MM02P02023
-MADE IN THAILAND`, endUser: '', consignee: '', product: '', 
+  { no: 1, status: getRandomStatus(), saleOrderNo: '1100077645', soAttachment: '', 
+    sapInvoiceNo: 'TIX2406001', payerName: 'DAINICHI COLOR (THAILAND) LTD.', user: 'CHALERM CHAICHAN CO., LTD.', shipper: 'CHALERM CHAICHAN CO., LTD.', 
+    shipperLocation: '536 Ekkachai Rd, Khlong Bang Phran, Bang Bon, Bangkok 10150', shippingCondition: `1) COA 1 Set
+2) Label in English & Malaysian Language
+3) Shipping mark provide by TCPT`, shippingMark: `AL-40
+No. 
+PO NO.
+MADE IN THAILAND`, endUser: '', consignee: 'SHANGHAI NAGASE TRADING CO., LTD.', product: 'SANPRENE IB-967T Do 1st-Org2', 
     lotNumber: [{ id: '01', lotNUmber: 'PC23110006' }, 
       { id: '01', lotNUmber: 'PC23110007' }], qty: '16,000.00', coa: '', 
-    freightForwarder: 'LCL', carrier: '', vesselName: '', truck: '', 
+    freightForwarder: '', carrier: '', vesselName: '', truck: 'LCL', truckResNo: '', 
     truckFee: '', truckPrint: '', truckOrder: '', doEx: '', country: 'SINGAPORE', 
-    loadingDate: '07/05/2024', etd: '07/05/2024', eta: '', deliveryNote: '', 
+    loadingDate: '07/05/2024', etd: '07/05/2024', eta: '25/05/2024', deliveryNote: '', 
     remarkSal: '', remarkWh: 'Shipping complete', remarkLog: '5501354541', 
-    byWhow: 'ธนาธิป' },
-  { no: 2, status: getRandomStatus(), saleOrderNo: '1100078116', 
-    soAttachment: '', sapInvoiceNo: 'TIX2406002', payerName: 'SCI', 
-    user: '', shipper: '', shipperLocation: '', shippingCondition: `MAT-105T`, 
-    shippingMark: '', endUser: '', consignee: '', product: '', 
+    byWhow: 'admin' },
+  { no: 2, status: getRandomStatus(), saleOrderNo: '1100077646', 
+    soAttachment: '', sapInvoiceNo: 'TIX2406002', payerName: 'MC INDUSTRIAL CHEMICAL CO., LTD.', 
+    user: 'MC INDUSTRIAL CHEMICAL CO., LTD.', shipper: 'CHALERM CHAICHAN CO., LTD.', shipperLocation: '536 Ekkachai Rd, Khlong Bang Phran, Bang Bon, Bangkok 10150', shippingCondition: `1) COA 1 Set
+2) Label in English & Malaysian Language
+3) Shipping mark provide by TCPT`, 
+    shippingMark: `AL-47
+No. 
+PO NO.
+MADE IN THAILAND`, endUser: '', consignee: 'PT. SHINTO PAINT MANUFACTURING INDO', product: 'SANPRENE TH8  D/M  1st-Org2', 
     lotNumber: [{ id: '01', lotNUmber: 'PC23110041' }, 
       { id: '01', lotNUmber: 'PC23110007' }, 
       { id: '01', lotNUmber: 'PC23110008' }], qty: '14,400.00', coa: '', 
-    freightForwarder: 'LEO', carrier: '', vesselName: '', truck: '', truckFee: '', 
+    freightForwarder: '', carrier: '', vesselName: '', truck: 'LEO', truckResNo: '',  truckFee: '', 
     truckPrint: '', truckOrder: '', doEx: '', country: 'JAPAN', 
-    loadingDate: '06/07/2024', etd: '18/06/2024', eta: '', deliveryNote: '', 
-    remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'กาญจนา' },
-  { no: 3, status: getRandomStatus(), saleOrderNo: '1100078128', soAttachment: '', 
-    sapInvoiceNo: 'TIX2406003', payerName: 'RESONAC', user: '', shipper: '', 
-    shipperLocation: '', shippingCondition: ``, shippingMark: 'CHEMICLEAN PR-084CT', 
-    endUser: '', consignee: '', product: '', 
+    loadingDate: '06/07/2024', etd: '18/06/2024', eta: '20/06/2024', deliveryNote: '', 
+    remarkSal: '', remarkWh: '', remarkLog: 'OSMO(1)2405', byWhow: 'WH1' },
+  { no: 3, status: getRandomStatus(), saleOrderNo: '1100077647', soAttachment: '', 
+    sapInvoiceNo: 'TIX2406003', payerName: 'TOA PAINT (THAILAND) PCL.', user: 'TOA PAINT (THAILAND) PCL.', shipper: 'TOA PAINT (THAILAND) PCL.', 
+    shipperLocation: '31/2 Moo 3 Bang Na-Trat Frontage Rd, Bang Sao Thong, Bang Sao Thong District, Samut Prakan 10570', shippingCondition: `1) On plastic pallet with wrapping
+2) Label with product name and lot number
+3) COA Original 2 sets
+4) Shipping mark
+CHEMICLEAN AS- S142T
+NO. 1-
+PO. No....SHM400000XXXX
+MM02P02031
+MADE IN THAILAND`, shippingMark: `CHEMICLEAN AS- S142T
+NO. 1-
+PO. No....SHM400000XXXX
+MM02P02031
+MADE IN THAILAND`, 
+    endUser: '', consignee: 'PT. HI-TECH INK INDONESIA', product: 'GLYCI-ALE PP-300P (DO) 1st-org2', 
     lotNumber: [{ id: '01', lotNUmber: 'PC231151561' }], 
-    qty: '5,000.00', coa: '', freightForwarder: 'LCL', carrier: '', 
-    vesselName: '', truck: '', truckFee: '', truckFee: '', truckPrint: '',
+    qty: '5,000.00', coa: '', freightForwarder: '', carrier: '', 
+    vesselName: '', truck: 'BTS', truckResNo: '',  truckFee: '', truckFee: '', truckPrint: '',
     doEx: '', country: 'MALAYSIA', loadingDate: '06/02/2024', etd: '10/03/2024', 
-    eta: '', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400',
-    byWhow: 'สมชาย' },
+    eta: '29/03/2024', deliveryNote: '', remarkSal: '', remarkWh: '', remarkLog: '7400',
+    byWhow: 'WH2' },
   
 ])
 
@@ -1268,7 +1302,7 @@ const handleFileUpdates = updatedFiles => {
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
     <VCard class="mt-6">
-      <VTable class="text-no-wrap table-header-bg rounded-0">
+      <VTable class="text-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
         <thead class="">
           <tr>
@@ -1397,12 +1431,12 @@ const handleFileUpdates = updatedFiles => {
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
-              class="bg-green-lighten-3 text-center"
+              class="bg-green-lighten-3 text-start"
               style="min-width: 150px;"
             >
               <span
                 style="min-width: 250px; font-weight: bold;"
-                class="text-center"
+                class="text-start"
               >{{ $t('Carrier') }}</span>
             </th>
             <th
@@ -1473,7 +1507,7 @@ const handleFileUpdates = updatedFiles => {
             </th>
             <th
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
-              class="text-center"
+              class="text-start px-2"
             >
               <span style="font-weight: bold;">{{ $t('Loading date') }}</span>
             </th>
@@ -1571,7 +1605,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 150px; font-size: 12px;"
             >
               {{ product.saleOrderNo }}
             </td>
@@ -1596,7 +1630,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-2"
-              style="font-size: 12px;"
+              style="min-width: 120px; font-size: 12px;"
             >
               {{ product.sapInvoiceNo }}
             </td>
@@ -1605,7 +1639,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 150px; font-size: 12px;"
             >
               {{ (product.payerName) }}
             </td>
@@ -1614,7 +1648,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountINSP || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               {{ (product.user) }}
               User
@@ -1624,20 +1658,18 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               {{ (product.shipper) }}
-              Shipper
             </td>
 
             <!-- 👉 shipperLocation -->
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 300px; max-width: 300px;  font-size: 12px;"
             >
               {{ (product.shipperLocation) }}
-              shipperLocation
             </td>
 
             <!-- 👉 Shipping Condition -->
@@ -1651,7 +1683,7 @@ const handleFileUpdates = updatedFiles => {
                   style="min-width: 196px;"
                   variant="outlined"
                   :color="product.shippingCondition ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('ShipMC', product.shippingCondition, index)"
+                  @click="textAreaShipDialogActive('ShipMC',product.shippingMark, product.shippingCondition, index)"
                 >
                   <span
                     v-if="product.shippingCondition"
@@ -1660,6 +1692,7 @@ const handleFileUpdates = updatedFiles => {
                   <span v-else>Shipping Mark/Cound.</span>
                 </VBtn>
                 <VBtn
+                  v-if="false"
                   class="mx-2"
                   :color="product.shippingCondition ? 'warning' : 'grey'"
                   :disabled="!product.shippingCondition"
@@ -1761,20 +1794,18 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               {{ (product.consignee) }}
-              consignee
             </td>
 
             <!-- 👉 product -->
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 250px; font-size: 12px;"
             >
               {{ (product.product) }}
-              item
             </td>
 
             <!-- 👉 Lot Number -->
@@ -1802,7 +1833,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-end px-1"
-              style="font-size: 12px;"
+              style="min-width: 100px; font-size: 12px;"
             >
               {{ (product.qty) }}
             </td>
@@ -1827,59 +1858,41 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               <VSelect
                 :items="items"
                 density="compact"
                 eager
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Freight Forwarder
-                  </span>
-                </template>
-              </VSelect>
+              />
             </td>
 
             <!-- 👉 carrier -->
             <td
               v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               <VSelect
                 v-model="product.carrier"
                 :items="items"
                 density="compact"
                 eager
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Carrier
-                  </span>
-                </template>
-              </VSelect>
+              />
             </td>
 
             <!-- 👉 vesselName -->
             <td
               v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 200px; font-size: 12px;"
             >
               <VSelect
                 v-model="product.vesselName"
                 :items="items"
                 density="compact"
                 eager
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Vessel Name
-                  </span>
-                </template>
-              </VSelect>
+              />
             </td>
 
             <!-- 👉 voy -->
@@ -1892,13 +1905,7 @@ const handleFileUpdates = updatedFiles => {
                 v-model="product.voy"
                 density="compact"
                 style=" min-width: 150px;"
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Voy
-                  </span>
-                </template>
-              </VTextField>
+              />
             </td>
 
 
@@ -1906,29 +1913,30 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
-              :class="checkBgTruck(product.freightForwarder)"
-              style="font-size: 12px;"
+              :class="checkBgTruck(product.truck)"
+              style="min-width: 120px; font-size: 12px;"
             >
-              {{ (product.freightForwarder) }}
+              <VSelect
+                v-model="product.truck"
+                :items="itemsTruck"
+                density="compact"
+                eager
+              />
             </td>
 
             <!-- 👉 truckReserving -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
               class="text-center px-1"
-              style="font-size: 12px;"
+              style="min-width: 250px; font-size: 12px;"
             >
               <VTextField
+                v-if="false"
                 v-model="product.truckReserving"
                 density="compact"
                 style=" min-width: 150px;"
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Truck Reserving Number
-                  </span>
-                </template>
-              </VTextField>
+              />
+              {{ product.truckReserving }}
             </td>
 
             <!-- 👉 truckFee -->
@@ -1941,13 +1949,7 @@ const handleFileUpdates = updatedFiles => {
                 v-model="product.truckFee"
                 density="compact"
                 style=" min-width: 150px;"
-              >
-                <template #label>
-                  <span style="font-size: 12px;">
-                    Truck Fee
-                  </span>
-                </template>
-              </VTextField>
+              />
             </td>
 
             <!-- 👉 truckOrder -->
@@ -2013,7 +2015,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
               class="text-start px-1"
-              style="min-width: 150px; font-size: 12px;"
+              style="min-width: 120px; font-size: 12px;"
             >
               {{ (product.loadingDate) }}
             </td>
@@ -2026,8 +2028,6 @@ const handleFileUpdates = updatedFiles => {
             >
               <AppDateTimePicker
                 v-model="product.etd"
-                label="Input Date"
-                placeholder="Input date"
                 density="compact"
                 prepend-inner-icon="ri-calendar-schedule-fill"
                 :config="{ dateFormat: 'd/m/Y' }"
@@ -2042,8 +2042,6 @@ const handleFileUpdates = updatedFiles => {
             >
               <AppDateTimePicker
                 v-model="product.eta"
-                label="Input Date"
-                placeholder="Input date"
                 density="compact"
                 prepend-inner-icon="ri-calendar-schedule-fill"
                 :config="{ dateFormat: 'd/m/Y' }"
@@ -2129,7 +2127,7 @@ const handleFileUpdates = updatedFiles => {
             <!-- 👉 byWhow -->
             <td
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 100px; font-size: 12px;"
             >
               {{ product.byWhow }}
             </td>
@@ -2137,7 +2135,7 @@ const handleFileUpdates = updatedFiles => {
             <!-- 👉 Update now -->
             <td
               class="text-start px-1"
-              style="font-size: 12px;"
+              style="min-width: 120px; font-size: 12px;"
             >
               {{ getRandomDate('2022-01-01', '2023-12-31') }}
             </td>
@@ -2284,7 +2282,8 @@ const handleFileUpdates = updatedFiles => {
         v-model="dialogVisible"
         :sap-in-value="sapInValueView"
         :lot-value="lotValueView"
-        :text-area-value="dialogDataTextArea"
+        :model-value-text="dialogDataTextArea"
+        :model-value-text2="dialogData2TextArea"
         :type-dialog="typeDialogView"
         :type-btn="typeBtnView"
         :title-dialog="titleDialogView"
