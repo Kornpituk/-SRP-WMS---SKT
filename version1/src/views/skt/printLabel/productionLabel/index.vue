@@ -130,13 +130,21 @@ const printLabelForm = () => {
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
 //----------------------------- api ------------------------------
-import { useFetchPrintLabelData, usePrintLabelBarcodeFormService, useSavePrintBarcodeFormService } from '@/services/skt/global/gloBalService'
+import { useFetchPrintLabelData, 
+  usePrintLabelBarcodeFormService, 
+  useSavePrintBarcodeFormService,
+  useGetTemplatesByItemCodeSearchService,
+} from '@/services/skt/global/gloBalService'
 
 const { printLabelFormViewResult, errorMessagePrintLabelView, printLabelFormViewService } = useFetchPrintLabelData()
 
 const dataPrintLabel = ref([])
-const selectedDataTables = ref(['Product Label'])
+const selectedDataTables = ref([''])
 const isDialogPrintLabelVisible = ref(false)
+
+const showSelectBox = () => {
+  console.log("showSelectBox", selectedDataTables.value)
+}
 
 const itemsTypeLabel = ref([
   {
@@ -255,250 +263,86 @@ const { printLabelBarcodeFormViewResult, printLabelFormBarcodeService } = usePri
 const isLoadingPrintLabel = ref(false)
 const successPrintLabel = ref(null)
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const printLabel = async () => {
-  console.log("12355", typePrintLabel.value)
-  if(typePrintLabel.value === 'Raw Mat Label'){
-    console.log('Raw Mat Label print start .....')
-
-    const barcodes = Array.isArray(selectedDataTables.value)
-      ? selectedDataTables.value.flatMap(item => 
-        Array.isArray(item.barcodes) 
-          ? item.barcodes.map(b => b.barcode)   // กรณีที่ `barcodes` เป็นอาเรย์ ให้ดึง `barcode`
-          : [item.barcode],                      // กรณีที่ `barcode` เป็นตัวเดียว ให้เก็บค่า `barcode`
-      )
-      : [selectedDataTables.value.barcode]  // ถ้า `selectedDataTables.value` ไม่ใช่อาเรย์ ให้ใช้ `barcode` ตรง ๆ
-
-    console.log('Semi Label print start .....', barcodes)
-
-    isLoadingPrintLabel.value = true
-    successPrintLabel.value = null
-    await saveToPrintLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, barcodes)
-    if(saveToPrintLabelFormBarcodeResult.value){
-      await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore)
-      isLoadingPrintLabel.value = false
-      if(printLabelBarcodeFormViewResult.value){
-        console.log('print label by barcode success', printLabelBarcodeFormViewResult)
-        isLoadingPrintLabel.value = false
-        successPrintLabel.value = true
-      }else {
-        successPrintLabel.value = false
-      }
-    }else {
-      isLoadingPrintLabel.value = false
-      successPrintLabel.value = false
-      throw 'Could not save to print label form'
-    }
-  }
-  if(typePrintLabel.value === 'Semi Label'){
-    console.log('Semi Label print start .....')
-  }
-  if(typePrintLabel.value === 'Product Label'){
-    console.log('Product Label print start .....')
-  }
-}
-
-const dataTableExpanded = ref([])
-
-const headers = [
+const headersNewEx = [
   {
-    title: 'data-table-select',
-    key: 'data-table-select',
+    title: 'Print',
+    key: 'print',
     align: "center",
     fixed: true,
     readonly: true,
-  },
-  {
-    title: 'No.',
-    key: 'no',
-  },
-  {
-    title: 'Category',
-    key: 'category',
-  },
-  {
-    title: 'Lot',
-    key: 'lot',
-  },
-  {
-    title: 'Lot QTY',
-    key: 'lotQty',
-  },
-  {
-    title: 'Barcode',
-    key: 'barcode',
-  },
-  {
-    title: 'NO/RCVD(PCS)',
-    key: 'lotDescription',
-  },
-  {
-    title: 'RCVD Date',
-    key: 'receivedDate',
-    
-  },
-  {
-    title: 'P/O No',
-    key: 'purchaseOrderNo',
-  },
-  {
-    title: 'Item Code',
-    key: 'productId',
-  },
-  {
-    title: 'Item Name',
-    key: 'productName',
-  },
-  
-  {
-    title: 'Location',
-    key: 'locationName',
-  },
-  {
-    title: 'RCVD(PCS)',
-    key: 'qtyPcs',
-  },
-  {
-    title: 'RCVD(KGS)',
-    key: 'qtyKgs',
-  },
-  {
-    title: 'Update By',
-    key: 'updatedBy',
-  },
-  {
-    title: 'Update Date',
-    key: 'updatedDate',
-  },
-]
-
-const dataTableGroupBy = [
-  { key: 'lot' },
-]
-
-const expanded = ref([])
-
-const updateSelectedData = sub => {
-  // Add to selectedDataTables if selected, remove if deselected
-  if (sub.selected) {
-    selectedDataTables.value.push(sub)
-  } else {
-    const index = selectedDataTables.value.findIndex(item => item.name === sub.name)
-    if (index !== -1) selectedDataTables.value.splice(index, 1)
-  }
-}
-
-const eXprtreeNode = () => {
-  console.log('eXprtreeNode', selectedDataTables.value)
-}
-
-const headersNewEx = [
-  {
-    title: 'No.',
-    key: 'no',
-  },
-  {
-    title: 'Category',
-    key: 'category',
-  },
-  {
-    title: 'Lot',
-    key: 'lot',
-  },
-  {
-    title: 'Lot QTY',
-    key: 'lotQty',
-  },
-  {
-    title: 'RCVD Date',
-    key: 'receivedDate',
-    
-  },
-  {
-    title: 'P/O No',
-    key: 'purchaseOrderNo',
-  },
-  {
-    title: 'Item Code',
-    key: 'productId',
-  },
-  {
-    title: 'Item Name',
-    key: 'productName',
-  },
-  
-  {
-    title: 'Location',
-    key: 'locationName',
-  },
-  {
-    title: 'RCVD(PCS)',
-    key: 'qtyPcs',
-  },
-  {
-    title: 'RCVD(KGS)',
-    key: 'qtyKgs',
-  },
-  {
-    title: 'Update By',
-    key: 'updatedBy',
-  },
-  {
-    title: 'Update Date',
-    key: 'updatedDate',
-  },
-]
-
-const headersSubNewEx = [
-  {
-    title: 'Barcode',
-    key: 'barcode',
-  },
-  {
-    title: 'NO/RCVD(PCS)',
-    key: 'lotDescription',
-  },
-  {
-    title: 'Item Code',
-    key: 'productId',
-  },
-  {
-    title: 'Item Name',
-    key: 'productName',
-  },
-]
-
-const dessertHeaders = [
-  { title: '', key: 'data-table-expand' },
-  {
-    title: 'Dessert (100g serving)',
-    align: 'start',
     sortable: false,
-    key: 'name',
   },
-  { title: 'Calories', key: 'calories' },
-  { title: 'Fat (g)', key: 'fat' },
-  { title: 'Carbs (g)', key: 'carbs' },
+  {
+    title: 'No.',
+    key: 'no',
+  },
+  {
+    title: 'Category',
+    key: 'category',
+  },
+  {
+    title: 'Lot',
+    key: 'lot',
+  },
+  {
+    title: 'Lot QTY',
+    key: 'lotQty',
+  },
+  {
+    title: 'RCVD Date',
+    key: 'receivedDate',
+    
+  },
+  {
+    title: 'P/O No',
+    key: 'purchaseOrderNo',
+  },
+  {
+    title: 'Item Code',
+    key: 'productId',
+  },
+  {
+    title: 'Item Name',
+    key: 'productName',
+  },
   
+  {
+    title: 'Location',
+    key: 'locationName',
+  },
+  {
+    title: 'RCVD(PCS)',
+    key: 'qtyPcs',
+  },
+  {
+    title: 'RCVD(KGS)',
+    key: 'qtyKgs',
+  },
+  {
+    title: 'Update By',
+    key: 'updatedBy',
+  },
+  {
+    title: 'Update Date',
+    key: 'updatedDate',
+  },
 ]
 
-const headerSubtitle = [
-  { title: '' },
-  { title: '' },
-  { title: '' },
-  { title: '' },
-  { title: '', key: 'checkbox' },
-  { title: 'Item Code', key: 'name' },
-  { title: 'Item Name', key: 'calories' },
-  { title: 'Lot', key: 'fat' },
-  { title: 'Barcode', key: 'carbs' },
-  { title: 'NO/Lot QTY', key: 'protein' },
-  { title: '' },
-  { title: '' },
-  { title: '' },
-  { title: '' },
-  { title: '' },
-]
+//-------------------- print production lable -------------------
+
+const { getTemplateByItemCodeResult, errorMessageGetTemplatesByItemCodeSearch, fetchGetTemplateByItemCode } = useGetTemplatesByItemCodeSearchService()
+
+const actionPrintProductLable = ItemCode => {
+  isDialogPrintLabelVisible.value = true
+
+  const result = fetchGetTemplateByItemCode(ItemCode, urlApi.value, 'PrintLabel', whereHouse, accessTokenAtStore)
+  if(result){
+    console.log('getTemplateByItemCodeResult', getTemplateByItemCodeResult.value)
+  }else{
+    console.log('errorMessageGetTemplatesByItemCodeSearch', errorMessageGetTemplatesByItemCodeSearch.value)
+  }
+
+}
 
 //------------------- Highlighter --------------------------------
 
@@ -745,8 +589,8 @@ const dataTableColor = ref('#E0F7FA')
               >
                 <VRow>
                   <VCol
-                    cols="4"
-                    md="4"
+                    cols="6"
+                    md="6"
                   >
                     <VBtn
                       height="100%"
@@ -761,21 +605,21 @@ const dataTableColor = ref('#E0F7FA')
                     </VBtn>
                   </VCol>
                   <VCol
-                    cols="4"
-                    md="4"
+                    cols="6"
+                    md="6"
                   >
                     <VBtn
                       color="red"
-                      height="100%"
                       width="100%"
                       density="compact"
-                      style="font-size: 12px;"
+                      style="height: 40px; font-size: 12px;"
                       @click="clearModel"
                     >
                       {{ $t('Clear') }}
                     </VBtn>
                   </VCol>
                   <VCol
+                    v-if="false"
                     cols="4"
                     md="4"
                   >
@@ -953,12 +797,15 @@ const dataTableColor = ref('#E0F7FA')
 
         <VCardTitle>
           <div class="text-center">
-            <span>Type of Label</span>
+            <span>Select Language</span>
           </div>
         </VCardTitle>
 
         <VCardText>
-          <div class="">
+          <div
+            v-if="false"
+            class=""
+          >
             <VSelect
               v-model="typePrintLabel"
               :items="itemsTypeLabel"
@@ -969,42 +816,20 @@ const dataTableColor = ref('#E0F7FA')
             />
           </div>
 
-          <div
-            v-if="typePrintLabel === 'Product Label' "
-            class="d-flex justify-center"
-          >
-            <VList
-              density="compact"
-              select-strategy="classic"
-            >
-              <VListheader class="bg-grey-lighten-3">
-                Select Language
-              </VListheader>
-
-              <VListItem value="Thai">
-                <VListItemTitle>Thai</VListItemTitle>
-              </VListItem>
-
-              <VListItem value="English">
-                <VListItemTitle>English</VListItemTitle>
-              </VListItem>
-
-              <VListItem value="Japanese">
-                <VListItemTitle>Japanese</VListItemTitle>
-              </VListItem>
-
-              <VListItem value="Chinese">
-                <VListItemTitle>Chinese</VListItemTitle>
-              </VListItem>
-
-              <VListItem value="Maiyasia">
-                <VListItemTitle>Maiyasia</VListItemTitle>
-              </VListItem>
-
-              <VListItem value="Korea">
-                <VListItemTitle>Korea</VListItemTitle>
-              </VListItem>
-            </VList>
+          <div class="d-flex justify-center">
+            <VTable>
+              <thead>
+                <tr>
+                  <th>NO</th>
+                  <th>LanguageName</th>
+                  <th>LabelName</th>
+                  <th>FileName</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr />
+              </tbody>
+            </VTable>
           </div>
         </VCardText>
 
@@ -1083,6 +908,12 @@ const dataTableColor = ref('#E0F7FA')
         >
           <span>Loading Data....</span>
         </VProgressLinear>
+        <VBtn
+          v-if="false"
+          @click="showSelectBox"
+        >
+          Test
+        </VBtn>
         <VDataTable
           v-if="dataPrintLabel && progressLinearNoData === true"
           v-model="selectedDataTables"
@@ -1090,9 +921,85 @@ const dataTableColor = ref('#E0F7FA')
           :items="dataPrintLabel"
           :items-per-page="10"
           class="text-no-wrap"
-          expand-on-click
-          show-select
         >
+          <template #item="{item}">
+            <tr>
+              <td style="position: sticky; z-index: 1; left: 0;">
+                <VBtn
+                  color="warning"
+                  @click="actionPrintProductLable(123123)"
+                >
+                  <VIcon
+                    v-if="!isLoadingPrintLabel"
+                    size="20"
+                    icon="ri-printer-fill"
+                  />
+                </VBtn>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.no }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.category }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.lot }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.lot }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ convertDate(item.raw.receivedDate) }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.purchaseOrderNo }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.productId }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.productName }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.locationName }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.qtyPcs }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ formatNumber(item.raw.qtyKgs) }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ (item.raw.updatedByName) }}</span>
+              </td>
+              <td>
+                <span
+                  v-if="item.raw.updatedDate"
+                  class="text-capitalize"
+                >{{ convertDate(item.raw.updatedDate) }}</span>
+                <span
+                  v-else
+                  class="text-capitalize"
+                />
+              </td>
+            </tr>
+          </template>
+          <template #item.print="{}">
+            <tr>
+              <td>
+                <VBtn
+                  color="warning"
+                  @click="actionPrintProductLable(123123)"
+                >
+                  <VIcon
+                    v-if="!isLoadingPrintLabel"
+                    size="20"
+                    icon="ri-printer-fill"
+                  />
+                </VBtn>
+              </td>
+            </tr>
+          </template>
           <template #item.no="{item}">
             <tr>
               <td>

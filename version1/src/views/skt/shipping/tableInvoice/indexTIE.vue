@@ -2293,57 +2293,5 @@ const handleFileUpdates = updatedFiles => {
   </section>
 </template>
 
-<style lang="scss">
-.text-capitalize {
-  text-transform: capitalize;
-}
-
-.user-list-name:not(:hover) {
-  color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
-}
-
-// Hover For Image Product
-.image-transition {
-  transition: inline-size 0.2s, inline-size 0.2s;
-}
-
-.fixed-bottom {
-  position: fixed;
-  justify-content: center;
-  inline-size: 95%;
-  inset-block-end: 0;
-}
-
-.custom-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  inline-size: 100%;
-}
-
-.v-text-field >>> input {
-  font-size: 12px;
-}
-
-.custom-table,
-.custom-table th,
-.custom-table td {
-  border: 1px solid black;
-}
-
-.custom-table th,
-.custom-table td {
-  padding: 8px;
-  text-align: start;
-}
-
-.custom-table td {
-  font-weight: 400;
-}
-
-.header {
-  justify-content: space-between;
-  font-weight: bold;
-  text-align: center;
-}
-</style>
+<style lang="scss" src="./indexTIE.scss"></style>
 
