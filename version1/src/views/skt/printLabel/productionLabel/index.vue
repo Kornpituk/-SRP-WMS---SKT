@@ -366,38 +366,54 @@ const actionPrintProductLabel = async (ItemCode, lot) => {
 const checkColorBgStatus = function (index) {
 
   if(index === IndexForPrintProductLabel.value) {
-    return { color: '#D3E3FC', variant: 'outlined' }
+    return { color: '#D3E3FC', variant: 'outlined', selected: true }
   }
 
-  return { color: '#FFFFFF', variant: 'flat' }
+  return { color: '#FFFFFF', variant: 'flat', selected: false }
   
 }
 
-const selectTemplate = (item, index) => {
-  console.log('selectTemplate', item)
-  ItemCodeForPrintProductLabel.value = item
-  IndexForPrintProductLabel.value = index
+const selectTemplate = async (item, index) => {
+  try {
+    console.log('selectTemplate', item)
+    ItemCodeForPrintProductLabel.value = item
+    IndexForPrintProductLabel.value = index
 
-  if(item){
-    console.log('selectTemplate Start')
-    FileCodeForPrintProductLabel.value = item.fileCode
+    if (item) {
+      console.log('selectTemplate Start')
+      FileCodeForPrintProductLabel.value = item.fileCode
 
-    if(dataTemplatesByFileCode.value){
-      dataTemplatesByFileCode.value = null
-      IndexForPrintProductLabel.value = null
-    }else{
-      const result = fetchGetTemplateByFileCode(item.fileCode, urlApi.value, 'PrintLabel', whereHouse, accessTokenAtStore)
+      if (dataTemplatesByFileCode.value) {
+        dataTemplatesByFileCode.value = null
+        IndexForPrintProductLabel.value = null
+      } else {
+        console.log('selectTemplate Starting...')
+        
+        // รอ fetchGetTemplateByFileCode จนเสร็จ
+        const result = await fetchGetTemplateByFileCode(
+          item.fileCode,
+          urlApi.value,
+          'PrintLabel',
+          whereHouse,
+          accessTokenAtStore,
+        )
 
-      console.log('selectTemplate Startting.....')
-      if(result){
-        dataTemplatesByFileCode.value = getTemplateByFileCodeResult.value.data
-        console.log('getTemplateByFileCodeResult', dataTemplatesByFileCode.value)
-      }else{
-        console.log('errorMessageGetTemplatesByFileCodeSearch', errorMessageGetTemplatesByFileCodeSearch.value)
+        if (result) {
+          dataTemplatesByFileCode.value = getTemplateByFileCodeResult.value.data
+          isDialogPrintLabelVisible.value = false
+          console.log('getTemplateByFileCodeResult', dataTemplatesByFileCode.value)
+        } else {
+          console.log('errorMessageGetTemplatesByFileCodeSearch', errorMessageGetTemplatesByFileCodeSearch.value)
+        }
       }
     }
-    
+
+    // รอให้ process ก่อนเรียก printProdcutLabel
+    await printProdcutLabel()
+  } catch (error) {
+    console.error('Error in selectTemplate:', error)
   }
+  isDialogPrintLabelVisible.value = false
 }
 
 
@@ -416,7 +432,7 @@ const printProdcutLabel = async () => {
 
     if (result) {
       // แสดง Dialog หลังจาก API ทำงานเสร็จ
-      isDialogPrintLabelVisible.value = true
+      isDialogPrintLabelVisible.value = false
       isLoadingPrintLabel.value = false
     } else {
       console.log(
@@ -890,6 +906,15 @@ const dataTableColor = ref('#E0F7FA')
             <VTable>
               <thead>
                 <tr>
+                  <VProgressLinear
+                    height="10"
+                    color="primary"
+                    rounded
+                    style="width: 100%;"
+                    indeterminate
+                  />
+                </tr>
+                <tr>
                   <th>NO</th>
                   <th>Language</th>
                   <th>LabelName</th>
@@ -935,68 +960,33 @@ const dataTableColor = ref('#E0F7FA')
                     }"
                   >
                     <VBtn
-                      :color="accountINSP ? 'grey' : 'info'"
-                      :variant="checkColorBgStatus(index).variant"
+                      color="warning"
                       @click="selectTemplate(item, index)"
                     >
-                      Select
+                      <VProgressCircular
+                        v-if="isLoadingPrintLabel && checkColorBgStatus(index).selected"
+                        :rotate="360"
+                        indeterminate
+                        :size="40"
+                        :width="6"
+                        color="primary"
+                      >
+                        <VIcon
+                          size="20"
+                          icon="ri-printer-fill"
+                        />
+                      </VProgressCircular>
+                      <VIcon
+                        v-else
+                        size="20"
+                        icon="ri-printer-fill"
+                      />
                     </VBtn>
                   </td>
                 </tr>
               </tbody>
             </VTable>
           </div>
-        </VCardText>
-
-        <VCardText class="d-flex justify-center align-center flex-wrap gap-4">
-          <VAlert
-            v-if="successPrintLabel"
-            border="end"
-            border-color="success"
-            variant="tonal"
-            closable
-            class="pa-2"
-          >
-            <div class="d-flex justify-start align-center">
-              <VIcon
-                icon="ri-checkbox-circle-line"
-                class="mx-4"
-              />Print Completed.
-            </div>
-          </VAlert>
-          <VAlert
-            v-if="successPrintLabel === false"
-            border="end"
-            border-color="error"
-            variant="tonal"
-            closable
-          >
-            Print Failed.
-          </VAlert>
-          <VBtn
-            color="warning"
-            style="min-width: 400px; max-width: 400px; height: 50px;"
-            @click="printProdcutLabel"
-          >
-            <VIcon
-              v-if="!isLoadingPrintLabel"
-              size="20"
-              icon="ri-printer-fill"
-            />
-            <VProgressCircular
-              v-if="isLoadingPrintLabel"
-              :rotate="360"
-              indeterminate
-              :size="40"
-              :width="6"
-              color="primary"
-            >
-              <VIcon
-                size="20"
-                icon="ri-printer-fill"
-              />
-            </VProgressCircular>
-          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
