@@ -384,3 +384,72 @@ export const useGetTemplatesByItemCodeSearchService = () => {
     fetchGetTemplateByItemCode,
   }
 }
+
+export const useGetTemplatesByFileCodeSearchService = () => {
+  const getTemplateByFileCodeResult = ref(null)
+  const errorMessageGetTemplatesByFileCodeSearch = ref(null)
+  
+  const fetchGetTemplateByFileCode = async (FileCode, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageGetTemplatesByFileCodeSearch.value = null
+      console.log('Fetching getTemplatesByFileCodeSearch...')
+  
+      const result = await globalService.getTempateByFileCode(FileCode, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Fetching data getTemplatesByFileCodeSearch:', result)
+        getTemplateByFileCodeResult.value = result
+        
+        return result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchGetTemplateByFileCode:', error)
+      errorMessageGetTemplatesByFileCodeSearch.value = error.message
+    }
+  }
+  
+  return {
+    getTemplateByFileCodeResult,
+    errorMessageGetTemplatesByFileCodeSearch,
+    fetchGetTemplateByFileCode,
+  }
+}
+
+export const usePrintExportPDFProductLabelService = () => {
+  const printExportPDFResult = ref(null)
+  const printExportPDFErrorMessage = ref(null)
+
+  const printExportPDFService = async (fileCode, LotNo, urlApi, whereHouse, accessToken) => {
+    try {
+      printExportPDFErrorMessage.value = null
+      console.log('Print Export PDF Form Service Starting...')
+  
+      const result = await globalService.printExportPDFProductLabel(fileCode, LotNo, urlApi, whereHouse, accessToken)
+        
+      if (result && result.success) {
+        console.log('Print Export PDF Form Service Complete:', result)
+        printExportPDFResult.value = result.data
+        
+        return { success: true, data: printExportPDFResult.value }
+      } else {
+        console.warn('Print Export PDF Form Service Failed')
+        
+        return { success: false, error: 'Print Export PDF Form Service Failed' }
+      }
+    } catch (error) {
+      console.error('Error in printExportPDFService:', error)
+      printExportPDFErrorMessage.value = error.message
+      printExportPDFResult.value = null
+      
+      return { success: false, error: error.message }
+    }
+  }
+  
+  return {
+    printExportPDFResult,
+    printExportPDFErrorMessage,
+    printExportPDFService,
+  }
+}

@@ -857,6 +857,15 @@ const selectFilterProduction = (index, item) => {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const addSelectProdutionCode = index => {
   // ตรวจสอบและอัปเดตค่าที่เลือกในตำแหน่งของแถวที่กด
+
+  const trickerItem1N2 = ref(false)
+
+  if(productionPlan.value[index].productionCode !== selectedProductionCode.value){
+    trickerItem1N2.value = true
+  }else{
+    trickerItem1N2.value = false
+  }
+
   if (selectedProductionCode.value) {
     productionPlan.value[index].productionCode = selectedProductionCode.value
   }
@@ -892,24 +901,38 @@ const addSelectProdutionCode = index => {
     }
   }
 
-  if (selectedItemCode2.value) {
-    productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
-  }
-  if (selectedItemName2.value) {
-    productionPlan.value[index].product2Name = selectedItemName2.value
-  }
-  if (selectedPackagingType2.value) {
-    productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
-  }
-  if (selectedPackagingName2.value) {
-    productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
-  }
-  if (selectedPackagingKgs2.value) {
-    productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
-    if (selectedProductionbatchScaleKgs.value) {
-      productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
+  if(trickerItem1N2.value){
+    console.log("Tricker true", trickerItem1N2.value)
+    productionPlan.value[index].product2SelectedCode = null
+    productionPlan.value[index].product2Name = null
+    productionPlan.value[index].product2SelectedPackagingCode = null
+    productionPlan.value[index].product2PackagingName = null
+    productionPlan.value[index].product2PackingQtyKgs = null
+    productionPlan.value[index].product2UomCount = null
+  }else{
+    console.log("Tricker false", trickerItem1N2.value)
+    if (selectedItemCode2.value) {
+      productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
+    }
+    if (selectedItemName2.value) {
+      productionPlan.value[index].product2Name = selectedItemName2.value
+    }
+    if (selectedPackagingType2.value) {
+      productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
+    }
+    if (selectedPackagingName2.value) {
+      productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
+    }
+    if (selectedPackagingKgs2.value) {
+      productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
+      if (selectedProductionbatchScaleKgs.value) {
+        productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
+      }
     }
   }
+
+
+  
 
   console.log("Updated row:", productionPlan.value[index])
 }
