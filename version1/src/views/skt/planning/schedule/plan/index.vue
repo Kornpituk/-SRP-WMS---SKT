@@ -11,6 +11,7 @@ import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
 import alertWordConst from '@/utilities/constant'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 
@@ -49,7 +50,7 @@ function openConfirmDialog() {
       isDialogVisibleAlertDialog.value = false
       console.log("selectedDataTables 102")
     }else if(item.statusId === 101){
-      textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
+      textAlertSubDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
       console.log("selectedDataTables 101")
     }
     else{
@@ -802,6 +803,7 @@ const formatDateDMY = date => {
 const { responseGenerateLotBatchProductionPlan, errorMessageGenerateLotBatchProductionPlan, generateLotBatchProdutcionPlanFunc } = useGenerateBatchProductionPlanService()
 
 const handleBtnGenerateLotBatch = async () => {
+  console.log("Alert: GenerateLotBatch", isDialogVisibleAlertDialog.value)
   try {
     await generateLotBatchProdutcionPlanFunc(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
 
@@ -3337,9 +3339,13 @@ const print = () => {
 
   <!-- Alert Dialog Success/Fiald new -->
   <section>
+    <VBtn @click="isDialogVisibleAlertDialog = true">
+      asdasd
+    </VBtn>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->
       <AuthenticatorDialog
+        v-if="false"
         :is-dialog-visible="isDialogVisibleAlertDialog"
         :word="wordForSubmit"
         :subword="subWordForSubmit"
@@ -3357,6 +3363,20 @@ const print = () => {
         @confirm="handleConfirmAction"
         @cancel="handleCancel"
       />
+    </div>
+
+    <div>
+      <!-- ใช้ AuthenticatorDialog Component -->
+      <AlertWord2
+        v-model="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :subword="subWordForSubmit"
+        :success="successDialAlert"
+      />
+
+      <VBtn @click="handleBtnGenerateLotBatch">
+        Generate Lot Batch
+      </VBtn>
     </div>
   </section>
 

@@ -1,70 +1,43 @@
 <script setup>
-import pixinventQr from '@images/pages/pixinvent-qr.png'
+import { computed, defineProps, defineEmits } from 'vue'
 
+// รับ props และ event
 const props = defineProps({
-  authCode: {
-    type: String,
-    required: false,
-  },
-  isDialogVisible: {
-    type: Boolean,
-    required: true,
-  },
-  success: {
+  modelValue: {
     type: Boolean,
     required: true,
   },
   word: {
     type: String,
-    default: 'Operation',
+    default: '',
   },
   subword: {
     type: String,
     default: '',
   },
+  success: {
+    type: Boolean,
+    required: true,
+  },
 })
 
-const emit = defineEmits(['update:isDialogVisible'])
+const emit = defineEmits(['update:modelValue'])
 
-// ใช้ ref แทน props
-const localDialogVisible = ref(false)
-
-// ใช้ watch เพื่อตรวจจับการเปลี่ยนแปลงของ props
-watch(
-  () => props.isDialogVisible,
-  newValue => {
-    localDialogVisible.value = newValue
-  },
-  { immediate: true }, // เพิ่ม immediate เพื่อให้ watch ทำงานทันทีเมื่อ component ถูก mount
-)
-
-const wordAlert = ref('')
-const subWordAlert = ref('')
-
-// Watch สำหรับ word และ subword
-watch(
-  () => [props.word, props.subword],
-  ([word, subword]) => {
-    if (word === 'REJECT') {
-      wordAlert.value = 'REJECTION'
-    } else {
-      wordAlert.value = word
-      subWordAlert.value = subword
-    }
-  },
-  { immediate: true },
-)
+// สร้าง computed เพื่อจัดการ modelValue
+const dialogVisible = computed({
+  get: () => props.modelValue,
+  set: value => emit('update:modelValue', value),
+})
 
 // ฟังก์ชันปิด Dialog
 const closeDialog = () => {
-  localDialogVisible.value = false
-  emit('update:isDialogVisible', false)
+  dialogVisible.value = false
 }
 </script>
 
 <template>
   <VDialog
-    v-model="localDialogVisible"
+    v-model="dialogVisible"
     class="v-dialog-sm"
   >
     <DialogCloseBtn
@@ -113,16 +86,16 @@ const closeDialog = () => {
           <span
             v-if="props.success"
             style="font-size: 22px; font-weight: bolder;"
-          >{{ wordAlert }} Completed.</span>
+          >{{ word }} Completed.</span>
           <span
             v-if="!props.success"
             style="font-size: 22px; font-weight: bolder;"
-          >{{ wordAlert }} Failed.</span>
+          >{{ word }} Failed.</span>
         </div>
       </VCardText>
       <VCardText class="d-flex justify-center">
         <div>
-          <span style="font-size: 16px; font-weight: bolder;">{{ subWordAlert }}</span>
+          <span style="font-size: 16px; font-weight: bolder;">{{ subword }}</span>
         </div>
       </VCardText>
 
