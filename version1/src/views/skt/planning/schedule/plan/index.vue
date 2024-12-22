@@ -3339,9 +3339,6 @@ const print = () => {
 
   <!-- Alert Dialog Success/Fiald new -->
   <section>
-    <VBtn @click="isDialogVisibleAlertDialog = true">
-      asdasd
-    </VBtn>
     <div>
       <!-- ใช้ AuthenticatorDialog component -->
       <AuthenticatorDialog
@@ -3373,10 +3370,6 @@ const print = () => {
         :subword="subWordForSubmit"
         :success="successDialAlert"
       />
-
-      <VBtn @click="handleBtnGenerateLotBatch">
-        Generate Lot Batch
-      </VBtn>
     </div>
   </section>
 

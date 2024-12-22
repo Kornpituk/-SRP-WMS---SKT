@@ -906,15 +906,6 @@ const dataTableColor = ref('#E0F7FA')
             <VTable>
               <thead>
                 <tr>
-                  <VProgressLinear
-                    height="10"
-                    color="primary"
-                    rounded
-                    style="width: 100%;"
-                    indeterminate
-                  />
-                </tr>
-                <tr>
                   <th>NO</th>
                   <th>Language</th>
                   <th>LabelName</th>
