@@ -1,9 +1,8 @@
+import SelectWhereHouse from '@/pages/selectWhereHouse.vue'
 import { setupLayouts } from 'virtual:generated-layouts'
-import { createRouter, createWebHistory } from 'vue-router'
-import { isUserLoggedIn } from './utils'
-import routes from '~pages'
-import { canNavigate } from '@layouts/plugins/casl'
 import { watchEffect } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import routes from '~pages'
 
 watchEffect(() => {
   console.log('AccessToken', localStorage.getItem('accessToken'))
@@ -36,24 +35,39 @@ const router = createRouter({
       path: '/pages/account-settings',
       redirect: () => ({ name: 'pages-account-settings-tab', params: { tab: 'account' } }),
     },
+    {
+      path: '/selectWhereHouse',
+      component: SelectWhereHouse,
+    },
     ...setupLayouts(routes),
   ],
 })
 
 
 // Docs: https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
-// router.beforeEach(to => {
-//   const isLoggedIn = isUserLoggedIn()
+// router.beforeEach( to =>  {
 
-//   if (canNavigate(to)) {
-//     if (to.meta.redirectIfLoggedIn && isLoggedIn)
-//       return '/'
+//   if(to.href != "/login" && to.href != "/selectWhereHouse"){
+//     console.log("router.beforeEach")
+
+//     const accessToken = localStorage.getItem('accessTokenAtStore')
+//     const whereHouse = localStorage.getItem('whereHouseName')
+//     const refreshToken = localStorage.getItem('refreshToken')
+
+//     axios.post(`${urlApi.value}/api/Auth/refreshToken`, { refreshToken: refreshToken }, {
+//       headers: {
+//         'accept': '*/*',
+//         'x-location': `${whereHouse}`,
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     }).then(response => {
+
+      
+//     })
+//     router.replace("/login")
 //   }
-//   else {
-//     if (isLoggedIn)
-//       return { name: 'not-authorized' }
-//     else
-//       return { name: 'login', query: { to: to.name !== 'dashboards-crm' ? to.fullPath : undefined } }
-//   }
+
 // })
+
+
 export default router

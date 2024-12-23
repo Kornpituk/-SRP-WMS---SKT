@@ -1,6 +1,5 @@
 <script setup>
 import { useGenerateImageVariant } from '@/@core/composable/useGenerateImageVariant'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import axios from '@axios'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
 import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
@@ -8,13 +7,10 @@ import authV2LoginIllustrationDark from '@images/pages/auth-v2-login-illustratio
 import authV2LoginIllustrationLight from '@images/pages/auth-v2-login-illustration-light.png'
 import authV2LoginMaskDark from '@images/pages/auth-v2-login-mask-dark.png'
 import authV2LoginMaskLight from '@images/pages/auth-v2-login-mask-light.png'
-import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
-import { themeConfig } from '@themeConfig'
 import {
   requiredValidator,
 } from '@validators'
 import { VForm } from 'vuetify/components/VForm'
-import { reactive, onMounted } from 'vue'
 
 import { urlApi } from '../api'
 
@@ -106,10 +102,11 @@ watchEffect(() => {
   }
 })
 
-const login = () => {
-
+function clearLocalStorage(){
   // Clear the access token from localStorage
   localStorage.removeItem('accessToken')
+  localStorage.removeItem('refreshToken')
+  
 
   // Clear the access token from localStorage
   localStorage.removeItem('accessTokenAtStore')
@@ -118,71 +115,76 @@ const login = () => {
   localStorage.removeItem('whereHouseName')
 
   localStorage.removeItem('nameCompany')
-  
-  axios.post(`${urlApi.value}/api/Auth`, {
+}
+
+const login = async () => {
+
+  var response = await axios.post(`${urlApi.value}/api/Auth`, {
     username: username.value,
     password: password.value,
     grantType: 'password',
+  }) .catch(err => {
+    // Handle errors
+    usernameError.value = 'Username not found.'
+    passwordError.value = 'Password not found.'
+    console.error('Error:', err) 
+    
+    return false
   })
-    .then(response => {
-      console.log(response.data)
 
-      const { access_token, refresh_token } = response.data
 
-      // Store access token in localStorage
-      localStorage.setItem('accessToken', access_token)
-      localStorage.setItem('accessTokenAtStore', access_token)
-      
+  if(response.status == 200){
+    console.log(response.data)
 
-      // ... store other relevant data if needed
+    const { access_token, refresh_token } = response.data
 
-      // Redirect to `to` query if exist or redirect to index route
-      // router.replace(route.query.to ? String(route.query.to) : '/selectWhereHouse')
+    // Store access token in localStorage
+    localStorage.setItem('accessToken', access_token)
+    localStorage.setItem('accessTokenAtStore', access_token)
+    localStorage.setItem('refreshToken', refresh_token)
+    
+    // ... store other relevant data if needed
 
-      if(!rememberMe){
-        localStorage.removeItem('rememberMeUserName')
-        localStorage.removeItem('rememberMe')
-      }
+    // Redirect to `to` query if exist or redirect to index route
+    // router.replace(route.query.to ? String(route.query.to) : '/selectWhereHouse')
 
-      //*------------------------------ Set จำนวนเวลาที่สามารถใช้งานได้ --------------------------
-      // const now = new Date().getTime()
-      // const sessionDuration = 1 * 60 * 1000 // 30 นาที
-      // const sessionExpiry = now + sessionDuration
+    if(!rememberMe){
+      localStorage.removeItem('rememberMeUserName')
+      localStorage.removeItem('rememberMe')
+    }
 
-      // localStorage.setItem('sessionExpiry', sessionExpiry)
+    //*------------------------------ Set จำนวนเวลาที่สามารถใช้งานได้ --------------------------
+    // const now = new Date().getTime()
+    // const sessionDuration = 1 * 60 * 1000 // 30 นาที
+    // const sessionExpiry = now + sessionDuration
 
-      //*------------------------------ Set จำนวนเวลาที่สามารถใช้งานได้ --------------------------
+    // localStorage.setItem('sessionExpiry', sessionExpiry)
 
-      router.replace('/selectWhereHouse')
-    })
-    .catch(error => {
-      // Handle errors
-      usernameError.value = 'Username not found.'
-      passwordError.value = 'Password not found.'
-      console.error('Error:', error)
-    })
+    //*------------------------------ Set จำนวนเวลาที่สามารถใช้งานได้ --------------------------
+    return true
+  }
 }
 
 const userData = ref([])
 
-const getInfoUserData = () => {
+const getInfoUserData = async () => {
   const accessToken = localStorage.getItem('accessToken')
 
-  axios.get(`${urlApi.value}/api/v1/User/me`, {
+  var response =  await axios.get(`${urlApi.value}/api/v1/User/me`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   })
-    .then(response => {
-      userData.value  = response.data
 
-      console.log('getInfoUserData: name', userData.username)
-      localStorage.setItem('userName', userData.username)
-      console.log("localStorage.setItem('userData', userData)", localStorage.getItem('userDate'))
-    })
+  if(response.status == 200){
+    userData.value  = response.data
+    console.log('getInfoUserData: name', userData.username)
+    localStorage.setItem('userName', userData.username)
+    console.log("localStorage.setItem('userData', userData)", localStorage.getItem('userDate'))
+  }
 }
 
-watchEffect(getInfoUserData)
+// watchEffect(getInfoUserData)
 
 const checkIsLogin = () => {
   // console.log('Check islogon userData:', localStorage.getItem('userDate'))
@@ -190,29 +192,38 @@ const checkIsLogin = () => {
 }
 
 
-const onSubmit = () => {
+const onSubmit = async () => {
   localStorage.setItem('userCheck', username.value)
+
+  clearLocalStorage()
 
   // console.log('!![username.value In Login 01]',username.value)
   // console.log('!![localStorage UserCheck In Login 01]', localStorage.getItem('userCheck', username.value))
   // const userTest = localStorage.getItem('userCheck')
   // console.log('Test:', userTest)
   
-  getInfoCompany()
+  // getInfoCompany()
 
-  const accessToken = localStorage.getItem('accessToken')
-  if (accessToken) {
-    console.error('Access token is available')
-    getInfoUserData()
-    checkIsLogin()
-  } else {
-    // Handle the case when accessToken is not available
-    console.error('Access token is not available')
+  // const accessToken = localStorage.getItem('accessToken')
+  // if (accessToken) {
+  //   console.error('Access token is available')
+  //   getInfoUserData()
 
-    // You might want to prompt the user to login again or handle this scenario accordingly
+  //   // checkIsLogin()
+  // } else {
+  //   // Handle the case when accessToken is not available
+  //   console.error('Access token is not available')
+
+  //   // You might want to prompt the user to login again or handle this scenario accordingly
+  // }
+
+  var isSuccess =  await login()
+
+  if(isSuccess){
+    await getInfoUserData()
+    router.replace('/selectWhereHouse')
   }
   
-  login()
 }
 
 const nameCompany = localStorage.getItem('companyName')

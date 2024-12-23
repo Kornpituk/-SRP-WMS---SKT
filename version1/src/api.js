@@ -22,7 +22,7 @@ const urlSkt = ref('https://sktwebapi.easetrackwms.com')
 const urlSktDev = ref('https://sktdevwebapi.easetrackwms.com')
 const urlTestSRP =ref('https://skttest1webapi.easetrackwms.com')
 
-const urlEnv = ref(import.meta.env.VITE_API_URL)
+const urlEnv = ref(process.env.VITE_API_URL)
 
-export const urlApi = urlSktDev
+export const urlApi = urlEnv
 

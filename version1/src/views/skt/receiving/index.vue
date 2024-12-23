@@ -12,7 +12,7 @@ import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 //---------------------- new rel table --------------------
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
-import { useItemStore, useCookieStore } from '@/stores/skt/receingFormStore/itemStore'
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 import { useCookie } from '@/stores/skt/receingFormStore/useCookie'
 
@@ -1343,9 +1343,12 @@ const dataPrintlabel = ref([])
 
 //------------------------ Print Label------------------------------------------
 // const success = ref(false)
-import { useViewPrintLabelFormService, usePrintReceivingFormService, 
-  usePrintInspectionFormService, usePrintPackagingFormService, 
-  usePrintExportExcelService }  from '@/services/skt/global/gloBalService'
+import {
+  usePrintExportExcelService,
+  usePrintInspectionFormService, usePrintPackagingFormService,
+  usePrintReceivingFormService,
+  useViewPrintLabelFormService,
+} from '@/services/skt/global/gloBalService'
 
 import { usePrintIPAFormService } from '@/services/skt/receivingFrom/lorry/ipaServices'
 

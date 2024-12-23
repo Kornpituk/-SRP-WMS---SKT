@@ -1,21 +1,20 @@
 <script setup>
 import navItems from '@/navigation/vertical'
+import { useAuthExStore } from '@/stores/AuthExpireStore'
 import { useThemeConfig } from '@core/composable/useThemeConfig'
 
 // Components
 import Footer from '@/layouts/components/Footer.vue'
 import NavBarI18n from '@/layouts/components/NavBarI18n.vue'
-import NavBarNotifications from '@/layouts/components/NavBarNotifications.vue'
-import NavbarShortcuts from '@/layouts/components/NavbarShortcuts.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
-import WhereHouse from '@/layouts/components/WhereHouse.vue'
-import NavSearchBar from '@/layouts/components/NavSearchBar.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
+import WhereHouse from '@/layouts/components/WhereHouse.vue'
+
 
 
 // @layouts plugin
-import { VerticalNavLayout } from '@layouts'
 import axios from '@axios'
+import { VerticalNavLayout } from '@layouts'
 
 const { appRouteTransition, isLessThanOverlayNavBreakpoint, isVerticalNavCollapsed } = useThemeConfig()
 const { width: windowWidth } = useWindowSize()
@@ -28,6 +27,7 @@ watch(isVerticalNavCollapsed, val => {
 })
 
 const router = useRouter() 
+const authStore = useAuthExStore()
 
 const NameUser = ref('addmin001')
 const whereHouseName = localStorage.getItem('WarehouseNameAtIcons')
@@ -106,6 +106,12 @@ const GetWhereHouse = () => {
 
 watchEffect(() => {
   NameUser.value = localStorage.getItem('userCheck')
+  console.log("AUTH : " + authStore.getAuth())
+  if(authStore.getAuth()===false){
+   
+    authStore.setAuth(false)
+    router.push('/login')
+  }
   GetWhereHouse()
 })
 
@@ -163,10 +169,19 @@ const removeUserCheck = () => {
         />
 
         <VChip color="white">
-          <span class="text-black">WH:&nbsp;&nbsp;</span> <span v-if="false" class="text-primary">{{ wareHouseName }}</span>&nbsp;<span style="text-transform: capitalize;" class="text-primary">{{ NameUser }}</span>
+          <span class="text-black">WH:&nbsp;&nbsp;</span> <span
+            v-if="false"
+            class="text-primary"
+          >{{ wareHouseName }}</span>&nbsp;<span
+            style="text-transform: capitalize;"
+            class="text-primary"
+          >{{ NameUser }}</span>
         </VChip>
 
-        <NavbarThemeSwitcher v-if="true" class="me-1" />
+        <NavbarThemeSwitcher
+          v-if="true"
+          class="me-1"
+        />
         <UserProfile v-if="false" />
 
         <VHover

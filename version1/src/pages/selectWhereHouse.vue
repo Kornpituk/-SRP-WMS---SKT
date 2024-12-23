@@ -1,15 +1,11 @@
 <script setup>
 import { useGenerateImageVariant } from '@/@core/composable/useGenerateImageVariant'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import axios from '@axios'
 import authV1LoginMaskDark from '@images/pages/auth-v1-login-mask-dark.png'
 import authV1LoginMaskLight from '@images/pages/auth-v1-login-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 
-import {
-  requiredValidator,
-} from '@validators'
 
 const router = useRouter() 
 
@@ -42,10 +38,10 @@ const url = ref(`${urlApi.value}/api/Auth/GetLocation/all`)
 const GetWhereHouse = () => {
   // Clear the access token cookie
   // document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
-  localStorage.removeItem('accessToken')
+  // localStorage.removeItem('accessToken')
 
   // Clear the access token from localStorage
-  localStorage.removeItem('accessToken')
+  // localStorage.removeItem('accessToken')
 
   axios.get(`${urlApi.value}/api/Auth/GetLocation`, {
     headers: {
@@ -139,8 +135,8 @@ const nameCompany = ref('company')
 const getInfoUser = () => {
   // Clear the access token cookie
   // document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
-  localStorage.removeItem('nameCompany')
-  localStorage.removeItem('accessToken')
+  // localStorage.removeItem('nameCompany')
+  // localStorage.removeItem('accessToken')
 
   axios.get(`${urlApi.value}/api/v1/User/me`, {
     headers: {
