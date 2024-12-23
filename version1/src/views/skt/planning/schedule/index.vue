@@ -61,7 +61,7 @@ function openConfirmDialog() {
     // กำหนดค่าเริ่มต้น
     console.log("selectedDataTables", item.statusId)
 
-    if (item.statusId === 102 ) {
+    if (item.statusId === 102 || item.statusId === 103 ) {
       wordForSubmit.value = alertWordConst.approve
       confirmDialog2.value.openDialog()
       isDialogVisibleAlertDialog.value = false
@@ -1740,7 +1740,7 @@ const newBatch = async batchID => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
-                  v-if="item.raw.statusId === 102"
+                  v-if="item.raw.statusId === 102 || item.raw.statusId === 103"
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"

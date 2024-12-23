@@ -282,21 +282,20 @@ const headersNewEx = [
     key: 'category',
   },
   {
-    title: 'Lot',
-    key: 'lot',
+    title: 'Plants',
+    key: 'Plants',
   },
   {
-    title: 'Lot QTY',
-    key: 'lotQty',
+    title: 'Reactor',
+    key: 'Reactor',
   },
   {
-    title: 'RCVD Date',
-    key: 'receivedDate',
-    
+    title: 'Production Code',
+    key: 'productionCode',
   },
   {
-    title: 'P/O No',
-    key: 'purchaseOrderNo',
+    title: 'Production Name',
+    key: 'productionName',
   },
   {
     title: 'Item Code',
@@ -306,7 +305,23 @@ const headersNewEx = [
     title: 'Item Name',
     key: 'productName',
   },
-  
+  {
+    title: 'Lot',
+    key: 'lot',
+  },
+  {
+    title: 'QTY(Kgs)',
+    key: 'qtyKgs',
+  },
+  {
+    title: 'QTY(PCS)',
+    key: 'qtyPcs',
+  },
+  {
+    title: 'Producing Date',
+    key: 'receivedDate',
+    
+  },
   {
     title: 'Update By',
     key: 'updatedBy',
@@ -400,7 +415,6 @@ const selectTemplate = async (item, index) => {
 
         if (result) {
           dataTemplatesByFileCode.value = getTemplateByFileCodeResult.value.data
-          isDialogPrintLabelVisible.value = false
           console.log('getTemplateByFileCodeResult', dataTemplatesByFileCode.value)
         } else {
           console.log('errorMessageGetTemplatesByFileCodeSearch', errorMessageGetTemplatesByFileCodeSearch.value)
@@ -413,7 +427,6 @@ const selectTemplate = async (item, index) => {
   } catch (error) {
     console.error('Error in selectTemplate:', error)
   }
-  isDialogPrintLabelVisible.value = false
 }
 
 
@@ -432,7 +445,6 @@ const printProdcutLabel = async () => {
 
     if (result) {
       // แสดง Dialog หลังจาก API ทำงานเสร็จ
-      isDialogPrintLabelVisible.value = false
       isLoadingPrintLabel.value = false
     } else {
       console.log(
@@ -574,7 +586,7 @@ const dataTableColor = ref('#E0F7FA')
                       class="d-flex align-center"
                       style="font-size: 12px;"
                     >
-                      Item Code
+                      Production Code/Name
                     </span>
                   </template>
                 </VTextField>
@@ -595,7 +607,7 @@ const dataTableColor = ref('#E0F7FA')
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Item Name
+                      Item Code/Name
                     </span>
                   </template>
                 </VTextField>
@@ -608,7 +620,7 @@ const dataTableColor = ref('#E0F7FA')
               >
                 <AppDateTimePicker
                   v-model="paramsFetchDataPrintLabel.receivedDate"
-                  placeholder="Production Date"
+                  placeholder="Producting Date"
                   density="compact"
                   :config="{ dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -631,7 +643,7 @@ const dataTableColor = ref('#E0F7FA')
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Reactor
+                      Plant/Reactor
                     </span>
                   </template>
                 </VTextField>
@@ -907,8 +919,11 @@ const dataTableColor = ref('#E0F7FA')
               <thead>
                 <tr>
                   <th>NO</th>
+                  <th>User Code</th>
+                  <th>User Name</th>
                   <th>Language</th>
-                  <th>LabelName</th>
+                  <th>Label Name</th>
+                  <th>File Name</th>
                   <th class="text-center">
                     Select
                   </th>
@@ -934,6 +949,31 @@ const dataTableColor = ref('#E0F7FA')
                     }"
                   >
                     {{ item.languageName }}
+                  </td>
+                  <td
+                    :style="{
+                      background:
+                        checkColorBgStatus(index).color
+                    }"
+                  >
+                    {{ item.languageName }}
+                  </td>
+                  <td
+                    :style="{
+                      background:
+                        checkColorBgStatus(index).color
+                    }"
+                  >
+                    {{ item.languageName }}
+                  </td>
+                  <td
+                    :style="{
+                      background:
+                        checkColorBgStatus(index).color
+                    }"
+                    style="min-width: 150px;"
+                  >
+                    {{ item.labelName }}
                   </td>
                   <td
                     :style="{
@@ -1016,6 +1056,8 @@ const dataTableColor = ref('#E0F7FA')
           :headers="headersNewEx"
           :items="dataPrintLabel"
           :items-per-page="10"
+          height="550"
+          fixed-header
           class="text-no-wrap"
         >
           <template #item="{item}">
@@ -1038,23 +1080,36 @@ const dataTableColor = ref('#E0F7FA')
               <td>
                 <span class="text-capitalize">{{ item.raw.category }}</span>
               </td>
+              
               <td>
-                <span class="text-capitalize">{{ item.raw.lot }}</span>
+                <span class="text-capitalize">{{ item.raw.Plants }}</span>
               </td>
               <td>
-                <span class="text-capitalize">{{ item.raw.lot }}</span>
+                <span class="text-capitalize">{{ item.raw.Reactor }}</span>
               </td>
               <td>
-                <span class="text-capitalize">{{ convertDate(item.raw.receivedDate) }}</span>
+                <span class="text-capitalize">{{ item.raw.productionCode }}</span>
               </td>
               <td>
-                <span class="text-capitalize">{{ item.raw.purchaseOrderNo }}</span>
+                <span class="text-capitalize">{{ item.raw.productionName }}</span>
               </td>
               <td>
                 <span class="text-capitalize">{{ item.raw.productId }}</span>
               </td>
               <td>
                 <span class="text-capitalize">{{ item.raw.productName }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.lot }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.qtyKgs }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.qtyPcs }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ convertDate(item.raw.receivedDate) }}</span>
               </td>
               <td>
                 <span class="text-capitalize">{{ (item.raw.updatedByName) }}</span>
