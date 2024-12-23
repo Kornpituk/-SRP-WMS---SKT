@@ -172,12 +172,11 @@ const itemsCategories = [
 
 const paramsFetchDataPrintLabel = ref({
   lot: '',
-  productId: '',
-  productName: '',
-  purchaseOrderNo: '',
-  receivedDate: '',
+  productionTextSearch: '',
+  itemTextSearch: '',
+  plantReactorTextSearch: '',
   category: '',
-  plant: '',
+  producingDate: '',
 })
 
 const clearModel = () => {
@@ -576,7 +575,7 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-2"
               >
                 <VTextField
-                  v-model="paramsFetchDataPrintLabel.productId"
+                  v-model="paramsFetchDataPrintLabel.productionTextSearch"
                   density="compact"
                   height="20px"
                   class="py-0"
@@ -600,7 +599,7 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-2"
               >
                 <VTextField
-                  v-model="paramsFetchDataPrintLabel.productName"
+                  v-model="paramsFetchDataPrintLabel.itemTextSearch"
                   density="compact"
                   height="20px"
                   class="py-0"
@@ -619,7 +618,7 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-1"
               >
                 <AppDateTimePicker
-                  v-model="paramsFetchDataPrintLabel.receivedDate"
+                  v-model="paramsFetchDataPrintLabel.producingDate"
                   placeholder="Producting Date"
                   density="compact"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -638,7 +637,7 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-1"
               >
                 <VTextField
-                  v-model="paramsFetchDataPrintLabel.purchaseOrderNo"
+                  v-model="paramsFetchDataPrintLabel.plantReactorTextSearch"
                   density="compact"
                 >
                   <template #label>
@@ -948,7 +947,7 @@ const dataTableColor = ref('#E0F7FA')
                         checkColorBgStatus(index).color
                     }"
                   >
-                    {{ item.languageName }}
+                    {{ item.userCode }}
                   </td>
                   <td
                     :style="{
@@ -956,7 +955,7 @@ const dataTableColor = ref('#E0F7FA')
                         checkColorBgStatus(index).color
                     }"
                   >
-                    {{ item.languageName }}
+                    {{ item.userName }}
                   </td>
                   <td
                     :style="{
@@ -982,7 +981,7 @@ const dataTableColor = ref('#E0F7FA')
                     }"
                     style="min-width: 150px;"
                   >
-                    {{ item.labelName }}
+                    {{ item.fileName }}
                   </td>
                   <td
                     :style="{
@@ -1082,10 +1081,10 @@ const dataTableColor = ref('#E0F7FA')
               </td>
               
               <td>
-                <span class="text-capitalize">{{ item.raw.Plants }}</span>
+                <span class="text-capitalize">{{ item.raw.plantName }}</span>
               </td>
               <td>
-                <span class="text-capitalize">{{ item.raw.Reactor }}</span>
+                <span class="text-capitalize">{{ item.raw.reactorName }}</span>
               </td>
               <td>
                 <span class="text-capitalize">{{ item.raw.productionCode }}</span>
@@ -1109,7 +1108,7 @@ const dataTableColor = ref('#E0F7FA')
                 <span class="text-capitalize">{{ item.raw.qtyPcs }}</span>
               </td>
               <td>
-                <span class="text-capitalize">{{ convertDate(item.raw.receivedDate) }}</span>
+                <span class="text-capitalize">{{ convertDate(item.raw.producingDate) }}</span>
               </td>
               <td>
                 <span class="text-capitalize">{{ (item.raw.updatedByName) }}</span>

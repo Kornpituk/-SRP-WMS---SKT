@@ -51,6 +51,109 @@ const specialRequests = ref([
   
 ])
 
+const GBSMockData = ref({
+  "No1": { title: "No.", c1: '1', c2: '2', c3: '3', c4: '4', c5: '5' },
+  "ubc1": { title: "UBC No", c1: "", c2: "", c3: "", c4: "", c5: ""  },
+  "GBS1": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: ""  },
+  "rows1": { 
+    "item1": [
+      { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "-ไม่บุบ ไม่เสียรูปทรง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "-ฐานรองรับแข็งแรง", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item2": [
+      { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item3": [
+      { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- ฝาเกลียวที่ใช้ขนาดถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item4": [
+      { "label": "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item5": [
+      { "label": "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+  },
+
+  "No2": { title: "No.", c1: '6', c2: '7', c3: '8', c4: '9', c5: '10' },
+  "ubc2": { title: "UBC No", c1: "", c2: "", c3: "", c4: "", c5: ""  },
+  "GBS2": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: ""  },
+  "rows2": { 
+    "item1": [
+      { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "-ไม่บุบ ไม่เสียรูปทรง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "-ฐานรองรับแข็งแรง", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item2": [
+      { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item3": [
+      { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- ฝาเกลียวที่ใช้ขนาดถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item4": [
+      { "label": "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item5": [
+      { "label": "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+  },
+
+  "No3": { title: "No.", c1: '11', c2: '12', c3: '13', c4: '14', c5: '15' },
+  "ubc3": { title: "UBC No", c1: "", c2: "", c3: "", c4: "", c5: ""  },
+  "GBS3": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: ""  },
+  "rows3": { 
+    "item1": [
+      { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "-ไม่บุบ ไม่เสียรูปทรง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "-ฐานรองรับแข็งแรง", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item2": [
+      { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item3": [
+      { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- ฝาเกลียวที่ใช้ขนาดถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item4": [
+      { "label": "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+    "item5": [
+      { "label": "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม", value1: false, value2: false, value3: false, value4: false, value5: false },
+    ],
+  }
+  ,
+})
+
+//--------------------------------------- Pagination ----------------------------------------------
+
+const currentPage = ref(1)  // หน้าที่กำลังแสดง
+const rowsPerPage = 5       // จำนวนแถวที่จะแสดงในแต่ละหน้า
+const totalRows = computed(() => Object.values(GBSMockData.value.rows1).flat().length)  // จำนวนแถวทั้งหมด
+
+const displayedRows = computed(() => {
+  const startIndex = (currentPage.value - 1) * rowsPerPage
+  const endIndex = startIndex + rowsPerPage
+  
+  return Object.values(GBSMockData.value.rows1).flat().slice(startIndex, endIndex)
+})
+
 const labelImages = ref([])
 
 
@@ -316,7 +419,10 @@ const dessertsMockAmountView = [
 
 <template>
   <VContainer fluid>
-    <span class="text-center d-flex justify-center" style="font-weight: bolder;">Resale / Product Shipping Check Sheet</span>
+    <span
+      class="text-center d-flex justify-center"
+      style="font-weight: bolder;"
+    >Resale / Product Shipping Check Sheet</span>
     <div class="my-6">
       <VRow>
         <VCol
@@ -587,7 +693,10 @@ const dessertsMockAmountView = [
                 </td>
               </tr>
               <tr>
-                <td colspan="12">
+                <td
+                  colspan="12"
+                  style="height: 159px;"
+                >
                   <VRow v-if="!labelImages.length">
                     <VCol cols="12">
                       <VFileInput
@@ -621,7 +730,6 @@ const dessertsMockAmountView = [
                   <VRow
                     v-if="labelImages.length"
                     class=" d-flex justify-center"
-                    style="border: 1px dashed black; border-radius: 10px;"
                   >
                     <VCol
                       v-for="(file, index) in labelImages"
@@ -629,6 +737,7 @@ const dessertsMockAmountView = [
                       cols="3"
                       md="3"
                       lg="3"
+                      style="min-height: 50px;"
                     >
                       <VCard class="pa-2">
                         <VImg
@@ -639,36 +748,8 @@ const dessertsMockAmountView = [
                           contain
                           @click="showDialogImageMuti(file.src, file.name)"
                         />
-                        
-                        <VCardText class="pa-2">
-                          <div class="d-flex flex-column align-center text-center">
-                            <span class="text-center">{{ file.name }}</span>
-                            <VBtn
-                              class="mt-2"
-                              icon="mdi-close"
-                              color="error"
-                              size="small"
-                              variant="tonal"
-                              @click="removeFileLabel(index)"
-                            />
-                          </div>
-                        </VCardText>
                       </VCard>
                     </VCol>
-
-                    <Vcol
-                      style="width: 100%;"
-                      cols="12"
-                    >
-                      <VBtn
-                        class="mx-2 mb-2"
-                        color="red"
-                        width="98%"
-                        @click="removeFilesInLabel(index)"
-                      >
-                        Delete Image
-                      </VBtn>
-                    </Vcol>
                   </VRow>
                   <VDialog
                     v-model="isDialogVisibleImgFileMuti"
@@ -740,24 +821,27 @@ const dessertsMockAmountView = [
                     borderStyle: 'solid',
                   }"
                   :class="{'bg-green-lighten-3': selectedLanguage.includes('Thai')}"
+                  style="height: 53px;"
                   @click="addItemsLang('Thai')"
                 >
                   Thai
                 </td>
                 <td
-                  rowspan="7"
+                  rowspan="9"
                   colspan="5"
                 >
-                  <VImg
-                    height="150"
-                    width="150"
-                    :src="image02"
-                    alt="Packaging Image"
-                    class="image"
-                  />
+                  <div class="d-flex justify-center">
+                    <VImg
+                      height="250"
+                      width="150"
+                      :src="image02"
+                      alt="Packaging Image"
+                      class="image"
+                    />
+                  </div>
                 </td>
                 <td
-                  rowspan="7"
+                  rowspan="9"
                   colspan="6"
                 >
                   <div class="d-flex justify-center">
@@ -781,6 +865,7 @@ const dessertsMockAmountView = [
               
                   }"
                   :class="{'bg-green-lighten-3': selectedLanguage.includes('English')}"
+                  style="height: 53px;"
                   @click="addItemsLang('English')"
                 >
                   English
@@ -797,6 +882,7 @@ const dessertsMockAmountView = [
                     borderStyle: 'solid',
                   }"
                   :class="{'bg-green-lighten-3': selectedLanguage.includes('Japanese')}"
+                  style="height: 53px;"
                   @click="addItemsLang('Japanese')"
                 >
                   Japanese
@@ -813,6 +899,7 @@ const dessertsMockAmountView = [
                     borderStyle: 'solid',
                   }"
                   :class="{'bg-green-lighten-3': selectedLanguage.includes('Chinese')}"
+                  style="height: 53px;"
                   @click="addItemsLang('Chinese')"
                 >
                   Chinese
@@ -829,6 +916,7 @@ const dessertsMockAmountView = [
                     borderStyle: 'solid',
                   }"
                   :class="{'bg-green-lighten-3': selectedLanguage.includes('Malaysia')}"
+                  style="height: 53px;"
                   @click="addItemsLang('Malaysia')"
                 >
                   Malaysia
@@ -845,6 +933,7 @@ const dessertsMockAmountView = [
                     borderStyle: 'solid',
                   }"
                   :class="{'bg-green-lighten-3': selectedLanguage.includes('Korean')}"
+                  style="height: 53px;"
                   @click="addItemsLang('Korean')"
                 >
                   Korean
@@ -861,10 +950,19 @@ const dessertsMockAmountView = [
                     borderStyle: 'solid',
                   }"
                   :class="{'bg-green-lighten-3': selectedLanguage.includes('SDS')}"
+                  style="height: 53px;"
                   @click="addItemsLang('SDS')"
                 >
                   SDS
                 </td>
+              </tr>
+              <tr>
+                <td
+                  class="text-center"
+                  colspan="1"
+                  ripple
+                  style="height: 106px;"
+                />
               </tr>
             </tbody>
           </table>
@@ -876,8 +974,8 @@ const dessertsMockAmountView = [
         <VCol
           class=""
           cols="12"
-          md="4"
-          lg="4"
+          md="6"
+          lg="6"
         >
           <table class="custom-table">
             <tr>
@@ -907,8 +1005,8 @@ const dessertsMockAmountView = [
         <VCol
           class=""
           cols="12"
-          md="8"
-          lg="8"
+          md="6"
+          lg="6"
         >
           <table class="custom-table">
             <!--  header table -->
@@ -961,69 +1059,73 @@ const dessertsMockAmountView = [
                 </td>
               </tr>
             </tbody>
-          </table>
-          <table class="custom-table">
-            <!--  header table -->
-            <tr>
-              <th
-                colspan="12"
-                class="section-title text-center"
-              >
-                Check The Packaging.
-              </th>
-            </tr>
-            <!--  body table -->
-            <tr>
-              <td colspan="4">
-                <div class="d-flex justify-center">
-                  Wrapping
-                </div>
-              </td>
-              <td colspan="4">
-                <div class="d-flex justify-center">
-                  <div class="d-flex justify-center align-center">
-                    <VCheckbox />
-                    Yes 
+
+            <thead>
+              <tr>
+                <th
+                  colspan="12"
+                  class="section-title text-center"
+                >
+                  Check The Packaging.
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    Wrapping
                   </div>
-                </div>
-              </td>
-              <td colspan="4">
-                <div class="d-flex justify-center">
-                  <div class="d-flex justify-center align-center">
-                    <VCheckbox />
-                    No 
+                </td>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    <div class="d-flex justify-center align-center">
+                      <VCheckbox />
+                      Yes 
+                    </div>
                   </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="4">
-                <div class="d-flex justify-center">
-                  Strap
-                </div>
-              </td>
-              <td colspan="4">
-                <div class="d-flex justify-center">
-                  <div class="d-flex justify-center align-center">
-                    <VCheckbox />
-                    Yes 
+                </td>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    <div class="d-flex justify-center align-center">
+                      <VCheckbox />
+                      No 
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td colspan="4">
-                <div class="d-flex justify-center">
-                  <div class="d-flex justify-center align-center">
-                    <VCheckbox />
-                    No 
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    Strap
                   </div>
-                </div>
-              </td>
-            </tr>
+                </td>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    <div class="d-flex justify-center align-center">
+                      <VCheckbox />
+                      Yes 
+                    </div>
+                  </div>
+                </td>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    <div class="d-flex justify-center align-center">
+                      <VCheckbox />
+                      No 
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </VCol>
       </VRow>
       
-      <div v-if="false" class="my-4">
+      <div
+        v-if="false"
+        class="my-4"
+      >
         <VBtn @click="addTruck">
           Add Truck
         </VBtn>
@@ -1036,6 +1138,237 @@ const dessertsMockAmountView = [
           See Label
         </VBtn>
       </div>
+
+      <section>
+        <table class="custom-table my-4">
+          <thead>
+            <tr>
+              <template
+                v-for="(Gbs, key) in GBSMockData.No1"
+                :key="key"
+              />
+              <th
+                colspan="4"
+                class="text-center"
+              >
+                {{ GBSMockData.No1.title }}
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                {{ GBSMockData.No1.c1 }}
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                {{ GBSMockData.No1.c2 }}
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                {{ GBSMockData.No1.c3 }}
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                {{ GBSMockData.No1.c4 }}
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                {{ GBSMockData.No1.c5 }}
+              </th>
+            </tr>
+
+            <tr>
+              <template
+                v-for="(Gbs, key) in GBSMockData.ubc1"
+                :key="key"
+              />
+              <th
+                colspan="4"
+                class="text-center"
+              >
+                {{ GBSMockData.ubc1.title }}
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.ubc1.c1"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.ubc1.c2"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.ubc1.c3"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.ubc1.c4"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.ubc1.c5"
+                  density="compact"
+                />
+              </th>
+            </tr>
+
+            <tr>
+              <template
+                v-for="(Gbs, key) in GBSMockData.GBS1"
+                :key="key"
+              />
+              <th
+                colspan="4"
+                class="text-center"
+              >
+                {{ GBSMockData.GBS1.title }}
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.GBS1.c1"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.GBS1.c2"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.GBS1.c3"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.GBS1.c4"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="GBSMockData.GBS1.c5"
+                  density="compact"
+                />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- วนลูปข้อมูล item1 และ item2 -->
+            <template
+              v-for="(items, key) in GBSMockData.rows1"
+              :key="key"
+            >
+              <!-- วนลูปแต่ละ row ใน item -->
+              <tr
+                v-for="(row, rowIndex) in items"
+                :key="rowIndex"
+              >
+                <td
+                  colspan="4"
+                  :class="{ 'font-weight-bold': row.label.match(/^\d+\./) }"
+                >
+                  {{ row.label }}
+                </td>
+                <td colspan="2">
+                  <div class="d-flex justify-center">
+                    <VCheckbox
+                      v-model="row.value1"
+                      density="compact"
+                    />
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div class="d-flex justify-center">
+                    <VCheckbox
+                      v-model="row.value2"
+                      density="compact"
+                    />
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div class="d-flex justify-center">
+                    <VCheckbox
+                      v-model="row.value3"
+                      density="compact"
+                    />
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div class="d-flex justify-center">
+                    <VCheckbox
+                      v-model="row.value4"
+                      density="compact"
+                    />
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div class="d-flex justify-center">
+                    <VCheckbox
+                      v-model="row.value5"
+                      density="compact"
+                    />
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <VPagination
+          v-model:page="currentPage"
+          :length="Math.ceil(totalRows.value / rowsPerPage)"
+          :total-visible="5"
+          class="my-4"
+        />
+      </section>
 
       <section
         v-for="(truck, index) in resaleProductShipping"

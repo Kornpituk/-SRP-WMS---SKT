@@ -1740,7 +1740,7 @@ const newBatch = async batchID => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
-                  v-if="item.raw.statusId === 102 || item.raw.statusId === 103"
+                  v-if="item.raw.statusId === 102 || item.raw.statusId === 107"
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"
