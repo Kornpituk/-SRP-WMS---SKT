@@ -568,8 +568,7 @@ const handleFileUpdates = updatedFiles => {
                   <!-- 👉 Search Product code -->
                   <AppDateTimePicker
                     v-model="date"
-                    label="ETA"
-                    placeholder="Select date"
+                    placeholder="Select ETA"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     density="compact"
                     :config="{ dateFormat: 'd/m/Y' }"
@@ -585,12 +584,16 @@ const handleFileUpdates = updatedFiles => {
                   <!-- 👉 Search Product code -->
                   <AppDateTimePicker
                     v-model="date"
-                    label="ETD"
                     prepend-inner-icon="ri-calendar-schedule-fill"
-                    placeholder="Select date"
+                    placeholder="Select ETD"
                     density="compact"
+                    style="font-size: 14px;"
                     :config="{ dateFormat: 'd/m/Y' }"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">ETD</span>
+                    </template>
+                  </AppDateTimePicker>
                 </VCol>
                 <VCol
                   cols="12"
@@ -601,10 +604,12 @@ const handleFileUpdates = updatedFiles => {
                   <!-- 👉 Search Product code -->
                   <VTextField
                     v-model="searchByProductId"
-                    :label="$t('Sale Order No.')"
-                    type="Sale Order No."
                     density="compact"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Sale Order No.</span>
+                    </template>
+                  </VTextField>
                 </VCol>
 
                 <!-- 👉 Select Product code -->
@@ -616,10 +621,12 @@ const handleFileUpdates = updatedFiles => {
                 >
                   <VTextField
                     v-model="searchByProductId"
-                    :label="$t('Payer Name')"
-                    type="Payer Name"
                     density="compact"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Payer Name</span>
+                    </template>
+                  </VTextField>
                 </VCol>
 
                 <!-- 👉 Select Product Name -->
@@ -631,10 +638,12 @@ const handleFileUpdates = updatedFiles => {
                 >
                   <VTextField
                     v-model="searchByProductName"
-                    :label="$t('Product Name')"
-                    type="Product Name"
                     density="compact"
-                  />
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Product Name</span>
+                    </template>
+                  </VTextField>
                 </VCol>
 
                 <!-- 👉 Button Search and Export -->
@@ -654,7 +663,7 @@ const handleFileUpdates = updatedFiles => {
                         
                         @click="isDialogPrintLabelVisible = true"
                       >
-                        {{ $t('Search') }}
+                        <span style="font-size: 12px;">{{ $t('Search') }}</span>
                       </VBtn>
                     </VCol>
                     <VCol cols="4">
@@ -665,7 +674,7 @@ const handleFileUpdates = updatedFiles => {
                         density="compact"
                         @click="clearModel"
                       >
-                        {{ $t('Clear') }}
+                        <span style="font-size: 12px;">{{ $t('Clear') }}</span>
                       </VBtn>
                     </VCol>
                     <VCol
@@ -684,7 +693,7 @@ const handleFileUpdates = updatedFiles => {
                           style="width: 27px;"
                           class="custom-small-img"
                         >
-                        <span style="font-size: 14px;">{{ $t('Export file') }}</span>
+                        <span style="font-size: 12px;">{{ $t('Export file') }}</span>
                       </VBtn>
                     </VCol>
                   </VRow>
