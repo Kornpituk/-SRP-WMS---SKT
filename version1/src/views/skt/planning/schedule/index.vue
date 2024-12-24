@@ -776,7 +776,7 @@ const newBatch = async batchID => {
                 class="cursor-pointer"
                 color="#FFFFFF"
                 :to="{
-                  name: 'dashboards-main',
+                  name: 'skt-receiving',
                 }"
               >
                 <VIcon

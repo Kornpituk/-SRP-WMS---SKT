@@ -181,12 +181,12 @@ const paramsFetchDataPrintLabel = ref({
 
 const clearModel = () => {
   paramsFetchDataPrintLabel.value.lot = ''
-  paramsFetchDataPrintLabel.value.productId = ''
-  paramsFetchDataPrintLabel.value.productName = ''
-  paramsFetchDataPrintLabel.value.purchaseOrderNo = ''
+  paramsFetchDataPrintLabel.value.productionTextSearch = ''
+  paramsFetchDataPrintLabel.value.itemTextSearch = ''
+  paramsFetchDataPrintLabel.value.plantReactorTextSearch = ''
   paramsFetchDataPrintLabel.value.receivedDate = ''
   paramsFetchDataPrintLabel.value.category = ''
-  paramsFetchDataPrintLabel.value.plant = ''
+  paramsFetchDataPrintLabel.value.producingDate = ''
 
   fetchData()
 }
@@ -495,7 +495,8 @@ const dataTableColor = ref('#E0F7FA')
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'dashboards-main',
+                :to="{
+                  name: 'skt-receiving',
                 }"
               >
                 <VIcon
