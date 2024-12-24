@@ -28,7 +28,11 @@ import TestTable from '@/pages/skt/planning/schedule/gridTable/tableTest.vue'
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
-import { useGetBatchProductionPlanService, useGetProductionPlanSearchService, useApproveProductionPlanService } from '@/services/skt/productionPlan/services'
+import { useGetBatchProductionPlanService, 
+  useGetProductionPlanSearchService, 
+  useApproveProductionPlanService,
+  usePrintExportExcelService,
+} from '@/services/skt/productionPlan/services'
 
 import { useFormatDateUtilities } from '@/utilities/utilities'
 
@@ -54,14 +58,25 @@ const confirmValueCheck = ref(false)
 //-- dialog 2 
 const confirmDialog2 = ref(null)
 
+const selectedDataTablesStatusId = ref('')
+
+watch( () => {
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    console.log("selectedDataTables", item.statusId)
+    selectedDataTablesStatusId.value = item.statusId
+  })
+})
+
 function openConfirmDialog() {
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
 
   selectedDataTables.value.forEach(item => {
     // กำหนดค่าเริ่มต้น
     console.log("selectedDataTables", item.statusId)
+    selectedDataTablesStatusId.value = item.statusId
 
-    if (item.statusId === 102 || item.statusId === 103 ) {
+    if (item.statusId === 102 || item.statusId === 107 ) {
       wordForSubmit.value = alertWordConst.approve
       confirmDialog2.value.openDialog()
       isDialogVisibleAlertDialog.value = false
@@ -81,7 +96,12 @@ function openConfirmDialog() {
 
 function handleConfirmAction() {
   console.log('Confirmed! Executing action...')
-  approvePlan()
+  if(selectedDataTablesStatusId.value === 102){
+    approvePlan('approve')
+  }else if(selectedDataTablesStatusId.value === 107){
+    approvePlan('PRODapproveplans')
+  }
+  
 }
 
 function handleCancel() {
@@ -308,6 +328,62 @@ const fetchDataProductingPlan = async () => {
   }
 }
 
+//----------------------------- export to excel --------------------------------
+
+//-------------------------------- Export Excel ----------------------------
+
+const { printExportExcelResult, printExportExcelErrorMessage, printExportExcelService } = usePrintExportExcelService()
+
+const filledParamsCount= ref('')
+
+const checkBtnExportExcel = () => {
+
+  filledParamsCount.value = Object.values(filterForSearchBatchProductionPlan.value).filter(value => value !== null && value !== '').length
+
+  return filledParamsCount.value === 0
+}
+
+const printExportExcel = async () => {
+  try {
+    if (datePickerFilter.value) {
+      console.log("datePickerFilter:", datePickerFilter.value)
+
+      if (datePickerFilter.value.includes(" to ")) {
+        // กรณีเป็นช่วงวันที่
+        const [startDate, endDate] = datePickerFilter.value.split(" to ")
+
+        filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
+        filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+
+      } else {
+        // กรณีเป็นวันเดียว
+        const singleDate = datePickerFilter.value
+
+        filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(singleDate)
+        filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
+      }
+    }
+    filterForSearchBatchProductionPlan.value.SortColumn = sortColumn.value
+    filterForSearchBatchProductionPlan.value.SortDirection = sortDirection.value
+
+    const resultFetchGet = await printExportExcelService(
+      urlApi.value, whereHouse, 
+      accessTokenAtStore, 
+      filterForSearchBatchProductionPlan.value)
+
+    if(resultFetchGet){
+      // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
+      console.log("printExportExcelResult", printExportExcelResult.value)
+    }else{
+      console.error("Error export production plan master data:", printExportExcelErrorMessage.value)
+    }
+
+    
+  } catch (error) {
+    console.error("Error export production plan master data:", error)
+  }
+}
+
 //--------------------------- New batch -----------------------------------------------------
 
 const { getBatchProductionplanResult, errorMessageGetBatchProductionPlan, fetchGetBatchProductionplan } = useGetBatchProductionPlanService()
@@ -348,13 +424,13 @@ const newBatchGenBatch = async () => {
 //------------------------------- approved ----------------------------------------------------------------
 const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approveProdutcionPlanFunc } = useApproveProductionPlanService()
 
-const approvePlan = async () => {
+const approvePlan = async type => {
 
   const body = selectedDataTables.value.map(item => item.planningID)
 
   try {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', type, whereHouse, accessTokenAtStore)
     if(responseApproveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.approve, true)
       setTimeout(() => {
@@ -765,7 +841,6 @@ const newBatch = async batchID => {
 
 <template>
   <!-- Title Page -->
-
   <div>
     <VCard>
       <VCardTitle>
@@ -964,12 +1039,12 @@ const newBatch = async batchID => {
                       md="4"
                     >
                       <VBtn
-                        disabled
                         density="compact"
                         class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                         color="warning"
                         style="width: 100%; height: 40px;"
-                        @click="stockUpdateExcel"
+                        :disabled="checkBtnExportExcel()"
+                        @click="printExportExcel"
                       >
                         <img
                           src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
@@ -1275,7 +1350,7 @@ const newBatch = async batchID => {
         <VRow>
           <VCol cols="10">
             <VBtn
-              :disabled="!selectedDataTables.length > 0"
+              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 102"
               @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">Approve</span>
@@ -1283,8 +1358,8 @@ const newBatch = async batchID => {
             <VBtn
               class="mx-2"
               color="info"
-              disabled
-              @click="viewAllData"
+              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 107"
+              @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">PROD Approved</span>
             </VBtn>

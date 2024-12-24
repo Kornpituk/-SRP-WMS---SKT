@@ -1214,7 +1214,7 @@ const approvePlan = async () => {
 
   try {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', 'approve', whereHouse, accessTokenAtStore)
     if(responseApproveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.approve, true)
       setTimeout(() => {

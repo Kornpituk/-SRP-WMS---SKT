@@ -191,31 +191,48 @@ const clearModel = () => {
   fetchData()
 }
 
+const statusData = ref(null)
+
 const fetchData = async () => {
+  progressLinearNoData.value = false
+  try {
+    const result = await printLabelFormViewService(
+      'GetProductLabels',
+      urlApi.value,
+      whereHouse,
+      accessTokenAtStore,
+      paramsFetchDataPrintLabel.value,
+    )
 
-  const result = await printLabelFormViewService('GetProductLabels', urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
-
-  progressLinearNoData.value = true
-  if (result) {
-    // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
-    dataPrintLabel.value = result.data.map((item, index) => ({
-      ...item, // คงข้อมูลเดิมใน item
-      no: index + 1, // เพิ่มฟิลด์ number โดยเริ่มจาก 1
-    }))
-
-    // dataPrintLabel.value = result
-
+    if (result) { // ตรวจสอบสถานะการตอบกลับ
+      printLabelFormViewResult.value = true
+      progressLinearNoData.value = true
+      dataPrintLabel.value = result.data.map((item, index) => ({
+        ...item,
+        no: index + 1,
+      }))
+      statusData.value = null
+      console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
+    } else {
+      // กรณี API ส่งผลลัพธ์ที่ไม่สำเร็จ
+      printLabelFormViewResult.value = false
+      dataPrintLabel.value = []
+      statusData.value = "No data found"
+      console.log("printLabelFormViewService failed view with result", result)
+    }
+  } catch (error) {
+    // จัดการข้อผิดพลาด เช่น Network Error
+    printLabelFormViewResult.value = false
+    statusData.value = "Error occurred while fetching data"
+    console.error("Error in fetchData:", error)
+  } finally {
+    // ไม่ว่าผลจะสำเร็จหรือล้มเหลว ปรับสถานะ progressLinearNoData
     progressLinearNoData.value = true
-    console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
-
-    // console.log("printLabelFormViewResult successfully view", printLabelFormViewResult.value)
-  } else {
-    console.log("printLabelFormViewService failed view")
   }
 }
 
-onMounted(() => {
-  fetchData()
+onMounted( async ()  => {
+  await fetchData()
 })
 
 const searchFilter = () => {
@@ -1028,7 +1045,7 @@ const dataTableColor = ref('#E0F7FA')
     <VCard>
       <VCardText>
         <VProgressLinear
-          v-if="!dataPrintLabel"
+          v-if="statusData && progressLinearNoData !== false"
           height="20"
           color="secondary"
           class="elevation-1"
@@ -1051,7 +1068,7 @@ const dataTableColor = ref('#E0F7FA')
           Test
         </VBtn>
         <VDataTable
-          v-if="dataPrintLabel && progressLinearNoData === true"
+          v-if="dataPrintLabel && !statusData"
           v-model="selectedDataTables"
           :headers="headersNewEx"
           :items="dataPrintLabel"
