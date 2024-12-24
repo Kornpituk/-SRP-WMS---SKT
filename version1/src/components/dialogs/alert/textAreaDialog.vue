@@ -51,13 +51,13 @@ watch(
 
 // ปิด Dialog
 const closeDialog = () => {
-  localDialog.value = false
-  emit('update:modelValue', '')  // เมื่อปิด dialog ให้ส่งค่ากลับเป็นค่าว่าง
+  emit('update:modelValue', false) // ส่งค่า false กลับไปยัง parent ก่อน
+  localDialog.value = false // ปิด dialog ที่ local
 }
 
 // ส่งข้อมูลกลับ Parent
 const submitDialog = () => {
-  emit('update:modelValue', { text1: localText.value, text2: localText2.value }) // ส่งค่ากลับ Parent
+  emit('update:modelValue', { text1: localText.value, text2: localText2.value }) // ส่งค่าข้อมูลกลับไป
   closeDialog()
 }
 </script>

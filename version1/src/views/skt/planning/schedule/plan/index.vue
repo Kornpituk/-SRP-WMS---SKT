@@ -24,6 +24,7 @@ const confirmDialog2 = ref(null)
 const statusId = ref(0)
 
 const textAlertDialogFunction = (word, success) => {
+  subWordForSubmit.value = ''
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
