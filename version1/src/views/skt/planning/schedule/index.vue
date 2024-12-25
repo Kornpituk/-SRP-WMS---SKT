@@ -32,6 +32,7 @@ import { useGetBatchProductionPlanService,
   useGetProductionPlanSearchService, 
   useApproveProductionPlanService,
   usePrintExportExcelService,
+  useGetStatusTextService,
 } from '@/services/skt/productionPlan/services'
 
 import { useFormatDateUtilities } from '@/utilities/utilities'
@@ -517,16 +518,11 @@ const rules = [v => v.length <= 150 || 'Max 25 characters']
 
 //---------------------------------
 
-const itemsStatus = [
-  { name: "All", id: null },
-  { name: "Draft PROD plan", id: 101 },
-  { name: "Waitting for plan APVL", id: 102 },
-  { name: "Waiting for Mat. Picking", id: 103 },
-  { name: "In Producing", id: 105 },
-  { name: "Waiting for FG/PROD APVL", id: 107 },
-  { name: "PROD Completed", id: 108 },
-  { name: "Plan Rejected", id: 109 },
-]
+const statusFormApi = ref({
+  StatusID: null,
+})
+
+const itemsStatus = ref([])
 
 const colorStatusWithId = id => {
   switch (id) {
@@ -837,6 +833,46 @@ const newBatch = async batchID => {
     console.error("Error in newBatch:", error)
   }
 }
+
+//----------------------- staus text --------------------------------
+
+const {  getStatusTextCodeResult, errorMessageGetStatusText, fetchGetStatusText } = useGetStatusTextService()
+
+onMounted(async () => {
+  try {
+    const result = await fetchGetStatusText(
+      urlApi.value,
+      'ProductionPlan',
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if (result && result.success && Array.isArray(result.data)) {
+      getStatusTextCodeResult.value = result.data // กำหนดค่าเฉพาะ data
+      itemsStatus.value = result.data.map(item => ({
+        id: item.statusId || '', // ค่า item-value
+        name: item.statusName || 'All', // ค่า item-title
+      }))
+      console.log('Status Text Code Result:', getStatusTextCodeResult.value)
+    } else {
+      console.error('Invalid data structure:', result)
+    }
+  } catch (error) {
+    console.error('Failed to fetch status text:', error)
+  }
+})
+
+const statusText = statusId => {
+  if (!getStatusTextCodeResult.value || !Array.isArray(getStatusTextCodeResult.value)) {
+    console.error('getStatusTextCodeResult is not available or not an array')
+    
+    return 'All'
+  }
+
+  const status = getStatusTextCodeResult.value.find(item => item.statusId === statusId)
+  
+  return status ? status.statusName : 'All'
+}
 </script>
 
 <template>
@@ -930,7 +966,7 @@ const newBatch = async batchID => {
                         style="min-height: 20px;"
                         :color="colorStatusWithId(item.raw.id).color"
                       >
-                        <span class="text-white">{{ colorStatusWithId(item.raw.id).text }}</span>
+                        <span class="text-white">{{ statusText(item.raw.id) }}</span>
                       </VChip>
                     </template>
                   </VAutocomplete>
@@ -1841,7 +1877,7 @@ const newBatch = async batchID => {
                   <VChip
                     :color="colorStatusWithId(item.raw.statusId).color"
                     :style="{ color: colorStatusWithId(item.raw.statusId).color }"
-                  >{{ colorStatusWithId(item.raw.statusId).text }}</VChip>
+                  >{{ statusText(item.raw.statusId) }}</VChip>
                 </span>
               </td>
               <td

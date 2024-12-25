@@ -365,4 +365,31 @@ export const productionPlanRepository = {
       throw new Error(`Failed to export Excel file: ${error.response?.data?.message || error.message}`)
     }
   },
+
+  async getStatusText(urlApi, form, whereHouse, accessToken) {
+    console.log('get repo getStatusText...')
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/status`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (response && response.data) {
+        console.log('success get repo getStatusText...')
+        console.log('Service Response data getStatusText:', response.data)
+        
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getStatusText...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getStatusText...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getStatusText ${error.response?.data?.message || error.message}`)
+    }
+  },
 }
