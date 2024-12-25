@@ -540,7 +540,7 @@ const dataTableColor = ref('#E0F7FA')
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'dashboards-main',
+                :to="{ name: 'skt-receiving',
                 }"
               >
                 <VIcon

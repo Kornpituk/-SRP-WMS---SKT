@@ -149,8 +149,8 @@ import { ProductionDataModel } from '@/model/skt/planning/production/model'
 
 const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
 
-const sortColumn = ref('producingDate')
-const sortDirection = ref('desc')
+const sortColumn = ref('')
+const sortDirection = ref('')
 
 const filterForSearchBatchProductionPlan = ref({
   StatusID: '',
@@ -703,12 +703,12 @@ const headersDataTableNew = [
     sortable: false,
   },
   {
-    title: 'Update By',
+    title: 'Updated By',
     key: 'updatedBy',
     sortable: false,
   },
   {
-    title: 'Update Date',
+    title: 'Updated Date',
     key: 'updatedDate',
     sortable: false,
   },

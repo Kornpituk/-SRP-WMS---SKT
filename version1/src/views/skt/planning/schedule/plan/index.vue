@@ -1400,12 +1400,12 @@ const headersDataTableNew = [
     key: 'remark',
   },
   {
-    title: 'Update By',
+    title: 'Updated By',
     sortable: false,
     key: 'updatedBy',
   },
   {
-    title: 'Update Date',
+    title: 'Updated Date',
     sortable: false,
     key: 'updateDated',
   },

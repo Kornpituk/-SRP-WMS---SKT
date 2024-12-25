@@ -1,6 +1,16 @@
 <script setup>
 import { ref } from "vue"
 
+import iconMock1 from '@images/icons/Group 1000004801.png'
+import iconMock2 from '@images/icons/Group 1000004802.png'
+import iconMock3 from '@images/icons/Icon.png'
+
+const iconMock = [
+  { iconName: 'icon1', src: iconMock1 },
+  { iconName: 'icon2', src: iconMock2 },
+  { iconName: 'icon3', src: iconMock3 },
+]
+
 const items = ref([
   { sktLotNo: '', productCode: '', tradeName: '', netWeight: '', packing: '', quantity: '', customerName: '', deliveryPlace: '' },
   { sktLotNo: '', productCode: '', tradeName: '', netWeight: '', packing: '', quantity: '', customerName: '', deliveryPlace: '' },
@@ -12,7 +22,6 @@ const conditions = ref({ shippingMark: false, sanyoChemical: false })
 const checkedBy = ref('')
 const preparedBy = ref('')
 const driverCheckedBy = ref('')
-
 
 const checkboxOne = ref(false)
 
@@ -141,6 +150,33 @@ const GBSMockData = ref({
   ,
 })
 
+const currentData = ref({
+  no: GBSMockData.value.No1,
+  ubc: GBSMockData.value.ubc1,
+  gbs: GBSMockData.value.GBS1,
+  rows: GBSMockData.value.rows1,
+})
+
+const currentDataIndex = ref(1) // ใช้สำหรับเก็บหมายเลขชุดข้อมูลปัจจุบัน
+
+function switchData(set) {
+  currentData.value.no = GBSMockData.value[`No${set}`]
+  currentData.value.ubc = GBSMockData.value[`ubc${set}`]
+  currentData.value.gbs = GBSMockData.value[`GBS${set}`]
+  currentData.value.rows = GBSMockData.value[`rows${set}`]
+}
+
+// ฟังก์ชัน switchData ที่เปลี่ยนชุดข้อมูล
+const switchDataSet = index => {
+  if (index >= 1 && index <= 3) {
+    currentDataIndex.value = index
+
+    currentData.value.no = GBSMockData.value[`No${index}`]
+    currentData.value.ubc = GBSMockData.value[`ubc${index}`]
+    currentData.value.gbs = GBSMockData.value[`GBS${index}`]
+    currentData.value.rows = GBSMockData.value[`rows${index}`]
+  }
+}
 
 //--------------------------------------- Pagination ----------------------------------------------
 
@@ -156,7 +192,6 @@ const displayedRows = computed(() => {
 })
 
 const labelImages = ref([])
-
 
 // Watch for changes in labelImages and clean up old URLs
 watch(labelImages, newFiles => {
@@ -191,7 +226,6 @@ const removeFilesInLabel = index => {
 const seeLabelItems = () => {
   console.log(labelImages.value)
 }
-
 
 // ติดตามการเปลี่ยนแปลงของไฟล์ที่เลือก
 watch(() => specialRequests.value[0].label, newFiles => {
@@ -698,60 +732,25 @@ const dessertsMockAmountView = [
                   colspan="12"
                   style="height: 159px;"
                 >
-                  <VRow v-if="!labelImages.length">
-                    <VCol cols="12">
-                      <VFileInput
-                        v-model="labelImages"
-                        multiple
-                        placeholder="Upload your documents"
-                        label="File input"
-                        prepend-icon="ri-attachment-line"
-                        accept="image/png, image/jpeg, image/bmp"
-                      >
-                        <template #selection="{ fileNames }">
-                          <template
-                            v-for="fileName in fileNames"
-                            :key="fileName"
-                          >
-                            <VChip
-                              label
-                              size="small"
-                              variant="outlined"
-                              color="primary"
-                              class="me-2"
-                            >
-                              {{ fileName }}
-                            </VChip>
-                          </template>
-                        </template>
-                      </VFileInput>
-                    </VCol>
-                  </VRow>
-
-                  <VRow
-                    v-if="labelImages.length"
-                    class=" d-flex justify-center"
-                  >
+                  <VRow>
                     <VCol
-                      v-for="(file, index) in labelImages"
+                      v-for="(file, index) in iconMock"
                       :key="index"
-                      cols="3"
-                      md="3"
-                      lg="3"
-                      style="min-height: 50px;"
+                      cols="4"
                     >
                       <VCard class="pa-2">
                         <VImg
                           role="presentation"
-                          :alt="file.name"
+                          :alt="file.iconName"
                           :src="file.src"
                           height="100"
                           contain
-                          @click="showDialogImageMuti(file.src, file.name)"
+                          @click="showDialogImageMuti(file.src, file.iconName)"
                         />
                       </VCard>
                     </VCol>
                   </VRow>
+
                   <VDialog
                     v-model="isDialogVisibleImgFileMuti"
                     width="500"
@@ -1144,65 +1143,57 @@ const dessertsMockAmountView = [
         <table class="custom-table my-4">
           <thead>
             <tr>
-              <template
-                v-for="(Gbs, key) in GBSMockData.No1"
-                :key="key"
-              />
               <th
                 colspan="4"
                 class="text-center"
               >
-                {{ GBSMockData.No1.title }}
+                {{ currentData.no.title }}
               </th>
               <th
                 colspan="2"
                 class="text-center"
               >
-                {{ GBSMockData.No1.c1 }}
+                {{ currentData.no.c1 }}
               </th>
               <th
                 colspan="2"
                 class="text-center"
               >
-                {{ GBSMockData.No1.c2 }}
+                {{ currentData.no.c2 }}
               </th>
               <th
                 colspan="2"
                 class="text-center"
               >
-                {{ GBSMockData.No1.c3 }}
+                {{ currentData.no.c3 }}
               </th>
               <th
                 colspan="2"
                 class="text-center"
               >
-                {{ GBSMockData.No1.c4 }}
+                {{ currentData.no.c4 }}
               </th>
               <th
                 colspan="2"
                 class="text-center"
               >
-                {{ GBSMockData.No1.c5 }}
+                {{ currentData.no.c5 }}
               </th>
             </tr>
 
             <tr>
-              <template
-                v-for="(Gbs, key) in GBSMockData.ubc1"
-                :key="key"
-              />
               <th
                 colspan="4"
                 class="text-center"
               >
-                {{ GBSMockData.ubc1.title }}
+                {{ currentData.ubc.title }}
               </th>
               <th
                 colspan="2"
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.ubc1.c1"
+                  v-model="currentData.ubc.c1"
                   density="compact"
                 />
               </th>
@@ -1211,7 +1202,7 @@ const dessertsMockAmountView = [
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.ubc1.c2"
+                  v-model="currentData.ubc.c2"
                   density="compact"
                 />
               </th>
@@ -1220,7 +1211,7 @@ const dessertsMockAmountView = [
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.ubc1.c3"
+                  v-model="currentData.ubc.c3"
                   density="compact"
                 />
               </th>
@@ -1229,7 +1220,7 @@ const dessertsMockAmountView = [
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.ubc1.c4"
+                  v-model="currentData.ubc.c4"
                   density="compact"
                 />
               </th>
@@ -1238,29 +1229,25 @@ const dessertsMockAmountView = [
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.ubc1.c5"
+                  v-model="currentData.ubc.c5"
                   density="compact"
                 />
               </th>
             </tr>
 
             <tr>
-              <template
-                v-for="(Gbs, key) in GBSMockData.GBS1"
-                :key="key"
-              />
               <th
                 colspan="4"
                 class="text-center"
               >
-                {{ GBSMockData.GBS1.title }}
+                {{ currentData.gbs.title }}
               </th>
               <th
                 colspan="2"
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.GBS1.c1"
+                  v-model="currentData.gbs.c1"
                   density="compact"
                 />
               </th>
@@ -1269,7 +1256,7 @@ const dessertsMockAmountView = [
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.GBS1.c2"
+                  v-model="currentData.gbs.c2"
                   density="compact"
                 />
               </th>
@@ -1278,7 +1265,7 @@ const dessertsMockAmountView = [
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.GBS1.c3"
+                  v-model="currentData.gbs.c3"
                   density="compact"
                 />
               </th>
@@ -1287,7 +1274,7 @@ const dessertsMockAmountView = [
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.GBS1.c4"
+                  v-model="currentData.gbs.c4"
                   density="compact"
                 />
               </th>
@@ -1296,13 +1283,13 @@ const dessertsMockAmountView = [
                 class="text-center"
               >
                 <VTextField
-                  v-model="GBSMockData.GBS1.c5"
+                  v-model="currentData.gbs.c5"
                   density="compact"
                 />
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody v-if="false">
             <!-- วนลูปข้อมูล item1 และ item2 -->
             <template
               v-for="(items, key) in GBSMockData.rows1"
@@ -1314,6 +1301,7 @@ const dessertsMockAmountView = [
                 :key="rowIndex"
               >
                 <td
+                  style="max-width: 250px;"
                   colspan="4"
                   :class="{ 'font-weight-bold': row.label.match(/^\d+\./) }"
                 >
@@ -1362,13 +1350,307 @@ const dessertsMockAmountView = [
               </tr>
             </template>
           </tbody>
+
+          <tbody>
+            <tr
+              v-for="(item, index) in currentData.rows.item1"
+              :key="index"
+            >
+              <td
+                style="max-width: 250px;"
+                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
+                colspan="4"
+              >
+                {{ item.label }}
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value1"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value2"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value3"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value4"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              v-for="(item, index) in currentData.rows.item2"
+              :key="index"
+            >
+              <td
+                style="max-width: 250px;"
+                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
+                colspan="4"
+              >
+                {{ item.label }}
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value1"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value2"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value3"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value4"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              v-for="(item, index) in currentData.rows.item3"
+              :key="index"
+            >
+              <td
+                style="max-width: 250px;"
+                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
+                colspan="4"
+              >
+                {{ item.label }}
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value1"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value2"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value3"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value4"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              v-for="(item, index) in currentData.rows.item5"
+              :key="index"
+            >
+              <td
+                style="max-width: 250px;"
+                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
+                colspan="4"
+              >
+                {{ item.label }}
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value1"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value2"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value3"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value4"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              v-for="(item, index) in currentData.rows.item5"
+              :key="index"
+            >
+              <td
+                style="max-width: 250px;"
+                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
+                colspan="4"
+              >
+                {{ item.label }}
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value1"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value2"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value3"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value4"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
-        <VPagination
-          v-model:page="currentPage"
-          :length="Math.ceil(totalRows.value / rowsPerPage)"
-          :total-visible="5"
-          class="my-4"
-        />
+        
+        <section>
+          <div>
+            <VRow>
+              <VCol cols="6" />
+              <VCol
+                cols="6"
+                class="d-flex justify-end"
+              >
+                <!-- ปุ่มย้อนกลับ (ไปที่ชุดข้อมูลก่อนหน้า) -->
+                <VBtn
+                  variant="text"
+                  icon
+                  class="mx-2"
+                  :disabled="currentDataIndex === 1"
+                  @click="switchDataSet(currentDataIndex - 1)"
+                >
+                  <VIcon icon="ri-arrow-left-s-line" />
+                </VBtn>
+
+                <!-- ปุ่มไปข้างหน้า (ไปที่ชุดข้อมูลถัดไป) -->
+                <VBtn
+                  variant="text"
+                  icon
+                  :disabled="currentDataIndex === 3"
+                  @click="switchDataSet(currentDataIndex + 1)"
+                >
+                  <VIcon icon="ri-arrow-right-s-line" />
+                </VBtn>
+              </VCol>
+            </VRow>
+          </div>
+        </section>
       </section>
 
       <section
