@@ -28,10 +28,10 @@ const checkboxOne = ref(false)
 const checkboxThree = ref(true)
 const checkboxTwo = ref(false)
 
-import image01 from '../image/01.png'
-import image02 from '../image/02.png'
-import image03 from '../image/03.png'
-import image04 from '../image/04.png'
+import image01 from '@/views/skt/shipping/image/01.png'
+import image02 from '@/views/skt/shipping/image/02.png'
+import image03 from '@/views/skt/shipping/image/03.png'
+import image04 from '@/views/skt/shipping/image/04.png'
 
 const selectedLanguage = ref([])
 
@@ -454,10 +454,27 @@ const dessertsMockAmountView = [
 
 <template>
   <VContainer fluid>
+    <div>
+      <div style="position: fixed;">
+        <VBtn
+          :to="{ name: 'skt-shipping',
+          }"
+          class="mx-2"
+          size="40"
+      
+          icon
+        >
+          <VIcon
+            size="40"
+            icon="ri-arrow-left-s-line"
+          />
+        </VBtn>
+      </div>
+    </div>
     <span
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
-    >Resale / Product Shipping Check Sheet</span>
+    >Resale / Product Shipping Check Sheet (Drum) on dd/mm/yyyy</span>
     <div class="my-6">
       <VRow>
         <VCol
@@ -472,7 +489,7 @@ const dessertsMockAmountView = [
                     colspan="9"
                     class="section-title text-center"
                   >
-                    SKT Name
+                    Sale Order: xxxxxxxx
                   </th>
                   <th
                     colspan="5"
@@ -1139,7 +1156,7 @@ const dessertsMockAmountView = [
         </VBtn>
       </div>
 
-      <section>
+      <section v-if="false">
         <table class="custom-table my-4">
           <thead>
             <tr>
@@ -1563,7 +1580,6 @@ const dessertsMockAmountView = [
                 </div>
               </td>
             </tr>
-
           </tbody>
         </table>
         
