@@ -511,5 +511,7 @@ export const  globalService = {
       throw new Error(`Failed to export PDF file: ${error.response?.data?.message || error.message}`)
     }
   },
+
+  
 }
   

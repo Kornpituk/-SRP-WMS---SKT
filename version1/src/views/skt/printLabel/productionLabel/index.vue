@@ -136,6 +136,7 @@ import { useFetchPrintLabelData,
   useGetTemplatesByItemCodeSearchService,
   useGetTemplatesByFileCodeSearchService,
   usePrintExportPDFProductLabelService,
+  useGetStatusTextService,
 } from '@/services/skt/global/gloBalService'
 
 const { printLabelFormViewResult, errorMessagePrintLabelView, printLabelFormViewService } = useFetchPrintLabelData()
@@ -445,7 +446,6 @@ const selectTemplate = async (item, index) => {
   }
 }
 
-
 const printProdcutLabel = async () => {
   isLoadingPrintLabel.value = true
   console.log("Authorization view", urlApi.value, whereHouse, accessTokenAtStore)
@@ -500,6 +500,7 @@ const isSelected = (item, type) => {
 
 const dataTableColor = ref('#E0F7FA')
 </script>
+
 
 <template>
   <!-- Title Page -->
