@@ -877,6 +877,20 @@ watchEffect(() => {
   comprePorductionCode()
 })
 
+const compireHightlight = (itemCodeNew, itemOld, ComProductionCode) => {
+  if(ComProductionCode){
+    if(itemCodeNew === itemOld){
+      return true
+    }
+  }else if(!ComProductionCode){
+    if(itemCodeNew === itemOld){
+      return true
+    }else{
+      return
+    }
+  }
+}
+
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const addSelectProdutionCode = index => {
@@ -2054,9 +2068,9 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2 && comprePorductionCode()
+                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1 && comprePorductionCode()
+                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2066,9 +2080,9 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2 && comprePorductionCode()
+                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1 && comprePorductionCode()
+                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2078,9 +2092,9 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2 && comprePorductionCode()
+                          item.raw.itemCode === selectItemCodeSwitch && btnSelectitem2
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1 && comprePorductionCode()
+                            : item.raw.itemCode === selectItemCodeSwitch && btnSelectitem1
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2151,9 +2165,9 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && comprePorductionCode()
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && comprePorductionCode()
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2163,21 +2177,21 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && comprePorductionCode()
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && comprePorductionCode()
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
                     >
-                      <span style="font-size: 12px;">{{ item.raw.itemName }} {{ comprePorductionCode() }} </span>
+                      <span style="font-size: 12px;">{{ item.raw.itemName }} </span>
                     </td>
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && comprePorductionCode()
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && comprePorductionCode()
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2190,9 +2204,9 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && comprePorductionCode()
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && comprePorductionCode()
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2205,6 +2219,8 @@ const print = () => {
                       >
                         Select
                       </VBtn>
+                     
+
                       <VBtn
                         v-if="item.raw.itemCode !== selectPackagingTypeSwitch"
                         :color="colorBtnSwitchActive()"
