@@ -1400,6 +1400,7 @@ const panel = ref(['filter'])
               </VMenu>
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
@@ -1993,7 +1994,7 @@ const panel = ref(['filter'])
             </td>
 
             <!-- 👉 Secondary product categories -->
-            <td class="text-start px-1">
+            <td v-if="false" class="text-start px-1">
               {{ product.typeName }}
             </td>
 
