@@ -453,3 +453,35 @@ export const usePrintExportPDFProductLabelService = () => {
     printExportPDFService,
   }
 }
+
+export const useGetStatusTextService = () => {
+  const getStatusTextCodeResult = ref(null)
+  const errorMessageGetStatusText = ref(null)
+  
+  const fetchGetStatusText = async (urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageGetStatusText.value = null
+      console.log('Fetching fetchGetStatusText...')
+  
+      const result = await globalService.getStatusText(urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Fetching data fetchGetStatusText:', result)
+        getStatusTextCodeResult.value = result
+        
+        return result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchGetStatusText:', error)
+      errorMessageGetStatusText.value = error.message
+    }
+  }
+  
+  return {
+    getStatusTextCodeResult,
+    errorMessageGetStatusText,
+    fetchGetStatusText,
+  }
+}

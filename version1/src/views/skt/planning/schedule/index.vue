@@ -28,7 +28,12 @@ import TestTable from '@/pages/skt/planning/schedule/gridTable/tableTest.vue'
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
-import { useGetBatchProductionPlanService, useGetProductionPlanSearchService, useApproveProductionPlanService } from '@/services/skt/productionPlan/services'
+import { useGetBatchProductionPlanService, 
+  useGetProductionPlanSearchService, 
+  useApproveProductionPlanService,
+  usePrintExportExcelService,
+  useGetStatusTextService,
+} from '@/services/skt/productionPlan/services'
 
 import { useFormatDateUtilities } from '@/utilities/utilities'
 
@@ -54,14 +59,25 @@ const confirmValueCheck = ref(false)
 //-- dialog 2 
 const confirmDialog2 = ref(null)
 
+const selectedDataTablesStatusId = ref('')
+
+watch( () => {
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    console.log("selectedDataTables", item.statusId)
+    selectedDataTablesStatusId.value = item.statusId
+  })
+})
+
 function openConfirmDialog() {
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
 
   selectedDataTables.value.forEach(item => {
     // กำหนดค่าเริ่มต้น
     console.log("selectedDataTables", item.statusId)
+    selectedDataTablesStatusId.value = item.statusId
 
-    if (item.statusId === 102 ) {
+    if (item.statusId === 102 || item.statusId === 107 ) {
       wordForSubmit.value = alertWordConst.approve
       confirmDialog2.value.openDialog()
       isDialogVisibleAlertDialog.value = false
@@ -81,7 +97,12 @@ function openConfirmDialog() {
 
 function handleConfirmAction() {
   console.log('Confirmed! Executing action...')
-  approvePlan()
+  if(selectedDataTablesStatusId.value === 102){
+    approvePlan('approve')
+  }else if(selectedDataTablesStatusId.value === 107){
+    approvePlan('PRODapproveplans')
+  }
+  
 }
 
 function handleCancel() {
@@ -129,8 +150,8 @@ import { ProductionDataModel } from '@/model/skt/planning/production/model'
 
 const { getProductionplanSearchResult, errorMessageGetProductionPlanSearch, fetchGetProductionplanSearch } = useGetProductionPlanSearchService()
 
-const sortColumn = ref('producingDate')
-const sortDirection = ref('desc')
+const sortColumn = ref('')
+const sortDirection = ref('')
 
 const filterForSearchBatchProductionPlan = ref({
   StatusID: '',
@@ -308,6 +329,62 @@ const fetchDataProductingPlan = async () => {
   }
 }
 
+//----------------------------- export to excel --------------------------------
+
+//-------------------------------- Export Excel ----------------------------
+
+const { printExportExcelResult, printExportExcelErrorMessage, printExportExcelService } = usePrintExportExcelService()
+
+const filledParamsCount= ref('')
+
+const checkBtnExportExcel = () => {
+
+  filledParamsCount.value = Object.values(filterForSearchBatchProductionPlan.value).filter(value => value !== null && value !== '').length
+
+  return filledParamsCount.value === 0
+}
+
+const printExportExcel = async () => {
+  try {
+    if (datePickerFilter.value) {
+      console.log("datePickerFilter:", datePickerFilter.value)
+
+      if (datePickerFilter.value.includes(" to ")) {
+        // กรณีเป็นช่วงวันที่
+        const [startDate, endDate] = datePickerFilter.value.split(" to ")
+
+        filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(startDate)
+        filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(endDate)
+
+      } else {
+        // กรณีเป็นวันเดียว
+        const singleDate = datePickerFilter.value
+
+        filterForSearchBatchProductionPlan.value.ProducingDateFrom = formatToMMDDYYYY(singleDate)
+        filterForSearchBatchProductionPlan.value.ProducingDateTo = formatToMMDDYYYY(singleDate)
+      }
+    }
+    filterForSearchBatchProductionPlan.value.SortColumn = sortColumn.value
+    filterForSearchBatchProductionPlan.value.SortDirection = sortDirection.value
+
+    const resultFetchGet = await printExportExcelService(
+      urlApi.value, whereHouse, 
+      accessTokenAtStore, 
+      filterForSearchBatchProductionPlan.value)
+
+    if(resultFetchGet){
+      // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
+      console.log("printExportExcelResult", printExportExcelResult.value)
+    }else{
+      console.error("Error export production plan master data:", printExportExcelErrorMessage.value)
+    }
+
+    
+  } catch (error) {
+    console.error("Error export production plan master data:", error)
+  }
+}
+
 //--------------------------- New batch -----------------------------------------------------
 
 const { getBatchProductionplanResult, errorMessageGetBatchProductionPlan, fetchGetBatchProductionplan } = useGetBatchProductionPlanService()
@@ -348,13 +425,13 @@ const newBatchGenBatch = async () => {
 //------------------------------- approved ----------------------------------------------------------------
 const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approveProdutcionPlanFunc } = useApproveProductionPlanService()
 
-const approvePlan = async () => {
+const approvePlan = async type => {
 
   const body = selectedDataTables.value.map(item => item.planningID)
 
   try {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', type, whereHouse, accessTokenAtStore)
     if(responseApproveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.approve, true)
       setTimeout(() => {
@@ -441,16 +518,11 @@ const rules = [v => v.length <= 150 || 'Max 25 characters']
 
 //---------------------------------
 
-const itemsStatus = [
-  { name: "All", id: null },
-  { name: "Draft PROD plan", id: 101 },
-  { name: "Waitting for plan APVL", id: 102 },
-  { name: "Waiting for Mat. Picking", id: 103 },
-  { name: "In Producing", id: 105 },
-  { name: "Waiting for FG/PROD APVL", id: 107 },
-  { name: "PROD Completed", id: 108 },
-  { name: "Plan Rejected", id: 109 },
-]
+const statusFormApi = ref({
+  StatusID: null,
+})
+
+const itemsStatus = ref([])
 
 const colorStatusWithId = id => {
   switch (id) {
@@ -627,12 +699,12 @@ const headersDataTableNew = [
     sortable: false,
   },
   {
-    title: 'Update By',
+    title: 'Updated By',
     key: 'updatedBy',
     sortable: false,
   },
   {
-    title: 'Update Date',
+    title: 'Updated Date',
     key: 'updatedDate',
     sortable: false,
   },
@@ -761,11 +833,50 @@ const newBatch = async batchID => {
     console.error("Error in newBatch:", error)
   }
 }
+
+//----------------------- staus text --------------------------------
+
+const {  getStatusTextCodeResult, errorMessageGetStatusText, fetchGetStatusText } = useGetStatusTextService()
+
+onMounted(async () => {
+  try {
+    const result = await fetchGetStatusText(
+      urlApi.value,
+      'ProductionPlan',
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if (result && result.success && Array.isArray(result.data)) {
+      getStatusTextCodeResult.value = result.data // กำหนดค่าเฉพาะ data
+      itemsStatus.value = result.data.map(item => ({
+        id: item.statusId || '', // ค่า item-value
+        name: item.statusName || 'All', // ค่า item-title
+      }))
+      console.log('Status Text Code Result:', getStatusTextCodeResult.value)
+    } else {
+      console.error('Invalid data structure:', result)
+    }
+  } catch (error) {
+    console.error('Failed to fetch status text:', error)
+  }
+})
+
+const statusText = statusId => {
+  if (!getStatusTextCodeResult.value || !Array.isArray(getStatusTextCodeResult.value)) {
+    console.error('getStatusTextCodeResult is not available or not an array')
+    
+    return 'All'
+  }
+
+  const status = getStatusTextCodeResult.value.find(item => item.statusId === statusId)
+  
+  return status ? status.statusName : 'All'
+}
 </script>
 
 <template>
   <!-- Title Page -->
-
   <div>
     <VCard>
       <VCardTitle>
@@ -776,7 +887,7 @@ const newBatch = async batchID => {
                 class="cursor-pointer"
                 color="#FFFFFF"
                 :to="{
-                  name: 'dashboards-main',
+                  name: 'skt-receiving',
                 }"
               >
                 <VIcon
@@ -855,7 +966,7 @@ const newBatch = async batchID => {
                         style="min-height: 20px;"
                         :color="colorStatusWithId(item.raw.id).color"
                       >
-                        <span class="text-white">{{ colorStatusWithId(item.raw.id).text }}</span>
+                        <span class="text-white">{{ statusText(item.raw.id) }}</span>
                       </VChip>
                     </template>
                   </VAutocomplete>
@@ -964,12 +1075,12 @@ const newBatch = async batchID => {
                       md="4"
                     >
                       <VBtn
-                        disabled
                         density="compact"
                         class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                         color="warning"
                         style="width: 100%; height: 40px;"
-                        @click="stockUpdateExcel"
+                        :disabled="checkBtnExportExcel()"
+                        @click="printExportExcel"
                       >
                         <img
                           src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
@@ -1275,7 +1386,7 @@ const newBatch = async batchID => {
         <VRow>
           <VCol cols="10">
             <VBtn
-              :disabled="!selectedDataTables.length > 0"
+              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 102"
               @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">Approve</span>
@@ -1283,8 +1394,8 @@ const newBatch = async batchID => {
             <VBtn
               class="mx-2"
               color="info"
-              disabled
-              @click="viewAllData"
+              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 107"
+              @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">PROD Approved</span>
             </VBtn>
@@ -1740,7 +1851,7 @@ const newBatch = async batchID => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
-                  v-if="item.raw.statusId === 102"
+                  v-if="item.raw.statusId === 102 || item.raw.statusId === 107"
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"
@@ -1766,7 +1877,7 @@ const newBatch = async batchID => {
                   <VChip
                     :color="colorStatusWithId(item.raw.statusId).color"
                     :style="{ color: colorStatusWithId(item.raw.statusId).color }"
-                  >{{ colorStatusWithId(item.raw.statusId).text }}</VChip>
+                  >{{ statusText(item.raw.statusId) }}</VChip>
                 </span>
               </td>
               <td

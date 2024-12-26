@@ -24,6 +24,7 @@ const confirmDialog2 = ref(null)
 const statusId = ref(0)
 
 const textAlertDialogFunction = (word, success) => {
+  subWordForSubmit.value = ''
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
@@ -587,9 +588,6 @@ const selectPlan = plan => {
   selectedPackagingType2.value = plan.itemCode
   selectedProductionCode2.value = plan.itemCode
 
-  console.log("selectedProductionCode", selectedProductionCode.value)
-
-  console.log("selectedProductionCode", selectedProductionCode.value)
 }
 
 const selectItemCode = plan => {
@@ -830,6 +828,7 @@ const handleBtnGenerateLotBatch = async () => {
 
 //------------------------------ func Save add data production plan service --------------------------------
 const indexSelectBoxFilter = ref(null)
+const productionCodeOld = ref(null)
 
 const selectFilterProduction = (index, item) => {
   indexSelectBoxFilter.value = index
@@ -845,6 +844,7 @@ const selectFilterProduction = (index, item) => {
   isDialogVisibleFilterSelect.value = true
 
   selectedProductionCode.value = productionPlan.value[index].productionCode
+  productionCodeOld.value = productionPlan.value[index].productionCode
 
   selectedItemCode.value = productionPlan.value[index].product1SelectedCode
   selectedPackagingType.value = productionPlan.value[index].product1SelectedPackagingCode
@@ -855,6 +855,42 @@ const selectFilterProduction = (index, item) => {
   console.log("Selected item", selectedItemCode.value)
 
 }
+
+const comprePorductionCode = () => {
+  const success = ref(false)
+  if(productionCodeOld.value === selectedProductionCode.value){
+    console.log("IF")
+    success.value = true
+    console.log("Selected", productionCodeOld.value, "=", selectedProductionCode.value, success.value)
+    
+  }else{
+    console.log("ELSE")
+    success.value = false
+    console.log("Selected", productionCodeOld.value, "=", selectedProductionCode.value, success.value)
+    
+  }
+
+  return success.value
+}
+
+watchEffect(() => {
+  comprePorductionCode()
+})
+
+const compireHightlight = (itemCodeNew, itemOld, ComProductionCode) => {
+  if(ComProductionCode){
+    if(itemCodeNew === itemOld){
+      return true
+    }
+  }else if(!ComProductionCode){
+    if(itemCodeNew === itemOld){
+      return true
+    }else{
+      return
+    }
+  }
+}
+
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const addSelectProdutionCode = index => {
@@ -1213,7 +1249,7 @@ const approvePlan = async () => {
 
   try {
   // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
-    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', 'approve', whereHouse, accessTokenAtStore)
     if(responseApproveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.approve, true)
       setTimeout(() => {
@@ -1399,12 +1435,12 @@ const headersDataTableNew = [
     key: 'remark',
   },
   {
-    title: 'Update By',
+    title: 'Updated By',
     sortable: false,
     key: 'updatedBy',
   },
   {
-    title: 'Update Date',
+    title: 'Updated Date',
     sortable: false,
     key: 'updateDated',
   },
@@ -2148,7 +2184,7 @@ const print = () => {
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
                     >
-                      <span style="font-size: 12px;">{{ item.raw.itemName }}</span>
+                      <span style="font-size: 12px;">{{ item.raw.itemName }} </span>
                     </td>
                     <td
                       :style="{
@@ -2183,6 +2219,8 @@ const print = () => {
                       >
                         Select
                       </VBtn>
+                     
+
                       <VBtn
                         v-if="item.raw.itemCode !== selectPackagingTypeSwitch"
                         :color="colorBtnSwitchActive()"
@@ -2980,24 +3018,24 @@ const print = () => {
                     class="pa-1"
                   >
                     <div style="font-size: 10px;">
-                      packaging exceed
+                      Packaging exceed
                     </div>
                     <div style="font-size: 10px;">
-                      the batch scale (kgs).
+                      the batch scale (Kgs).
                     </div>
                   </VAlert>
                   <span
                     v-if="item.raw.hasError"
                     style="font-size: 12px;"
                     class=""
-                  >packaging exceed</span>
+                  >Packaging exceed</span>
                 </div>
                 <div class="text-start">
                   <span
                     v-if="item.raw.hasError"
                     style="font-size: 12px;"
                     class=""
-                  >the batch scale (kgs).</span>
+                  >the batch scale (Kgs).</span>
                 </div>
               </td>
 

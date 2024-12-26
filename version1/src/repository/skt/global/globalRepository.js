@@ -219,11 +219,12 @@ export const  globalService = {
         },
         params: {
           lot: params.lot || '',
-          productId: params.productId || '',
-          productName: params.productName || '',
-          purchaseOrderNo: params.purchaseOrderNo || '',
-          receivedDate: params.receivedDate || '',
+          productionTextSearch: params.productionTextSearch || '',
+          itemTextSearch: params.itemTextSearch || '',
+          plantReactorTextSearch: params.plantReactorTextSearch || '',
           category: params.category || '',
+          producingDate: params.producingDate || '',
+          stockId: warehouseId,
         },
       })
 
@@ -510,5 +511,7 @@ export const  globalService = {
       throw new Error(`Failed to export PDF file: ${error.response?.data?.message || error.message}`)
     }
   },
+
+  
 }
   

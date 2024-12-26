@@ -1709,62 +1709,59 @@ const { printExportExcelResult, printExportExcelService } = usePrintExportExcelS
 const loadingPrintExportExcel = ref(false)
 
 const printExportExcelFunction = async () => {
+  console.log('Staet Export!')
   loadingPrintExportExcel.value = true
-  if (deliveryDateRange.value) {
-    const [fromDate, toDate] = deliveryDateRange.value.split(" to ")
-    if(deliveryDateRange.value === '' || deliveryDateRange.value === null || deliveryDateRange.value === undefined){
-      deliveryDateFrom.value = ''
 
-      deliveryDateTo.value = ''
-    }
+  const { deliveryDateRange, productId, productName, supplierId, supplierName, purchaseOrderNo } = searchFilters.value
 
-    deliveryDateFrom.value = fromDate
+  // จัดการวันที่
+  if (deliveryDateRange) {
+    const [fromDate, toDate] = deliveryDateRange.split(" to ")
 
-    deliveryDateTo.value = toDate
-  }else {
+    deliveryDateFrom.value = fromDate || ''
+    deliveryDateTo.value = toDate || ''
+  } else {
     deliveryDateFrom.value = ''
-
     deliveryDateTo.value = ''
   }
-  
 
-  if(statusFilter.value === 'All'){
-    fileterStatusInPAI.value = ''
-  } else {
-    fileterStatusInPAI.value = statusFilter.value
-  }
-  
+  // จัดการสถานะ
+  fileterStatusInPAI.value = statusFilter.value === 'All' ? '' : statusFilter.value
 
-  const fileterStatusInApiStr = ref('')
+  // แปลงสถานะเป็น String
+  const fileterStatusInApiStr = typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null
+    ? fileterStatusInPAI.value.join(',')
+    : fileterStatusInPAI.value
 
-  if (typeof fileterStatusInPAI.value === 'object' && fileterStatusInPAI.value !== null) {
-  // แปลงเป็น string
-    fileterStatusInApiStr.value = fileterStatusInPAI.value.join(',')
-  }else{
-    fileterStatusInApiStr.value = fileterStatusInPAI.value
-  }
   
   // กำหนดค่า params
   const params = {
     deliveryDateFrom: deliveryDateFrom.value,
     deliveryDateTo: deliveryDateTo.value,
-    productId: productId.value,
-    productName: productName.value,
-    supplierId: supplierId.value,
-    supplierName: supplierName.value,
-    statusName: fileterStatusInApiStr.value || '',
-    purchaseOrderNo: purchaseOrderNo.value,
+    productId: productId,
+    productName: productName,
+    supplierId: supplierId,
+    supplierName: supplierName,
+    statusName: fileterStatusInApiStr || '',
+    purchaseOrderNo: purchaseOrderNo,
   }
+
+  console.log('Staet Export!6')
 
   // ตรวจสอบว่ามีค่าที่ไม่ว่างอย่างน้อยหนึ่งค่าใน params
   const filledParamsCount = Object.values(params).filter(value => value !== null && value !== '').length
 
+  console.log('Staet Export!6.5')
+
   if (filledParamsCount < 1) {
-    console.warn('กรุณากรอกข้อมูลอย่างน้อย 1 ค่าในฟิลด์ที่จำเป็น')
+    console.log('กรุณากรอกข้อมูลอย่างน้อย 1 ค่าในฟิลด์ที่จำเป็น')
     loadingPrintExportExcel.value = false
-    
+    console.log('Staet Export!6.5.2')
+
     return
   }
+
+  console.log('Staet Export!7')
   
   try {
     // รอให้ printExportExcel ทำงานและได้ผลลัพธ์กลับมา

@@ -160,12 +160,12 @@ export const useApproveProductionPlanService = () => {
   const responseApproveProductionPlan = ref(null)
   const errorMessageApproveProductionPlan = ref(null)
   
-  const approveProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
+  const approveProdutcionPlanFunc = async (planningId, urlApi, form, type, whereHouse, accessToke) => {
     try {
       errorMessageApproveProductionPlan.value = null
       console.log('Approve Produtcion Plan Func...')
   
-      const result = await productionPlanRepository.approveProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
+      const result = await productionPlanRepository.approveProductionPlan(planningId, urlApi, form, type, whereHouse, accessToke)
         
       if (result) {
         console.log('Approve Produtcion Plan Func result:', result)
@@ -335,3 +335,75 @@ export const useSaveProductionPlanService = () => {
     saveProdutcionPlanFunc,
   }
 }
+
+//--------------------------------------- Excel ---------------------------------------
+
+export const usePrintExportExcelService = () => {
+  const printExportExcelResult = ref(null)
+  const printExportExcelErrorMessage = ref(null)
+
+  const printExportExcelService = async (urlApi, whereHouse, accessToken, params = {}) => {
+    try {
+      printExportExcelErrorMessage.value = null
+      console.log('Print Export Excel Form Service Starting...')
+  
+      const result = await productionPlanRepository.printExportExcel(urlApi, whereHouse, accessToken, params)
+        
+      if (result && result.success) {
+        console.log('Print Export Excel Form Service Complete:', result)
+        printExportExcelResult.value = result.data
+        
+        return { success: true, data: printExportExcelResult.value }
+      } else {
+        console.warn('Print Export Excel Form Service Failed')
+        
+        return { success: false, error: 'Print Export Excel Form Service Failed' }
+      }
+    } catch (error) {
+      console.error('Error in printExportExcelService:', error)
+      printExportExcelErrorMessage.value = error.message
+      printExportExcelResult.value = null
+      
+      return { success: false, error: error.message }
+    }
+  }
+  
+  return {
+    printExportExcelResult,
+    printExportExcelErrorMessage,
+    printExportExcelService,
+  }
+}
+
+export const useGetStatusTextService = () => {
+  const getStatusTextCodeResult = ref(null)
+  const errorMessageGetStatusText = ref(null)
+  
+  const fetchGetStatusText = async (urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageGetStatusText.value = null
+      console.log('Fetching fetchGetStatusText...')
+  
+      const result = await productionPlanRepository.getStatusText(urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Fetching data fetchGetStatusText:', result)
+        getStatusTextCodeResult.value = result
+        
+        return result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchGetStatusText:', error)
+      errorMessageGetStatusText.value = error.message
+    }
+  }
+  
+  return {
+    getStatusTextCodeResult,
+    errorMessageGetStatusText,
+    fetchGetStatusText,
+  }
+}
+

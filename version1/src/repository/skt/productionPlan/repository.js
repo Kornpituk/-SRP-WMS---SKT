@@ -246,9 +246,9 @@ export const productionPlanRepository = {
     }
   },
 
-  async approveProductionPlan(planningId, urlApi, form, whereHouse, accessToken) {
+  async approveProductionPlan(planningId, urlApi, form, type, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/approve`, planningId, {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/${type}`, planningId, {
         headers: {
           'x-location': whereHouse,
           'Authorization': `Bearer ${accessToken}`,
@@ -307,6 +307,89 @@ export const productionPlanRepository = {
       }
     } catch (error) {
       throw { success: false, error }
+    }
+  },
+
+  //------------------------------------------- Excel Production Plan --------------------------------------------
+  async printExportExcel(urlApi, whereHouse, accessToken, params = {}) {
+    try {
+      const response = await axios.get(
+        `${urlApi}/api/v1/ProductionPlan/ExportExcel/Production/Detail`,
+        {
+          headers: {
+            'accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            StatusID: params.StatusID,
+            ProductionTextSearch: params.ProductionTextSearch,
+            ItemTextSearch: params.ItemTextSearch,
+            ProducingDateFrom: params.ProducingDateFrom,
+            ProducingDateTo: params.ProducingDateTo,
+            LotTextSearch: params.LotTextSearch,
+            SortColumn: params.SortColumn,
+            SortDirection: params.SortDirection,
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response export Excel form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // สร้างลิงก์สำหรับดาวน์โหลดไฟล์
+        const link = document.createElement('a')
+
+        link.href = blobUrl
+        link.download = 'exported_file.xlsx' // ตั้งชื่อไฟล์ที่ต้องการให้ดาวน์โหลด
+        document.body.appendChild(link)
+        link.click()
+  
+        // ลบลิงก์ออกหลังการดาวน์โหลด
+        document.body.removeChild(link)
+        URL.revokeObjectURL(blobUrl) // ปิด URL Blob
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data generated for export Excel form')
+      }
+    } catch (error) {
+      console.error('Error in export excel:', error)
+      throw new Error(`Failed to export Excel file: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async getStatusText(urlApi, form, whereHouse, accessToken) {
+    console.log('get repo getStatusText...')
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/status`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (response && response.data) {
+        console.log('success get repo getStatusText...')
+        console.log('Service Response data getStatusText:', response.data)
+        
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getStatusText...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getStatusText...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getStatusText ${error.response?.data?.message || error.message}`)
     }
   },
 }

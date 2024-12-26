@@ -136,6 +136,7 @@ import { useFetchPrintLabelData,
   useGetTemplatesByItemCodeSearchService,
   useGetTemplatesByFileCodeSearchService,
   usePrintExportPDFProductLabelService,
+  useGetStatusTextService,
 } from '@/services/skt/global/gloBalService'
 
 const { printLabelFormViewResult, errorMessagePrintLabelView, printLabelFormViewService } = useFetchPrintLabelData()
@@ -172,51 +173,67 @@ const itemsCategories = [
 
 const paramsFetchDataPrintLabel = ref({
   lot: '',
-  productId: '',
-  productName: '',
-  purchaseOrderNo: '',
-  receivedDate: '',
+  productionTextSearch: '',
+  itemTextSearch: '',
+  plantReactorTextSearch: '',
   category: '',
-  plant: '',
+  producingDate: '',
 })
 
 const clearModel = () => {
   paramsFetchDataPrintLabel.value.lot = ''
-  paramsFetchDataPrintLabel.value.productId = ''
-  paramsFetchDataPrintLabel.value.productName = ''
-  paramsFetchDataPrintLabel.value.purchaseOrderNo = ''
+  paramsFetchDataPrintLabel.value.productionTextSearch = ''
+  paramsFetchDataPrintLabel.value.itemTextSearch = ''
+  paramsFetchDataPrintLabel.value.plantReactorTextSearch = ''
   paramsFetchDataPrintLabel.value.receivedDate = ''
   paramsFetchDataPrintLabel.value.category = ''
-  paramsFetchDataPrintLabel.value.plant = ''
+  paramsFetchDataPrintLabel.value.producingDate = ''
 
   fetchData()
 }
 
+const statusData = ref(null)
+
 const fetchData = async () => {
+  progressLinearNoData.value = false
+  try {
+    const result = await printLabelFormViewService(
+      'GetProductLabels',
+      urlApi.value,
+      whereHouse,
+      accessTokenAtStore,
+      paramsFetchDataPrintLabel.value,
+    )
 
-  const result = await printLabelFormViewService('GetProductLabels', urlApi.value, whereHouse, accessTokenAtStore, paramsFetchDataPrintLabel.value)
-
-  progressLinearNoData.value = true
-  if (result) {
-    // เพิ่มหมายเลขลำดับให้แต่ละข้อมูล
-    dataPrintLabel.value = result.data.map((item, index) => ({
-      ...item, // คงข้อมูลเดิมใน item
-      no: index + 1, // เพิ่มฟิลด์ number โดยเริ่มจาก 1
-    }))
-
-    // dataPrintLabel.value = result
-
+    if (result) { // ตรวจสอบสถานะการตอบกลับ
+      printLabelFormViewResult.value = true
+      progressLinearNoData.value = true
+      dataPrintLabel.value = result.data.map((item, index) => ({
+        ...item,
+        no: index + 1,
+      }))
+      statusData.value = null
+      console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
+    } else {
+      // กรณี API ส่งผลลัพธ์ที่ไม่สำเร็จ
+      printLabelFormViewResult.value = false
+      dataPrintLabel.value = []
+      statusData.value = "No data found"
+      console.log("printLabelFormViewService failed view with result", result)
+    }
+  } catch (error) {
+    // จัดการข้อผิดพลาด เช่น Network Error
+    printLabelFormViewResult.value = false
+    statusData.value = "Error occurred while fetching data"
+    console.error("Error in fetchData:", error)
+  } finally {
+    // ไม่ว่าผลจะสำเร็จหรือล้มเหลว ปรับสถานะ progressLinearNoData
     progressLinearNoData.value = true
-    console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
-
-    // console.log("printLabelFormViewResult successfully view", printLabelFormViewResult.value)
-  } else {
-    console.log("printLabelFormViewService failed view")
   }
 }
 
-onMounted(() => {
-  fetchData()
+onMounted( async ()  => {
+  await fetchData()
 })
 
 const searchFilter = () => {
@@ -282,21 +299,20 @@ const headersNewEx = [
     key: 'category',
   },
   {
-    title: 'Lot',
-    key: 'lot',
+    title: 'Plants',
+    key: 'Plants',
   },
   {
-    title: 'Lot QTY',
-    key: 'lotQty',
+    title: 'Reactor',
+    key: 'Reactor',
   },
   {
-    title: 'RCVD Date',
-    key: 'receivedDate',
-    
+    title: 'Production Code',
+    key: 'productionCode',
   },
   {
-    title: 'P/O No',
-    key: 'purchaseOrderNo',
+    title: 'Production Name',
+    key: 'productionName',
   },
   {
     title: 'Item Code',
@@ -306,7 +322,23 @@ const headersNewEx = [
     title: 'Item Name',
     key: 'productName',
   },
-  
+  {
+    title: 'Lot',
+    key: 'lot',
+  },
+  {
+    title: 'QTY(Kgs)',
+    key: 'qtyKgs',
+  },
+  {
+    title: 'QTY(PCS)',
+    key: 'qtyPcs',
+  },
+  {
+    title: 'Producing Date',
+    key: 'receivedDate',
+    
+  },
   {
     title: 'Update By',
     key: 'updatedBy',
@@ -400,7 +432,6 @@ const selectTemplate = async (item, index) => {
 
         if (result) {
           dataTemplatesByFileCode.value = getTemplateByFileCodeResult.value.data
-          isDialogPrintLabelVisible.value = false
           console.log('getTemplateByFileCodeResult', dataTemplatesByFileCode.value)
         } else {
           console.log('errorMessageGetTemplatesByFileCodeSearch', errorMessageGetTemplatesByFileCodeSearch.value)
@@ -413,9 +444,7 @@ const selectTemplate = async (item, index) => {
   } catch (error) {
     console.error('Error in selectTemplate:', error)
   }
-  isDialogPrintLabelVisible.value = false
 }
-
 
 const printProdcutLabel = async () => {
   isLoadingPrintLabel.value = true
@@ -432,7 +461,6 @@ const printProdcutLabel = async () => {
 
     if (result) {
       // แสดง Dialog หลังจาก API ทำงานเสร็จ
-      isDialogPrintLabelVisible.value = false
       isLoadingPrintLabel.value = false
     } else {
       console.log(
@@ -473,6 +501,7 @@ const isSelected = (item, type) => {
 const dataTableColor = ref('#E0F7FA')
 </script>
 
+
 <template>
   <!-- Title Page -->
   <div>
@@ -484,7 +513,8 @@ const dataTableColor = ref('#E0F7FA')
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'dashboards-main',
+                :to="{
+                  name: 'skt-receiving',
                 }"
               >
                 <VIcon
@@ -564,7 +594,7 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-2"
               >
                 <VTextField
-                  v-model="paramsFetchDataPrintLabel.productId"
+                  v-model="paramsFetchDataPrintLabel.productionTextSearch"
                   density="compact"
                   height="20px"
                   class="py-0"
@@ -574,7 +604,7 @@ const dataTableColor = ref('#E0F7FA')
                       class="d-flex align-center"
                       style="font-size: 12px;"
                     >
-                      Item Code
+                      Production Code/Name
                     </span>
                   </template>
                 </VTextField>
@@ -588,14 +618,14 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-2"
               >
                 <VTextField
-                  v-model="paramsFetchDataPrintLabel.productName"
+                  v-model="paramsFetchDataPrintLabel.itemTextSearch"
                   density="compact"
                   height="20px"
                   class="py-0"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Item Name
+                      Item Code/Name
                     </span>
                   </template>
                 </VTextField>
@@ -607,8 +637,8 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-1"
               >
                 <AppDateTimePicker
-                  v-model="paramsFetchDataPrintLabel.receivedDate"
-                  placeholder="Production Date"
+                  v-model="paramsFetchDataPrintLabel.producingDate"
+                  placeholder="Producting Date"
                   density="compact"
                   :config="{ dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -626,12 +656,12 @@ const dataTableColor = ref('#E0F7FA')
                 class="py-1"
               >
                 <VTextField
-                  v-model="paramsFetchDataPrintLabel.purchaseOrderNo"
+                  v-model="paramsFetchDataPrintLabel.plantReactorTextSearch"
                   density="compact"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Reactor
+                      Plant/Reactor
                     </span>
                   </template>
                 </VTextField>
@@ -907,8 +937,11 @@ const dataTableColor = ref('#E0F7FA')
               <thead>
                 <tr>
                   <th>NO</th>
+                  <th>User Code</th>
+                  <th>User Name</th>
                   <th>Language</th>
-                  <th>LabelName</th>
+                  <th>Label Name</th>
+                  <th>File Name</th>
                   <th class="text-center">
                     Select
                   </th>
@@ -933,6 +966,22 @@ const dataTableColor = ref('#E0F7FA')
                         checkColorBgStatus(index).color
                     }"
                   >
+                    {{ item.userCode }}
+                  </td>
+                  <td
+                    :style="{
+                      background:
+                        checkColorBgStatus(index).color
+                    }"
+                  >
+                    {{ item.userName }}
+                  </td>
+                  <td
+                    :style="{
+                      background:
+                        checkColorBgStatus(index).color
+                    }"
+                  >
                     {{ item.languageName }}
                   </td>
                   <td
@@ -943,6 +992,15 @@ const dataTableColor = ref('#E0F7FA')
                     style="min-width: 150px;"
                   >
                     {{ item.labelName }}
+                  </td>
+                  <td
+                    :style="{
+                      background:
+                        checkColorBgStatus(index).color
+                    }"
+                    style="min-width: 150px;"
+                  >
+                    {{ item.fileName }}
                   </td>
                   <td
                     :style="{
@@ -988,7 +1046,7 @@ const dataTableColor = ref('#E0F7FA')
     <VCard>
       <VCardText>
         <VProgressLinear
-          v-if="!dataPrintLabel"
+          v-if="statusData && progressLinearNoData !== false"
           height="20"
           color="secondary"
           class="elevation-1"
@@ -1011,11 +1069,13 @@ const dataTableColor = ref('#E0F7FA')
           Test
         </VBtn>
         <VDataTable
-          v-if="dataPrintLabel && progressLinearNoData === true"
+          v-if="dataPrintLabel && !statusData"
           v-model="selectedDataTables"
           :headers="headersNewEx"
           :items="dataPrintLabel"
           :items-per-page="10"
+          height="550"
+          fixed-header
           class="text-no-wrap"
         >
           <template #item="{item}">
@@ -1038,23 +1098,36 @@ const dataTableColor = ref('#E0F7FA')
               <td>
                 <span class="text-capitalize">{{ item.raw.category }}</span>
               </td>
+              
               <td>
-                <span class="text-capitalize">{{ item.raw.lot }}</span>
+                <span class="text-capitalize">{{ item.raw.plantName }}</span>
               </td>
               <td>
-                <span class="text-capitalize">{{ item.raw.lot }}</span>
+                <span class="text-capitalize">{{ item.raw.reactorName }}</span>
               </td>
               <td>
-                <span class="text-capitalize">{{ convertDate(item.raw.receivedDate) }}</span>
+                <span class="text-capitalize">{{ item.raw.productionCode }}</span>
               </td>
               <td>
-                <span class="text-capitalize">{{ item.raw.purchaseOrderNo }}</span>
+                <span class="text-capitalize">{{ item.raw.productionName }}</span>
               </td>
               <td>
                 <span class="text-capitalize">{{ item.raw.productId }}</span>
               </td>
               <td>
                 <span class="text-capitalize">{{ item.raw.productName }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.lot }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.qtyKgs }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ item.raw.qtyPcs }}</span>
+              </td>
+              <td>
+                <span class="text-capitalize">{{ convertDate(item.raw.producingDate) }}</span>
               </td>
               <td>
                 <span class="text-capitalize">{{ (item.raw.updatedByName) }}</span>
