@@ -1924,7 +1924,6 @@ const panel = ref(['filter'])
                       product.qty,
                       product.unitName,
                       product.details,
-                      
                     )"
                   />
                 </VBtn>
