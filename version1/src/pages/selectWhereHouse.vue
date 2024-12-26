@@ -17,9 +17,10 @@ const form = ref({
 const authV1ThemeLoginMask = useGenerateImageVariant(authV1LoginMaskLight, authV1LoginMaskDark)
 const isPasswordVisible = ref(false)
 
+import { onMounted } from 'vue'
 import { urlApi } from '../api'
 
-const whereHouseSelectedItem = ([])
+const whereHouseSelectedItem = ref(null)
 
 const items = ref([])
 
@@ -34,6 +35,10 @@ const userName = localStorage.getItem('userCheck')
 console.log("userName:", userName)
 
 const url = ref(`${urlApi.value}/api/Auth/GetLocation/all`)
+
+onMounted(async () => {
+  GetWhereHouse()
+})
 
 const GetWhereHouse = () => {
   // Clear the access token cookie
@@ -78,8 +83,6 @@ const GetWhereHouse = () => {
     
 }
 
-watchEffect(GetWhereHouse)
-
 // ----------------------------------  When Select Where House and Submit ------------------------
 console.log('whereHouseSelectedItem.value: ', whereHouseSelectedItem.value)
 
@@ -87,7 +90,6 @@ const saveToLocalStorage = () => {
   localStorage.setItem('whereHouseName', whereHouseSelectedItem.value)
 }
 
-watchEffect(saveToLocalStorage)
 
 const usernameError = ref('')
  
@@ -123,10 +125,6 @@ const onSubmitWhereHouse = () => {
   // router.replace('/dashboards/crm')
   
 }
-
-watchEffect(() => {
-  console.log("whereHouseSelectedItem.value!!", whereHouseSelectedItem.value)
-})
 
 
 const inFoUser = ref([])
@@ -176,7 +174,11 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="auth-wrapper d-flex align-center justify-center">
+  <div class="auth-wrapper d-flex justify-center align-center ma-auto">
+    <VImg
+      :src="authV1ThemeLoginMask"
+      class="d-none d-md-block auth-footer-mask"
+    />
     <VCard
       class="auth-card pt-4 px-10"
       max-width="500"
@@ -211,8 +213,8 @@ watchEffect(() => {
           <VRow>
             <!-- WareHouse -->
             <VCol cols="12 px-0">
-              <VAutocomplete
-                v-model="whereHouseSelectedItem.value"
+              <VSelect
+                v-model="whereHouseSelectedItem"
                 class="mb-4"
                 label="Warehouse "
                 :items="items"
@@ -239,10 +241,6 @@ watchEffect(() => {
         </VForm>
       </VCardText>
     </VCard>
-    <VImg
-      :src="authV1ThemeLoginMask"
-      class="d-none d-md-block auth-footer-mask"
-    />
   </div>
 </template>
 
