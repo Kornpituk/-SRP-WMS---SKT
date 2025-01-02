@@ -3220,4 +3220,99 @@ const getDisabledFollowStatusNRole = () => {
   </div>
 </template>
 
-<style lang="scss" src="./insp.scss"></style>
+<style scoped>
+.text-center {
+  text-align: center;
+}
+
+.centered-input >>> input {
+  padding: 10px;
+  text-align: center;
+}
+
+.custom-table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+.custom-table,
+.custom-table th,
+.custom-table td {
+  border: 1px solid black;
+  font-size: 12px;
+}
+
+.custom-radio-group .v-label {
+  font-size: 12px !important;
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 8px;
+  text-align: start;
+}
+
+.header {
+  justify-content: space-between;
+  font-weight: bold;
+  text-align: center;
+}
+
+.section-title {
+  font-weight: bold;
+}
+
+.image {
+  inline-size: 100px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.divider {
+  border-inline-end: 1px solid black;
+  line-height: 20px; /* ปรับค่า line-height ตามที่คุณต้องการ */
+  padding-inline-end: 10px;
+}
+
+.card-stack-container {
+  display: flex;
+  align-items: center !important; /* จัดกึ่งกลางแนวตั้ง */
+  justify-content: center !important; /* จัดกึ่งกลางแนวนอน */
+  block-size: 60px;
+  inline-size: 200px; /* กำหนดขนาดที่ต้องการสำหรับการ์ด */
+}
+
+.card {
+  position: absolute;
+  block-size: 70px;
+  inline-size: 60px;
+  transition: transform 0.3s ease;
+}
+
+.v-text-field >>> input {
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.cardHide:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 20%); /* เพิ่มเงาเมื่อ hover */
+  transform: translateY(-20px) !important; /* เลื่อนการ์ดขึ้น 10px เมื่อ hover */
+}
+
+.view-all-button {
+  margin-block-start: 16px;
+}
+
+.custom-date-time-picker >>> input {
+  font-size: 12px; /* ปรับขนาดของข้อความในฟิลด์ */
+}
+
+.custom-date-time-picker >>> input icon--prepend {
+  font-size: 12px; /* ปรับขนาดของไอคอนที่อยู่ด้านหน้า */
+}
+</style>
