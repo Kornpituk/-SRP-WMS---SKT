@@ -206,7 +206,7 @@ const validateFields = () => {
   // ตรวจสอบว่ามีฟิลด์ใดที่ไม่ใช่ค่าว่างอย่างน้อย 1 ค่า
   const hasValue = Object.values(fields).some(value => value !== '' && value.length !== 0)
 
-  if (!hasValue || !statusFilter.value) {
+  if (!hasValue || statusFilter.value === 'All') {
     disBtnExoport.value = true
     
     return false // คืนค่า false ถ้าไม่มีฟิลด์ไหนที่มีค่า

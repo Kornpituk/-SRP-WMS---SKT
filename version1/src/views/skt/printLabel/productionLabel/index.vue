@@ -159,7 +159,7 @@ const itemsTypeLabel = ref([
 const typePrintLabel = ref('Semi Label')
 
 //----------------------- Filter Status 
-const progressLinearNoData = ref(false)
+const progressLinearNoData = ref(true)
 
 //------------------------- Get Label ------------------------
 
@@ -168,16 +168,20 @@ const itemsCategoriesOld = ['Packaging', 'Raw material', 'Lorry']
 const itemsCategories = [
   { name: 'Product', value: 'Product' },
   { name: 'Resale', value: 'Resale' },
-  { name: 'All', value: '' },
 ]
+
+const sortColumn = ref('')
+const sortDirection = ref('')
 
 const paramsFetchDataPrintLabel = ref({
   lot: '',
   productionTextSearch: '',
   itemTextSearch: '',
   plantReactorTextSearch: '',
-  category: '',
+  category: null,
   producingDate: '',
+  sortColumn: '',
+  sortDirection: '',
 })
 
 const clearModel = () => {
@@ -186,17 +190,30 @@ const clearModel = () => {
   paramsFetchDataPrintLabel.value.itemTextSearch = ''
   paramsFetchDataPrintLabel.value.plantReactorTextSearch = ''
   paramsFetchDataPrintLabel.value.receivedDate = ''
-  paramsFetchDataPrintLabel.value.category = ''
+  paramsFetchDataPrintLabel.value.category = null
   paramsFetchDataPrintLabel.value.producingDate = ''
 
-  fetchData()
+  dataPrintLabel.value = []
 }
 
 const statusData = ref(null)
 
+const validatedFilterEmpty = () => {
+  return Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
+}
+
 const fetchData = async () => {
   progressLinearNoData.value = false
+
+  paramsFetchDataPrintLabel.value.sortColumn = sortColumn.value
+  paramsFetchDataPrintLabel.value.sortDirection = sortDirection.value
   try {
+
+    if (!validatedFilterEmpty()) {
+      progressLinearNoData.value = true
+      throw new Error('Invalid paramsFetchDataPrintLabel')
+    } 
+
     const result = await printLabelFormViewService(
       'GetProductLabels',
       urlApi.value,
@@ -204,6 +221,7 @@ const fetchData = async () => {
       accessTokenAtStore,
       paramsFetchDataPrintLabel.value,
     )
+    
 
     if (result) { // ตรวจสอบสถานะการตอบกลับ
       printLabelFormViewResult.value = true
@@ -232,9 +250,18 @@ const fetchData = async () => {
   }
 }
 
-onMounted( async ()  => {
+const toggleDirection = async key => {
+  if (key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+  }
+  sortColumn.value = key
   await fetchData()
-})
+}
+
+// onMounted( async ()  => {
+//   await fetchData()
+// })
 
 const searchFilter = () => {
   fetchData()
@@ -293,59 +320,72 @@ const headersNewEx = [
   {
     title: 'No.',
     key: 'no',
+    sortable: false,
   },
   {
     title: 'Category',
     key: 'category',
+    sortable: false,
   },
   {
     title: 'Plants',
-    key: 'Plants',
+    key: 'plantName',
+    sortable: false,
   },
   {
     title: 'Reactor',
-    key: 'Reactor',
+    key: 'reactorName',
+    sortable: false,
   },
   {
     title: 'Production Code',
     key: 'productionCode',
+    sortable: false,
   },
   {
     title: 'Production Name',
     key: 'productionName',
+    sortable: false,
   },
   {
     title: 'Item Code',
     key: 'productId',
+    sortable: false,
   },
   {
     title: 'Item Name',
     key: 'productName',
+    sortable: false,
   },
   {
     title: 'Lot',
     key: 'lot',
+    sortable: false,
   },
   {
     title: 'QTY(Kgs)',
     key: 'qtyKgs',
+    sortable: false,
   },
   {
     title: 'QTY(PCS)',
     key: 'qtyPcs',
+    sortable: false,
   },
   {
     title: 'Producing Date',
-    key: 'receivedDate',
-    
+    key: 'producingDate',
+    sortable: false,
   },
   {
     title: 'Update By',
-    key: 'updatedBy',
+    key: 'updatedByName',
+    sortable: false,
   },
   {
     title: 'Update Date',
     key: 'updatedDate',
+    sortable: false,
   },
 ]
 
@@ -581,7 +621,7 @@ const dataTableColor = ref('#E0F7FA')
                   clearable
                 >
                   <template #label>
-                    <span>Categories</span>
+                    <span style="font-size: 12px;">Categories</span>
                   </template>
                 </VSelect>
               </VCol>
@@ -709,6 +749,7 @@ const dataTableColor = ref('#E0F7FA')
                     md="6"
                   >
                     <VBtn
+                      :disabled="!validatedFilterEmpty()"
                       height="100%"
                       width="100%"
                       color="green"
@@ -1046,7 +1087,7 @@ const dataTableColor = ref('#E0F7FA')
     <VCard>
       <VCardText>
         <VProgressLinear
-          v-if="statusData && progressLinearNoData !== false"
+          v-if="dataPrintLabel.length < 1 && progressLinearNoData !== false"
           height="20"
           color="secondary"
           class="elevation-1"
@@ -1054,7 +1095,7 @@ const dataTableColor = ref('#E0F7FA')
           <span>No Data....</span>
         </VProgressLinear>
         <VProgressLinear
-          v-if="progressLinearNoData === false"
+          v-if="progressLinearNoData === false && dataPrintLabel.length < 1"
           height="20"
           indeterminate
           color="primary"
@@ -1069,7 +1110,7 @@ const dataTableColor = ref('#E0F7FA')
           Test
         </VBtn>
         <VDataTable
-          v-if="dataPrintLabel && !statusData"
+          v-if="dataPrintLabel.length > 0"
           v-model="selectedDataTables"
           :headers="headersNewEx"
           :items="dataPrintLabel"
@@ -1078,6 +1119,153 @@ const dataTableColor = ref('#E0F7FA')
           fixed-header
           class="text-no-wrap"
         >
+          <template #column.print="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}</span>
+              </th>
+            </tr>
+          </template>
+          <template #column.no="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}</span>
+              </th>
+            </tr>
+          </template>
+          <template #column.category="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.plantName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.productionCode="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.productionName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.productId="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.productName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.lot="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.qtyKgs="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.qtyPcs="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.producingDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.updatedByName="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.updatedDate="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+
           <template #item="{item}">
             <tr>
               <td style="position: sticky; z-index: 1; left: 0;">

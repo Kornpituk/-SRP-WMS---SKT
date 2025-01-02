@@ -156,12 +156,16 @@ const itemsTypeLabel = ref([
     title: 'Product Label',
     value: 'Product Label',
   },
+  {
+    title: 'All',
+    value: '',
+  },
 ])
 
 const typePrintLabel = ref('')
 
 //----------------------- Filter Status 
-const progressLinearNoData = ref(false)
+const progressLinearNoData = ref(true)
 const activeBtnprint = ref(false)
 
 //------------------------- Get Label ------------------------
@@ -171,8 +175,11 @@ const itemsCategoriesOld = ['Packaging', 'Raw material', 'Lorry']
 const itemsCategories = [
   { name: 'Packaging', value: 'Packaging' },
   { name: 'Raw material', value: 'Raw material' },
+  { name: 'Product', value: 'Product' },
+  { name: 'Resale', value: 'Resale' },
   { name: 'Lorry', value: 'Lorry' },
   { name: 'Semi', value: 'Semi' },
+  { name: 'All', value: '' },
 ]
 
 const paramsFetchDataPrintLabel = ref({
@@ -199,12 +206,12 @@ const clearModel = async () => {
   paramsFetchDataPrintLabel.value.receivedDate = ''
   paramsFetchDataPrintLabel.value.category = ''
 
-  await fetchData()
+  dataPrintLabel.value = []
 }
 
-onMounted( async () => {
-  await fetchData()
-})
+// onMounted( async () => {
+//   await fetchData()
+// })
 
 
 const fetchData = async () => {

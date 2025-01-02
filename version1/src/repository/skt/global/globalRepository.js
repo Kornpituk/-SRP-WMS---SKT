@@ -225,6 +225,8 @@ export const  globalService = {
           category: params.category || '',
           producingDate: params.producingDate || '',
           stockId: warehouseId,
+          SortColumn: params.sortColumn || '',
+          SortDirection: params.sortDirection || 'asc',
         },
       })
 
