@@ -411,7 +411,6 @@ const handleFileUpdates = updatedFiles => {
 
 <template>
   <!-- Title Page -->
-
   <div>
     <VCard>
       <VCardTitle>

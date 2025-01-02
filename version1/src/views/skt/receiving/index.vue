@@ -206,7 +206,7 @@ const validateFields = () => {
   // ตรวจสอบว่ามีฟิลด์ใดที่ไม่ใช่ค่าว่างอย่างน้อย 1 ค่า
   const hasValue = Object.values(fields).some(value => value !== '' && value.length !== 0)
 
-  if (!hasValue) {
+  if (!hasValue || !statusFilter.value) {
     disBtnExoport.value = true
     
     return false // คืนค่า false ถ้าไม่มีฟิลด์ไหนที่มีค่า
@@ -231,7 +231,7 @@ const validateFields = () => {
   }
 }
 
-watch(() => {
+watchEffect(() => {
   if(sessionStorage.getItem('fileterStatusInPAI') === 'null'){
     sessionStorage.setItem('fileterStatusInPAI', '')
   }
@@ -802,7 +802,6 @@ onMounted(() => {
 
 })
 
-
 const updateItemsPerPage = newItemsPerPage => {
   // อัปเดตค่าใน sessionStorage เมื่อมีการเปลี่ยนแปลง
   sessionStorage.setItem('itemsPerPage', newItemsPerPage)
@@ -1240,7 +1239,6 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   poEtILogAction.value = poEtlLogDetailJournalID
   findProductByJournalID(poEtlLogDetailJournalID)
   isDialogVisibleAction.value = true
-  
   
 }
 
@@ -1753,7 +1751,7 @@ const printExportExcelFunction = async () => {
 
   console.log('Staet Export!6.5')
 
-  if (filledParamsCount < 1) {
+  if (filledParamsCount < 1 || !fileterStatusInApiStr) {
     console.log('กรุณากรอกข้อมูลอย่างน้อย 1 ค่าในฟิลด์ที่จำเป็น')
     loadingPrintExportExcel.value = false
     console.log('Staet Export!6.5.2')
@@ -1859,7 +1857,6 @@ const isSelected = item => {
     selectedItem => selectedItem.journalID === item.journalID,
   )
 }
-
 
 const testBtn = () => {
   console.log('selectedDataTables', selectedDataTables.value)
@@ -3863,101 +3860,5 @@ const insetSwitch1 = ref('')
   </section>
 </template>
 
-<style scoped>
-.text-capitalize {
-  text-transform: capitalize;
-}
-
-.code input {
-  text-transform: lowercase;
-}
-
-.user-list-name:not(:hover) {
-  color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
-}
-
-.image-transition {
-  transition: inline-size 0.2s, inline-size 0.2s;
-}
-
-.fixed-top {
-  position: fixed; /* Fix the position relative to the viewport */
-  z-index: 1000; /* Ensure it's on top of other content */
-  inline-size: 92%; /* Set the width to 95% of the viewport width */
-  inset-block-start: 5%; /* Position it at the top of the viewport */
-}
-
-.fixed-bottom {
-  position: fixed;
-  display: flex;
-  box-sizing: border-box;
-  justify-content: start;
-  padding: 2px;
-  inline-size: 105vw;
-  inset-block-end: 0;
-  margin-block-end: 80px;
-  max-inline-size: 1500vw; /* ไม่ให้เกินขอบหน้าจอ */
-}
-
-.spinning {
-  animation: spin 0.5s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.v-text-field >>> input {
-  font-size: 12px !important;
-
-  /* text-transform: capitalize; */
-}
-
-.v-text-field-density-compact >>> input {
-  padding-block-start: 10px;
-
-  /* text-transform: capitalize; */
-}
-
-.custom-date-time-picker >>> input {
-  font-size: 12px; /* ปรับขนาดของข้อความในฟิลด์ */
-}
-
-.custom-date-time-picker >>> input icon--prepend {
-  font-size: 12px; /* ปรับขนาดของไอคอนที่อยู่ด้านหน้า */
-}
-
-.custom-header {
-  margin: 2px; /* ปรับค่า margin ที่นี่ */
-}
-
-.auto-wide-table {
-  inline-size: 100%; /* ให้ตารางใช้ความกว้างทั้งหมด */
-  table-layout: auto; /* ให้ตารางปรับขนาดตามเนื้อหา */
-}
-
-.auto-wide-table th,
-.auto-wide-table td {
-  max-inline-size: 250px; /* กำหนดความกว้างสูงสุด */
-  overflow-wrap: break-word; /* ให้ข้อความตัดบรรทัดเมื่อยาวเกิน */
-  white-space: normal; /* ให้ข้อความสามารถตัดบรรทัดได้ */
-  word-wrap: break-word; /* รองรับข้อความตัดบรรทัด */
-}
-
-/* กำหนด CSS สำหรับคอลัมน์ที่ต้องการให้ sticky ด้านซ้าย */
-.pa-5 {
-  position: sticky;
-  z-index: 1;
-  background-color: white;
-  inset-inline-start: 0;
-}
-
-/* กำหนด CSS สำหรับคอลัมน์ Action ที่ต้องการให้ sticky ด้านขวา */
-.sticky-right {
-  position: sticky;
-  z-index: 1;
-  inset-inline-end: 0;
-}
-</style>
+<style lang="scss" src="./receivingPlan.scss"></style>
 

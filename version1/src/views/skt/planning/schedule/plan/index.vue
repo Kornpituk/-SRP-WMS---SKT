@@ -3430,33 +3430,5 @@ const print = () => {
   </section>
 </template>
 
-<style lang="scss">
-.text-capitalize {
-  text-transform: capitalize;
-}
-
-.user-list-name:not(:hover) {
-  color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
-}
-
-// Hover For Image Product
-.image-transition {
-  transition: inline-size 0.2s, inline-size 0.2s;
-}
-
-.fixed-bottom {
-  position: fixed;
-  justify-content: center;
-  inline-size: 95%;
-  inset-block-end: 0;
-}
-
-.spinning {
-  animation: spin 0.5s linear infinite;
-}
-
-.my-header-style {
-  background: aquamarine;
-}
-</style>
+<style lang="scss" src="./batch.scss"></style>
 

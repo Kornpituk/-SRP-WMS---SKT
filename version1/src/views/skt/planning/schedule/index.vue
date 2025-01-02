@@ -155,11 +155,11 @@ const sortDirection = ref('')
 
 const filterForSearchBatchProductionPlan = ref({
   StatusID: '',
-  ProductionTextSearch: sessionStorage.getItem("ProductionTextSearchProductionFilter"),
-  ItemTextSearch: sessionStorage.getItem("ItemTextSearchProductionFilter"),
-  ProducingDateFrom: sessionStorage.getItem("ProducingDateFromProductionFilter"),
-  ProducingDateTo: sessionStorage.getItem("ProducingDateToProductionFilter"),
-  LotTextSearch: sessionStorage.getItem("LotTextSearchProductionFilter"),
+  ProductionTextSearch: sessionStorage.getItem("ProductionTextSearchProductionFilter") || '',
+  ItemTextSearch: sessionStorage.getItem("ItemTextSearchProductionFilter") || '',
+  ProducingDateFrom: sessionStorage.getItem("ProducingDateFromProductionFilter") || '',
+  ProducingDateTo: sessionStorage.getItem("ProducingDateToProductionFilter") || '',
+  LotTextSearch: sessionStorage.getItem("LotTextSearchProductionFilter") || '',
   SortColumn: '',
   SortDirection: '',
 })
@@ -942,7 +942,7 @@ const statusText = statusId => {
                   sm="6"
                   class="py-1"
                 >
-                  <VAutocomplete
+                  <VSelect
                     v-model="filterForSearchBatchProductionPlan.StatusID"
                     :items="itemsStatus"
                     item-title="name"
@@ -969,7 +969,7 @@ const statusText = statusId => {
                         <span class="text-white">{{ statusText(item.raw.id) }}</span>
                       </VChip>
                     </template>
-                  </VAutocomplete>
+                  </VSelect>
                 </VCol>
 
                 <VCol
@@ -2403,35 +2403,4 @@ const statusText = statusId => {
   </section>
 </template>
 
-<style scoped>
-.active-row {
-  background-color: lightgreen;
-}
-
-.inactive-row {
-  background-color: lightcoral;
-}
-
-.text-capitalize {
-  text-transform: capitalize;
-}
-
-.user-list-name:not(:hover) {
-  color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
-}
-
-.fixed-bottom {
-  position: fixed;
-  justify-content: center;
-  inline-size: 95%;
-  inset-block-end: 0;
-}
-
-.spinning {
-  animation: spin 0.5s linear infinite;
-}
-
-.my-header-style {
-  background: aquamarine;
-}
-</style>
+<style lang="scss" src="./productionPlan.scss"></style>
