@@ -838,7 +838,7 @@ const newBatch = async batchID => {
 
 const {  getStatusTextCodeResult, errorMessageGetStatusText, fetchGetStatusText } = useGetStatusTextService()
 
-onMounted(async () => {
+watch(async () => {
   try {
     const result = await fetchGetStatusText(
       urlApi.value,
@@ -851,9 +851,16 @@ onMounted(async () => {
       getStatusTextCodeResult.value = result.data // กำหนดค่าเฉพาะ data
       itemsStatus.value = result.data.map(item => ({
         id: item.statusId || '', // ค่า item-value
-        name: item.statusName || 'All', // ค่า item-title
+        name: item.statusName || '', // ค่า item-title
       }))
-      console.log('Status Text Code Result:', getStatusTextCodeResult.value)
+
+      // เพิ่มข้อมูลใหม่เข้าไปที่จุดเริ่มต้นของ itemsStatus
+      itemsStatus.value.unshift({
+        id: '', // ค่า item-value สำหรับ "All"
+        name: 'All', // ค่า item-title สำหรับ "All"
+      })
+
+      console.log('Status Text Code Result:', itemsStatus.value)
     } else {
       console.error('Invalid data structure:', result)
     }
