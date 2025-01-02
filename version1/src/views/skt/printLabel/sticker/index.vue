@@ -179,7 +179,6 @@ const itemsCategories = [
   { name: 'Resale', value: 'Resale' },
   { name: 'Lorry', value: 'Lorry' },
   { name: 'Semi', value: 'Semi' },
-  { name: 'All', value: '' },
 ]
 
 const paramsFetchDataPrintLabel = ref({
@@ -188,7 +187,7 @@ const paramsFetchDataPrintLabel = ref({
   productName: '',
   purchaseOrderNo: '',
   receivedDate: '',
-  category: '',
+  category: null,
 })
 
 const searchFilters = ref({ ...paramsFetchDataPrintLabel.value }) // ฟิลเตอร์จริงที่จะส่งไป API
@@ -204,7 +203,7 @@ const clearModel = async () => {
   paramsFetchDataPrintLabel.value.productName = ''
   paramsFetchDataPrintLabel.value.purchaseOrderNo = ''
   paramsFetchDataPrintLabel.value.receivedDate = ''
-  paramsFetchDataPrintLabel.value.category = ''
+  paramsFetchDataPrintLabel.value.category = null
 
   dataPrintLabel.value = []
 }
@@ -213,17 +212,18 @@ const clearModel = async () => {
 //   await fetchData()
 // })
 
+const validatedFilterEmpty = () => {
+  return Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
+}
 
 const fetchData = async () => {
   try {
     progressLinearNoData.value = false
 
-    const hasValue = Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
-
-    // if (!hasValue) {
-    //   progressLinearNoData.value = true
-    //   throw new Error('Invalid paramsFetchDataPrintLabel')
-    // }
+    if (!validatedFilterEmpty()) {
+      progressLinearNoData.value = true
+      throw new Error('Invalid paramsFetchDataPrintLabel')
+    }
 
     progressLinearNoData.value = false // เริ่มแสดง Progress
 
@@ -534,7 +534,7 @@ const dataTableCliclHighlightIsToggle = no => {
                   clearable
                 >
                   <template #label>
-                    <span>Categories</span>
+                    <span style="font-size: 12px;">Categories</span>
                   </template>
                 </VSelect>
               </VCol>
@@ -662,6 +662,7 @@ const dataTableCliclHighlightIsToggle = no => {
                     md="4"
                   >
                     <VBtn
+                      :disabled="!validatedFilterEmpty()"
                       height="100%"
                       width="100%"
                       color="green"
@@ -695,7 +696,7 @@ const dataTableCliclHighlightIsToggle = no => {
                     <VBtn
                       :disabled="!selectedDataTables.length > 0"
                       color="warning"
-                      style="width: 100%; height: 50px;"
+                      style="width: 100%; height: 40px;"
                       @click="printLabel"
                     >
                       <VIcon

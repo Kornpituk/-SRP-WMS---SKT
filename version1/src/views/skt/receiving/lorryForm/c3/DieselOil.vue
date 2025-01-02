@@ -1161,7 +1161,7 @@ watchEffect(async () => {
 
 .tr-border-right-0 {
   font-size: 16px;
-  border-right: 0px !important;
+  border-inline-end: 0px !important;
 }
 
 .tr-border-left-0 {
