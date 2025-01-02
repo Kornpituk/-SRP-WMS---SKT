@@ -156,12 +156,16 @@ const itemsTypeLabel = ref([
     title: 'Product Label',
     value: 'Product Label',
   },
+  {
+    title: 'All',
+    value: '',
+  },
 ])
 
 const typePrintLabel = ref('')
 
 //----------------------- Filter Status 
-const progressLinearNoData = ref(false)
+const progressLinearNoData = ref(true)
 const activeBtnprint = ref(false)
 
 //------------------------- Get Label ------------------------
@@ -171,6 +175,8 @@ const itemsCategoriesOld = ['Packaging', 'Raw material', 'Lorry']
 const itemsCategories = [
   { name: 'Packaging', value: 'Packaging' },
   { name: 'Raw material', value: 'Raw material' },
+  { name: 'Product', value: 'Product' },
+  { name: 'Resale', value: 'Resale' },
   { name: 'Lorry', value: 'Lorry' },
   { name: 'Semi', value: 'Semi' },
 ]
@@ -181,7 +187,7 @@ const paramsFetchDataPrintLabel = ref({
   productName: '',
   purchaseOrderNo: '',
   receivedDate: '',
-  category: '',
+  category: null,
 })
 
 const searchFilters = ref({ ...paramsFetchDataPrintLabel.value }) // ฟิลเตอร์จริงที่จะส่งไป API
@@ -197,26 +203,27 @@ const clearModel = async () => {
   paramsFetchDataPrintLabel.value.productName = ''
   paramsFetchDataPrintLabel.value.purchaseOrderNo = ''
   paramsFetchDataPrintLabel.value.receivedDate = ''
-  paramsFetchDataPrintLabel.value.category = ''
+  paramsFetchDataPrintLabel.value.category = null
 
-  await fetchData()
+  dataPrintLabel.value = []
 }
 
-onMounted( async () => {
-  await fetchData()
-})
+// onMounted( async () => {
+//   await fetchData()
+// })
 
+const validatedFilterEmpty = () => {
+  return Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
+}
 
 const fetchData = async () => {
   try {
     progressLinearNoData.value = false
 
-    const hasValue = Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
-
-    // if (!hasValue) {
-    //   progressLinearNoData.value = true
-    //   throw new Error('Invalid paramsFetchDataPrintLabel')
-    // }
+    if (!validatedFilterEmpty()) {
+      progressLinearNoData.value = true
+      throw new Error('Invalid paramsFetchDataPrintLabel')
+    }
 
     progressLinearNoData.value = false // เริ่มแสดง Progress
 
@@ -353,56 +360,68 @@ const headersNewEx = [
   {
     title: 'No.',
     key: 'no',
+    sortable: false,
   },
   {
     title: 'Category',
     key: 'category',
+    sortable: false,
   },
   {
     title: 'Lot',
     key: 'lot',
+    sortable: false,
   },
   {
     title: 'Lot QTY',
     key: 'lotQty',
+    sortable: false,
   },
   {
     title: 'RCVD Date',
     key: 'receivedDate',
-    
+    sortable: false,
   },
   {
     title: 'P/O No',
     key: 'purchaseOrderNo',
+    sortable: false,
   },
   {
     title: 'Item Code',
     key: 'productId',
+    sortable: false,
   },
   {
     title: 'Item Name',
     key: 'productName',
+    sortable: false,
   },
   
   {
     title: 'Location',
     key: 'locationName',
+    sortable: false,
   },
   {
     title: 'RCVD(PCS)',
     key: 'qtyPcs',
+    sortable: false,
   },
   {
     title: 'RCVD(KGS)',
     key: 'qtyKgs',
+    sortable: false,
   },
   {
     title: 'Update By',
     key: 'updatedBy',
+    sortable: false,
   },
   {
     title: 'Update Date',
     key: 'updatedDate',
+    sortable: false,
   },
 ]
 
@@ -527,7 +546,7 @@ const dataTableCliclHighlightIsToggle = no => {
                   clearable
                 >
                   <template #label>
-                    <span>Categories</span>
+                    <span style="font-size: 12px;">Categories</span>
                   </template>
                 </VSelect>
               </VCol>
@@ -655,6 +674,7 @@ const dataTableCliclHighlightIsToggle = no => {
                     md="4"
                   >
                     <VBtn
+                      :disabled="!validatedFilterEmpty()"
                       height="100%"
                       width="100%"
                       color="green"
@@ -688,7 +708,7 @@ const dataTableCliclHighlightIsToggle = no => {
                     <VBtn
                       :disabled="!selectedDataTables.length > 0"
                       color="warning"
-                      style="width: 100%; height: 50px;"
+                      style="width: 100%; height: 40px;"
                       @click="printLabel"
                     >
                       <VIcon
@@ -1129,6 +1149,14 @@ const dataTableCliclHighlightIsToggle = no => {
             </tr>
           </template>
 
+          <template #column.no="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}</span>
+              </th>
+            </tr>
+          </template>
+
           <template #item.no="{item}">
             <tr>
               <td>
@@ -1136,7 +1164,6 @@ const dataTableCliclHighlightIsToggle = no => {
               </td>
             </tr>
           </template>
-
           <template #item.lotQty="{ item}">
             <tr>
               <td>

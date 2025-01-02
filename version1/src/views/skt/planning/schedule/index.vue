@@ -22,7 +22,6 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 //------------------------------------------- compoennt ----------------------------------------------------------------
 import GTable from '@/pages/skt/planning/schedule/gridTable/index.vue'
-import TestTable from '@/pages/skt/planning/schedule/gridTable/tableTest.vue'
 
 //------------------------------------------ Data --------------------------------
 
@@ -193,58 +192,9 @@ onMounted( async () => {
 const searchResult = ref([]) // ตัวแปรสำหรับเก็บผลลัพธ์
 const datePickerFilter = ref(null)
 
-// ฟังก์ชันสร้างโครงสร้างข้อมูล
-function createProductionPlanItem() {
-  return {
-    actualFgEntryBy: '',
-    actualFgEntryDate: '',
-    actualFinishedBy: '',
-    actualFinishedDate: '',
-    actualStartBy: '',
-    actualStartDate: '',
-    batchID: '',
-    finishedDate: '',
-    inputDate: '',
-    journalID: '',
-    linkedJournalID: '',
-    lotNumber: '',
-    no: 0,
-    planningApprovedBy: '',
-    planningApprovedDate: '',
-    planningID: '',
-    plantName: '',
-    producingDate: '',
-    product1InBomName: '',
-    product1Name: '',
-    product1PackagingName: '',
-    product1PackingQtyKgs: 0,
-    product1SelectedCode: '',
-    product1SelectedPackagingCode: '',
-    product1UomCount: 0,
-    product2InBomName: '',
-    product2Name: '',
-    product2PackagingName: '',
-    product2PackingQtyKgs: 0,
-    product2SelectedCode: '',
-    product2SelectedPackagingCode: '',
-    product2UomCount: 0,
-    productionCode: '',
-    productionName: '',
-    quantityKgs: 0,
-    reactorName: '',
-    remark: '',
-    seqNo: '',
-    statusComments: '',
-    statusId: 0,
-    submitedBy: '',
-    submitedDate: '',
-    updatedBy: '',
-    updatedDate: '',
-  }
-}
 
 // ใช้ฟังก์ชันเพื่อกำหนดค่าเริ่มต้น
-const productionPlanItems = ref([createProductionPlanItem()])
+const productionPlanItems = ref([])
 
 const formatToMMDDYYYY = date => {
   const [day, month, year] = date.split("/")
@@ -757,69 +707,7 @@ const getColumnClass = index => {
   return colorClasses[index] || "" // กำหนดสีตาม index
 }
 
-//--------------------- Menu
-
-const menuDataTable = ref(false)
-
-const itemsActionDataTable = [
-  {
-    title: 'Save Draft',
-    value: 'Save Draft',
-    icon: 'ri-save-3-line',
-  },
-  {
-    title: 'Delete Item',
-    value: 'Delete Item',
-    icon: 'ri-delete-bin-5-line',
-  },
-  {
-    title: 'Submit',
-    value: 'Submit',
-    icon: 'ri-upload-2-line',
-  },
-  {
-    title: 'Print',
-    value: 'Print',
-    icon: 'ri-printer-line',
-  },
-]
-
-const handleAction = action => {
-  switch (action) {
-  case 'Save Draft':
-    saveDraft()
-    break
-  case 'Delete Item':
-    deleteItem()
-    break
-  case 'Submit':
-    submit()
-    break
-  case 'Print':
-    print()
-    break
-  default:
-    console.warn('Action not defined:', action)
-  }
-}
-
 // ตัวอย่างฟังก์ชันของแต่ละ action
-const saveDraft = () => {
-  console.log('Draft saved')
-}
-
-const deleteItem = () => {
-  console.log('Item deleted')
-}
-
-const submit = () => {
-  console.log('Submitted')
-  window.location.href = '/skt/planning/schedule/plan'
-}
-
-const print = () => {
-  console.log('Printed')
-}
 
 const newBatch = async batchID => {
   batchIDDataPlan.value = batchID
@@ -851,14 +739,8 @@ watch(async () => {
       getStatusTextCodeResult.value = result.data // กำหนดค่าเฉพาะ data
       itemsStatus.value = result.data.map(item => ({
         id: item.statusId || '', // ค่า item-value
-        name: item.statusName || '', // ค่า item-title
+        name: item.statusName|| '', // ค่า item-title
       }))
-
-      // เพิ่มข้อมูลใหม่เข้าไปที่จุดเริ่มต้นของ itemsStatus
-      itemsStatus.value.unshift({
-        id: '', // ค่า item-value สำหรับ "All"
-        name: 'All', // ค่า item-title สำหรับ "All"
-      })
 
       console.log('Status Text Code Result:', itemsStatus.value)
     } else {

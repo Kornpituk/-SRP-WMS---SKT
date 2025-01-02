@@ -2613,46 +2613,4 @@ const saveDraftData = word => {
   </div>
 </template>
 
-<style scoped>
-.text-center {
-  text-align: center;
-}
-
-.centered-input >>> input {
-  padding: 0;
-  text-align: center;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.custom-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  inline-size: 100%;
-}
-
-.custom-table,
-.custom-table th,
-.custom-table td {
-  border: 1px solid black;
-  font-size: 12px;
-}
-
-.custom-table th,
-.custom-table td {
-  padding: 8px;
-  text-align: start;
-}
-
-.header {
-  justify-content: space-between;
-  font-weight: bold;
-  text-align: center;
-}
-
-.section-title {
-  font-weight: bold;
-}
-</style>
+<style scoped src="./packaging.scss"></style>
