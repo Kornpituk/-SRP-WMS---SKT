@@ -1075,7 +1075,7 @@ watchEffect(async () => {
   text-align: center;
 }
 
-.centered-input>>>input {
+.centered-input >>> input {
   padding: 0;
   block-size: 20px !important;
   text-align: center;
@@ -1160,13 +1160,13 @@ watchEffect(async () => {
 }
 
 .tr-border-right-0 {
+  border-inline-end: 0 !important;
   font-size: 16px;
-  border-inline-end: 0px !important;
 }
 
 .tr-border-left-0 {
+  border-inline-start: 0 !important;
   font-size: 16px;
-  border-left: 0px !important;
 }
 
 .text-red {

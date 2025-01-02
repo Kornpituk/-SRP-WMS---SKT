@@ -360,56 +360,68 @@ const headersNewEx = [
   {
     title: 'No.',
     key: 'no',
+    sortable: false,
   },
   {
     title: 'Category',
     key: 'category',
+    sortable: false,
   },
   {
     title: 'Lot',
     key: 'lot',
+    sortable: false,
   },
   {
     title: 'Lot QTY',
     key: 'lotQty',
+    sortable: false,
   },
   {
     title: 'RCVD Date',
     key: 'receivedDate',
-    
+    sortable: false,
   },
   {
     title: 'P/O No',
     key: 'purchaseOrderNo',
+    sortable: false,
   },
   {
     title: 'Item Code',
     key: 'productId',
+    sortable: false,
   },
   {
     title: 'Item Name',
     key: 'productName',
+    sortable: false,
   },
   
   {
     title: 'Location',
     key: 'locationName',
+    sortable: false,
   },
   {
     title: 'RCVD(PCS)',
     key: 'qtyPcs',
+    sortable: false,
   },
   {
     title: 'RCVD(KGS)',
     key: 'qtyKgs',
+    sortable: false,
   },
   {
     title: 'Update By',
     key: 'updatedBy',
+    sortable: false,
   },
   {
     title: 'Update Date',
     key: 'updatedDate',
+    sortable: false,
   },
 ]
 
@@ -1137,6 +1149,14 @@ const dataTableCliclHighlightIsToggle = no => {
             </tr>
           </template>
 
+          <template #column.no="{ column }">
+            <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}</span>
+              </th>
+            </tr>
+          </template>
+
           <template #item.no="{item}">
             <tr>
               <td>
@@ -1144,7 +1164,6 @@ const dataTableCliclHighlightIsToggle = no => {
               </td>
             </tr>
           </template>
-
           <template #item.lotQty="{ item}">
             <tr>
               <td>
