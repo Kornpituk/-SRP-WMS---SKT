@@ -314,7 +314,7 @@ const headerDataTableItem1 = [
     key: 'productionName',
   },
   {
-    title: 'Plan Name',
+    title: 'Plant Name',
     key: 'plantName',
   },
   {

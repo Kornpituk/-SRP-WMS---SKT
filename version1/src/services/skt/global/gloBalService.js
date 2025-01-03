@@ -235,6 +235,46 @@ export const useFetchPrintLabelData = () => {
   }
 }
 
+export const useFetchPrintLabelDataSticker = () => {
+  const printLabelFormViewResult = ref(null)
+  const errorMessagePrintLabelView = ref(null)
+
+  const printLabelFormViewService = async (form, urlApi, whereHouse, accessToken, params = {}) => {
+    try {
+      errorMessagePrintLabelView.value = null
+      console.log('Print Inspection Sticker Form Service Starting...')
+  
+      const result = await globalService.getPrintLabelSticker(form, urlApi, whereHouse, accessToken, params)
+        
+      if (result) {
+        console.log('Print Inspection Sticker Form Service Complete:', result)
+        printLabelFormViewResult.value = result.map((item, index) => ({
+          ...item,
+          index: index + 1, // เริ่มนับจาก 1
+        }))
+        
+        return { success: true, data: printLabelFormViewResult.value }
+      } else {
+        console.warn('Print Inspection Sticker Form Service Failed')
+        
+        return { success: false, error: 'Print Inspection Sticker Form Service Failed' }
+      }
+    } catch (error) {
+      console.error('Error in printLabelFormViewService:', error)
+      errorMessagePrintLabelView.value = error.message
+      printLabelFormViewResult.value = []
+      
+      return { success: false, data: null, error: error.message }
+    }
+  }
+  
+  return {
+    printLabelFormViewResult,
+    errorMessagePrintLabelView,
+    printLabelFormViewService,
+  }
+}
+
 export const useSavePrintBarcodeFormService = () => {
   const saveToPrintLabelFormBarcodeResult = ref(null)
   const errorMessageSaveToPrintLabelBarcode = ref(null)

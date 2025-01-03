@@ -289,7 +289,9 @@ const filledParamsCount= ref('')
 
 const checkBtnExportExcel = () => {
 
-  filledParamsCount.value = Object.values(filterForSearchBatchProductionPlan.value).filter(value => value !== null && value !== '').length
+  filledParamsCount.value = Object.values(filterForSearchBatchProductionPlan.value).filter(value => value !== null && value !== '' && value !== -1).length
+
+  console.log('filledParamsCount', filterForSearchBatchProductionPlan.value)
 
   return filledParamsCount.value === 0
 }

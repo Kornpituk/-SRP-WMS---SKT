@@ -135,6 +135,13 @@ const setValueFilter = () => {
 
 const disBtnExoport = ref(true)
 
+const checkBtnExportExcel = () => {
+
+  filledParamsCount.value = Object.values(filterForSearchBatchProductionPlan.value).filter(value => value !== null && value !== '').length
+
+  return filledParamsCount.value === 0
+}
+
 // ดึงค่าจาก sessionStorage
 const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
 
@@ -182,50 +189,29 @@ watch(() => {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const validateFields = () => {
-  const fields = {
-    // deliveryDateFrom: deliveryDateFrom.value,
-    // deliveryDateTo: deliveryDateTo.value,
-    // productId: productId.value,
-    // productName: productName.value,
-    // supplierId: supplierId.value,
-    // supplierName: supplierName.value,
-    // purchaseOrderNo: purchaseOrderNo.value,
-    // statusName: fileterStatusInPAI.value,
-
-    deliveryDateFrom: tempFilters.value.deliveryDateRange || '',
-    deliveryDateTo: tempFilters.value.deliveryDateTo || '',
-    productId: tempFilters.value.productId || '',
-    productName: tempFilters.value.productName || '',
-    supplierId: tempFilters.value.supplierId || '',
-    supplierName: tempFilters.value.supplierName || '',
-    purchaseOrderNo: tempFilters.value.purchaseOrderNo || '',
-    statusName: tempFilters.value.fileterStatusInPAI || '',
-
-  }
 
   // ตรวจสอบว่ามีฟิลด์ใดที่ไม่ใช่ค่าว่างอย่างน้อย 1 ค่า
-  const hasValue = Object.values(fields).some(value => value !== '' && value.length !== 0)
+  const hasValue = Object.values(tempFilters.value).filter(value => value !== null && value !== '' && value !== 'All').length
 
-  if (!hasValue || statusFilter.value === 'All') {
-    disBtnExoport.value = true
+  if (!hasValue) {
+    console.log('tempFilters.value.deliveryDateRange', tempFilters.value.deliveryDateRange)
     
     return false // คืนค่า false ถ้าไม่มีฟิลด์ไหนที่มีค่า
   } else {
-    disBtnExoport.value = false
-    console.log("filter Validate", fields)
+    console.log("filter Validate", tempFilters.value)
 
-    sessionStorage.setItem('deliveryDateFrom', fields.deliveryDateRange || '')
-    sessionStorage.setItem('deliveryDateTo', fields.deliveryDateTo || '')
-    sessionStorage.setItem('productId', fields.productId || '')
-    sessionStorage.setItem('productName', fields.productName || '')
-    sessionStorage.setItem('supplierId', fields.supplierId || '')
-    sessionStorage.setItem('supplierName', fields.supplierName || '')
-    sessionStorage.setItem('purchaseOrderNo', fields.purchaseOrderNo || '')
-    sessionStorage.setItem('fileterStatusInPAI', fields.fileterStatusInPAI || '')
+    sessionStorage.setItem('deliveryDateFrom', tempFilters.value.deliveryDateRange || '')
+    sessionStorage.setItem('deliveryDateTo', tempFilters.value.deliveryDateTo || '')
+    sessionStorage.setItem('productId', tempFilters.value.productId || '')
+    sessionStorage.setItem('productName', tempFilters.value.productName || '')
+    sessionStorage.setItem('supplierId', tempFilters.value.supplierId || '')
+    sessionStorage.setItem('supplierName', tempFilters.value.supplierName || '')
+    sessionStorage.setItem('purchaseOrderNo', tempFilters.value.purchaseOrderNo || '')
+    sessionStorage.setItem('fileterStatusInPAI', tempFilters.value.fileterStatusInPAI || '')
 
     addStoredStatus()
 
-    sessionStorage.setItem('productId', fields.productId)
+    sessionStorage.setItem('productId', tempFilters.value.productId)
     
     return true // คืนค่า true ถ้ามีข้อมูลในฟิลด์อย่างน้อย 1 ฟิลด์
   }
@@ -881,53 +867,6 @@ function customFilter(item, queryText, itemText) {
 }
 
 // -------------------------------------- Export Bar Excel - --------------------------------
-
-const stockUpdateExcel = () => {
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    responseType: 'blob', // ให้เซิร์ฟเวอร์รีเทิร์น blob สำหรับไฟล์ Excel
-  })
-    .then(response => {
-      // สร้าง URL ของไฟล์ Excel จาก binary data
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-
-      const currentDate = new Date() // สร้างวัตถุ Date ปัจจุบัน
-      const year = currentDate.getFullYear() // ดึงปีปัจจุบัน
-      let fileYear
-      const threshold = 2500 // กำหนดจุดแบ่ง พ.ศ. กับ ค.ศ.
-
-      if (year > threshold) {
-        // พ.ศ. เปลี่ยนเป็น ค.ศ.
-        fileYear = year - 543
-      } else {
-        // ค.ศ.
-        fileYear = year
-      }
-
-      const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
-
-      const fileName = `stock_update_Tag_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
-
-      // สร้างลิงก์สำหรับดาวน์โหลดไฟล์ Excel
-      const link = document.createElement('a')
-
-      link.href = url
-      link.setAttribute('download', fileName) // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
-      document.body.appendChild(link)
-      link.click()
-
-      // ลบ URL หลังจากดาวน์โหลดเสร็จเรียบร้อยแล้ว
-      window.URL.revokeObjectURL(url)
-    })
-    .catch(error => {
-      // จัดการข้อผิดพลาด
-      console.error('Error:', error)
-    })
-}
 
 //-------------------------- format decimal -------------------
 
@@ -1744,27 +1683,10 @@ const printExportExcelFunction = async () => {
     purchaseOrderNo: purchaseOrderNo,
   }
 
-  console.log('Staet Export!6')
-
-  // ตรวจสอบว่ามีค่าที่ไม่ว่างอย่างน้อยหนึ่งค่าใน params
-  const filledParamsCount = Object.values(params).filter(value => value !== null && value !== '').length
-
-  console.log('Staet Export!6.5')
-
-  if (filledParamsCount < 1 || !fileterStatusInApiStr) {
-    console.log('กรุณากรอกข้อมูลอย่างน้อย 1 ค่าในฟิลด์ที่จำเป็น')
-    loadingPrintExportExcel.value = false
-    console.log('Staet Export!6.5.2')
-
-    return
-  }
-
-  console.log('Staet Export!7')
   
   try {
     // รอให้ printExportExcel ทำงานและได้ผลลัพธ์กลับมา
     await printExportExcelService(urlApi.value, whereHouse, accessTokenAtStore, params)
-    console.log('Staet Export!')
     console.log('การส่งออก Excel เสร็จสมบูรณ์')
     loadingPrintExportExcel.value = false
   } catch (error) {
@@ -2286,7 +2208,7 @@ const insetSwitch1 = ref('')
                     md="4"
                   >
                     <VBtn
-                      :disabled="disBtnExoport"
+                      :disabled="!validateFields()"
                       density="compact"
                       class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                       color="warning"

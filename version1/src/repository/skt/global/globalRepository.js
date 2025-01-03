@@ -207,6 +207,32 @@ export const  globalService = {
     }
   },
 
+  async getPrintLabelSticker (form, urlApi, warehouseId, accessToken, params = {}) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/PrintLabel/${form}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': warehouseId,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          lot: params.lot || '',
+          productId: params.productId || '',
+          productName: params.productName || '',
+          purchaseOrderNo: params.purchaseOrderNo || '',
+          category: params.category || '',
+          receivedDate: params.receivedDate || '',
+          SortColumn: params.sortColumn || '',
+          SortDirection: params.sortDirection || 'asc',
+        },
+      })
+
+      return response.data
+    } catch (error) {
+      throw new Error(`Failed to printLabelView ${error.response?.data?.message || error.message}`)
+    }
+  },
+
 
   //-----
   async getPrintLabel (form, urlApi, warehouseId, accessToken, params = {}) {

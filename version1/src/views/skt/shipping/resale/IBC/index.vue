@@ -982,14 +982,6 @@ const dessertsMockAmountView = [
                   SDS
                 </td>
               </tr>
-              <tr>
-                <td
-                  class="text-center"
-                  colspan="1"
-                  ripple
-                  style="height: 106px;"
-                />
-              </tr>
             </tbody>
           </table>
         </VCol>
@@ -1488,6 +1480,59 @@ const dessertsMockAmountView = [
 
             <tr
               v-for="(item, index) in currentData.rows.item3"
+              :key="index"
+            >
+              <td
+                style="max-width: 250px;"
+                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
+                colspan="4"
+              >
+                {{ item.label }}
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value1"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value2"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value3"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value4"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              v-for="(item, index) in currentData.rows.item4"
               :key="index"
             >
               <td
