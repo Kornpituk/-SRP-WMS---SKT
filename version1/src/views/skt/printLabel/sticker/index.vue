@@ -126,6 +126,7 @@ const clearModel = async () => {
   paramsFetchDataPrintLabel.value.category = null
 
   dataPrintLabel.value = []
+  selectedDataTables.value = []
 }
 
 // onMounted( async () => {
@@ -346,12 +347,12 @@ const headersNewEx = [
     sortable: false,
   },
   {
-    title: 'Update By',
+    title: 'Updated By',
     key: 'updatedBy',
     sortable: false,
   },
   {
-    title: 'Update Date',
+    title: 'Updated Date',
     key: 'updatedDate',
     sortable: false,
   },
