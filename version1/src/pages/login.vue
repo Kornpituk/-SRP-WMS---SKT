@@ -14,6 +14,12 @@ import { VForm } from 'vuetify/components/VForm'
 
 import { urlApi } from '../api'
 
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
+const cookieStore = useCookieStore()
+
 const router = useRouter() 
 
 const isPasswordVisible = ref(false)
@@ -76,6 +82,8 @@ const getInfoCompany = () => {
       companyName.value = inFoCompany.value.companyName
       companyLogo.value = inFoCompany.value.logo
       localStorage.setItem('companyLogo', inFoCompany.value.logo)
+
+      
 
       // console.log('companyId', localStorage.getItem('companyId'))
       // console.log('companyName', localStorage.getItem('companyName'))
@@ -178,6 +186,7 @@ const getInfoUserData = async () => {
 
   if(response.status == 200){
     userData.value  = response.data
+    itemStore.setItemDetails(userData.value, 'UserDataCookies')
     console.log('getInfoUserData: name', userData.username)
     localStorage.setItem('userName', userData.username)
     console.log("localStorage.setItem('userData', userData)", localStorage.getItem('userDate'))

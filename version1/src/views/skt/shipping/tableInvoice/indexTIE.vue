@@ -2,19 +2,71 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 
-//------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
+const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
+//------------------------------ Get User Data --------------------------------
+
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+
+
+//------------------------------ fetch data from API --------------------------------
+import { useGetUserPermissionService,
+} from '@/services/skt/shipmentPlan/services'
+
+const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '',
+})
+
+const getUserPermissions = async () => {
+  try {
+    // Call the fetch function
+    const result = await fetchUserPermission(
+      urlApi.value,
+      'getPermission',
+      whereHouse,
+      accessTokenAtStore,
+      paramsForGetPermission.value,
+    )
+
+    console.log('getUserPermissions')
+    if(result){
+      console.log('Result:', result)
+
+      // Access the result from `getUserPermissionResult`
+      console.log('User Permission Result:', getUserPermissionResult.value)
+    }else{
+      console.log('No Result:', result)
+    }
+  } catch (error) {
+    // Handle errors (e.g., log or show a message)
+    console.error('Error fetching user permissions:', errorGetUserPermission.value)
+  }
+}
+
+watch(async ()  => {
+  console.log('asdasdasd')
+  await getUserPermissions()
+})
+
+
+//------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
-
-// Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const perPage = ref(10)
 const page = ref(0)
@@ -262,6 +314,50 @@ const accountLOG = ref (false)
 const accountWH = ref (false)
 const accountWHSub = ref (false)
 const accountAll = ref (true)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  if (getUserPermissionResult.value) {
+    const userPermission = getUserPermissionResult.value.find(item => {
+      // แปลงค่าและตัดช่องว่างก่อนเปรียบเทียบ
+      const itemStatusId = String(item.statusID).trim()
+      const providedStatusId = String(statusId).trim()
+      const itemUiControlContextId = String(item.uiControlName).trim().toLowerCase()
+      const providedUiControlContextId = String(uiControlContextId).trim().toLowerCase()
+
+      // Log ค่าเพื่อ Debug
+      console.log('Comparing:', {
+        itemStatusId,
+        providedStatusId,
+        itemUiControlContextId,
+        providedUiControlContextId,
+      })
+
+      return (
+        itemStatusId === providedStatusId &&
+        itemUiControlContextId === providedUiControlContextId
+      )
+    })
+
+    // หากพบข้อมูลที่ตรงกัน
+    if (userPermission) {
+      console.log('Matched Item:', {
+        canExecute: userPermission.canExecute,
+        canVisible: userPermission.canVisible,
+      })
+      
+      return {
+        canExecute: userPermission.canExecute,
+        canVisible: userPermission.canVisible,
+      }
+    }
+  }
+
+  // หากไม่พบข้อมูลที่ตรงกัน
+  return {
+    canExecute: false,
+    canVisible: false,
+  }
+}
 
 const setAccount = role => {
   accountAmin.value = false
@@ -799,7 +895,7 @@ const handleFileUpdates = updatedFiles => {
 
   <!-- Btn Test Role -->
   <div
-    v-if="true"
+    v-if="false"
     class="mt-4"
   >
     <VCard>
@@ -1239,49 +1335,49 @@ const handleFileUpdates = updatedFiles => {
               <span style="font-weight: bold;">{{ $t('Status') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_SALE_ORDER_NO').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Sale Order No.') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_SO_ATTACHMENT').canVisible"
               class="text-center"
             >
               <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_SAP_INVOICE_NO').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_PAYER_NAME').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Payer Name') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountINSP || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_USER').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('User') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_SHIPPER').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Shipper') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_SHIPPER_LOCATION').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Shipper location') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_SHIPPING_MARK').canVisible"
               class="text-center"
             >
               <div>
@@ -1310,38 +1406,38 @@ const handleFileUpdates = updatedFiles => {
                 </span>
               </div>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll">
+            <th v-if="canVisibleUserPermission(-1,'COL_END_USER').canVisible">
               <span style="font-weight: bold;">{{ $t('End User') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_CONSIGNEE').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Consignee') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_PRODUCT').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Item Name') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll">
+            <th v-if="canVisibleUserPermission(-1,'COL_LOT_NUMBER').canVisible">
               <span style="font-weight: bold;">{{ $t('Lot') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_QTY_KG').canVisible"
               class="text-end px-2"
             >
               <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_COA').canVisible"
               class="text-center"
             >
               <span style="font-weight: bold;">{{ $t('COA') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_FREIGHT_FORWARDER').canVisible"
               class="bg-green-lighten-3"
             >
               <span
@@ -1350,7 +1446,7 @@ const handleFileUpdates = updatedFiles => {
               >{{ $t('Freight forwarder') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_CARRIER').canVisible"
               class="bg-green-lighten-3 text-start"
               style="min-width: 150px;"
             >
@@ -1360,7 +1456,7 @@ const handleFileUpdates = updatedFiles => {
               >{{ $t('Carrier') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_VESSEL_NAME').canVisible"
               class="bg-green-lighten-3"
             >
               <span
@@ -1369,7 +1465,7 @@ const handleFileUpdates = updatedFiles => {
               >{{ $t('Vessel name') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_VOY').canVisible"
               class="bg-yellow-lighten-3"
             >
               <span
@@ -1378,22 +1474,22 @@ const handleFileUpdates = updatedFiles => {
               >{{ $t('Voy') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_TRUCK').canVisible"
               class="bg-green-lighten-3"
             >
               <span style="font-weight: bold;">{{ $t('Truck') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_TRUCK_RESERVING_NUMBER').canVisible"
               class="bg-yellow-lighten-3 texct-end"
             >
               <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll">
+            <th v-if="canVisibleUserPermission(-1,'COL_TRUCK_FEE').canVisible">
               <span style="font-weight: bold;">{{ $t('Truck fee') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
+              v-if="true"
               class="text-center"
               style="min-width: 300px;"
             >
@@ -1414,24 +1510,24 @@ const handleFileUpdates = updatedFiles => {
               </VRow>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_DO_EX').canVisible"
               class="px-4"
             >
               <span style="font-weight: bold;">{{ $t('DO/EX') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_COUNTRY').canVisible"
               class="px-2"
             >
               <span style="font-weight: bold;">{{ $t('Country') }}</span>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_LOADING_DATE').canVisible"
               class="text-start px-2"
             >
               <span style="font-weight: bold;">{{ $t('Loading date') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll">
+            <th v-if="canVisibleUserPermission(-1,'COL_ETD').canVisible">
               <VRow>
                 <VCol cols="6">
                   <span style="font-weight: bold;">{{ $t('ETD') }}</span>
@@ -1447,7 +1543,7 @@ const handleFileUpdates = updatedFiles => {
                 </VCol>
               </VRow>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountLOG || accountWH || accountWHSub || accountAll">
+            <th v-if="canVisibleUserPermission(-1,'COL_ETA').canVisible">
               <VRow>
                 <VCol cols="6">
                   <span style="font-weight: bold;">{{ $t('ETA') }}</span>
@@ -1464,18 +1560,18 @@ const handleFileUpdates = updatedFiles => {
               </VRow>
             </th>
             <th
-              v-if="accountAmin || accountViewerKK || accountLOG || accountWH || accountWHSub || accountAll"
+              v-if="canVisibleUserPermission(-1,'COL_DELIVERY_NOTE').canVisible"
               class="text-center"
             >
               <span style="font-weight: bold;">{{ $t('Delivery note') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountSALLOG || accountSAL || accountAll">
+            <th v-if="canVisibleUserPermission(-1,'COL_REMARK_SAL').canVisible">
               <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll">
+            <th v-if="canVisibleUserPermission(-1,'COL_REMARK_WH').canVisible">
               <span style="font-weight: bold;">{{ $t('Remark (WH)') }}</span>
             </th>
-            <th v-if="accountAmin || accountViewerKK || accountAll || accountLOG">
+            <th v-if="canVisibleUserPermission(-1,'COL_REMARK_LOG').canVisible">
               <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}</span>
             </th>
             <th class="px-1">
