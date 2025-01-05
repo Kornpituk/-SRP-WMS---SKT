@@ -6,6 +6,7 @@ const props = defineProps({
   typeFileInput: { type: String, default: '' },
   typeBtn: { type: String, default: '' },
   titleDialog: { type: String, default: 'Dialog Title' },
+  disabledProp: { type: Boolean, default: true },
 })
 
 const emit = defineEmits(['updateFiles']) // กำหนด event ชื่อ updateFiles
@@ -74,6 +75,7 @@ const removeFile = index => {
           v-model="filesModel"
           multiple
           clearable
+          :disabled="disabledProp"
           accept="image/*,.pdf"
           style="max-width: 200px;"
           density="compact"
