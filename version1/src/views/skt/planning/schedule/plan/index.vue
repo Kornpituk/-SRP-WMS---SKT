@@ -913,6 +913,7 @@ const addSelectProdutionCode = index => {
   const trickerItem1N2 = ref(false)
 
   if(productionPlan.value[index].productionCode !== selectedProductionCode.value){
+    console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
     trickerItem1N2.value = true
   }else{
     trickerItem1N2.value = false
@@ -934,6 +935,8 @@ const addSelectProdutionCode = index => {
     productionPlan.value[index].plantName = selectedProductionPlanName.value
   }
 
+  console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+
   if (selectedItemCode.value) {
     productionPlan.value[index].product1SelectedCode = selectedItemCode.value
   }
@@ -953,8 +956,9 @@ const addSelectProdutionCode = index => {
     }
   }
 
+
   if(trickerItem1N2.value){
-    console.log("Tricker true", trickerItem1N2.value)
+    
     productionPlan.value[index].product2SelectedCode = null
     productionPlan.value[index].product2Name = null
     productionPlan.value[index].product2SelectedPackagingCode = null
@@ -962,12 +966,15 @@ const addSelectProdutionCode = index => {
     productionPlan.value[index].product2PackingQtyKgs = null
     productionPlan.value[index].product2UomCount = null
 
-    productionPlan.value[index].product1SelectedCode = null
-    productionPlan.value[index].product1Name = null
-    productionPlan.value[index].product1SelectedPackagingCode = null
-    productionPlan.value[index].product1PackagingName = null
-    productionPlan.value[index].product1PackingQtyKgs = null
-    productionPlan.value[index].product1UomCount = null
+    if(productionPlan.value[index].productionCode){
+      productionPlan.value[index].product1SelectedCode = null
+      productionPlan.value[index].product1Name = null
+      productionPlan.value[index].product1SelectedPackagingCode = null
+      productionPlan.value[index].product1PackagingName = null
+      productionPlan.value[index].product1PackingQtyKgs = null
+      productionPlan.value[index].product1UomCount = null
+    }
+    
   }else{
     console.log("Tricker false", trickerItem1N2.value)
     if (selectedItemCode2.value) {
