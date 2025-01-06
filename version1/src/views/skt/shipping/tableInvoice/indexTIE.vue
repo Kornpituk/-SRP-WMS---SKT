@@ -1020,14 +1020,14 @@ const handleFileUpdates = updatedFiles => {
                 </th>
                 <td
                   colspan="8"
-                  class="text-center"
+                  class="text-start"
                 >
                   24/07/2024
                 </td>
               </tr>
               <tr>
                 <th colspan="4">
-                  เลขที่ใบสั่งงานรถขนส่ง (Truck order no)
+                  เลขที่ใบสั่งงานรถขนส่ง (Truck Order No)
                 </th>
                 <th colspan="8">
                   <VTextField
@@ -1047,9 +1047,9 @@ const handleFileUpdates = updatedFiles => {
                 </th>
                 <td
                   colspan="8"
-                  class="text-center"
+                  class="text-start"
                 >
-                  Shipment plan
+                RfS24999212321
                 </td>
               </tr>
               <tr>
@@ -1072,17 +1072,10 @@ const handleFileUpdates = updatedFiles => {
                 </th>
                 <td
                   colspan="8"
-                  class="text-center"
+                  class="text-start"
                 >
                   LEO Global Logistics Public Company Limited 251-251/1 Soi Pakdee, Rama 3 Road, Bangkorlaem, Bangkok 10120 Thailand
                 </td>
-              </tr>
-              <tr>
-                <th colspan="4" />
-                <th
-                  colspan="8"
-                  class="text-center"
-                />
               </tr>
               <tr>
                 <th colspan="4">
@@ -1103,7 +1096,7 @@ const handleFileUpdates = updatedFiles => {
               </tr>
               <tr>
                 <th colspan="4">
-                  ประเภทรถ (Truck type)
+                  ประเภทรถ (Truck Type)
                 </th>
                 <th
                   colspan="8"
@@ -1112,7 +1105,7 @@ const handleFileUpdates = updatedFiles => {
                   <VAutocomplete
                     class="text-center"
                     density="compact"
-                    label="Truck type"
+                    label="Truck Type"
                     :items="items"
                     placeholder="Select State"
                   />
@@ -1120,7 +1113,7 @@ const handleFileUpdates = updatedFiles => {
               </tr>
               <tr>
                 <th colspan="4">
-                  ทะเบียนรถ (Truck license)
+                  ทะเบียนรถ (Truck License)
                 </th>
                 <th
                   colspan="8"
@@ -1136,7 +1129,7 @@ const handleFileUpdates = updatedFiles => {
               </tr>
               <tr>
                 <th colspan="4">
-                  ชื่อพนักงานขับรถ (Drive Name)
+                  ชื่อพนักงานขับรถ (Driver Name)
                 </th>
                 <td
                   colspan="8"
@@ -1145,13 +1138,13 @@ const handleFileUpdates = updatedFiles => {
                   <VTextField
                     style="min-width: 250px;"
                     density="compact"
-                    label="Drive Name"
+                    label="Driver Name"
                     placeholder="MR. ABCD"
                     class="text-center"
                   />
                 </td>
               </tr>
-              <tr>
+              <tr v-if="false">
                 <th colspan="4">
                   เลขที่อ้างอิง (Ref SO No.)
                 </th>
@@ -1170,7 +1163,7 @@ const handleFileUpdates = updatedFiles => {
               </tr>
               <tr>
                 <th colspan="4">
-                  เบอร์ติดต่อ (Tel)    
+                  เบอร์ติดต่อ (Tel.)    
                 </th>
                 <td
                   colspan="8"
@@ -1709,7 +1702,7 @@ const handleFileUpdates = updatedFiles => {
                     v-if="product.shippingCondition"
                     style="overflow: hidden;min-width: 180px; max-width: 180px; text-overflow: ellipsis;"
                   >{{ product.shippingCondition }}</span>
-                  <span v-else>Shipping Mark/Cound.</span>
+                  <span v-else>Shipping Mark/Coundition.</span>
                 </VBtn>
                 <VBtn
                   v-if="false"
@@ -1837,14 +1830,14 @@ const handleFileUpdates = updatedFiles => {
             >
               <VBtn
                 v-if="product.lotNumber.length > 1"
-                style="min-width: 177px;"
+                style="min-width: 50px;"
                 :disabled="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
                 variant="outlined"
                 @click="textAreaDialogActive('Lot', product.lotNumber)"
               >
                 <span
                   v-if="product.lotNumber"
-                  style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
+                  style="overflow: hidden; max-width: 500px; text-overflow: ellipsis;"
                 >{{ product.lotNumber[0].lotNUmber }}...</span>
                 <span v-else>Lot Number</span>
               </VBtn>

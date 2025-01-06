@@ -61,93 +61,63 @@ const specialRequests = ref([
 ])
 
 const GBSMockData = ref({
-  "No1": { title: "No.", c1: '1', c2: '2', c3: '3', c4: '4', c5: '5' },
-  "ubc1": { title: "UBC No", c1: "", c2: "", c3: "", c4: "", c5: ""  },
-  "GBS1": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: ""  },
+  "No1": { title: "No.", c1: '1', c2: '2', c3: '3', c4: '4', c5: '5', c6: '6', c7: '7', c8: '8', c9: '9', c10: '10' },
+  "ubc1": { title: "UBC No", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
+  "GBS1": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
   "rows1": { 
     "item1": [
-      { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "-ไม่บุบ ไม่เสียรูปทรง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "-ฐานรองรับแข็งแรง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "-ไม่บุบ ไม่เสียรูปทรง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "-ฐานรองรับแข็งแรง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
     ],
     "item2": [
-      { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
     ],
     "item3": [
-      { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- ฝาเกลียวที่ใช้ขนาดถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "- ฝาเกลียวที่ใช้ขนาดถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
     ],
     "item4": [
-      { "label": "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
     ],
     "item5": [
-      { "label": "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
     ],
   },
 
-  "No2": { title: "No.", c1: '6', c2: '7', c3: '8', c4: '9', c5: '10' },
-  "ubc2": { title: "UBC No", c1: "", c2: "", c3: "", c4: "", c5: ""  },
-  "GBS2": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: ""  },
+  "No2": { title: "No.", c1: '11', c2: '12', c3: '13', c4: '14', c5: '15', c6: '16', c7: '17', c8: '18', c9: '19', c10: '20' },
+  "ubc2": { title: "UBC No", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
+  "GBS2": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
   "rows2": { 
     "item1": [
-      { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "-ไม่บุบ ไม่เสียรูปทรง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "-ฐานรองรับแข็งแรง", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "-ไม่บุบ ไม่เสียรูปทรง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "-ฐานรองรับแข็งแรง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
     ],
     "item2": [
-      { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
     ],
     "item3": [
-      { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- ฝาเกลียวที่ใช้ขนาดถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "- ฝาเกลียวที่ใช้ขนาดถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
     ],
     "item4": [
-      { "label": "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
     ],
     "item5": [
-      { "label": "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม", value1: false, value2: false, value3: false, value4: false, value5: false },
+      { "label": "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
     ],
   },
-
-  "No3": { title: "No.", c1: '11', c2: '12', c3: '13', c4: '14', c5: '15' },
-  "ubc3": { title: "UBC No", c1: "", c2: "", c3: "", c4: "", c5: ""  },
-  "GBS3": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: ""  },
-  "rows3": { 
-    "item1": [
-      { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "-ไม่บุบ ไม่เสียรูปทรง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "-ฐานรองรับแข็งแรง", value1: false, value2: false, value3: false, value4: false, value5: false },
-    ],
-    "item2": [
-      { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false },
-    ],
-    "item3": [
-      { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- ฝาเกลียวที่ใช้ขนาดถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false },
-      { "label": "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี", value1: false, value2: false, value3: false, value4: false, value5: false },
-    ],
-    "item4": [
-      { "label": "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย", value1: false, value2: false, value3: false, value4: false, value5: false },
-    ],
-    "item5": [
-      { "label": "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม", value1: false, value2: false, value3: false, value4: false, value5: false },
-    ],
-  }
-  ,
 })
 
 const currentData = ref({
@@ -168,7 +138,7 @@ function switchData(set) {
 
 // ฟังก์ชัน switchData ที่เปลี่ยนชุดข้อมูล
 const switchDataSet = index => {
-  if (index >= 1 && index <= 3) {
+  if (index >= 1 && index <= 2) {
     currentDataIndex.value = index
 
     currentData.value.no = GBSMockData.value[`No${index}`]
@@ -181,7 +151,7 @@ const switchDataSet = index => {
 //--------------------------------------- Pagination ----------------------------------------------
 
 const currentPage = ref(1)  // หน้าที่กำลังแสดง
-const rowsPerPage = 5       // จำนวนแถวที่จะแสดงในแต่ละหน้า
+const rowsPerPage = 10       // จำนวนแถวที่จะแสดงในแต่ละหน้า
 const totalRows = computed(() => Object.values(GBSMockData.value.rows1).flat().length)  // จำนวนแถวทั้งหมด
 
 const displayedRows = computed(() => {
@@ -1159,11 +1129,12 @@ const dessertsMockAmountView = [
         </VBtn>
       </div>
 
-      <section>
+      <section style="overflow-x: auto; white-space: nowrap;">
         <table class="custom-table my-4">
           <thead>
             <tr>
               <th
+                style="position: sticky;z-index: 1;  left: 0; min-width: 350px; background-color: #fafafa;"
                 colspan="4"
                 class="text-center"
               >
@@ -1171,38 +1142,79 @@ const dessertsMockAmountView = [
               </th>
               <th
                 colspan="2"
+                style="min-width: 180px;"
                 class="text-center"
               >
                 {{ currentData.no.c1 }}
               </th>
               <th
                 colspan="2"
+                style="min-width: 180px;"
                 class="text-center"
               >
                 {{ currentData.no.c2 }}
               </th>
               <th
                 colspan="2"
+                style="min-width: 180px;"
                 class="text-center"
               >
                 {{ currentData.no.c3 }}
               </th>
               <th
                 colspan="2"
+                style="min-width: 180px;"
                 class="text-center"
               >
                 {{ currentData.no.c4 }}
               </th>
               <th
                 colspan="2"
+                style="min-width: 180px;"
                 class="text-center"
               >
                 {{ currentData.no.c5 }}
+              </th>
+              <th
+                colspan="2"
+                style="min-width: 180px;"
+                class="text-center"
+              >
+                {{ currentData.no.c6 }}
+              </th>
+              <th
+                colspan="2"
+                style="min-width: 180px;"
+                class="text-center"
+              >
+                {{ currentData.no.c7 }}
+              </th>
+              <th
+                colspan="2"
+                style="min-width: 180px;"
+                class="text-center"
+              >
+                {{ currentData.no.c8 }}
+              </th>
+              <th
+                colspan="2"
+                style="min-width: 180px;"
+                class="text-center"
+              >
+                {{ currentData.no.c9 }}
+              </th>
+              <th
+                colspan="2"
+                style="min-width: 180px;"
+                class="text-center"
+              >
+                {{ currentData.no.c10 }}
               </th>
             </tr>
 
             <tr>
               <th
+                style="position: sticky;z-index: 1;  left: 0; min-width: 350px; background-color: #fafafa;"
                 colspan="4"
                 class="text-center"
               >
@@ -1253,10 +1265,56 @@ const dessertsMockAmountView = [
                   density="compact"
                 />
               </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.ubc.c6"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.ubc.c7"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.ubc.c8"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.ubc.c9"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.ubc.c10"
+                  density="compact"
+                />
+              </th>
             </tr>
 
             <tr>
               <th
+                style="position: sticky;z-index: 1;  left: 0; min-width: 350px; background-color: #fafafa;"
                 colspan="4"
                 class="text-center"
               >
@@ -1307,69 +1365,53 @@ const dessertsMockAmountView = [
                   density="compact"
                 />
               </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.gbs.c6"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.gbs.c7"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.gbs.c8"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.gbs.c9"
+                  density="compact"
+                />
+              </th>
+              <th
+                colspan="2"
+                class="text-center"
+              >
+                <VTextField
+                  v-model="currentData.gbs.c10"
+                  density="compact"
+                />
+              </th>
             </tr>
           </thead>
-          <tbody v-if="false">
-            <!-- วนลูปข้อมูล item1 และ item2 -->
-            <template
-              v-for="(items, key) in GBSMockData.rows1"
-              :key="key"
-            >
-              <!-- วนลูปแต่ละ row ใน item -->
-              <tr
-                v-for="(row, rowIndex) in items"
-                :key="rowIndex"
-              >
-                <td
-                  style="max-width: 250px;"
-                  colspan="4"
-                  :class="{ 'font-weight-bold': row.label.match(/^\d+\./) }"
-                >
-                  {{ row.label }}
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value1"
-                      density="compact"
-                    />
-                  </div>
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value2"
-                      density="compact"
-                    />
-                  </div>
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value3"
-                      density="compact"
-                    />
-                  </div>
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value4"
-                      density="compact"
-                    />
-                  </div>
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value5"
-                      density="compact"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </template>
-          </tbody>
 
           <tbody>
             <tr
@@ -1377,7 +1419,7 @@ const dessertsMockAmountView = [
               :key="index"
             >
               <td
-                style="max-width: 250px;"
+                style="position: sticky;z-index: 1;  left: 0; max-width: 250px;  background-color: #fafafa;"
                 :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
                 colspan="4"
               >
@@ -1419,6 +1461,46 @@ const dessertsMockAmountView = [
                 <div class="d-flex justify-center">
                   <VCheckbox
                     v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value6"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value7"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value8"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value9"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value10"
                     density="compact"
                   />
                 </div>
@@ -1430,7 +1512,7 @@ const dessertsMockAmountView = [
               :key="index"
             >
               <td
-                style="max-width: 250px;"
+                style="position: sticky;z-index: 1;  left: 0; max-width: 250px;  background-color: #fafafa;"
                 :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
                 colspan="4"
               >
@@ -1472,6 +1554,46 @@ const dessertsMockAmountView = [
                 <div class="d-flex justify-center">
                   <VCheckbox
                     v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value6"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value7"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value8"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value9"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value10"
                     density="compact"
                   />
                 </div>
@@ -1483,7 +1605,7 @@ const dessertsMockAmountView = [
               :key="index"
             >
               <td
-                style="max-width: 250px;"
+                style="position: sticky;z-index: 1;  left: 0; max-width: 250px;  background-color: #fafafa;"
                 :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
                 colspan="4"
               >
@@ -1525,6 +1647,46 @@ const dessertsMockAmountView = [
                 <div class="d-flex justify-center">
                   <VCheckbox
                     v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value6"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value7"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value8"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value9"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value10"
                     density="compact"
                   />
                 </div>
@@ -1536,7 +1698,7 @@ const dessertsMockAmountView = [
               :key="index"
             >
               <td
-                style="max-width: 250px;"
+                style="position: sticky;z-index: 1;  left: 0; max-width: 250px;  background-color: #fafafa;"
                 :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
                 colspan="4"
               >
@@ -1578,6 +1740,46 @@ const dessertsMockAmountView = [
                 <div class="d-flex justify-center">
                   <VCheckbox
                     v-model="item.value5"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value6"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value7"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value8"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value9"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value10"
                     density="compact"
                   />
                 </div>
@@ -1589,7 +1791,7 @@ const dessertsMockAmountView = [
               :key="index"
             >
               <td
-                style="max-width: 250px;"
+                style="position: sticky;z-index: 1;  left: 0; max-width: 250px;  background-color: #fafafa;"
                 :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
                 colspan="4"
               >
@@ -1635,6 +1837,46 @@ const dessertsMockAmountView = [
                   />
                 </div>
               </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value6"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value7"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value8"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value9"
+                    density="compact"
+                  />
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="d-flex justify-center">
+                  <VCheckbox
+                    v-model="item.value10"
+                    density="compact"
+                  />
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -1642,10 +1884,9 @@ const dessertsMockAmountView = [
         <section>
           <div>
             <VRow>
-              <VCol cols="6" />
               <VCol
                 cols="6"
-                class="d-flex justify-end"
+                class="d-flex justify-start"
               >
                 <!-- ปุ่มย้อนกลับ (ไปที่ชุดข้อมูลก่อนหน้า) -->
                 <VBtn
@@ -1668,6 +1909,7 @@ const dessertsMockAmountView = [
                   <VIcon icon="ri-arrow-right-s-line" />
                 </VBtn>
               </VCol>
+              <VCol cols="6" />
             </VRow>
           </div>
         </section>
@@ -2043,5 +2285,44 @@ const dessertsMockAmountView = [
   align-items: center;
   justify-content: center;
   gap: 10px;
+}
+
+tr.sticky {
+  position: sticky;
+  z-index: 1;
+  background: var(#f5f5f5);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 25%);
+  inset-block-start: 0;
+}
+
+th.sticky,
+td.sticky {
+  position: sticky;
+  background: var(#f5f5f5);
+  inset-inline-start: 0;
+}
+
+th.sticky::after,
+td.sticky::after {
+  position: absolute;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 8%) 0%, rgba(0, 0, 0, 0%) 100%);
+  border-inline-start: 1px solid var(#c9d1dc);
+  content: "";
+  inline-size: 5px;
+  inset-block: 0;
+  inset-block-end: -1px;
+  inset-inline-end: -6px;
+}
+
+th.sticky::before,
+td.sticky::before {
+  position: absolute;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0%) 0%, rgba(0, 0, 0, 0.08%) 100%);
+  border-inline-end: 1px solid var(#c9d1dc);
+  content: "";
+  inline-size: 5px;
+  inset-block: 0;
+  inset-block-end: -1px;
+  inset-inline-start: -6px;
 }
 </style>

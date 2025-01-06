@@ -1,8 +1,5 @@
 <script setup>
-import axiosIns from '@axios'
-
-//// --------------------------------------------------------------------------------------
-import { onMounted, ref, watch, watchEffect } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -12,8 +9,8 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
-import alertWordConst from '@/utilities/constant'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+import alertWordConst from '@/utilities/constant'
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -260,15 +257,16 @@ const colorStatusWithId = id => {
 
 //----------------------------- function true data ---------------------------------
 
-import { useGetProductionPlanService, 
-  useNewProductionPlanService, 
-  useGetBatchProductionPlanService, 
+import {
+  useApproveProductionPlanService,
   useDeleteProductionPlanService,
+  useGenerateBatchProductionPlanService,
+  useGetBatchProductionPlanService,
   useGetProductionPlanMasterService,
+  useGetProductionPlanService,
+  useNewProductionPlanService,
   useSaveProductionPlanService,
   useSubmitProductionPlanService,
-  useApproveProductionPlanService,
-  useGenerateBatchProductionPlanService,
 } from '@/services/skt/productionPlan/services'
 
 const countItemProduction = ref(1)
@@ -473,6 +471,9 @@ const textAlert = ref(false)
 const sortColumn = ref('producingDate')
 const sortDirection = ref('desc')
 
+const packag1QtyOle = ref('')
+const packag2QtyOle = ref('')
+
 watch(async () => {
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
@@ -553,6 +554,13 @@ const selectPackagingTypeSwitch = computed(() => {
   return [] // Default empty or fallback data
 })
 
+const selectPackagingQtySwitch = computed(() => {
+  if (btnSelectitem1.value) return packag1QtyOle.value
+  if (btnSelectitem2.value) return packag2QtyOle.value
+  
+  return [] // Default empty or fallback data
+})
+
 const colorBtnSwitch = () => {
   if(btnSelectitem2.value){
     return 'red-lighten-1'
@@ -590,6 +598,8 @@ const selectPlan = plan => {
 
 }
 
+
+
 const selectItemCode = plan => {
   if(btnSelectitem1.value){
     selectedItemCode.value = plan.itemCode
@@ -608,12 +618,14 @@ const selectPackaging = plan => {
     selectedPackagingType.value = plan.itemCode
     selectedPackagingName.value = plan.itemName
     selectedPackagingKgs.value = plan.packingQtyKgs
+    packag1QtyOle.value = plan.packingQtyKgs
     console.log("selectedPackagingType", selectedPackagingType.value)
   }
   if(btnSelectitem2.value){
     selectedPackagingType2.value = plan.itemCode
     selectedPackagingName2.value = plan.itemName
     selectedPackagingKgs2.value = plan.packingQtyKgs
+    packag2QtyOle.value = plan.packingQtyKgs
     console.log("selectedProductionCode2", selectedPackagingType2.value)
   }
 }
@@ -848,9 +860,11 @@ const selectFilterProduction = (index, item) => {
 
   selectedItemCode.value = productionPlan.value[index].product1SelectedCode
   selectedPackagingType.value = productionPlan.value[index].product1SelectedPackagingCode
+  packag1QtyOle.value = productionPlan.value[index].product1PackingQtyKgs
 
   selectedItemCode2.value = productionPlan.value[index].product2SelectedCode
   selectedPackagingType2.value = productionPlan.value[index].product2SelectedPackagingCode
+  packag2QtyOle.value = productionPlan.value[index].product2PackingQtyKgs
 
   console.log("Selected item", selectedItemCode.value)
 
@@ -947,6 +961,13 @@ const addSelectProdutionCode = index => {
     productionPlan.value[index].product2PackagingName = null
     productionPlan.value[index].product2PackingQtyKgs = null
     productionPlan.value[index].product2UomCount = null
+
+    productionPlan.value[index].product1SelectedCode = null
+    productionPlan.value[index].product1Name = null
+    productionPlan.value[index].product1SelectedPackagingCode = null
+    productionPlan.value[index].product1PackagingName = null
+    productionPlan.value[index].product1PackingQtyKgs = null
+    productionPlan.value[index].product1UomCount = null
   }else{
     console.log("Tricker false", trickerItem1N2.value)
     if (selectedItemCode2.value) {
@@ -2165,9 +2186,9 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && item.raw.packingQtyKgs === selectPackagingQtySwitch
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && item.raw.packingQtyKgs === selectPackagingQtySwitch
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2177,9 +2198,9 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && item.raw.packingQtyKgs === selectPackagingQtySwitch
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && item.raw.packingQtyKgs === selectPackagingQtySwitch
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2189,9 +2210,9 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && item.raw.packingQtyKgs === selectPackagingQtySwitch
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && item.raw.packingQtyKgs === selectPackagingQtySwitch
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
@@ -2204,25 +2225,23 @@ const print = () => {
                     <td
                       :style="{
                         background:
-                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && item.raw.packingQtyKgs === selectPackagingQtySwitch
                             ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
-                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && item.raw.packingQtyKgs === selectPackagingQtySwitch
                               ? '#D3E3FC' // เงื่อนไขแรก
                               : '#FFFFFF', // ค่าเริ่มต้น
                       }"
                     >
                       <VBtn
-                        v-if="item.raw.itemCode === selectPackagingTypeSwitch"
+                        v-if="item.raw.itemCode === selectPackagingTypeSwitch && item.raw.packingQtyKgs === selectPackagingQtySwitch"
                         :color="colorBtnSwitch()"
                         variant="tonal"
                         @click="selectPackaging(item.raw)"
                       >
                         Select
                       </VBtn>
-                     
-
                       <VBtn
-                        v-if="item.raw.itemCode !== selectPackagingTypeSwitch"
+                        v-else
                         :color="colorBtnSwitchActive()"
                         variant="flat"
                         @click="selectPackaging(item.raw)"
