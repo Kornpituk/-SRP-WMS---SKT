@@ -1380,7 +1380,7 @@ const approvePlan = async () => {
     }else{
       textAlertDialogFunction(alertWordConst.approve, false)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }
   } catch (error) {
