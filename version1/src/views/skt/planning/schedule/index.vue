@@ -2228,7 +2228,6 @@ const statusText = statusId => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VBtn
-                  v-if="item.raw.statusId == 101 || item.raw.statusId === 102"
                   color="info"
                   @click="newBatch(item.raw.batchID)"
                 >

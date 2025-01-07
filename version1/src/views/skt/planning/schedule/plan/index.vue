@@ -596,6 +596,18 @@ const selectPlan = plan => {
   selectedPackagingType2.value = plan.itemCode
   selectedProductionCode2.value = plan.itemCode
 
+  selectedItemCode.value = null
+  selectedItemName.value = null
+  selectedPackagingType.value = null
+  selectedPackagingName.value = null
+  selectedPackagingKgs.value = null
+
+  selectedItemCode2.value = null
+  selectedItemName2.value = null
+  selectedPackagingType2.value = null
+  selectedPackagingName2.value = null
+  selectedPackagingKgs2.value = null
+
 }
 
 
@@ -914,14 +926,96 @@ const addSelectProdutionCode = index => {
 
   if(productionPlan.value[index].productionCode !== selectedProductionCode.value){
     trickerItem1N2.value = true
-    console.log("Tricker false", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+    console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
   }else{
     trickerItem1N2.value = false
-    console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+    console.log("Tricker false", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
   }
 
-  if(trickerItem1N2.value){
+  // if(trickerItem1N2.value){
+  //   console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+  //   productionPlan.value[index].product2SelectedCode = null
+  //   productionPlan.value[index].product2Name = null
+  //   productionPlan.value[index].product2SelectedPackagingCode = null
+  //   productionPlan.value[index].product2PackagingName = null
+  //   productionPlan.value[index].product2PackingQtyKgs = null
+  //   productionPlan.value[index].product2UomCount = null
+
+  //   if(productionPlan.value[index].productionCode !== null){
+  //     productionPlan.value[index].product1SelectedCode = null
+  //     productionPlan.value[index].product1Name = null
+  //     productionPlan.value[index].product1SelectedPackagingCode = null
+  //     productionPlan.value[index].product1PackagingName = null
+  //     productionPlan.value[index].product1PackingQtyKgs = null
+  //     productionPlan.value[index].product1UomCount = null
+  //   }else{
+  //     if (selectedItemCode.value) {
+  //       productionPlan.value[index].product1SelectedCode = selectedItemCode.value
+  //     }
+  //     if (selectedItemName.value) {
+  //       productionPlan.value[index].product1Name = selectedItemName.value
+  //     }
+  //     if (selectedPackagingType.value) {
+  //       productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value
+  //     }
+  //     if (selectedPackagingName.value) {
+  //       productionPlan.value[index].product1PackagingName = selectedPackagingName.value
+  //     }
+  //     if (selectedPackagingKgs.value) {
+  //       productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value
+  //       if (selectedProductionbatchScaleKgs.value) {
+  //         productionPlan.value[index].product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs.value)
+  //       }
+  //     }
+  //   }
     
+  // }else{
+  //   console.log("Tricker false", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+  //   if (selectedItemCode2.value) {
+  //     productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
+  //   }
+  //   if (selectedItemName2.value) {
+  //     productionPlan.value[index].product2Name = selectedItemName2.value
+  //   }
+  //   if (selectedPackagingType2.value) {
+  //     productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
+  //   }
+  //   if (selectedPackagingName2.value) {
+  //     productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
+  //   }
+  //   if (selectedPackagingKgs2.value) {
+  //     productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
+  //     if (selectedProductionbatchScaleKgs.value) {
+  //       productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
+  //     }
+  //   }
+
+  //   if (selectedItemCode.value) {
+  //     productionPlan.value[index].product1SelectedCode = selectedItemCode.value
+  //   }
+  //   if (selectedItemName.value) {
+  //     productionPlan.value[index].product1Name = selectedItemName.value
+  //   }
+  //   if (selectedPackagingType.value) {
+  //     productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value
+  //   }
+  //   if (selectedPackagingName.value) {
+  //     productionPlan.value[index].product1PackagingName = selectedPackagingName.value
+  //   }
+  //   if (selectedPackagingKgs.value) {
+  //     productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value
+  //     if (selectedProductionbatchScaleKgs.value) {
+  //       productionPlan.value[index].product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs.value)
+  //     }
+  //   }
+
+  //   console.log("Tricker false after", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+  // }
+
+  console.log("Item 1 before", productionPlan.value[index].product1SelectedCode, '||', selectedItemCode.value)
+
+  if(trickerItem1N2.value){
+    console.log("Tricker true if", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
     productionPlan.value[index].product2SelectedCode = null
     productionPlan.value[index].product2Name = null
     productionPlan.value[index].product2SelectedPackagingCode = null
@@ -929,54 +1023,17 @@ const addSelectProdutionCode = index => {
     productionPlan.value[index].product2PackingQtyKgs = null
     productionPlan.value[index].product2UomCount = null
 
-    if(productionPlan.value[index].productionCode !== null){
-      productionPlan.value[index].product1SelectedCode = null
-      productionPlan.value[index].product1Name = null
-      productionPlan.value[index].product1SelectedPackagingCode = null
-      productionPlan.value[index].product1PackagingName = null
-      productionPlan.value[index].product1PackingQtyKgs = null
-      productionPlan.value[index].product1UomCount = null
-    }
+    productionPlan.value[index].product1SelectedCode = null
+    productionPlan.value[index].product1Name = null
+    productionPlan.value[index].product1SelectedPackagingCode = null
+    productionPlan.value[index].product1PackagingName = null
+    productionPlan.value[index].product1PackingQtyKgs = null
+    productionPlan.value[index].product1UomCount = null
+
     
-  }else{
-    console.log("Tricker false", trickerItem1N2.value)
-    if (selectedItemCode2.value) {
-      productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
-    }
-    if (selectedItemName2.value) {
-      productionPlan.value[index].product2Name = selectedItemName2.value
-    }
-    if (selectedPackagingType2.value) {
-      productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
-    }
-    if (selectedPackagingName2.value) {
-      productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
-    }
-    if (selectedPackagingKgs2.value) {
-      productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
-      if (selectedProductionbatchScaleKgs.value) {
-        productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
-      }
-    }
+    console.log("Item 1 null", productionPlan.value[index].product1SelectedCode, '||', selectedItemCode.value)
   }
-
-  if (selectedProductionCode.value) {
-    productionPlan.value[index].productionCode = selectedProductionCode.value
-  }
-  if (selectedProductionName.value) {
-    productionPlan.value[index].productionName = selectedProductionName.value
-  }
-  if (selectedProductionReactorName.value) {
-    productionPlan.value[index].reactorName = selectedProductionReactorName.value
-  }
-  if (selectedProductionbatchScaleKgs.value) {
-    productionPlan.value[index].quantityKgs = selectedProductionbatchScaleKgs.value
-  }
-  if (selectedProductionPlanName.value) {
-    productionPlan.value[index].plantName = selectedProductionPlanName.value
-  }
-
-  console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+  
 
   if (selectedItemCode.value) {
     productionPlan.value[index].product1SelectedCode = selectedItemCode.value
@@ -997,34 +1054,48 @@ const addSelectProdutionCode = index => {
     }
   }
 
+  if (selectedItemCode2.value) {
+    productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
+  }
+  if (selectedItemName2.value) {
+    productionPlan.value[index].product2Name = selectedItemName2.value
+  }
+  if (selectedPackagingType2.value) {
+    productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
+  }
+  if (selectedPackagingName2.value) {
+    productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
+  }
+  if (selectedPackagingKgs2.value) {
+    productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
+    if (selectedProductionbatchScaleKgs.value) {
+      productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
+    }
+  }
 
-  
+  console.log("Item 1 replace", productionPlan.value[index].product1SelectedCode, '||', selectedItemCode.value)
 
-
-  
+  if (selectedProductionCode.value) {
+    productionPlan.value[index].productionCode = selectedProductionCode.value
+  }
+  if (selectedProductionName.value) {
+    productionPlan.value[index].productionName = selectedProductionName.value
+  }
+  if (selectedProductionReactorName.value) {
+    productionPlan.value[index].reactorName = selectedProductionReactorName.value
+  }
+  if (selectedProductionbatchScaleKgs.value) {
+    productionPlan.value[index].quantityKgs = selectedProductionbatchScaleKgs.value
+  }
+  if (selectedProductionPlanName.value) {
+    productionPlan.value[index].plantName = selectedProductionPlanName.value
+  }
 
   console.log("Updated row:", productionPlan.value[index])
 }
 
 const confirmFilterSelectProduction = () => {
   dataPlanningForSave.value.productionCode = selectedProductionCode.value
-
-  if(selectedItemCode.value){
-    dataPlanningForSave.value.product1SelectedCode = selectedItemCode.value  
-  }
-
-  if(selectedPackagingType.value){
-    dataPlanningForSave.value.product1SelectedPackagingCode = selectedPackagingType.value
-  }
-
-  if(selectedItemCode2.value){
-    dataPlanningForSave.value.product2SelectedCode = selectedItemCode2.value
-  }
-  
-  if(selectedPackagingType2.value){
-    dataPlanningForSave.value.product2SelectedPackagingCode = selectedPackagingType2.value
-  }
-
 
   const index = indexSelectBoxFilter.value
   if (index !== null) {
@@ -1059,13 +1130,11 @@ const saveProductionPlan = async () => {
 
       product1SelectedCode: (item.product1SelectedCode),
       product1SelectedPackagingCode: item.product1SelectedPackagingCode,
-
       product1PackingQtyKgs: parseInt(item.product1PackingQtyKgs) || item.product1PackingQtyKgs,
       product1UomCount: item.product1UomCount,
 
       product2SelectedCode: item.product2SelectedCode,
       product2SelectedPackagingCode: item.product2SelectedPackagingCode,
-
       product2PackingQtyKgs: parseInt(item.product2PackingQtyKgs)  || item.product2PackingQtyKgs,
       product2UomCount: item.product2UomCount,
 
@@ -1204,7 +1273,6 @@ const submitPlan = async () => {
     "product1SelectedPackagingCode",
     "product1PackingQtyKgs",
     "product1UomCount",
-
     "lotNumber",
     "planningID",
     "producingDate",
@@ -1212,25 +1280,49 @@ const submitPlan = async () => {
 
   // ตรวจสอบฟิลด์ที่ไม่มีค่า
   let hasErrors = false
+
   selectedDataTables.value.forEach(item => {
-  // กำหนดค่าเริ่มต้น
+    // กำหนดค่าเริ่มต้น
     if (!item.missingFields) {
       item.missingFields = []
     }
 
+    // ตรวจสอบฟิลด์ที่ต้องมีสำหรับ product1
     requiredFields.forEach(field => {
       if (isFieldMissing(item, field)) {
         item.missingFields.push(field)
         hasErrors = true // หากพบฟิลด์ที่ไม่มีค่า
       }
     })
+
+    // ตรวจสอบเงื่อนไข product2
+    const hasProduct2Values =
+      item.product2SelectedCode &&
+      item.product2SelectedPackagingCode &&
+      item.product2PackingQtyKgs &&
+      item.product2UomCount
+
+    const isProduct2Empty =
+      !item.product2SelectedCode &&
+      !item.product2SelectedPackagingCode &&
+      !item.product2PackingQtyKgs &&
+      !item.product2UomCount
+
+    if (!isProduct2Empty && !hasProduct2Values) {
+      hasErrors = true
+      item.missingFields.push(
+        "product2SelectedCode",
+        "product2SelectedPackagingCode",
+        "product2PackingQtyKgs",
+        "product2UomCount",
+      )
+    }
   })
 
   // ถ้ามีฟิลด์ที่ไม่มีค่า ให้หยุดและแจ้งเตือน
   if (hasErrors) {
-    textAlertSubDialogFunction(alertWordConst.submit, "Plases check input.", false)
-    console.warn("Some fields are missing:", selectedDataTables.value, subWordForSubmit.value)
-    
+    textAlertSubDialogFunction(alertWordConst.submit, "Please check input. Some fields are missing.", false)
+    console.warn("Some fields are missing:", selectedDataTables.value)
     
     return // หยุดการทำงานถ้าข้อมูลไม่ครบ
   }
@@ -1247,26 +1339,25 @@ const submitPlan = async () => {
       accessTokenAtStore,
     )
 
-    if(responseSubmitProductionPlan.value){
+    if (responseSubmitProductionPlan.value) {
       textAlertDialogFunction(alertWordConst.submit, true)
       setTimeout(() => {
         location.reload()
       }, 500)
-    }else if(errorMessageSubmitProductionPlan.value){
+    } else if (errorMessageSubmitProductionPlan.value) {
       textAlertSubDialogFunction(alertWordConst.submit, errorMessageSubmitProductionPlan.value, false)
       setTimeout(() => {
-        // location.reload()
+        // location.reload();
       }, 500)
 
       console.log("AlertDialog Submit", errorMessageSubmitProductionPlan.value, responseSubmitProductionPlan.value)
     }
-
-    
   } catch (error) {
     console.error("Error submitting production plan:", error)
     textAlertDialogFunction(alertWordConst.submit, false)
   }
 }
+
 
 //------------------------- approve plan
 const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approveProdutcionPlanFunc } = useApproveProductionPlanService()
@@ -2297,20 +2388,20 @@ const print = () => {
           <span style="font-size: 12px;">Gen Lot</span>
         </VBtn>
         <VBtn
+          color="error"
+          :disabled="!activeBtnCancelPlan"
+          class="mx-1"
+          @click="deletePlan"
+        >
+          <span style="font-size: 12px;">Delete Plan</span>
+        </VBtn>
+        <VBtn
           class="mx-1"
           color="light-green-darken-1"
           :disabled="!activeBtnSubmit"
           @click="submitPlan"
         >
           <span style="font-size: 12px;">Submit</span>
-        </VBtn>
-        <VBtn
-          color="error"
-          :disabled="!activeBtnCancelPlan"
-          class="mx-1"
-          @click="deletePlan"
-        >
-          <span style="font-size: 12px;">Reject Plan</span>
         </VBtn>
         <VBtn
           class="mx-1"
@@ -2325,7 +2416,7 @@ const print = () => {
           class="mx-2"
           @click="addEmptyRowToPlan"
         >
-          <span style="font-size: 12px;">Add Item</span>
+          <span style="font-size: 12px;">Reject Plan</span>
         </VBtn>
 
         <VBtn

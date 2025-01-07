@@ -241,6 +241,7 @@ const fetchData = async () => {
     }
   } catch (error) {
     // จัดการข้อผิดพลาด เช่น Network Error
+    dataPrintLabel.value = []
     printLabelFormViewResult.value = false
     statusData.value = "Error occurred while fetching data"
     console.error("Error in fetchData:", error)

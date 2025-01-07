@@ -1001,7 +1001,7 @@ const handleFileUpdates = updatedFiles => {
                   colspan="12"
                   class="text-center"
                 >
-                  Tel. : (038) 627-0505 Fax. (038 946-072)
+                  Tel. : (038) 627-050 Fax. (038 946-072)
                 </th>
               </tr>
               <tr>
@@ -1049,7 +1049,7 @@ const handleFileUpdates = updatedFiles => {
                   colspan="8"
                   class="text-start"
                 >
-                  RfS24999212321
+                1100077645
                 </td>
               </tr>
               <tr>
@@ -1129,7 +1129,7 @@ const handleFileUpdates = updatedFiles => {
               </tr>
               <tr>
                 <th colspan="4">
-                  ชื่อพนักงานขับรถ (Driver Name)
+                  ชื่อพนักงานขับรถ (Driver's Name)
                 </th>
                 <td
                   colspan="8"
@@ -1138,7 +1138,7 @@ const handleFileUpdates = updatedFiles => {
                   <VTextField
                     style="min-width: 250px;"
                     density="compact"
-                    label="Driver Name"
+                    label="Driver's Name"
                     placeholder="MR. ABCD"
                     class="text-center"
                   />
@@ -1486,18 +1486,17 @@ const handleFileUpdates = updatedFiles => {
             <th
               v-if="true"
               class="text-center"
-              style="min-width: 300px;"
             >
               <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
-              <VRow>
+              <VRow v-if="false">
                 <VCol
-                  class="px-1"
+                  class="px-3"
                   cols="6"
                 >
                   <span style="font-weight: bold;">Print</span> 
                 </VCol>
                 <VCol
-                  class="px-1"
+                  class="px-3"
                   cols="6"
                 >
                   <span style="font-weight: bold;">Attach File</span>
@@ -1616,7 +1615,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
               class="text-start px-1"
-              style="min-width: 150px; font-size: 12px;"
+              style="min-width: 120px; font-size: 12px;"
             >
               {{ product.saleOrderNo }}
             </td>
@@ -1625,7 +1624,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
               class="text-start px-1"
-              style="min-width: 300px; font-size: 12px;"
+              style="min-width: 250px; font-size: 12px;"
             >
               <div>
                 <FileInputDialogCarousels
@@ -1662,8 +1661,7 @@ const handleFileUpdates = updatedFiles => {
               class="text-start px-1"
               style="min-width: 200px; font-size: 12px;"
             >
-              {{ (product.user) }}
-              User
+              <span class="d-felx align-start">{{ (product.user) }}</span>
             </td>
 
             <!-- 👉 shipper -->
@@ -1844,7 +1842,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
               class="text-start px-1"
-              style="min-width: 300px; font-size: 12px;"
+              style="min-width: 250px; font-size: 12px;"
             >
               <div>
                 <FileInputDialogCarousels
@@ -1964,17 +1962,15 @@ const handleFileUpdates = updatedFiles => {
             <!-- 👉 truckOrder -->
             <td
               v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
-              class="text-start px-1"
-              style="min-width: 450px; font-size: 12px;"
+              class="text-start px-2"
+              style="min-width: 350px; font-size: 12px;"
             >
               <VRow>
-                <VCol
-                  class="text-center px-2"
-                  cols="6"
-                >
+                <VCol cols="3">
                   <VBtn
-                    width="60%"
+                    width="90px"
                     color="warning"
+                    class="mx-2"
                     @click="isDialogVisiblePrintTruck = true"
                   >
                     <VIcon
@@ -1983,22 +1979,17 @@ const handleFileUpdates = updatedFiles => {
                     />
                   </VBtn>
                 </VCol>
-                <VCol
-                  cols="6"
-                  class="px-2"
-                >
-                  <div>
-                    <FileInputDialogCarousels
-                      title-dialog="Truck Order"
-                      :type-file-input="typeFileInput"
-                      file-name="Truck Order" 
-                      @updateFiles="handleFileUpdates"
-                    />
-                  </div>
+                <VCol cols="9">
+                  <FileInputDialogCarousels
+                    title-dialog="Truck Order"
+                    :disabled-prop="false"
+                    :type-file-input="typeFileInput"
+                    file-name="Truck Order"
+                    
+                    @updateFiles="handleFileUpdates"
+                  />
                 </VCol>
               </VRow>
-              
-              <div class="d-flex justify-space-evenly" />
             </td>
 
             <!-- 👉 doEx -->
@@ -2065,7 +2056,7 @@ const handleFileUpdates = updatedFiles => {
             <td
               v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
               class="text-start px-1"
-              style="min-width: 300px; font-size: 12px;"
+              style="min-width: 250px; font-size: 12px;"
             >
               <div>
                 <FileInputDialogCarousels
@@ -2085,7 +2076,7 @@ const handleFileUpdates = updatedFiles => {
               style="font-size: 12px;"
             >
               <VBtn
-                style="min-width: 177px;"
+                style="min-width: 150px;"
                 :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
                 variant="outlined"
                 :color="product.remarkSal ? 'primary' : 'grey'"
@@ -2106,7 +2097,7 @@ const handleFileUpdates = updatedFiles => {
               style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
             >
               <VBtn
-                style="min-width: 177px; max-width: 177px;"
+                style="min-width: 150px; max-width: 150px;"
                 :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
                 variant="outlined"
                 :color="product.remarkWh ? 'primary' : 'grey'"
@@ -2127,7 +2118,7 @@ const handleFileUpdates = updatedFiles => {
               style="font-size: 12px;"
             >
               <VBtn
-                style="min-width: 177px;"
+                style="min-width: 150px;"
                 variant="outlined"
                 :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
                 :color="product.remarkLog ? 'primary' : 'grey'"

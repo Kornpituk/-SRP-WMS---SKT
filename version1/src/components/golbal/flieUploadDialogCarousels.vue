@@ -97,7 +97,7 @@ const removeFile = index => {
               </VChip>
 
               <span
-                v-else-if="index === 1"
+                v-if="false"
                 class="text-overline text-grey-darken-3 mx-2"
               >
                 +{{ files.length - 1 }} File(s)
@@ -112,7 +112,7 @@ const removeFile = index => {
       >
         <!-- ปุ่มเปิด Carousel Dialog -->
         <VBtn
-          :disabled="!files.length || !filesModel.length"
+          :disabled="!files.length || !filesModel.length || disabledProp"
           class="d-flex justify-center"
           :color="files.length && filesModel.length? 'primary' : 'grey'"
           style="max-width: 70px;"
