@@ -1009,7 +1009,7 @@ const handleFileUpdates = updatedFiles => {
                   colspan="12"
                   class="text-center"
                 >
-                  ใบสั่งรถขนส่ง / Truck order
+                  ใบสั่งรถขนส่ง / Truck Order
                 </th>
               </tr>
             </thead>
@@ -1049,7 +1049,7 @@ const handleFileUpdates = updatedFiles => {
                   colspan="8"
                   class="text-start"
                 >
-                RfS24999212321
+                  RfS24999212321
                 </td>
               </tr>
               <tr>
@@ -1172,7 +1172,7 @@ const handleFileUpdates = updatedFiles => {
                   <VTextField
                     style="min-width: 250px;"
                     density="compact"
-                    label="Tel"
+                    label="Tel."
                     placeholder="000-0000000"
                     class="text-center"
                   />
@@ -1217,7 +1217,7 @@ const handleFileUpdates = updatedFiles => {
                   class="text-center"
                 >
                   <template #label>
-                    ผู้สั้งการ / Oder By
+                    ผู้สั่งการ / Oder By
                   </template>
                 </VTextField>
               </th>
@@ -1373,11 +1373,11 @@ const handleFileUpdates = updatedFiles => {
             </th>
             <th
               v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
-              class="text-center"
+              class="text-start px-2"
             >
               <div>
-                <span style="padding-right: 60px; font-weight: bold;">
-                  {{ $t('Shipping Mark/Cound.') }}
+                <span style="font-weight: bold;">
+                  {{ $t('Shipping Mark/Cond.') }}
                 </span>
               </div>
             </th>
@@ -1630,7 +1630,7 @@ const handleFileUpdates = updatedFiles => {
               <div>
                 <FileInputDialogCarousels
                   title-dialog="So Attachment"
-                  :disabled-prop="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
                   :type-file-input="typeFileInput"
                   file-name="So Attachment" 
                   @updateFiles="handleFileUpdates"
@@ -1687,35 +1687,22 @@ const handleFileUpdates = updatedFiles => {
             <!-- 👉 Shipping Condition -->
             <td
               v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
-              class="text-start px-2"
-              style="min-width: 250px; font-size: 12px;"
+              class="text-start px-1"
+              style="min-width: 180px; font-size: 12px;"
             >
-              <div class="d-flex justify-space-between">
+              <div class="text-start">
                 <VBtn
-                  :disabled="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
-                  style="min-width: 196px;"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
+                  style="min-width: 150px; max-width: 160px;"
                   variant="outlined"
                   :color="product.shippingCondition ? 'primary' : 'grey'"
                   @click="textAreaShipDialogActive('ShipMC',product.shippingMark, product.shippingCondition, index)"
                 >
                   <span
                     v-if="product.shippingCondition"
-                    style="overflow: hidden;min-width: 180px; max-width: 180px; text-overflow: ellipsis;"
+                    style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
                   >{{ product.shippingCondition }}</span>
                   <span v-else>Shipping Mark/Coundition.</span>
-                </VBtn>
-                <VBtn
-                  v-if="false"
-                  class="mx-2"
-                  :color="product.shippingCondition ? 'warning' : 'grey'"
-                  :disabled="!product.shippingCondition"
-                  @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
-                >
-                  <VIcon
-                    size="30"
-                    icon="ri-eye-fill"
-                    @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
-                  />
                 </VBtn>
               </div>
             </td>
@@ -1795,7 +1782,7 @@ const handleFileUpdates = updatedFiles => {
               <VTextField
                 v-model="product.endUser"
                 density="compact"
-                :disabled="canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute"
+                :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute"
                 style=" min-width: 150px;"
               >
                 <template #label>
@@ -1830,14 +1817,14 @@ const handleFileUpdates = updatedFiles => {
             >
               <VBtn
                 v-if="product.lotNumber.length > 1"
-                style="min-width: 50px;"
-                :disabled="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
+                style="min-width: 50px; max-width: 80px;"
+                :disabled="!canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
                 variant="outlined"
                 @click="textAreaDialogActive('Lot', product.lotNumber)"
               >
                 <span
                   v-if="product.lotNumber"
-                  style="overflow: hidden; max-width: 500px; text-overflow: ellipsis;"
+                  style="overflow: hidden; max-width: 60px; text-overflow: ellipsis;"
                 >{{ product.lotNumber[0].lotNUmber }}...</span>
                 <span v-else>Lot Number</span>
               </VBtn>
@@ -1862,7 +1849,7 @@ const handleFileUpdates = updatedFiles => {
               <div>
                 <FileInputDialogCarousels
                   title-dialog="COA"
-                  :disabled-prop="canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
                   :type-file-input="typeFileInput"
                   file-name="COA" 
                   @updateFiles="handleFileUpdates"
@@ -1891,7 +1878,7 @@ const handleFileUpdates = updatedFiles => {
             >
               <VSelect
                 v-model="product.carrier"
-                :disabled="canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
+                :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
                 :items="items"
                 density="compact"
                 eager
@@ -1907,7 +1894,7 @@ const handleFileUpdates = updatedFiles => {
               <VSelect
                 v-model="product.vesselName"
                 :items="items"
-                :disabled="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
+                :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
                 density="compact"
                 eager
               />
@@ -1921,7 +1908,7 @@ const handleFileUpdates = updatedFiles => {
             >
               <VTextField
                 v-model="product.voy"
-                :disabled="canVisibleUserPermission(statusPermission,'COL_VOY').canExecute"
+                :disabled="!canVisibleUserPermission(statusPermission,'COL_VOY').canExecute"
                 density="compact"
                 style=" min-width: 150px;"
               />
@@ -1938,7 +1925,7 @@ const handleFileUpdates = updatedFiles => {
               <VSelect
                 v-model="product.truck"
                 :items="itemsTruck"
-                :disabled="canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
+                :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
                 density="compact"
                 eager
               />
@@ -1954,7 +1941,7 @@ const handleFileUpdates = updatedFiles => {
                 v-if="false"
                 v-model="product.truckReserving"
                 density="compact"
-                :disabled="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
+                :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
                 style=" min-width: 150px;"
               />
               {{ product.truckReserving }}
@@ -1968,7 +1955,7 @@ const handleFileUpdates = updatedFiles => {
             >
               <VTextField
                 v-model="product.truckFee"
-                :disabled="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute"
+                :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute"
                 density="compact"
                 style=" min-width: 150px;"
               />
@@ -2083,7 +2070,7 @@ const handleFileUpdates = updatedFiles => {
               <div>
                 <FileInputDialogCarousels
                   title-dialog="Delivery Note"
-                  :disabled-prop="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
                   :type-file-input="typeFileInput"
                   file-name="Delivery Note" 
                   @updateFiles="handleFileUpdates"
@@ -2099,7 +2086,7 @@ const handleFileUpdates = updatedFiles => {
             >
               <VBtn
                 style="min-width: 177px;"
-                :disabled-prop="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
+                :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
                 variant="outlined"
                 :color="product.remarkSal ? 'primary' : 'grey'"
                 @click="textAreaDialogActive('RemarkSAL', product.remarkSal, index)"
@@ -2120,7 +2107,7 @@ const handleFileUpdates = updatedFiles => {
             >
               <VBtn
                 style="min-width: 177px; max-width: 177px;"
-                :disabled-prop="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
+                :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
                 variant="outlined"
                 :color="product.remarkWh ? 'primary' : 'grey'"
                 @click="textAreaDialogActive('RemarkWH', product.remarkWh, index)"
@@ -2142,7 +2129,7 @@ const handleFileUpdates = updatedFiles => {
               <VBtn
                 style="min-width: 177px;"
                 variant="outlined"
-                :disabled-prop="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
+                :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
                 :color="product.remarkLog ? 'primary' : 'grey'"
                 @click="textAreaDialogActive('RemarkLOG', product.remarkLog, index)"
               >

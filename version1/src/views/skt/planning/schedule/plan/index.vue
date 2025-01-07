@@ -350,11 +350,11 @@ const itemCodeDataTable = [
 
 const packagingKgsDataTable = [
   {
-    title: 'Item Code',
+    title: 'Packaging Code',
     key: 'itemCode',
   },
   {
-    title: 'Product Name',
+    title: 'Packaging Name',
     key: 'itemName',
   },
   {
@@ -913,10 +913,51 @@ const addSelectProdutionCode = index => {
   const trickerItem1N2 = ref(false)
 
   if(productionPlan.value[index].productionCode !== selectedProductionCode.value){
-    console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
     trickerItem1N2.value = true
+    console.log("Tricker false", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
   }else{
     trickerItem1N2.value = false
+    console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+  }
+
+  if(trickerItem1N2.value){
+    
+    productionPlan.value[index].product2SelectedCode = null
+    productionPlan.value[index].product2Name = null
+    productionPlan.value[index].product2SelectedPackagingCode = null
+    productionPlan.value[index].product2PackagingName = null
+    productionPlan.value[index].product2PackingQtyKgs = null
+    productionPlan.value[index].product2UomCount = null
+
+    if(productionPlan.value[index].productionCode !== null){
+      productionPlan.value[index].product1SelectedCode = null
+      productionPlan.value[index].product1Name = null
+      productionPlan.value[index].product1SelectedPackagingCode = null
+      productionPlan.value[index].product1PackagingName = null
+      productionPlan.value[index].product1PackingQtyKgs = null
+      productionPlan.value[index].product1UomCount = null
+    }
+    
+  }else{
+    console.log("Tricker false", trickerItem1N2.value)
+    if (selectedItemCode2.value) {
+      productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
+    }
+    if (selectedItemName2.value) {
+      productionPlan.value[index].product2Name = selectedItemName2.value
+    }
+    if (selectedPackagingType2.value) {
+      productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
+    }
+    if (selectedPackagingName2.value) {
+      productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
+    }
+    if (selectedPackagingKgs2.value) {
+      productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
+      if (selectedProductionbatchScaleKgs.value) {
+        productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
+      }
+    }
   }
 
   if (selectedProductionCode.value) {
@@ -957,45 +998,7 @@ const addSelectProdutionCode = index => {
   }
 
 
-  if(trickerItem1N2.value){
-    
-    productionPlan.value[index].product2SelectedCode = null
-    productionPlan.value[index].product2Name = null
-    productionPlan.value[index].product2SelectedPackagingCode = null
-    productionPlan.value[index].product2PackagingName = null
-    productionPlan.value[index].product2PackingQtyKgs = null
-    productionPlan.value[index].product2UomCount = null
-
-    if(productionPlan.value[index].productionCode){
-      productionPlan.value[index].product1SelectedCode = null
-      productionPlan.value[index].product1Name = null
-      productionPlan.value[index].product1SelectedPackagingCode = null
-      productionPlan.value[index].product1PackagingName = null
-      productionPlan.value[index].product1PackingQtyKgs = null
-      productionPlan.value[index].product1UomCount = null
-    }
-    
-  }else{
-    console.log("Tricker false", trickerItem1N2.value)
-    if (selectedItemCode2.value) {
-      productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
-    }
-    if (selectedItemName2.value) {
-      productionPlan.value[index].product2Name = selectedItemName2.value
-    }
-    if (selectedPackagingType2.value) {
-      productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
-    }
-    if (selectedPackagingName2.value) {
-      productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
-    }
-    if (selectedPackagingKgs2.value) {
-      productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
-      if (selectedProductionbatchScaleKgs.value) {
-        productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
-      }
-    }
-  }
+  
 
 
   
