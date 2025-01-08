@@ -1327,7 +1327,11 @@ const submitPlan = async () => {
   // ถ้ามีฟิลด์ที่ไม่มีค่า ให้หยุดและแจ้งเตือน
   if (hasErrors) {
     textAlertSubDialogFunction(alertWordConst.submit, "Please check input. Some fields are missing.", false)
+    setTimeout(() => {
+      location.reload()
+    }, 1200)
     console.warn("Some fields are missing:", selectedDataTables.value)
+    trickerSubmit.value = false
     
     return // หยุดการทำงานถ้าข้อมูลไม่ครบ
   }
@@ -1352,14 +1356,19 @@ const submitPlan = async () => {
     } else if (errorMessageSubmitProductionPlan.value) {
       textAlertSubDialogFunction(alertWordConst.submit, errorMessageSubmitProductionPlan.value, false)
       setTimeout(() => {
-        // location.reload();
-      }, 500)
+        location.reload()
+      }, 1000)
+      trickerSubmit.value = false
 
       console.log("AlertDialog Submit", errorMessageSubmitProductionPlan.value, responseSubmitProductionPlan.value)
     }
   } catch (error) {
     console.error("Error submitting production plan:", error)
     textAlertDialogFunction(alertWordConst.submit, false)
+    setTimeout(() => {
+      location.reload()
+    }, 1000)
+    trickerSubmit.value = false
   }
 }
 
