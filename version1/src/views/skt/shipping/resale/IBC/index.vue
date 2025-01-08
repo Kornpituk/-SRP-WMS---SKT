@@ -584,6 +584,7 @@ const dessertsMockAmountView = [
                         {{ item.amount }}
                       </VCol>
                       <VCol
+                        v-if="false"
                         class="d-flex align-start justify-end pa-2"
                         cols="6"
                         @click="isDialogVisibleImgAmount = true"
@@ -1088,6 +1089,29 @@ const dessertsMockAmountView = [
                 <td colspan="4">
                   <div class="d-flex justify-center">
                     Strap
+                  </div>
+                </td>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    <div class="d-flex justify-center align-center">
+                      <VCheckbox />
+                      Yes 
+                    </div>
+                  </div>
+                </td>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    <div class="d-flex justify-center align-center">
+                      <VCheckbox />
+                      No 
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    Other
                   </div>
                 </td>
                 <td colspan="4">
@@ -2231,95 +2255,4 @@ const dessertsMockAmountView = [
   </VContainer>
 </template>
 
-<style scoped>
-.text-center {
-  text-align: center;
-}
-
-.centered-input >>> input {
-  padding: 0;
-  text-align: center;
-}
-
-.custom-table {
-  border-collapse: collapse;
-  inline-size: 100%;
-}
-
-.custom-table,
-.custom-table th,
-.custom-table td {
-  border: 1px solid black;
-}
-
-.custom-table td {
-  font-size: 14px;
-  font-weight: 300;
-}
-
-.custom-table th,
-.custom-table td {
-  padding: 8px;
-  text-align: start;
-}
-
-.header {
-  justify-content: space-between;
-  font-weight: bold;
-  text-align: center;
-}
-
-.section-title {
-  font-weight: bold;
-}
-
-.image {
-  inline-size: 100px;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-tr.sticky {
-  position: sticky;
-  z-index: 1;
-  background: var(#f5f5f5);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 25%);
-  inset-block-start: 0;
-}
-
-th.sticky,
-td.sticky {
-  position: sticky;
-  background: var(#f5f5f5);
-  inset-inline-start: 0;
-}
-
-th.sticky::after,
-td.sticky::after {
-  position: absolute;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 8%) 0%, rgba(0, 0, 0, 0%) 100%);
-  border-inline-start: 1px solid var(#c9d1dc);
-  content: "";
-  inline-size: 5px;
-  inset-block: 0;
-  inset-block-end: -1px;
-  inset-inline-end: -6px;
-}
-
-th.sticky::before,
-td.sticky::before {
-  position: absolute;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0%) 0%, rgba(0, 0, 0, 0.08%) 100%);
-  border-inline-end: 1px solid var(#c9d1dc);
-  content: "";
-  inline-size: 5px;
-  inset-block: 0;
-  inset-block-end: -1px;
-  inset-inline-start: -6px;
-}
-</style>
+<style scoped src="../IBC/ibc.scss"></style>

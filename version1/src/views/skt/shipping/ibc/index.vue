@@ -495,6 +495,7 @@ const filteredTableIBCData = computed(() => {
                         {{ item.amount }}
                       </VCol>
                       <VCol
+                        v-if="false"
                         class="d-flex align-start justify-end pa-2"
                         cols="6"
                         @click="isDialogVisibleImgAmount = true"

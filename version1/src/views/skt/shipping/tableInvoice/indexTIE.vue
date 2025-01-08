@@ -2252,5 +2252,5 @@ const handleFileUpdates = updatedFiles => {
   </section>
 </template>
 
-<style lang="scss" src="./indexTIE.scss"></style>
+<style scoped lang="scss" src="./indexTIE.scss"></style>
 

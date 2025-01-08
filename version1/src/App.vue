@@ -52,6 +52,41 @@ watchEffect(() => {
 
 // })
 
+const INACTIVITY_TIMEOUT = 15 * 60 * 1000 // 15 นาที
+let timeoutId
+
+const resetTimeout = () => {
+  clearTimeout(timeoutId)
+  timeoutId = setTimeout(() => {
+    // alert('Session Timed Out. You will be logged out.')
+    logout()
+  }, INACTIVITY_TIMEOUT)
+}
+
+const logout = () => {
+  // ล้างข้อมูลและ Log Out
+  localStorage.removeItem('accessToken')
+
+  // location.reload()
+  router.push('/login')
+}
+
+onMounted(() => {
+  // ติดตั้ง Event Listener
+  ['mousemove', 'keydown', 'click'].forEach(event =>
+    window.addEventListener(event, resetTimeout),
+  )
+  resetTimeout()
+})
+
+onBeforeUnmount(() => {
+  // ลบ Event Listener
+  ['mousemove', 'keydown', 'click'].forEach(event =>
+    window.removeEventListener(event, resetTimeout),
+  )
+  clearTimeout(timeoutId)
+})
+
 //---------------------------------------------------------------------------------
 
 const {

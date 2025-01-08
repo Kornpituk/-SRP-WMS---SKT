@@ -465,6 +465,7 @@ const dessertsMockAmountView = [
                         {{ item.amount }}
                       </VCol>
                       <VCol
+                        v-if="false"
                         class="d-flex align-start justify-end pa-2"
                         cols="6"
                         @click="isDialogVisibleImgAmount = true"
@@ -972,6 +973,29 @@ const dessertsMockAmountView = [
                 <td colspan="4">
                   <div class="d-flex justify-center">
                     Strap
+                  </div>
+                </td>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    <div class="d-flex justify-center align-center">
+                      <VCheckbox />
+                      Yes 
+                    </div>
+                  </div>
+                </td>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    <div class="d-flex justify-center align-center">
+                      <VCheckbox />
+                      No 
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  <div class="d-flex justify-center">
+                    Other
                   </div>
                 </td>
                 <td colspan="4">

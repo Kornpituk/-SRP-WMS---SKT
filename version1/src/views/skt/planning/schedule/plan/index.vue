@@ -1109,6 +1109,8 @@ const confirmFilterSelectProduction = () => {
 //------------------------------ func save production plan service --------------------------------
 const { responseSaveProductionPlan, errorMessageSaveProductionPlan, saveProdutcionPlanFunc } = useSaveProductionPlanService()
 
+const trickerSubmit = ref(false)
+
 const saveProductionPlan = async () => {
   console.log("saveProductionPlan staret")
 
@@ -1118,9 +1120,7 @@ const saveProductionPlan = async () => {
     producingDate: item.producingDate && item.producingDate !== "null" ? item.producingDate : new Date().toISOString(),
   }))
 
-  console.log("saveProductionPlan staret in 2", productionPlan.value.producingDate)
   try {
-    console.log("saveProductionPlan staret in", productionPlan.value)
 
     const filteredData = productionPlan.value.map(item => ({
       planningID: item.planningID,
@@ -1143,34 +1143,36 @@ const saveProductionPlan = async () => {
       remark: item.remark,
     }))
 
-    console.log("saveProductionPlan staret in 2")
 
     // ส่งข้อมูลที่กรองแล้วไปยัง API
     await saveProdutcionPlanFunc(filteredData, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
     if(responseSaveProductionPlan.value){
-      textAlertDialogFunction(alertWordConst.saveDraft, true)
-      setTimeout(() => {
-        location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
-
-      console.log("saveProductionPlan staret in 3")
-
-      // แสดงค่าใน console
-      console.log("Filtered Production Plan Saved:", filteredData)
+      if(!trickerSubmit.value){
+        textAlertDialogFunction(alertWordConst.saveDraft, true)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+        console.log("Filtered Production Plan Saved:", filteredData)
+      }
+      
     }else{
-      textAlertDialogFunction(alertWordConst.saveDraft, false)
-      setTimeout(() => {
+      if(!trickerSubmit.value){
+        textAlertDialogFunction(alertWordConst.saveDraft, false)
+        setTimeout(() => {
         // location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }
     }
 
   } catch (error) {
-    // จัดการข้อผิดพลาด
-    textAlertDialogFunction(alertWordConst.saveDraft, false)
-    setTimeout(() => {
+    if(!trickerSubmit.value){
+      // จัดการข้อผิดพลาด
+      textAlertDialogFunction(alertWordConst.saveDraft, false)
+      setTimeout(() => {
       // location.reload()
-    }, 500) // 10000 มิลลิวินาที = 10 วินาที
-    console.error("Error saving production plan:", error)
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      console.error("Error saving production plan:", error)
+    }
   }
 }
 
@@ -1265,6 +1267,9 @@ const isFieldMissing = (item, field) => {
 }
 
 const submitPlan = async () => {
+  trickerSubmit.value = true
+  await saveProductionPlan()
+
   const requiredFields = [
     "inputDate",
     "productionCode",

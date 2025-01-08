@@ -1,5 +1,5 @@
 <script setup>
-import ResaleForm from '@/views/skt/shipping/resale/IBC/index.vue'
+import ResaleForm from '@/views/skt/shipping/ibc/index.vue'
 </script>
 
 <template>
