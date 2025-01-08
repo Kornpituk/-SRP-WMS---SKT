@@ -24,6 +24,8 @@ const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 import { useGetUserPermissionService,
 } from '@/services/skt/shipmentPlan/services'
 
+import { fetchUserPermissions, canVisibleUserPermissionPermission  } from '@/utilities/permission'
+
 const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 
 const paramsForGetPermission = ref({
@@ -32,38 +34,31 @@ const paramsForGetPermission = ref({
   uiControlContextId: '7',
 })
 
-const getUserPermissions = async () => {
-  try {
-    // Call the fetch function
-    const result = await fetchUserPermission(
-      urlApi.value,
-      'getPermission',
-      whereHouse,
-      accessTokenAtStore,
-      paramsForGetPermission.value,
-    )
-
-    console.log('getUserPermissions')
-    if(result){
-      console.log('Result:', result)
-
-      // Access the result from `getUserPermissionResult`
-      console.log('User Permission Result:', getUserPermissionResult.value)
-    }else{
-      console.log('No Result:', result)
-    }
-  } catch (error) {
-    // Handle errors (e.g., log or show a message)
-    console.error('Error fetching user permissions:', errorGetUserPermission.value)
-  }
-}
-
-watch(async ()  => {
-  console.log('asdasdasd')
-  await getUserPermissions()
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
 })
 
 const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  const result = canVisibleUserPermissionPermission(statusId, uiControlContextId)
+
+  console.log('Permission Result:', result)
+
+  if (result.canVisible) {
+    console.log('This UI element is visible!')
+  } else {
+    console.log('This UI element is hidden!')
+  }
+  
+  return result
+}
 
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
@@ -316,50 +311,6 @@ const accountLOG = ref (false)
 const accountWH = ref (false)
 const accountWHSub = ref (false)
 const accountAll = ref (true)
-
-const canVisibleUserPermission = (statusId, uiControlContextId) => {
-  if (getUserPermissionResult.value) {
-    const userPermission = getUserPermissionResult.value.find(item => {
-      // แปลงค่าและตัดช่องว่างก่อนเปรียบเทียบ
-      const itemStatusId = String(item.statusID).trim()
-      const providedStatusId = String(statusId).trim()
-      const itemUiControlContextId = String(item.uiControlName).trim().toLowerCase()
-      const providedUiControlContextId = String(uiControlContextId).trim().toLowerCase()
-
-      // Log ค่าเพื่อ Debug
-      console.log('Comparing:', {
-        itemStatusId,
-        providedStatusId,
-        itemUiControlContextId,
-        providedUiControlContextId,
-      })
-
-      return (
-        itemStatusId === providedStatusId &&
-        itemUiControlContextId === providedUiControlContextId
-      )
-    })
-
-    // หากพบข้อมูลที่ตรงกัน
-    if (userPermission) {
-      console.log('Matched Item:', {
-        canExecute: userPermission.canExecute,
-        canVisible: userPermission.canVisible,
-      })
-      
-      return {
-        canExecute: userPermission.canExecute,
-        canVisible: userPermission.canVisible,
-      }
-    }
-  }
-
-  // หากไม่พบข้อมูลที่ตรงกัน
-  return {
-    canExecute: false,
-    canVisible: false,
-  }
-}
 
 const setAccount = role => {
   accountAmin.value = false
@@ -1049,7 +1000,7 @@ const handleFileUpdates = updatedFiles => {
                   colspan="8"
                   class="text-start"
                 >
-                1100077645
+                  1100077645
                 </td>
               </tr>
               <tr>

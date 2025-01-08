@@ -469,7 +469,10 @@ const dessertsMockAmountView = [
                         cols="6"
                         @click="isDialogVisibleImgAmount = true"
                       >
-                        <VIcon icon=" ri-eye-fill" />
+                        <VIcon
+                          icon=" ri-eye-fill"
+                          class="cursor-pointer"
+                        />
                       </VCol>
                     </VRow>
                   </td>
@@ -613,7 +616,7 @@ const dessertsMockAmountView = [
                       :key="index"
                       cols="4"
                     >
-                      <VCard class="pa-2">
+                      <VCard class="pa-2 cursor-pointer">
                         <VImg
                           role="presentation"
                           :alt="file.iconName"
@@ -645,7 +648,7 @@ const dessertsMockAmountView = [
                         </div>
                       </VCardTitle>
 
-                      <VCardText>
+                      <VCardText class="cursor-pointer">
                         <VImg
                           role="presentation"
                           :src="imgDialog"
@@ -705,13 +708,14 @@ const dessertsMockAmountView = [
                   rowspan="9"
                   colspan="5"
                 >
-                  <div class="d-flex justify-center">
+                  <div class="d-flex justify-center cursor-pointer">
                     <VImg
                       height="250"
                       width="150"
                       :src="image02"
                       alt="Packaging Image"
                       class="image"
+                      @click="showDialogImageMuti(image02)"
                     />
                   </div>
                 </td>
@@ -719,11 +723,12 @@ const dessertsMockAmountView = [
                   rowspan="9"
                   colspan="6"
                 >
-                  <div class="d-flex justify-center">
+                  <div class="d-flex justify-center cursor-pointer">
                     <VImg
                       height="150"
                       width="150"
                       :src="image01"
+                      @click="showDialogImageMuti(image01)"
                     />
                   </div>
                 </td>
@@ -904,11 +909,12 @@ const dessertsMockAmountView = [
                   rowspan="6"
                   colspan="6"
                 >
-                  <div class="d-flex justify-center">
+                  <div class="d-flex justify-center cursor-pointer">
                     <VImg
                       height="250"
                       width="250"
                       :src="image04"
+                      @click="showDialogImageMuti(image04)"
                     />
                   </div>
                 </td>
@@ -916,11 +922,12 @@ const dessertsMockAmountView = [
                   rowspan="6"
                   colspan="6"
                 >
-                  <div class="d-flex justify-center">
+                  <div class="d-flex justify-center cursor-pointer">
                     <VImg
                       height="250"
                       width="250"
                       :src="image03"
+                      @click="showDialogImageMuti(image03)"
                     />
                   </div>
                 </td>

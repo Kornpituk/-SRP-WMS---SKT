@@ -588,7 +588,7 @@ const dessertsMockAmountView = [
                         cols="6"
                         @click="isDialogVisibleImgAmount = true"
                       >
-                        <VIcon icon=" ri-eye-fill" />
+                        <VIcon icon=" ri-eye-fill" class='cursor-pointer' />
                       </VCol>
                     </VRow>
                   </td>
@@ -732,7 +732,7 @@ const dessertsMockAmountView = [
                       :key="index"
                       cols="4"
                     >
-                      <VCard class="pa-2">
+                      <VCard class="pa-2 cursor-pointer">
                         <VImg
                           role="presentation"
                           :alt="file.iconName"
@@ -824,7 +824,7 @@ const dessertsMockAmountView = [
                   rowspan="9"
                   colspan="5"
                 >
-                  <div class="d-flex justify-center">
+                  <div class="d-flex justify-center cursor-pointer">
                     <VImg
                       height="250"
                       width="150"
@@ -839,7 +839,7 @@ const dessertsMockAmountView = [
                   rowspan="9"
                   colspan="6"
                 >
-                  <div class="d-flex justify-center">
+                  <div class="d-flex justify-center cursor-pointer">
                     <VImg
                       height="150"
                       width="150"
@@ -1025,7 +1025,7 @@ const dessertsMockAmountView = [
                   rowspan="6"
                   colspan="6"
                 >
-                  <div class="d-flex justify-center">
+                  <div class="d-flex justify-center cursor-pointer">
                     <VImg
                       height="250"
                       width="250"
@@ -1038,7 +1038,7 @@ const dessertsMockAmountView = [
                   rowspan="6"
                   colspan="6"
                 >
-                  <div class="d-flex justify-center">
+                  <div class="d-flex justify-center cursor-pointer">
                     <VImg
                       height="250"
                       width="250"
@@ -1881,36 +1881,32 @@ const dessertsMockAmountView = [
           </tbody>
         </table>
         
-        <section>
-          <div>
-            <VRow>
-              <VCol
-                cols="6"
-                class="d-flex justify-start"
-              >
-                <!-- ปุ่มย้อนกลับ (ไปที่ชุดข้อมูลก่อนหน้า) -->
-                <VBtn
-                  variant="text"
-                  icon
-                  class="mx-2"
-                  :disabled="currentDataIndex === 1"
-                  @click="switchDataSet(currentDataIndex - 1)"
-                >
-                  <VIcon icon="ri-arrow-left-s-line" />
-                </VBtn>
+        <section style="position: sticky;z-index: 1;  left: 0; max-width: 150px;  background-color: #fafafa;">
+          <div class="d-flex justify-start pa-0 px-2 align-center">
+            <!-- ปุ่มย้อนกลับ (ไปที่ชุดข้อมูลก่อนหน้า) -->
+            <VBtn
+              variant="flat"
+              icon
+              class="mx-2"
+              :disabled="currentDataIndex === 1"
+              @click="switchDataSet(currentDataIndex - 1)"
+            >
+              <VIcon icon="ri-arrow-left-s-line" />
+            </VBtn>
 
-                <!-- ปุ่มไปข้างหน้า (ไปที่ชุดข้อมูลถัดไป) -->
-                <VBtn
-                  variant="text"
-                  icon
-                  :disabled="currentDataIndex === 3"
-                  @click="switchDataSet(currentDataIndex + 1)"
-                >
-                  <VIcon icon="ri-arrow-right-s-line" />
-                </VBtn>
-              </VCol>
-              <VCol cols="6" />
-            </VRow>
+            <!-- ปุ่มไปข้างหน้า (ไปที่ชุดข้อมูลถัดไป) -->
+            <VBtn
+              variant="flat"
+              icon
+              class="px-2"
+              :disabled="currentDataIndex === 2"
+              @click="switchDataSet(currentDataIndex + 1)"
+            >
+              <VIcon icon="ri-arrow-right-s-line" />
+            </VBtn>
+            <div class="mx-4">
+              Page: {{ currentDataIndex }}
+            </div>
           </div>
         </section>
       </section>
@@ -1918,6 +1914,7 @@ const dessertsMockAmountView = [
       <section
         v-for="(truck, index) in resaleProductShipping"
         :key="index"
+        class="my-4"
       >
         <!-- Muti File Inpur Imge -->
         <VRow v-if="!truck.files.length">
