@@ -111,10 +111,12 @@ const imagePicture = ref([img01, img02, img03, img04])
           >
             <span class="font-weight-body">PA24020033</span>
           </th>
-          <th
+          <td
             colspan="8"
             class="text-center "
-          />
+          >
+            <span>Mix Lot no.PA24020032 = 8 IBC + PA24030012 = 8 IBC</span>
+          </td>
         </tr>
       </table>
     </VCol>
@@ -473,7 +475,9 @@ const imagePicture = ref([img01, img02, img03, img04])
             class="text-center "
             colspan="1"
           >
-            1st Sampling
+            <span>
+              1<sup>st</sup>  Sampling
+            </span>
           </th>
           <th
             class="text-center "
@@ -514,7 +518,9 @@ const imagePicture = ref([img01, img02, img03, img04])
             class="text-center "
             colspan="1"
           >
-            2nd Sampling
+            <span>
+              2<sup>nd</sup>  Sampling
+            </span>
           </th>
           <th
             class="text-center "
@@ -555,7 +561,9 @@ const imagePicture = ref([img01, img02, img03, img04])
             class="text-center "
             colspan="1"
           >
-            3rd  Sampling
+            <span>
+              3<sup>rd</sup>  Sampling
+            </span>
           </th>
           <th
             class="text-center "
@@ -596,7 +604,9 @@ const imagePicture = ref([img01, img02, img03, img04])
             class="text-center "
             colspan="1"
           >
-            4th Sampling
+            <span>
+              4<sup>rd</sup>  Sampling
+            </span>
           </th>
           <th
             class="text-center "

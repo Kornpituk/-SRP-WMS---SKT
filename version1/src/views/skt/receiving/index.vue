@@ -159,12 +159,6 @@ const addStoredStatus = () => {
   if (storedStatus && storedStatus !== null && storedStatus !== '') {
     const newItems = storedStatus.split(',')
 
-    // newItems.forEach(item => {
-    //   if (!statusFilter.value.includes(item.trim())) { // เช็คว่าค่าไม่มีใน array
-    //     statusFilter.value.push(item.trim()) // เพิ่มค่าใหม่เข้าไป
-    //   }
-    // })
-
     // อัปเดต sessionStorage
     sessionStorage.setItem('fileterStatusInPAI', statusFilter.value)
     sessionStorage.setItem('statusFilter', statusFilter.value)
@@ -193,7 +187,11 @@ const validateFields = () => {
   // ตรวจสอบว่ามีฟิลด์ใดที่ไม่ใช่ค่าว่างอย่างน้อย 1 ค่า
   const hasValue = Object.values(tempFilters.value).filter(value => value !== null && value !== '' && value !== 'All').length
 
-  if (!hasValue) {
+  if(statusFilter.value && statusFilter.value !== 'All'){
+    return true
+  }
+
+  if (!hasValue && statusFilter.value === 'All') {
     console.log('tempFilters.value.deliveryDateRange', tempFilters.value.deliveryDateRange)
     
     return false // คืนค่า false ถ้าไม่มีฟิลด์ไหนที่มีค่า
@@ -215,6 +213,7 @@ const validateFields = () => {
     
     return true // คืนค่า true ถ้ามีข้อมูลในฟิลด์อย่างน้อย 1 ฟิลด์
   }
+
 }
 
 watchEffect(() => {
@@ -343,7 +342,7 @@ const clearModel = async () => {
   searchBySubAreaId.value = ''
   serialProductCode.value = ''
   fileterStatusInPAI.value = ''
-  statusFilter.value = []
+  statusFilter.value = 'All'
 
   tempFilters.value.deliveryDateRange = ''
   tempFilters.value.deliveryDateTo = ''

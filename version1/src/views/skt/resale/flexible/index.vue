@@ -419,6 +419,18 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             colspan="1"
           >
             1st Sampling
+            <span>
+              1<sup>st</sup>
+            </span>
+            <span>
+              2<sup>nd</sup>
+            </span>
+            <span>
+              3<sup>rd</sup>
+            </span>
+            <span>
+              4<sup>th</sup>
+            </span>
           </th>
           <th
             class="text-center "
@@ -647,11 +659,18 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
 
     <VCol cols="12">
       <div class="d-flex justify-end">
-        <VBtn class="mx-2" @click="submitForm" color="warning">Save Draft</VBtn>
-        <VBtn @click="resetForm">Submit</VBtn>
+        <VBtn
+          class="mx-2"
+          color="warning"
+          @click="submitForm"
+        >
+          Save Draft
+        </VBtn>
+        <VBtn @click="resetForm">
+          Submit
+        </VBtn>
       </div>
     </VCol>
-    
   </VRow>
 </template>
 
