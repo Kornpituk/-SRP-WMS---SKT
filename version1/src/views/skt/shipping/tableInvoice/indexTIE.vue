@@ -7,6 +7,7 @@ import { onMounted, ref, watch, watchEffect } from 'vue'
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
+import { VDataTable } from 'vuetify/labs/VDataTable'
 
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
@@ -22,9 +23,11 @@ const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 //------------------------------ fetch data from API --------------------------------
 import { useGetUserPermissionService,
+  useGetSelectDataService,
+  useGetSearchPlanService,
 } from '@/services/skt/shipmentPlan/services'
 
-import { fetchUserPermissions, canVisibleUserPermissionPermission  } from '@/utilities/permission'
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
 
 const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 
@@ -47,17 +50,17 @@ onMounted(async () => {
 const statusPermission = ref(-1)
 
 const canVisibleUserPermission = (statusId, uiControlContextId) => {
-  const result = canVisibleUserPermissionPermission(statusId, uiControlContextId)
+  // console.log('Permission Result:', result)
 
-  console.log('Permission Result:', result)
-
-  if (result.canVisible) {
-    console.log('This UI element is visible!')
-  } else {
-    console.log('This UI element is hidden!')
-  }
+  // if (result.canVisible) {
+  //   console.log('This UI element is visible!')
+  // } else {
+  //   // console.log('This UI element is hidden!')
+  // }
   
-  return result
+  // return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+
+  return { canVisible: true, canExecute: true }
 }
 
 
@@ -70,12 +73,17 @@ const page = ref(0)
 const totalCount = ref(0)
 
 const rowPerPage = ref(10)
-const currentPage = ref(1)
 const totalPage = ref(1)
 
 const router = useRouter()
 
 const serialProductCode = ref(null)
+
+//---------------------- Select Model ----------------------------------------------
+const freightForwarderModel = ref([])
+const carrierModel = ref([])
+const vesselsModel = ref([])
+const truckModel = ref([])
 
 /// ------------------------------ Import Component --------------------------------
 // --- Dialog Text Area --------------------------------
@@ -184,25 +192,137 @@ const handleDialogSubmit = data => {
   console.log('Updated mockData:', data)
 }
 
-//------------------------------- Function Get StockUpdate Need Enter Search -----------------
+//------------------------------- Function Get Search plan -----------------
+
+const { getSearchPlanResult, errorGetSearchPlan, fetchSearchPlan } = useGetSearchPlanService()
+
+const searchPlanData = ref([])
+const isLoading = ref(false)
+const selectedDataTables = ref([])
+
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
+const selectedItemsPerPage = ref(10)
+
+watch(selectedItemsPerPage, newVal => {
+  itemsPerPage.value = newVal === 'All' ? totalItems.value : newVal
+  currentPage.value = 1 // รีเซ็ตหน้าเป็นหน้าแรก
+})
+
+const totalItems = computed(() => searchPlanData.value.length)
+
+// คำนวณจำนวนหน้าทั้งหมด
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value))
+
+const pageCount = computed(() => {
+  return Math.ceil(searchPlanData.value.length / itemsPerPage.value)
+})
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = currentPage.value * itemsPerPage.value
+  
+  return searchPlanData.value.slice(start, end)
+})
+
+const searchShipmentPlan = async () => {
+  isLoading.value = true
+  try {
+    const result = await fetchSearchPlan(
+      urlApi.value,
+      'searchplans',
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if (result && getSearchPlanResult.value.datas) {
+      searchPlanData.value = getSearchPlanResult.value.datas // เก็บข้อมูลใน reactive stat
+      console.log(`Fetched search plan:`, searchPlanData.value)
+    } else {
+      console.error('No result from API')
+      searchPlanData.value = [] // Set empty data if no result
+    }
+  } catch (error) {
+    console.error(`Error fetching search plan:`, error)
+    console.error(`Error(service) fetching search plan:`, errorGetSearchPlan)
+    searchPlanData.value = [] // Set empty data on error
+  } finally {
+    isLoading.value = false // Stop loading indicator
+  }
+}
+
+
+const handlePageChange = newPage => {
+  currentPage.value = newPage
+  console.log(`Page changed to: ${newPage}`)
+}
+
+//--------------------------------------- hihtlight -------------------
+const isSelected = item => {
+  return selectedDataTables.value.some(
+    selectedItem => selectedItem.journalID === item.journalID,
+  )
+}
+
+const dataTableCliclHighlightIsToggle = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle.value = null
+  } else if (dataTableNummberedToggle.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle.value)
+}
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
-watch(() => {
-  if (currentPage.value > totalPage.value)
-    currentPage.value = totalPage.value
+onMounted( async () => {
+  searchShipmentPlan()
 })
 
-// 👉 Computing pagination data
-const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
-  
-  return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
-})
+//------------------------------------- Vdata --------------------
+const headersShipment = [
+  { title: 'No.', align: 'start', key: 'no' },
+  { title: 'Status', align: 'center', key: 'statusComments' },
+  { title: 'Sale Order No.', align: 'center', key: 'salesOrderNo' },
+  { title: 'SO Attachment', align: 'center', key: 'sOAttachment' },
+  { title: 'SAP Invoice No', align: 'center', key: 'sapInvoiceNo' },
+  { title: 'Payer Name', align: 'center', key: 'payerName' },
+  { title: 'User', align: 'center', key: 'User' },
+  { title: 'Shipper', align: 'center', key: 'shippingUserName' },
+  { title: 'Shipper Location', align: 'center', key: 'shipperLocation' },
+  { title: 'Shipping Mark/Cond.', align: 'center', key: 'shippingMark' },
+  { title: 'End User', align: 'center', key: 'shippingEndUser' },
+  { title: 'Consignee', align: 'center', key: 'consignee' },
+  { title: 'Item Name', align: 'center', key: 'itemName' },
+  { title: 'Lot', align: 'center', key: 'lot' },
+  { title: 'Qty. (Kg.)', align: 'end', key: 'quantity' },
+  { title: 'COA', align: 'center', key: 'COA' },
+  { title: 'Freight Forwarder', align: 'center', key: 'freightForwarder' },
+  { title: 'Carrier', align: 'start', key: 'carrier' },
+  { title: 'Vessel Name', align: 'center', key: 'vesselName' },
+  { title: 'Voy', align: 'center', key: 'voy' },
+  { title: 'Truck', align: 'center', key: 'truck' },
+  { title: 'Truck Reserving Number', align: 'end', key: 'truckReservingNumber' },
+  { title: 'Truck Fee', align: 'center', key: 'truckFee' },
+  { title: 'Truck Order', align: 'center', key: 'truckOrder' },
+  { title: 'DO/EX', align: 'center', key: 'doEx' },
+  { title: 'Country', align: 'center', key: 'country' },
+  { title: 'Loading Date', align: 'start', key: 'loadingDate' },
+  { title: 'ETD', align: 'center', key: 'etd' },
+  { title: 'ETA', align: 'center', key: 'eta' },
+  { title: 'Delivery Note', align: 'center', key: 'DeliveryNote' },
+  { title: 'Remark (SAL)', align: 'center', key: 'saL_Remarks' },
+  { title: 'Remark (WH)', align: 'center', key: 'wH_Remarks' },
+  { title: 'Remark (LOG)', align: 'center', key: 'loG_Remarks' },
+  { title: 'Updated By', align: 'start', key: 'updatedBy' },
+  { title: 'Updated Date', align: 'start', key: 'updatedDate' },
+  { title: 'Action', align: 'center', key: 'Action' },
+]
 
-// SECTION Checkbox toggle
-const selectedRows = ref([])
 
 //-------------------------- format decimal -------------------
 
@@ -297,6 +417,51 @@ const checkBgTruck = truck => {
     return 'bg-warning'
   } 
 }
+
+//----------------------------------------- fetch data ----------------------------------
+//---- select data --------------------------------
+
+const { getSelectDataResult, errorGetSelectData, fetchSelectData } = useGetSelectDataService()
+
+const getSelectData = async type => {
+  try {
+    const result = await fetchSelectData(
+      urlApi.value,
+      type,
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if (result) {
+      // console.log(`Fetched ${type}:`, getSelectDataResult.value)
+      
+      return getSelectDataResult.value
+    } else {
+      console.error('No result from API')
+      
+      return [] // Return empty array if no result
+    }
+  } catch (error) {
+    console.error(`Error fetching ${type}:`, error)
+    console.error(`Error(service) fetching ${type}:`, errorGetSelectData)
+    
+    return [] // Return empty array on error
+  }
+}
+
+onMounted(async () => {
+  const [freightForwarders, carriers, vessels, truck] = await Promise.all([
+    getSelectData('getfreightforwarders'),
+    getSelectData('getcarriers'),
+    getSelectData('getvessels'),
+    getSelectData('gettrucks'),
+  ])
+
+  freightForwarderModel.value = freightForwarders
+  carrierModel.value = carriers
+  vesselsModel.value = vessels
+  truckModel.value = truck
+})
 
 //------------------------------------------ Mock Data --------------------------------
 import mockData from './dataMock'
@@ -429,7 +594,7 @@ const isDialogVisiblePrintTruck = ref(false)
 ///------------ Dialog PDF
 
 const isDialogPDFViewVisible = ref(false)
-
+const currentPageDataTable = ref(1)
 const imgDialogPDF = ref('')
 const imgDialogPng = ref('')
 
@@ -1264,954 +1429,1421 @@ const handleFileUpdates = updatedFiles => {
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
     <VCard class="mt-6">
-      <VTable class="text-wrap table-header-bg rounded-0">
-        <!-- 👉 table head -->
-        <thead class="">
-          <tr>
-            <th>
-              <VCheckbox />
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              <span style="font-weight: bold;">{{ $t('No.') }}</span>
-            </th>
-            <th class="text-center">
-              <span style="font-weight: bold;">{{ $t('Status') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Sale Order No.') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
-              class="text-center"
-            >
-              <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Payer Name') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('User') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Shipper') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Shipper location') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
-              class="text-start px-2"
-            >
-              <div>
-                <span style="font-weight: bold;">
-                  {{ $t('Shipping Mark/Cond.') }}
-                </span>
-              </div>
-            </th>
-            <th
-              v-if="false"
-              class="text-center"
-            >
-              <div>
-                <span style="padding-right: 60px; font-weight: bold;">
-                  {{ $t('Shipping Condition') }}
-                </span>
-              </div>
-            </th>
-            <th
-              v-if="false"
-              class="text-center"
-            >
-              <div>
-                <span style="padding-right: 60px; font-weight: bold;">
-                  {{ $t('Shipping Mark') }}
-                </span>
-              </div>
-            </th>
-            <th v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible">
-              <span style="font-weight: bold;">{{ $t('End User') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Consignee') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Item Name') }}</span>
-            </th>
-            <th v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible">
-              <span style="font-weight: bold;">{{ $t('Lot') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
-              class="text-end px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
-              class="text-center"
-            >
-              <span style="font-weight: bold;">{{ $t('COA') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
-              class="bg-green-lighten-3"
-            >
-              <span
-                style="font-weight: bold;"
-                class="text-black"
-              >{{ $t('Freight forwarder') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
-              class="bg-green-lighten-3 text-start"
-              style="min-width: 150px;"
-            >
-              <span
-                style="min-width: 250px; font-weight: bold;"
-                class="text-start"
-              >{{ $t('Carrier') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
-              class="bg-green-lighten-3"
-            >
-              <span
-                style="font-weight: bold;"
-                class="text-black"
-              >{{ $t('Vessel name') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
-              class="bg-yellow-lighten-3"
-            >
-              <span
-                style="font-weight: bold;"
-                class="text-black"
-              >{{ $t('Voy') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
-              class="bg-green-lighten-3"
-            >
-              <span style="font-weight: bold;">{{ $t('Truck') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
-              class="bg-yellow-lighten-3 texct-end"
-            >
-              <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}</span>
-            </th>
-            <th v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible">
-              <span style="font-weight: bold;">{{ $t('Truck fee') }}</span>
-            </th>
-            <th
-              v-if="true"
-              class="text-center"
-            >
-              <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
-              <VRow v-if="false">
-                <VCol
-                  class="px-3"
-                  cols="6"
-                >
-                  <span style="font-weight: bold;">Print</span> 
-                </VCol>
-                <VCol
-                  class="px-3"
-                  cols="6"
-                >
-                  <span style="font-weight: bold;">Attach File</span>
-                </VCol>
-              </VRow>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
-              class="px-4"
-            >
-              <span style="font-weight: bold;">{{ $t('DO/EX') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
-              class="px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Country') }}</span>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
-              class="text-start px-2"
-            >
-              <span style="font-weight: bold;">{{ $t('Loading date') }}</span>
-            </th>
-            <th v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible">
-              <VRow>
-                <VCol cols="6">
-                  <span style="font-weight: bold;">{{ $t('ETD') }}</span>
-                </VCol>
-                <VCol
-                  class="d-flex justify-end"
-                  cols="6"
-                >
-                  <VIcon
-                    size="25"
-                    icon="ri-calendar-todo-fill"
-                  />
-                </VCol>
-              </VRow>
-            </th>
-            <th v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible">
-              <VRow>
-                <VCol cols="6">
-                  <span style="font-weight: bold;">{{ $t('ETA') }}</span>
-                </VCol>
-                <VCol
-                  class="d-flex justify-end"
-                  cols="6"
-                >
-                  <VIcon
-                    size="25"
-                    icon="ri-calendar-todo-fill"
-                  />
-                </VCol>
-              </VRow>
-            </th>
-            <th
-              v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
-              class="text-center"
-            >
-              <span style="font-weight: bold;">{{ $t('Delivery note') }}</span>
-            </th>
-            <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible">
-              <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}</span>
-            </th>
-            <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible">
-              <span style="font-weight: bold;">{{ $t('Remark (WH)') }}</span>
-            </th>
-            <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible">
-              <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}</span>
-            </th>
-            <th class="px-1">
-              <span style="font-weight: bold;">{{ $t('Updated By') }}</span>
-            </th>
-            <th class="px-1">
-              <span style="font-weight: bold;">{{ $t('Updated Date') }}</span>
-            </th>
-            <th class="text-center">
-              <span style="font-weight: bold;" />
-            </th>
-            <th class="text-center">
-              <span style="font-weight: bold;">{{ $t('Action') }}</span>
-            </th>
-            <th class="text-center">
-              <span style="font-weight: bold;" />
-            </th>
-          </tr>
-        </thead>
-        <!-- 👉 table body -->
-        <tbody>
-          <tr
-            v-for="(product, index) in mockData"
-            :key="index"
-          >
-            <td>
-              <VCheckbox />
-            </td>
-            <!-- 👉 Ordinal Number -->
-            <td class="text-center px-1">
-              {{ index + 1 }}
-            </td>
-            <!-- 👉 status -->
-            <td class="text-start px-1">
-              <span v-if="product.status === 'Approve'">
-                <VChip color="success">{{ product.status }}</VChip>
-              </span>
-              <span v-else-if="product.status === 'Back to Edit'">
-                <VChip color="warning">{{ product.status }}</VChip>
-              </span>
-              <span v-else-if="product.status === 'Reject'">
-                <VChip color="error">{{ product.status }}</VChip>
-              </span>
-            </td>
-
-            <!-- 👉 saleOrderNo -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
-              class="text-start px-1"
-              style="min-width: 120px; font-size: 12px;"
-            >
-              {{ product.saleOrderNo }}
-            </td>
-
-            <!-- 👉 soAttachment -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
-              class="text-start px-1"
-              style="min-width: 250px; font-size: 12px;"
-            >
-              <div>
-                <FileInputDialogCarousels
-                  title-dialog="So Attachment"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
-                  :type-file-input="typeFileInput"
-                  file-name="So Attachment" 
-                  @updateFiles="handleFileUpdates"
-                />
-              </div>
-            </td>
-
-            <!-- 👉 sapInvoiceNo -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
-              class="text-start px-2"
-              style="min-width: 120px; font-size: 12px;"
-            >
-              {{ product.sapInvoiceNo }}
-            </td>
-
-            <!-- 👉 payerName -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
-              class="text-start px-1"
-              style="min-width: 150px; font-size: 12px;"
-            >
-              {{ (product.payerName) }}
-            </td>
-
-            <!-- 👉 user -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
-              class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
-            >
-              <span class="d-felx align-start">{{ (product.user) }}</span>
-            </td>
-
-            <!-- 👉 shipper -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
-              class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
-            >
-              {{ (product.shipper) }}
-            </td>
-
-            <!-- 👉 shipperLocation -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
-              class="text-start px-1"
-              style="min-width: 300px; max-width: 300px;  font-size: 12px;"
-            >
-              {{ (product.shipperLocation) }}
-            </td>
-
-            <!-- 👉 Shipping Condition -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
-              class="text-start px-1"
-              style="min-width: 180px; font-size: 12px;"
-            >
-              <div class="text-start">
-                <VBtn
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
-                  style="min-width: 150px; max-width: 160px;"
-                  variant="outlined"
-                  :color="product.shippingCondition ? 'primary' : 'grey'"
-                  @click="textAreaShipDialogActive('ShipMC',product.shippingMark, product.shippingCondition, index)"
-                >
-                  <span
-                    v-if="product.shippingCondition"
-                    style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
-                  >{{ product.shippingCondition }}</span>
-                  <span v-else>Shipping Mark/Coundition.</span>
-                </VBtn>
-              </div>
-            </td>
-
-            <!-- 👉 Shipping Condition -->
-            <td
-              v-if="false"
-              class="text-start px-2"
-              style="min-width: 300px; font-size: 12px;"
-            >
-              <div class="d-flex justify-space-between">
-                <VBtn
-                  style="min-width: 196px;"
-                  variant="outlined"
-                  :color="product.shippingCondition ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('ShipCon', product.shippingCondition, index)"
-                >
-                  <span
-                    v-if="product.shippingCondition"
-                    style="overflow: hidden; max-width: 159px; text-overflow: ellipsis;"
-                  >{{ product.shippingCondition }}</span>
-                  <span v-else>Shipping Condition</span>
-                </VBtn>
-                <VBtn
-                  class="mx-2"
-                  :color="product.shippingCondition ? 'warning' : 'grey'"
-                  :disabled="!product.shippingCondition"
-                  @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
-                >
-                  <VIcon
-                    size="30"
-                    icon="ri-printer-fill"
-                    @click="textAreaDialogActive('ShipConPrint', product.shippingCondition, index)"
-                  />
-                </VBtn>
-              </div>
-            </td>
-
-            <!-- 👉 Shipping Mark -->
-            <td
-              v-if="false"
-              class="text-start px-1"
-              style="min-width: 300px; font-size: 12px;"
-            >
-              <div class="d-flex justify-space-between">
-                <VBtn
-                  style="min-width: 196px;"
-                  variant="outlined"
-                  :color="product.shippingMark ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('ShipMark', product.shippingMark, index)"
-                >
-                  <span
-                    v-if="product.shippingMark"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
-                  >{{ product.shippingMark }}</span>
-                  <span v-else>Shipping Mark</span>
-                </VBtn>
-                <VBtn
-                  class="mx-2"
-                  :color="product.shippingMark ? 'warning' : 'grey'"
-                  :disabled="!product.shippingMark"
-                  @click="textAreaDialogActive('ShipMarkPrint', product.shippingMark, index)"
-                >
-                  <VIcon
-                    size="30"
-                    icon="ri-printer-fill"
-                  />
-                </VBtn>
-              </div>
-            </td>
-            <!-- 👉 endUser -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible"
-              class="text-start px-1"
-              style="font-size: 12px;"
-            >
-              <VTextField
-                v-model="product.endUser"
-                density="compact"
-                :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute"
-                style=" min-width: 150px;"
+      <VCardHeader
+        class="d-flex justify-between"
+        style="padding: 0.5rem 1rem;"
+      >
+        <div v-if="isLoading">
+          Loading...
+        </div>
+        <div
+          v-if="errorMessage"
+          class="error"
+        >
+          {{ errorMessage }}
+        </div>
+      </VCardHeader>
+      <section>
+        <VTable
+          v-if="true"
+          class="text-wrap table-header-bg rounded-0"
+        >
+          <!-- 👉 table head -->
+          <thead class="">
+            <tr>
+              <th>
+                <VCheckbox />
+              </th>
+              <th
+                scope="row"
+                class="text-center px-1"
               >
-                <template #label>
-                  <span style="font-size: 12px;">End User</span>
-                </template>
-              </VTextField>
-            </td>
-
-            <!-- 👉 consignee -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
-              class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
-            >
-              {{ (product.consignee) }}
-            </td>
-
-            <!-- 👉 product -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
-              class="text-start px-1"
-              style="min-width: 250px; font-size: 12px;"
-            >
-              {{ (product.product) }}
-            </td>
-
-            <!-- 👉 Lot Number -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible"
-              class="text-start px-1"
-              style="font-size: 12px;"
-            >
-              <VBtn
-                v-if="product.lotNumber.length > 1"
-                style="min-width: 50px; max-width: 80px;"
-                :disabled="!canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
-                variant="outlined"
-                @click="textAreaDialogActive('Lot', product.lotNumber)"
+                <span style="font-weight: bold;">{{ $t('No.') }}</span>
+              </th>
+              <th class="text-center">
+                <span style="font-weight: bold;">{{ $t('Status') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Sale Order No.') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
+                class="text-center"
+              >
+                <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Payer Name') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('User') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Shipper') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Shipper location') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
+                class="text-start px-2"
+              >
+                <div>
+                  <span style="font-weight: bold;">
+                    {{ $t('Shipping Mark/Cond.') }}
+                  </span>
+                </div>
+              </th>
+              <th v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible">
+                <span style="font-weight: bold;">{{ $t('End User') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Consignee') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Item Name') }}</span>
+              </th>
+              <th v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible">
+                <span style="font-weight: bold;">{{ $t('Lot') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
+                class="text-end px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
+                class="text-center"
+              >
+                <span style="font-weight: bold;">{{ $t('COA') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
+                class="bg-green-lighten-3"
               >
                 <span
-                  v-if="product.lotNumber"
-                  style="overflow: hidden; max-width: 60px; text-overflow: ellipsis;"
-                >{{ product.lotNumber[0].lotNUmber }}...</span>
-                <span v-else>Lot Number</span>
-              </VBtn>
-              <span v-else>{{ product.lotNumber[0].lotNUmber }}</span>
-            </td>
-
-            <!-- 👉 qty -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
-              class="text-end px-1"
-              style="min-width: 100px; font-size: 12px;"
-            >
-              {{ (product.qty) }}
-            </td>
-
-            <!-- 👉 coa -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
-              class="text-start px-1"
-              style="min-width: 250px; font-size: 12px;"
-            >
-              <div>
-                <FileInputDialogCarousels
-                  title-dialog="COA"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
-                  :type-file-input="typeFileInput"
-                  file-name="COA" 
-                  @updateFiles="handleFileUpdates"
-                />
-              </div>
-            </td>
-
-            <!-- 👉 Freight Forwarder -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
-              class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
-            >
-              <VSelect
-                :items="items"
-                density="compact"
-                eager
-              />
-            </td>
-
-            <!-- 👉 carrier -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
-              class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
-            >
-              <VSelect
-                v-model="product.carrier"
-                :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
-                :items="items"
-                density="compact"
-                eager
-              />
-            </td>
-
-            <!-- 👉 vesselName -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
-              class="text-start px-1"
-              style="min-width: 200px; font-size: 12px;"
-            >
-              <VSelect
-                v-model="product.vesselName"
-                :items="items"
-                :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
-                density="compact"
-                eager
-              />
-            </td>
-
-            <!-- 👉 voy -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
-              style="font-size: 12px;"
-              class="text-start px-1"
-            >
-              <VTextField
-                v-model="product.voy"
-                :disabled="!canVisibleUserPermission(statusPermission,'COL_VOY').canExecute"
-                density="compact"
-                style=" min-width: 150px;"
-              />
-            </td>
-
-
-            <!-- 👉 freightForwarder -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
-              class="text-start px-1"
-              :class="checkBgTruck(product.truck)"
-              style="min-width: 120px; font-size: 12px;"
-            >
-              <VSelect
-                v-model="product.truck"
-                :items="itemsTruck"
-                :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
-                density="compact"
-                eager
-              />
-            </td>
-
-            <!-- 👉 truckReserving -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
-              class="text-center px-1"
-              style="min-width: 250px; font-size: 12px;"
-            >
-              <VTextField
-                v-if="false"
-                v-model="product.truckReserving"
-                density="compact"
-                :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
-                style=" min-width: 150px;"
-              />
-              {{ product.truckReserving }}
-            </td>
-
-            <!-- 👉 truckFee -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible"
-              class="text-start px-1"
-              style="font-size: 12px;"
-            >
-              <VTextField
-                v-model="product.truckFee"
-                :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute"
-                density="compact"
-                style=" min-width: 150px;"
-              />
-            </td>
-
-            <!-- 👉 truckOrder -->
-            <td
-              v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
-              class="text-start px-2"
-              style="min-width: 350px; font-size: 12px;"
-            >
-              <VRow>
-                <VCol cols="3">
-                  <VBtn
-                    width="90px"
-                    color="warning"
-                    class="mx-2"
-                    @click="isDialogVisiblePrintTruck = true"
+                  style="font-weight: bold;"
+                  class="text-black"
+                >{{ $t('Freight forwarder') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
+                class="bg-green-lighten-3 text-start"
+                style="min-width: 150px;"
+              >
+                <span
+                  style="min-width: 250px; font-weight: bold;"
+                  class="text-start"
+                >{{ $t('Carrier') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
+                class="bg-green-lighten-3"
+              >
+                <span
+                  style="font-weight: bold;"
+                  class="text-black"
+                >{{ $t('Vessel name') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
+                class="bg-yellow-lighten-3"
+              >
+                <span
+                  style="font-weight: bold;"
+                  class="text-black"
+                >{{ $t('Voy') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
+                class="bg-green-lighten-3"
+              >
+                <span style="font-weight: bold;">{{ $t('Truck') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
+                class="bg-yellow-lighten-3 texct-end"
+              >
+                <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}</span>
+              </th>
+              <th v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible">
+                <span style="font-weight: bold;">{{ $t('Truck fee') }}</span>
+              </th>
+              <th
+                v-if="true"
+                class="text-center"
+              >
+                <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
+                class="px-4"
+              >
+                <span style="font-weight: bold;">{{ $t('DO/EX') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                class="px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Country') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
+                class="text-start px-2"
+              >
+                <span style="font-weight: bold;">{{ $t('Loading date') }}</span>
+              </th>
+              <th v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible">
+                <VRow>
+                  <VCol cols="6">
+                    <span style="font-weight: bold;">{{ $t('ETD') }}</span>
+                  </VCol>
+                  <VCol
+                    class="d-flex justify-end"
+                    cols="6"
                   >
                     <VIcon
-                      size="30"
-                      icon="ri-printer-fill"
+                      size="25"
+                      icon="ri-calendar-todo-fill"
                     />
-                  </VBtn>
-                </VCol>
-                <VCol cols="9">
+                  </VCol>
+                </VRow>
+              </th>
+              <th v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible">
+                <VRow>
+                  <VCol cols="6">
+                    <span style="font-weight: bold;">{{ $t('ETA') }}</span>
+                  </VCol>
+                  <VCol
+                    class="d-flex justify-end"
+                    cols="6"
+                  >
+                    <VIcon
+                      size="25"
+                      icon="ri-calendar-todo-fill"
+                    />
+                  </VCol>
+                </VRow>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
+                class="text-center"
+              >
+                <span style="font-weight: bold;">{{ $t('Delivery note') }}</span>
+              </th>
+              <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible">
+                <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}</span>
+              </th>
+              <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible">
+                <span style="font-weight: bold;">{{ $t('Remark (WH)') }}</span>
+              </th>
+              <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible">
+                <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}</span>
+              </th>
+              <th class="px-1">
+                <span style="font-weight: bold;">{{ $t('Updated By') }}</span>
+              </th>
+              <th class="px-1">
+                <span style="font-weight: bold;">{{ $t('Updated Date') }}</span>
+              </th>
+              <th class="text-center">
+                <span style="font-weight: bold;" />
+              </th>
+              <th class="text-center">
+                <span style="font-weight: bold;">{{ $t('Action') }}</span>
+              </th>
+              <th class="text-center">
+                <span style="font-weight: bold;" />
+              </th>
+            </tr>
+          </thead>
+          <!-- 👉 table body -->
+          <tbody>
+            <tr
+              v-for="(product, index) in paginatedData"
+              :key="index"
+            >
+              <td>
+                <VCheckboxBtn
+                  v-model="selectedDataTables"
+                  :value="product"
+                  @update:modelValue="(selected) => handleSelection(selected, product)"
+                />
+              </td>
+              <td>
+                <span>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</span>
+              </td>
+              <td>
+                <span>{{ product.statusComments }}</span>
+              </td>
+              <!-- 👉 saleOrderNo -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
+                class="text-start px-1"
+                style="min-width: 120px; font-size: 12px;"
+              >
+                {{ product.salesOrderNo }}
+              </td>
+              <!-- 👉 soAttachment -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
+                class="text-start px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                <div>
                   <FileInputDialogCarousels
-                    title-dialog="Truck Order"
-                    :disabled-prop="false"
+                    title-dialog="So Attachment"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
                     :type-file-input="typeFileInput"
-                    file-name="Truck Order"
-                    
+                    file-name="So Attachment" 
                     @updateFiles="handleFileUpdates"
                   />
-                </VCol>
-              </VRow>
-            </td>
+                </div>
+              </td>
+              <!-- 👉 sapInvoiceNo -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
+                class="text-start px-2"
+                style="min-width: 120px; font-size: 12px;"
+              >
+                {{ product.sapInvoiceNo }}
+              </td>
+              <!-- 👉 payerName -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
+                class="text-start px-1"
+                style="min-width: 150px; font-size: 12px;"
+              >
+                {{ (product.payerName) }}
+              </td>
+              <!-- 👉 user -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                <span class="d-felx align-start">{{ (product.user) }}</span>
+              </td>
+              <!-- 👉 shipper -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                {{ (product.shippingUserName) }}
+              </td>
 
-            <!-- 👉 doEx -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
-              class="text-start px-4"
-              style="font-size: 12px;"
-            >
-              {{ (product.doEx) }}
-              doEx
-            </td>
+              <!-- 👉 shipperLocation -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
+                class="text-start px-1"
+                style="min-width: 300px; max-width: 300px;  font-size: 12px;"
+              >
+                {{ (product.shipperLocation) }}
+              </td>
 
-            <!-- 👉 country -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
-              class="text-start px-1"
-              style="font-size: 12px;"
-            >
-              {{ (product.country) }}
-            </td>
+              <!-- 👉 Shipping Condition -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
+                class="text-start px-1"
+                style="min-width: 180px; font-size: 12px;"
+              >
+                <div class="text-start">
+                  <VBtn
+                    :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
+                    style="min-width: 150px; max-width: 160px;"
+                    variant="outlined"
+                    :color="product.shipperConditions ? 'primary' : 'grey'"
+                    @click="textAreaShipDialogActive('ShipMC',product.shipperMark, product.shipperConditions, index)"
+                  >
+                    <span
+                      v-if="product.shipperConditions"
+                      style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
+                    >{{ product.shipperConditions }}</span>
+                    <span v-else>Shipping Mark/Coundition.</span>
+                  </VBtn>
+                </div>
+              </td>
 
-            <!-- 👉 loadingDate -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
-              class="text-start px-1"
-              style="min-width: 120px; font-size: 12px;"
-            >
-              {{ (product.loadingDate) }}
-            </td>
+              <!-- 👉 endUser -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VTextField
+                  v-model="product.shippingEndUser"
+                  density="compact"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute"
+                  style=" min-width: 150px;"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">End User</span>
+                  </template>
+                </VTextField>
+              </td>
 
-            <!-- 👉 etd -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible"
-              class="text-start px-1"
-              style="min-width: 150px; font-size: 12px;"
-            >
-              <AppDateTimePicker
-                v-if="!canVisibleUserPermission(statusPermission,'COL_ETD').canExecute"
-                v-model="product.etd"
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              />
-              <span v-else>{{ product.etd }}</span>
-            </td>
+              <!-- 👉 consignee -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                {{ (product.consignee) }}
+              </td>
 
-            <!-- 👉 eta -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible"
-              class="text-start px-1"
-              style="min-width: 150px; font-size: 12px;"
-            >
-              <AppDateTimePicker
-                v-if="!canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
-                disabeld
-                density="compact"
-                prepend-inner-icon="ri-calendar-schedule-fill"
-                :config="{ dateFormat: 'd/m/Y' }"
-              />
-              <span v-else>{{ product.etd }}</span>
-            </td>
+              <!-- 👉 product -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
+                class="text-start px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                {{ (product.itemName) }}
+              </td>
 
-            <!-- 👉 deliveryNote -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
-              class="text-start px-1"
-              style="min-width: 250px; font-size: 12px;"
-            >
-              <div>
-                <FileInputDialogCarousels
-                  title-dialog="Delivery Note"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
-                  :type-file-input="typeFileInput"
-                  file-name="Delivery Note" 
-                  @updateFiles="handleFileUpdates"
+              <!-- 👉 Lot Number -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VBtn
+                  v-if=" product.lot.length > 1"
+                  style="min-width: 50px; max-width: 80px;"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
+                  variant="outlined"
+                  @click="textAreaDialogActive('Lot', product.lot)"
+                >
+                  <span
+                    v-if="product.lot"
+                    style="overflow: hidden; max-width: 60px; text-overflow: ellipsis;"
+                  >{{ product.lot[0].lotNUmber }}...</span>
+                  <span v-else>Lot Number</span>
+                </VBtn>
+                <span v-else>{{ product.lot }}</span>
+              </td>
+
+              <!-- 👉 qty -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
+                class="text-end px-1"
+                style="min-width: 100px; font-size: 12px;"
+              >
+                {{ (product.quantity) }}
+              </td>
+
+              <!-- 👉 coa -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
+                class="text-start px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                <div>
+                  <FileInputDialogCarousels
+                    title-dialog="COA"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
+                    :type-file-input="typeFileInput"
+                    file-name="COA" 
+                    @updateFiles="handleFileUpdates"
+                  />
+                </div>
+              </td>
+
+              <!-- 👉 Freight Forwarder -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                <VSelect
+                  v-model="product.freightForwarder"
+                  :items="freightForwarderModel"
+                  item-title="freightForwarder"
+                  item-value="no"
+                  density="compact"
+                  eager
                 />
-              </div>
-            </td>
+              </td>
 
-            <!-- 👉 remarkSAL -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible"
-              class="text-start px-1"
-              style="font-size: 12px;"
-            >
-              <VBtn
-                style="min-width: 150px;"
-                :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
-                variant="outlined"
-                :color="product.remarkSal ? 'primary' : 'grey'"
-                @click="textAreaDialogActive('RemarkSAL', product.remarkSal, index)"
+              <!-- 👉 carrier -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
               >
-                <span
-                  v-if="product.remarkSal"
-                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
-                >{{ product.remarkSal }}</span>
-                <span v-else>remark(SAL)</span>
-              </VBtn>
-            </td>
+                <VSelect
+                  v-model="product.carrier"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
+                  :items="carrierModel"
+                  item-title="carrier"
+                  item-value="no"
+                  density="compact"
+                  eager
+                />
+              </td>
 
-            <!-- 👉 remarkWH -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible"
-              class="text-start px-1"
-              style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
-            >
-              <VBtn
-                style="min-width: 150px; max-width: 150px;"
-                :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
-                variant="outlined"
-                :color="product.remarkWh ? 'primary' : 'grey'"
-                @click="textAreaDialogActive('RemarkWH', product.remarkWh, index)"
+              <!-- 👉 vesselName -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
               >
-                <span
-                  v-if="product.remarkWh"
-                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
-                >{{ product.remarkWh }}</span>
-                <span v-else>remark(WH)</span>
-              </VBtn>
-            </td>
+                <VSelect
+                  v-model="product.vesselName"
+                  :items="vesselsModel"
+                  item-title="carrier"
+                  item-value="no"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
+                  density="compact"
+                  eager
+                />
+              </td>
 
-            <!-- 👉 remarkLOG -->
-            <td
-              v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible"
-              class="text-start px-1"
-              style="font-size: 12px;"
-            >
-              <VBtn
-                style="min-width: 150px;"
-                variant="outlined"
-                :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
-                :color="product.remarkLog ? 'primary' : 'grey'"
-                @click="textAreaDialogActive('RemarkLOG', product.remarkLog, index)"
+              <!-- 👉 voy -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
+                style="font-size: 12px;"
+                class="text-start px-1"
               >
-                <span
-                  v-if="product.remarkLog"
-                  style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
-                >{{ product.remarkLog }}</span>
-                <span v-else>remark(LOG)</span>
-              </VBtn>
-            </td>
+                <VTextField
+                  v-model="product.voy"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VOY').canExecute"
+                  density="compact"
+                  style=" min-width: 150px;"
+                />
+              </td>
 
-            <!-- 👉 byWhow -->
-            <td
-              class="text-start px-1"
-              style="min-width: 100px; font-size: 12px;"
-            >
-              {{ product.byWhow }}
-            </td>
 
-            <!-- 👉 Update now -->
-            <td
-              class="text-start px-1"
-              style="min-width: 120px; font-size: 12px;"
-            >
-              {{ getRandomDate('2022-01-01', '2023-12-31') }}
-            </td>
-            
-            <!-- 👉 Actions -->
-            <td
-              v-if="!accountWHSub"
-              style="width: 8rem; font-size: 12px;"
-              class="text-center px-1"
-            >
-              <VBtn
-                :disabled="accountINSP"
-                :color="accountINSP ? 'grey' : 'warning'"
+              <!-- 👉 COL_TRUCK -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
+                class="text-start px-1"
+                :class="checkBgTruck(product.truck)"
+                style="min-width: 120px; font-size: 12px;"
               >
-                <span style="font-size: 12px;">Save Draft</span>
-              </VBtn>
-            </td>
-            <td
-              v-if="!accountWHSub"
-              style="width: 8rem; font-size: 12px;"
-              class="text-center px-1"
-            >
-              <VBtn
-                :disabled="accountINSP"
-                class="mx-2"
-                :color="accountINSP ? 'grey' : 'primary'"
+                <VSelect
+                  v-model="product.truck"
+                  :items="truckModel"
+                  item-title="truck"
+                  item-value="no"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
+                  density="compact"
+                  eager
+                />
+              </td>
+
+              <!-- 👉 truckReserving -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
+                class="text-center px-1"
+                style="min-width: 250px; font-size: 12px;"
               >
-                <span style="font-size: 12px;">Submit</span>
-              </VBtn>
-            </td>
-            <td
-              v-if="accountWHSub"
-              style="width: 8rem; font-size: 12px;"
-              class="text-center px-1"
-            >
-              <VBtn
-                class="mx-2"
-                :color="accountINSP ? 'grey' : 'primary'"
+                <VTextField
+                  v-if="false"
+                  v-model="product.truckReserving"
+                  density="compact"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
+                  style=" min-width: 150px;"
+                />
+                {{ product.truckReserving }}
+              </td>
+
+              <!-- 👉 truckFee -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
               >
-                <span style="font-size: 12px;">Approve</span>
-              </VBtn>
-            </td>
-            <td
-              style="width: 8rem; font-size: 12px;"
-              class="text-center px-1"
-            >
-              <VBtn
-                :disabled="accountINSP"
-                :to="{ 
-                  name: 'skt-shipping-resale',  
-                }"
-                :color="accountINSP ? 'grey' : 'pink-lighten-2'"
+                <VTextField
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute"
+                  density="compact"
+                  style=" min-width: 150px;"
+                />
+              </td>
+
+              <!-- 👉 truckOrder -->
+              <td
+                v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
+                class="text-start px-2"
+                style="min-width: 350px; font-size: 12px;"
               >
-                <span style="font-size: 12px;">Check Sheet</span>
-              </VBtn>
-            </td>
-          </tr>
-        </tbody>
-        <!-- Total -->
-        <tbody v-if="false">
-          <tr>
-            <td class="bg-green-lighten-5" />
-            <td class="bg-green-lighten-5 px-1">
-              <span style="font-size: 12px;">TOTAL</span>
-            </td>
-            <td class="bg-green-lighten-5" />
-            <td
-              v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
-              class="bg-green-lighten-5 px-1"
-            >
-              <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
-            </td>
-            <td
-              v-if="accountAmin || accountViewerKK || accountAll"
-              class="bg-green-lighten-5"
-            />
-            <td
-              v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
-              class="bg-green-lighten-5"
-            >
-              <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
-            </td>
-          </tr>
-        </tbody>
+                <VRow>
+                  <VCol cols="3">
+                    <VBtn
+                      width="90px"
+                      color="warning"
+                      class="mx-2"
+                      @click="isDialogVisiblePrintTruck = true"
+                    >
+                      <VIcon
+                        size="30"
+                        icon="ri-printer-fill"
+                      />
+                    </VBtn>
+                  </VCol>
+                  <VCol cols="9">
+                    <FileInputDialogCarousels
+                      title-dialog="Truck Order"
+                      :disabled-prop="false"
+                      :type-file-input="typeFileInput"
+                      file-name="Truck Order"
+                    
+                      @updateFiles="handleFileUpdates"
+                    />
+                  </VCol>
+                </VRow>
+              </td>
+
+              <!-- 👉 doEx -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
+                class="text-start px-4"
+                style="font-size: 12px;"
+              >
+                {{ (product.doEx) }}
+              </td>
+
+              <!-- 👉 country -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                {{ (product.country) }}
+              </td>
+
+              <!-- 👉 loadingDate -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
+                class="text-start px-1"
+                style="min-width: 120px; font-size: 12px;"
+              >
+                {{ (product.loadingDate) }}
+              </td>
+
+              <!-- 👉 etd -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible"
+                class="text-start px-1"
+                style="min-width: 150px; font-size: 12px;"
+              >
+                <AppDateTimePicker
+                  v-if="!canVisibleUserPermission(statusPermission,'COL_ETD').canExecute"
+                  v-model="product.etd"
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+                <span v-else>{{ product.etd }}</span>
+              </td>
+
+              <!-- 👉 eta -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible"
+                class="text-start px-1"
+                style="min-width: 150px; font-size: 12px;"
+              >
+                <AppDateTimePicker
+                  v-if="!canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
+                  disabeld
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+                <span v-else>{{ product.etd }}</span>
+              </td>
+
+              <!-- 👉 deliveryNote -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
+                class="text-start px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                <div>
+                  <FileInputDialogCarousels
+                    title-dialog="Delivery Note"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
+                    :type-file-input="typeFileInput"
+                    file-name="Delivery Note" 
+                    @updateFiles="handleFileUpdates"
+                  />
+                </div>
+              </td>
+
+              <!-- 👉 remarkSAL -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VBtn
+                  style="min-width: 150px;"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
+                  variant="outlined"
+                  :color="product.saL_Remarks ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('RemarkSAL', product.saL_Remarks, index)"
+                >
+                  <span
+                    v-if="product.saL_Remarks"
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                  >{{ product.saL_Remarks }}</span>
+                  <span v-else>remark(SAL)</span>
+                </VBtn>
+              </td>
+
+              <!-- 👉 remarkWH -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible"
+                class="text-start px-1"
+                style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
+              >
+                <VBtn
+                  style="min-width: 150px; max-width: 150px;"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
+                  variant="outlined"
+                  :color="product.wH_Remarks ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('RemarkWH', product.wH_Remarks, index)"
+                >
+                  <span
+                    v-if="product.wH_Remarks"
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                  >{{ product.wH_Remarks }}</span>
+                  <span v-else>remark(WH)</span>
+                </VBtn>
+              </td>
+
+              <!-- 👉 remarkLOG -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VBtn
+                  style="min-width: 150px;"
+                  variant="outlined"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
+                  :color="product.loG_Remarks ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('RemarkLOG', product.loG_Remarks, index)"
+                >
+                  <span
+                    v-if="product.loG_Remarks"
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                  >{{ product.loG_Remarks }}</span>
+                  <span v-else>remark(LOG)</span>
+                </VBtn>
+              </td>
+
+              <!-- 👉 update by -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                {{ (product.updatedBy) }}
+              </td>
+
+              <!-- 👉 update date -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                {{ (product.updatedDate) }}
+              </td>
+
+
+              <!-- 👉 Actions -->
+              <td
+                v-if="!accountWHSub"
+                style="width: 8rem; font-size: 12px;"
+                class="text-center px-1"
+              >
+                <VBtn
+                  :disabled="accountINSP"
+                  :color="accountINSP ? 'grey' : 'warning'"
+                >
+                  <span style="font-size: 12px;">Save Draft</span>
+                </VBtn>
+              </td>
+              <td
+                v-if="!accountWHSub"
+                style="width: 8rem; font-size: 12px;"
+                class="text-center px-1"
+              >
+                <VBtn
+                  :disabled="accountINSP"
+                  class="mx-2"
+                  :color="accountINSP ? 'grey' : 'primary'"
+                >
+                  <span style="font-size: 12px;">Submit</span>
+                </VBtn>
+              </td>
+              <td
+                v-if="accountWHSub"
+                style="width: 8rem; font-size: 12px;"
+                class="text-center px-1"
+              >
+                <VBtn
+                  class="mx-2"
+                  :color="accountINSP ? 'grey' : 'primary'"
+                >
+                  <span style="font-size: 12px;">Approve</span>
+                </VBtn>
+              </td>
+              <td
+                style="width: 8rem; font-size: 12px;"
+                class="text-center px-1"
+              >
+                <VBtn
+                  :disabled="accountINSP"
+                  :to="{ 
+                    name: 'skt-shipping-resale',  
+                  }"
+                  :color="accountINSP ? 'grey' : 'pink-lighten-2'"
+                >
+                  <span style="font-size: 12px;">Check Sheet</span>
+                </VBtn>
+              </td>
+            </tr>
+          </tbody>
+          <!-- Total -->
+          <tbody v-if="false">
+            <tr>
+              <td class="bg-green-lighten-5" />
+              <td class="bg-green-lighten-5 px-1">
+                <span style="font-size: 12px;">TOTAL</span>
+              </td>
+              <td class="bg-green-lighten-5" />
+              <td
+                v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
+                class="bg-green-lighten-5 px-1"
+              >
+                <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
+              </td>
+              <td
+                v-if="accountAmin || accountViewerKK || accountAll"
+                class="bg-green-lighten-5"
+              />
+              <td
+                v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
+                class="bg-green-lighten-5"
+              >
+                <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
+              </td>
+            </tr>
+          </tbody>
+          <VDivider />
+        </VTable>
+
         <VDivider />
-      </VTable>
-
-      <VDivider />
-      <VCardText class="d-flex align-center flex-wrap justify-end gap-4 pa-2">
-        <div
-          class="d-flex align-center me-3"
-          style="width: 171px;"
+        <VCardText>
+          <div class="d-flex align-center flex-no-wrap justify-end pa-2">
+            <VSelect
+              style="max-width: 80px;"
+              v-model="selectedItemsPerPage"
+              :items="[10, 25, 50, 100, 'All']"
+              hide-details
+              density="compact"
+              dense
+              class="mx-4"
+            />
+            <span>
+              {{ (currentPage - 1) * itemsPerPage + 1 }} -
+              {{ Math.min(currentPage * itemsPerPage, totalItems) }}
+              of {{ totalItems }}
+            </span>
+            <VPagination
+              v-if="itemsPerPage !== totalItems"
+              v-model="currentPage"
+              :length="totalPages"
+            />
+          </div>
+        </VCardText>
+      </section>
+      
+      <VCardText v-if="false">
+        {{ searchPlanData.length }}
+        <VDataTable
+          v-if="searchPlanData"
+          :headers="headersShipment"
+          :items="searchPlanData"
+          item-key="id"
+          show-select
+          class="elevation-1"
         >
-          <span class="text-no-wrap me-3">Rows per page:</span>
+          <template #item="{ item, index }">
+            <tr>
+              <td>
+                <VCheckboxBtn
+                  v-model="selectedDataTables"
+                  :value="item.raw"
+                  @update:modelValue="(selected) => handleSelection(selected, item.raw)"
+                />
+              </td>
+              <td>
+                <span>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</span>
+              </td>
+              <td>
+                <span>{{ item.raw.statusComments }}</span>
+              </td>
+              <!-- 👉 saleOrderNo -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
+                class="text-start px-1"
+                style="min-width: 120px; font-size: 12px;"
+              >
+                {{ item.raw.salesOrderNo }}
+              </td>
+              <!-- 👉 soAttachment -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
+                class="text-start px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                <div>
+                  <FileInputDialogCarousels
+                    title-dialog="So Attachment"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
+                    :type-file-input="typeFileInput"
+                    file-name="So Attachment" 
+                    @updateFiles="handleFileUpdates"
+                  />
+                </div>
+              </td>
+              <!-- 👉 sapInvoiceNo -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
+                class="text-start px-2"
+                style="min-width: 120px; font-size: 12px;"
+              >
+                {{ item.raw.sapInvoiceNo }}
+              </td>
+              <!-- 👉 payerName -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
+                class="text-start px-1"
+                style="min-width: 150px; font-size: 12px;"
+              >
+                {{ (item.raw.payerName) }}
+              </td>
+              <!-- 👉 user -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                <span class="d-felx align-start">{{ (item.raw.user) }}</span>
+              </td>
+              <!-- 👉 shipper -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                {{ (item.raw.shippingUserName) }}
+              </td>
 
-          <VSelect
-            v-model="rowPerPage"
-            density="compact"
-            variant="plain"
-            class="mt-n4"
-            :items="[10, 20, 30, 50]"
-          />
-        </div>
+              <!-- 👉 shipperLocation -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
+                class="text-start px-1"
+                style="min-width: 300px; max-width: 300px;  font-size: 12px;"
+              >
+                {{ (item.raw.shipperLocation) }}
+              </td>
 
-        <div class="d-flex align-center">
-          <h6 class="text-sm font-weight-regular">
-            {{ paginationData }}
-          </h6>
+              <!-- 👉 Shipping Condition -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
+                class="text-start px-1"
+                style="min-width: 180px; font-size: 12px;"
+              >
+                <div class="text-start">
+                  <VBtn
+                    :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
+                    style="min-width: 150px; max-width: 160px;"
+                    variant="outlined"
+                    :color="item.raw.shipperConditions ? 'primary' : 'grey'"
+                    @click="textAreaShipDialogActive('ShipMC',item.raw.shipperMark, item.raw.shipperConditions, index)"
+                  >
+                    <span
+                      v-if="item.raw.shipperConditions"
+                      style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
+                    >{{ item.raw.shipperConditions }}</span>
+                    <span v-else>Shipping Mark/Coundition.</span>
+                  </VBtn>
+                </div>
+              </td>
 
-          <VPagination
-            v-model="currentPage"
-            :length="totalPage"
-            :total-visible="$vuetify.display.mdAndUp ? 7 : 3"
-            @next="selectedRows = []"
-            @prev="selectedRows = []"
-          />
-        </div>
+              <!-- 👉 endUser -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VTextField
+                  v-model="item.raw.shippingEndUser"
+                  density="compact"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute"
+                  style=" min-width: 150px;"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">End User</span>
+                  </template>
+                </VTextField>
+              </td>
+
+              <!-- 👉 consignee -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                {{ (item.raw.consignee) }}
+              </td>
+
+              <!-- 👉 product -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
+                class="text-start px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                {{ (item.raw.itemName) }}
+              </td>
+
+              <!-- 👉 Lot Number -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VBtn
+                  v-if=" item.raw.lot.length > 1"
+                  style="min-width: 50px; max-width: 80px;"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
+                  variant="outlined"
+                  @click="textAreaDialogActive('Lot', product.lot)"
+                >
+                  <span
+                    v-if="item.raw.lot"
+                    style="overflow: hidden; max-width: 60px; text-overflow: ellipsis;"
+                  >{{ item.raw.lot[0].lotNUmber }}...</span>
+                  <span v-else>Lot Number</span>
+                </VBtn>
+                <span v-else>{{ item.raw.lot }}</span>
+              </td>
+
+              <!-- 👉 qty -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
+                class="text-end px-1"
+                style="min-width: 100px; font-size: 12px;"
+              >
+                {{ (item.raw.quantity) }}
+              </td>
+
+              <!-- 👉 coa -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
+                class="text-start px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                <div>
+                  <FileInputDialogCarousels
+                    title-dialog="COA"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
+                    :type-file-input="typeFileInput"
+                    file-name="COA" 
+                    @updateFiles="handleFileUpdates"
+                  />
+                </div>
+              </td>
+
+              <!-- 👉 Freight Forwarder -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                <VSelect
+                  v-model="item.raw.freightForwarder"
+                  :items="freightForwarderModel"
+                  item-title="freightForwarder"
+                  item-value="no"
+                  density="compact"
+                  eager
+                />
+              </td>
+
+              <!-- 👉 carrier -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                <VSelect
+                  v-model="item.raw.carrier"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
+                  :items="carrierModel"
+                  item-title="carrier"
+                  item-value="no"
+                  density="compact"
+                  eager
+                />
+              </td>
+
+              <!-- 👉 vesselName -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
+                class="text-start px-1"
+                style="min-width: 200px; font-size: 12px;"
+              >
+                <VSelect
+                  v-model="item.raw.vesselName"
+                  :items="vesselsModel"
+                  item-title="carrier"
+                  item-value="no"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
+                  density="compact"
+                  eager
+                />
+              </td>
+
+              <!-- 👉 voy -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
+                style="font-size: 12px;"
+                class="text-start px-1"
+              >
+                <VTextField
+                  v-model="item.raw.voy"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VOY').canExecute"
+                  density="compact"
+                  style=" min-width: 150px;"
+                />
+              </td>
+
+
+              <!-- 👉 COL_TRUCK -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
+                class="text-start px-1"
+                :class="checkBgTruck(item.raw.truck)"
+                style="min-width: 120px; font-size: 12px;"
+              >
+                <VSelect
+                  v-model="item.raw.truck"
+                  :items="truckModel"
+                  item-title="truck"
+                  item-value="no"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
+                  density="compact"
+                  eager
+                />
+              </td>
+
+              <!-- 👉 truckReserving -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
+                class="text-center px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                <VTextField
+                  v-if="false"
+                  v-model="item.raw.truckReserving"
+                  density="compact"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
+                  style=" min-width: 150px;"
+                />
+                {{ item.raw.truckReserving }}
+              </td>
+
+              <!-- 👉 truckFee -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VTextField
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute"
+                  density="compact"
+                  style=" min-width: 150px;"
+                />
+              </td>
+
+              <!-- 👉 truckOrder -->
+              <td
+                v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
+                class="text-start px-2"
+                style="min-width: 350px; font-size: 12px;"
+              >
+                <VRow>
+                  <VCol cols="3">
+                    <VBtn
+                      width="90px"
+                      color="warning"
+                      class="mx-2"
+                      @click="isDialogVisiblePrintTruck = true"
+                    >
+                      <VIcon
+                        size="30"
+                        icon="ri-printer-fill"
+                      />
+                    </VBtn>
+                  </VCol>
+                  <VCol cols="9">
+                    <FileInputDialogCarousels
+                      title-dialog="Truck Order"
+                      :disabled-prop="false"
+                      :type-file-input="typeFileInput"
+                      file-name="Truck Order"
+                    
+                      @updateFiles="handleFileUpdates"
+                    />
+                  </VCol>
+                </VRow>
+              </td>
+
+              <!-- 👉 doEx -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
+                class="text-start px-4"
+                style="font-size: 12px;"
+              >
+                {{ (item.raw.doEx) }}
+              </td>
+
+              <!-- 👉 country -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                {{ (item.raw.country) }}
+              </td>
+
+              <!-- 👉 loadingDate -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
+                class="text-start px-1"
+                style="min-width: 120px; font-size: 12px;"
+              >
+                {{ (item.raw.loadingDate) }}
+              </td>
+
+              <!-- 👉 etd -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible"
+                class="text-start px-1"
+                style="min-width: 150px; font-size: 12px;"
+              >
+                <AppDateTimePicker
+                  v-if="!canVisibleUserPermission(statusPermission,'COL_ETD').canExecute"
+                  v-model="item.raw.etd"
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+                <span v-else>{{ item.raw.etd }}</span>
+              </td>
+
+              <!-- 👉 eta -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible"
+                class="text-start px-1"
+                style="min-width: 150px; font-size: 12px;"
+              >
+                <AppDateTimePicker
+                  v-if="!canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
+                  disabeld
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+                <span v-else>{{ item.raw.etd }}</span>
+              </td>
+
+              <!-- 👉 deliveryNote -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
+                class="text-start px-1"
+                style="min-width: 250px; font-size: 12px;"
+              >
+                <div>
+                  <FileInputDialogCarousels
+                    title-dialog="Delivery Note"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
+                    :type-file-input="typeFileInput"
+                    file-name="Delivery Note" 
+                    @updateFiles="handleFileUpdates"
+                  />
+                </div>
+              </td>
+
+              <!-- 👉 remarkSAL -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VBtn
+                  style="min-width: 150px;"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
+                  variant="outlined"
+                  :color="item.raw.saL_Remarks ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('RemarkSAL', item.raw.saL_Remarks, index)"
+                >
+                  <span
+                    v-if="item.raw.saL_Remarks"
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                  >{{ item.raw.saL_Remarks }}</span>
+                  <span v-else>remark(SAL)</span>
+                </VBtn>
+              </td>
+
+              <!-- 👉 remarkWH -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible"
+                class="text-start px-1"
+                style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
+              >
+                <VBtn
+                  style="min-width: 150px; max-width: 150px;"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
+                  variant="outlined"
+                  :color="item.raw.wH_Remarks ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('RemarkWH', item.raw.wH_Remarks, index)"
+                >
+                  <span
+                    v-if="item.raw.wH_Remarks"
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                  >{{ item.raw.wH_Remarks }}</span>
+                  <span v-else>remark(WH)</span>
+                </VBtn>
+              </td>
+
+              <!-- 👉 remarkLOG -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                <VBtn
+                  style="min-width: 150px;"
+                  variant="outlined"
+                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
+                  :color="item.raw.loG_Remarks ? 'primary' : 'grey'"
+                  @click="textAreaDialogActive('RemarkLOG', item.raw.loG_Remarks, index)"
+                >
+                  <span
+                    v-if="item.raw.loG_Remarks"
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                  >{{ item.raw.loG_Remarks }}</span>
+                  <span v-else>remark(LOG)</span>
+                </VBtn>
+              </td>
+
+              <!-- 👉 update by -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                {{ (item.raw.updatedBy) }}
+              </td>
+
+              <!-- 👉 update date -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                class="text-start px-1"
+                style="font-size: 12px;"
+              >
+                {{ (item.raw.updatedDate) }}
+              </td>
+
+              <!-- 👉 Actions -->
+              <td
+                v-if="!accountWHSub"
+                style="width: 8rem; font-size: 12px;"
+                class="text-center px-1"
+              >
+                <VBtn
+                  :disabled="accountINSP"
+                  :color="accountINSP ? 'grey' : 'warning'"
+                >
+                  <span style="font-size: 12px;">Save Draft</span>
+                </VBtn>
+              </td>
+              <td
+                v-if="!accountWHSub"
+                style="width: 8rem; font-size: 12px;"
+                class="text-center px-1"
+              >
+                <VBtn
+                  :disabled="accountINSP"
+                  class="mx-2"
+                  :color="accountINSP ? 'grey' : 'primary'"
+                >
+                  <span style="font-size: 12px;">Submit</span>
+                </VBtn>
+              </td>
+              <td
+                v-if="accountWHSub"
+                style="width: 8rem; font-size: 12px;"
+                class="text-center px-1"
+              >
+                <VBtn
+                  class="mx-2"
+                  :color="accountINSP ? 'grey' : 'primary'"
+                >
+                  <span style="font-size: 12px;">Approve</span>
+                </VBtn>
+              </td>
+              <td
+                style="width: 8rem; font-size: 12px;"
+                class="text-center px-1"
+              >
+                <VBtn
+                  :disabled="accountINSP"
+                  :to="{ 
+                    name: 'skt-shipping-resale',  
+                  }"
+                  :color="accountINSP ? 'grey' : 'pink-lighten-2'"
+                >
+                  <span style="font-size: 12px;">Check Sheet</span>
+                </VBtn>
+              </td>
+            </tr>
+          </template>
+        </VDataTable>
       </VCardText>
     </VCard>
   </section>
