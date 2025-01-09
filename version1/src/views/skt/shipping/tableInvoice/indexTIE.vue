@@ -335,6 +335,15 @@ const formatDecimal = decimal => {
   }
 }
 
+const formatDate = date => {
+  const d = new Date(date)
+  const day = d.getDate().toString().padStart(2, '0')
+  const month = (d.getMonth() + 1).toString().padStart(2, '0')
+  const year = d.getFullYear()
+
+  return `${day}/${month}/${year}`
+}
+
 //------------------------ Dialog Image ----------------------------
 const isDialogImageVisible = ref(false)
 const urlImage = ref('')
@@ -371,20 +380,73 @@ const showExpansionDialog = ref(false)
 const colorStatus = ref('grey')
 const bgStatus = ref('bg-grey')
 
+const colorStatusWithId = id => {
+  switch (id) {
+  case 200:
+    return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan', bgColor: '#E0E0E0' }
+  case 201:
+    return { color: 'green', message: 'green', text: 'Waitting for plan APVL', bgColor: '#EF9A9A' }
+  case 202:
+    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking', bgColor: '#FCE4EC' }
+  case 203:
+    return { color: 'purple', message: 'purple', text: 'In Producing', bgColor: '#F3E5F5' }
 
-const checkColorTextStatus = status => {
-  if(status === 'Received'){
-    return 'bg-green-lighten-4'
-  }else if(status === 'Waiting for Receive') {
-    return 'bg-yellow-lighten-4' 
-  }
-}
+  case 302:
+    return { color: 'brown', message: 'brown', text: 'Waiting for FG/PROD APVL', bgColor: '#EFEBE9' }
+  case 303:
+    return { color: 'green', message: 'green', text: 'PROD Completed', bgColor: '#E8F5E9' }
+  case 304:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
 
-const checkColorBgStatus = status => {
-  if(status === 'Received'){
-    return 'text-green'
-  }else if(status === 'Waiting for Receive') {
-    return 'text-warning' 
+  case 402:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 403:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 404:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+
+  case 502:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 503:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 504:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+
+  case 602:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 603:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 604:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+
+  case 1002:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 1003:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 1004:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 1005:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+
+  case 1102:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 1103:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 1104:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 1105:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+
+  case 204:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 205:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 206:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  case 207:
+    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+  default:
+    return { color: 'grey', message: 'grey', text: 'All', bgColor: '#FFF3E0' }
   }
 }
 
@@ -1429,23 +1491,34 @@ const handleFileUpdates = updatedFiles => {
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
     <VCard class="mt-6">
-      <VCardHeader
-        class="d-flex justify-between"
-        style="padding: 0.5rem 1rem;"
-      >
-        <div v-if="isLoading">
-          Loading...
-        </div>
+      <div>
         <div
           v-if="errorMessage"
           class="error"
         >
           {{ errorMessage }}
         </div>
-      </VCardHeader>
-      <section>
+        <VProgressLinear
+          v-if="!paginatedData"
+          height="20"
+          color="secondary"
+          class="elevation-1"
+        >
+          <span>No Data....</span>
+        </VProgressLinear>
+        <VProgressLinear
+          v-if="isLoading"
+          height="20"
+          indeterminate
+          color="primary"
+          class="elevation-1"
+        >
+          <span>Loading Data.... {{ errorMessage }}</span>
+        </VProgressLinear>
+      </div>
+      <section v-if="!isLoading">
         <VTable
-          v-if="true"
+          v-if="!isLoading"
           class="text-wrap table-header-bg rounded-0"
         >
           <!-- 👉 table head -->
@@ -1702,7 +1775,10 @@ const handleFileUpdates = updatedFiles => {
                 <span>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</span>
               </td>
               <td>
-                <span>{{ product.statusComments }}</span>
+                <span><VChip
+                  :color="colorStatusWithId(product.statusId).color"
+                  :style="{ color: colorStatusWithId(product.statusId).color }"
+                >{{ (product.statusComments) }}</VChip></span>
               </td>
               <!-- 👉 saleOrderNo -->
               <td
@@ -2062,7 +2138,7 @@ const handleFileUpdates = updatedFiles => {
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
                 />
-                <span v-else>{{ product.etd }}</span>
+                <span v-else>{{ formatDate(product.etd) }}</span>
               </td>
 
               <!-- 👉 eta -->
@@ -2078,7 +2154,7 @@ const handleFileUpdates = updatedFiles => {
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
                 />
-                <span v-else>{{ product.etd }}</span>
+                <span v-else>{{ formatDate(product.eta) }}</span>
               </td>
 
               <!-- 👉 deliveryNote -->
@@ -2176,7 +2252,7 @@ const handleFileUpdates = updatedFiles => {
                 class="text-start px-1"
                 style="font-size: 12px;"
               >
-                {{ (product.updatedDate) }}
+                {{ formatDate(product.updatedDate) }}
               </td>
 
 
@@ -2267,8 +2343,8 @@ const handleFileUpdates = updatedFiles => {
         <VCardText>
           <div class="d-flex align-center flex-no-wrap justify-end pa-2">
             <VSelect
-              style="max-width: 80px;"
               v-model="selectedItemsPerPage"
+              style="max-width: 80px;"
               :items="[10, 25, 50, 100, 'All']"
               hide-details
               density="compact"
