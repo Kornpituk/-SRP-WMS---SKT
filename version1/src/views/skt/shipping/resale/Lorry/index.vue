@@ -50,7 +50,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             colspan="4"
             class="text-center"
           >
-            <span>Delivery Place: </span><span class="font-weight-body">10-04-2024</span>
+            <span>Delivery Place: </span><span class="font-weight-body">10/02/2024</span>
           </th>
           <th
             colspan="4"
@@ -88,13 +88,13 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
         <tr>
           <th
             colspan="2"
-            class="text-center "
+            class="text-center"
           >
-            <span>Product Name</span>
+            <span>Item Name</span>
           </th>
           <th
-            colspan="2"
-            class="text-center "
+            colspan="10"
+            class="text-center"
           >
             <span class="font-weight-body">F-190</span>
           </th>
@@ -107,7 +107,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             Lot No.
           </th>
           <th
-            colspan="2"
+            colspan=""
             class="text-center "
           >
             <span class="font-weight-body">PA24020033</span>
@@ -147,8 +147,20 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
           >
             <div class="checkbox-container">
-              <VCheckbox /><span class="font-weight-body">YES</span>
-              <VCheckbox /><span class="font-weight-body">NO</span>
+              <VRow>
+                <VCol
+                  cols="6"
+                  class="d-flex justify-center align-center"
+                >
+                  <VCheckbox /><span class="font-weight-body">YES</span>
+                </VCol>
+                <VCol
+                  cols="6"
+                  class="d-flex justify-center align-center"
+                >
+                  <VCheckbox /><span class="font-weight-body">NO</span>
+                </VCol>
+              </VRow>
             </div>
           </th>
         </tr>
@@ -170,8 +182,20 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
           >
             <div class="checkbox-container">
-              <VCheckbox /><span class="font-weight-body">YES</span>
-              <VCheckbox /><span class="font-weight-body">NO</span>
+              <VRow>
+                <VCol
+                  cols="6"
+                  class="d-flex justify-center align-center"
+                >
+                  <VCheckbox /><span class="font-weight-body">YES</span>
+                </VCol>
+                <VCol
+                  cols="6"
+                  class="d-flex justify-center align-center"
+                >
+                  <VCheckbox /><span class="font-weight-body">NO</span>
+                </VCol>
+              </VRow>
             </div>
           </th>
         </tr>
@@ -205,15 +229,30 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
           >
             <div class="checkbox-container">
-              <VCheckbox /><span class="font-weight-body">YES</span>
-              <VCheckbox /><span class="font-weight-body">NO</span>
+              <VRow>
+                <VCol
+                  cols="6"
+                  class="d-flex justify-center align-center"
+                >
+                  <VCheckbox /><span class="font-weight-body">YES</span>
+                </VCol>
+                <VCol
+                  cols="6"
+                  class="d-flex justify-center align-center"
+                >
+                  <VCheckbox /><span class="font-weight-body">NO</span>
+                </VCol>
+              </VRow>
             </div>
           </th>
         </tr>
       </table>
     </VCol>
 
-    <VCol cols="12">
+    <VCol
+      v-if="false"
+      cols="12"
+    >
       <table class="custom-table">
         <tr>
           <th cols="4">
@@ -237,6 +276,22 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
     <VCol cols="12">
       <table class="custom-table">
         <tr>
+          <th colspan="1">
+            Filling Valve Open
+          </th>
+          <th colspan="5">
+            Filling Line Valve Open
+          </th>
+          <th colspan="4">
+            <div class="d-flex justify-space-between align-center">
+              Checked by <VTextField
+                class="mx-2"
+                density="compact"
+              />
+            </div>
+          </th>
+        </tr>
+        <tr>
           <th
             colspan="1"
             class="text-start "
@@ -249,18 +304,6 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
           >
             <div class="d-flex">
-              <VTextField
-                density="compact"
-                variant="outlined"
-                @click:append-inner="visible = !visible"
-              />
-              <VTextField
-                append-inner-icon="ri-arrow-right-wide-line"
-                density="compact"
-                prepend-inner-icon="ri-arrow-left-wide-line"
-                variant="outlined"
-                @click:append-inner="visible = !visible"
-              />
               <VTextField
                 density="compact"
                 variant="outlined"
@@ -332,13 +375,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
               <VTextField
                 density="compact"
                 variant="outlined"
-                @click:append-inner="visible = !visible"
-              />
-              <VTextField
-                density="compact"
-                variant="outlined"
-                label="Kg."
-                @click:append-inner="visible = !visible"
+                suffix="Kg."
               />
             </div>
           </th>
@@ -650,23 +687,20 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
           <tr>
             <th
               class="text-center "
-              colsapn="6"
+              colspan="6"
             >
               Picture
             </th>
             <th
               class="text-center "
-              colsapn="6"
+              colspan="6"
             >
-              <VTextField
-                density="compact"
-                variant="outlined"
-                label="Seal No."
-              >
-                <template #label>
-                  <span class="font-size">Seal No.</span>
-                </template>
-              </VTextField>
+              <div class="d-flex justify-space-between align-center">
+                Seal No. <VTextField
+                  class="mx-2"
+                  density="compact"
+                />
+              </div>
             </th>
           </tr>
         </thead>
@@ -675,27 +709,44 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             v-for="(image, index) in imagePicture"
             :key="index"
           >
-            <td colspan="6">
+            <td
+              style="min-width: 410px;"
+              colspan="6"
+            >
               <VImg :src="image" />
             </td>
             <td colspan="6">
               <div class="d-flex justify-center">
-                Already Cleaned
-              </div>
-              <div class="d-flex justify-space-between">
-                <VCheckbox class="mx-4">
-                  <template #label>
-                    <span class="font-size">YES</span>
-                  </template>
-                </VCheckbox>
-                <VCheckbox
-                  class="mx-4"
-                  label="NO"
-                >
-                  <template #label>
-                    <span class="font-size">NO</span>
-                  </template>
-                </VCheckbox>
+                <VRow>
+                  <VCol cols="12">
+                    <div class="d-flex justify-center">
+                      Already Cleaned
+                    </div>
+                  </VCol>
+                  <VCol
+                    cols="6"
+                    class="d-flex justify-center align-center"
+                  >
+                    <VCheckbox class="px-10">
+                      <template #label>
+                        <span class="font-size">YES</span>
+                      </template>
+                    </VCheckbox>
+                  </VCol>
+                  <VCol
+                    cols="6"
+                    class="d-flex justify-center align-center"
+                  >
+                    <VCheckbox
+                      class="px-10"
+                      label="NO"
+                    >
+                      <template #label>
+                        <span class="font-size">NO</span>
+                      </template>
+                    </VCheckbox>
+                  </VCol>
+                </VRow>
               </div>
             </td>
           </tr>
