@@ -5,6 +5,15 @@ import iconMock1 from '@images/icons/Group 1000004801.png'
 import iconMock2 from '@images/icons/Group 1000004802.png'
 import iconMock3 from '@images/icons/Icon.png'
 
+//-------------------------- for mat -------------- 
+const formatNumber = value => {
+  if (value !== null && value !== undefined) {
+    return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  return '0.00'
+}
+
 const iconMock = [
   { iconName: 'icon1', src: iconMock1 },
   { iconName: 'icon2', src: iconMock2 },
@@ -388,7 +397,7 @@ const dessertsMockAmountView = [
                     colspan="1"
                     class="section-title text-center"
                   >
-                    Product Code
+                    Item Code
                   </th>
                   <th
                     colspan="1"
@@ -457,11 +466,18 @@ const dessertsMockAmountView = [
                   <td>{{ item.supplierLotNo }}</td>
                   <td>{{ item.productCode }}</td>
                   <td>{{ item.tradeName }}</td>
-                  <td>{{ item.packaging }}</td>
-                  <td>{{ item.netContent }}</td>
+                  <td class="text-center">
+                    {{ item.packaging }}
+                  </td>
+                  <td class="text-end">
+                    {{ formatNumber(item.netContent) }}
+                  </td>
                   <td>
                     <VRow>
-                      <VCol cols="6">
+                      <VCol
+                        class="text-end"
+                        cols="12"
+                      >
                         {{ item.amount }}
                       </VCol>
                       <VCol
@@ -477,12 +493,31 @@ const dessertsMockAmountView = [
                       </VCol>
                     </VRow>
                   </td>
-                  <td>{{ item.quantity }}</td>
+                  <td class="text-end">
+                    {{ item.quantity }}
+                  </td>
                   <td style="font-size: 14px;">
                     {{ item.customerName }}
                   </td>
                   <td>{{ item.deliveryPlace }}</td>
-                  <td>{{ item.appearanceCheck }}</td>
+                  <td>
+                    <VRow>
+                      <VCol cols="6">
+                        <VCheckbox>
+                          <template #label>
+                            <span class="font-size">YES</span>
+                          </template>
+                        </VCheckbox>
+                      </VCol>
+                      <VCol cols="6">
+                        <VCheckbox>
+                          <template #label>
+                            <span class="font-size">No</span>
+                          </template>
+                        </VCheckbox>
+                      </VCol>
+                    </VRow>
+                  </td>
                   <td>{{ item.remark }}</td>
                 </tr>
               </tbody>

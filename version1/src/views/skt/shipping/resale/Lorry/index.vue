@@ -455,7 +455,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             colspan="3"
             class="text-center "
           >
-            TIME  DATE
+            Time Date
           </th>
           <th
             colspan="3"
@@ -641,7 +641,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             colspan="1"
           >
             <span>
-              4<sup>rd</sup>  Sampling
+              4<sup>th</sup>  Sampling
             </span>
           </th>
           <th
@@ -719,8 +719,20 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
               <div class="d-flex justify-center">
                 <VRow>
                   <VCol cols="12">
-                    <div class="d-flex justify-center">
+                    <div v-if="index === 0" class="d-flex justify-center">
                       Already Cleaned
+                    </div>
+                    <div v-if="index === 1" class="d-flex justify-center">
+                      After Seal
+                    </div>
+                    <div v-if="index === 2" class="d-flex justify-center">
+                      Inside Tank
+                    </div>
+                    <div v-if="index === 3" class="d-flex justify-center">
+                      Cleaning House and Air Blow
+                    </div>
+                    <div v-if="index === 4" class="d-flex justify-center">
+                      Cover By Coping
                     </div>
                   </VCol>
                   <VCol

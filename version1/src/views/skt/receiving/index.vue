@@ -2797,7 +2797,7 @@ const insetSwitch1 = ref('')
             style="font-size: 12px;"
             :disabled="!checkReceivedStatus(detailsReceiv.statusText)"
             :to="{ 
-              name: 'skt-receiving-receingForm'
+              name: 'skt-receiving-receivingForm'
             }"
           >
             <span class="text-white">{{ detailsReceiv.statusText }}</span>

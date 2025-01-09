@@ -5,6 +5,15 @@ import iconMock1 from '@images/icons/Group 1000004801.png'
 import iconMock2 from '@images/icons/Group 1000004802.png'
 import iconMock3 from '@images/icons/Icon.png'
 
+//-------------------------- for mat -------------- 
+const formatNumber = value => {
+  if (value !== null && value !== undefined) {
+    return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  return '0.00'
+}
+
 const iconMock = [
   { iconName: 'icon1', src: iconMock1 },
   { iconName: 'icon2', src: iconMock2 },
@@ -62,8 +71,8 @@ const specialRequests = ref([
 
 const GBSMockData = ref({
   "No1": { title: "No.", c1: '1', c2: '2', c3: '3', c4: '4', c5: '5', c6: '6', c7: '7', c8: '8', c9: '9', c10: '10' },
-  "ubc1": { title: "UBC No", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
-  "GBS1": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
+  "ubc1": { title: "IBC No", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
+  "GBS1": { title: "GROSS WEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
   "rows1": { 
     "item1": [
       { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
@@ -74,7 +83,7 @@ const GBSMockData = ref({
       { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
       { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
       { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
-      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
+      { "label": "- ตำแหน่ง Label ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
     ],
     "item3": [
       { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false },
@@ -91,8 +100,8 @@ const GBSMockData = ref({
   },
 
   "No2": { title: "No.", c1: '11', c2: '12', c3: '13', c4: '14', c5: '15', c6: '16', c7: '17', c8: '18', c9: '19', c10: '20' },
-  "ubc2": { title: "UBC No", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
-  "GBS2": { title: "GROSSWEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
+  "ubc2": { title: "IBC No", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
+  "GBS2": { title: "GROSS WEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
   "rows2": { 
     "item1": [
       { "label": "1. ไม่เป็นสนิม", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
@@ -103,7 +112,7 @@ const GBSMockData = ref({
       { "label": "2.Label ไม่ฉีกขาด", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
       { "label": "- Lot No.ถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
       { "label": "- น้ำหนักถูกต้อง", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
-      { "label": "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
+      { "label": "- ตำแหน่ง Label ถูกต้อง (อยู่ตรงกลาง)", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
     ],
     "item3": [
       { "label": "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า", value1: false, value2: false, value3: false, value4: false, value5: false, value6: false, value7: false, value8: false, value9: false, value10: false  },
@@ -507,7 +516,7 @@ const dessertsMockAmountView = [
                     colspan="1"
                     class="section-title text-center"
                   >
-                    Product Code
+                    Item Code
                   </th>
                   <th
                     colspan="1"
@@ -576,11 +585,11 @@ const dessertsMockAmountView = [
                   <td>{{ item.supplierLotNo }}</td>
                   <td>{{ item.productCode }}</td>
                   <td>{{ item.tradeName }}</td>
-                  <td>{{ item.packaging }}</td>
-                  <td>{{ item.netContent }}</td>
+                  <td class="text-center">{{ item.packaging }}</td>
+                  <td class="text-end">{{ formatNumber(item.netContent) }}</td>
                   <td>
                     <VRow>
-                      <VCol cols="6">
+                      <VCol class="text-end" cols="12">
                         {{ item.amount }}
                       </VCol>
                       <VCol
@@ -589,16 +598,36 @@ const dessertsMockAmountView = [
                         cols="6"
                         @click="isDialogVisibleImgAmount = true"
                       >
-                        <VIcon icon=" ri-eye-fill" class='cursor-pointer' />
+                        <VIcon
+                          icon=" ri-eye-fill"
+                          class="cursor-pointer"
+                        />
                       </VCol>
                     </VRow>
                   </td>
-                  <td>{{ item.quantity }}</td>
+                  <td class="text-end">{{ item.quantity }}</td>
                   <td style="font-size: 14px;">
                     {{ item.customerName }}
                   </td>
                   <td>{{ item.deliveryPlace }}</td>
-                  <td>{{ item.appearanceCheck }}</td>
+                  <td>
+                    <VRow>
+                      <VCol cols="6">
+                        <VCheckbox>
+                          <template #label>
+                            <span class="font-size">YES</span>
+                          </template>
+                        </VCheckbox>
+                      </VCol>
+                      <VCol cols="6">
+                        <VCheckbox>
+                          <template #label>
+                            <span class="font-size">No</span>
+                          </template>
+                        </VCheckbox>
+                      </VCol>
+                    </VRow>
+                  </td>
                   <td>{{ item.remark }}</td>
                 </tr>
               </tbody>
