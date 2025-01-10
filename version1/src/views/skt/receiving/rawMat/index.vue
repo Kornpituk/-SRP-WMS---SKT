@@ -1628,7 +1628,7 @@ watchEffect(() => {
       if (data.value.receiveTypeId === 2) {
         purchaseOrder.value[netCountField] = dataHeaderReceving.value.packagingQtyKg
       } else if (data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0) {
-        purchaseOrder.value[netCountField] = data.value.purchasingAmountKgs
+        purchaseOrder.value[netCountField] = purchaseOrder.value[netCountField]
       }
     } else {
       purchaseOrder.value[netCountField] = null
