@@ -91,6 +91,66 @@ export const useDeleteProductionPlanService = () => {
   }
 }
 
+export const useRejectProductionPlanService = () => {
+  const responseRejectProductionPlan = ref(null)
+  const errorMessageRejectProductionPlan = ref(null)
+  
+  const rejectProdutcionPlanFunc = async (statusComment, planningId, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageRejectProductionPlan.value = null
+      console.log('Reject Produtcion Plan Func...')
+  
+      const result = await productionPlanRepository.rejectBatchProductionPlan(statusComment, planningId, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Reject Produtcion Plan Func result:', result)
+        responseRejectProductionPlan.value = result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in rejectProdutcionPlanFunc:', error)
+      errorMessageRejectProductionPlan.value = error.message
+    }
+  }
+  
+  return {
+    responseRejectProductionPlan,
+    errorMessageRejectProductionPlan,
+    rejectProdutcionPlanFunc,
+  }
+}
+
+export const useValidateBatchProductionPlanService = () => {
+  const responseValidateLotBatchProductionPlan = ref(null)
+  const errorMessageValidateLotBatchProductionPlan = ref(null)
+  
+  const validateLotBatchProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
+    try {
+      errorMessageValidateLotBatchProductionPlan.value = null
+      console.log('Genertate Batch lot Produtcion Plan Func...')
+  
+      const result = await productionPlanRepository.validateLotBatchProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
+        
+      if (result) {
+        console.log('Genertate Batch lot Produtcion Plan Func result:', result)
+        responseValidateLotBatchProductionPlan.value = result.data.message
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.error('Error in validateLotBatchProdutcionPlanFunc:', error)
+      errorMessageValidateLotBatchProductionPlan.value = error.message
+    }
+  }
+  
+  return {
+    responseValidateLotBatchProductionPlan,
+    errorMessageValidateLotBatchProductionPlan,
+    validateLotBatchProdutcionPlanFunc,
+  }
+}
+
 export const useGenerateBatchProductionPlanService = () => {
   const responseGenerateLotBatchProductionPlan = ref(null)
   const errorMessageGenerateLotBatchProductionPlan = ref(null)

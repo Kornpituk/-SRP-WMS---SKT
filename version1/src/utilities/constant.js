@@ -1,6 +1,6 @@
 const alertWordConst = {
   saveDraft: 'SAVE DRAFT',
-  reject: 'REJECT',
+  reject: 'REJECTION',
   accept: 'ACCEPT',
   approve: 'APPROVE',
   submit: 'SUBMIT',

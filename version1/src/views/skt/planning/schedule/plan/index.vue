@@ -35,6 +35,8 @@ const textAlertSubDialogFunction = (word, subWord, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
+const typeConfirm = ref('')
+
 function openConfirmDialog() {
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
 
@@ -43,6 +45,7 @@ function openConfirmDialog() {
     console.log("selectedDataTables", item.statusId)
 
     if (item.statusId === 102 ) {
+      typeConfirm.value = 'approve'
       wordForSubmit.value = alertWordConst.approve
       confirmDialog2.value.openDialog()
       isDialogVisibleAlertDialog.value = false
@@ -60,10 +63,48 @@ function openConfirmDialog() {
 
 }
 
-function handleConfirmAction() {
-  console.log('Confirmed! Executing action...')
-  approvePlan()
+function btnSubmitConfirm() {
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    typeConfirm.value = 'submit'
+    wordForSubmit.value = alertWordConst.submit
+    confirmDialog2.value.openDialog()
+    isDialogVisibleAlertDialog.value = false
+
+  })
 }
+
+function btnRejectConfirm() {
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    typeConfirm.value = 'reject'
+    wordForSubmit.value = alertWordConst.reject
+    confirmDialog2.value.openDialog()
+    isDialogVisibleAlertDialog.value = false
+
+  })
+}
+
+async function handleConfirmAction () {
+  console.log('Confirmed! Executing action...')
+  if(typeConfirm.value === "approve"){
+    approvePlan()
+  }else if(typeConfirm.value === "submit"){
+    await validateLotBeforeSubmit()
+
+    // await submitPlan()
+  }else if(typeConfirm.value === "reject"){
+    isDialogVisibleCommentDialog.value = true
+
+    // await rejectPlan()
+  }
+  
+}
+
+//--------------------------------------- dialog -------------------------------------
+
+const isDialogVisibleCommentDialog = ref(false)
+const statusCommnetValue = ref('Hello!')
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
@@ -267,6 +308,8 @@ import {
   useNewProductionPlanService,
   useSaveProductionPlanService,
   useSubmitProductionPlanService,
+  useValidateBatchProductionPlanService,
+  useRejectProductionPlanService,
 } from '@/services/skt/productionPlan/services'
 
 const countItemProduction = ref(1)
@@ -610,8 +653,6 @@ const selectPlan = plan => {
 
 }
 
-
-
 const selectItemCode = plan => {
   if(btnSelectitem1.value){
     selectedItemCode.value = plan.itemCode
@@ -648,6 +689,7 @@ const selectedDataTables = ref([])
 const activeBtnApprove = ref(false)
 const activeBtnSubmit = ref(false)
 const activeBtnCancelPlan = ref(false)
+const activeBtnRejectPlan = ref(false)
 const activeBtnError =ref('primary')
 
 watch(()=> {
@@ -655,6 +697,7 @@ watch(()=> {
   activeBtnApprove.value = false
   activeBtnSubmit.value = false
   activeBtnCancelPlan.value = false
+  activeBtnRejectPlan.value = false
   if(selectedDataTables.value){
     selectedDataTables.value.forEach(item => {
       // กำหนดค่าเริ่มต้น
@@ -666,6 +709,8 @@ watch(()=> {
       }else if(item.statusId === 101){
         activeBtnCancelPlan.value = true
         activeBtnSubmit.value = true
+      }else if(item.statusId === 103){
+        activeBtnRejectPlan.value = true
       }
       else{
         activeBtnApprove.value = false
@@ -932,86 +977,6 @@ const addSelectProdutionCode = index => {
     console.log("Tricker false", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
   }
 
-  // if(trickerItem1N2.value){
-  //   console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
-  //   productionPlan.value[index].product2SelectedCode = null
-  //   productionPlan.value[index].product2Name = null
-  //   productionPlan.value[index].product2SelectedPackagingCode = null
-  //   productionPlan.value[index].product2PackagingName = null
-  //   productionPlan.value[index].product2PackingQtyKgs = null
-  //   productionPlan.value[index].product2UomCount = null
-
-  //   if(productionPlan.value[index].productionCode !== null){
-  //     productionPlan.value[index].product1SelectedCode = null
-  //     productionPlan.value[index].product1Name = null
-  //     productionPlan.value[index].product1SelectedPackagingCode = null
-  //     productionPlan.value[index].product1PackagingName = null
-  //     productionPlan.value[index].product1PackingQtyKgs = null
-  //     productionPlan.value[index].product1UomCount = null
-  //   }else{
-  //     if (selectedItemCode.value) {
-  //       productionPlan.value[index].product1SelectedCode = selectedItemCode.value
-  //     }
-  //     if (selectedItemName.value) {
-  //       productionPlan.value[index].product1Name = selectedItemName.value
-  //     }
-  //     if (selectedPackagingType.value) {
-  //       productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value
-  //     }
-  //     if (selectedPackagingName.value) {
-  //       productionPlan.value[index].product1PackagingName = selectedPackagingName.value
-  //     }
-  //     if (selectedPackagingKgs.value) {
-  //       productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value
-  //       if (selectedProductionbatchScaleKgs.value) {
-  //         productionPlan.value[index].product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs.value)
-  //       }
-  //     }
-  //   }
-    
-  // }else{
-  //   console.log("Tricker false", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
-  //   if (selectedItemCode2.value) {
-  //     productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
-  //   }
-  //   if (selectedItemName2.value) {
-  //     productionPlan.value[index].product2Name = selectedItemName2.value
-  //   }
-  //   if (selectedPackagingType2.value) {
-  //     productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
-  //   }
-  //   if (selectedPackagingName2.value) {
-  //     productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
-  //   }
-  //   if (selectedPackagingKgs2.value) {
-  //     productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
-  //     if (selectedProductionbatchScaleKgs.value) {
-  //       productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
-  //     }
-  //   }
-
-  //   if (selectedItemCode.value) {
-  //     productionPlan.value[index].product1SelectedCode = selectedItemCode.value
-  //   }
-  //   if (selectedItemName.value) {
-  //     productionPlan.value[index].product1Name = selectedItemName.value
-  //   }
-  //   if (selectedPackagingType.value) {
-  //     productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value
-  //   }
-  //   if (selectedPackagingName.value) {
-  //     productionPlan.value[index].product1PackagingName = selectedPackagingName.value
-  //   }
-  //   if (selectedPackagingKgs.value) {
-  //     productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value
-  //     if (selectedProductionbatchScaleKgs.value) {
-  //       productionPlan.value[index].product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs.value)
-  //     }
-  //   }
-
-  //   console.log("Tricker false after", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
-  // }
-
   console.log("Item 1 before", productionPlan.value[index].product1SelectedCode, '||', selectedItemCode.value)
 
   if(trickerItem1N2.value){
@@ -1254,6 +1219,52 @@ const deletePlan = async () => {
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error deleted production plan:", error)
+  }
+
+  console.log("body selectedDataTables", body)
+}
+
+//------------------------- reject plan
+
+const { responseRejectProductionPlan, errorMessageRejectProductionPlan, rejectProdutcionPlanFunc } = useRejectProductionPlanService()
+
+const rejectPlan = async () => {
+  const body = selectedDataTables.value.map(item => item.planningID)
+
+  try {
+    // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    await rejectProdutcionPlanFunc(statusCommnetValue.value, body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    textAlertDialogFunction(alertWordConst.reject, true)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+    console.error("Error deleted production plan:", error)
+  }
+
+  console.log("body selectedDataTables", body)
+}
+
+//------------------------  validate lot --------------------------------------------------
+
+const { responseValidateLotBatchProductionPlan, errorMessageValidateLotBatchProductionPlan, validateLotBatchProdutcionPlanFunc } = useValidateBatchProductionPlanService()
+
+const validateLotBeforeSubmit = async () => {
+  const body = selectedDataTables.value.map(item => item.planningID)
+
+  try {
+    // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    const result = await validateLotBatchProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+
+    textAlertDialogFunction(responseValidateLotBatchProductionPlan.value, true)
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+    console.error("Error deleted production plan:", error)
+    console.error("Error deleted production plan:", errorMessageValidateLotBatchProductionPlan)
   }
 
   console.log("body selectedDataTables", body)
@@ -1586,52 +1597,6 @@ const headersDataTableNew = [
   //   key: 'action',
   // },
 ]
-
-//--------------------- Menu
-
-const menuDataTable = ref(false)
-
-const itemsActionDataTable = [
-  {
-    title: 'Save Draft',
-    value: 'Save Draft',
-    icon: 'ri-save-3-line',
-  },
-  {
-    title: 'Delete Item',
-    value: 'Delete Item',
-    icon: 'ri-delete-bin-5-line',
-  },
-  {
-    title: 'Submit',
-    value: 'Submit',
-    icon: 'ri-upload-2-line',
-  },
-  {
-    title: 'Print',
-    value: 'Print',
-    icon: 'ri-printer-line',
-  },
-]
-
-const handleAction = action => {
-  switch (action) {
-  case 'Save Draft':
-    saveDraft()
-    break
-  case 'Delete Item':
-    deleteItem()
-    break
-  case 'Submit':
-    submit()
-    break
-  case 'Print':
-    print()
-    break
-  default:
-    console.warn('Action not defined:', action)
-  }
-}
 
 ///---------------------- Filter Select
 const isDialogVisibleFilterSelect = ref(false)
@@ -2413,7 +2378,7 @@ const print = () => {
           class="mx-1"
           color="light-green-darken-1"
           :disabled="!activeBtnSubmit"
-          @click="submitPlan"
+          @click="btnSubmitConfirm"
         >
           <span style="font-size: 12px;">Submit</span>
         </VBtn>
@@ -2425,10 +2390,11 @@ const print = () => {
           <span style="font-size: 12px;">Approve</span>
         </VBtn>
         <VBtn
-          v-if="false"
-          color="info"
+          v-if="true"
+          :disabled="!activeBtnRejectPlan"
+          color="error"
           class="mx-2"
-          @click="addEmptyRowToPlan"
+          @click="btnRejectConfirm"
         >
           <span style="font-size: 12px;">Reject Plan</span>
         </VBtn>
@@ -3542,6 +3508,41 @@ const print = () => {
         :subword="subWordForSubmit"
         :success="successDialAlert"
       />
+    </div>
+
+    <!-- dialogcomment -->
+    <div>
+      <VDialog
+        v-model="isDialogVisibleCommentDialog"
+        persistent
+        class="v-dialog-sm"
+      >
+        <!-- Dialog Content -->
+        <VCard title="Comment">
+          <DialogCloseBtn
+            variant="text"
+            size="default"
+            @click="isDialogVisibleCommentDialog = false"
+          />
+
+          <VCardText>
+            <VTextarea
+              v-model="statusCommnetValue"
+              counter
+              placeholder="Enter Commnet"
+            />
+          </VCardText>
+
+          <VCardText class="d-flex justify-end flex-wrap gap-4">
+            <VBtn
+              color="error"
+              @click="isDialogVisibleCommentDialog = false, rejectPlan()"
+            >
+              Reject
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
     </div>
   </section>
 

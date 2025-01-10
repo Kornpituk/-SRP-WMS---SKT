@@ -81,9 +81,10 @@ const closeDialog = () => {
         />
       </VCardText>
 
-      <VCardText class="d-flex justify-center pb-1">
+      <VCardText class="d-flex justify-center text-center pb-1">
         <div>
           <span
+            class="text-center"
             v-if="props.success"
             style="font-size: 22px; font-weight: bolder;"
           >{{ word }} Completed.</span>

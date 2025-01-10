@@ -179,6 +179,30 @@ export const productionPlanRepository = {
     }
   },
 
+  async rejectBatchProductionPlan(statusComment, batchId, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/reject`, batchId, {
+        headers: {
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        params: {
+          StatusComment: statusComment,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data reject Batch production plan:', response.data.data)
+        
+        return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
   async generateLotBatchProductionPlan(batchId, urlApi, form, whereHouse, accessToken) {
     try {
       const response = await axios.post(`${urlApi}/api/v1/${form}/genlot?BatchID=${batchId}`, {}, {
@@ -192,6 +216,27 @@ export const productionPlanRepository = {
         console.log('Repo Response data genlot Batch production plan:', response.data.data)
         
         return { data: response.data.data, success: true }
+      } else {
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
+  async validateLotBatchProductionPlan(batchId, urlApi, form, whereHouse, accessToken) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/Validate`, batchId, {
+        headers: {
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+  
+      if (response && response.data) {
+        console.log('Repo Response data validate lot Batch production plan:', response.data)
+        
+        return { data: response.data, success: true }
       } else {
         throw new Error('No data received from the server')
       }
