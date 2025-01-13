@@ -33,6 +33,7 @@ export const useGetUserPermissionService = () => {
   }
 }
 
+//----------------------------------- get ----------------------------
 export const useGetSelectDataService = () => {
   const getSelectDataResult = ref(null)
   const errorGetSelectData = ref(null)
@@ -94,5 +95,38 @@ export const useGetSearchPlanService = () => {
     getSearchPlanResult,
     errorGetSearchPlan,
     fetchSearchPlan,
+  }
+}
+
+//---------------------------------- post ---------------------------------
+export const useSaveSearchPlanService = () => {
+  const saveSearchPlanResult = ref(null)
+  const errorSaveSearchPlan = ref(null)
+  
+  const saveSearchPlan = async (urlApi, form, whereHouse, accessToke, body) => {
+    try {
+      errorSaveSearchPlan.value = null
+      console.log('Fetching saveSearchPlan...')
+  
+      const result = await shipmentPlanRepository.saveSearchPlan(urlApi, form, whereHouse, accessToke, body)
+        
+      if (result) {
+        // console.log('Fetching data saveSearchPlan:', result)
+        saveSearchPlanResult.value = result.data
+        
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in saveSearchPlan:', error)
+      errorSaveSearchPlan.value = error.message
+    }
+  }
+  
+  return {
+    saveSearchPlanResult,
+    errorSaveSearchPlan,
+    saveSearchPlan,
   }
 }

@@ -49,3 +49,10 @@
   font-weight: bold;
   text-align: center;
 }
+
+.truncate-select {
+  overflow: hidden !important;
+  inline-size: 200px !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}

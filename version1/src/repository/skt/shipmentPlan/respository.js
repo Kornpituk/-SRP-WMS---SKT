@@ -100,4 +100,33 @@ export const shipmentPlanRepository = {
       throw new Error(`Failed to fetch getSearchPlan ${error.response?.data?.message || error.message}`)
     }
   },
+
+  //---------------------------- post --------------------------------
+  async saveSearchPlan(urlApi, form, whereHouse, accessToken, body) {
+    console.log('get repo saveSearchPlan...')
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}`, body, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+        console.log('success get repo saveSearchPlan...')
+
+        // console.log('Service Response data saveSearchPlan:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If saveSearchPlan...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try saveSearchPlan...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch saveSearchPlan ${error.response?.data?.message || error.message}`)
+    }
+  },
 }

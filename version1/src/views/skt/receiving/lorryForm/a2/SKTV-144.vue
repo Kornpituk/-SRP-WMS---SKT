@@ -124,7 +124,7 @@ async function saveDraft(e) {
   if (response.status == 200) {
     textAlertDialogFunction(alertWordConst.saveDraft, true)
     setTimeout(() => {
-      location.reload()
+      // location.reload()
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
     console.error(response.data)

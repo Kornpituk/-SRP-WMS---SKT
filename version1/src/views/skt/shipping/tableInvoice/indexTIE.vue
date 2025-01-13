@@ -25,6 +25,7 @@ const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 import { useGetUserPermissionService,
   useGetSelectDataService,
   useGetSearchPlanService,
+  useSaveSearchPlanService,
 } from '@/services/skt/shipmentPlan/services'
 
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
@@ -251,6 +252,79 @@ const searchShipmentPlan = async () => {
   }
 }
 
+//------------------------------- Function check --------------------------------
+
+const allData = ref([]) // ข้อมูลทั้งหมดที่แสดงในตาราง
+const isSelectAll = ref(false) // สถานะของ Checkbox "Select All"
+
+const testValue = () => {
+  console.log('Test Value', selectedDataTables.value)
+}
+
+// คำนวณว่าทุกแถวถูกเลือกหรือไม่
+const isAllSelected = computed(() => {
+  return paginatedData.value.length > 0 && selectedDataTables.value.length === paginatedData.value.length
+})
+
+// เมื่อกด "Select All"
+const toggleSelectAll = () => {
+  if (isAllSelected.value) {
+    selectedDataTables.value = [] // ยกเลิกการเลือกทั้งหมด
+    console.log('clear data checkbox...')
+  } else {
+    selectedDataTables.value = [...paginatedData.value] // เลือกทั้งหมด
+    console.log('add all data checkbox...')
+  }
+}
+
+
+//------------------------------- Function save Search plan -----------------
+
+const { saveSearchPlanResult, errorSaveSearchPlan, saveSearchPlan } = useSaveSearchPlanService()
+
+const mapRequestData = data => ({
+  soEtlLogDetailJournalID: getOrDefault(data.soEtlLogDetailJournalID, 0),
+  updatedBy: getOrDefault(data.salUpdatedBy, "system"),
+  shipperMark: getOrDefault(data.shipperMark, ""),
+  shipperConditions: getOrDefault(data.shipperConditions, ""),
+  shippingEndUser: getOrDefault(data.shippingEndUser, ""),
+  freightForwarder: getOrDefault(data.freightForwarder, ""),
+  carrier: getOrDefault(data.carrier, ""),
+  vesselName: getOrDefault(data.vesselName, ""),
+  voy: getOrDefault(data.voy, ""),
+  truck: getOrDefault(data.truck, ""),
+  truckReservingNumber: getOrDefault(data.truckReservingNumber, ""),
+  etd: getOrDefault(data.etd, null),
+  eta: getOrDefault(data.eta, null),
+  saL_Remarks: getOrDefault(data.saL_Remarks, ""),
+  wH_Remarks: getOrDefault(data.wH_Remarks, ""),
+  loG_Remarks: getOrDefault(data.loG_Remarks, ""),
+})
+
+const getOrDefault = (value, defaultValue) => value ?? defaultValue
+
+const saveShipmentPlan = async row => {
+  console.log("save plan start...", row)
+  try {
+    // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
+    const requestData = Array.isArray(row)
+      ? row.map(mapRequestData) // ถ้าเป็นอาร์เรย์ ให้ใช้ map
+      : [mapRequestData(row)] // ถ้าเป็นออบเจ็กต์เดี่ยว ให้แปลงเป็นอาร์เรย์ที่มีหนึ่งออบเจ็กต์
+
+    const response = await saveSearchPlan(
+      urlApi.value,
+      "save",
+      whereHouse,
+      accessTokenAtStore,
+      requestData,
+    )
+
+    console.log(`Saved search plan:`, response)
+  } catch (error) {
+    console.error(`Error saving search plan:`, error)
+  }
+}
+
 
 const handlePageChange = newPage => {
   currentPage.value = newPage
@@ -276,6 +350,7 @@ const dataTableCliclHighlightIsToggle = no => {
 
   console.log("dataTableNum", dataTableNummberedToggle.value)
 }
+
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
@@ -524,6 +599,10 @@ onMounted(async () => {
   vesselsModel.value = vessels
   truckModel.value = truck
 })
+
+const itemMock = ref([
+  'Foo', 'Barหกฟหกฟหกฟหกฟหกฟหก', 'Fizz', 'Buzz',
+])
 
 //------------------------------------------ Mock Data --------------------------------
 import mockData from './dataMock'
@@ -1488,6 +1567,67 @@ const handleFileUpdates = updatedFiles => {
     </VDialog>
   </section>
 
+  <!-- Btn Approve / PROD APPROVE / NEW BATCH -->
+  <div class="my-2">
+    <VCard>
+      <VCardText class="pa-2">
+        <VRow>
+          <VCol cols="10">
+            <VBtn
+              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 102"
+              @click="openConfirmDialog"
+            >
+              <span style="font-size: 12px;">Approve</span>
+            </VBtn>
+            <VBtn
+              class="mx-2"
+              color="info"
+              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 107"
+              @click="openConfirmDialog"
+            >
+              <span style="font-size: 12px;">PROD Approved</span>
+            </VBtn>
+            <VBtn
+              class="mx-2"
+              color="warning"
+              @click="saveShipmentPlan"
+            >
+              <span style="font-size: 12px;">Save PLan</span>
+            </VBtn>
+
+            <VBtn
+              v-if="false"
+              color="info"
+              class="mx-2"
+              @click="saveShipmentPlan"
+            >
+              <span style="font-size: 12px;">Add Item</span>
+            </VBtn>
+          </VCol>
+          <VCol
+            cols="2"
+            class="d-flex justify-end"
+          >
+            <VBtn
+              icon
+              size="small"
+              @click="refeshPage"
+            >
+              <VIcon
+                size="20"
+                icon="ri-restart-line"
+                :class="{ spinning: isSpinning }"
+              />
+            </VBtn>
+          </VCol>
+          <VBtn @click="testValue">
+            Test
+          </VBtn>
+        </VRow>
+      </VCardText>
+    </VCard>
+  </div>
+
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
     <VCard class="mt-6">
@@ -1525,7 +1665,11 @@ const handleFileUpdates = updatedFiles => {
           <thead class="">
             <tr>
               <th>
-                <VCheckbox />
+                <VCheckbox
+                  v-model="isSelectAll"
+                  :indeterminate="isIndeterminate"
+                  @click="toggleSelectAll"
+                />
               </th>
               <th
                 scope="row"
@@ -1768,7 +1912,6 @@ const handleFileUpdates = updatedFiles => {
                 <VCheckboxBtn
                   v-model="selectedDataTables"
                   :value="product"
-                  @update:modelValue="(selected) => handleSelection(selected, product)"
                 />
               </td>
               <td>
@@ -1962,6 +2105,7 @@ const handleFileUpdates = updatedFiles => {
                 <VSelect
                   v-model="product.freightForwarder"
                   :items="freightForwarderModel"
+                  class="truncate-select"
                   item-title="freightForwarder"
                   item-value="no"
                   density="compact"
@@ -1979,6 +2123,7 @@ const handleFileUpdates = updatedFiles => {
                   v-model="product.carrier"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
                   :items="carrierModel"
+                  class="truncate-select"
                   item-title="carrier"
                   item-value="no"
                   density="compact"
@@ -1994,6 +2139,7 @@ const handleFileUpdates = updatedFiles => {
               >
                 <VSelect
                   v-model="product.vesselName"
+                  class="truncate-select"
                   :items="vesselsModel"
                   item-title="carrier"
                   item-value="no"
@@ -2023,17 +2169,23 @@ const handleFileUpdates = updatedFiles => {
                 v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
                 class="text-start px-1"
                 :class="checkBgTruck(product.truck)"
-                style="min-width: 120px; font-size: 12px;"
+                style="font-size: 12px;"
               >
-                <VSelect
-                  v-model="product.truck"
-                  :items="truckModel"
-                  item-title="truck"
-                  item-value="no"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
-                  density="compact"
-                  eager
-                />
+                <VRow>
+                  <VCol cols="12">
+                    <VSelect
+                      v-model="product.truck"
+                      :items="truckModel"
+                      :menu-props="{ top: true, offsetY: true }"
+                      item-title="truck"
+                      class="truncate-select"
+                      item-value="no"
+                      :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
+                      density="compact"
+                      dense
+                    />
+                  </VCol>
+                </VRow>
               </td>
 
               <!-- 👉 truckReserving -->
@@ -2265,6 +2417,7 @@ const handleFileUpdates = updatedFiles => {
                 <VBtn
                   :disabled="accountINSP"
                   :color="accountINSP ? 'grey' : 'warning'"
+                  @click="saveShipmentPlan(product)"
                 >
                   <span style="font-size: 12px;">Save Draft</span>
                 </VBtn>

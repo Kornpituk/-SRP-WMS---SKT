@@ -104,7 +104,7 @@ async function handleConfirmAction () {
 //--------------------------------------- dialog -------------------------------------
 
 const isDialogVisibleCommentDialog = ref(false)
-const statusCommnetValue = ref('Hello!')
+const statusCommnetValue = ref('')
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
