@@ -493,11 +493,11 @@ function formatDate(dateString) {
                   :readonly="isReadOnly"
                 >
                   <VRadio
-                    label="Ok"
+                    label="OK"
                     value="1"
                   />
                   <VRadio
-                    label="Not"
+                    label="NOT"
                     value="0"
                   />
                 </VRadioGroup>
@@ -596,11 +596,11 @@ function formatDate(dateString) {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>
@@ -633,11 +633,11 @@ function formatDate(dateString) {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>
@@ -670,11 +670,11 @@ function formatDate(dateString) {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>
@@ -749,11 +749,11 @@ function formatDate(dateString) {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>
@@ -787,11 +787,11 @@ function formatDate(dateString) {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>

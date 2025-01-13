@@ -376,11 +376,11 @@ watchEffect(async () => {
                   :readonly="isReadOnly"
                 >
                   <VRadio
-                    label="Ok"
+                    label="OK"
                     value="1"
                   />
                   <VRadio
-                    label="Not"
+                    label="NOT"
                     value="0"
                   />
                 </VRadioGroup>
@@ -463,11 +463,11 @@ watchEffect(async () => {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>
@@ -503,11 +503,11 @@ watchEffect(async () => {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>
@@ -540,11 +540,11 @@ watchEffect(async () => {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>
@@ -577,11 +577,11 @@ watchEffect(async () => {
                       :readonly="isReadOnly"
                     >
                       <VRadio
-                        label="Ok"
+                        label="OK"
                         value="1"
                       />
                       <VRadio
-                        label="Not"
+                        label="NOT"
                         value="0"
                       />
                     </VRadioGroup>

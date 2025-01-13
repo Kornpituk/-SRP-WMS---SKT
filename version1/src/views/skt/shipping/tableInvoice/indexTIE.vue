@@ -26,6 +26,7 @@ import { useGetUserPermissionService,
   useGetSelectDataService,
   useGetSearchPlanService,
   useSaveSearchPlanService,
+  useSubmitShipmentPlanService,
 } from '@/services/skt/shipmentPlan/services'
 
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
@@ -325,6 +326,31 @@ const saveShipmentPlan = async row => {
   }
 }
 
+//------------------------------------- Function Submit shipment plan --------------------------------------
+
+
+const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
+
+const submitShipmentPlanBySoEId = () => {
+  try{
+    const body = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+
+    const result = submitShipmentPlan(urlApi.value,
+      "submit",
+      whereHouse,
+      accessTokenAtStore,
+      body)
+    
+    if(submitShipmentPlanResult.value){
+      console.log('successfully submit shipment plan', submitShipmentPlan.value)
+    }else{
+      console.error('Error submit shipment plan', errorSubmitShipmentPlan)
+    }
+  } catch (e) {
+    console.error(`Error saving search plan:`, error)
+  }
+}
+
 
 const handlePageChange = newPage => {
   currentPage.value = newPage
@@ -350,7 +376,6 @@ const dataTableCliclHighlightIsToggle = no => {
 
   console.log("dataTableNum", dataTableNummberedToggle.value)
 }
-
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
@@ -397,7 +422,6 @@ const headersShipment = [
   { title: 'Updated Date', align: 'start', key: 'updatedDate' },
   { title: 'Action', align: 'center', key: 'Action' },
 ]
-
 
 //-------------------------- format decimal -------------------
 
@@ -458,68 +482,68 @@ const bgStatus = ref('bg-grey')
 const colorStatusWithId = id => {
   switch (id) {
   case 200:
-    return { color: 'orange', message: 'orange-darken-1', text: 'Draft PROD plan', bgColor: '#E0E0E0' }
+    return { color: 'orange', message: 'orange-darken-1', text: 'Cancel', bgColor: '#E0E0E0' }
   case 201:
-    return { color: 'green', message: 'green', text: 'Waitting for plan APVL', bgColor: '#EF9A9A' }
+    return { color: 'green', message: 'green', text: 'ETL Failed!', bgColor: '#EF9A9A' }
   case 202:
-    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Mat. Picking', bgColor: '#FCE4EC' }
+    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Shipping', bgColor: '#FCE4EC' }
   case 203:
-    return { color: 'purple', message: 'purple', text: 'In Producing', bgColor: '#F3E5F5' }
+    return { color: 'purple', message: 'purple', text: 'Draft Shipping', bgColor: '#F3E5F5' }
 
   case 302:
-    return { color: 'brown', message: 'brown', text: 'Waiting for FG/PROD APVL', bgColor: '#EFEBE9' }
+    return { color: 'brown', message: 'brown', text: 'Waiting for SAL Draft', bgColor: '#EFEBE9' }
   case 303:
-    return { color: 'green', message: 'green', text: 'PROD Completed', bgColor: '#E8F5E9' }
+    return { color: 'green', message: 'green', text: 'SAL Draft Shipping', bgColor: '#E8F5E9' }
   case 304:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'SAL Submitted', bgColor: '#FFEBEE' }
 
   case 402:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Waiting for WH Draft', bgColor: '#FFEBEE' }
   case 403:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'WH Draft Shipping', bgColor: '#FFEBEE' }
   case 404:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'WH Submitted', bgColor: '#FFEBEE' }
 
   case 502:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Waiting FOR LOG Draft', bgColor: '#FFEBEE' }
   case 503:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'LOG Draft Shipping', bgColor: '#FFEBEE' }
   case 504:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'LOG Submitted', bgColor: '#FFEBEE' }
 
   case 602:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Waiting FOR INSP Draft', bgColor: '#FFEBEE' }
   case 603:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'INSP Draft Shipping', bgColor: '#FFEBEE' }
   case 604:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'INSP Submitted', bgColor: '#FFEBEE' }
 
   case 1002:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Waiting for CS Draft', bgColor: '#FFEBEE' }
   case 1003:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'CS1 Draft Shipping', bgColor: '#FFEBEE' }
   case 1004:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'CS2 Draft Shipping', bgColor: '#FFEBEE' }
   case 1005:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'CS Submitted', bgColor: '#FFEBEE' }
 
   case 1102:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Waiting for Draft', bgColor: '#FFEBEE' }
   case 1103:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Draft Shipping LF', bgColor: '#FFEBEE' }
   case 1104:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Waiting for Lorry/Flex APVL', bgColor: '#FFEBEE' }
   case 1105:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Lorry/Flex Submitted', bgColor: '#FFEBEE' }
 
   case 204:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'In Submitting (____)', bgColor: '#FFEBEE' }
   case 205:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Waiting for WH APVL', bgColor: '#FFEBEE' }
   case 206:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Shipping Rejected', bgColor: '#FFEBEE' }
   case 207:
-    return { color: 'red', message: 'red', text: 'Plan Rejected', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'Shipping Completed', bgColor: '#FFEBEE' }
   default:
     return { color: 'grey', message: 'grey', text: 'All', bgColor: '#FFF3E0' }
   }
@@ -761,6 +785,48 @@ const handleFileUpdates = updatedFiles => {
   filesFromUploader.value = updatedFiles
   console.log('Updated Files:', filesFromUploader.value)
   console.log('Name Files:', typeNameFileInput.value)
+}
+
+//------------------------------------------ Check Sheet To Page Resale -----------------------
+function redirectBasedOnStatus(status) {
+  // ดึงเฉพาะตัวเลขหลักแรกของ status
+  const mainStatus = Math.floor(status / 100)
+
+  // กำหนดประเภทตามเลขหลักแรกของ status
+  const statusMapping = {
+    1: "Drum",
+    2: "Drum",
+    3: "Drum",
+    4: "Drum",
+    0: "Drum",
+    8: "Drum",
+    9: "Drum",
+    5: "IBC",
+    6: "Flexi",
+    7: "Lorry",
+    10: "Flexi",
+  }
+
+  // ตรวจสอบว่า status มีใน mapping หรือไม่
+  const subPath = statusMapping[mainStatus] || "unknown-status"
+
+  // ต่อ URL เดิมด้วย path ใหม่
+  const currentPath = window.location.pathname // ดึง path ปัจจุบัน
+  const newPath = `${currentPath}/${subPath}` // ต่อท้าย subPath
+
+  // เปลี่ยนเส้นทางไปยัง path ใหม่
+  console.log(`Redirecting to: ${newPath}`)
+  window.location.href = newPath
+}
+
+const isSpinning = ref(false)
+
+const refeshPage = () => {
+  isSpinning.value = true
+  setTimeout(() => {
+    isSpinning.value = false
+  }, 10 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+  location.reload()
 }
 </script>
 
@@ -1574,25 +1640,18 @@ const handleFileUpdates = updatedFiles => {
         <VRow>
           <VCol cols="10">
             <VBtn
-              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 102"
-              @click="openConfirmDialog"
-            >
-              <span style="font-size: 12px;">Approve</span>
-            </VBtn>
-            <VBtn
-              class="mx-2"
-              color="info"
-              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 107"
-              @click="openConfirmDialog"
-            >
-              <span style="font-size: 12px;">PROD Approved</span>
-            </VBtn>
-            <VBtn
               class="mx-2"
               color="warning"
               @click="saveShipmentPlan"
             >
-              <span style="font-size: 12px;">Save PLan</span>
+              <span style="font-size: 12px;">Save</span>
+            </VBtn>
+            <VBtn
+              class="mx-2"
+              color="primary"
+              @click="submitShipmentPlanBySoEId"
+            >
+              <span style="font-size: 12px;">Submit</span>
             </VBtn>
 
             <VBtn
@@ -1620,7 +1679,10 @@ const handleFileUpdates = updatedFiles => {
               />
             </VBtn>
           </VCol>
-          <VBtn @click="testValue">
+          <VBtn
+            v-if="false"
+            @click="testValue"
+          >
             Test
           </VBtn>
         </VRow>
@@ -1921,7 +1983,7 @@ const handleFileUpdates = updatedFiles => {
                 <span><VChip
                   :color="colorStatusWithId(product.statusId).color"
                   :style="{ color: colorStatusWithId(product.statusId).color }"
-                >{{ (product.statusComments) }}</VChip></span>
+                >{{ colorStatusWithId(product.statusId).text }}</VChip></span>
               </td>
               <!-- 👉 saleOrderNo -->
               <td
@@ -2453,10 +2515,8 @@ const handleFileUpdates = updatedFiles => {
               >
                 <VBtn
                   :disabled="accountINSP"
-                  :to="{ 
-                    name: 'skt-shipping-resale',  
-                  }"
                   :color="accountINSP ? 'grey' : 'pink-lighten-2'"
+                  @click="redirectBasedOnStatus(product.statusId)"
                 >
                   <span style="font-size: 12px;">Check Sheet</span>
                 </VBtn>
@@ -3062,10 +3122,8 @@ const handleFileUpdates = updatedFiles => {
               >
                 <VBtn
                   :disabled="accountINSP"
-                  :to="{ 
-                    name: 'skt-shipping-resale',  
-                  }"
                   :color="accountINSP ? 'grey' : 'pink-lighten-2'"
+                  @click="redirectBasedOnStatus(item.raw.statusId)"
                 >
                   <span style="font-size: 12px;">Check Sheet</span>
                 </VBtn>

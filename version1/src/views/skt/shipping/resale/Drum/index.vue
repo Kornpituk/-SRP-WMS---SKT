@@ -379,7 +379,7 @@ const dessertsMockAmountView = [
                     colspan="1"
                     class="section-title text-center"
                   >
-                    Container No/License plate No
+                    Container No. /License plate No.
                   </th>
                   <th
                     colspan="1"
@@ -512,7 +512,7 @@ const dessertsMockAmountView = [
                       <VCol cols="6">
                         <VCheckbox>
                           <template #label>
-                            <span class="font-size">No</span>
+                            <span class="font-size">NO</span>
                           </template>
                         </VCheckbox>
                       </VCol>
@@ -619,7 +619,7 @@ const dessertsMockAmountView = [
                   colspan="12"
                   class="section-title text-center"
                 >
-                  ** Condition check for special request **
+                  ** Condition Check for Special Request **
                 </th>
               </tr>
             </thead>
@@ -999,7 +999,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      No 
+                      NO 
                     </div>
                   </div>
                 </td>
@@ -1022,7 +1022,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      No 
+                      NO 
                     </div>
                   </div>
                 </td>
@@ -1045,7 +1045,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      No 
+                      NO 
                     </div>
                   </div>
                 </td>
@@ -1597,7 +1597,7 @@ const dessertsMockAmountView = [
               <thead>
                 <tr>
                   <th class="text-center">
-                    Container No/License plate No
+                    Container No. /License plate No.
                   </th>
                 </tr>
               </thead>

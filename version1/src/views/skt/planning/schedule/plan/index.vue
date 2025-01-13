@@ -899,32 +899,41 @@ const handleBtnGenerateLotBatch = async () => {
 const indexSelectBoxFilter = ref(null)
 const productionCodeOld = ref(null)
 
-const selectFilterProduction = (index, item) => {
-  indexSelectBoxFilter.value = index
-  if(item === 1){
+const selectFilterProduction = (planningID, item) => {
+  // ค้นหาออบเจกต์ที่ตรงกับ planningID
+  indexSelectBoxFilter.value = planningID
+
+  const selectedPlan = productionPlan.value.find(plan => plan.planningID === planningID)
+
+  if (!selectedPlan) {
+    console.error(`PlanningID ${planningID} not found.`)
+    
+    return
+  }
+
+  if (item === 1) {
     btnSelectitem1.value = true
     btnSelectitem2.value = false
-    console.log("Itesm", item)
-  }else if(item === 2){
+    console.log("Item", item, planningID)
+  } else if (item === 2) {
     btnSelectitem2.value = true
     btnSelectitem1.value = false
-    console.log("Itesm", item)
+    console.log("Item", item)
   }
   isDialogVisibleFilterSelect.value = true
 
-  selectedProductionCode.value = productionPlan.value[index].productionCode
-  productionCodeOld.value = productionPlan.value[index].productionCode
+  selectedProductionCode.value = selectedPlan.productionCode
+  productionCodeOld.value = selectedPlan.productionCode
 
-  selectedItemCode.value = productionPlan.value[index].product1SelectedCode
-  selectedPackagingType.value = productionPlan.value[index].product1SelectedPackagingCode
-  packag1QtyOle.value = productionPlan.value[index].product1PackingQtyKgs
+  selectedItemCode.value = selectedPlan.product1SelectedCode
+  selectedPackagingType.value = selectedPlan.product1SelectedPackagingCode
+  packag1QtyOle.value = selectedPlan.product1PackingQtyKgs
 
-  selectedItemCode2.value = productionPlan.value[index].product2SelectedCode
-  selectedPackagingType2.value = productionPlan.value[index].product2SelectedPackagingCode
-  packag2QtyOle.value = productionPlan.value[index].product2PackingQtyKgs
+  selectedItemCode2.value = selectedPlan.product2SelectedCode
+  selectedPackagingType2.value = selectedPlan.product2SelectedPackagingCode
+  packag2QtyOle.value = selectedPlan.product2PackingQtyKgs
 
   console.log("Selected item", selectedItemCode.value)
-
 }
 
 const comprePorductionCode = () => {
@@ -964,111 +973,89 @@ const compireHightlight = (itemCodeNew, itemOld, ComProductionCode) => {
 
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const addSelectProdutionCode = index => {
-  // ตรวจสอบและอัปเดตค่าที่เลือกในตำแหน่งของแถวที่กด
+const addSelectProductionCode = planningID => {
+  const selectedPlan = productionPlan.value.find(plan => plan.planningID === planningID)
+
+  console.log('addSelectProductionCode start.....')
+
+  if (!selectedPlan) {
+    console.error(`PlanningID ${planningID} not found.`)
+    
+    return
+  }
 
   const trickerItem1N2 = ref(false)
 
-  if(productionPlan.value[index].productionCode !== selectedProductionCode.value){
+  if (selectedPlan.productionCode !== selectedProductionCode.value) {
     trickerItem1N2.value = true
-    console.log("Tricker true", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
-  }else{
+    console.log("Tricker true", trickerItem1N2.value, selectedPlan.productionCode, selectedProductionCode.value)
+  } else {
     trickerItem1N2.value = false
-    console.log("Tricker false", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
+    console.log("Tricker false", trickerItem1N2.value, selectedPlan.productionCode, selectedProductionCode.value)
   }
 
-  console.log("Item 1 before", productionPlan.value[index].product1SelectedCode, '||', selectedItemCode.value)
+  if (trickerItem1N2.value) {
+    // Reset product2 and product1 fields
+    selectedPlan.product2SelectedCode = null
+    selectedPlan.product2Name = null
+    selectedPlan.product2SelectedPackagingCode = null
+    selectedPlan.product2PackagingName = null
+    selectedPlan.product2PackingQtyKgs = null
+    selectedPlan.product2UomCount = null
 
-  if(trickerItem1N2.value){
-    console.log("Tricker true if", trickerItem1N2.value, productionPlan.value[index].productionCode, selectedProductionCode.value)
-    productionPlan.value[index].product2SelectedCode = null
-    productionPlan.value[index].product2Name = null
-    productionPlan.value[index].product2SelectedPackagingCode = null
-    productionPlan.value[index].product2PackagingName = null
-    productionPlan.value[index].product2PackingQtyKgs = null
-    productionPlan.value[index].product2UomCount = null
+    selectedPlan.product1SelectedCode = null
+    selectedPlan.product1Name = null
+    selectedPlan.product1SelectedPackagingCode = null
+    selectedPlan.product1PackagingName = null
+    selectedPlan.product1PackingQtyKgs = null
+    selectedPlan.product1UomCount = null
+  }
 
-    productionPlan.value[index].product1SelectedCode = null
-    productionPlan.value[index].product1Name = null
-    productionPlan.value[index].product1SelectedPackagingCode = null
-    productionPlan.value[index].product1PackagingName = null
-    productionPlan.value[index].product1PackingQtyKgs = null
-    productionPlan.value[index].product1UomCount = null
-
-    
-    console.log("Item 1 null", productionPlan.value[index].product1SelectedCode, '||', selectedItemCode.value)
-  }
-  
-
-  if (selectedItemCode.value) {
-    productionPlan.value[index].product1SelectedCode = selectedItemCode.value
-  }
-  if (selectedItemName.value) {
-    productionPlan.value[index].product1Name = selectedItemName.value
-  }
-  if (selectedPackagingType.value) {
-    productionPlan.value[index].product1SelectedPackagingCode = selectedPackagingType.value
-  }
-  if (selectedPackagingName.value) {
-    productionPlan.value[index].product1PackagingName = selectedPackagingName.value
-  }
+  // Update product1 fields
+  if (selectedItemCode.value) selectedPlan.product1SelectedCode = selectedItemCode.value
+  if (selectedItemName.value) selectedPlan.product1Name = selectedItemName.value
+  if (selectedPackagingType.value) selectedPlan.product1SelectedPackagingCode = selectedPackagingType.value
+  if (selectedPackagingName.value) selectedPlan.product1PackagingName = selectedPackagingName.value
   if (selectedPackagingKgs.value) {
-    productionPlan.value[index].product1PackingQtyKgs = selectedPackagingKgs.value
+    selectedPlan.product1PackingQtyKgs = selectedPackagingKgs.value
     if (selectedProductionbatchScaleKgs.value) {
-      productionPlan.value[index].product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs.value)
+      selectedPlan.product1UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs.value)
     }
   }
 
-  if (selectedItemCode2.value) {
-    productionPlan.value[index].product2SelectedCode = selectedItemCode2.value
-  }
-  if (selectedItemName2.value) {
-    productionPlan.value[index].product2Name = selectedItemName2.value
-  }
-  if (selectedPackagingType2.value) {
-    productionPlan.value[index].product2SelectedPackagingCode = selectedPackagingType2.value
-  }
-  if (selectedPackagingName2.value) {
-    productionPlan.value[index].product2PackagingName = selectedPackagingName2.value
-  }
+  // Update product2 fields
+  if (selectedItemCode2.value) selectedPlan.product2SelectedCode = selectedItemCode2.value
+  if (selectedItemName2.value) selectedPlan.product2Name = selectedItemName2.value
+  if (selectedPackagingType2.value) selectedPlan.product2SelectedPackagingCode = selectedPackagingType2.value
+  if (selectedPackagingName2.value) selectedPlan.product2PackagingName = selectedPackagingName2.value
   if (selectedPackagingKgs2.value) {
-    productionPlan.value[index].product2PackingQtyKgs = selectedPackagingKgs2.value
+    selectedPlan.product2PackingQtyKgs = selectedPackagingKgs2.value
     if (selectedProductionbatchScaleKgs.value) {
-      productionPlan.value[index].product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
+      selectedPlan.product2UomCount = Math.floor(selectedProductionbatchScaleKgs.value / selectedPackagingKgs2.value)
     }
   }
 
-  console.log("Item 1 replace", productionPlan.value[index].product1SelectedCode, '||', selectedItemCode.value)
+  // Update production details
+  if (selectedProductionCode.value) selectedPlan.productionCode = selectedProductionCode.value
+  if (selectedProductionName.value) selectedPlan.productionName = selectedProductionName.value
+  if (selectedProductionReactorName.value) selectedPlan.reactorName = selectedProductionReactorName.value
+  if (selectedProductionbatchScaleKgs.value) selectedPlan.quantityKgs = selectedProductionbatchScaleKgs.value
+  if (selectedProductionPlanName.value) selectedPlan.plantName = selectedProductionPlanName.value
 
-  if (selectedProductionCode.value) {
-    productionPlan.value[index].productionCode = selectedProductionCode.value
-  }
-  if (selectedProductionName.value) {
-    productionPlan.value[index].productionName = selectedProductionName.value
-  }
-  if (selectedProductionReactorName.value) {
-    productionPlan.value[index].reactorName = selectedProductionReactorName.value
-  }
-  if (selectedProductionbatchScaleKgs.value) {
-    productionPlan.value[index].quantityKgs = selectedProductionbatchScaleKgs.value
-  }
-  if (selectedProductionPlanName.value) {
-    productionPlan.value[index].plantName = selectedProductionPlanName.value
-  }
-
-  console.log("Updated row:", productionPlan.value[index])
+  console.log("Updated row:", selectedPlan)
 }
 
 const confirmFilterSelectProduction = () => {
   dataPlanningForSave.value.productionCode = selectedProductionCode.value
 
-  const index = indexSelectBoxFilter.value
-  if (index !== null) {
-    addSelectProdutionCode(index)
+  console.log('confirmFilterSelectProduction start....')
+
+  const planningID = indexSelectBoxFilter.value // Update to store planningID instead of index
+  if (planningID !== null) {
+    addSelectProductionCode(planningID)
   }
 
-  isDialogVisibleFilterSelect.value = false // ปิด dialog
-
+  isDialogVisibleFilterSelect.value = false // Close dialog
 }
 
 //------------------------------ func save production plan service --------------------------------
@@ -1256,15 +1243,20 @@ const validateLotBeforeSubmit = async () => {
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     const result = await validateLotBatchProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
+    if(responseValidateLotBatchProductionPlan.value){
+      textAlertDialogFunction(responseValidateLotBatchProductionPlan.value, true)
+      setTimeout(() => {
+        // isDialogVisibleAlertDialog.value = false
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      textAlertDialogFunction(errorMessageValidateLotBatchProductionPlan.value, false)
+    }
 
-    textAlertDialogFunction(responseValidateLotBatchProductionPlan.value, true)
-    setTimeout(() => {
-      location.reload()
-    }, 500) // 10000 มิลลิวินาที = 10 วินาที
   } catch (error) {
     // จัดการข้อผิดพลาด
     console.error("Error deleted production plan:", error)
-    console.error("Error deleted production plan:", errorMessageValidateLotBatchProductionPlan)
+    console.error("Error deleted production plan:", errorMessageValidateLotBatchProductionPlan.value)
   }
 
   console.log("body selectedDataTables", body)
@@ -2899,7 +2891,7 @@ const print = () => {
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
-                  @click="selectFilterProduction(index,1)"
+                  @click="selectFilterProduction(item.raw.planningID,1)"
                 >
                   <span v-if="item.raw.productionCode">{{ item.raw.productionCode }}</span><span v-else>Select Production</span>
                   <template #append>
@@ -2989,7 +2981,7 @@ const print = () => {
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
-                  @click="selectFilterProduction(index,1)"
+                  @click="selectFilterProduction(item.raw.planningID,1)"
                 >
                   <span v-if="item.raw.product1SelectedCode">{{ item.raw.product1SelectedCode }}</span><span v-else>Select Item</span>
                   <template #append>
@@ -3043,7 +3035,7 @@ const print = () => {
                 <VBtn
                   v-if="item.raw.statusId === 101"
                   variant="outlined"
-                  @click="selectFilterProduction(index,1)"
+                  @click="selectFilterProduction(item.raw.planningID,1)"
                 >
                   <span v-if="item.raw.product1SelectedPackagingCode">{{ item.raw.product1SelectedPackagingCode }}</span><span v-else>Select Packaging</span>
                   <template #append>
@@ -3158,7 +3150,7 @@ const print = () => {
                   v-if="item.raw.statusId === 101"
                   :disabled="checkDisabledBtnSelectItem2(selectedItemCode,item.raw.product1SelectedCode)"
                   variant="outlined"
-                  @click="selectFilterProduction(index,2)"
+                  @click="selectFilterProduction(item.raw.planningID,2)"
                 >
                   <span v-if="item.raw.product2SelectedCode">{{ item.raw.product2SelectedCode }}</span><span v-else>Select Item</span>
                   <template #append>
@@ -3210,7 +3202,7 @@ const print = () => {
                   v-if="item.raw.statusId === 101"
                   :disabled="checkDisabledBtnSelectItem2(selectedItemCode,item.raw.product1SelectedCode)"
                   variant="outlined"
-                  @click="selectFilterProduction(index,2)"
+                  @click="selectFilterProduction(item.raw.planningID,2)"
                 >
                   <span v-if="item.raw.product2SelectedPackagingCode">{{ item.raw.product2SelectedPackagingCode }}</span><span v-else>Select Packaging</span>
                   <template #append>

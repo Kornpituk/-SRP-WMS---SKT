@@ -71,7 +71,7 @@ const specialRequests = ref([
 
 const GBSMockData = ref({
   "No1": { title: "No.", c1: '1', c2: '2', c3: '3', c4: '4', c5: '5', c6: '6', c7: '7', c8: '8', c9: '9', c10: '10' },
-  "ubc1": { title: "IBC No", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
+  "ubc1": { title: "IBC No.", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
   "GBS1": { title: "GROSS WEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: "", c5: "", c6: "", c7: "", c8: "", c9: "", c10: ""  },
   "rows1": { 
     "item1": [
@@ -100,7 +100,7 @@ const GBSMockData = ref({
   },
 
   "No2": { title: "No.", c1: '11', c2: '12', c3: '13', c4: '14', c5: '15', c6: '16', c7: '17', c8: '18', c9: '19', c10: '20' },
-  "ubc2": { title: "IBC No", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
+  "ubc2": { title: "IBC No.", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
   "GBS2": { title: "GROSS WEIGHT Before Shipping", c1: "", c2: "", c3: "", c4: '', c5: '', c6: '', c7: '', c8: '', c9: '', c10: '' },
   "rows2": { 
     "item1": [
@@ -498,7 +498,7 @@ const dessertsMockAmountView = [
                     colspan="1"
                     class="section-title text-center"
                   >
-                    Container No/License plate No
+                    Container No. /License plate No.
                   </th>
                   <th
                     colspan="1"
@@ -622,7 +622,7 @@ const dessertsMockAmountView = [
                       <VCol cols="6">
                         <VCheckbox>
                           <template #label>
-                            <span class="font-size">No</span>
+                            <span class="font-size">NO</span>
                           </template>
                         </VCheckbox>
                       </VCol>
@@ -729,7 +729,7 @@ const dessertsMockAmountView = [
                   colspan="12"
                   class="section-title text-center"
                 >
-                  ** Condition check for special request **
+                  ** Condition Check for Special Request **
                 </th>
               </tr>
             </thead>
@@ -1101,7 +1101,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      Yes 
+                      YES 
                     </div>
                   </div>
                 </td>
@@ -1109,7 +1109,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      No 
+                      NO 
                     </div>
                   </div>
                 </td>
@@ -1124,7 +1124,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      Yes 
+                      YES 
                     </div>
                   </div>
                 </td>
@@ -1132,7 +1132,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      No 
+                      NO 
                     </div>
                   </div>
                 </td>
@@ -1147,7 +1147,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      Yes 
+                      YES 
                     </div>
                   </div>
                 </td>
@@ -1155,7 +1155,7 @@ const dessertsMockAmountView = [
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
                       <VCheckbox />
-                      No 
+                      NO 
                     </div>
                   </div>
                 </td>
@@ -1976,7 +1976,7 @@ const dessertsMockAmountView = [
               <thead>
                 <tr>
                   <th class="text-center">
-                    Container No/License plate No
+                    Container No. /License plate No.
                   </th>
                 </tr>
               </thead>

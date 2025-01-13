@@ -1170,6 +1170,7 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   idStatusDialogAction.value = status
   receivingTypeAction.value = receivingType
   lotAction.value = lot
+  console.log('')
   sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(status))
 
   selectedPrintLabel.value = []
@@ -1309,6 +1310,9 @@ const getPrintLabelView = async lot => {
       'accept': '*/*',
       'x-location': `${searchByWareHouseId.value}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+    params: {
+      SortDirection: 'asc',
     },
   }, {})
     .then(response => {

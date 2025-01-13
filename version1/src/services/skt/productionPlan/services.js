@@ -139,8 +139,8 @@ export const useValidateBatchProductionPlanService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.error('Error in validateLotBatchProdutcionPlanFunc:', error)
-      errorMessageValidateLotBatchProductionPlan.value = error.message
+      console.error('Error in validateLotBatchProdutcionPlanFunc:', error.error.data.message)
+      errorMessageValidateLotBatchProductionPlan.value = error.error.data.message
     }
   }
   

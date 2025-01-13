@@ -35,7 +35,7 @@ const imagePicture = ref([img01, img02, img03, img04])
             colspan="12"
             class="text-center"
           >
-            Filling direction & Report to FLEXI
+            Filling Direction & Report to FLEXI
           </th>
         </tr>
         <tr>
@@ -69,19 +69,19 @@ const imagePicture = ref([img01, img02, img03, img04])
             colspan="2"
             class="text-center "
           >
-            Issued by
+            Issued By
           </th>
           <th
             colspan="2"
             class="text-center "
           >
-            Checked by
+            Checked By
           </th>
           <th
             colspan="4"
             class="text-center "
           >
-            Approved by
+            Approved By
           </th>
         </tr>
         <tr>
@@ -129,7 +129,7 @@ const imagePicture = ref([img01, img02, img03, img04])
             rowspan="3"
             class="text-center "
           >
-            Strainer type
+            Strainer Type
           </th>
           <th
             colspan="2"
@@ -205,14 +205,14 @@ const imagePicture = ref([img01, img02, img03, img04])
             colspan="2"
             class="text-center "
           >
-            <span class="font-weight-body">Bag filter</span>
+            <span class="font-weight-body">Bag Filter</span>
           </th>
           <th
             colspan="5"
             class="text-start"
           >
             <div class="d-flex justify-center">
-              <span class="font-weight-body">Cotton( pieces)</span>
+              <span class="font-weight-body">Cotton( Pieces)</span>
             </div>
           </th>
           <th
@@ -221,7 +221,7 @@ const imagePicture = ref([img01, img02, img03, img04])
           >
             <span class="end">
               <div class="d-flex justify-center">
-                <span class="font-weight-body">flannel( pieces)</span>
+                <span class="font-weight-body">Flannel( pieces)</span>
               </div>
             </span>
           </th>
@@ -261,7 +261,7 @@ const imagePicture = ref([img01, img02, img03, img04])
           </th>
           <th colspan="4">
             <div class="d-flex justify-space-between align-center">
-              Checked by <VTextField
+              Checked By <VTextField
                 class="mx-2"
                 density="compact"
               />
@@ -273,7 +273,7 @@ const imagePicture = ref([img01, img02, img03, img04])
             colspan="1"
             class="text-start "
           >
-            Filling equipment
+            Filling Equipment
           </th>
           <th
             colspan="11"
@@ -294,7 +294,7 @@ const imagePicture = ref([img01, img02, img03, img04])
             colspan="1"
             class="text-start "
           >
-            (Filling order)
+            (Filling Order)
           </th>
         </tr>
         <tr>
@@ -362,7 +362,7 @@ const imagePicture = ref([img01, img02, img03, img04])
             colspan="1"
             class="text-start "
           >
-            Point of delivery
+            Point of Delivery
           </th>
           <th
             colspan="11"
@@ -438,7 +438,7 @@ const imagePicture = ref([img01, img02, img03, img04])
             colspan="3"
             class="text-center "
           >
-            Person incharge
+            Person Incharge
           </th>
         </tr>
 
@@ -447,7 +447,7 @@ const imagePicture = ref([img01, img02, img03, img04])
             class="text-center "
             colspan="1"
           >
-            Analysis result
+            Analysis Result
           </th>
           <th
             class="text-center "
@@ -762,7 +762,7 @@ const imagePicture = ref([img01, img02, img03, img04])
               class="text-center"
               colspan="12"
             >
-              <span>Filling direction & Report to FLEXI</span>
+              <span>Filling Direction & Report to FLEXI</span>
             </th>
           </tr>
         </thead>

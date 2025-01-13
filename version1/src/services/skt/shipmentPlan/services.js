@@ -130,3 +130,35 @@ export const useSaveSearchPlanService = () => {
     saveSearchPlan,
   }
 }
+
+export const useSubmitShipmentPlanService = () => {
+  const submitShipmentPlanResult = ref(null)
+  const errorSubmitShipmentPlan = ref(null)
+  
+  const submitShipmentPlan = async (urlApi, form, whereHouse, accessToke, soeId) => {
+    try {
+      errorSubmitShipmentPlan.value = null
+      console.log('submitShipmentPlan...')
+  
+      const result = await shipmentPlanRepository.submitShipmentPlan(urlApi, form, whereHouse, accessToke, soeId)
+        
+      if (result) {
+        // console.log('submitShipmentPlan:', result)
+        submitShipmentPlanResult.value = result.data
+        
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in submitShipmentPlan:', error)
+      errorSubmitShipmentPlan.value = error.message
+    }
+  }
+  
+  return {
+    submitShipmentPlanResult,
+    errorSubmitShipmentPlan,
+    submitShipmentPlan,
+  }
+}

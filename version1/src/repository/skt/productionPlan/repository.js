@@ -241,7 +241,7 @@ export const productionPlanRepository = {
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      throw { success: false, error }
+      throw { success: false, error: error.response }
     }
   },
 
