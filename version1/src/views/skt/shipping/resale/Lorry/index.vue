@@ -429,7 +429,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
                 <AppDateTimePicker
                   v-model="date"
                   placeholder="Select date and time"
-                  :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+                  :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
                 />
               </VCol>
@@ -450,7 +450,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
                 <AppDateTimePicker
                   v-model="date"
                   placeholder="Select date and time"
-                  :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+                  :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
                 />
               </VCol>
@@ -771,7 +771,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
                       v-if="index === 3"
                       class="d-flex justify-center"
                     >
-                      Cleaning House and Air Blow
+                      Cleaning Hose and Air Blow
                     </div>
                     <div
                       v-if="index === 4"
@@ -812,6 +812,12 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
     </VCol>
 
     <VCol cols="12">
+      <div
+        class="mb-2"
+        style="font-size: 12px;"
+      >
+        Remark
+      </div>
       <table class="custom-table">
         <tr>
           <th colspan="12">

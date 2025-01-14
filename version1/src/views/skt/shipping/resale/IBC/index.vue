@@ -5,6 +5,44 @@ import iconMock1 from '@images/icons/Group 1000004801.png'
 import iconMock2 from '@images/icons/Group 1000004802.png'
 import iconMock3 from '@images/icons/Icon.png'
 
+const resaleProductShipping = ref([
+  { truckNo: 'SEGU2382128', sKTLotNo: 'PC2311000B', supplierLotNo: '4500178132/0320',  productCode: 'CHEMICAL PR-029',  tradeName: 'CHEMICAL PR-029',  packaging: 'DM',  netContent: '200',   amount: '8',   quantity: '1,800.00',  customerName: 'INNOVATIVE CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท', files: [] },
+  { truckNo: 'SEGU6545181', sKTLotNo: 'PC2311001C', supplierLotNo: '4500178133/0321',  productCode: 'CHEMICAL PR-030',  tradeName: 'CHEMICAL PR-030',  packaging: 'DM',  netContent: '300',   amount: '10',   quantity: '2,000.00',  customerName: 'ADVANCED CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: false, remark: '10 Bags X 1 พาเลท', files: [] },
+  { truckNo: 'SEGU2382128', sKTLotNo: 'PC2311000B', supplierLotNo: '4500178132/0320',  productCode: 'CHEMICAL PR-029',  tradeName: 'CHEMICAL PR-029',  packaging: 'DM',  netContent: '200',   amount: '8',   quantity: '1,800.00',  customerName: 'INNOVATIVE CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท', files: [] },
+  { truckNo: 'SEGU6545181', sKTLotNo: 'PC2311001C', supplierLotNo: '4500178133/0321',  productCode: 'CHEMICAL PR-030',  tradeName: 'CHEMICAL PR-030',  packaging: 'DM',  netContent: '300',   amount: '10',   quantity: '2,000.00',  customerName: 'ADVANCED CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: false, remark: '10 Bags X 1 พาเลท', files: [] },
+  { truckNo: 'SEGU2382128', sKTLotNo: 'PC2311000B', supplierLotNo: '4500178132/0320',  productCode: 'CHEMICAL PR-029',  tradeName: 'CHEMICAL PR-029',  packaging: 'DM',  netContent: '200',   amount: '8',   quantity: '1,800.00',  customerName: 'INNOVATIVE CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท', files: [] },
+  { truckNo: 'SEGU6545181', sKTLotNo: 'PC2311001C', supplierLotNo: '4500178133/0321',  productCode: 'CHEMICAL PR-030',  tradeName: 'CHEMICAL PR-030',  packaging: 'DM',  netContent: '300',   amount: '10',   quantity: '2,000.00',  customerName: 'ADVANCED CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: false, remark: '10 Bags X 1 พาเลท', files: [] },
+  { truckNo: 'SEGU2382128', sKTLotNo: 'PC2311000B', supplierLotNo: '4500178132/0320',  productCode: 'CHEMICAL PR-029',  tradeName: 'CHEMICAL PR-029',  packaging: 'DM',  netContent: '200',   amount: '8',   quantity: '1,800.00',  customerName: 'INNOVATIVE CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท', files: [] },
+  { truckNo: 'SEGU6545181', sKTLotNo: 'PC2311001C', supplierLotNo: '4500178133/0321',  productCode: 'CHEMICAL PR-030',  tradeName: 'CHEMICAL PR-030',  packaging: 'DM',  netContent: '300',   amount: '10',   quantity: '2,000.00',  customerName: 'ADVANCED CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: false, remark: '10 Bags X 1 พาเลท', files: [] },
+
+])
+
+//--------------------------- File INput --------------------------------
+
+import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
+
+// --- Dialog Text Area --------------------------------
+
+import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue' //--------- import component
+
+const dialogVisible = ref(false)
+const typeDialogTextArea = ref('')
+const indexDataDialogTextArea = ref('')
+const titleDialogView = ref('')
+const typeDialogView = ref('')
+const sapInValueView = ref('')
+const typeBtnView = ref('')
+const dialogDataTextArea = ref('')
+
+// ฟังก์ชันสำหรับเปิด dialog
+const textAreaDialogActive = (type, data, index) => {
+  typeDialogTextArea.value = type
+  indexDataDialogTextArea.value = index
+  titleDialogView.value = 'Remark'
+  dialogDataTextArea.value = data // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  dialogVisible.value = true
+}
+
 //-------------------------- for mat -------------- 
 const formatNumber = value => {
   if (value !== null && value !== undefined) {
@@ -248,17 +286,6 @@ const validateAfterPicking = ref([
   { item: 'ฉลากมีทั้ง2ภาษาและติดคู่กันถูกต้อง' },
 ])
 
-const resaleProductShipping = ref([
-  { truckNo: 'SEGU2382128', sKTLotNo: 'PC2311000B', supplierLotNo: '4500178132/0320',  productCode: 'CHEMICAL PR-029',  tradeName: 'CHEMICAL PR-029',  packaging: 'DM',  netContent: '200',   amount: '8',   quantity: '1,800.00',  customerName: 'INNOVATIVE CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท', files: [] },
-  { truckNo: 'SEGU6545181', sKTLotNo: 'PC2311001C', supplierLotNo: '4500178133/0321',  productCode: 'CHEMICAL PR-030',  tradeName: 'CHEMICAL PR-030',  packaging: 'DM',  netContent: '300',   amount: '10',   quantity: '2,000.00',  customerName: 'ADVANCED CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: false, remark: '10 Bags X 1 พาเลท', files: [] },
-  { truckNo: 'SEGU2382128', sKTLotNo: 'PC2311000B', supplierLotNo: '4500178132/0320',  productCode: 'CHEMICAL PR-029',  tradeName: 'CHEMICAL PR-029',  packaging: 'DM',  netContent: '200',   amount: '8',   quantity: '1,800.00',  customerName: 'INNOVATIVE CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท', files: [] },
-  { truckNo: 'SEGU6545181', sKTLotNo: 'PC2311001C', supplierLotNo: '4500178133/0321',  productCode: 'CHEMICAL PR-030',  tradeName: 'CHEMICAL PR-030',  packaging: 'DM',  netContent: '300',   amount: '10',   quantity: '2,000.00',  customerName: 'ADVANCED CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: false, remark: '10 Bags X 1 พาเลท', files: [] },
-  { truckNo: 'SEGU2382128', sKTLotNo: 'PC2311000B', supplierLotNo: '4500178132/0320',  productCode: 'CHEMICAL PR-029',  tradeName: 'CHEMICAL PR-029',  packaging: 'DM',  netContent: '200',   amount: '8',   quantity: '1,800.00',  customerName: 'INNOVATIVE CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท', files: [] },
-  { truckNo: 'SEGU6545181', sKTLotNo: 'PC2311001C', supplierLotNo: '4500178133/0321',  productCode: 'CHEMICAL PR-030',  tradeName: 'CHEMICAL PR-030',  packaging: 'DM',  netContent: '300',   amount: '10',   quantity: '2,000.00',  customerName: 'ADVANCED CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: false, remark: '10 Bags X 1 พาเลท', files: [] },
-  { truckNo: 'SEGU2382128', sKTLotNo: 'PC2311000B', supplierLotNo: '4500178132/0320',  productCode: 'CHEMICAL PR-029',  tradeName: 'CHEMICAL PR-029',  packaging: 'DM',  netContent: '200',   amount: '8',   quantity: '1,800.00',  customerName: 'INNOVATIVE CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท', files: [] },
-  { truckNo: 'SEGU6545181', sKTLotNo: 'PC2311001C', supplierLotNo: '4500178133/0321',  productCode: 'CHEMICAL PR-030',  tradeName: 'CHEMICAL PR-030',  packaging: 'DM',  netContent: '300',   amount: '10',   quantity: '2,000.00',  customerName: 'ADVANCED CHEMICALS', deliveryPlace: 'SKT', appearanceCheck: false, remark: '10 Bags X 1 พาเลท', files: [] },
-
-])
 
 const expoertAndDomain = ref([
   { deliveryPlace: 'SKT', appearanceCheck: true, remark: '12 Bags X 1 พาเลท' },
@@ -585,11 +612,18 @@ const dessertsMockAmountView = [
                   <td>{{ item.supplierLotNo }}</td>
                   <td>{{ item.productCode }}</td>
                   <td>{{ item.tradeName }}</td>
-                  <td class="text-center">{{ item.packaging }}</td>
-                  <td class="text-end">{{ formatNumber(item.netContent) }}</td>
+                  <td class="text-center">
+                    {{ item.packaging }}
+                  </td>
+                  <td class="text-end">
+                    {{ formatNumber(item.netContent) }}
+                  </td>
                   <td>
                     <VRow>
-                      <VCol class="text-end" cols="12">
+                      <VCol
+                        class="text-end"
+                        cols="12"
+                      >
                         {{ item.amount }}
                       </VCol>
                       <VCol
@@ -605,11 +639,13 @@ const dessertsMockAmountView = [
                       </VCol>
                     </VRow>
                   </td>
-                  <td class="text-end">{{ item.quantity }}</td>
+                  <td class="text-end">
+                    {{ item.quantity }}
+                  </td>
                   <td style="font-size: 14px;">
                     {{ item.customerName }}
                   </td>
-                  <td>{{ item.deliveryPlace }}</td>
+                  <td class="text-center">{{ item.deliveryPlace }}</td>
                   <td>
                     <VRow>
                       <VCol cols="6">
@@ -628,7 +664,20 @@ const dessertsMockAmountView = [
                       </VCol>
                     </VRow>
                   </td>
-                  <td>{{ item.remark }}</td>
+                  <td>
+                    <VBtn
+                      style="min-width: 150px;"
+                      variant="outlined"
+                      :color="item.remark ? 'primary' : 'grey'"
+                      @click="textAreaDialogActive('RemarkLOG', item.remark, item.truckNo)"
+                    >
+                      <span
+                        v-if="item.remark"
+                        style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                      >{{ item.remark }}</span>
+                      <span v-else>{{ item.remark }}</span>
+                    </VBtn>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -2282,6 +2331,23 @@ const dessertsMockAmountView = [
       </div>
     </div>
   </VContainer>
+
+  <!-- Dialog Text area -->
+  <section>
+    <div>
+      <TextAreaDialog
+        v-model="dialogVisible"
+        :sap-in-value="sapInValueView"
+        :lot-value="lotValueView"
+        :model-value-text="dialogDataTextArea"
+        :model-value-text2="dialogData2TextArea"
+        :type-dialog="typeDialogView"
+        :type-btn="typeBtnView"
+        :title-dialog="titleDialogView"
+        @submit="handleDialogSubmit"
+      />
+    </div>
+  </section>
 </template>
 
 <style scoped src="../IBC/ibc.scss"></style>

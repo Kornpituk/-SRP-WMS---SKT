@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 
 const props = defineProps({
   fileName: { type: String, required: true },
@@ -22,6 +22,12 @@ const emitUpdateFiles = () => {
     files: files.value, // หรือข้อมูลไฟล์ที่ต้องการส่งออก
   })
 }
+
+watchEffect(() => {
+  if(!filesModel.value || filesModel.value.length < 1){
+    files.value = []
+  }
+})
 
 // ฟังก์ชันจัดการการอัปโหลดไฟล์
 const handleFileUpload = event => {
@@ -74,7 +80,6 @@ const removeFile = index => {
         <VFileInput
           v-model="filesModel"
           multiple
-          clearable
           :disabled="disabledProp"
           accept="image/*,.pdf"
           style="max-width: 200px;"

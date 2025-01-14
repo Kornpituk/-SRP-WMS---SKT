@@ -1720,12 +1720,7 @@ const print = () => {
               cols="2"
               class="d-flex justify-end"
             >
-              <VBtn
-                variant="flat"
-                @click="panel = panel.length ? [] : ['filter']"
-              >
-                <VIcon icon="ri-equalizer-line" />
-              </VBtn>
+              
             </VCol>
           </VRow>
         </div>
@@ -2047,12 +2042,12 @@ const print = () => {
                   Item 2
                 </VBtn>
               </VCol>
-              <VCol cols="2">
+              <VCol cols="2" class="d-flex justify-end">
                 <VBtn
                   color="info"
                   @click="confirmFilterSelectProduction"
                 >
-                  Confirm select
+                  Confirm
                 </VBtn>
               </VCol>
             </VRow>

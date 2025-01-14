@@ -16,6 +16,8 @@ import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/item
 
 const itemStore = useItemStore()
 
+//------------------------------- 
+
 //------------------------------ Get User Data --------------------------------
 
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
@@ -424,6 +426,10 @@ const headersShipment = [
 ]
 
 //-------------------------- format decimal -------------------
+
+import { useGetCOAFormController } from '@/utilities/format'
+
+const { formatNumber } = useGetCOAFormController()
 
 const formatDecimal = decimal => {
   const configsShowDigit = localStorage.getItem('configsShowDigit')
@@ -973,7 +979,7 @@ const refeshPage = () => {
                     density="compact"
                   >
                     <template #label>
-                      <span style="font-size: 12px;">Product Name</span>
+                      <span style="font-size: 12px;">Item Name</span>
                     </template>
                   </VTextField>
                 </VCol>
@@ -2081,7 +2087,7 @@ const refeshPage = () => {
                       v-if="product.shipperConditions"
                       style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
                     >{{ product.shipperConditions }}</span>
-                    <span v-else>Shipping Mark/Coundition.</span>
+                    <span style="font-size: 12px;" v-else>Shipping Mark/ConD</span>
                   </VBtn>
                 </div>
               </td>
@@ -2150,7 +2156,7 @@ const refeshPage = () => {
                 class="text-end px-1"
                 style="min-width: 100px; font-size: 12px;"
               >
-                {{ (product.quantity) }}
+                {{ formatNumber(product.quantity) }}
               </td>
 
               <!-- 👉 coa -->
@@ -2269,13 +2275,12 @@ const refeshPage = () => {
                 style="min-width: 250px; font-size: 12px;"
               >
                 <VTextField
-                  v-if="false"
+                  v-if="true"
                   v-model="product.truckReserving"
                   density="compact"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
                   style=" min-width: 150px;"
                 />
-                {{ product.truckReserving }}
               </td>
 
               <!-- 👉 truckFee -->
@@ -2358,7 +2363,7 @@ const refeshPage = () => {
                 style="min-width: 150px; font-size: 12px;"
               >
                 <AppDateTimePicker
-                  v-if="!canVisibleUserPermission(statusPermission,'COL_ETD').canExecute"
+                  v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canExecute"
                   v-model="product.etd"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -2374,7 +2379,8 @@ const refeshPage = () => {
                 style="min-width: 150px; font-size: 12px;"
               >
                 <AppDateTimePicker
-                  v-if="!canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
+                v-model="product.eta"
+                  v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
                   disabeld
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -2392,7 +2398,7 @@ const refeshPage = () => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="Delivery Note"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
+                    :disabled-prop="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
                     :type-file-input="typeFileInput"
                     file-name="Delivery Note" 
                     @updateFiles="handleFileUpdates"

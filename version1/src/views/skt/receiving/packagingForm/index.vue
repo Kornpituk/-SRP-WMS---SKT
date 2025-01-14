@@ -1798,6 +1798,7 @@ const saveDraftData = word => {
           <VCol cols="10">
             <VTextField
               v-model="dataHeader.pcsPerSticker"
+              :readonly="frozeCheck"
               suffix="PCS"
               type="number"
               density="compact"
