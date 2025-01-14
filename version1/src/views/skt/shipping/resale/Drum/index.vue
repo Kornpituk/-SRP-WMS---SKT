@@ -891,7 +891,7 @@ const dessertsMockAmountView = [
                 colspan="4"
                 class="section-title text-center "
               >
-                Check The Following Items Before Shipping.
+                Check The Following Items Before Shipping
               </th>
             </tr>
             <tr
@@ -976,7 +976,7 @@ const dessertsMockAmountView = [
                   colspan="12"
                   class="section-title text-center"
                 >
-                  Check The Packaging.
+                  Check The Packaging
                 </th>
               </tr>
             </thead>
@@ -1597,7 +1597,7 @@ const dessertsMockAmountView = [
               <thead>
                 <tr>
                   <th class="text-center">
-                    Container No. /License plate No.
+                    Container No. /License Plate No.
                   </th>
                 </tr>
               </thead>

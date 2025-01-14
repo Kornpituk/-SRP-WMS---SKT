@@ -15,6 +15,10 @@
   text-align: center;
 }
 
+.v-text-field >>> input {
+  font-size: 12px;
+}
+
 .custom-table {
   border-collapse: collapse;
   font-size: 12px;

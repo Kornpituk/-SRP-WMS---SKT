@@ -90,11 +90,15 @@ async function handleConfirmAction () {
   if(typeConfirm.value === "approve"){
     approvePlan()
   }else if(typeConfirm.value === "submit"){
+    trickerSubmit.value = true
+    await saveProductionPlan()
     await validateLotBeforeSubmit()
+    trickerSubmit.value = false
 
     // await submitPlan()
   }else if(typeConfirm.value === "reject"){
     isDialogVisibleCommentDialog.value = true
+    trickerSubmit.value = false
 
     // await rejectPlan()
   }
@@ -1239,6 +1243,72 @@ const { responseValidateLotBatchProductionPlan, errorMessageValidateLotBatchProd
 
 const validateLotBeforeSubmit = async () => {
   const body = selectedDataTables.value.map(item => item.planningID)
+
+  const requiredFields = [
+    "inputDate",
+    "productionCode",
+    "product1SelectedCode",
+    "product1Name",
+    "product1SelectedPackagingCode",
+    "product1PackingQtyKgs",
+    "product1UomCount",
+    "lotNumber",
+    "planningID",
+    "producingDate",
+  ]
+
+  // ตรวจสอบฟิลด์ที่ไม่มีค่า
+  let hasErrors = false
+
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    if (!item.missingFields) {
+      item.missingFields = []
+    }
+
+    // ตรวจสอบฟิลด์ที่ต้องมีสำหรับ product1
+    requiredFields.forEach(field => {
+      if (isFieldMissing(item, field)) {
+        item.missingFields.push(field)
+        hasErrors = true // หากพบฟิลด์ที่ไม่มีค่า
+      }
+    })
+
+    // ตรวจสอบเงื่อนไข product2
+    const hasProduct2Values =
+      item.product2SelectedCode &&
+      item.product2SelectedPackagingCode &&
+      item.product2PackingQtyKgs &&
+      item.product2UomCount
+
+    const isProduct2Empty =
+      !item.product2SelectedCode &&
+      !item.product2SelectedPackagingCode &&
+      !item.product2PackingQtyKgs &&
+      !item.product2UomCount
+
+    if (!isProduct2Empty && !hasProduct2Values) {
+      hasErrors = true
+      item.missingFields.push(
+        "product2SelectedCode",
+        "product2SelectedPackagingCode",
+        "product2PackingQtyKgs",
+        "product2UomCount",
+      )
+    }
+  })
+
+  // ถ้ามีฟิลด์ที่ไม่มีค่า ให้หยุดและแจ้งเตือน
+  if (hasErrors) {
+    textAlertSubDialogFunction(alertWordConst.submit, "Please check input. Some fields are missing.", false)
+    setTimeout(() => {
+      location.reload()
+    }, 1200)
+    console.warn("Some fields are missing:", selectedDataTables.value)
+    trickerSubmit.value = false
+    
+    return // หยุดการทำงานถ้าข้อมูลไม่ครบ
+  }
 
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ

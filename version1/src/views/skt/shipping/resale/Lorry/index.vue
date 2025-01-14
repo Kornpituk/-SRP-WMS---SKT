@@ -140,7 +140,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             colspan="6"
             class="text-center "
           >
-            <span class="font-weight-body">80&nbsp;&nbsp;&nbsp;100&nbsp;&nbsp;&nbsp;20&nbsp;&nbsp;&nbsp;150&nbsp;&nbsp;&nbsp;200&nbsp;&nbsp;&nbsp;300</span>
+            <span class="font-weight-body">80&nbsp;&nbsp;&nbsp;100&nbsp;&nbsp;&nbsp;120&nbsp;&nbsp;&nbsp;150&nbsp;&nbsp;&nbsp;200&nbsp;&nbsp;&nbsp;300</span>
           </th>
           <th
             colspan="3"
@@ -418,23 +418,43 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             colspan="5"
             class="text-center "
           >
-            <div class="d-flex justify-space-between align-center">
-              Start Time <VTextField
-                class="mx-2"
-                density="compact"
-              />
-            </div>
+            <VRow>
+              <VCol
+                cols="3"
+                class="d-flex align-center"
+              >
+                Start Time
+              </VCol>
+              <VCol cols="9">
+                <AppDateTimePicker
+                  v-model="date"
+                  placeholder="Select date and time"
+                  :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+                  density="compact"
+                />
+              </VCol>
+            </VRow>
           </th>
           <th
             colspan="5"
             class="text-center "
           >
-            <div class="d-flex justify-space-between align-center">
-              Finished Time <VTextField
-                class="mx-2"
-                density="compact"
-              />
-            </div>
+            <VRow>
+              <VCol
+                cols="3"
+                class="d-flex align-center"
+              >
+                Finished Time
+              </VCol>
+              <VCol cols="9">
+                <AppDateTimePicker
+                  v-model="date"
+                  placeholder="Select date and time"
+                  :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+                  density="compact"
+                />
+              </VCol>
+            </VRow>
           </th>
         </tr>
 
@@ -491,9 +511,11 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
             colspan="2"
           >
-            <VTextField
+            <AppDateTimePicker
+              v-model="date"
+              placeholder="Select date and time"
+              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
-              variant="outlined"
             />
           </th>
           <th
@@ -534,9 +556,11 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
             colspan="2"
           >
-            <VTextField
+            <AppDateTimePicker
+              v-model="date"
+              placeholder="Select date and time"
+              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
-              variant="outlined"
             />
           </th>
           <th
@@ -577,9 +601,11 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
             colspan="2"
           >
-            <VTextField
+            <AppDateTimePicker
+              v-model="date"
+              placeholder="Select date and time"
+              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
-              variant="outlined"
             />
           </th>
           <th
@@ -620,9 +646,11 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
             colspan="2"
           >
-            <VTextField
+            <AppDateTimePicker
+              v-model="date"
+              placeholder="Select date and time"
+              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
-              variant="outlined"
             />
           </th>
           <th
@@ -663,9 +691,11 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
             class="text-center "
             colspan="2"
           >
-            <VTextField
+            <AppDateTimePicker
+              v-model="date"
+              placeholder="Select date and time"
+              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
-              variant="outlined"
             />
           </th>
           <th
@@ -719,19 +749,34 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
               <div class="d-flex justify-center">
                 <VRow>
                   <VCol cols="12">
-                    <div v-if="index === 0" class="d-flex justify-center">
+                    <div
+                      v-if="index === 0"
+                      class="d-flex justify-center"
+                    >
                       Already Cleaned
                     </div>
-                    <div v-if="index === 1" class="d-flex justify-center">
+                    <div
+                      v-if="index === 1"
+                      class="d-flex justify-center"
+                    >
                       After Seal
                     </div>
-                    <div v-if="index === 2" class="d-flex justify-center">
+                    <div
+                      v-if="index === 2"
+                      class="d-flex justify-center"
+                    >
                       Inside Tank
                     </div>
-                    <div v-if="index === 3" class="d-flex justify-center">
+                    <div
+                      v-if="index === 3"
+                      class="d-flex justify-center"
+                    >
                       Cleaning House and Air Blow
                     </div>
-                    <div v-if="index === 4" class="d-flex justify-center">
+                    <div
+                      v-if="index === 4"
+                      class="d-flex justify-center"
+                    >
                       Cover By Coping
                     </div>
                   </VCol>

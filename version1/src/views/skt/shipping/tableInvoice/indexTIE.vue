@@ -537,7 +537,7 @@ const colorStatusWithId = id => {
     return { color: 'red', message: 'red', text: 'Lorry/Flex Submitted', bgColor: '#FFEBEE' }
 
   case 204:
-    return { color: 'red', message: 'red', text: 'In Submitting (____)', bgColor: '#FFEBEE' }
+    return { color: 'red', message: 'red', text: 'In Submitting (SWL )', bgColor: '#FFEBEE' }
   case 205:
     return { color: 'red', message: 'red', text: 'Waiting for WH APVL', bgColor: '#FFEBEE' }
   case 206:
@@ -1980,10 +1980,22 @@ const refeshPage = () => {
                 <span>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</span>
               </td>
               <td>
-                <span><VChip
-                  :color="colorStatusWithId(product.statusId).color"
-                  :style="{ color: colorStatusWithId(product.statusId).color }"
-                >{{ colorStatusWithId(product.statusId).text }}</VChip></span>
+                <span>
+                  <VChip
+                    :color="colorStatusWithId(product.statusId).color"
+                    :style="{ color: colorStatusWithId(product.statusId).color }"
+                  >{{ colorStatusWithId(product.statusId).text }} 
+                    <VTooltip
+                      activator="parent"
+                      location="right"
+                    >
+                      <p>SAL Submitted</p>
+                      <p>WH Submitted</p>
+                      <p>LOG Submitted</p>
+                      <p class="mb-0">INSP Draft Shipping</p>
+                    </VTooltip>
+                  </VChip>
+                </span>
               </td>
               <!-- 👉 saleOrderNo -->
               <td
