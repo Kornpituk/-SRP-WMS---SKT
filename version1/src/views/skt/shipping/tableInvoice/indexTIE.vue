@@ -80,12 +80,10 @@ const canVisibleUserPermission = (statusId, uiControlContextId) => {
   // if (result.canVisible) {
   //   console.log('This UI element is visible!')
   // } else {
-  //   // console.log('This UI element is hidden!')
+  //   console.log('This UI element is hidden!')
   // }
   
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
-
-  // return { canVisible: true, canExecute: true }
 }
 
 
@@ -118,6 +116,9 @@ import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue' //---
 const dialogDataTextArea = ref('')
 const dialogData2TextArea = ref('')
 const dialogVisible = ref(false)
+const dialogVisibleTextarea = ref(false)
+const dialogRemark = ref('')
+
 
 // --- define Model
 
@@ -199,6 +200,34 @@ const btnCloseShipCon = () => {
   dialogVisible.value = false
 }
 
+const btnTextarea = () => {
+  console.log('textAreaRemarkDialogActive', dialogRemark.value)
+  paginatedData.value.forEach(item => {
+    if (item.soEtlLogDetailJournalID === soEIdModel.value) {
+      if(typeDialogTextArea.value = 'Remark WH'){
+        item.wH_Remarks = dialogRemark.value
+        console.log('btnCloseRemark... Remark WH', dialogRemark.value)
+      }else if(typeDialogTextArea.value = 'Remark SAL'){
+        item.saL_Remarks = dialogRemark.value
+      }else if(typeDialogTextArea.value = 'Remark LOG'){
+        item.loG_Remarks = dialogRemark.value
+      }
+    }else{
+      console.log('btnCloseRemark... ELSe', typeDialogTextArea.value, soEIdModel.value, item.soEtlLogDetailJournalID)
+    }
+  })
+  console.log('btnCloseRemark...')
+  dialogVisibleTextarea.value = false
+}
+
+const textAreaRemarkDialogActive = (type, data, soEId) => {
+  typeDialogTextArea.value = type
+  soEIdModel.value = soEId
+  titleDialogView.value = 'Shipping Mark Con'
+  dialogRemark.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  dialogVisibleTextarea.value = true
+}
+
 const textAreaShipDialogActive2 = (type, data, data2, index, soEId) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
@@ -266,11 +295,30 @@ const pageCount = computed(() => {
   return Math.ceil(searchPlanData.value.length / itemsPerPage.value)
 })
 
+const formatToDate = dateString => {
+  if (!dateString) return null // จัดการค่าว่าง
+  const date = new Date(dateString)
+  if (isNaN(date)) return null // จัดการค่าที่ไม่ใช่วันที่
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  
+  return `${day}/${month}/${year}`
+}
+
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = currentPage.value * itemsPerPage.value
   
-  return searchPlanData.value.slice(start, end)
+  // ตัดข้อมูลเฉพาะที่ต้องแสดงในหน้านั้น
+  const pageData = searchPlanData.value.slice(start, end)
+  
+  // จัดรูปแบบวันที่สำหรับ `eta` และ `etd`
+  return pageData.map(item => ({
+    ...item,
+    eta: formatToDate(item.eta),
+    etd: formatToDate(item.etd),
+  }))
 })
 
 const searchShipmentPlan = async () => {
@@ -327,13 +375,12 @@ const toggleSelectAll = () => {
 //------------------------------- Formate --------------------------------------
 function formatDateSave(date) {
   if (!date) return null // หากค่าว่างให้คืน null
-  const parsedDate = new Date(date)
-  if (isNaN(parsedDate)) return null // ตรวจสอบว่าค่าวันที่ถูกต้อง
-  const year = parsedDate.getFullYear()
-  const month = String(parsedDate.getMonth() + 1).padStart(2, '0') // เติมเลข 0 ถ้าจำนวนหลักไม่ถึง 2
-  const day = String(parsedDate.getDate()).padStart(2, '0') // เติมเลข 0 ถ้าจำนวนหลักไม่ถึง 2
-  
-  return `${year}-${month}-${day}`
+
+  const [day, month, year] = date.split('/') // แยกวันที่ตามรูปแบบ dd/mm/yyyy
+  if (!day || !month || !year) return null // ตรวจสอบว่าแยกข้อมูลสำเร็จ
+
+  // สร้างวันที่ในรูปแบบ yyyy-mm-dd
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
 //------------------------------- Function save Search plan -----------------
@@ -2486,7 +2533,7 @@ const refeshPage = () => {
                   :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
                   variant="outlined"
                   :color="product.saL_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('RemarkSAL', product.saL_Remarks, index)"
+                  @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID)"
                 >
                   <span
                     v-if="product.saL_Remarks"
@@ -2507,7 +2554,7 @@ const refeshPage = () => {
                   :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
                   variant="outlined"
                   :color="product.wH_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('RemarkWH', product.wH_Remarks, index)"
+                  @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID)"
                 >
                   <span
                     v-if="product.wH_Remarks"
@@ -2528,7 +2575,7 @@ const refeshPage = () => {
                   variant="outlined"
                   :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
                   :color="product.loG_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('RemarkLOG', product.loG_Remarks, index)"
+                  @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID)"
                 >
                   <span
                     v-if="product.loG_Remarks"
@@ -3116,7 +3163,7 @@ const refeshPage = () => {
                   :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
                   variant="outlined"
                   :color="item.raw.wH_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('RemarkWH', item.raw.wH_Remarks, index)"
+                  @click="textAreaRemarkDialogActive2('RemarkWH', item.raw.wH_Remarks, index)"
                 >
                   <span
                     v-if="item.raw.wH_Remarks"
@@ -3256,6 +3303,7 @@ const refeshPage = () => {
       />
     </div>
 
+    <!-- Shipment mark/ con -->
     <div>
       <VDialog
         v-model="dialogVisible"
@@ -3327,6 +3375,61 @@ const refeshPage = () => {
                   disabled
                   variant="flat"
                   color="warning"
+                >
+                  <VIcon icon="ri-printer-fill" />Print
+                </VBtn>
+              </VCol>
+            </VRow>
+          </VCardActions>
+        </VCard>
+      </VDialog>
+    </div>
+
+    <!-- text area -->
+    <div>
+      <VDialog
+        v-model="dialogVisibleTextarea"
+        persistent
+        max-width="900px"
+      >
+        <VCard class="d-flex justify-center">
+          <VRow class="mt-5">
+            <VCol cols="12">
+              <VCardTitle class="text-center">
+                {{ typeDialogTextArea }}
+              </VCardTitle>
+            </VCol>
+          </VRow>
+
+          <DialogCloseBtn
+            v-if="true"
+            variant="text"
+            size="default"
+            @click="btnTextarea"
+          />
+          <VCardText>
+            <VTextarea
+              v-model="dialogRemark"
+              auto-grow
+              rows="7"
+              counter
+              class="text-center"
+              outlined
+            />
+          </VCardText>
+          <VCardActions
+            v-if="false"
+            class="d-flex justify-center"
+          >
+            <VRow>
+              <VCol
+                cols="12"
+                class="d-flex justify-center"
+              >
+                <VBtn
+                  variant="flat"
+                  color="warning"
+                  disabled
                 >
                   <VIcon icon="ri-printer-fill" />Print
                 </VBtn>
