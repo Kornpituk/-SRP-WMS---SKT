@@ -425,7 +425,7 @@ const saveShipmentPlan = async row => {
     if(saveSearchPlanResult.value){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }else{
       textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -445,20 +445,24 @@ const saveShipmentPlan = async row => {
 
 const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
 
-const submitShipmentPlanBySoEId = () => {
+const submitShipmentPlanBySoEId = soEtlLogDetailJournalID => {
   try{
-    const body = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-
+    
     const result = submitShipmentPlan(urlApi.value,
       "submit",
       whereHouse,
       accessTokenAtStore,
-      body)
+      soEtlLogDetailJournalID)
     
     if(submitShipmentPlanResult.value){
-      console.log('successfully submit shipment plan', submitShipmentPlan.value)
+      textAlertDialogFunction(alertWordConst.submit, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }else{
-      console.error('Error submit shipment plan', errorSubmitShipmentPlan)
+      textAlertDialogFunction(alertWordConst.submit, false)
+      setTimeout(() => {
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }
   } catch (e) {
     console.error(`Error saving search plan:`, error)
@@ -2627,6 +2631,7 @@ const refeshPage = () => {
                   :disabled="accountINSP"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
+                  @Click="submitShipmentPlanBySoEId(product.soEtlLogDetailJournalID)"
                 >
                   <span style="font-size: 12px;">Submit</span>
                 </VBtn>
