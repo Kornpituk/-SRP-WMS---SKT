@@ -405,7 +405,7 @@ const imagePicture = ref([img01, img02, img03, img04])
               <VCol cols="9">
                 <AppDateTimePicker
                   v-model="date"
-                  placeholder="Select date and time"
+                  placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
                 />
@@ -426,7 +426,7 @@ const imagePicture = ref([img01, img02, img03, img04])
               <VCol cols="9">
                 <AppDateTimePicker
                   v-model="date"
-                  placeholder="Select date and time"
+                  placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
                 />
@@ -805,7 +805,7 @@ const imagePicture = ref([img01, img02, img03, img04])
               class="text-center"
               colspan="12"
             >
-              <span>Filling Direction & Report to FLEXI</span>
+              <span>Inspector </span>
             </th>
           </tr>
         </thead>

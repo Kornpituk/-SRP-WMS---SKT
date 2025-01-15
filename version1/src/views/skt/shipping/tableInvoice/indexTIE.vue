@@ -16,6 +16,27 @@ import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/item
 
 const itemStore = useItemStore()
 
+//------------------------------- alert --------------------------------------------
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+import alertWordConst from '@/utilities/constant'
+
+const isDialogVisibleAlertDialog = ref(false)
+const wordForSubmit = ref('')
+const subWordForSubmit = ref('')
+const successDialAlert = ref(false)
+const confirmDialog2 = ref(null)
+
+const statusId = ref(0)
+
+const textAlertDialogFunction = (word, success) => {
+  subWordForSubmit.value = ''
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
 //------------------------------- 
 
 //------------------------------ Get User Data --------------------------------
@@ -62,9 +83,9 @@ const canVisibleUserPermission = (statusId, uiControlContextId) => {
   //   // console.log('This UI element is hidden!')
   // }
   
-  // return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 
-  return { canVisible: true, canExecute: true }
+  // return { canVisible: true, canExecute: true }
 }
 
 
@@ -117,7 +138,7 @@ const lotValueView = ref('')
 const typeDialogView = ref('')
 const typeBtnView = ref('')
 const titleDialogView = ref('')
-
+const soEIdModel = ref('')
 const indexDataDialogTextArea = ref('')
 
 //------ function for dialog text area ----------------------------------------------
@@ -161,6 +182,29 @@ const textAreaShipDialogActive = (type, data, data2, index) => {
   typeDialogView.value = 'ShipMC'
   sapInValueView.value = 'TIX2406001'
   typeBtnView.value = 'twinPrint'
+  dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  dialogData2TextArea.value = data2 // 
+  dialogVisible.value = true
+}
+
+const btnCloseShipCon = () => {
+  // ค้นหาและอัปเดตค่าใน paginatedData
+  paginatedData.value.forEach(item => {
+    if (item.soEtlLogDetailJournalID === soEIdModel.value) {
+      item.shipperMark = dialogDataTextArea.value
+      item.shipperConditions = dialogData2TextArea.value
+    }
+  })
+  console.log('btnCloseShipCon...')
+  dialogVisible.value = false
+}
+
+const textAreaShipDialogActive2 = (type, data, data2, index, soEId) => {
+  typeDialogTextArea.value = type
+  indexDataDialogTextArea.value = index
+  soEIdModel.value = soEId
+  titleDialogView.value = 'Shipping Mark Con'
+  typeDialogView.value = 'ShipMC'
   dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogData2TextArea.value = data2 // 
   dialogVisible.value = true
@@ -280,6 +324,17 @@ const toggleSelectAll = () => {
   }
 }
 
+//------------------------------- Formate --------------------------------------
+function formatDateSave(date) {
+  if (!date) return null // หากค่าว่างให้คืน null
+  const parsedDate = new Date(date)
+  if (isNaN(parsedDate)) return null // ตรวจสอบว่าค่าวันที่ถูกต้อง
+  const year = parsedDate.getFullYear()
+  const month = String(parsedDate.getMonth() + 1).padStart(2, '0') // เติมเลข 0 ถ้าจำนวนหลักไม่ถึง 2
+  const day = String(parsedDate.getDate()).padStart(2, '0') // เติมเลข 0 ถ้าจำนวนหลักไม่ถึง 2
+  
+  return `${year}-${month}-${day}`
+}
 
 //------------------------------- Function save Search plan -----------------
 
@@ -297,8 +352,8 @@ const mapRequestData = data => ({
   voy: getOrDefault(data.voy, ""),
   truck: getOrDefault(data.truck, ""),
   truckReservingNumber: getOrDefault(data.truckReservingNumber, ""),
-  etd: getOrDefault(data.etd, null),
-  eta: getOrDefault(data.eta, null),
+  etd: formatDateSave(getOrDefault(data.etd, null)),
+  eta: formatDateSave(getOrDefault(data.eta, null)),
   saL_Remarks: getOrDefault(data.saL_Remarks, ""),
   wH_Remarks: getOrDefault(data.wH_Remarks, ""),
   loG_Remarks: getOrDefault(data.loG_Remarks, ""),
@@ -310,9 +365,7 @@ const saveShipmentPlan = async row => {
   console.log("save plan start...", row)
   try {
     // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
-    const requestData = Array.isArray(row)
-      ? row.map(mapRequestData) // ถ้าเป็นอาร์เรย์ ให้ใช้ map
-      : [mapRequestData(row)] // ถ้าเป็นออบเจ็กต์เดี่ยว ให้แปลงเป็นอาร์เรย์ที่มีหนึ่งออบเจ็กต์
+    const requestData = mapRequestData(row)
 
     const response = await saveSearchPlan(
       urlApi.value,
@@ -321,6 +374,18 @@ const saveShipmentPlan = async row => {
       accessTokenAtStore,
       requestData,
     )
+
+    if(saveSearchPlanResult.value){
+      textAlertDialogFunction(alertWordConst.saveDraft, true)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      textAlertDialogFunction(alertWordConst.saveDraft, false)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
 
     console.log(`Saved search plan:`, response)
   } catch (error) {
@@ -1865,7 +1930,7 @@ const refeshPage = () => {
                 <span
                   style="font-weight: bold;"
                   class="text-black"
-                >{{ $t('Voy') }}</span>
+                >{{ $t('Voy') }}</span>{{ canVisibleUserPermission(statusPermission,'COL_VOY').canVisible }}
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
@@ -2081,13 +2146,16 @@ const refeshPage = () => {
                     style="min-width: 150px; max-width: 160px;"
                     variant="outlined"
                     :color="product.shipperConditions ? 'primary' : 'grey'"
-                    @click="textAreaShipDialogActive('ShipMC',product.shipperMark, product.shipperConditions, index)"
+                    @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, product.shipperConditions, index, product.soEtlLogDetailJournalID)"
                   >
                     <span
                       v-if="product.shipperConditions"
                       style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
                     >{{ product.shipperConditions }}</span>
-                    <span style="font-size: 12px;" v-else>Shipping Mark/ConD</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Shipping Mark/ConD</span>
                   </VBtn>
                 </div>
               </td>
@@ -2187,7 +2255,7 @@ const refeshPage = () => {
                   :items="freightForwarderModel"
                   class="truncate-select"
                   item-title="freightForwarder"
-                  item-value="no"
+                  item-value="freightForwarder"
                   density="compact"
                   eager
                 />
@@ -2205,7 +2273,7 @@ const refeshPage = () => {
                   :items="carrierModel"
                   class="truncate-select"
                   item-title="carrier"
-                  item-value="no"
+                  item-value="carrier"
                   density="compact"
                   eager
                 />
@@ -2222,7 +2290,7 @@ const refeshPage = () => {
                   class="truncate-select"
                   :items="vesselsModel"
                   item-title="carrier"
-                  item-value="no"
+                  item-value="carrier"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
                   density="compact"
                   eager
@@ -2259,7 +2327,7 @@ const refeshPage = () => {
                       :menu-props="{ top: true, offsetY: true }"
                       item-title="truck"
                       class="truncate-select"
-                      item-value="no"
+                      item-value="truck"
                       :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
                       density="compact"
                       dense
@@ -2276,7 +2344,7 @@ const refeshPage = () => {
               >
                 <VTextField
                   v-if="true"
-                  v-model="product.truckReserving"
+                  v-model="product.truckReservingNumber"
                   density="compact"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
                   style=" min-width: 150px;"
@@ -2290,6 +2358,7 @@ const refeshPage = () => {
                 style="font-size: 12px;"
               >
                 <VTextField
+                  v-model="product.truckFee"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute"
                   density="compact"
                   style=" min-width: 150px;"
@@ -2379,8 +2448,8 @@ const refeshPage = () => {
                 style="min-width: 150px; font-size: 12px;"
               >
                 <AppDateTimePicker
-                v-model="product.eta"
                   v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
+                  v-model="product.eta"
                   disabeld
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -2804,7 +2873,7 @@ const refeshPage = () => {
                   v-model="item.raw.freightForwarder"
                   :items="freightForwarderModel"
                   item-title="freightForwarder"
-                  item-value="no"
+                  item-value="freightForwarder"
                   density="compact"
                   eager
                 />
@@ -2821,7 +2890,7 @@ const refeshPage = () => {
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
                   :items="carrierModel"
                   item-title="carrier"
-                  item-value="no"
+                  item-value="carrier"
                   density="compact"
                   eager
                 />
@@ -2837,7 +2906,7 @@ const refeshPage = () => {
                   v-model="item.raw.vesselName"
                   :items="vesselsModel"
                   item-title="carrier"
-                  item-value="no"
+                  item-value="carrier"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
                   density="compact"
                   eager
@@ -2870,7 +2939,7 @@ const refeshPage = () => {
                   v-model="item.raw.truck"
                   :items="truckModel"
                   item-title="truck"
-                  item-value="no"
+                  item-value="truck"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
                   density="compact"
                   eager
@@ -3173,7 +3242,7 @@ const refeshPage = () => {
 
   <!-- Dialog Text area -->
   <section>
-    <div>
+    <div v-if="false">
       <TextAreaDialog
         v-model="dialogVisible"
         :sap-in-value="sapInValueView"
@@ -3186,7 +3255,98 @@ const refeshPage = () => {
         @submit="handleDialogSubmit"
       />
     </div>
+
+    <div>
+      <VDialog
+        v-model="dialogVisible"
+        persistent
+        max-width="900px"
+      >
+        <VCard class="d-flex justify-center">
+          <VRow class="mt-5">
+            <VCol cols="6">
+              <VCardTitle class="text-center">
+                Shipping Mark
+              </VCardTitle>
+            </VCol>
+            <VCol cols="6">
+              <VCardTitle class="text-center">
+                Shipping Condition
+              </VCardTitle>
+            </VCol>
+          </VRow>
+
+          <DialogCloseBtn
+            v-if="true"
+            variant="text"
+            size="default"
+            @click="btnCloseShipCon"
+          />
+          <VCardText>
+            <VRow>
+              <VCol cols="6">
+                <VTextarea
+                  v-model="dialogDataTextArea"
+                  auto-grow
+                  rows="7"
+                  counter
+                  class="text-center"
+                  outlined
+                />
+              </VCol>
+              <VCol cols="6">
+                <VTextarea
+                  v-model="dialogData2TextArea"
+                  counter
+                  class="text-center"
+                  rows="15"
+                  outlined
+                />
+              </VCol>
+            </VRow>
+          </VCardText>
+          <VCardActions class="d-flex justify-center">
+            <VRow>
+              <VCol
+                cols="6"
+                class="d-flex justify-center"
+              >
+                <VBtn
+                  variant="flat"
+                  color="warning"
+                  disabled
+                >
+                  <VIcon icon="ri-printer-fill" />Print
+                </VBtn>
+              </VCol>
+              <VCol
+                cols="6"
+                class="d-flex justify-center"
+              >
+                <VBtn
+                  disabled
+                  variant="flat"
+                  color="warning"
+                >
+                  <VIcon icon="ri-printer-fill" />Print
+                </VBtn>
+              </VCol>
+            </VRow>
+          </VCardActions>
+        </VCard>
+      </VDialog>
+    </div>
   </section>
+
+  <div>
+    <!-- ใช้ AuthenticatorDialog Component -->
+    <AlertWord2
+      v-model="isDialogVisibleAlertDialog"
+      :word="wordForSubmit"
+      :subword="subWordForSubmit"
+      :success="successDialAlert"
+    />
+  </div>
 </template>
 
 <style scoped lang="scss" src="./indexTIE.scss"></style>

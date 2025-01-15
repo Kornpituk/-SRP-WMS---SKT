@@ -428,7 +428,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
               <VCol cols="9">
                 <AppDateTimePicker
                   v-model="date"
-                  placeholder="Select date and time"
+                  placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
                 />
@@ -449,7 +449,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
               <VCol cols="9">
                 <AppDateTimePicker
                   v-model="date"
-                  placeholder="Select date and time"
+                  placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
                 />
@@ -839,7 +839,7 @@ const imagePicture = ref([img01, img02, img03, img04, img05])
               class="text-center"
               colspan="12"
             >
-              <span>Filling Direction & Report to Lorry</span>
+              <span>Inspector </span>
             </th>
           </tr>
         </thead>

@@ -13,11 +13,13 @@ import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 import alertWordConst from '@/utilities/constant'
 
 const isDialogVisibleAlertDialog = ref(false)
+const isDialogVisibleConfirmLotValidateDialog = ref(false)
 const wordForSubmit = ref('')
 const subWordForSubmit = ref('')
 const successDialAlert = ref(false)
 const confirmDialog2 = ref(null)
 
+const alertValidate = ref('')
 const statusId = ref(0)
 
 const textAlertDialogFunction = (word, success) => {
@@ -85,6 +87,11 @@ function btnRejectConfirm() {
   })
 }
 
+const btnConfirmLotValidate = async () => {
+  isDialogVisibleConfirmLotValidateDialog.value = false
+  await submitPlan()
+}
+
 async function handleConfirmAction () {
   console.log('Confirmed! Executing action...')
   if(typeConfirm.value === "approve"){
@@ -104,6 +111,7 @@ async function handleConfirmAction () {
   }
   
 }
+
 
 //--------------------------------------- dialog -------------------------------------
 
@@ -1314,13 +1322,15 @@ const validateLotBeforeSubmit = async () => {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     const result = await validateLotBatchProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
     if(responseValidateLotBatchProductionPlan.value){
-      textAlertDialogFunction(responseValidateLotBatchProductionPlan.value, true)
-      setTimeout(() => {
-        // isDialogVisibleAlertDialog.value = false
-        location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      // textAlertDialogFunction(responseValidateLotBatchProductionPlan.value, true)
+      // setTimeout(() => {
+      //   isDialogVisibleAlertDialog.value = false
+      // }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      await submitPlan()
     }else{
-      textAlertDialogFunction(errorMessageValidateLotBatchProductionPlan.value, false)
+      // textAlertDialogFunction(errorMessageValidateLotBatchProductionPlan.value, false)
+      alertValidate.value = errorMessageValidateLotBatchProductionPlan.value
+      isDialogVisibleConfirmLotValidateDialog.value = true
     }
 
   } catch (error) {
@@ -1719,9 +1729,7 @@ const print = () => {
             <VCol
               cols="2"
               class="d-flex justify-end"
-            >
-              
-            </VCol>
+            />
           </VRow>
         </div>
       </VCardTitle>
@@ -2042,7 +2050,10 @@ const print = () => {
                   Item 2
                 </VBtn>
               </VCol>
-              <VCol cols="2" class="d-flex justify-end">
+              <VCol
+                cols="2"
+                class="d-flex justify-end"
+              >
                 <VBtn
                   color="info"
                   @click="confirmFilterSelectProduction"
@@ -3565,6 +3576,45 @@ const print = () => {
         :subword="subWordForSubmit"
         :success="successDialAlert"
       />
+    </div>
+
+    <div>
+      <VDialog
+        v-model="isDialogVisibleConfirmLotValidateDialog"
+        persistent
+        class="v-dialog-sm"
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardText class="text-center">
+            <div class="d-flex justify-center">
+              <VIcon
+                size="100"
+                color="warning"
+                icon="ri-question-line"
+              />
+            </div>
+            <div class="text-center">
+              <span style="font-size: 22px; font-weight: bolder;">{{ alertValidate }}</span>
+            </div>
+          </VCardText>
+
+          <VCardText class="d-flex justify-space-between flex-wrap gap-4">
+            <VBtn
+              color="error"
+              @click="isDialogVisibleConfirmLotValidateDialog = false"
+            >
+              Cancel
+            </VBtn>
+            <VBtn
+              color="success"
+              @click="btnConfirmLotValidate"
+            >
+              Confirm
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
     </div>
 
     <!-- dialogcomment -->
