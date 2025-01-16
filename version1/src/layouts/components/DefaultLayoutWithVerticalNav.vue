@@ -9,7 +9,7 @@ import NavBarI18n from '@/layouts/components/NavBarI18n.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
 import WhereHouse from '@/layouts/components/WhereHouse.vue'
-
+import { departmentData } from '@/utilities/department'
 
 
 // @layouts plugin
@@ -18,6 +18,10 @@ import { VerticalNavLayout } from '@layouts'
 
 const { appRouteTransition, isLessThanOverlayNavBreakpoint, isVerticalNavCollapsed } = useThemeConfig()
 const { width: windowWidth } = useWindowSize()
+
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
 
 // ℹ️ Provide animation name for vertical nav collapse icon.
 const verticalNavHeaderActionAnimationName = ref(null)
@@ -30,9 +34,39 @@ const router = useRouter()
 const authStore = useAuthExStore()
 
 const NameUser = ref('addmin001')
+const NameDepartment = ref('')
+const NameRole = ref('')
 const whereHouseName = localStorage.getItem('WarehouseNameAtIcons')
 
+function checkDepartment(wareHouseName) {
+  // ค้นหาในข้อมูล
+  const found = departmentData.value.find(
+    person =>
+      `${person.firstName}` === wareHouseName,
+  )
+
+  const result = ref('')
+
+  // อัปเดตค่าของ NameDepartment
+  if (found) {
+    NameDepartment.value = found.department
+    result.value = found.department
+    NameRole.value = found.role
+  } else {
+    NameDepartment.value = 'nothing'
+    result.value = 'nothing'
+    NameRole.value = 'nothing'
+  }
+
+  return result.value
+}
+
+watchEffect(() => {
+  checkDepartment(itemStore.getItemDetails('UserDataCookies').firstName)
+})
+
 import { urlApi } from '@/api'
+import { onMounted, watchEffect } from 'vue'
 
 const whereHouseSelectedItem = ([])
 const whereRoomNameSet = ref('')
@@ -45,7 +79,7 @@ const accessToken = localStorage.getItem('accessTokenAtStore')
 
 // console.log("accessToken:",accessToken)
 
-const wareHouseName = ref('')
+const wareHouseName = ref('adasdsdad')
 const wareHouseId = ref('')
 
 
@@ -100,9 +134,6 @@ const GetWhereHouse = () => {
 
     
 }
-
-// watchEffect(GetWhereHouse)
-
 
 watchEffect(() => {
   NameUser.value = localStorage.getItem('userCheck')
@@ -169,13 +200,17 @@ const removeUserCheck = () => {
         />
 
         <VChip color="white">
-          <span class="text-black">WH:&nbsp;&nbsp;</span> <span
-            v-if="false"
-            class="text-primary"
-          >{{ wareHouseName }}</span>&nbsp;<span
+          <span style="color: black; text-transform: capitalize;"><VIcon icon="ri-user-3-fill" />{{ NameDepartment }}:&nbsp;&nbsp;</span>
+
+          <span
             style="text-transform: capitalize;"
             class="text-primary"
           >{{ NameUser }}</span>
+          
+          <span
+            style="text-transform: capitalize;"
+            class="text-primary"
+          >-{{ NameRole }}</span>
         </VChip>
 
         <NavbarThemeSwitcher

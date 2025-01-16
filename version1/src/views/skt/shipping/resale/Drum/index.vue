@@ -378,7 +378,7 @@ const dessertsMockAmountView = [
                     colspan="9"
                     class="section-title text-center"
                   >
-                    Sale Order: xxxxxxxx
+                    Sale Order: xxxxxxxxx
                   </th>
                   <th
                     colspan="5"
@@ -485,7 +485,12 @@ const dessertsMockAmountView = [
                   <td>{{ index+1 }}</td>
                   <td>{{ item.truckNo }}</td>
                   <td>{{ item.sKTLotNo }}</td>
-                  <td>{{ item.supplierLotNo }}</td>
+                  <td style="min-width: 200px;">
+                    <VTextField
+                      v-model="item.supplierLotNo"
+                      density="compact"
+                    />
+                  </td>
                   <td>{{ item.productCode }}</td>
                   <td>{{ item.tradeName }}</td>
                   <td class="text-center">
@@ -518,10 +523,18 @@ const dessertsMockAmountView = [
                   <td class="text-end">
                     {{ item.quantity }}
                   </td>
-                  <td style="font-size: 14px;">
-                    {{ item.customerName }}
+                  <td style="min-width: 200px; font-size: 14px;">
+                    <VTextField
+                      v-model="item.customerName"
+                      density="compact"
+                    />
                   </td>
-                  <td class="text-center">{{ item.deliveryPlace }}</td>
+                  <td style="min-width: 250px;">
+                    <VTextField
+                      v-model="item.deliveryPlace"
+                      density="compact"
+                    />
+                  </td>
                   <td>
                     <VRow>
                       <VCol cols="6">

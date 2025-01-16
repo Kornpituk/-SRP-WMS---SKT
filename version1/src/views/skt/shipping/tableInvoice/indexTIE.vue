@@ -37,6 +37,17 @@ const textAlertDialogFunction = (word, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
+//------------------------------ Formate --------------------------------------
+function formatDateSave(date) {
+  if (!date) return null // หากค่าว่างให้คืน null
+
+  const [day, month, year] = date.split('/') // แยกวันที่ตามรูปแบบ dd/mm/yyyy
+  if (!day || !month || !year) return null // ตรวจสอบว่าแยกข้อมูลสำเร็จ
+
+  // สร้างวันที่ในรูปแบบ yyyy-mm-dd
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
 //------------------------------- 
 
 //------------------------------ Get User Data --------------------------------
@@ -161,7 +172,7 @@ const dialogConfig = {
 const textAreaDialogActive = (type, data, index) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
-
+  
   // โหลดค่าจากคอนฟิก
   const config = dialogConfig[type]
   if (config) {
@@ -201,16 +212,21 @@ const btnCloseShipCon = () => {
 }
 
 const btnTextarea = () => {
-  console.log('textAreaRemarkDialogActive', dialogRemark.value)
+  console.log('textAreaRemarkDialogActive', typeDialogTextArea.value)
   paginatedData.value.forEach(item => {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
-      if(typeDialogTextArea.value = 'Remark WH'){
+      if(typeDialogTextArea.value === 'Remark WH'){
         item.wH_Remarks = dialogRemark.value
-        console.log('btnCloseRemark... Remark WH', dialogRemark.value)
-      }else if(typeDialogTextArea.value = 'Remark SAL'){
+
+        // console.log('btnCloseRemark... Remark WH', dialogRemark.value)
+      }else if(typeDialogTextArea.value === 'Remark SAL'){
         item.saL_Remarks = dialogRemark.value
-      }else if(typeDialogTextArea.value = 'Remark LOG'){
+
+        // console.log('btnCloseRemark... Remark SAL', dialogRemark.value, item.saL_Remarks)
+      }else if(typeDialogTextArea.value === 'Remark LOG'){
         item.loG_Remarks = dialogRemark.value
+
+        // console.log('btnCloseRemark... Remark LOG', dialogRemark.value)
       }
     }else{
       console.log('btnCloseRemark... ELSe', typeDialogTextArea.value, soEIdModel.value, item.soEtlLogDetailJournalID)
@@ -221,11 +237,13 @@ const btnTextarea = () => {
 }
 
 const textAreaRemarkDialogActive = (type, data, soEId) => {
+ 
   typeDialogTextArea.value = type
   soEIdModel.value = soEId
   titleDialogView.value = 'Shipping Mark Con'
   dialogRemark.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogVisibleTextarea.value = true
+  console.log('Type dialog', typeDialogTextArea.value, '=', type)
 }
 
 const textAreaShipDialogActive2 = (type, data, data2, index, soEId) => {
@@ -311,28 +329,78 @@ const paginatedData = computed(() => {
   const end = currentPage.value * itemsPerPage.value
   
   // ตัดข้อมูลเฉพาะที่ต้องแสดงในหน้านั้น
-  const pageData = searchPlanData.value.slice(start, end)
-  
   // จัดรูปแบบวันที่สำหรับ `eta` และ `etd`
-  return pageData.map(item => ({
-    ...item,
-    eta: formatToDate(item.eta),
-    etd: formatToDate(item.etd),
-  }))
+  // return pageData.map(item => ({
+  //   ...item,
+  //   eta: formatToDate(item.eta),
+  //   etd: formatToDate(item.etd),
+  // }))
+
+  return searchPlanData.value.slice(start, end)
+
 })
+
+const sortColumn = ref('')
+const sortDirection = ref('')
+
+const filterForSearchPlan = ref({
+  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
+  ETA: (sessionStorage.getItem("ETASearchProductionFilter")) || '',
+  ETD: (sessionStorage.getItem("ETDSearchProductionFilter")) || '',
+  SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
+  PayerNameSearch: sessionStorage.getItem("PayerNameSearchProductionFilter") || '',
+  ItemNameSearch: sessionStorage.getItem("ItemNameSearchProductionFilter") || '',
+  SortColumn: '',
+  SortDirection: '',
+})
+
+const saveHistoryFilter = () => {
+  sessionStorage.setItem("StatusIdSearchProductionFilter", filterForSearchPlan.value.StatusId || ''),
+  sessionStorage.setItem("ETASearchProductionFilter", filterForSearchPlan.value.ETA) || '',
+  sessionStorage.setItem("ETDSearchProductionFilter", filterForSearchPlan.value.ETD) || '',
+  sessionStorage.setItem("SalesOrderNoSearchProductionFilter", filterForSearchPlan.value.SalesOrderNoSearch) || '',
+  sessionStorage.setItem("PayerNameSearchProductionFilter", filterForSearchPlan.value.PayerNameSearch) || '',
+  sessionStorage.setItem("ItemNameSearchProductionFilter", filterForSearchPlan.value.ItemNameSearch) || ''
+}
+
+// ฟังก์ชันสำหรับสลับสถานะของไอคอนแต่ละตัว
+const toggleDirection = async key => {
+  if (key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+  }
+  sortColumn.value = key
+  await searchShipmentPlan()
+}
 
 const searchShipmentPlan = async () => {
   isLoading.value = true
+
+  // Format ค่า ETA และ ETD ก่อนส่ง API
+  filterForSearchPlan.value.ETA = formatDateSave(filterForSearchPlan.value.ETA)
+  filterForSearchPlan.value.ETD = formatDateSave(filterForSearchPlan.value.ETD)
+
+  filterForSearchPlan.value.SortColumn = sortColumn.value
+  filterForSearchPlan.value.SortDirection = sortDirection.value
+
+  saveHistoryFilter()
   try {
     const result = await fetchSearchPlan(
       urlApi.value,
       'searchplans',
       whereHouse,
       accessTokenAtStore,
+      filterForSearchPlan.value,
     )
 
     if (result && getSearchPlanResult.value.datas) {
       searchPlanData.value = getSearchPlanResult.value.datas // เก็บข้อมูลใน reactive stat
+      
+      searchPlanData.value = getSearchPlanResult.value.datas.map(item => ({
+        ...item,
+        eta: formatToDate(item.eta),
+        etd: formatToDate(item.etd),
+      }))
       console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
       console.error('No result from API')
@@ -345,6 +413,24 @@ const searchShipmentPlan = async () => {
   } finally {
     isLoading.value = false // Stop loading indicator
   }
+}
+
+const searchFilterPlanFunctionBtn = async () => {
+  await searchShipmentPlan()
+}
+
+const clearFilterPlanFunctionBtn = async () => {
+  filterForSearchPlan.value = {
+    StatusId: '',
+    ETA: '',
+    ETD: '',
+    SalesOrderNoSearch: '',
+    PayerNameSearch: '',
+    ItemNameSearch: '',
+    SortColumn: '',
+    SortDirection: '',
+  }
+  await searchShipmentPlan()
 }
 
 //------------------------------- Function check --------------------------------
@@ -372,16 +458,6 @@ const toggleSelectAll = () => {
   }
 }
 
-//------------------------------- Formate --------------------------------------
-function formatDateSave(date) {
-  if (!date) return null // หากค่าว่างให้คืน null
-
-  const [day, month, year] = date.split('/') // แยกวันที่ตามรูปแบบ dd/mm/yyyy
-  if (!day || !month || !year) return null // ตรวจสอบว่าแยกข้อมูลสำเร็จ
-
-  // สร้างวันที่ในรูปแบบ yyyy-mm-dd
-  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-}
 
 //------------------------------- Function save Search plan -----------------
 
@@ -454,7 +530,7 @@ const submitShipmentPlanBySoEId = soEtlLogDetailJournalID => {
       accessTokenAtStore,
       soEtlLogDetailJournalID)
     
-    if(submitShipmentPlanResult.value){
+    if(result){
       textAlertDialogFunction(alertWordConst.submit, true)
       setTimeout(() => {
         location.reload()
@@ -476,6 +552,9 @@ const handlePageChange = newPage => {
 }
 
 //--------------------------------------- hihtlight -------------------
+const dataTableColor = ref('#E0F7FA')
+const dataTableNummberedToggle = ref(null)
+
 const isSelected = item => {
   return selectedDataTables.value.some(
     selectedItem => selectedItem.journalID === item.journalID,
@@ -667,7 +746,7 @@ const colorStatusWithId = id => {
   case 207:
     return { color: 'red', message: 'red', text: 'Shipping Completed', bgColor: '#FFEBEE' }
   default:
-    return { color: 'grey', message: 'grey', text: 'All', bgColor: '#FFF3E0' }
+    return { color: 'grey', message: 'grey', text: '', bgColor: '#FFF3E0' }
   }
 }
 
@@ -1021,7 +1100,7 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <AppDateTimePicker
-                    v-model="date"
+                    v-model="filterForSearchPlan.ETA"
                     placeholder="Select ETA"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     density="compact"
@@ -1037,7 +1116,7 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <AppDateTimePicker
-                    v-model="date"
+                    v-model="filterForSearchPlan.ETD"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     placeholder="Select ETD"
                     density="compact"
@@ -1057,7 +1136,7 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <VTextField
-                    v-model="searchByProductId"
+                    v-model="filterForSearchPlan.SalesOrderNoSearch"
                     density="compact"
                   >
                     <template #label>
@@ -1074,7 +1153,7 @@ const refeshPage = () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductId"
+                    v-model="filterForSearchPlan.PayerNameSearch"
                     density="compact"
                   >
                     <template #label>
@@ -1091,7 +1170,7 @@ const refeshPage = () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
+                    v-model="filterForSearchPlan.ItemNameSearch"
                     density="compact"
                   >
                     <template #label>
@@ -1115,7 +1194,7 @@ const refeshPage = () => {
                         density="compact"
                         class="mx-0"
                         
-                        @click="isDialogPrintLabelVisible = true"
+                        @click="searchFilterPlanFunctionBtn"
                       >
                         <span style="font-size: 12px;">{{ $t('Search') }}</span>
                       </VBtn>
@@ -1126,7 +1205,7 @@ const refeshPage = () => {
                         height="100%"
                         width="100%"
                         density="compact"
-                        @click="clearModel"
+                        @click="clearFilterPlanFunctionBtn"
                       >
                         <span style="font-size: 12px;">{{ $t('Clear') }}</span>
                       </VBtn>
@@ -1868,7 +1947,11 @@ const refeshPage = () => {
                 v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Sale Order No.') }}</span>
+                <span style="font-weight: bold;">{{ $t('Sale Order No.') }}<VIcon
+                  :icon="sortColumn === 'salesOrderNo' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('salesOrderNo')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
@@ -1880,13 +1963,21 @@ const refeshPage = () => {
                 v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}</span>
+                <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}<VIcon
+                  :icon="sortColumn === 'sapInvoiceNo' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('sapInvoiceNo')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Payer Name') }}</span>
+                <span style="font-weight: bold;">{{ $t('Payer Name') }}<VIcon
+                  :icon="sortColumn === 'payerName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('payerName')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
@@ -1898,13 +1989,21 @@ const refeshPage = () => {
                 v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Shipper') }}</span>
+                <span style="font-weight: bold;">{{ $t('Shipper') }}<VIcon
+                  :icon="sortColumn === 'shipper' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('shipper')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Shipper location') }}</span>
+                <span style="font-weight: bold;">{{ $t('Shipper location') }}<VIcon
+                  :icon="sortColumn === 'shipperLocation' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('shipperLocation')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
@@ -1923,22 +2022,38 @@ const refeshPage = () => {
                 v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Consignee') }}</span>
+                <span style="font-weight: bold;">{{ $t('Consignee') }}<VIcon
+                  :icon="sortColumn === 'consignee' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('consignee')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Item Name') }}</span>
+                <span style="font-weight: bold;">{{ $t('Item Name') }}<VIcon
+                  :icon="sortColumn === 'itemName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('itemName')"
+                /></span>
               </th>
               <th v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible">
-                <span style="font-weight: bold;">{{ $t('Lot') }}</span>
+                <span style="font-weight: bold;">{{ $t('Lot') }}<VIcon
+                  :icon="sortColumn === 'lot' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('lot')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
                 class="text-end px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}</span>
+                <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}<VIcon
+                  :icon="sortColumn === 'quantity' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('quantity')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
@@ -1953,7 +2068,11 @@ const refeshPage = () => {
                 <span
                   style="font-weight: bold;"
                   class="text-black"
-                >{{ $t('Freight forwarder') }}</span>
+                >{{ $t('Freight forwarder') }}<VIcon
+                  :icon="sortColumn === 'freightForwarder' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('freightForwarder')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
@@ -1963,7 +2082,11 @@ const refeshPage = () => {
                 <span
                   style="min-width: 250px; font-weight: bold;"
                   class="text-start"
-                >{{ $t('Carrier') }}</span>
+                >{{ $t('Carrier') }}<VIcon
+                  :icon="sortColumn === 'carrier' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('carrier')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
@@ -1972,7 +2095,11 @@ const refeshPage = () => {
                 <span
                   style="font-weight: bold;"
                   class="text-black"
-                >{{ $t('Vessel name') }}</span>
+                >{{ $t('Vessel name') }}<VIcon
+                  :icon="sortColumn === 'vesselName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('vesselName')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
@@ -1981,22 +2108,38 @@ const refeshPage = () => {
                 <span
                   style="font-weight: bold;"
                   class="text-black"
-                >{{ $t('Voy') }}</span>{{ canVisibleUserPermission(statusPermission,'COL_VOY').canVisible }}
+                >{{ $t('Voy') }}<VIcon
+                  :icon="sortColumn === 'voy' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('voy')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
                 class="bg-green-lighten-3"
               >
-                <span style="font-weight: bold;">{{ $t('Truck') }}</span>
+                <span style="font-weight: bold;">{{ $t('Truck') }}<VIcon
+                  :icon="sortColumn === 'truck' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('truck')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
                 class="bg-yellow-lighten-3 texct-end"
               >
-                <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}</span>
+                <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}<VIcon
+                  :icon="sortColumn === 'truckReservingNumber' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('truckReservingNumber')"
+                /></span>
               </th>
               <th v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible">
-                <span style="font-weight: bold;">{{ $t('Truck fee') }}</span>
+                <span style="font-weight: bold;">{{ $t('Truck fee') }}<VIcon
+                  :icon="sortColumn === 'truckFee' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('truckFee')"
+                /></span>
               </th>
               <th
                 v-if="true"
@@ -2008,19 +2151,31 @@ const refeshPage = () => {
                 v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
                 class="px-4"
               >
-                <span style="font-weight: bold;">{{ $t('DO/EX') }}</span>
+                <span style="font-weight: bold;">{{ $t('DO/EX') }}<VIcon
+                  :icon="sortColumn === 'doEx' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('doEx')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Country') }}</span>
+                <span style="font-weight: bold;">{{ $t('Country') }}<VIcon
+                  :icon="sortColumn === 'country' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('country')"
+                /></span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
                 class="text-start px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Loading date') }}</span>
+                <span style="font-weight: bold;">{{ $t('Loading date') }}<VIcon
+                  :icon="sortColumn === 'logUpdatedDate' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('logUpdatedDate')"
+                /></span>
               </th>
               <th v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible">
                 <VRow>
@@ -2031,6 +2186,11 @@ const refeshPage = () => {
                     class="d-flex justify-end"
                     cols="6"
                   >
+                    <VIcon
+                      :icon="sortColumn === 'etd' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                      class="clickable-icon"
+                      @click="toggleDirection('etd')"
+                    />
                     <VIcon
                       size="25"
                       icon="ri-calendar-todo-fill"
@@ -2048,6 +2208,11 @@ const refeshPage = () => {
                     cols="6"
                   >
                     <VIcon
+                      :icon="sortColumn === 'eta' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                      class="clickable-icon"
+                      @click="toggleDirection('eta')"
+                    />
+                    <VIcon
                       size="25"
                       icon="ri-calendar-todo-fill"
                     />
@@ -2061,19 +2226,39 @@ const refeshPage = () => {
                 <span style="font-weight: bold;">{{ $t('Delivery note') }}</span>
               </th>
               <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible">
-                <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}</span>
+                <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}<VIcon
+                  :icon="sortColumn === 'saL_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('saL_Remarks')"
+                /></span>
               </th>
               <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible">
-                <span style="font-weight: bold;">{{ $t('Remark (WH)') }}</span>
+                <span style="font-weight: bold;">{{ $t('Remark (WH)') }}<VIcon
+                  :icon="sortColumn === 'wH_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('wH_Remarks')"
+                /></span>
               </th>
               <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible">
-                <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}</span>
+                <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}<VIcon
+                  :icon="sortColumn === 'loG_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('loG_Remarks')"
+                /></span>
               </th>
               <th class="px-1">
-                <span style="font-weight: bold;">{{ $t('Updated By') }}</span>
+                <span style="font-weight: bold;">{{ $t('Updated By') }}<VIcon
+                  :icon="sortColumn === 'updatedBy' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('updatedBy')"
+                /></span>
               </th>
               <th class="px-1">
-                <span style="font-weight: bold;">{{ $t('Updated Date') }}</span>
+                <span style="font-weight: bold;">{{ $t('Updated Date') }}<VIcon
+                  :icon="sortColumn === 'updatedDate' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection('updatedDate')"
+                /></span>
               </th>
               <th class="text-center">
                 <span style="font-weight: bold;" />
@@ -2092,16 +2277,55 @@ const refeshPage = () => {
               v-for="(product, index) in paginatedData"
               :key="index"
             >
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
                 <VCheckboxBtn
                   v-model="selectedDataTables"
                   :value="product"
                 />
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
                 <span>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</span>
               </td>
-              <td>
+              <td
+                class="cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
                 <span>
                   <VChip
                     :color="colorStatusWithId(product.statusId).color"
@@ -2111,10 +2335,10 @@ const refeshPage = () => {
                       activator="parent"
                       location="right"
                     >
-                      <p>SAL Submitted</p>
-                      <p>WH Submitted</p>
-                      <p>LOG Submitted</p>
-                      <p class="mb-0">INSP Draft Shipping</p>
+                      <p>{{ colorStatusWithId(product.inspStatusId).text }}</p>
+                      <p>{{ colorStatusWithId(product.salStatusId).text }}</p>
+                      <p>{{ colorStatusWithId(product.logStatusId).text }}</p>
+                      <p class="mb-0">{{ colorStatusWithId(product.whStatusId).text }}</p>
                     </VTooltip>
                   </VChip>
                 </span>
@@ -2122,16 +2346,38 @@ const refeshPage = () => {
               <!-- 👉 saleOrderNo -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
-                class="text-start px-1"
-                style="min-width: 120px; font-size: 12px;"
+                class="text-start px-1 cursor-pointer"
+                style="min-width: 150px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ product.salesOrderNo }}
               </td>
               <!-- 👉 soAttachment -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 250px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <div>
                   <FileInputDialogCarousels
@@ -2146,32 +2392,76 @@ const refeshPage = () => {
               <!-- 👉 sapInvoiceNo -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
-                class="text-start px-2"
-                style="min-width: 120px; font-size: 12px;"
+                class="text-start px-2 cursor-pointer"
+                style="min-width: 150px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ product.sapInvoiceNo }}
               </td>
               <!-- 👉 payerName -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.payerName) }}
               </td>
               <!-- 👉 user -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <span class="d-felx align-start">{{ (product.user) }}</span>
               </td>
               <!-- 👉 shipper -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.shippingUserName) }}
               </td>
@@ -2179,8 +2469,19 @@ const refeshPage = () => {
               <!-- 👉 shipperLocation -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 300px; max-width: 300px;  font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.shipperLocation) }}
               </td>
@@ -2188,10 +2489,21 @@ const refeshPage = () => {
               <!-- 👉 Shipping Condition -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 180px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <div class="text-start">
+                <div class="text-start cursor-pointer">
                   <VBtn
                     :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
                     style="min-width: 150px; max-width: 160px;"
@@ -2214,8 +2526,19 @@ const refeshPage = () => {
               <!-- 👉 endUser -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VTextField
                   v-model="product.shippingEndUser"
@@ -2232,8 +2555,19 @@ const refeshPage = () => {
               <!-- 👉 consignee -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.consignee) }}
               </td>
@@ -2241,8 +2575,19 @@ const refeshPage = () => {
               <!-- 👉 product -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 250px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.itemName) }}
               </td>
@@ -2250,8 +2595,19 @@ const refeshPage = () => {
               <!-- 👉 Lot Number -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
                   v-if=" product.lot.length > 1"
@@ -2272,8 +2628,19 @@ const refeshPage = () => {
               <!-- 👉 qty -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
-                class="text-end px-1"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                class="text-end px-1 cursor-pointer"
                 style="min-width: 100px; font-size: 12px;"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ formatNumber(product.quantity) }}
               </td>
@@ -2281,8 +2648,19 @@ const refeshPage = () => {
               <!-- 👉 coa -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 250px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <div>
                   <FileInputDialogCarousels
@@ -2298,8 +2676,19 @@ const refeshPage = () => {
               <!-- 👉 Freight Forwarder -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VSelect
                   v-model="product.freightForwarder"
@@ -2315,8 +2704,19 @@ const refeshPage = () => {
               <!-- 👉 carrier -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VSelect
                   v-model="product.carrier"
@@ -2333,8 +2733,19 @@ const refeshPage = () => {
               <!-- 👉 vesselName -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VSelect
                   v-model="product.vesselName"
@@ -2352,7 +2763,18 @@ const refeshPage = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
                 style="font-size: 12px;"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VTextField
                   v-model="product.voy"
@@ -2366,9 +2788,20 @@ const refeshPage = () => {
               <!-- 👉 COL_TRUCK -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 :class="checkBgTruck(product.truck)"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VRow>
                   <VCol cols="12">
@@ -2390,8 +2823,19 @@ const refeshPage = () => {
               <!-- 👉 truckReserving -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
-                class="text-center px-1"
+                class="text-center px-1 cursor-pointer"
                 style="min-width: 250px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VTextField
                   v-if="true"
@@ -2405,8 +2849,19 @@ const refeshPage = () => {
               <!-- 👉 truckFee -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VTextField
                   v-model="product.truckFee"
@@ -2419,8 +2874,19 @@ const refeshPage = () => {
               <!-- 👉 truckOrder -->
               <td
                 v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
-                class="text-start px-2"
+                class="text-start px-2 cursor-pointer"
                 style="min-width: 350px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VRow>
                   <VCol cols="3">
@@ -2452,8 +2918,19 @@ const refeshPage = () => {
               <!-- 👉 doEx -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
-                class="text-start px-4"
+                class="text-start px-4 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.doEx) }}
               </td>
@@ -2461,8 +2938,19 @@ const refeshPage = () => {
               <!-- 👉 country -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.country) }}
               </td>
@@ -2472,6 +2960,17 @@ const refeshPage = () => {
                 v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
                 class="text-start px-1"
                 style="min-width: 120px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.loadingDate) }}
               </td>
@@ -2479,8 +2978,19 @@ const refeshPage = () => {
               <!-- 👉 etd -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
                   v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canExecute"
@@ -2495,8 +3005,19 @@ const refeshPage = () => {
               <!-- 👉 eta -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
                   v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
@@ -2512,8 +3033,19 @@ const refeshPage = () => {
               <!-- 👉 deliveryNote -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="min-width: 250px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <div>
                   <FileInputDialogCarousels
@@ -2529,8 +3061,19 @@ const refeshPage = () => {
               <!-- 👉 remarkSAL -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
                   style="min-width: 150px;"
@@ -2550,8 +3093,19 @@ const refeshPage = () => {
               <!-- 👉 remarkWH -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
@@ -2571,8 +3125,19 @@ const refeshPage = () => {
               <!-- 👉 remarkLOG -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
                   style="min-width: 150px;"
@@ -2592,8 +3157,19 @@ const refeshPage = () => {
               <!-- 👉 update by -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.updatedBy) }}
               </td>
@@ -2601,8 +3177,19 @@ const refeshPage = () => {
               <!-- 👉 update date -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
-                class="text-start px-1"
+                class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ formatDate(product.updatedDate) }}
               </td>
@@ -2612,7 +3199,18 @@ const refeshPage = () => {
               <td
                 v-if="!accountWHSub"
                 style="width: 8rem; font-size: 12px;"
-                class="text-center px-1"
+                class="text-center px-1 cursor-pointer"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
                   :disabled="accountINSP"
@@ -2624,8 +3222,19 @@ const refeshPage = () => {
               </td>
               <td
                 v-if="!accountWHSub"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
                 style="width: 8rem; font-size: 12px;"
                 class="text-center px-1"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
                   :disabled="accountINSP"
@@ -2640,6 +3249,17 @@ const refeshPage = () => {
                 v-if="accountWHSub"
                 style="width: 8rem; font-size: 12px;"
                 class="text-center px-1"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
                   class="mx-2"
@@ -2651,6 +3271,17 @@ const refeshPage = () => {
               <td
                 style="width: 8rem; font-size: 12px;"
                 class="text-center px-1"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
+                    isSelected(product) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
                   :disabled="accountINSP"

@@ -40,15 +40,17 @@ const versionWMSConfig = ref('')
 
 
 const refVForm = ref()
-const username = ref('')
-const password = ref('')
 
 // const urlApi = process.env.API_KEY
 
-const rememberMe = ref(false)
-
 const usernameError = ref('') 
 const passwordError = ref('')
+const nameCompany = localStorage.getItem('companyName')
+
+const username = ref('')
+const password = ref('')
+const rememberMe = ref(false)
+const savedUsernames = ref(JSON.parse(localStorage.getItem('usernames')) || []) // ดึง usernames ที่เคยบันทึกไว้
 
 
 watchEffect(() => {
@@ -162,13 +164,6 @@ const login = async () => {
     }
 
     //*------------------------------ Set จำนวนเวลาที่สามารถใช้งานได้ --------------------------
-    // const now = new Date().getTime()
-    // const sessionDuration = 1 * 60 * 1000 // 30 นาที
-    // const sessionExpiry = now + sessionDuration
-
-    // localStorage.setItem('sessionExpiry', sessionExpiry)
-
-    //*------------------------------ Set จำนวนเวลาที่สามารถใช้งานได้ --------------------------
     return true
   }
 }
@@ -200,42 +195,39 @@ const checkIsLogin = () => {
   // console.log('Check islogon accessToken:', localStorage.getItem('accessToken'))
 }
 
-
 const onSubmit = async () => {
   localStorage.setItem('userCheck', username.value)
 
   clearLocalStorage()
 
-  // console.log('!![username.value In Login 01]',username.value)
-  // console.log('!![localStorage UserCheck In Login 01]', localStorage.getItem('userCheck', username.value))
-  // const userTest = localStorage.getItem('userCheck')
-  // console.log('Test:', userTest)
-  
-  // getInfoCompany()
+  if (username.value && password.value) {
+    if (rememberMe.value) {
+      saveUsername(username.value)
+    }
+    var isSuccess =  await login()
 
-  // const accessToken = localStorage.getItem('accessToken')
-  // if (accessToken) {
-  //   console.error('Access token is available')
-  //   getInfoUserData()
-
-  //   // checkIsLogin()
-  // } else {
-  //   // Handle the case when accessToken is not available
-  //   console.error('Access token is not available')
-
-  //   // You might want to prompt the user to login again or handle this scenario accordingly
-  // }
-
-  var isSuccess =  await login()
-
-  if(isSuccess){
-    await getInfoUserData()
-    router.replace('/selectWhereHouse')
+    if(isSuccess){
+      await getInfoUserData()
+      router.replace('/selectWhereHouse')
+    }
+  } else {
+    alert('Please fill in all fields')
   }
   
 }
 
-const nameCompany = localStorage.getItem('companyName')
+function saveUsername(username) {
+  if (!savedUsernames.value.includes(username)) {
+    savedUsernames.value.push(username)
+    localStorage.setItem('usernames', JSON.stringify(savedUsernames.value)) // เก็บ usernames ใน Local Storage
+  }
+}
+
+// ลบ Username ที่บันทึกไว้
+function removeUsername(index) {
+  savedUsernames.value.splice(index, 1)
+  localStorage.setItem('usernames', JSON.stringify(savedUsernames.value))
+}
 </script>
 
 <template>
@@ -283,12 +275,38 @@ const nameCompany = localStorage.getItem('companyName')
                 class="px-12"
               >
                 <VTextField
+                  v-if="false"
                   v-model="username"
                   label="Username"
                   type="username"
+                  :items="savedUsernames"
                   :rules="[requiredValidator]"
                   :error-messages="usernameError" 
                 />
+                <VCombobox
+                  v-model="username"
+                  label="Username"
+                  clearable
+                  :items="savedUsernames "
+                  :rules="[requiredValidator]"
+                  :error-messages="usernameError" 
+                  placeholder="Enter Username"
+                  @select="handleSelect"
+                />
+                <ul v-if="false">
+                  <li
+                    v-for="(user, index) in savedUsernames"
+                    :key="index"
+                  >
+                    {{ user }}
+                    <VBtn
+                      icon
+                      @click="removeUsername(index)"
+                    >
+                      X
+                    </VBtn>
+                  </li>
+                </ul>
               </VCol>
 
               <!-- password -->
