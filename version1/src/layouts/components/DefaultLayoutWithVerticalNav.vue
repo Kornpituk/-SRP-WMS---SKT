@@ -19,6 +19,10 @@ import { VerticalNavLayout } from '@layouts'
 const { appRouteTransition, isLessThanOverlayNavBreakpoint, isVerticalNavCollapsed } = useThemeConfig()
 const { width: windowWidth } = useWindowSize()
 
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
 // ℹ️ Provide animation name for vertical nav collapse icon.
 const verticalNavHeaderActionAnimationName = ref(null)
 
@@ -38,7 +42,7 @@ function checkDepartment(wareHouseName) {
   // ค้นหาในข้อมูล
   const found = departmentData.value.find(
     person =>
-      `${person.firstName}`.toLowerCase() === wareHouseName.toLowerCase(),
+      `${person.firstName}` === wareHouseName,
   )
 
   const result = ref('')
@@ -49,20 +53,20 @@ function checkDepartment(wareHouseName) {
     result.value = found.department
     NameRole.value = found.role
   } else {
-    NameDepartment.value = ''
-    result.value = ''
-    NameRole.value = ''
+    NameDepartment.value = 'nothing'
+    result.value = 'nothing'
+    NameRole.value = 'nothing'
   }
 
   return result.value
 }
 
-onMounted(() => {
-  checkDepartment(NameUser.value)
+watchEffect(() => {
+  checkDepartment(itemStore.getItemDetails('UserDataCookies').firstName)
 })
 
 import { urlApi } from '@/api'
-import { onMounted } from 'vue'
+import { onMounted, watchEffect } from 'vue'
 
 const whereHouseSelectedItem = ([])
 const whereRoomNameSet = ref('')
@@ -196,20 +200,17 @@ const removeUserCheck = () => {
         />
 
         <VChip color="white">
-          <span
-            style="text-transform: capitalize;"
-            class="text-primary"
-          ><VIcon icon="ri-settings-fill"></VIcon>{{ NameDepartment }}</span>
+          <span style="color: black; text-transform: capitalize;"><VIcon icon="ri-user-3-fill" />{{ NameDepartment }}:&nbsp;&nbsp;</span>
 
           <span
             style="text-transform: capitalize;"
             class="text-primary"
-          ><VIcon icon="ri-user-fill"></VIcon>{{ NameUser }}</span>
+          >{{ NameUser }}</span>
           
           <span
             style="text-transform: capitalize;"
             class="text-primary"
-          ><VIcon icon="ri-shield-fill"></VIcon>{{ NameRole }}</span>
+          >-{{ NameRole }}</span>
         </VChip>
 
         <NavbarThemeSwitcher

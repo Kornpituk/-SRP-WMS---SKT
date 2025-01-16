@@ -37,6 +37,17 @@ const textAlertDialogFunction = (word, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
+//------------------------------- Formate --------------------------------------
+function formatDateSave(date) {
+  if (!date) return null // หากค่าว่างให้คืน null
+
+  const [day, month, year] = date.split('/') // แยกวันที่ตามรูปแบบ dd/mm/yyyy
+  if (!day || !month || !year) return null // ตรวจสอบว่าแยกข้อมูลสำเร็จ
+
+  // สร้างวันที่ในรูปแบบ yyyy-mm-dd
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
 //------------------------------- 
 
 //------------------------------ Get User Data --------------------------------
@@ -161,7 +172,7 @@ const dialogConfig = {
 const textAreaDialogActive = (type, data, index) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
-
+  
   // โหลดค่าจากคอนฟิก
   const config = dialogConfig[type]
   if (config) {
@@ -201,16 +212,21 @@ const btnCloseShipCon = () => {
 }
 
 const btnTextarea = () => {
-  console.log('textAreaRemarkDialogActive', dialogRemark.value)
+  console.log('textAreaRemarkDialogActive', typeDialogTextArea.value)
   paginatedData.value.forEach(item => {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
-      if(typeDialogTextArea.value = 'Remark WH'){
+      if(typeDialogTextArea.value === 'Remark WH'){
         item.wH_Remarks = dialogRemark.value
-        console.log('btnCloseRemark... Remark WH', dialogRemark.value)
-      }else if(typeDialogTextArea.value = 'Remark SAL'){
+
+        // console.log('btnCloseRemark... Remark WH', dialogRemark.value)
+      }else if(typeDialogTextArea.value === 'Remark SAL'){
         item.saL_Remarks = dialogRemark.value
-      }else if(typeDialogTextArea.value = 'Remark LOG'){
+
+        // console.log('btnCloseRemark... Remark SAL', dialogRemark.value, item.saL_Remarks)
+      }else if(typeDialogTextArea.value === 'Remark LOG'){
         item.loG_Remarks = dialogRemark.value
+
+        // console.log('btnCloseRemark... Remark LOG', dialogRemark.value)
       }
     }else{
       console.log('btnCloseRemark... ELSe', typeDialogTextArea.value, soEIdModel.value, item.soEtlLogDetailJournalID)
@@ -221,11 +237,13 @@ const btnTextarea = () => {
 }
 
 const textAreaRemarkDialogActive = (type, data, soEId) => {
+ 
   typeDialogTextArea.value = type
   soEIdModel.value = soEId
   titleDialogView.value = 'Shipping Mark Con'
   dialogRemark.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogVisibleTextarea.value = true
+  console.log('Type dialog', typeDialogTextArea.value, '=', type)
 }
 
 const textAreaShipDialogActive2 = (type, data, data2, index, soEId) => {
@@ -311,28 +329,62 @@ const paginatedData = computed(() => {
   const end = currentPage.value * itemsPerPage.value
   
   // ตัดข้อมูลเฉพาะที่ต้องแสดงในหน้านั้น
-  const pageData = searchPlanData.value.slice(start, end)
-  
   // จัดรูปแบบวันที่สำหรับ `eta` และ `etd`
-  return pageData.map(item => ({
-    ...item,
-    eta: formatToDate(item.eta),
-    etd: formatToDate(item.etd),
-  }))
+  // return pageData.map(item => ({
+  //   ...item,
+  //   eta: formatToDate(item.eta),
+  //   etd: formatToDate(item.etd),
+  // }))
+
+  return searchPlanData.value.slice(start, end)
+
 })
+
+const filterForSearchPlan = ref({
+  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
+  ETA: (sessionStorage.getItem("ETASearchProductionFilter")) || '',
+  ETD: (sessionStorage.getItem("ETDSearchProductionFilter")) || '',
+  SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
+  PayerNameSearch: sessionStorage.getItem("PayerNameSearchProductionFilter") || '',
+  ItemNameSearch: sessionStorage.getItem("ItemNameSearchProductionFilter") || '',
+  SortColumn: '',
+  SortDirection: '',
+})
+
+const saveHistoryFilter = () => {
+  sessionStorage.setItem("StatusIdSearchProductionFilter", filterForSearchPlan.value.StatusId || ''),
+  sessionStorage.setItem("ETASearchProductionFilter", filterForSearchPlan.value.ETA) || '',
+  sessionStorage.setItem("ETDSearchProductionFilter", filterForSearchPlan.value.ETD) || '',
+  sessionStorage.setItem("SalesOrderNoSearchProductionFilter", filterForSearchPlan.value.SalesOrderNoSearch) || '',
+  sessionStorage.setItem("PayerNameSearchProductionFilter", filterForSearchPlan.value.PayerNameSearch) || '',
+  sessionStorage.setItem("ItemNameSearchProductionFilter", filterForSearchPlan.value.ItemNameSearch) || ''
+}
 
 const searchShipmentPlan = async () => {
   isLoading.value = true
+
+  // Format ค่า ETA และ ETD ก่อนส่ง API
+  filterForSearchPlan.value.ETA = formatDateSave(filterForSearchPlan.value.ETA)
+  filterForSearchPlan.value.ETD = formatDateSave(filterForSearchPlan.value.ETD)
+
+  saveHistoryFilter()
   try {
     const result = await fetchSearchPlan(
       urlApi.value,
       'searchplans',
       whereHouse,
       accessTokenAtStore,
+      filterForSearchPlan.value,
     )
 
     if (result && getSearchPlanResult.value.datas) {
       searchPlanData.value = getSearchPlanResult.value.datas // เก็บข้อมูลใน reactive stat
+      
+      searchPlanData.value = getSearchPlanResult.value.datas.map(item => ({
+        ...item,
+        eta: formatToDate(item.eta),
+        etd: formatToDate(item.etd),
+      }))
       console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
       console.error('No result from API')
@@ -345,6 +397,24 @@ const searchShipmentPlan = async () => {
   } finally {
     isLoading.value = false // Stop loading indicator
   }
+}
+
+const searchFilterPlanFunctionBtn = async () => {
+  await searchShipmentPlan()
+}
+
+const clearFilterPlanFunctionBtn = async () => {
+  filterForSearchPlan.value = {
+    StatusId: '',
+    ETA: '',
+    ETD: '',
+    SalesOrderNoSearch: '',
+    PayerNameSearch: '',
+    ItemNameSearch: '',
+    SortColumn: '',
+    SortDirection: '',
+  }
+  await searchShipmentPlan()
 }
 
 //------------------------------- Function check --------------------------------
@@ -372,16 +442,6 @@ const toggleSelectAll = () => {
   }
 }
 
-//------------------------------- Formate --------------------------------------
-function formatDateSave(date) {
-  if (!date) return null // หากค่าว่างให้คืน null
-
-  const [day, month, year] = date.split('/') // แยกวันที่ตามรูปแบบ dd/mm/yyyy
-  if (!day || !month || !year) return null // ตรวจสอบว่าแยกข้อมูลสำเร็จ
-
-  // สร้างวันที่ในรูปแบบ yyyy-mm-dd
-  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-}
 
 //------------------------------- Function save Search plan -----------------
 
@@ -454,7 +514,7 @@ const submitShipmentPlanBySoEId = soEtlLogDetailJournalID => {
       accessTokenAtStore,
       soEtlLogDetailJournalID)
     
-    if(submitShipmentPlanResult.value){
+    if(result){
       textAlertDialogFunction(alertWordConst.submit, true)
       setTimeout(() => {
         location.reload()
@@ -1021,7 +1081,7 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <AppDateTimePicker
-                    v-model="date"
+                    v-model="filterForSearchPlan.ETA"
                     placeholder="Select ETA"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     density="compact"
@@ -1037,7 +1097,7 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <AppDateTimePicker
-                    v-model="date"
+                    v-model="filterForSearchPlan.ETD"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     placeholder="Select ETD"
                     density="compact"
@@ -1057,7 +1117,7 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <VTextField
-                    v-model="searchByProductId"
+                    v-model="filterForSearchPlan.SalesOrderNoSearch"
                     density="compact"
                   >
                     <template #label>
@@ -1074,7 +1134,7 @@ const refeshPage = () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductId"
+                    v-model="filterForSearchPlan.PayerNameSearch"
                     density="compact"
                   >
                     <template #label>
@@ -1091,7 +1151,7 @@ const refeshPage = () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="searchByProductName"
+                    v-model="filterForSearchPlan.ItemNameSearch"
                     density="compact"
                   >
                     <template #label>
@@ -1115,7 +1175,7 @@ const refeshPage = () => {
                         density="compact"
                         class="mx-0"
                         
-                        @click="isDialogPrintLabelVisible = true"
+                        @click="searchFilterPlanFunctionBtn"
                       >
                         <span style="font-size: 12px;">{{ $t('Search') }}</span>
                       </VBtn>
@@ -1126,7 +1186,7 @@ const refeshPage = () => {
                         height="100%"
                         width="100%"
                         density="compact"
-                        @click="clearModel"
+                        @click="clearFilterPlanFunctionBtn"
                       >
                         <span style="font-size: 12px;">{{ $t('Clear') }}</span>
                       </VBtn>
