@@ -9,7 +9,7 @@ import NavBarI18n from '@/layouts/components/NavBarI18n.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
 import WhereHouse from '@/layouts/components/WhereHouse.vue'
-
+import { departmentData } from '@/utilities/department'
 
 
 // @layouts plugin
@@ -30,9 +30,39 @@ const router = useRouter()
 const authStore = useAuthExStore()
 
 const NameUser = ref('addmin001')
+const NameDepartment = ref('')
+const NameRole = ref('')
 const whereHouseName = localStorage.getItem('WarehouseNameAtIcons')
 
+function checkDepartment(wareHouseName) {
+  // ค้นหาในข้อมูล
+  const found = departmentData.value.find(
+    person =>
+      `${person.firstName}`.toLowerCase() === wareHouseName.toLowerCase(),
+  )
+
+  const result = ref('')
+
+  // อัปเดตค่าของ NameDepartment
+  if (found) {
+    NameDepartment.value = found.department
+    result.value = found.department
+    NameRole.value = found.role
+  } else {
+    NameDepartment.value = ''
+    result.value = ''
+    NameRole.value = ''
+  }
+
+  return result.value
+}
+
+onMounted(() => {
+  checkDepartment(NameUser.value)
+})
+
 import { urlApi } from '@/api'
+import { onMounted } from 'vue'
 
 const whereHouseSelectedItem = ([])
 const whereRoomNameSet = ref('')
@@ -45,7 +75,7 @@ const accessToken = localStorage.getItem('accessTokenAtStore')
 
 // console.log("accessToken:",accessToken)
 
-const wareHouseName = ref('')
+const wareHouseName = ref('adasdsdad')
 const wareHouseId = ref('')
 
 
@@ -100,9 +130,6 @@ const GetWhereHouse = () => {
 
     
 }
-
-// watchEffect(GetWhereHouse)
-
 
 watchEffect(() => {
   NameUser.value = localStorage.getItem('userCheck')
@@ -169,13 +196,20 @@ const removeUserCheck = () => {
         />
 
         <VChip color="white">
-          <span class="text-black">WH:&nbsp;&nbsp;</span> <span
-            v-if="false"
-            class="text-primary"
-          >{{ wareHouseName }}</span>&nbsp;<span
+          <span
             style="text-transform: capitalize;"
             class="text-primary"
-          >{{ NameUser }}</span>
+          ><VIcon icon="ri-settings-fill"></VIcon>{{ NameDepartment }}</span>
+
+          <span
+            style="text-transform: capitalize;"
+            class="text-primary"
+          ><VIcon icon="ri-user-fill"></VIcon>{{ NameUser }}</span>
+          
+          <span
+            style="text-transform: capitalize;"
+            class="text-primary"
+          ><VIcon icon="ri-shield-fill"></VIcon>{{ NameRole }}</span>
         </VChip>
 
         <NavbarThemeSwitcher
