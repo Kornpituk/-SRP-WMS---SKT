@@ -2,7 +2,6 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { onMounted, ref, watch, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -300,8 +299,11 @@ const itemsPerPage = ref(10)
 const selectedItemsPerPage = ref(10)
 
 watch(selectedItemsPerPage, newVal => {
-  itemsPerPage.value = newVal === 'All' ? totalItems.value : newVal
-  currentPage.value = 1 // รีเซ็ตหน้าเป็นหน้าแรก
+  const newItems = newVal === 'All' ? totalItems.value : newVal
+  if (itemsPerPage.value !== newItems) {
+    itemsPerPage.value = newItems
+    currentPage.value = 1 // รีเซ็ตหน้าเป็นหน้าแรกเมื่อเปลี่ยนจำนวนรายการต่อหน้า
+  }
 })
 
 const totalItems = computed(() => searchPlanData.value.length)
@@ -309,8 +311,9 @@ const totalItems = computed(() => searchPlanData.value.length)
 // คำนวณจำนวนหน้าทั้งหมด
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value))
 
-const pageCount = computed(() => {
-  return Math.ceil(searchPlanData.value.length / itemsPerPage.value)
+watch(currentPage, newVal => {
+  if (newVal < 1) currentPage.value = 1
+  if (newVal > totalPages.value) currentPage.value = totalPages.value
 })
 
 const formatToDate = dateString => {
@@ -323,6 +326,11 @@ const formatToDate = dateString => {
   
   return `${day}/${month}/${year}`
 }
+
+const goToFirstPage = () => (currentPage.value = 1)
+const goToPrevPage = () => (currentPage.value = Math.max(1, currentPage.value - 1))
+const goToNextPage = () => (currentPage.value = Math.min(totalPages.value, currentPage.value + 1))
+const goToLastPage = () => (currentPage.value = totalPages.value)
 
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
@@ -475,6 +483,7 @@ const mapRequestData = data => ({
   voy: getOrDefault(data.voy, ""),
   truck: getOrDefault(data.truck, ""),
   truckReservingNumber: getOrDefault(data.truckReservingNumber, ""),
+  truckFee: getOrDefault(data.truckFee, ""),
   etd: formatDateSave(getOrDefault(data.etd, null)),
   eta: formatDateSave(getOrDefault(data.eta, null)),
   saL_Remarks: getOrDefault(data.saL_Remarks, ""),
@@ -546,10 +555,10 @@ const submitShipmentPlanBySoEId = soEtlLogDetailJournalID => {
 }
 
 
-const handlePageChange = newPage => {
-  currentPage.value = newPage
-  console.log(`Page changed to: ${newPage}`)
-}
+// const handlePageChange = newPage => {
+//   currentPage.value = newPage
+//   console.log(`Page changed to: ${newPage}`)
+// }
 
 //--------------------------------------- hihtlight -------------------
 const dataTableColor = ref('#E0F7FA')
@@ -967,6 +976,7 @@ const imgDialogPng = ref('')
 //--------------------------- File INput --------------------------------
 
 import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
+import { watchEffect } from 'vue'
 
 const viewAllData = () => {
   console.log(mockData.value)
@@ -2341,6 +2351,7 @@ const refeshPage = () => {
                       <p class="mb-0">{{ colorStatusWithId(product.whStatusId).text }}</p>
                     </VTooltip>
                   </VChip>
+                  
                 </span>
               </td>
               <!-- 👉 saleOrderNo -->
@@ -2596,7 +2607,7 @@ const refeshPage = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -2919,7 +2930,7 @@ const refeshPage = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
                 class="text-start px-4 cursor-pointer"
-                style="font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -2939,7 +2950,7 @@ const refeshPage = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -2959,7 +2970,7 @@ const refeshPage = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
                 class="text-start px-1"
-                style="min-width: 120px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -3158,7 +3169,7 @@ const refeshPage = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="font-size: 12px;"
+                style="min-width: 110px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -3178,7 +3189,7 @@ const refeshPage = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="font-size: 12px;"
+                style="min-width: 120px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -3339,11 +3350,40 @@ const refeshPage = () => {
               {{ Math.min(currentPage * itemsPerPage, totalItems) }}
               of {{ totalItems }}
             </span>
-            <VPagination
-              v-if="itemsPerPage !== totalItems"
-              v-model="currentPage"
-              :length="totalPages"
-            />
+            <div class="pagination-container">
+              <VBtn
+                icon
+                variant="text"
+                :disabled="currentPage === 1"
+                @click="goToFirstPage"
+              >
+                <VIcon>ri-skip-left-line</VIcon>
+              </VBtn>
+              <VBtn
+                icon
+                variant="text"
+                :disabled="currentPage === 1"
+                @click="goToPrevPage"
+              >
+                <VIcon>mdi-chevron-left</VIcon>
+              </VBtn>
+              <VBtn
+                icon
+                variant="text"
+                :disabled="currentPage === totalPages"
+                @click="goToNextPage"
+              >
+                <VIcon>mdi-chevron-right</VIcon>
+              </VBtn>
+              <VBtn
+                icon
+                variant="text"
+                :disabled="currentPage === totalPages"
+                @click="goToLastPage"
+              >
+                <VIcon>ri-skip-right-line</VIcon>
+              </VBtn>
+            </div>
           </div>
         </VCardText>
       </section>

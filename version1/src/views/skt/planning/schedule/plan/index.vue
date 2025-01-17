@@ -721,7 +721,7 @@ watch(()=> {
       }else if(item.statusId === 101){
         activeBtnCancelPlan.value = true
         activeBtnSubmit.value = true
-      }else if(item.statusId === 103){
+      }else if(item.statusId === 103 || item.statusId === 105){
         activeBtnRejectPlan.value = true
       }
       else{
@@ -2414,6 +2414,7 @@ const print = () => {
     <VCard>
       <VCardText class="pa-2">
         <VBtn
+          class="mx-1"
           color="orange-darken-3"
           @click="addEmptyRowToPlan"
         >
@@ -2461,7 +2462,7 @@ const print = () => {
           v-if="true"
           :disabled="!activeBtnRejectPlan"
           color="error"
-          class="mx-2"
+          class="mx-1"
           @click="btnRejectConfirm"
         >
           <span style="font-size: 12px;">Reject Plan</span>

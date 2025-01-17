@@ -592,7 +592,7 @@ const headersDataTableNew = [
     sortable: false,
   },
   {
-    title: 'Actual Pcs 1',
+    title: 'Actual Pcs1',
     key: 'actualPcs1',
     sortable: false,
   },
@@ -624,7 +624,7 @@ const headersDataTableNew = [
     sortable: false,
   },
   {
-    title: 'Actual Pcs 2',
+    title: 'Actual Pcs2',
     key: 'actualPcs2',
     sortable: false,
   },
@@ -907,7 +907,7 @@ const statusText = statusId => {
                 >
                   <AppDateTimePicker
                     v-model="datePickerFilter"
-                    placeholder="Producing date"
+                    placeholder="Producing Date"
                     density="compact"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     :config="{ dateFormat: 'd/m/Y', mode: 'range' }"
@@ -1291,7 +1291,7 @@ const statusText = statusId => {
               <span style="font-size: 12px;">PROD Approved</span>
             </VBtn>
             <VBtn
-              class="mx-2"
+              class=""
               color="warning"
               @click="newBatch(null)"
             >
