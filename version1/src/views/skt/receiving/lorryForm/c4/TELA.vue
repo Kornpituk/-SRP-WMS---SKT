@@ -342,21 +342,36 @@ watchEffect(async () => {
               
               <div v-else-if="section.practice.type === 'checkbox3'">
                 <VRow>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :readonly="isReadOnly"
                       :label="section.practice.field[0].startPracticeText"
                     />
                   </VCol>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :readonly="isReadOnly"
                       :label="section.practice.field[1].startPracticeText"
                     />
                   </VCol>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :readonly="isReadOnly"
@@ -367,28 +382,48 @@ watchEffect(async () => {
               </div> 
               <div v-else-if="section.practice.type === 'checkbox4'">
                 <VRow>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :readonly="isReadOnly"
                       :label="section.practice.field[0].startPracticeText"
                     />
                   </VCol>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :readonly="isReadOnly"
                       :label="section.practice.field[1].startPracticeText"
                     />
                   </VCol>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :readonly="isReadOnly"
                       :label="section.practice.field[2].startPracticeText"
                     />
                   </VCol>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[3].value"
                       :readonly="isReadOnly"

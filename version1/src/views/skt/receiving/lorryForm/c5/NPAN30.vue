@@ -345,14 +345,24 @@ watchEffect(async () => {
               </div>
               <div v-else-if="section.practice.type === 'checkbox2'">
                 <VRow>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
                       :readonly="isReadOnly"
                     />
                   </VCol>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
@@ -363,21 +373,36 @@ watchEffect(async () => {
               </div>
               <div v-else-if="section.practice.type === 'checkbox3'">
                 <VRow>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[0].value"
                       :label="section.practice.field[0].startPracticeText"
                       :readonly="isReadOnly"
                     />
                   </VCol>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[1].value"
                       :label="section.practice.field[1].startPracticeText"
                       :readonly="isReadOnly"
                     />
                   </VCol>
-                  <VCol>
+                  <VCol
+                    cols="12"
+                    lg="4"
+                    md="12"
+                    sm="12"
+                  >
                     <VCheckbox
                       v-model="section.practice.field[2].value"
                       :label="section.practice.field[2].startPracticeText"
