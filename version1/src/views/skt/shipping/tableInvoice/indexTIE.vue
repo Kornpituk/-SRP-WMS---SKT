@@ -2438,7 +2438,7 @@ const refeshPage = () => {
                   <VChip
                     :color="colorStatusWithId(product.statusId).color"
                     :style="{ color: colorStatusWithId(product.statusId).color }"
-                  >{{ colorStatusWithId(product.statusId).text }} 
+                  >{{ product.statusText }} 
                     <VTooltip
                       activator="parent"
                       location="right"
@@ -2615,7 +2615,7 @@ const refeshPage = () => {
                 <div class="text-start cursor-pointer">
                   <VBtn
                     :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
-                    style="min-width: 150px; max-width: 160px;"
+                    style="min-width: 160px; max-width: 160px;"
                     variant="outlined"
                     :color="product.shipperConditions ? 'primary' : 'grey'"
                     @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, product.shipperConditions, index, product.soEtlLogDetailJournalID)"
@@ -3185,7 +3185,7 @@ const refeshPage = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  style="min-width: 150px;"
+                  style="min-width: 150px; max-width: 150px;"
                   :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
                   variant="outlined"
                   :color="product.saL_Remarks ? 'primary' : 'grey'"
@@ -3249,7 +3249,7 @@ const refeshPage = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  style="min-width: 150px;"
+                  style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
                   :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
                   :color="product.loG_Remarks ? 'primary' : 'grey'"
@@ -3586,7 +3586,7 @@ const refeshPage = () => {
                 <div class="text-start">
                   <VBtn
                     :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
-                    style="min-width: 150px; max-width: 160px;"
+                    style="min-width: 160px; max-width: 160px;"
                     variant="outlined"
                     :color="item.raw.shipperConditions ? 'primary' : 'grey'"
                     @click="textAreaShipDialogActive('ShipMC',item.raw.shipperMark, item.raw.shipperConditions, index)"
@@ -3912,7 +3912,7 @@ const refeshPage = () => {
                 style="font-size: 12px;"
               >
                 <VBtn
-                  style="min-width: 150px;"
+                  style="min-width: 150px; max-width: 150px;"
                   :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
                   variant="outlined"
                   :color="item.raw.saL_Remarks ? 'primary' : 'grey'"
@@ -3920,7 +3920,7 @@ const refeshPage = () => {
                 >
                   <span
                     v-if="item.raw.saL_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
                   >{{ item.raw.saL_Remarks }}</span>
                   <span v-else>remark(SAL)</span>
                 </VBtn>
