@@ -1,4 +1,4 @@
-import { shipmentPlanRepository,
+import { shipmentPlanRepository, FileService,
 } from '@/repository/skt/shipmentPlan/respository'
 
 export const useGetUserPermissionService = () => {
@@ -160,5 +160,50 @@ export const useSubmitShipmentPlanService = () => {
     submitShipmentPlanResult,
     errorSubmitShipmentPlan,
     submitShipmentPlan,
+  }
+}
+
+//------------------------------------- COA ---------------------------------
+export const useSaveFileFormService = () => {
+  const resultSaveFielForm = ref(null) // เก็บข้อมูล response ของการบันทึก
+  const errorMessageSaveFileForm = ref(null) // เก็บข้อความแจ้งข้อผิดพลาด
+
+  const functionSaveFileForm = async (files, soEtlLogDetailJournalID, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) => {
+    try {
+      // ตรวจสอบว่ามีไฟล์และข้อมูลก่อนที่จะดำเนินการบันทึก
+      if (!files || files.length === 0) {
+        throw new Error('No files selected')
+      }
+
+      if (!poEtlLogDetailJournalID || !urlApi || !accessToken) {
+        throw new Error('Missing required parameters')
+      }
+
+      errorMessageSaveFileForm.value = null
+      console.log('Saving Draft Form COA...')
+
+      // เรียกใช้ Service เพื่อบันทึกข้อมูล
+      const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
+
+      if (result) {
+        console.log('Save data COA Controller:', result)
+        resultSaveFielForm.value = { data: result, success: true } // เก็บข้อมูล response
+        
+        return result
+      } else {
+        throw new Error('Failed to save data')
+      }
+    } catch (error) {
+      console.error('Error in functionSaveFileForm:', error)
+
+      // เก็บข้อมูลข้อผิดพลาด
+      errorMessageSaveFileForm.value = { message: error.message, success: false }
+    }
+  }
+
+  return {
+    resultSaveFielForm,
+    errorMessageSaveFileForm,
+    functionSaveFileForm, // เปลี่ยนชื่อเป็น handleSaveDraftCoaForm เพื่อให้ชัดเจน
   }
 }

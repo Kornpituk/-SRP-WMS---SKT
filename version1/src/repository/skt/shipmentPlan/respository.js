@@ -157,4 +157,84 @@ export const shipmentPlanRepository = {
       throw new Error(`Failed to fetch submit Shipment Plan ${error.response?.data?.message || error.message}`)
     }
   },
+
+  
+}
+
+export const FileService = {
+  async saveDraftFileForm(files, soEtlLogDetailJournalID, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
+    const formData = new FormData()
+
+    // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
+    files.forEach(file => {
+      formData.append('files', file)
+    })
+
+    console.log("Files Upload", files)
+
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${poEtlLogDetailJournalID}?soEtlLogDetailJournalID=${soEtlLogDetailJournalID}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+
+      return { success: true, data: response.data }
+    } catch (error) {
+      throw { success: false, error }
+    }
+  },
+
+  async deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/DeleteCoa/${poEtlLogDetailJournalID}`, body, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data detelete coa:', response.data.messageResult)
+        
+        return { success: true, data: response.data.messageResult }
+      } else {
+        throw new Error('No data delete coa from the server')
+      }
+    } catch (error) {
+      console.error('Error in deleteCoaForm:', error)
+      error = new Error(`Deleted to coa by id for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
+    }
+  },
+
+
+  async deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/DeleteAllCoA/${poEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data all detelete coa:', response.data.messageResult)
+        
+        return { success: true, data: response.data.messageResult }
+      } else {
+        throw new Error('No data delete all coa from the server')
+      }
+    } catch (error) {
+      console.error('Error in deleteAllCoaForm:', error)
+      error = new Error(`Deleted to coa all for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
+    }
+  },
 }

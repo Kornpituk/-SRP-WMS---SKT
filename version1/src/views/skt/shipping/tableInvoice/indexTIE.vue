@@ -47,8 +47,6 @@ function formatDateSave(date) {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
-//------------------------------- 
-
 //------------------------------ Get User Data --------------------------------
 
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
@@ -60,6 +58,7 @@ import { useGetUserPermissionService,
   useGetSearchPlanService,
   useSaveSearchPlanService,
   useSubmitShipmentPlanService,
+  useSaveFileFormService,
 } from '@/services/skt/shipmentPlan/services'
 
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
@@ -351,10 +350,13 @@ const paginatedData = computed(() => {
 const sortColumn = ref('')
 const sortDirection = ref('')
 
+const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
+const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
+
 const filterForSearchPlan = ref({
   StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
-  ETA: (sessionStorage.getItem("ETASearchProductionFilter")) || '',
-  ETD: (sessionStorage.getItem("ETDSearchProductionFilter")) || '',
+  ETA: etaDateModel.value || '',
+  ETD: etdDateModel.value || '',
   SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
   PayerNameSearch: sessionStorage.getItem("PayerNameSearchProductionFilter") || '',
   ItemNameSearch: sessionStorage.getItem("ItemNameSearchProductionFilter") || '',
@@ -364,8 +366,8 @@ const filterForSearchPlan = ref({
 
 const saveHistoryFilter = () => {
   sessionStorage.setItem("StatusIdSearchProductionFilter", filterForSearchPlan.value.StatusId || ''),
-  sessionStorage.setItem("ETASearchProductionFilter", filterForSearchPlan.value.ETA) || '',
-  sessionStorage.setItem("ETDSearchProductionFilter", filterForSearchPlan.value.ETD) || '',
+  sessionStorage.setItem("ETASearchProductionFilter", etaDateModel.value) || '',
+  sessionStorage.setItem("ETDSearchProductionFilter", etdDateModel.value) || '',
   sessionStorage.setItem("SalesOrderNoSearchProductionFilter", filterForSearchPlan.value.SalesOrderNoSearch) || '',
   sessionStorage.setItem("PayerNameSearchProductionFilter", filterForSearchPlan.value.PayerNameSearch) || '',
   sessionStorage.setItem("ItemNameSearchProductionFilter", filterForSearchPlan.value.ItemNameSearch) || ''
@@ -385,8 +387,13 @@ const searchShipmentPlan = async () => {
   isLoading.value = true
 
   // Format ค่า ETA และ ETD ก่อนส่ง API
-  filterForSearchPlan.value.ETA = formatDateSave(filterForSearchPlan.value.ETA)
-  filterForSearchPlan.value.ETD = formatDateSave(filterForSearchPlan.value.ETD)
+  // filterForSearchPlan.value.ETA = formatDateSave(filterForSearchPlan.value.ETA)
+
+  const etaDateForApi = ref(etaDateModel.value)
+  const etdDateForApi = ref(etdDateModel.value)
+
+  filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
+  filterForSearchPlan.value.ETD = formatDateSave(etdDateForApi.value)
 
   filterForSearchPlan.value.SortColumn = sortColumn.value
   filterForSearchPlan.value.SortDirection = sortDirection.value
@@ -406,8 +413,10 @@ const searchShipmentPlan = async () => {
       
       searchPlanData.value = getSearchPlanResult.value.datas.map(item => ({
         ...item,
+
         eta: formatToDate(item.eta),
         etd: formatToDate(item.etd),
+
       }))
       console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
@@ -438,6 +447,9 @@ const clearFilterPlanFunctionBtn = async () => {
     SortColumn: '',
     SortDirection: '',
   }
+
+  etaDateModel.value = ''
+  etdDateModel.value = ''
   await searchShipmentPlan()
 }
 
@@ -466,6 +478,93 @@ const toggleSelectAll = () => {
   }
 }
 
+//--------------------------- File INput --------------------------------
+
+import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
+import { watchEffect } from 'vue'
+
+const viewAllData = () => {
+  console.log(mockData.value)
+}
+
+const typeFileInput = ref('hideInput')
+
+const filesFromUploaderSO = ref([])
+const filesFromUploaderCOA = ref([])
+const filesFromUploaderTruckOrder = ref([])
+const filesFromUploaderDeliNote = ref([])
+
+const typeNameFileInput = ref('')
+
+// ฟังก์ชันจัดการข้อมูลที่ส่งมาจาก FileUploader
+const handleFileUpdatesSO = updatedFiles => {
+  filesFromUploaderSO.value = updatedFiles
+}
+
+const handleFileUpdatesCOA = updatedFiles => {
+  filesFromUploaderCOA.value = updatedFiles
+}
+
+
+const handleFileUpdatesTruckOrder = updatedFiles => {
+  filesFromUploaderTruckOrder.value = updatedFiles
+}
+
+const handleFileUpdatesDeliNote = updatedFiles => {
+  filesFromUploaderDeliNote.value = updatedFiles
+}
+
+//------------------------------- Function Save File ------------------------
+const { resultSaveFielForm, errorMessageSaveFileForm, functionSaveFileForm } = useSaveFileFormService()
+
+const saveFileFormShipment = async (
+  file,
+  typeFile,
+  soEtlLogDetailJournalID,
+  poEtlLogDetailJournalID,
+) => {
+  console.log("save file start...", soEtlLogDetailJournalID, poEtlLogDetailJournalID)
+  try {
+    // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
+    const requestData = file
+
+    const response = await functionSaveFileForm(
+      requestData,
+      soEtlLogDetailJournalID,
+      poEtlLogDetailJournalID,
+      typeFile,
+      urlApi.value,
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    console.log("Response from functionSaveFileForm:", response)
+
+    if (resultSaveFielForm.value?.success) {
+      textAlertDialogFunction(alertWordConst.saveDraft, true)
+      console.log(`Saved File Plan:`, resultSaveFielForm.value)
+
+      // Reload หลังแจ้งเตือนสำเร็จ
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 0.5 วินาที
+      
+      return true
+    } else {
+      // กรณีบันทึกไม่สำเร็จ
+      console.error(`Error saving File plan:`, errorMessageSaveFileForm.value)
+      textAlertDialogFunction(errorMessageSaveFileForm.value, false)
+      
+      return false
+    }
+  } catch (error) {
+    // กรณีเกิดข้อผิดพลาดในกระบวนการ
+    console.error(`Error saving File plan:`, error)
+    textAlertDialogFunction("An error occurred while saving the file.", false)
+    
+    return false
+  }
+}
 
 //------------------------------- Function save Search plan -----------------
 
@@ -495,8 +594,32 @@ const getOrDefault = (value, defaultValue) => value ?? defaultValue
 
 const saveShipmentPlan = async row => {
   console.log("save plan start...", row)
+
   try {
-    // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
+    // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
+    if (
+      filesFromUploaderSO.value ||
+      filesFromUploaderCOA.value ||
+      filesFromUploaderTruckOrder.value ||
+      filesFromUploaderDeliNote.value
+    ) {
+      console.log("Uploading files...")
+
+      const saveFile = await saveFileFormShipment(
+        filesFromUploaderSO.value,
+        "SaveSo",
+        row.soEtlLogDetailJournalID,
+        row.poEtlLogDetailJournalID,
+      )
+
+      console.log("File upload completed.")
+    }
+
+    if(!saveFile){
+      throw 'Save FIle Error'
+    }
+
+    // Mapping request data และส่งคำขอ
     const requestData = mapRequestData(row)
 
     const response = await saveSearchPlan(
@@ -507,16 +630,16 @@ const saveShipmentPlan = async row => {
       requestData,
     )
 
-    if(saveSearchPlanResult.value){
+    if (saveSearchPlanResult.value) {
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
-    }else{
+        // location.reload()
+      }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+    } else {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
       setTimeout(() => {
         // location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }, 500) // 500 มิลลิวินาที = 0.5 วินาที
     }
 
     console.log(`Saved search plan:`, response)
@@ -973,31 +1096,6 @@ const currentPageDataTable = ref(1)
 const imgDialogPDF = ref('')
 const imgDialogPng = ref('')
 
-//--------------------------- File INput --------------------------------
-
-import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
-import { watchEffect } from 'vue'
-
-const viewAllData = () => {
-  console.log(mockData.value)
-}
-
-const typeFileInput = ref('hideInput')
-
-const filesFromUploader = ref([])
-const typeNameFileInput = ref('')
-
-const addNameTypeFileInput = name => {
-  typeNameFileInput.value = name
-}
-
-// ฟังก์ชันจัดการข้อมูลที่ส่งมาจาก FileUploader
-const handleFileUpdates = updatedFiles => {
-  filesFromUploader.value = updatedFiles
-  console.log('Updated Files:', filesFromUploader.value)
-  console.log('Name Files:', typeNameFileInput.value)
-}
-
 //------------------------------------------ Check Sheet To Page Resale -----------------------
 function redirectBasedOnStatus(status) {
   // ดึงเฉพาะตัวเลขหลักแรกของ status
@@ -1110,7 +1208,7 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <AppDateTimePicker
-                    v-model="filterForSearchPlan.ETA"
+                    v-model="etaDateModel"
                     placeholder="Select ETA"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     density="compact"
@@ -1126,7 +1224,7 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <AppDateTimePicker
-                    v-model="filterForSearchPlan.ETD"
+                    v-model="etdDateModel"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     placeholder="Select ETD"
                     density="compact"
@@ -2396,7 +2494,7 @@ const refeshPage = () => {
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
                     :type-file-input="typeFileInput"
                     file-name="So Attachment" 
-                    @updateFiles="handleFileUpdates"
+                    @updateFiles="handleFileUpdatesSO"
                   />
                 </div>
               </td>
@@ -2455,7 +2553,7 @@ const refeshPage = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <span class="d-felx align-start">{{ (product.user) }}</span>
+                <span class="d-felx align-start">{{ (product.shippingUserName) }}</span>
               </td>
               <!-- 👉 shipper -->
               <td
@@ -2474,7 +2572,7 @@ const refeshPage = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                {{ (product.shippingUserName) }}
+                {{ (product.shippingName) }}
               </td>
 
               <!-- 👉 shipperLocation -->
@@ -2679,7 +2777,7 @@ const refeshPage = () => {
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
                     :type-file-input="typeFileInput"
                     file-name="COA" 
-                    @updateFiles="handleFileUpdates"
+                    @updateFiles="handleFileUpdatesCOA"
                   />
                 </div>
               </td>
@@ -2920,7 +3018,7 @@ const refeshPage = () => {
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
                     
-                      @updateFiles="handleFileUpdates"
+                      @updateFiles="handleFileUpdatesTruckOrder"
                     />
                   </VCol>
                 </VRow>
@@ -3064,7 +3162,7 @@ const refeshPage = () => {
                     :disabled-prop="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
                     :type-file-input="typeFileInput"
                     file-name="Delivery Note" 
-                    @updateFiles="handleFileUpdates"
+                    @updateFiles="handleFileUpdatesDeliNote"
                   />
                 </div>
               </td>

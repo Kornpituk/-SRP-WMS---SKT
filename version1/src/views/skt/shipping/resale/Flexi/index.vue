@@ -6,7 +6,20 @@ import img02 from '@/views/skt/shipping/resale/Flexi/img/02.png'
 import img03 from '@/views/skt/shipping/resale/Flexi/img/03.png'
 import img04 from '@/views/skt/shipping/resale/Flexi/img/04.png'
 
-const imagePicture = ref([img01, img02, img03, img04])
+import img05 from '@/views/skt/resale/flexible/img/01.png'
+import img06 from '@/views/skt/resale/flexible/img/02.png'
+import img07 from '@/views/skt/resale/flexible/img/03.png'
+import img08 from '@/views/skt/resale/flexible/img/04.png'
+import img09 from '@/views/skt/resale/flexible/img/05.png'
+
+//-------------------------- Section Switch Flexi / Lorry ----------------
+const typeResalse = ref('Flexi')
+
+const TitleResalse = ref('Filling Direction & Report to FLEXI')
+
+const imagePictureFlexi = ref([img01, img02, img03, img04])
+
+const imagePictureLorry = ref([img05, img06, img07, img08, img09])
 </script>
 
 <template>
@@ -28,9 +41,53 @@ const imagePicture = ref([img01, img02, img03, img04])
         </VBtn>
       </div>
     </div>
+
+    
+    <VCol cols="12">
+      <div
+        class="text-center d-flex justify-center align-center"
+        style="font-weight: bold;"
+      >
+        <div class="d-flex justify-end" />
+      </div>
+    </VCol>
+
+
+    <VCol
+      class="text-center d-flex justify-center align-center"
+      cols="10"
+    >
+      <span
+        v-if="typeResalse ==='Flexi'"
+        style="font-weight: bold;"
+      >Filling Direction & Report to FLEXI</span>
+      <span
+        v-if="typeResalse ==='Lorry'"
+        style="font-weight: bold;"
+      >Filling Direction & Report to Lorry</span>
+    </VCol>
+    <VCol
+      class="text-center d-flex justify-end align-center"
+      cols="2"
+    >
+      <VBtn
+        :variant="typeResalse === 'Lorry' ? 'tonal' : 'flat'"
+        @click="typeResalse = 'Flexi'"
+      >
+        Flexi
+      </VBtn>
+      <VBtn
+        :variant="typeResalse === 'Flexi' ? 'tonal' : 'flat'"
+        @click="typeResalse = 'Lorry'"
+      >
+        Lorry
+      </VBtn>
+    </VCol>
+
+
     <VCol cols="12">
       <table class="custom-table">
-        <tr>
+        <tr v-if="false">
           <th
             colspan="12"
             class="text-center"
@@ -711,9 +768,9 @@ const imagePicture = ref([img01, img02, img03, img04])
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="typeResalse === 'Flexi'">
           <tr
-            v-for="(image, index) in imagePicture"
+            v-for="(image, index) in imagePictureFlexi"
             :key="index"
           >
             <td
@@ -779,11 +836,91 @@ const imagePicture = ref([img01, img02, img03, img04])
             </td>
           </tr>
         </tbody>
+
+        <tbody v-if="typeResalse === 'Lorry'">
+          <tr
+            v-for="(image, index) in imagePictureLorry"
+            :key="index"
+          >
+            <td
+              style="min-width: 410px;"
+              colspan="6"
+            >
+              <VImg :src="image" />
+            </td>
+            <td colspan="6">
+              <div class="d-flex justify-center">
+                <VRow>
+                  <VCol cols="12">
+                    <div
+                      v-if="index === 0"
+                      class="d-flex justify-center"
+                    >
+                      Already Cleaned
+                    </div>
+                    <div
+                      v-if="index === 1"
+                      class="d-flex justify-center"
+                    >
+                      After Seal
+                    </div>
+                    <div
+                      v-if="index === 2"
+                      class="d-flex justify-center"
+                    >
+                      Inside Tank
+                    </div>
+                    <div
+                      v-if="index === 3"
+                      class="d-flex justify-center"
+                    >
+                      Cleaning Hose and Air Blow
+                    </div>
+                    <div
+                      v-if="index === 4"
+                      class="d-flex justify-center"
+                    >
+                      Cover By Coping
+                    </div>
+                  </VCol>
+                  <VCol
+                    cols="6"
+                    class="d-flex justify-center align-center"
+                  >
+                    <VCheckbox class="px-10">
+                      <template #label>
+                        <span class="font-size">YES</span>
+                      </template>
+                    </VCheckbox>
+                  </VCol>
+                  <VCol
+                    cols="6"
+                    class="d-flex justify-center align-center"
+                  >
+                    <VCheckbox
+                      class="px-10"
+                      label="NO"
+                    >
+                      <template #label>
+                        <span class="font-size">NO</span>
+                      </template>
+                    </VCheckbox>
+                  </VCol>
+                </VRow>
+              </div>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </VCol>
 
     <VCol cols="12">
-      <div class="mb-2" style="font-size: 12px;">Remark</div>
+      <div
+        class="mb-2"
+        style="font-size: 12px;"
+      >
+        Remark
+      </div>
       <table class="custom-table">
         <tr>
           <th colspan="12">
