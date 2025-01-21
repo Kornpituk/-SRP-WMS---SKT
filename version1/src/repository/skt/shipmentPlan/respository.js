@@ -162,7 +162,7 @@ export const shipmentPlanRepository = {
 }
 
 export const FileService = {
-  async saveDraftFileForm(files, soEtlLogDetailJournalID, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
+  async saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
     const formData = new FormData()
 
     // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
@@ -173,7 +173,7 @@ export const FileService = {
     console.log("Files Upload", files)
 
     try {
-      const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${poEtlLogDetailJournalID}?soEtlLogDetailJournalID=${soEtlLogDetailJournalID}`, formData, {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,

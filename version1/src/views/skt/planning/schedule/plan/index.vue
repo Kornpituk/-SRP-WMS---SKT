@@ -322,6 +322,7 @@ import {
   useSubmitProductionPlanService,
   useValidateBatchProductionPlanService,
   useRejectProductionPlanService,
+  useGetStatusTextService,
 } from '@/services/skt/productionPlan/services'
 
 const countItemProduction = ref(1)
@@ -1690,6 +1691,47 @@ const submit = () => {
 const print = () => {
   console.log('Printed')
 }
+
+//----------------------- staus text --------------------------------
+
+const {  getStatusTextCodeResult, errorMessageGetStatusText, fetchGetStatusText } = useGetStatusTextService()
+
+watch(async () => {
+  try {
+    const result = await fetchGetStatusText(
+      urlApi.value,
+      'ProductionPlan',
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if (result && result.success && Array.isArray(result.data)) {
+      getStatusTextCodeResult.value = result.data // กำหนดค่าเฉพาะ data
+      itemsStatus.value = result.data.map(item => ({
+        id: item.statusId || '', // ค่า item-value
+        name: item.statusName|| '', // ค่า item-title
+      }))
+
+      console.log('Status Text Code Result:', itemsStatus.value)
+    } else {
+      console.error('Invalid data structure:', result)
+    }
+  } catch (error) {
+    console.error('Failed to fetch status text:', error)
+  }
+})
+
+const statusText = statusId => {
+  if (!getStatusTextCodeResult.value || !Array.isArray(getStatusTextCodeResult.value)) {
+    console.error('getStatusTextCodeResult is not available or not an array')
+    
+    return 'All'
+  }
+
+  const status = getStatusTextCodeResult.value.find(item => item.statusId === statusId)
+  
+  return status ? status.statusName : 'All'
+}
 </script>
 
 <template>
@@ -2912,7 +2954,7 @@ const print = () => {
                   :color="colorStatusWithId(item.raw.statusId).color"
                   :style="{ color: colorStatusWithId(item.raw.statusId).color }"
                 >
-                  {{ colorStatusWithId(item.raw.statusId).text }}
+                  {{ statusText(item.raw.statusId) }}
                 </VChip>
               </td>
               <td 
