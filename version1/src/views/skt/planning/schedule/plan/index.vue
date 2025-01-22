@@ -1231,6 +1231,12 @@ const { responseRejectProductionPlan, errorMessageRejectProductionPlan, rejectPr
 const rejectPlan = async () => {
   const body = selectedDataTables.value.map(item => item.planningID)
 
+  if(!statusCommnetValue.value){
+    textAlertDialogFunction("Plase Enter Comment.", false)
+    
+    return
+  }
+
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await rejectProdutcionPlanFunc(statusCommnetValue.value, body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)

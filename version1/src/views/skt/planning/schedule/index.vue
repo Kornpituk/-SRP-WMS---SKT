@@ -633,6 +633,7 @@ const headersDataTableNew = [
     title: 'Lot',
     key: 'lotNumber',
     sortable: false,
+    align: "start",
   },
   {
     title: 'Producing Date',
@@ -1648,7 +1649,7 @@ const statusText = statusId => {
           </template>
 
           <template #column.lotNumber="{ column }">
-            <tr class="d-flex justify-center">
+            <tr class="d-flex justify-start">
               <th>
                 <span>{{ column.title }}<VIcon
                   :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
@@ -2104,7 +2105,7 @@ const statusText = statusId => {
               </td>
 
               <td
-                class="px-1 cursor-pointer"
+                class="px-1 cursor-pointer text-start"
                 style="min-width: 150px;"
                 :style="{ 
                   backgroundColor: 
@@ -2119,7 +2120,7 @@ const statusText = statusId => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                {{ item.raw.lotNumber }}
+                <span class="text-start">{{ item.raw.lotNumber }}</span>
               </td>
               <td
                 class="px-1 text-center cursor-pointer"
