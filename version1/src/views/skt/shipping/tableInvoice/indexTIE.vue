@@ -350,16 +350,58 @@ const paginatedData = computed(() => {
 const sortColumn = ref('')
 const sortDirection = ref('')
 
+const itemsStatus = ([
+  { name: 'Cancel', id: 200, color: 'blue-grey' },
+  { name: 'ETL Failed!', id: 201, color: 'deep-orange' },
+  { name: 'Waiting for Shipping', id: 202, color: 'pink' },
+  { name: 'Draft Shipping', id: 203, color: 'amber' },
+
+  { name: 'Waiting for SAL Draft', id: 302, color: 'pink' },
+  { name: 'SAL Draft Shipping', id: 303, color: 'amber' },
+  { name: 'SAL Submitted', id: 304, color: 'teal' },
+
+  { name: 'Waiting for WH Draft', id: 402, color: 'pink' },
+  { name: 'WH Draft Shipping', id: 403, color: 'amber' },
+  { name: 'WH Submitted', id: 404, color: 'teal' },
+
+  { name: 'Waiting FOR LOG Draft', id: 502, color: 'pink' },
+  { name: 'LOG Draft Shipping', id: 503, color: 'amber' },
+  { name: 'LOG Submitted', id: 504, color: 'teal' },
+
+  { name: 'Waiting FOR INSP Draft', id: 602, color: 'pink' },
+  { name: 'INSP Draft Shipping', id: 603, color: 'amber' },
+  { name: 'INSP Submitted', id: 604, color: 'teal' },
+
+  { name: 'Waiting for CS Draft', id: 1002, color: 'pink' },
+  { name: 'CS1 Draft Shipping', id: 1003, color: 'amber' },
+  { name: 'CS2 Draft Shipping', id: 1004, color: 'amber' },
+  { name: 'CS Submitted', id: 1005, color: 'teal' },
+
+  { name: 'Waiting for Draft', id: 1102, color: 'pink' },
+  { name: 'Draft Shipping LF', id: 1103, color: 'amber' },
+  { name: 'Waiting for Lorry/Flex APVL', id: 1104, color: 'amber' },
+  { name: 'Lorry/Flex Submitted', id: 1105, color: 'teal' },
+
+  { name: 'In Submitting', id: 204, color: 'pink' },
+  { name: 'Waiting for WH APVL', id: 205, color: 'brown' },
+  { name: 'Shipping Rejected', id: 205, color: 'red' },
+  { name: 'Shipping Completed', id: 207, color: 'green' },
+
+  { name: 'All', id: 0, color: 'grey' },
+
+])
+
 const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
 const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
 
 const filterForSearchPlan = ref({
-  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
+  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || 'ddddd',
   ETA: etaDateModel.value || '',
   ETD: etdDateModel.value || '',
   SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
   PayerNameSearch: sessionStorage.getItem("PayerNameSearchProductionFilter") || '',
   ItemNameSearch: sessionStorage.getItem("ItemNameSearchProductionFilter") || '',
+  LotSearch: sessionStorage.getItem("LotSearchProductionFilter") || '',
   SortColumn: '',
   SortDirection: '',
 })
@@ -370,6 +412,7 @@ const saveHistoryFilter = () => {
   sessionStorage.setItem("ETDSearchProductionFilter", etdDateModel.value) || '',
   sessionStorage.setItem("SalesOrderNoSearchProductionFilter", filterForSearchPlan.value.SalesOrderNoSearch) || '',
   sessionStorage.setItem("PayerNameSearchProductionFilter", filterForSearchPlan.value.PayerNameSearch) || '',
+  sessionStorage.setItem("LotSearchProductionFilter", filterForSearchPlan.value.LotSearch) || '',
   sessionStorage.setItem("ItemNameSearchProductionFilter", filterForSearchPlan.value.ItemNameSearch) || ''
 }
 
@@ -381,6 +424,13 @@ const toggleDirection = async key => {
   }
   sortColumn.value = key
   await searchShipmentPlan()
+}
+
+//- เปรียบเทียบ status text = id
+function getStatusIdByName(statusName) {
+  const matchedItem = itemsStatus.find(item => item.name === statusName)
+  
+  return matchedItem ? matchedItem.id : '' // คืนค่า id หรือ null หากไม่พบ
 }
 
 const searchShipmentPlan = async () => {
@@ -399,6 +449,9 @@ const searchShipmentPlan = async () => {
   filterForSearchPlan.value.SortDirection = sortDirection.value
 
   saveHistoryFilter()
+
+  const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
+
   try {
     const result = await fetchSearchPlan(
       urlApi.value,
@@ -406,6 +459,7 @@ const searchShipmentPlan = async () => {
       whereHouse,
       accessTokenAtStore,
       filterForSearchPlan.value,
+      statusID,
     )
 
     if (result && getSearchPlanResult.value.datas) {
@@ -444,6 +498,7 @@ const clearFilterPlanFunctionBtn = async () => {
     SalesOrderNoSearch: '',
     PayerNameSearch: '',
     ItemNameSearch: '',
+    LotSearch: '',
     SortColumn: '',
     SortDirection: '',
   }
@@ -812,68 +867,68 @@ const bgStatus = ref('bg-grey')
 const colorStatusWithId = id => {
   switch (id) {
   case 200:
-    return { color: 'orange', message: 'orange-darken-1', text: 'Cancel', bgColor: '#E0E0E0' }
+    return { color: 'grey', message: 'orange-darken-1', text: 'Cancel', bgColor: '#E0E0E0' }
   case 201:
-    return { color: 'green', message: 'green', text: 'ETL Failed!', bgColor: '#EF9A9A' }
+    return { color: 'deep-orange', message: 'green', text: 'ETL Failed!', bgColor: '#EF9A9A' }
   case 202:
     return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Shipping', bgColor: '#FCE4EC' }
   case 203:
-    return { color: 'purple', message: 'purple', text: 'Draft Shipping', bgColor: '#F3E5F5' }
+    return { color: 'amber', message: 'purple', text: 'Draft Shipping', bgColor: '#FFC107' }
 
   case 302:
-    return { color: 'brown', message: 'brown', text: 'Waiting for SAL Draft', bgColor: '#EFEBE9' }
+    return { color: 'pink', message: 'brown', text: 'Waiting for SAL Draft', bgColor: '#EFEBE9' }
   case 303:
-    return { color: 'green', message: 'green', text: 'SAL Draft Shipping', bgColor: '#E8F5E9' }
+    return { color: 'amber', message: 'green', text: 'SAL Draft Shipping', bgColor: '#E8F5E9' }
   case 304:
-    return { color: 'red', message: 'red', text: 'SAL Submitted', bgColor: '#FFEBEE' }
+    return { color: 'teal', message: 'red', text: 'SAL Submitted', bgColor: '#FFEBEE' }
 
   case 402:
-    return { color: 'red', message: 'red', text: 'Waiting for WH Draft', bgColor: '#FFEBEE' }
+    return { color: 'pink', message: 'red', text: 'Waiting for WH Draft', bgColor: '#FFEBEE' }
   case 403:
-    return { color: 'red', message: 'red', text: 'WH Draft Shipping', bgColor: '#FFEBEE' }
+    return { color: 'amber', message: 'red', text: 'WH Draft Shipping', bgColor: '#FFEBEE' }
   case 404:
-    return { color: 'red', message: 'red', text: 'WH Submitted', bgColor: '#FFEBEE' }
+    return { color: 'teal', message: 'red', text: 'WH Submitted', bgColor: '#FFEBEE' }
 
   case 502:
-    return { color: 'red', message: 'red', text: 'Waiting FOR LOG Draft', bgColor: '#FFEBEE' }
+    return { color: 'pink', message: 'red', text: 'Waiting FOR LOG Draft', bgColor: '#FFEBEE' }
   case 503:
-    return { color: 'red', message: 'red', text: 'LOG Draft Shipping', bgColor: '#FFEBEE' }
+    return { color: 'amber', message: 'red', text: 'LOG Draft Shipping', bgColor: '#FFEBEE' }
   case 504:
-    return { color: 'red', message: 'red', text: 'LOG Submitted', bgColor: '#FFEBEE' }
+    return { color: 'teal', message: 'red', text: 'LOG Submitted', bgColor: '#FFEBEE' }
 
   case 602:
-    return { color: 'red', message: 'red', text: 'Waiting FOR INSP Draft', bgColor: '#FFEBEE' }
+    return { color: 'pink', message: 'red', text: 'Waiting FOR INSP Draft', bgColor: '#FFEBEE' }
   case 603:
-    return { color: 'red', message: 'red', text: 'INSP Draft Shipping', bgColor: '#FFEBEE' }
+    return { color: 'amber', message: 'red', text: 'INSP Draft Shipping', bgColor: '#FFEBEE' }
   case 604:
-    return { color: 'red', message: 'red', text: 'INSP Submitted', bgColor: '#FFEBEE' }
+    return { color: 'teal', message: 'red', text: 'INSP Submitted', bgColor: '#FFEBEE' }
 
   case 1002:
-    return { color: 'red', message: 'red', text: 'Waiting for CS Draft', bgColor: '#FFEBEE' }
+    return { color: 'pink', message: 'red', text: 'Waiting for CS Draft', bgColor: '#FFEBEE' }
   case 1003:
-    return { color: 'red', message: 'red', text: 'CS1 Draft Shipping', bgColor: '#FFEBEE' }
+    return { color: 'amber', message: 'red', text: 'CS1 Draft Shipping', bgColor: '#FFEBEE' }
   case 1004:
-    return { color: 'red', message: 'red', text: 'CS2 Draft Shipping', bgColor: '#FFEBEE' }
+    return { color: 'amber', message: 'red', text: 'CS2 Draft Shipping', bgColor: '#FFEBEE' }
   case 1005:
-    return { color: 'red', message: 'red', text: 'CS Submitted', bgColor: '#FFEBEE' }
+    return { color: 'teal', message: 'red', text: 'CS Submitted', bgColor: '#FFEBEE' }
 
   case 1102:
-    return { color: 'red', message: 'red', text: 'Waiting for Draft', bgColor: '#FFEBEE' }
+    return { color: 'pink', message: 'red', text: 'Waiting for Draft', bgColor: '#FFEBEE' }
   case 1103:
-    return { color: 'red', message: 'red', text: 'Draft Shipping LF', bgColor: '#FFEBEE' }
+    return { color: 'amber', message: 'red', text: 'Draft Shipping LF', bgColor: '#FFEBEE' }
   case 1104:
-    return { color: 'red', message: 'red', text: 'Waiting for Lorry/Flex APVL', bgColor: '#FFEBEE' }
+    return { color: 'amber', message: 'red', text: 'Waiting for Lorry/Flex APVL', bgColor: '#FFEBEE' }
   case 1105:
-    return { color: 'red', message: 'red', text: 'Lorry/Flex Submitted', bgColor: '#FFEBEE' }
+    return { color: 'teal', message: 'red', text: 'Lorry/Flex Submitted', bgColor: '#FFEBEE' }
 
   case 204:
-    return { color: 'red', message: 'red', text: 'In Submitting (SWL )', bgColor: '#FFEBEE' }
+    return { color: 'pink', message: 'red', text: 'In Submitting (SWL )', bgColor: '#FFEBEE' }
   case 205:
-    return { color: 'red', message: 'red', text: 'Waiting for WH APVL', bgColor: '#FFEBEE' }
+    return { color: 'brown', message: 'red', text: 'Waiting for WH APVL', bgColor: '#FFEBEE' }
   case 206:
     return { color: 'red', message: 'red', text: 'Shipping Rejected', bgColor: '#FFEBEE' }
   case 207:
-    return { color: 'red', message: 'red', text: 'Shipping Completed', bgColor: '#FFEBEE' }
+    return { color: 'green', message: 'red', text: 'Shipping Completed', bgColor: '#FFEBEE' }
   default:
     return { color: 'grey', message: 'grey', text: '', bgColor: '#FFF3E0' }
   }
@@ -1364,9 +1419,10 @@ const refeshPage = () => {
                   class="py-1"
                 >
                   <VSelect
+                    v-model="filterForSearchPlan.StatusId"
                     :items="itemsStatus"
                     item-title="name"
-                    item-value="id"
+                    item-value="name"
                     density="compact"
                   >
                     <template #label>
@@ -1381,12 +1437,18 @@ const refeshPage = () => {
                     <template #selection="{ item }">
                       <VChip
                         variant="elevated"
-                        :style="{ color: colorStatusWithId(item.raw.id).message }"
                         size="x-small"
                         style="min-height: 20px;"
-                        :color="colorStatusWithId(item.raw.id).color"
+                        :color="item.raw.color? item.raw.color : 'grey'"
                       >
-                        <span class="text-white">{{ statusText(item.raw.id) }}</span>
+                        <span
+                          v-if="item.raw.name"
+                          class="text-white"
+                        >{{ item.raw.name }}</span>
+                        <span
+                          v-else
+                          class="text-white"
+                        >All</span>
                       </VChip>
                     </template>
                   </VSelect>
@@ -1471,7 +1533,7 @@ const refeshPage = () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="filterForSearchPlan.ItemNameSearch"
+                    v-model="filterForSearchPlan.LotSearch"
                     density="compact"
                   >
                     <template #label>
@@ -2204,7 +2266,7 @@ const refeshPage = () => {
           {{ errorMessage }}
         </div>
         <VProgressLinear
-          v-if="!paginatedData"
+          v-if="!paginatedData && !isLoading"
           height="20"
           color="secondary"
           class="elevation-1"
@@ -3353,7 +3415,7 @@ const refeshPage = () => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="Delivery Note"
-                    :disabled-prop="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
                     :type-file-input="typeFileInput"
                     file-name="Delivery Note" 
                     @updateFiles="handleFileUpdatesDeliNote"

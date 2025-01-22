@@ -825,11 +825,17 @@ const panel = ref(['filter'])
                   class="py-1"
                 >
                   <VTextField
+                    v-if="false"
                     v-model="searchByBarcode"
                     :label="$t('Barcode')"
                     type="Barcode"
                     density="compact"
                     append-inner-icon="mdi-barcode-scan"
+                  />
+                  <VTextField
+                    v-model="searchByBarcode"
+                    :label="$t('Lot')"
+                    density="compact"
                   />
                 </VCol>
               </VRow>
@@ -935,11 +941,18 @@ const panel = ref(['filter'])
                   class="py-1"
                 >
                   <VTextField
+                    v-if="false"
                     v-model="searchByBarcode"
                     :label="$t('Barcode')"
                     type="Barcode"
                     density="compact"
                     append-inner-icon="mdi-barcode-scan"
+                  />
+                  <VTextField
+                    v-model="searchByBarcode"
+                    label=""
+                    type="Lot"
+                    density="compact"
                   />
                 </VCol>
               </VRow>
@@ -1539,6 +1552,7 @@ const panel = ref(['filter'])
             </th>
             
             <th
+              v-if="false"
               scope="row"
               class="text-center"
             >
@@ -1718,6 +1732,7 @@ const panel = ref(['filter'])
               />
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-end px-1"
             >
@@ -1993,7 +2008,10 @@ const panel = ref(['filter'])
             </td>
 
             <!-- 👉 Secondary product categories -->
-            <td v-if="false" class="text-start px-1">
+            <td
+              v-if="false"
+              class="text-start px-1"
+            >
               {{ product.typeName }}
             </td>
 
@@ -2006,7 +2024,10 @@ const panel = ref(['filter'])
             </td>
 
             <!-- 👉 Barcode -->
-            <td class="text-start px-1">
+            <td
+              v-if="false"
+              class="text-start px-1"
+            >
               <VueBarcode
                 v-if="product.barcode"
                 :options="{
@@ -2046,6 +2067,7 @@ const panel = ref(['filter'])
               {{ (formatDecimal(product.nonTags)).toLocaleString('en-US') }}
             </td>
             <td
+              v-if="false"
               class="text-end"
               style="width: 5rem;"
             >
