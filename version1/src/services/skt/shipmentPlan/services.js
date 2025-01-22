@@ -70,12 +70,12 @@ export const useGetSearchPlanService = () => {
   const getSearchPlanResult = ref(null)
   const errorGetSearchPlan = ref(null)
   
-  const fetchSearchPlan = async (urlApi, form, whereHouse, accessToke, params = {}) => {
+  const fetchSearchPlan = async (urlApi, form, whereHouse, accessToke, params = {}, statusID) => {
     try {
       errorGetSearchPlan.value = null
       console.log('Fetching fetchSearchPlan...')
   
-      const result = await shipmentPlanRepository.getSearchPlan(urlApi, form, whereHouse, accessToke, params)
+      const result = await shipmentPlanRepository.getSearchPlan(urlApi, form, whereHouse, accessToke, params, statusID)
         
       if (result) {
         // console.log('Fetching data fetchSearchPlan:', result)

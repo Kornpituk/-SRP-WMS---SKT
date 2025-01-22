@@ -63,7 +63,7 @@ export const shipmentPlanRepository = {
     }
   },
 
-  async getSearchPlan(urlApi, form, whereHouse, accessToken, params = {}) {
+  async getSearchPlan(urlApi, form, whereHouse, accessToken, params = {}, statusID) {
     console.log('get repo getSearchPlan...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/ShipmentPlan/${form}`, {
@@ -73,12 +73,13 @@ export const shipmentPlanRepository = {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-          StatusId: params.StatusId || '',
+          StatusId: statusID || '',
           ETA: params.ETA || '',
           ETD: params.ETD || '',
           SalesOrderNoSearch: params.SalesOrderNoSearch || '',
           PayerNameSearch: params.PayerNameSearch || '',
           ItemNameSearch: params.ItemNameSearch || '',
+          LotSearch: params.LotSearch || '',
           SortColumn: params.SortColumn || '',
           SortDirection: params.SortDirection || '',
         },
