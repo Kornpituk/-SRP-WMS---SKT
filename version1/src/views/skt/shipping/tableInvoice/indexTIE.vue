@@ -150,6 +150,7 @@ const typeBtnView = ref('')
 const titleDialogView = ref('')
 const soEIdModel = ref('')
 const indexDataDialogTextArea = ref('')
+const activeShipMarkModel = ref('')
 
 //------ function for dialog text area ----------------------------------------------
 
@@ -244,7 +245,7 @@ const textAreaRemarkDialogActive = (type, data, soEId) => {
   console.log('Type dialog', typeDialogTextArea.value, '=', type)
 }
 
-const textAreaShipDialogActive2 = (type, data, data2, index, soEId) => {
+const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMark) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
   soEIdModel.value = soEId
@@ -252,6 +253,7 @@ const textAreaShipDialogActive2 = (type, data, data2, index, soEId) => {
   typeDialogView.value = 'ShipMC'
   dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogData2TextArea.value = data2 // 
+  activeShipMarkModel.value = activeShipMark
   dialogVisible.value = true
 }
 
@@ -2874,7 +2876,7 @@ const refeshPage = () => {
                     style="min-width: 160px; max-width: 160px;"
                     variant="outlined"
                     :color="product.shipperConditions ? 'primary' : 'grey'"
-                    @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, product.shipperConditions, index, product.soEtlLogDetailJournalID)"
+                    @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, product.shipperConditions, index, product.soEtlLogDetailJournalID, product.shippingMarkActive)"
                   >
                     <span
                       v-if="product.shipperConditions"
@@ -3338,6 +3340,13 @@ const refeshPage = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ (product.loadingDate) }}
+                <AppDateTimePicker
+                  v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canExecute"
+                  v-model="product.loadingDate"
+                  density="compact"
+                  prepend-inner-icon="ri-calendar-schedule-fill"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
               </td>
 
               <!-- 👉 etd -->
@@ -4370,6 +4379,11 @@ const refeshPage = () => {
                   counter
                   class="text-center"
                   outlined
+                />
+                <VCheckbox
+                  v-model="activeShipMarkModel"
+                  value="activeShipMarkModel"
+                  label="Shipping Mark Active"
                 />
               </VCol>
               <VCol cols="6">
