@@ -221,6 +221,11 @@ const groupDataByLot = data => {
   return data
 }
 
+const testSelect = () => {
+  console.log('selectedDataTables', selectedDataTables.value)
+  console.log('selectedDataTables', selectedDataTables.value)
+}
+
 const dataFilterPrintLabel = [{ key: 'lot' }]
 
 //------------------------- Print Label ------------------------
@@ -233,6 +238,10 @@ const { printLabelBarcodeFormViewResult, printLabelFormBarcodeService } = usePri
 
 const isLoadingPrintLabel = ref(false)
 const successPrintLabel = ref(null)
+
+const removeDuplicates = arr => {
+  return [...new Set(arr)] // ใช้ Set เพื่อจัดการกับค่าที่ซ้ำกัน
+}
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const printLabel = async () => {
@@ -249,9 +258,11 @@ const printLabel = async () => {
 
   console.log('Semi Label print start .....', barcodes)
 
+  const uniqueBarcodes = removeDuplicates(barcodes)
+
   isLoadingPrintLabel.value = true
   successPrintLabel.value = null
-  await saveToPrintLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, barcodes)
+  await saveToPrintLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore, uniqueBarcodes)
   if(saveToPrintLabelFormBarcodeResult.value){
     await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore)
     isLoadingPrintLabel.value = false
@@ -278,9 +289,12 @@ const updateSelectedData = sub => {
   // Add to selectedDataTables if selected, remove if deselected
   if (sub.selected) {
     selectedDataTables.value.push(sub)
+    console.log('selectedDataTables in updateSelectedData if', selectedDataTables.value)
   } else {
+
     const index = selectedDataTables.value.findIndex(item => item.name === sub.name)
     if (index !== -1) selectedDataTables.value.splice(index, 1)
+    console.log('selectedDataTables in updateSelectedData else', selectedDataTables.value)
   }
 }
 
@@ -965,6 +979,12 @@ const dataTableCliclHighlightIsToggle = no => {
     </VDialog>
   </div>
 
+  <div>
+    <VBtn @click="testSelect">
+      Test
+    </VBtn>
+  </div>
+
   <!-- ----------             Production plan                                ------------------------------------ -->
   <section>
     <VCard>
@@ -1024,7 +1044,8 @@ const dataTableCliclHighlightIsToggle = no => {
                   :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                 >
                   <VCheckbox
-                    v-model="sub.selected" 
+                    v-model="sub.selected"
+                    value="selectedDataTables"
                     @change="updateSelectedData(sub)" 
                   />
                 </div>
