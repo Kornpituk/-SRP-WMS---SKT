@@ -321,7 +321,7 @@ const selectedRows = ref([])
 
 ///--------------------------------------- FetchItems for Search Box ----------------------------------------------
 
-const fetchItemsSearchBy = nameSearch => {
+const fetchItemsSearchBy = async nameSearch => {
   return axiosIns.get(`${urlApi.value}/api/v1/Product/${nameSearch}`, {
     headers: {
       'accept': '*/*',
