@@ -3065,7 +3065,16 @@ const refeshPage = () => {
                   item-value="freightForwarder"
                   density="compact"
                   eager
-                />
+                >
+                  <template #selection="{ item }">
+                    <div
+                      class="truncate-select"
+                      style="min-width: 150px;"
+                    >
+                      {{ item.title }}
+                    </div>
+                  </template>
+                </VSelect>
               </td>
 
               <!-- 👉 carrier -->
@@ -3094,7 +3103,16 @@ const refeshPage = () => {
                   item-value="carrier"
                   density="compact"
                   eager
-                />
+                >
+                  <template #selection="{ item }">
+                    <div
+                      class="truncate-select"
+                      style="min-width: 150px;"
+                    >
+                      {{ item.title }}
+                    </div>
+                  </template>
+                </VSelect>
               </td>
 
               <!-- 👉 vesselName -->
@@ -3123,7 +3141,16 @@ const refeshPage = () => {
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
                   density="compact"
                   eager
-                />
+                >
+                  <template #selection="{ item }">
+                    <div
+                      class="truncate-select"
+                      style="min-width: 150px;"
+                    >
+                      {{ item.title }}
+                    </div>
+                  </template>
+                </VSelect>
               </td>
 
               <!-- 👉 voy -->
@@ -3182,7 +3209,16 @@ const refeshPage = () => {
                       :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
                       density="compact"
                       dense
-                    />
+                    >
+                      <template #selection="{ item }">
+                        <div
+                          class="truncate-select"
+                          style="min-width: 150px;"
+                        >
+                          {{ item.title }}
+                        </div>
+                      </template>
+                    </VSelect>
                   </VCol>
                 </VRow>
               </td>
