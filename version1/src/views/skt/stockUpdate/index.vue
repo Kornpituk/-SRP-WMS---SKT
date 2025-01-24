@@ -664,7 +664,7 @@ const isDialogPrintVisible = ref(false)
                     density="compact"
                   >
                     <template #label>
-                      <span style="font-size: 14px;">Item Code</span>
+                      <span style="font-size: 14px;">Item Name</span>
                     </template>
                   </VTextField>
                 </VCol>
