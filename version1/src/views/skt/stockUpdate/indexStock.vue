@@ -364,13 +364,8 @@ const isDialogImageVisible = ref(false)
 const urlImage = ref('')
 const nameImage = ref('')
 
-const showImage = url => {
-  console.log('Show Image:', url)
-  urlImage.value = url
-  isDialogImageVisible.value = true
-}
-
 const checkRFID = ref ('')
+
 
 watchEffect(() =>{
   const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
@@ -743,9 +738,9 @@ const isDialogPrintVisible = ref(false)
       max-width="500"
     >
       <VCard class="">
-        <VCardTitle class="d-flex justify-space-between">
+        <VCardTitle class="d-flex justify-space-between bg-primary">
           <div>
-            <span>{{ $t('Image Product') }}</span>
+            <span class="text-white">{{ $t('Image Product') }}</span>
           </div>
           <div>
             <IconBtn
@@ -761,9 +756,72 @@ const isDialogPrintVisible = ref(false)
         </VCardTitle>
         <VImg
           style="width: 100%;"
-          :src="urlImage"
+          :src="imgProduct"
           cover
         />
+        <VCardActions
+          class="bg-primary"
+          style="width: 100%; padding: 0;"
+        >
+          <VBtn
+            color="red-green-1"
+            variant="text"
+            style="width: 100%;"
+            @click="showExpansionDialog = !showExpansionDialog"
+          >
+            <VIcon
+              size="40px"
+              color="white"
+              :icon="showExpansionDialog ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            />
+            <span class="text-white">{{ $t('Details') }}</span>
+          </VBtn>
+        </VCardActions>
+
+        <VExpandTransition>
+          <div v-show="showExpansionDialog">
+            <VCardText class="bg-green-lighten-3">
+              <div>
+                <VRow>
+                  <VCol
+                    cols="12"
+                    lg="6"
+                  >
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Name")
+                    }}:&nbsp;</span>&nbsp;{{ nameProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Code")
+                    }}:&nbsp;</span>&nbsp;{{ codeProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Barcode")
+                    }}:&nbsp;</span>&nbsp;{{ barcodeProduct }}<br>
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    lg="6"
+                  >
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Categories")
+                    }}:&nbsp;</span>&nbsp;{{ categoriesProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Group")
+                    }}:&nbsp;</span>&nbsp;{{ groupProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Sup Group")
+                    }}:&nbsp;</span>&nbsp;{{ groupSupProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Total")
+                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{ (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
+                  </VCol>
+                </VRow>
+                <span style="font-size: large; font-weight: 900;">{{
+                  $t("Details ")
+                }} :</span>{{ detailsProduct }}
+              </div>
+            </VCardText>
+          </div>
+        </VExpandTransition>
       </VCard>
     </VDialog>
   </section>
@@ -1036,12 +1094,11 @@ const isDialogPrintVisible = ref(false)
                   </VBtn>
                 </td>
                 <td>{{ item.no }}</td>
-                <td class="cursor-pointer" @click="showImage(item.image)">
+                <td>
                   <img
                     :src="item.image"
                     alt="Item Image"
                     width="50"
-                    @click="showImage(item.image)"
                   >
                 </td>
                 <td

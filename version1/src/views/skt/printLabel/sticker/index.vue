@@ -388,12 +388,11 @@ const headerSubtitle = [
   { title: '' },
   { title: '' },
   { title: '' },
-  { title: '', key: 'checkbox' },
-  { title: 'Item Code', key: 'name' },
-  { title: 'Item Name', key: 'calories' },
-  { title: 'Lot', key: 'fat' },
-  { title: 'Barcode', key: 'carbs' },
-  { title: 'NO/Lot QTY', key: 'protein' },
+  { title: '', key: 'checkbox', align: 'center' },
+  { title: 'Item Code', key: 'name', align: 'center' },
+  { title: 'Item Name', key: 'calories', align: 'center' },
+  { title: 'Lot', key: 'fat', align: 'center' },
+  { title: 'NO/Lot QTY', key: 'protein', align: 'center' },
   { title: '' },
   { title: '' },
   { title: '' },
@@ -1038,7 +1037,7 @@ const dataTableCliclHighlightIsToggle = no => {
               <th
                 v-for="(headerSub, index) in headerSubtitle"
                 :key="index"
-                class="px-2"
+                class="px-2 text-center"
               >
                 {{ headerSub.title }}
               </th>
@@ -1091,7 +1090,7 @@ const dataTableCliclHighlightIsToggle = no => {
                   {{ sub.lotId }}
                 </div>
               </td>
-              <td class="px-2">
+              <td v-if="false" class="px-2">
                 <div
                   v-for="(sub, index) in item.raw.barcodes"
                   :key="sub.barcode + index"
@@ -1106,9 +1105,9 @@ const dataTableCliclHighlightIsToggle = no => {
                   v-for="(sub, index) in item.raw.barcodes"
                   :key="sub.lotDescription + index"
                   :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
-                  class="d-flex align-center"
+                  class="d-flex justify-center align-center"
                 >
-                  {{ sub.lotDescription }}
+                  <span>{{ sub.lotDescription }}</span>
                 </div>
               </td>
             </tr>
