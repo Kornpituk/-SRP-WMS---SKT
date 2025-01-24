@@ -204,6 +204,7 @@ const btnCloseShipCon = () => {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
       item.shipperMark = dialogDataTextArea.value
       item.shipperConditions = dialogData2TextArea.value
+      item.shippingMarkActive = activeShipMarkModel.value
     }
   })
   console.log('btnCloseShipCon...')
@@ -631,6 +632,7 @@ const mapRequestData = data => ({
   shipperMark: getOrDefault(data.shipperMark, ""),
   shipperConditions: getOrDefault(data.shipperConditions, ""),
   shippingEndUser: getOrDefault(data.shippingEndUser, ""),
+  shippingMarkActive: getOrDefault(data.shippingMarkActive, ""),
   freightForwarder: getOrDefault(data.freightForwarder, ""),
   carrier: getOrDefault(data.carrier, ""),
   vesselName: getOrDefault(data.vesselName, ""),

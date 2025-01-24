@@ -133,12 +133,21 @@ const clearModel = async () => {
 //   await fetchData()
 // })
 
+const PoNoColumn = ref('P/O No.')
+
 const validatedFilterEmpty = () => {
   return Object.values(paramsFetchDataPrintLabel.value).some(value => !!value)
 }
 
 const fetchData = async () => {
   try {
+
+    if(paramsFetchDataPrintLabel.value.category === 'Product'){
+      PoNoColumn.value = 'Sale order No.'
+    }else{
+      PoNoColumn.value = 'P/O No.'
+    }
+
     progressLinearNoData.value = false
 
     paramsFetchDataPrintLabel.value.sortColumn = sortColumn.value
@@ -302,6 +311,8 @@ const eXprtreeNode = () => {
   console.log('eXprtreeNode', selectedDataTables.value)
 }
 
+
+
 const headersNewEx = [
   { title: '', key: 'data-table-expand' },
   {
@@ -330,7 +341,7 @@ const headersNewEx = [
     sortable: false,
   },
   {
-    title: 'P/O No',
+    title: PoNoColumn,
     key: 'purchaseOrderNo',
     sortable: false,
   },
@@ -1145,6 +1156,17 @@ const dataTableCliclHighlightIsToggle = no => {
           </template>
           <template #column.receivedDate="{ column }">
             <tr class="d-flex justify-center">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+          <template #column.seleOrderNo="{ column }">
+            <tr v-if="false" class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
                   :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
