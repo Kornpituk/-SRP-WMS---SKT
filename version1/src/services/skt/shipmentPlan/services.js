@@ -38,12 +38,12 @@ export const useGetSelectDataService = () => {
   const getSelectDataResult = ref(null)
   const errorGetSelectData = ref(null)
   
-  const fetchSelectData = async (urlApi, form, whereHouse, accessToke) => {
+  const fetchSelectData = async (urlApi, form, type, whereHouse, accessToke) => {
     try {
       errorGetSelectData.value = null
       console.log('Fetching fetchSelectData...')
   
-      const result = await shipmentPlanRepository.getSelect(urlApi, form, whereHouse, accessToke)
+      const result = await shipmentPlanRepository.getSelect(urlApi, form, type, whereHouse, accessToke)
         
       if (result) {
         // console.log('Fetching data fetchSelectData:', result)

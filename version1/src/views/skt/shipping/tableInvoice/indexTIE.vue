@@ -118,6 +118,69 @@ const carrierModel = ref([])
 const vesselsModel = ref([])
 const truckModel = ref([])
 
+const TruckCompanyModel = ref([])
+const TruckTypeModel = ref([])
+
+const TruckCompanyPrint = ref([])
+
+function getCurrentDateFormatted() {
+  // สร้างวัตถุ Date สำหรับวันที่ปัจจุบัน
+  const currentDate = new Date()
+
+  // ดึงวัน (วว)
+  const day = String(currentDate.getDate()).padStart(2, '0') // เพิ่ม leading zero ถ้าวันเป็นเลขหลักเดียว
+
+  // ดึงเดือน (ดด)
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0') // getMonth() คืนค่า 0-11 จึงต้องบวก 1
+
+  // ดึงปี (ปปปป)
+  const year = currentDate.getFullYear()
+
+  // คืนค่าวันที่ในรูปแบบ วว/ดด/ปปปป
+  return `${day}/${month}/${year}`
+}
+
+const selectedTruckCompany2 = type => {
+  // ตรวจสอบว่า type มีค่าหรือไม่
+  if (!type) {
+    console.error("Type is undefined or null")
+    
+    return null
+  }
+
+  // ตรวจสอบว่า TruckCompanyModel.value และ TruckCompanyPrint.value มีค่าหรือไม่
+  if (!TruckCompanyModel.value || !TruckCompanyPrint.value) {
+    console.error("TruckCompanyModel.value or TruckCompanyPrint.value is undefined or null")
+    
+    return null
+  }
+
+  // ค้นหาข้อมูลที่ตรงกับ TruckCompanyPrint.value
+  const foundItem = TruckCompanyModel.value.find(item => item.no === TruckCompanyPrint.value)
+
+  // ตรวจสอบว่าพบข้อมูลหรือไม่
+  if (!foundItem) {
+    console.error("No item found with no:", TruckCompanyPrint.value)
+    
+    return null
+  }
+
+  // คืนค่าตาม type
+  if (type === 'address') {
+    return foundItem.address
+  }else if(type === 'personIncharge'){
+    return foundItem.personIncharge
+  }else if(type === 'contact'){
+    return foundItem.contact
+  }
+
+  // คืนค่า null หาก type ไม่ตรงกับเงื่อนไข
+  return null
+}
+
+
+const TruckTypePrint = ref([])
+
 /// ------------------------------ Import Component --------------------------------
 // --- Dialog Text Area --------------------------------
 
@@ -974,11 +1037,12 @@ const checkBgTruck = truck => {
 
 const { getSelectDataResult, errorGetSelectData, fetchSelectData } = useGetSelectDataService()
 
-const getSelectData = async type => {
+const getSelectData = async (format, type) => {
   try {
     const result = await fetchSelectData(
       urlApi.value,
       type,
+      format,
       whereHouse,
       accessTokenAtStore,
     )
@@ -1001,17 +1065,22 @@ const getSelectData = async type => {
 }
 
 onMounted(async () => {
-  const [freightForwarders, carriers, vessels, truck] = await Promise.all([
-    getSelectData('getfreightforwarders'),
-    getSelectData('getcarriers'),
-    getSelectData('getvessels'),
-    getSelectData('gettrucks'),
+  const [freightForwarders, carriers, vessels, truck, truckConpany, truckType] = await Promise.all([
+    getSelectData('ShipmentPlan', 'getfreightforwarders'),
+    getSelectData('ShipmentPlan', 'getcarriers'),
+    getSelectData('ShipmentPlan', 'getvessels'),
+    getSelectData('ShipmentPlan', 'gettrucks'),
+    getSelectData('ShippingTruckOrder', 'getTruckCompany'),
+    getSelectData('ShippingTruckOrder', 'getTruckType'),
   ])
 
   freightForwarderModel.value = freightForwarders
   carrierModel.value = carriers
   vesselsModel.value = vessels
   truckModel.value = truck
+
+  TruckCompanyModel.value = truckConpany
+  TruckTypeModel.value = truckType
 })
 
 const itemMock = ref([
@@ -1143,8 +1212,14 @@ const rules = [v => v.length <= 150 || 'Max 25 characters']
 //--------- new expention
 const panel = ref(['filter'])
 
-///---------------- Dialog 
+///---------------- Dialog  truck order ------------------
 const isDialogVisiblePrintTruck = ref(false)
+const saleOrderNo = ref('')
+
+const showDialogTruckOrder = SoId => {
+  isDialogVisiblePrintTruck.value = true
+  saleOrderNo.value = SoId
+}
 
 ///------------ Dialog PDF
 
@@ -1884,6 +1959,7 @@ const printShipmentPDFBySoEId = type => {
     </VCard>
   </div>
 
+  <!-- Truck Order -->
   <section>
     <VDialog
       v-model="isDialogVisiblePrintTruck"
@@ -1942,7 +2018,7 @@ const printShipmentPDFBySoEId = type => {
                   colspan="8"
                   class="text-start"
                 >
-                  24/07/2024
+                  {{ getCurrentDateFormatted() }}
                 </td>
               </tr>
               <tr>
@@ -1969,7 +2045,7 @@ const printShipmentPDFBySoEId = type => {
                   colspan="8"
                   class="text-start"
                 >
-                  1100077645
+                  {{ saleOrderNo }}
                 </td>
               </tr>
               <tr>
@@ -1993,8 +2069,9 @@ const printShipmentPDFBySoEId = type => {
                 <td
                   colspan="8"
                   class="text-start"
+                  style="min-width: 500px; max-width: 500px;"
                 >
-                  LEO Global Logistics Public Company Limited 251-251/1 Soi Pakdee, Rama 3 Road, Bangkorlaem, Bangkok 10120 Thailand
+                  <span v-if="selectedTruckCompany2('address')">{{ selectedTruckCompany2('address') }}</span>
                 </td>
               </tr>
               <tr>
@@ -2005,12 +2082,14 @@ const printShipmentPDFBySoEId = type => {
                   colspan="8"
                   class="text-center"
                 >
-                  <VAutocomplete
+                  <VSelect
+                    v-model="TruckCompanyPrint"
                     class="text-center"
                     density="compact"
                     label="Transportation Company Name"
-                    :items="items"
-                    placeholder="Select State"
+                    :items="TruckCompanyModel"
+                    item-title="truck"
+                    item-value="no"
                   />
                 </th>
               </tr>
@@ -2022,12 +2101,14 @@ const printShipmentPDFBySoEId = type => {
                   colspan="8"
                   class="text-center"
                 >
-                  <VAutocomplete
+                  <VSelect
+                    v-model="TruckTypePrint"
                     class="text-center"
                     density="compact"
                     label="Truck Type"
-                    :items="items"
-                    placeholder="Select State"
+                    :items="TruckTypeModel"
+                    item-title="truckType"
+                    item-value="no"
                   />
                 </th>
               </tr>
@@ -2053,15 +2134,18 @@ const printShipmentPDFBySoEId = type => {
                 </th>
                 <td
                   colspan="8"
-                  class="text-center"
+                  class="text-start"
                 >
                   <VTextField
+                    v-if="false"
+                    :v-model="selectedTruckCompany2('personIncharge')"
                     style="min-width: 250px;"
                     density="compact"
                     label="Driver's Name"
                     placeholder="MR. ABCD"
                     class="text-center"
                   />
+                  <span v-if="selectedTruckCompany2('personIncharge')">{{ selectedTruckCompany2('personIncharge') }}</span>
                 </td>
               </tr>
               <tr v-if="false">
@@ -2073,12 +2157,14 @@ const printShipmentPDFBySoEId = type => {
                   class="text-center"
                 >
                   <VTextField
+                    v-if="false"
                     style="min-width: 250px;"
                     density="compact"
                     label="Ref SO No."
                     placeholder="000000000"
                     class="text-center"
                   />
+                  <span v-if="selectedTruckCompany2('contact')">{{ selectedTruckCompany2('contact') }}</span>
                 </td>
               </tr>
               <tr>
@@ -2087,15 +2173,17 @@ const printShipmentPDFBySoEId = type => {
                 </th>
                 <td
                   colspan="8"
-                  class="text-center"
+                  class="text-start"
                 >
                   <VTextField
+                    v-if="false"
                     style="min-width: 250px;"
                     density="compact"
                     label="Tel."
                     placeholder="000-0000000"
                     class="text-center"
                   />
+                  <span v-if="selectedTruckCompany2('contact')">{{ selectedTruckCompany2('contact') }}</span>
                 </td>
               </tr>
               <tr>
@@ -3328,7 +3416,7 @@ const printShipmentPDFBySoEId = type => {
                       width="90px"
                       color="warning"
                       class="mx-2"
-                      @click="isDialogVisiblePrintTruck = true"
+                      @click="showDialogTruckOrder(product.salesOrderNo)"
                     >
                       <VIcon
                         size="30"

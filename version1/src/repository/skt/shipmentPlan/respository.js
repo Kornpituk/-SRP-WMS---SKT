@@ -35,10 +35,10 @@ export const shipmentPlanRepository = {
   },
 
   //------------------------------ Get ----------------------------
-  async getSelect(urlApi, form, whereHouse, accessToken) {
+  async getSelect(urlApi, form, type, whereHouse, accessToken) {
     console.log('get repo getSelect...')
     try {
-      const response = await axios.get(`${urlApi}/api/v1/ShipmentPlan/${form}`, {
+      const response = await axios.get(`${urlApi}/api/v1/${type}/${form}`, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
