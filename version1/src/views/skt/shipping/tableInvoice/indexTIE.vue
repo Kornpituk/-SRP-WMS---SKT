@@ -59,6 +59,7 @@ import { useGetUserPermissionService,
   useSaveSearchPlanService,
   useSubmitShipmentPlanService,
   useSaveFileFormService,
+  usePrintShipmentPDFService,
 } from '@/services/skt/shipmentPlan/services'
 
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
@@ -1192,6 +1193,33 @@ const refeshPage = () => {
     isSpinning.value = false
   }, 10 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   location.reload()
+}
+
+//----------------------------------------- Print Section -------------------------------
+
+const { printShipmentPDFResult, errorPrintShipmentPDF, printShipmentPDF  } = usePrintShipmentPDFService()
+
+const printShipmentPDFBySoEId = type => {
+  try{
+    const result = printShipmentPDF(urlApi.value,
+      type,
+      whereHouse,
+      accessTokenAtStore,
+      soEIdModel.value)
+    
+    if(result){
+      // textAlertDialogFunction(alertWordConst.print, true)
+      // setTimeout(() => {
+      //   location.reload()
+      // }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      textAlertDialogFunction(alertWordConst.print, false)
+      setTimeout(() => {
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
+  } catch (e) {
+    console.error(`Error saving search plan:`, error)
+  }
 }
 </script>
 
@@ -2703,10 +2731,11 @@ const refeshPage = () => {
                       activator="parent"
                       location="right"
                     >
-                      <p>{{ colorStatusWithId(product.inspStatusId).text }}</p>
-                      <p>{{ colorStatusWithId(product.salStatusId).text }}</p>
-                      <p>{{ colorStatusWithId(product.logStatusId).text }}</p>
-                      <p class="mb-0">{{ colorStatusWithId(product.whStatusId).text }}</p>
+                      <p>{{ (product.csLfStatusText) }}</p>
+                      <p>{{ (product.inspStatusText) }}</p>
+                      <p>{{ (product.salStatusText) }}</p>
+                      <p>{{ (product.logStatusText) }}</p>
+                      <p class="mb-0">{{ (product.whStatusText) }}</p>
                     </VTooltip>
                   </VChip>
                   
@@ -2832,7 +2861,7 @@ const refeshPage = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                {{ (product.shippingName) }}
+                {{ (product.shipperName) }}
               </td>
 
               <!-- 👉 shipperLocation -->
@@ -3868,7 +3897,7 @@ const refeshPage = () => {
                 class="text-start px-1"
                 style="min-width: 200px; font-size: 12px;"
               >
-                {{ (item.raw.shippingUserName) }}
+                {{ (item.raw.shipperName) }}
               </td>
 
               <!-- 👉 shipperLocation -->
@@ -4444,7 +4473,7 @@ const refeshPage = () => {
                 <VBtn
                   variant="flat"
                   color="warning"
-                  disabled
+                  @click="printShipmentPDFBySoEId('ShipperMarkLabel')"
                 >
                   <VIcon icon="ri-printer-fill" />Print
                 </VBtn>
@@ -4454,9 +4483,9 @@ const refeshPage = () => {
                 class="d-flex justify-center"
               >
                 <VBtn
-                  disabled
                   variant="flat"
                   color="warning"
+                  @click="printShipmentPDFBySoEId('ShipperConditionLabel')"
                 >
                   <VIcon icon="ri-printer-fill" />Print
                 </VBtn>

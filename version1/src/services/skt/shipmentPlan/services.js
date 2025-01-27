@@ -163,6 +163,40 @@ export const useSubmitShipmentPlanService = () => {
   }
 }
 
+//-------------------------------- Print ----------------------------------
+export const usePrintShipmentPDFService = () => {
+  const printShipmentPDFResult = ref(null)
+  const errorPrintShipmentPDF = ref(null)
+  
+  const printShipmentPDF = async (urlApi, form, whereHouse, accessToke, soeId) => {
+    try {
+      errorPrintShipmentPDF.value = null
+      console.log('printShipmentPDF...')
+  
+      const result = await shipmentPlanRepository.printShipperPDFRepo(urlApi, form, whereHouse, accessToke, soeId)
+        
+      if (result) {
+        // console.log('printShipmentPDF:', result)
+        printShipmentPDFResult.value = result.data
+        
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in printShipmentPDF:', error)
+      errorPrintShipmentPDF.value = error.message
+    }
+  }
+  
+  return {
+    printShipmentPDFResult,
+    errorPrintShipmentPDF,
+    printShipmentPDF,
+  }
+}
+
+
 //------------------------------------- COA ---------------------------------
 export const useSaveFileFormService = () => {
   const resultSaveFielForm = ref(null) // เก็บข้อมูล response ของการบันทึก

@@ -159,6 +159,72 @@ export const shipmentPlanRepository = {
     }
   },
 
+  async submitShipmentPlan(urlApi, form, whereHouse, accessToken, edId) {
+    console.log('get repo submit Shipment Plan...')
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+        console.log('success get repo submit Shipment Plan...')
+
+        // console.log('Service Response data submit Shipment Plan:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If submit Shipment Plan...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try submit Shipment Plan...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch submit Shipment Plan ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  //-------------------------------- Print ----------------------------------
+  async printShipperPDFRepo(urlApi, type, whereHouse, accessToken, edId) {
+    try {
+      const response = await axios.post(
+        `${urlApi}/api/v1/PrintLabel/ShipmertPlan/Pdf/${type}/${edId}`,
+        {},
+        {
+          headers: {
+            'accept': 'application/pdf', // รับไฟล์ PDF
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response print PDF  form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+        window.open(blobUrl)
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data Genterate print PDF  form')
+      }
+    } catch (error) {
+      console.error('Error in printPDF Barcode:', error)
+      throw new Error(`Failed to printPDF Barcode for Lot ${edId}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   
 }
 
