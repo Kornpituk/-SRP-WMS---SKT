@@ -3172,7 +3172,7 @@ const insetSwitch1 = ref('')
                 </template>
               </VCheckbox>
               <VCheckbox
-                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
+                v-if="receivingTypeAction === 3"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListLorry()"
                 label="Lorry Loading Checklist"
