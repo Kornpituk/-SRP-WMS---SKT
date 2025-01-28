@@ -375,10 +375,10 @@ const checkRFID = ref ('')
 watchEffect(() =>{
   const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
   if(checkRFIDUpdate.value === 'true'){
-    console.log('RFID Check True:'+ checkRFIDUpdate.value)
+    // console.log('RFID Check True:'+ checkRFIDUpdate.value)
     checkRFID.value = true
   } else if (checkRFIDUpdate.value === 'false') {
-    console.log('RFID Check False:'+ checkRFIDUpdate.value)
+    // console.log('RFID Check False:'+ checkRFIDUpdate.value)
     checkRFID.value = false
   }
 })
