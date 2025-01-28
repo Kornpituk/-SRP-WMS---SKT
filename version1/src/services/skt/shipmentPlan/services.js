@@ -241,3 +241,35 @@ export const useSaveFileFormService = () => {
     functionSaveFileForm, // เปลี่ยนชื่อเป็น handleSaveDraftCoaForm เพื่อให้ชัดเจน
   }
 }
+
+export const useGetFileFormService = () => {
+  const getFileFormResult = ref(null)
+  const errorMessageGetFileForm = ref(null)
+
+  const getFileFormFunction = async (soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageGetFileForm.value = null
+      console.log('Fetching File Form ...')
+
+      const result = await FileService.fetchFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        console.log('Received File Form:', result)
+        getFileFormResult.value = result
+        
+        return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา
+      } else {
+        // console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      // console.error('Error in getFileFormResult:', error)
+      errorMessageGetFileForm.value = error.message
+    }
+  }
+
+  return {
+    getFileFormResult,
+    errorMessageGetFileForm,
+    getFileFormFunction,
+  }
+}

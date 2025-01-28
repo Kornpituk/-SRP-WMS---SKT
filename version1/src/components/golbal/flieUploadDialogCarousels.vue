@@ -3,6 +3,7 @@ import { ref, watch, watchEffect } from 'vue'
 
 const props = defineProps({
   fileName: { type: String, required: true },
+  filesFromAPI: { type: Array, default: () => [] },  // ใช้สำหรับรับไฟล์จาก API
   typeFileInput: { type: String, default: '' },
   typeBtn: { type: String, default: '' },
   titleDialog: { type: String, default: 'Dialog Title' },
@@ -26,6 +27,12 @@ const emitUpdateFiles = () => {
 watchEffect(() => {
   if(!filesModel.value || filesModel.value.length < 1){
     files.value = []
+  }
+})
+
+watchEffect(()=> {
+  if(props.filesFromAPI){
+    files.value = props.filesFromAPI
   }
 })
 
@@ -76,6 +83,7 @@ const removeFile = index => {
         class="px-2"
         cols="8"
       >
+        file : {{ typeof(files) }}
         <!-- อัปโหลดไฟล์ -->
         <VFileInput
           v-model="filesModel"
@@ -117,14 +125,16 @@ const removeFile = index => {
       >
         <!-- ปุ่มเปิด Carousel Dialog -->
         <VBtn
-          :disabled="!files.length || !filesModel.length || disabledProp"
+          
           class="d-flex justify-center"
           :color="files.length && filesModel.length? 'primary' : 'grey'"
           style="max-width: 70px;"
           @click="openDialog"
         >
           <div><VIcon icon="ri-gallery-fill" /></div>
-          <div v-if="files.length && filesModel.length">{{ files.length }}+</div>
+          <div v-if="files.length && filesModel.length">
+            {{ files.length }}+
+          </div>
         </VBtn>
       </VCol>
     </VRow>
@@ -215,8 +225,25 @@ const removeFile = index => {
                 v-if="file.type === 'image'"
                 :src="file.objectUrl"
               />
+
+              <div v-else-if="file.contentType === 'image/png'">
+                <VImg :src="file.fileUri" />
+                contentType img
+              </div>
+
               <div
-                v-else
+                v-else-if="file.contentType === 'application/pdf'"
+                class="d-flex justify-center align-center"
+              >
+                <iframe 
+                  :src="file.objectUrl"
+                  type="application/pdf"
+                  style="width: 80%; height: 500px;"
+                />
+              </div>
+
+              <div
+                v-else-if="file.type === 'application/pdf'"
                 class="d-flex justify-center align-center"
               >
                 <iframe 

@@ -225,10 +225,32 @@ export const shipmentPlanRepository = {
     }
   },
 
-  
 }
 
 export const FileService = {
+  async fetchFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/${type}/${soEtlLogDetailJournalID}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+        
+      if (response && response.data) {
+        console.log(`Service Response data File:`, response.data)
+          
+        return { success: true, data: response.data }
+      } else {
+        throw { success: false, error }
+      }
+    } catch (error) {
+      console.error('Error in fetchFileForm:', error)
+      throw new Error(`Failed to fetch header for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   async saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
     const formData = new FormData()
 
@@ -248,9 +270,9 @@ export const FileService = {
         },
       })
 
-      return { success: true, data: response.data }
+      return { success: true, data: response.data.data }
     } catch (error) {
-      throw { success: false, error }
+      // throw { success: false, error }
     }
   },
 
@@ -278,7 +300,6 @@ export const FileService = {
       throw { success: false, error }
     }
   },
-
 
   async deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
 

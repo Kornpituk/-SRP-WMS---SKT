@@ -60,6 +60,7 @@ import { useGetUserPermissionService,
   useSubmitShipmentPlanService,
   useSaveFileFormService,
   usePrintShipmentPDFService,
+  useGetFileFormService,
 } from '@/services/skt/shipmentPlan/services'
 
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
@@ -603,7 +604,7 @@ const toggleSelectAll = () => {
 //--------------------------- File INput --------------------------------
 
 import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
-import { watchEffect } from 'vue'
+import { onMounted, watchEffect } from 'vue'
 
 const viewAllData = () => {
   console.log(mockData.value)
@@ -619,23 +620,9 @@ const filesFromUploaderDeliNote = ref([])
 const typeNameFileInput = ref('')
 
 // ฟังก์ชันจัดการข้อมูลที่ส่งมาจาก FileUploader
-const handleFileUpdatesSO = updatedFiles => {
-  filesFromUploaderSO.value = updatedFiles
-}
-
-const handleFileUpdatesCOA = updatedFiles => {
-  filesFromUploaderCOA.value = updatedFiles
-}
 
 
-const handleFileUpdatesTruckOrder = updatedFiles => {
-  filesFromUploaderTruckOrder.value = updatedFiles
-}
-
-const handleFileUpdatesDeliNote = updatedFiles => {
-  filesFromUploaderDeliNote.value = updatedFiles
-}
-
+//------------------------------- Section FIle Form -------------------------------------
 //------------------------------- Function Save File ------------------------
 const { resultSaveFielForm, errorMessageSaveFileForm, functionSaveFileForm } = useSaveFileFormService()
 
@@ -685,6 +672,108 @@ const saveFileFormShipment = async (
     return false
   }
 }
+
+//------------------------------- Function Get File Form --------------------------
+const { getFileFormResult, errorMessageGetFileForm, getFileFormFunction } = useGetFileFormService()
+
+const getSoFileModel = ref([])
+const getCoAFileModel = ref([])
+const getTruckOrderFileModel = ref([])
+const getDeliveryNoteFileModel = ref([])
+
+const getFileForm = async (
+  typeFile,
+  soEtlLogDetailJournalID,
+) => {
+  console.log("save file start...", soEtlLogDetailJournalID)
+  try {
+
+    const response = await getFileFormFunction(
+      soEtlLogDetailJournalID,
+      'ShippingFile',
+      typeFile,
+      urlApi.value,
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    console.log("Response from getFileFormFunction:", response.data.data)
+
+    if (getFileFormResult.value?.success) {
+      console.log(`Fetch File Form:`, getFileFormResult.value)
+
+      if(typeFile === 'GetSo'){
+        filesFromUploaderSO.value = response.data.data
+      }
+      
+      return response.data.data
+    } else {
+      // กรณีบันทึกไม่สำเร็จ
+      // console.error(`Error fetching File plan:`, errorMessageGetFileForm.value)
+
+      return false
+    }
+  } catch (error) {
+    // กรณีเกิดข้อผิดพลาดในกระบวนการ
+    console.error(`Error fetching File plan:`, error)
+    
+    // textAlertDialogFunction("An error occurred while fetching the file.", false)
+    
+    return false
+  }
+}
+
+const showFileFormByTypeAndSoId = async (type, soId) => {
+  if(type === 'GetSo'){
+    console.log('showFileFormByTypeAndSoId', await getFileForm(type, soId))
+
+    getSoFileModel.value = await getFileForm(type, soId)
+
+    console.log(`showFileFormByTypeAnd${soId}`, getSoFileModel.value)
+
+    // return await getFileForm(type, soId)
+  }
+}
+
+showFileFormByTypeAndSoId('GetSo', '152')
+
+const handleFileUpdatesSO = updatedFiles => {
+  // if(getSoFileModel.value){
+  //   updatedFiles = getSoFileModel.value
+  // }else{
+  //   filesFromUploaderSO.value = updatedFiles
+  // }
+
+  console.log("Updated files:", updatedFiles)
+  
+}
+
+watch(() => {
+  handleFileUpdatesSO
+})
+
+const handleFileUpdatesCOA = updatedFiles => {
+  filesFromUploaderCOA.value = updatedFiles
+}
+
+
+const handleFileUpdatesTruckOrder = updatedFiles => {
+  filesFromUploaderTruckOrder.value = updatedFiles
+}
+
+const handleFileUpdatesDeliNote = updatedFiles => {
+  filesFromUploaderDeliNote.value = updatedFiles
+}
+
+
+
+// watch( async ()  => {
+//   // await getFileForm('GetSo', '152')
+
+//   showFileFormByTypeAndSoId('GetSo', '152')
+// })
+
+
 
 //------------------------------- Function save Search plan -----------------
 
@@ -2340,6 +2429,14 @@ const printShipmentPDFBySoEId = type => {
             </VBtn>
 
             <VBtn
+              class="mx-2"
+              color="primary"
+              @click="submitShipmentPlanBySoEId"
+            >
+              <span style="font-size: 12px;">Approve</span>
+            </VBtn>
+
+            <VBtn
               v-if="false"
               color="info"
               class="mx-2"
@@ -2867,6 +2964,7 @@ const printShipmentPDFBySoEId = type => {
               >
                 <div>
                   <FileInputDialogCarousels
+                    :files-from-a-p-i="filesFromUploaderSO"
                     title-dialog="So Attachment"
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
                     :type-file-input="typeFileInput"
