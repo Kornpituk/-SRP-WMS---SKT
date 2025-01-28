@@ -60,6 +60,7 @@ import { useGetUserPermissionService,
   useSubmitShipmentPlanService,
   useSaveFileFormService,
   usePrintShipmentPDFService,
+  usePrintTruckOrderFormPDFService,
   useGetFileFormService,
 } from '@/services/skt/shipmentPlan/services'
 
@@ -121,6 +122,12 @@ const truckModel = ref([])
 
 const TruckCompanyModel = ref([])
 const TruckTypeModel = ref([])
+const CompanyModel = ref([])
+const AddressModel = ref([])
+
+const CompanyPrint = ref([])
+const AddressPrint = ref([])
+
 
 const TruckCompanyPrint = ref([])
 
@@ -157,11 +164,11 @@ const selectedTruckCompany2 = type => {
   }
 
   // ค้นหาข้อมูลที่ตรงกับ TruckCompanyPrint.value
-  const foundItem = TruckCompanyModel.value.find(item => item.no === TruckCompanyPrint.value)
+  const foundItem = TruckCompanyModel.value.find(item => item.truck === TruckCompanyPrint.value)
 
   // ตรวจสอบว่าพบข้อมูลหรือไม่
   if (!foundItem) {
-    console.error("No item found with no:", TruckCompanyPrint.value)
+    // console.error("No item found with no:", TruckCompanyPrint.value)
     
     return null
   }
@@ -533,14 +540,17 @@ const searchShipmentPlan = async () => {
     if (result && getSearchPlanResult.value.datas) {
       searchPlanData.value = getSearchPlanResult.value.datas // เก็บข้อมูลใน reactive stat
       
-      searchPlanData.value = getSearchPlanResult.value.datas.map(item => ({
-        ...item,
+      searchPlanData.value = await Promise.all(
+        getSearchPlanResult.value.datas.map(async item => ({
+          ...item,
+          eta: formatToDate(item.eta),
+          etd: formatToDate(item.etd),
 
-        eta: formatToDate(item.eta),
-        etd: formatToDate(item.etd),
+          // fileSo: await getFileForm('GetSo', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+        })),
+      )
 
-      }))
-      console.log(`Fetched search plan:`, searchPlanData.value)
+      // console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
       console.error('No result from API')
       searchPlanData.value = [] // Set empty data if no result
@@ -685,7 +695,6 @@ const getFileForm = async (
   typeFile,
   soEtlLogDetailJournalID,
 ) => {
-  console.log("save file start...", soEtlLogDetailJournalID)
   try {
 
     const response = await getFileFormFunction(
@@ -697,10 +706,10 @@ const getFileForm = async (
       accessTokenAtStore,
     )
 
-    console.log("Response from getFileFormFunction:", response.data.data)
+    // console.log("Response from getFileFormFunction:", response.data.data)
 
     if (getFileFormResult.value?.success) {
-      console.log(`Fetch File Form:`, getFileFormResult.value)
+      // console.log(`Fetch File Form:`, getFileFormResult.value)
 
       if(typeFile === 'GetSo'){
         filesFromUploaderSO.value = response.data.data
@@ -715,7 +724,7 @@ const getFileForm = async (
     }
   } catch (error) {
     // กรณีเกิดข้อผิดพลาดในกระบวนการ
-    console.error(`Error fetching File plan:`, error)
+    // console.error(`Error fetching File plan:`, error)
     
     // textAlertDialogFunction("An error occurred while fetching the file.", false)
     
@@ -735,7 +744,7 @@ const showFileFormByTypeAndSoId = async (type, soId) => {
   }
 }
 
-showFileFormByTypeAndSoId('GetSo', '152')
+// showFileFormByTypeAndSoId('GetSo', '152')
 
 const handleFileUpdatesSO = updatedFiles => {
   // if(getSoFileModel.value){
@@ -995,10 +1004,10 @@ const checkRFID = ref ('')
 watchEffect(() =>{
   const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
   if(checkRFIDUpdate.value === 'true'){
-    console.log('RFID Check True:'+ checkRFIDUpdate.value)
+    // console.log('RFID Check True:'+ checkRFIDUpdate.value)
     checkRFID.value = true
   } else if (checkRFIDUpdate.value === 'false') {
-    console.log('RFID Check False:'+ checkRFIDUpdate.value)
+    // console.log('RFID Check False:'+ checkRFIDUpdate.value)
     checkRFID.value = false
   }
 })
@@ -1154,13 +1163,15 @@ const getSelectData = async (format, type) => {
 }
 
 onMounted(async () => {
-  const [freightForwarders, carriers, vessels, truck, truckConpany, truckType] = await Promise.all([
+  const [freightForwarders, carriers, vessels, truck, truckConpany, truckType, company, address] = await Promise.all([
     getSelectData('ShipmentPlan', 'getfreightforwarders'),
     getSelectData('ShipmentPlan', 'getcarriers'),
     getSelectData('ShipmentPlan', 'getvessels'),
     getSelectData('ShipmentPlan', 'gettrucks'),
     getSelectData('ShippingTruckOrder', 'getTruckCompany'),
     getSelectData('ShippingTruckOrder', 'getTruckType'),
+    getSelectData('ShippingTruckOrder', 'getCompany'),
+    getSelectData('ShippingTruckOrder', 'getAddress'),
   ])
 
   freightForwarderModel.value = freightForwarders
@@ -1170,6 +1181,8 @@ onMounted(async () => {
 
   TruckCompanyModel.value = truckConpany
   TruckTypeModel.value = truckType
+  CompanyModel.value = company
+  AddressModel.value = address
 })
 
 const itemMock = ref([
@@ -1305,9 +1318,10 @@ const panel = ref(['filter'])
 const isDialogVisiblePrintTruck = ref(false)
 const saleOrderNo = ref('')
 
-const showDialogTruckOrder = SoId => {
+const showDialogTruckOrder = (SoId, SoeId) => {
   isDialogVisiblePrintTruck.value = true
   saleOrderNo.value = SoId
+  soEIdModel.value = SoeId
 }
 
 ///------------ Dialog PDF
@@ -1384,6 +1398,68 @@ const printShipmentPDFBySoEId = type => {
   } catch (e) {
     console.error(`Error saving search plan:`, error)
   }
+}
+
+const { printTruckOrderFormPDFResult, errorPrintTruckOrderFormPDF, printTruckOrderFormPDF } = usePrintTruckOrderFormPDFService()
+
+const paramsTruckOrder = ref({
+  runningNum: '',
+  comName: '',
+  address: '',
+  transportComName: '',
+  truckType: '',
+  truckLicense: '',
+  driverName: '',
+  tel: '',
+  remark: '',
+  driverBy: '',
+  dateDriverBy: '',
+  orderBy: '',
+  dateOrderBy: '',
+  authorizedBy: '',
+  dateAuthorizedBy: '',
+})
+
+const loadingPrintTruckOrderForm = ref(false)
+
+const handlePrintTruckOrderPDF = () => {
+
+  paramsTruckOrder.value.comName = CompanyPrint.value
+  paramsTruckOrder.value.address = AddressPrint.value
+  paramsTruckOrder.value.transportComName = TruckCompanyPrint.value
+  paramsTruckOrder.value.truckType = TruckTypePrint.value
+  paramsTruckOrder.value.driverName = selectedTruckCompany2('personIncharge')
+  paramsTruckOrder.value.tel = selectedTruckCompany2('contact')
+
+  loadingPrintTruckOrderForm.value = true
+
+
+  try{
+    const result = printTruckOrderFormPDF(
+      urlApi.value,
+      paramsTruckOrder.value,
+      whereHouse,
+      accessTokenAtStore,
+      soEIdModel.value)
+    
+    if(result){
+      // textAlertDialogFunction(alertWordConst.print, true)
+      // setTimeout(() => {
+      //   location.reload()
+      // }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      loadingPrintTruckOrderForm.value = false
+    
+    }else{
+      textAlertDialogFunction(alertWordConst.print, false)
+      setTimeout(() => {
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      loadingPrintTruckOrderForm.value = false
+    }
+  } catch (e) {
+    console.error(`Error saving search plan:`, error)
+    loadingPrintTruckOrderForm.value = false
+  }
+  loadingPrintTruckOrderForm.value = false
 }
 </script>
 
@@ -2053,6 +2129,7 @@ const printShipmentPDFBySoEId = type => {
     <VDialog
       v-model="isDialogVisiblePrintTruck"
       width="100%"
+      persistent
     >
       <!-- Dialog Content -->
       <VCard title="Truck Order">
@@ -2086,7 +2163,7 @@ const printShipmentPDFBySoEId = type => {
                   colspan="12"
                   class="text-center"
                 >
-                  Tel. : (038) 627-050 Fax. (038 946-072)
+                  Tel. (038) 627-050 Fax. (038) 946-07
                 </th>
               </tr>
               <tr>
@@ -2144,12 +2221,14 @@ const printShipmentPDFBySoEId = type => {
                   ชื่อบริษัท (Company Name)
                 </th>
                 <th colspan="8">
-                  <VAutocomplete
-                    class="text-center"
+                  <VSelect
+                    v-model="CompanyPrint"
+                    class="text-start"
                     density="compact"
-                    label="Company Name"
-                    :items="items"
-                    placeholder="Select State"
+                    label="Company"
+                    :items="CompanyModel"
+                    item-title="company"
+                    item-value="company"
                   />
                 </th>
               </tr>
@@ -2162,7 +2241,15 @@ const printShipmentPDFBySoEId = type => {
                   class="text-start"
                   style="min-width: 500px; max-width: 500px;"
                 >
-                  <span v-if="selectedTruckCompany2('address')">{{ selectedTruckCompany2('address') }}</span>
+                  <VSelect
+                    v-model="AddressPrint"
+                    class="text-start"
+                    density="compact"
+                    label="Address"
+                    :items="AddressModel"
+                    item-title="shipperLocation"
+                    item-value="shipperLocation"
+                  />
                 </td>
               </tr>
               <tr>
@@ -2180,7 +2267,7 @@ const printShipmentPDFBySoEId = type => {
                     label="Transportation Company Name"
                     :items="TruckCompanyModel"
                     item-title="truck"
-                    item-value="no"
+                    item-value="truck"
                   />
                 </th>
               </tr>
@@ -2199,7 +2286,7 @@ const printShipmentPDFBySoEId = type => {
                     label="Truck Type"
                     :items="TruckTypeModel"
                     item-title="truckType"
-                    item-value="no"
+                    item-value="truckType"
                   />
                 </th>
               </tr>
@@ -2212,6 +2299,7 @@ const printShipmentPDFBySoEId = type => {
                   class="text-center"
                 >
                   <VTextField
+                    v-model="paramsTruckOrder.truckLicense"
                     style="min-width: 250px;"
                     density="compact"
                     label="Enter Truck License"
@@ -2274,7 +2362,7 @@ const printShipmentPDFBySoEId = type => {
                     placeholder="000-0000000"
                     class="text-center"
                   />
-                  <span v-if="selectedTruckCompany2('contact')">{{ selectedTruckCompany2('contact') }}</span>
+                  <span v-if="selectedTruckCompany2('contact')">{{ (selectedTruckCompany2('contact')) }}</span>
                 </td>
               </tr>
               <tr>
@@ -2286,6 +2374,7 @@ const printShipmentPDFBySoEId = type => {
                   class="text-center"
                 >
                   <VTextarea
+                    v-model="paramsTruckOrder.remark"
                     label="Default"
                     placeholder="Enter Remark"
                     clearable
@@ -2300,7 +2389,7 @@ const printShipmentPDFBySoEId = type => {
             <tr>
               <th colspan="4">
                 <VTextField
-                  
+                  v-model="paramsTruckOrder.driverBy"
                   density="compact"
                   class="text-center"
                 >
@@ -2311,7 +2400,7 @@ const printShipmentPDFBySoEId = type => {
               </th>
               <th colspan="4">
                 <VTextField
-                  
+                  v-model="paramsTruckOrder.orderBy"
                   density="compact"
                   class="text-center"
                 >
@@ -2322,7 +2411,7 @@ const printShipmentPDFBySoEId = type => {
               </th>
               <th colspan="4">
                 <VTextField
-                  
+                  v-model="paramsTruckOrder.authorizedBy"
                   density="compact"
                   class="text-center"
                 >
@@ -2334,24 +2423,27 @@ const printShipmentPDFBySoEId = type => {
             </tr>
             <tr>
               <th colspan="4">
-                <VueDatePicker
-                  v-model="dateSupervisor"
-                  :max-date="new Date()"
-                  :enable-time-picker="false"
+                <AppDateTimePicker
+                  v-model="paramsTruckOrder.dateDriverBy"
+                  density="compact"
+                  placeholder="Select date"
+                  :config="{ dateFormat: 'd/m/Y' }"
                 />
               </th>
               <th colspan="4">
-                <VueDatePicker
-                  v-model="dateSupervisor"
-                  :max-date="new Date()"
-                  :enable-time-picker="false"
+                <AppDateTimePicker
+                  v-model="paramsTruckOrder.dateOrderBy"
+                  density="compact"
+                  placeholder="Select date"
+                  :config="{ dateFormat: 'd/m/Y' }"
                 />
               </th>
               <th colspan="4">
-                <VueDatePicker
-                  v-model="dateSupervisor"
-                  :max-date="new Date()"
-                  :enable-time-picker="false"
+                <AppDateTimePicker
+                  v-model="paramsTruckOrder.dateAuthorizedBy"
+                  density="compact"
+                  placeholder="Select date"
+                  :config="{ dateFormat: 'd/m/Y' }"
                 />
               </th>
             </tr>
@@ -2361,12 +2453,26 @@ const printShipmentPDFBySoEId = type => {
         <VCardText class="d-flex justify-end flex-wrap gap-4">
           <VBtn
             color="warning"
-            @click="isDialogVisiblePrintTruck = false"
+            @click="handlePrintTruckOrderPDF"
           >
             <VIcon
+              v-if="!loadingPrintTruckOrderForm"
               start
               icon="ri-printer-fill"
             />
+            <VProgressCircular
+              v-if="loadingPrintTruckOrderForm"
+              :rotate="360"
+              :size="30"
+              indeterminate
+              :model-value="progressValue"
+              color="primary"
+            >
+              <VIcon
+                start
+                icon="ri-printer-fill"
+              />
+            </VProgressCircular>
             Print
           </VBtn>
         </VCardText>
@@ -2433,7 +2539,7 @@ const printShipmentPDFBySoEId = type => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00024' || userDataInfo.id === '00025'"
+              v-if="userDataInfo.id === '00024' || userDataInfo.id === '00023'"
               class="mx-2"
               color="primary"
             >
@@ -2968,7 +3074,7 @@ const printShipmentPDFBySoEId = type => {
               >
                 <div>
                   <FileInputDialogCarousels
-                    :files-from-a-p-i="filesFromUploaderSO"
+                    :files-from-a-p-i="product.fileSo"
                     title-dialog="So Attachment"
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
                     :type-file-input="typeFileInput"
@@ -3518,7 +3624,7 @@ const printShipmentPDFBySoEId = type => {
                       width="90px"
                       color="warning"
                       class="mx-2"
-                      @click="showDialogTruckOrder(product.salesOrderNo)"
+                      @click="showDialogTruckOrder(product.salesOrderNo, product.soEtlLogDetailJournalID)"
                     >
                       <VIcon
                         size="30"

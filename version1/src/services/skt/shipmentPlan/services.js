@@ -8,7 +8,8 @@ export const useGetUserPermissionService = () => {
   const fetchUserPermission = async (urlApi, form, whereHouse, accessToke, params = {}) => {
     try {
       errorGetUserPermission.value = null
-      console.log('Fetching fetchUserPermission...')
+
+      // console.log('Fetching fetchUserPermission...')
   
       const result = await shipmentPlanRepository.getPermissionUser(urlApi, form, whereHouse, accessToke, params)
         
@@ -41,7 +42,8 @@ export const useGetSelectDataService = () => {
   const fetchSelectData = async (urlApi, form, type, whereHouse, accessToke) => {
     try {
       errorGetSelectData.value = null
-      console.log('Fetching fetchSelectData...')
+
+      // console.log('Fetching fetchSelectData...')
   
       const result = await shipmentPlanRepository.getSelect(urlApi, form, type, whereHouse, accessToke)
         
@@ -51,7 +53,7 @@ export const useGetSelectDataService = () => {
         
         return result.data.data
       } else {
-        console.warn('No data returned from the API')
+        // console.warn('No data returned from the API')
       }
     } catch (error) {
       console.log('Error in fetchSelectData:', error)
@@ -73,7 +75,8 @@ export const useGetSearchPlanService = () => {
   const fetchSearchPlan = async (urlApi, form, whereHouse, accessToke, params = {}, statusID) => {
     try {
       errorGetSearchPlan.value = null
-      console.log('Fetching fetchSearchPlan...')
+
+      // console.log('Fetching fetchSearchPlan...')
   
       const result = await shipmentPlanRepository.getSearchPlan(urlApi, form, whereHouse, accessToke, params, statusID)
         
@@ -196,6 +199,38 @@ export const usePrintShipmentPDFService = () => {
   }
 }
 
+export const usePrintTruckOrderFormPDFService = () => {
+  const printTruckOrderFormPDFResult = ref(null)
+  const errorPrintTruckOrderFormPDF = ref(null)
+  
+  const printTruckOrderFormPDF = async (urlApi, param = {}, whereHouse, accessToke, soeId) => {
+    try {
+      errorPrintTruckOrderFormPDF.value = null
+      console.log('printTruckOrderFormPDF...')
+  
+      const result = await shipmentPlanRepository.printTruckOrderFormPDFRepo(urlApi, param, whereHouse, accessToke, soeId)
+        
+      if (result) {
+        // console.log('printTruckOrderFormPDF:', result)
+        printTruckOrderFormPDFResult.value = result.data
+        
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in printTruckOrderFormPDF:', error)
+      errorPrintTruckOrderFormPDF.value = error.message
+    }
+  }
+  
+  return {
+    printTruckOrderFormPDFResult,
+    errorPrintTruckOrderFormPDF,
+    printTruckOrderFormPDF,
+  }
+}
+
 
 //------------------------------------- COA ---------------------------------
 export const useSaveFileFormService = () => {
@@ -214,13 +249,14 @@ export const useSaveFileFormService = () => {
       }
 
       errorMessageSaveFileForm.value = null
-      console.log('Saving Draft Form COA...')
+
+      // console.log('Saving Draft Form COA...')
 
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
       const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
 
       if (result) {
-        console.log('Save data COA Controller:', result)
+        // console.log('Save data COA Controller:', result)
         resultSaveFielForm.value = { data: result, success: true } // เก็บข้อมูล response
         
         return result
@@ -228,7 +264,7 @@ export const useSaveFileFormService = () => {
         throw new Error('Failed to save data')
       }
     } catch (error) {
-      console.error('Error in functionSaveFileForm:', error)
+      // console.error('Error in functionSaveFileForm:', error)
 
       // เก็บข้อมูลข้อผิดพลาด
       errorMessageSaveFileForm.value = { message: error.message, success: false }
@@ -249,12 +285,13 @@ export const useGetFileFormService = () => {
   const getFileFormFunction = async (soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageGetFileForm.value = null
-      console.log('Fetching File Form ...')
+
+      // console.log('Fetching File Form ...')
 
       const result = await FileService.fetchFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
       
       if (result) {
-        console.log('Received File Form:', result)
+        // console.log('Received File Form:', result)
         getFileFormResult.value = result
         
         return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา
