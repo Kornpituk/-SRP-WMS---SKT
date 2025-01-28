@@ -2,7 +2,6 @@ import axios from '@axios'
 
 export const shipmentPlanRepository = {
   async getPermissionUser(urlApi, form, whereHouse, accessToken, params = {}) {
-    console.log('get repo getPermissionUser...')
     try {
       const response = await axios.get(`${urlApi}/api/UserShipping/${form}`, {
         headers: {
@@ -18,7 +17,7 @@ export const shipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo getPermissionUser...')
+        // console.log('success get repo getPermissionUser...')
 
         // console.log('Service Response data getPermissionUser:', response.data)
             
@@ -36,7 +35,6 @@ export const shipmentPlanRepository = {
 
   //------------------------------ Get ----------------------------
   async getSelect(urlApi, form, type, whereHouse, accessToken) {
-    console.log('get repo getSelect...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${type}/${form}`, {
         headers: {
@@ -47,7 +45,6 @@ export const shipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo getSelect...')
 
         // console.log('Service Response data getSelect:', response.data)
             
@@ -64,7 +61,6 @@ export const shipmentPlanRepository = {
   },
 
   async getSearchPlan(urlApi, form, whereHouse, accessToken, params = {}, statusID) {
-    console.log('get repo getSearchPlan...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/ShipmentPlan/${form}`, {
         headers: {
@@ -86,7 +82,6 @@ export const shipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo getSearchPlan...')
 
         // console.log('Service Response data getSearchPlan:', response.data)
             
@@ -104,7 +99,6 @@ export const shipmentPlanRepository = {
 
   //---------------------------- post --------------------------------
   async saveSearchPlan(urlApi, form, whereHouse, accessToken, body) {
-    console.log('get repo saveSearchPlan...')
     try {
       const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}`, body, {
         headers: {
@@ -132,7 +126,6 @@ export const shipmentPlanRepository = {
   },
 
   async submitShipmentPlan(urlApi, form, whereHouse, accessToken, edId) {
-    console.log('get repo submit Shipment Plan...')
     try {
       const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
         headers: {
@@ -160,7 +153,6 @@ export const shipmentPlanRepository = {
   },
 
   async submitShipmentPlan(urlApi, form, whereHouse, accessToken, edId) {
-    console.log('get repo submit Shipment Plan...')
     try {
       const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
         headers: {
@@ -225,6 +217,76 @@ export const shipmentPlanRepository = {
     }
   },
 
+  async printTruckOrderFormPDFRepo(urlApi, param = {}, whereHouse, accessToken, soId) {
+    try {
+      const response = await axios.post(
+        `${urlApi}/api/v1/PrintForm/Shipment/TruckOrder/Pdf/${soId}`,
+        {},
+        {
+          headers: this.getHeaders(whereHouse, accessToken),
+          params: this.getParams(param),
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        return this.handleResponse(response)
+      } else {
+        throw new Error('No data Genterate print PDF  form')
+      }
+    } catch (error) {
+      this.handleError(error, soId)
+    }
+  },
+
+  getHeaders(whereHouse, accessToken) {
+    return {
+      'accept': 'application/pdf', // รับไฟล์ PDF
+      'x-location': whereHouse,
+      Authorization: `Bearer ${accessToken}`,
+    }
+  },
+
+  getParams(param) {
+    return {
+      runningNum: param.runningNum || '',
+      comName: param.comName || '',
+      address: param.address || '',
+      transportComName: param.transportComName || '',
+      truckType: param.truckType || '',
+      truckLicense: param.truckLicense || '',
+      driverName: param.driverName || '',
+      tel: param.tel || '',
+      remark: param.remark || '',
+      driverBy: param.driverBy || '',
+      dateDriverBy: param.dateDriverBy || '',
+      orderBy: param.orderBy || '',
+      dateOrderBy: param.dateOrderBy || '',
+      authorizedBy: param.authorizedBy || '',
+      dateAuthorizedBy: param.dateAuthorizedBy || '',
+    }
+  },
+
+  handleResponse(response) {
+    console.log('Service Response print PDF  form:', response.data)
+  
+    // สร้าง Blob จาก response
+    const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+    // สร้าง URL สำหรับ Blob
+    const blobUrl = URL.createObjectURL(blob)
+  
+    // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+    window.open(blobUrl)
+  
+    return { success: true, data: blob }
+  },
+
+  handleError(error, soId) {
+    console.error('Error in printPDF Barcode:', error)
+    throw new Error(`Failed to printPDF Barcode for Lot ${soId}: ${error.response?.data?.message || error.message}`)
+  },
+
 }
 
 export const FileService = {
@@ -239,15 +301,15 @@ export const FileService = {
       })
         
       if (response && response.data) {
-        console.log(`Service Response data File:`, response.data)
+        // console.log(`Service Response data File:`, response.data)
           
         return { success: true, data: response.data }
       } else {
-        throw { success: false, error }
+        // throw { success: false, error }
       }
     } catch (error) {
-      console.error('Error in fetchFileForm:', error)
-      throw new Error(`Failed to fetch header for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      // console.error('Error in fetchFileForm:', error)
+      // throw new Error(`Failed to fetch header for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
     }
   },
 

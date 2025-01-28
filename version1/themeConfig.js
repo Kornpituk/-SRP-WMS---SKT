@@ -35,7 +35,7 @@ const getConfig = () => {
       localStorage.setItem('configsShowRfdi', response.data.showRfid)
       localStorage.setItem('configsShowExpiryDate', response.data.bigyaFormat)
 
-      console.log('configsShowExpiryDate in theme', localStorage.getItem('configsShowExpiryDate'))
+      // console.log('configsShowExpiryDate in theme', localStorage.getItem('configsShowExpiryDate'))
 
       // Now `items` contains an array of objects with id and name properties
       // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)

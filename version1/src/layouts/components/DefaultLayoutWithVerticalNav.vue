@@ -92,8 +92,6 @@ const GetWhereHouse = () => {
     .then(response => {
       const responseData = response.data
 
-      console.log('Wharehouse ****', responseData)
-
       wareHouseName.value = responseData[0].name
       wareHouseId.value = responseData[0].id
 
@@ -137,7 +135,8 @@ const GetWhereHouse = () => {
 
 watchEffect(() => {
   NameUser.value = localStorage.getItem('userCheck')
-  console.log("AUTH : " + authStore.getAuth())
+
+  // console.log("AUTH : " + authStore.getAuth())
   if(authStore.getAuth()===false){
    
     authStore.setAuth(false)

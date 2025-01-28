@@ -56,7 +56,7 @@ const { width: windowWidth } = useWindowSize()
 const isHovered = useElementHover(refNav)
 
 watch(()=> {
-  console.log("isHovered", typeof isHovered, useElementHover(false))
+  // console.log("isHovered", typeof isHovered, useElementHover(false))
 })
 
 provide(injectionKeyIsVerticalNavHovered, isHovered)

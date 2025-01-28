@@ -8,7 +8,6 @@ import ErrorMan from '../src/pages/pages/misc/under-maintenance.vue'
 const router = useRouter() 
 
 watchEffect(() => {
-  console.log('watch effect Now', localStorage.getItem('accessTokenAtStore'))
   if (!localStorage.getItem('accessTokenAtStore') | localStorage.getItem('nameCompany')){
     // alert('You must log in before accessing this page. Please log in.')
     router.replace('/login')

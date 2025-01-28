@@ -740,7 +740,7 @@ watchEffect(() =>{
     console.log('RFID Check True:'+ checkRFIDUpdate.value)
     checkRFID.value = true
   } else if (checkRFIDUpdate.value === 'false') {
-    console.log('RFID Check False:'+ checkRFIDUpdate.value)
+    // console.log('RFID Check False:'+ checkRFIDUpdate.value)
     checkRFID.value = false
   }
 })

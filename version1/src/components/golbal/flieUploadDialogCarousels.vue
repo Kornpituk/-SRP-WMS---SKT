@@ -83,7 +83,6 @@ const removeFile = index => {
         class="px-2"
         cols="8"
       >
-        file : {{ typeof(files) }}
         <!-- อัปโหลดไฟล์ -->
         <VFileInput
           v-model="filesModel"
@@ -125,14 +124,14 @@ const removeFile = index => {
       >
         <!-- ปุ่มเปิด Carousel Dialog -->
         <VBtn
-          
+          :disabled="files.length < 1"
           class="d-flex justify-center"
-          :color="files.length && filesModel.length? 'primary' : 'grey'"
+          :color="files.length > 0 || filesModel.length? 'primary' : 'grey'"
           style="max-width: 70px;"
           @click="openDialog"
         >
           <div><VIcon icon="ri-gallery-fill" /></div>
-          <div v-if="files.length && filesModel.length">
+          <div v-if="files.length > 0 || filesModel.length">
             {{ files.length }}+
           </div>
         </VBtn>
@@ -221,6 +220,12 @@ const removeFile = index => {
               v-for="(file, index) in files"
               :key="index"
             >
+              <VImg src="https://sktdevwebapi.easetrackwms.com/api/v1/ShippingForm/SO/256801/c4fcb5cd-f0cb-4c39-a693-99240209fc6f.jpg" />
+              
+              <div v-if="file.contentType === 'image/jpeg' || file.contentType === 'image/png'">
+                {{ file.contentType }}{{ file.soEtlLogDetailJournalID }}
+                <VImg :src="file.fileUri" />
+              </div>
               <VImg
                 v-if="file.type === 'image'"
                 :src="file.objectUrl"
@@ -228,13 +233,13 @@ const removeFile = index => {
 
               <div v-else-if="file.contentType === 'image/png'">
                 <VImg :src="file.fileUri" />
-                contentType img
               </div>
 
               <div
                 v-else-if="file.contentType === 'application/pdf'"
                 class="d-flex justify-center align-center"
               >
+                {{ file.contentType }}{{ file.soEtlLogDetailJournalID }}
                 <iframe 
                   :src="file.objectUrl"
                   type="application/pdf"
