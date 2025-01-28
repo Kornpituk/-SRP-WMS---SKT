@@ -424,31 +424,31 @@ const itemsStatus = ([
   { name: 'Waiting for Shipping', id: 202, color: 'pink' },
   { name: 'Draft Shipping', id: 203, color: 'amber' },
 
-  { name: 'Waiting for SAL Draft', id: 302, color: 'pink' },
-  { name: 'SAL Draft Shipping', id: 303, color: 'amber' },
-  { name: 'SAL Submitted', id: 304, color: 'teal' },
+  // { name: 'Waiting for SAL Draft', id: 302, color: 'pink' },
+  // { name: 'SAL Draft Shipping', id: 303, color: 'amber' },
+  // { name: 'SAL Submitted', id: 304, color: 'teal' },
 
-  { name: 'Waiting for WH Draft', id: 402, color: 'pink' },
-  { name: 'WH Draft Shipping', id: 403, color: 'amber' },
-  { name: 'WH Submitted', id: 404, color: 'teal' },
+  // { name: 'Waiting for WH Draft', id: 402, color: 'pink' },
+  // { name: 'WH Draft Shipping', id: 403, color: 'amber' },
+  // { name: 'WH Submitted', id: 404, color: 'teal' },
 
-  { name: 'Waiting FOR LOG Draft', id: 502, color: 'pink' },
-  { name: 'LOG Draft Shipping', id: 503, color: 'amber' },
-  { name: 'LOG Submitted', id: 504, color: 'teal' },
+  // { name: 'Waiting FOR LOG Draft', id: 502, color: 'pink' },
+  // { name: 'LOG Draft Shipping', id: 503, color: 'amber' },
+  // { name: 'LOG Submitted', id: 504, color: 'teal' },
 
-  { name: 'Waiting FOR INSP Draft', id: 602, color: 'pink' },
-  { name: 'INSP Draft Shipping', id: 603, color: 'amber' },
-  { name: 'INSP Submitted', id: 604, color: 'teal' },
+  // { name: 'Waiting FOR INSP Draft', id: 602, color: 'pink' },
+  // { name: 'INSP Draft Shipping', id: 603, color: 'amber' },
+  // { name: 'INSP Submitted', id: 604, color: 'teal' },
 
-  { name: 'Waiting for CS Draft', id: 1002, color: 'pink' },
-  { name: 'CS1 Draft Shipping', id: 1003, color: 'amber' },
-  { name: 'CS2 Draft Shipping', id: 1004, color: 'amber' },
-  { name: 'CS Submitted', id: 1005, color: 'teal' },
+  // { name: 'Waiting for CS Draft', id: 1002, color: 'pink' },
+  // { name: 'CS1 Draft Shipping', id: 1003, color: 'amber' },
+  // { name: 'CS2 Draft Shipping', id: 1004, color: 'amber' },
+  // { name: 'CS Submitted', id: 1005, color: 'teal' },
 
-  { name: 'Waiting for Draft', id: 1102, color: 'pink' },
-  { name: 'Draft Shipping LF', id: 1103, color: 'amber' },
-  { name: 'Waiting for Lorry/Flex APVL', id: 1104, color: 'amber' },
-  { name: 'Lorry/Flex Submitted', id: 1105, color: 'teal' },
+  // { name: 'Waiting for Draft', id: 1102, color: 'pink' },
+  // { name: 'Draft Shipping LF', id: 1103, color: 'amber' },
+  // { name: 'Waiting for Lorry/Flex APVL', id: 1104, color: 'amber' },
+  // { name: 'Lorry/Flex Submitted', id: 1105, color: 'teal' },
 
   { name: 'In Submitting', id: 204, color: 'pink' },
   { name: 'Waiting for WH APVL', id: 205, color: 'brown' },
@@ -2114,8 +2114,9 @@ const printShipmentPDFBySoEId = type => {
                 <th colspan="4">
                   เลขที่ใบสั่งงานรถขนส่ง (Truck Order No)
                 </th>
-                <th colspan="8">
+                <td colspan="8">
                   <VTextField
+                    v-if="false"
                     style="min-width: 250px;"
                     density="compact"
                     class="text-center"
@@ -2124,7 +2125,8 @@ const printShipmentPDFBySoEId = type => {
                       Running Number:
                     </template>
                   </VTextField>
-                </th>
+                  {{ saleOrderNo }}
+                </td>
               </tr>
               <tr>
                 <th colspan="4">
@@ -2314,7 +2316,7 @@ const printShipmentPDFBySoEId = type => {
                   class="text-center"
                 >
                   <template #label>
-                    ผู้สั่งการ / Oder By
+                    ผู้สั่งการ / Order By
                   </template>
                 </VTextField>
               </th>
@@ -2414,6 +2416,7 @@ const printShipmentPDFBySoEId = type => {
         <VRow>
           <VCol cols="10">
             <VBtn
+              v-if="false"
               class="mx-2"
               color="warning"
               @click="saveShipmentPlan"
@@ -2421,6 +2424,7 @@ const printShipmentPDFBySoEId = type => {
               <span style="font-size: 12px;">Save</span>
             </VBtn>
             <VBtn
+              v-if="false"
               class="mx-2"
               color="primary"
               @click="submitShipmentPlanBySoEId"
@@ -2429,9 +2433,9 @@ const printShipmentPDFBySoEId = type => {
             </VBtn>
 
             <VBtn
+              v-if="userDataInfo.id === '00024' || userDataInfo.id === '00025'"
               class="mx-2"
               color="primary"
-              @click="submitShipmentPlanBySoEId"
             >
               <span style="font-size: 12px;">Approve</span>
             </VBtn>
@@ -3592,7 +3596,6 @@ const printShipmentPDFBySoEId = type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                {{ (product.loadingDate) }}
                 <AppDateTimePicker
                   v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canExecute"
                   v-model="product.loadingDate"
