@@ -397,3 +397,182 @@ export const FileService = {
     }
   },
 }
+
+//---------------------------------- check sheet -------------------
+
+export const checkSheetShipmentPlanRepository = {
+
+  //------------------------------ Get ----------------------------
+  async getSelect(urlApi, form, type, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${type}/${form}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+
+        // console.log('Service Response data getSelect:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getSelect...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getSelect...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getSelect ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async getShippingCheckSheet(urlApi, form, whereHouse, accessToken, SoEId) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/get/${SoEId}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+
+        // console.log('Service Response data getShippingCheckSheet:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getShippingCheckSheet...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getShippingCheckSheet...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getShippingCheckSheet ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  //---------------------------- post --------------------------------
+  async generateForm(urlApi, form, whereHouse, accessToken, edId) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/regenerate?journalId=${edId}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+        console.log(`success get repo generate ${form}...`)
+
+        // console.log('Service Response data generate ${form}:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log(`Error repo Error If generate ${form}...`)
+        throw new Error(`No data received from the server`)
+      }
+    } catch (error) {
+      console.log(`Error repo Error Try generate ${form}...`)
+      console.error(`Error in getProductionShippingForm:`, error)
+      throw new Error(`Failed to fetch generate ${form} ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async saveSearchPlan(urlApi, form, whereHouse, accessToken, body) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}`, body, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+        console.log('success get repo saveSearchPlan...')
+
+        // console.log('Service Response data saveSearchPlan:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If saveSearchPlan...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try saveSearchPlan...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch saveSearchPlan ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async submitCheckSheet(urlApi, form, whereHouse, accessToken, SoEId) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/submit/${SoEId}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+        console.log('success get repo submit CheckSheet...')
+
+        // console.log('Service Response data submit CheckSheet:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If submit CheckSheet...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try submit CheckSheet...')
+      console.error('Error in submitCheckSheet:', error)
+      throw new Error(`Failed to fetch submit CheckSheet ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  //-------------------------------- Print ----------------------------------
+  async printShipperPDFRepo(urlApi, type, whereHouse, accessToken, edId) {
+    try {
+      const response = await axios.post(
+        `${urlApi}/api/v1/PrintLabel/ShipmertPlan/Pdf/${type}/${edId}`,
+        {},
+        {
+          headers: {
+            'accept': 'application/pdf', // รับไฟล์ PDF
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response print PDF  form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+        window.open(blobUrl)
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data Genterate print PDF  form')
+      }
+    } catch (error) {
+      console.error('Error in printPDF Barcode:', error)
+      throw new Error(`Failed to printPDF Barcode for Lot ${edId}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+}

@@ -1333,9 +1333,9 @@ const imgDialogPDF = ref('')
 const imgDialogPng = ref('')
 
 //------------------------------------------ Check Sheet To Page Resale -----------------------
-function redirectBasedOnStatus(status) {
+function redirectBasedOnStatus(product) {
   // ดึงเฉพาะตัวเลขหลักแรกของ status
-  const mainStatus = Math.floor(status / 100)
+  const mainStatus = Math.floor(product.statusId/ 100)
 
   // กำหนดประเภทตามเลขหลักแรกของ status
   const statusMapping = {
@@ -1359,9 +1359,17 @@ function redirectBasedOnStatus(status) {
   const currentPath = window.location.pathname // ดึง path ปัจจุบัน
   const newPath = `${currentPath}/${subPath}` // ต่อท้าย subPath
 
-  // เปลี่ยนเส้นทางไปยัง path ใหม่
-  console.log(`Redirecting to: ${newPath}`)
-  window.location.href = newPath
+  const params = new URLSearchParams({
+    journalIdParams: product.journalID,
+    SoEtlLogDetailJournalIDParams: product.soEtlLogDetailJournalID,
+    statusParams: product.statusId,
+  }).toString()
+
+  // 🔥 Redirect ไปยัง URL ใหม่พร้อม Query
+  const finalPath = `${newPath}?${params}`
+
+  console.log(`Redirecting to: ${finalPath}`)
+  window.location.href = finalPath
 }
 
 const isSpinning = ref(false)
@@ -4023,7 +4031,7 @@ const handlePrintTruckOrderPDF = () => {
                 <VBtn
                   :disabled="accountINSP"
                   :color="accountINSP ? 'grey' : 'pink-lighten-2'"
-                  @click="redirectBasedOnStatus(product.statusId)"
+                  @click="redirectBasedOnStatus(product)"
                 >
                   <span style="font-size: 12px;">Check Sheet</span>
                 </VBtn>

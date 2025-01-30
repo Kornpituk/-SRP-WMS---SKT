@@ -1,10 +1,87 @@
 <script setup>
-import { ref } from "vue"
+import { onMounted, ref, watch } from "vue"
+
+
 
 import iconMock1 from '@images/icons/Group 1000004801.png'
 import iconMock2 from '@images/icons/Group 1000004802.png'
 import iconMock3 from '@images/icons/Icon.png'
 
+
+import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
+import { VDataTable } from 'vuetify/labs/VDataTable'
+
+const whereHouse = localStorage.getItem('whereHouseName')
+const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
+//------------------------------------ params section -------------------------------
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const journalIdModel = ref(route.query.journalIdParams)
+const SoEtlLogDetailJournalIDModel = ref(route.query.SoEtlLogDetailJournalIDParams)
+const statusModel = ref(route.query.statusParams)
+
+console.log('journalIdModel', journalIdModel.value)
+
+//------------------------------------ import service --------------------------------
+
+import { useGenerateFormService, useGetShippingCheckSheetService } from '@/services/skt/shipmentPlan/checkSheetServices'
+
+//------------------------------------ generate section ----------------------
+
+const { generateFormResult, generateFormError, generateFormFunction } = useGenerateFormService()
+
+const generateForm = async () => {
+  try {
+    const result = await generateFormFunction(urlApi.value, 'ShippingForm', whereHouse, accessTokenAtStore, journalIdModel.value)
+    if(result){
+      generateFormResult.value = result
+      generateFormError.value = null
+      console.log('generateFormResult', result)
+    }else{
+      console.log('generateFormError !result ', generateFormError.value)
+    }
+
+  } catch (error) {
+    generateFormError.value = error.message
+  }
+}
+
+watch(async ()  => {
+  await generateForm()
+})
+
+//------------------------------------ Get ShippingCheckSheet  ----------------------
+
+const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCheckSheet } = useGetShippingCheckSheetService()
+
+const specialRequests = ref()
+
+const getShippingCheckSheet = async () => {
+  try {
+    const result = await fetchShippingCheckSheet(urlApi.value, 'ShippingCheckSheet', whereHouse, accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
+    if(result){
+      getShippingCheckSheetResult.value = result
+
+      specialRequests.value = result
+      errorGetShippingCheckSheet.value = null
+      console.log('getShippingCheckSheetResult', result)
+    }else{
+      console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
+    }
+  } catch (error) {
+    errorGetShippingCheckSheet.value = error.message
+  }
+}
+
+onMounted(async () => {
+  await getShippingCheckSheet()
+})
 
 
 // --- Dialog Text Area --------------------------------
@@ -62,7 +139,7 @@ import { GBSmockDataIm, specialRequestsIm,
   validateAfterPickingIm, resaleProductShippingIm,
 } from './GBSMockData'
 
-const specialRequests = ref(specialRequestsIm)
+
 
 const GBSMockData = ref(GBSmockDataIm)
 
@@ -147,24 +224,24 @@ const seeLabelItems = () => {
 }
 
 // ติดตามการเปลี่ยนแปลงของไฟล์ที่เลือก
-watch(() => specialRequests.value[0].label, newFiles => {
-  // ทำความสะอาด URL เก่า
-  newFiles.forEach(file => {
-    if (file.imagePreview) {
-      URL.revokeObjectURL(file.imagePreview)
-    }
-  })
+// watch(() => specialRequests.value[0].label, newFiles => {
+//   // ทำความสะอาด URL เก่า
+//   newFiles.forEach(file => {
+//     if (file.imagePreview) {
+//       URL.revokeObjectURL(file.imagePreview)
+//     }
+//   })
 
-  // สร้าง URL ใหม่
-  specialRequests.value[0].label = newFiles.map(file => {
-    const fileURL = file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+//   // สร้าง URL ใหม่
+//   specialRequests.value[0].label = newFiles.map(file => {
+//     const fileURL = file.type.startsWith('image/') ? URL.createObjectURL(file) : null
     
-    return {
-      ...file,
-      imagePreview: fileURL,
-    }
-  })
-}, { deep: true })
+//     return {
+//       ...file,
+//       imagePreview: fileURL,
+//     }
+//   })
+// }, { deep: true })
 
 
 
@@ -671,25 +748,22 @@ const dessertsMockAmountView = [
                 </th>
               </tr>
             </thead>
-            <tbody
-              v-for="(itemCore, index) in specialRequests"
-              :key="index"
-            >
+            <tbody>
               <!--  Condition check for special request | Check by -->
               <tr
-                v-for="(item, index) in itemCore.conditions"
-                :key="index"
+                v-for="item in getShippingCheckSheetResult?.specialRequestChecks"
+                :key="item.journalID"
               >
                 <td colspan="4">
                   <div class="d-flex justify-center">
-                    <VCheckbox v-model="item.checked" />
+                    <VCheckbox v-model="item.checkedValue" />
                   </div>
                 </td>
                 <td colspan="8">
-                  {{ item.shippingMark }}
+                  {{ item.displayText }}
                 </td>
               </tr>
-              <tr>
+              <tr v-if="false">
                 <td
                   colspan="12"
                   style="height: 159px;"
