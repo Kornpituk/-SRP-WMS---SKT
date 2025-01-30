@@ -223,7 +223,6 @@ const removeFile = index => {
               <VImg src="https://sktdevwebapi.easetrackwms.com/api/v1/ShippingForm/SO/256801/c4fcb5cd-f0cb-4c39-a693-99240209fc6f.jpg" />
               
               <div v-if="file.contentType === 'image/jpeg' || file.contentType === 'image/png'">
-                {{ file.contentType }}{{ file.soEtlLogDetailJournalID }}
                 <VImg :src="file.fileUri" />
               </div>
               <VImg
@@ -239,7 +238,6 @@ const removeFile = index => {
                 v-else-if="file.contentType === 'application/pdf'"
                 class="d-flex justify-center align-center"
               >
-                {{ file.contentType }}{{ file.soEtlLogDetailJournalID }}
                 <iframe 
                   :src="file.objectUrl"
                   type="application/pdf"

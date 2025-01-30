@@ -87,14 +87,6 @@ onMounted(async () => {
 const statusPermission = ref(-1)
 
 const canVisibleUserPermission = (statusId, uiControlContextId) => {
-  // console.log('Permission Result:', result)
-
-  // if (result.canVisible) {
-  //   console.log('This UI element is visible!')
-  // } else {
-  //   console.log('This UI element is hidden!')
-  // }
-  
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
 
@@ -547,6 +539,9 @@ const searchShipmentPlan = async () => {
           etd: formatToDate(item.etd),
 
           fileSo: await getFileForm('GetSo', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          fileCoA: await getFileForm('GetCoA', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          fileTruckOrder: await getFileForm('GetTruckOrder', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          fileDeliveryNote: await getFileForm('GetDeliveryNote', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
         })),
       )
 
@@ -713,6 +708,12 @@ const getFileForm = async (
 
       if(typeFile === 'GetSo'){
         filesFromUploaderSO.value = response.data.data
+      }else if(typeFile === 'GetCoA'){
+        filesFromUploaderCOA.value = response.data.data
+      }else if(typeFile === 'GetTruckOrder'){
+        filesFromUploaderTruckOrder.value = response.data.data
+      }else if(typeFile === 'GetDeliveryNote'){
+        filesFromUploaderDeliNote.value = response.data.data
       }
       
       return response.data.data
@@ -747,11 +748,6 @@ const showFileFormByTypeAndSoId = async (type, soId) => {
 // showFileFormByTypeAndSoId('GetSo', '152')
 
 const handleFileUpdatesSO = updatedFiles => {
-  // if(getSoFileModel.value){
-  //   updatedFiles = getSoFileModel.value
-  // }else{
-  //   filesFromUploaderSO.value = updatedFiles
-  // }
 
   filesFromUploaderSO.value = updatedFiles
   console.log("Updated files:", updatedFiles)
@@ -825,13 +821,31 @@ const saveShipmentPlan = async row => {
     ) {
       console.log("Uploading files...",  filesFromUploaderSO.value)
 
-      const saveFile =  await saveFileFormShipment(
+      const saveFile1 =  await saveFileFormShipment(
         filesFromUploaderSO.value,
         "SaveSo",
         row.soEtlLogDetailJournalID,
       )
 
-      if(!saveFile){
+      const saveFile2 =  await saveFileFormShipment(
+        filesFromUploaderCOA.value,
+        "SaveCOA",
+        row.soEtlLogDetailJournalID,
+      )
+
+      const saveFile3 =  await saveFileFormShipment(
+        filesFromUploaderTruckOrder.value,
+        "SaveTruckOrder",
+        row.soEtlLogDetailJournalID,
+      )
+
+      const saveFile4 =  await saveFileFormShipment(
+        filesFromUploaderDeliNote.value,
+        "SaveDeliveryNote",
+        row.soEtlLogDetailJournalID,
+      )
+
+      if(!saveFile1||!saveFile2||!saveFile3||!saveFile4){
         throw 'Save File Fiald!'
       }
 
@@ -3370,6 +3384,7 @@ const handlePrintTruckOrderPDF = () => {
                     title-dialog="COA"
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
                     :type-file-input="typeFileInput"
+                    :files-from-a-p-i="product.fileCoA"
                     file-name="COA" 
                     @updateFiles="handleFileUpdatesCOA"
                   />
@@ -3612,7 +3627,7 @@ const handlePrintTruckOrderPDF = () => {
 
               <!-- 👉 truckOrder -->
               <td
-                v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
                 class="text-start px-2 cursor-pointer"
                 style="min-width: 350px; font-size: 12px;"
                 :style="{ 
@@ -3644,10 +3659,10 @@ const handlePrintTruckOrderPDF = () => {
                   <VCol cols="9">
                     <FileInputDialogCarousels
                       title-dialog="Truck Order"
-                      :disabled-prop="false"
+                      :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute"
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
-                    
+                      :files-from-a-p-i="product.fileTruckOrder"
                       @updateFiles="handleFileUpdatesTruckOrder"
                     />
                   </VCol>
@@ -3797,6 +3812,7 @@ const handlePrintTruckOrderPDF = () => {
                     title-dialog="Delivery Note"
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
                     :type-file-input="typeFileInput"
+                    :files-from-a-p-i="product.fileDeliveryNote"
                     file-name="Delivery Note" 
                     @updateFiles="handleFileUpdatesDeliNote"
                   />
@@ -4434,7 +4450,7 @@ const handlePrintTruckOrderPDF = () => {
 
               <!-- 👉 truckOrder -->
               <td
-                v-if="accountAmin || accountViewerKK || accountWH || accountWHSub || accountAll"
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
                 class="text-start px-2"
                 style="min-width: 350px; font-size: 12px;"
               >
@@ -4455,7 +4471,7 @@ const handlePrintTruckOrderPDF = () => {
                   <VCol cols="9">
                     <FileInputDialogCarousels
                       title-dialog="Truck Order"
-                      :disabled-prop="false"
+                      :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute"
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
                     
