@@ -546,7 +546,7 @@ const searchShipmentPlan = async () => {
           eta: formatToDate(item.eta),
           etd: formatToDate(item.etd),
 
-          // fileSo: await getFileForm('GetSo', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          fileSo: await getFileForm('GetSo', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
         })),
       )
 
@@ -663,7 +663,7 @@ const saveFileFormShipment = async (
 
       // Reload หลังแจ้งเตือนสำเร็จ
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 0.5 วินาที
       
       return true
@@ -753,6 +753,7 @@ const handleFileUpdatesSO = updatedFiles => {
   //   filesFromUploaderSO.value = updatedFiles
   // }
 
+  filesFromUploaderSO.value = updatedFiles
   console.log("Updated files:", updatedFiles)
   
 }
@@ -822,7 +823,7 @@ const saveShipmentPlan = async row => {
       filesFromUploaderTruckOrder.value ||
       filesFromUploaderDeliNote.value
     ) {
-      console.log("Uploading files...")
+      console.log("Uploading files...",  filesFromUploaderSO.value)
 
       const saveFile =  await saveFileFormShipment(
         filesFromUploaderSO.value,
@@ -830,11 +831,11 @@ const saveShipmentPlan = async row => {
         row.soEtlLogDetailJournalID,
       )
 
-      console.log("File upload completed.", row.soEtlLogDetailJournalID)
-    }
+      if(!saveFile){
+        throw 'Save File Fiald!'
+      }
 
-    if(!saveFile){
-      throw 'Save File Fiald!'
+      console.log("File upload completed.", row.soEtlLogDetailJournalID)
     }
 
     // Mapping request data และส่งคำขอ
@@ -2593,7 +2594,7 @@ const handlePrintTruckOrderPDF = () => {
           {{ errorMessage }}
         </div>
         <VProgressLinear
-          v-if="!paginatedData && !isLoading"
+          v-if="!paginatedData && !isLoading || paginatedData.length < 1"
           height="20"
           color="secondary"
           class="elevation-1"
@@ -2610,7 +2611,7 @@ const handlePrintTruckOrderPDF = () => {
           <span>Loading Data.... {{ errorMessage }}</span>
         </VProgressLinear>
       </div>
-      <section v-if="!isLoading">
+      <section v-if="!isLoading && paginatedData.length > 0">
         <VTable
           v-if="!isLoading"
           class="text-wrap table-header-bg rounded-0"
@@ -3075,7 +3076,7 @@ const handlePrintTruckOrderPDF = () => {
                 <div>
                   <FileInputDialogCarousels
                     :files-from-a-p-i="product.fileSo"
-                    title-dialog="So Attachment"
+                    title-dialog="SO Attachment"
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
                     :type-file-input="typeFileInput"
                     file-name="So Attachment" 
@@ -3106,7 +3107,7 @@ const handlePrintTruckOrderPDF = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 150px; font-size: 12px;"
+                style="min-width: 220px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -3125,7 +3126,7 @@ const handlePrintTruckOrderPDF = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 200px; font-size: 12px;"
+                style="min-width: 220px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 

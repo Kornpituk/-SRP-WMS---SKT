@@ -237,14 +237,15 @@ export const useSaveFileFormService = () => {
   const resultSaveFielForm = ref(null) // เก็บข้อมูล response ของการบันทึก
   const errorMessageSaveFileForm = ref(null) // เก็บข้อความแจ้งข้อผิดพลาด
 
-  const functionSaveFileForm = async (files, soEtlLogDetailJournalID, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) => {
+  const functionSaveFileForm = async (files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) => {
     try {
       // ตรวจสอบว่ามีไฟล์และข้อมูลก่อนที่จะดำเนินการบันทึก
       if (!files || files.length === 0) {
-        throw new Error('No files selected')
+        console.log('No files selected', files)
+        throw new Error('No files selected', files)
       }
 
-      if (!poEtlLogDetailJournalID || !urlApi || !accessToken) {
+      if (!soEtlLogDetailJournalID || !urlApi || !accessToken) {
         throw new Error('Missing required parameters')
       }
 
@@ -253,7 +254,7 @@ export const useSaveFileFormService = () => {
       // console.log('Saving Draft Form COA...')
 
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
-      const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, poEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
+      const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
 
       if (result) {
         // console.log('Save data COA Controller:', result)

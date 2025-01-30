@@ -289,6 +289,7 @@ export const shipmentPlanRepository = {
 
 }
 
+//--------------------------------- File ----------------------------------------
 export const FileService = {
   async fetchFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) {
     try {
@@ -317,9 +318,17 @@ export const FileService = {
     const formData = new FormData()
 
     // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
-    files.forEach(file => {
-      formData.append('files', file)
-    })
+    // ตรวจสอบว่า files.files มีค่าหรือไม่
+    if (files?.files) {
+      console.log('Have File Selected', files.files)
+
+      // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
+      files.files.forEach(file => {
+        formData.append('files', file.file) // ใช้ file.file เพราะไฟล์ถูกเก็บใน key `file`
+      })
+    } else {
+      console.log('No File Selected', files)
+    }
 
     console.log("Files Upload", files)
 
