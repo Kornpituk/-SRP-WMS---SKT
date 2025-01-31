@@ -708,7 +708,7 @@ const saveFileFormShipment = async (
 
       // Reload หลังแจ้งเตือนสำเร็จ
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 0.5 วินาที
       
       return true
@@ -1511,6 +1511,8 @@ function redirectBasedOnStatus(product) {
     journalIdParams: product.journalID,
     SoEtlLogDetailJournalIDParams: product.soEtlLogDetailJournalID,
     statusParams: product.statusId,
+    salesOrderNoParams: product.salesOrderNo,
+    itemCodeParams: product.itemCode,
   }).toString()
 
   // 🔥 Redirect ไปยัง URL ใหม่พร้อม Query

@@ -391,31 +391,6 @@ export const FileService = {
 export const checkSheetShipmentPlanRepository = {
 
   //------------------------------ Get ----------------------------
-  async getSelect(urlApi, form, type, whereHouse, accessToken) {
-    try {
-      const response = await axios.get(`${urlApi}/api/v1/${type}/${form}`, {
-        headers: {
-          'accept': '*/*',
-          'x-location': whereHouse,
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-    
-      if (response && response.data) {
-
-        // console.log('Service Response data getSelect:', response.data)
-            
-        return { data: response.data, success: true }
-      } else {
-        console.log('Error repo Error If getSelect...')
-        throw new Error('No data received from the server')
-      }
-    } catch (error) {
-      console.log('Error repo Error Try getSelect...')
-      console.error('Error in getProductionPlan:', error)
-      throw new Error(`Failed to fetch getSelect ${error.response?.data?.message || error.message}`)
-    }
-  },
 
   async getShippingCheckSheet(urlApi, form, whereHouse, accessToken, SoEId) {
     try {
@@ -440,6 +415,32 @@ export const checkSheetShipmentPlanRepository = {
       console.log('Error repo Error Try getShippingCheckSheet...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getShippingCheckSheet ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async getShippingChecksheetImage(urlApi, form, whereHouse, accessToken, ItemCode, fileName  ) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/ShippingFile/${form}/${ItemCode}/${fileName}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+
+        // console.log('Service Response data getShippingCheckSheet:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getShippingChecksheetImage...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getShippingChecksheetImage...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getShippingChecksheetImage ${error.response?.data?.message || error.message}`)
     }
   },
 
@@ -471,9 +472,60 @@ export const checkSheetShipmentPlanRepository = {
     }
   },
 
-  async saveSearchPlan(urlApi, form, whereHouse, accessToken, body) {
+  async saveShippingCheckSheet(urlApi, form, whereHouse, accessToken, body) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}`, body, {
+
+      const payload = {
+        checkSheetItems: [
+          {
+            soEtlLogDetailJournalID: 0,
+            supplierLotNo: 'string',
+            appearanceCheck: true,
+            remark: 'string',
+          },
+        ],
+        specialRequestChecks: [
+          {
+            soEtlLogDetailJournalID: 0,
+            checkedValue: true,
+          },
+        ],
+        itemChecks: [
+          {
+            soEtlLogDetailJournalID: 0,
+            checkedValue: true,
+          },
+        ],
+        packagingChecks: [
+          {
+            soEtlLogDetailJournalID: 0,
+            checkedValue: true,
+          },
+        ],
+        unfIbc: [
+          {
+            soEtlLogDetailJournalID: 0,
+            ibcIndex: 0,
+            ibcNo: 'string',
+            grossWeightBeforeShipping: 'string',
+            rustFree: true,
+            noDents: true,
+            baseStrong: true,
+            labelIntact: true,
+            correctLotNo: true,
+            accurateWeight: true,
+            centeredLabel: true,
+            capSeal: true,
+            noLeakAtCap: true,
+            properCapSize: true,
+            capCondition: true,
+            topSeal: true,
+            bottomSeal: true,
+          },
+        ],
+      }
+
+      const response = await axios.post(`${urlApi}/api/v1/ShippingCheckSheet/${form}`, payload, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -482,19 +534,19 @@ export const checkSheetShipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo saveSearchPlan...')
+        console.log('success get repo ShippingCheckSheet...')
 
-        // console.log('Service Response data saveSearchPlan:', response.data)
+        // console.log('Service Response data ShippingCheckSheet:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If saveSearchPlan...')
+        console.log('Error repo Error If ShippingCheckSheet...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try saveSearchPlan...')
+      console.log('Error repo Error Try ShippingCheckSheet...')
       console.error('Error in getProductionPlan:', error)
-      throw new Error(`Failed to fetch saveSearchPlan ${error.response?.data?.message || error.message}`)
+      throw new Error(`Failed to fetch ShippingCheckSheet ${error.response?.data?.message || error.message}`)
     }
   },
 

@@ -35,6 +35,39 @@ export const useGetShippingCheckSheetService = () => {
   }
 }
 
+export const useGetShippingChecksheetImageService = () => {
+  const getShippingChecksheetImageResult = ref(null)
+  const errorGetShippingChecksheetImage = ref(null)
+    
+  const fetchShippingChecksheetImage = async (urlApi, form, whereHouse, accessToken, ItemCode, fileName  ) => {
+    try {
+      errorGetShippingChecksheetImage.value = null
+  
+      // console.log('Fetching fetchShippingChecksheetImage...')
+    
+      const result = await checkSheetShipmentPlanRepository.getShippingChecksheetImage(urlApi, form, whereHouse, accessToken, ItemCode, fileName  )
+          
+      if (result) {
+        // console.log('Fetching data fetchShippingChecksheetImage:', result)
+        getShippingChecksheetImageResult.value = result.data
+          
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchShippingChecksheetImage:', error)
+      errorGetShippingChecksheetImage.value = error.message
+    }
+  }
+    
+  return {
+    getShippingChecksheetImageResult,
+    errorGetShippingChecksheetImage,
+    fetchShippingChecksheetImage,
+  }
+}
+
 //----------------------- Post ----------------------
 export const useGenerateFormService = () => {
   const generateFormResult = ref(null)
@@ -65,6 +98,38 @@ export const useGenerateFormService = () => {
     generateFormResult,
     generateFormError,
     generateFormFunction,
+  }
+}
+
+export const useShippingCheckSheetService = () => {
+  const saveShippingCheckSheetResult = ref(null)
+  const errorSaveShippingCheckSheet = ref(null)
+  
+  const saveShippingCheckSheet = async (urlApi, form, whereHouse, accessToke, body) => {
+    try {
+      errorSaveShippingCheckSheet.value = null
+      console.log('Fetching saveShippingCheckSheet...')
+  
+      const result = await shipmentPlanRepository.saveShippingCheckSheet(urlApi, form, whereHouse, accessToke, body)
+        
+      if (result) {
+        // console.log('Fetching data saveShippingCheckSheet:', result)
+        saveShippingCheckSheetResult.value = result.data
+        
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in saveShippingCheckSheet:', error)
+      errorSaveShippingCheckSheet.value = error.message
+    }
+  }
+  
+  return {
+    saveShippingCheckSheetResult,
+    errorSaveShippingCheckSheet,
+    saveShippingCheckSheet,
   }
 }
 

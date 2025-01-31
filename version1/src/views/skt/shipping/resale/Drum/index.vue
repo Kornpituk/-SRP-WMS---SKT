@@ -1,8 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from "vue"
 
-
-
 import iconMock1 from '@images/icons/Group 1000004801.png'
 import iconMock2 from '@images/icons/Group 1000004802.png'
 import iconMock3 from '@images/icons/Icon.png'
@@ -23,14 +21,29 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const journalIdModel = ref(route.query.journalIdParams)
+const itemCodeModel = ref(route.query.itemCodeParams)
 const SoEtlLogDetailJournalIDModel = ref(route.query.SoEtlLogDetailJournalIDParams)
+const salesOrderNoModel = ref(route.query.salesOrderNoParams)
 const statusModel = ref(route.query.statusParams)
 
 console.log('journalIdModel', journalIdModel.value)
 
+//------------------------------------- date time
+
+function getCurrentDate() {
+  const now = new Date()
+  const day = String(now.getDate()).padStart(2, '0')
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const year = now.getFullYear()
+  
+  return `${day}/${month}/${year}`
+}
+
 //------------------------------------ import service --------------------------------
 
-import { useGenerateFormService, useGetShippingCheckSheetService } from '@/services/skt/shipmentPlan/checkSheetServices'
+import { useGenerateFormService, useGetShippingCheckSheetService,
+  useGetShippingChecksheetImageService, useShippingCheckSheetService,
+} from '@/services/skt/shipmentPlan/checkSheetServices'
 
 //------------------------------------ generate section ----------------------
 
@@ -84,6 +97,79 @@ onMounted(async () => {
 })
 
 
+//------------------------------------- Save Draft ---------------------------------------
+const { saveShippingCheckSheetResult,
+  errorSaveShippingCheckSheet,
+  saveShippingCheckSheet } = useShippingCheckSheetService()
+
+const payLoad = ref([{
+  "checkSheetItems": [
+    {
+      "soEtlLogDetailJournalID": 0,
+      "supplierLotNo": "string",
+      "appearanceCheck": true,
+      "remark": "string",
+    },
+  ],
+  "specialRequestChecks": [
+    {
+      "soEtlLogDetailJournalID": 0,
+      "checkedValue": true,
+    },
+  ],
+  "itemChecks": [
+    {
+      "soEtlLogDetailJournalID": 0,
+      "checkedValue": true,
+    },
+  ],
+  "packagingChecks": [
+    {
+      "soEtlLogDetailJournalID": 0,
+      "checkedValue": true,
+    },
+  ],
+  "unfIbc": [
+    {
+      "soEtlLogDetailJournalID": 0,
+      "ibcIndex": 0,
+      "ibcNo": "string",
+      "grossWeightBeforeShipping": "string",
+      "rustFree": true,
+      "noDents": true,
+      "baseStrong": true,
+      "labelIntact": true,
+      "correctLotNo": true,
+      "accurateWeight": true,
+      "centeredLabel": true,
+      "capSeal": true,
+      "noLeakAtCap": true,
+      "properCapSize": true,
+      "capCondition": true,
+      "topSeal": true,
+      "bottomSeal": true,
+    },
+  ],
+}])
+
+const habdleSaveDraft = async () => {
+  try {
+    const result = await saveShippingCheckSheet(
+      urlApi.value, 'save', whereHouse, 
+      accessTokenAtStore, payLoad.value)
+
+    if(result){
+      saveShippingCheckSheetResult.value = result
+      errorSaveShippingCheckSheet.value = null
+      console.log('saveShippingCheckSheetResult', result)
+    }else{
+      console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
+    }
+  } catch (error) {
+    errorSaveShippingCheckSheet.value = error.message
+  }
+}
+
 // --- Dialog Text Area --------------------------------
 
 import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue' //--------- import component
@@ -118,8 +204,46 @@ const iconMock = [
   { iconName: 'icon3', src: iconMock3 },
 ]
 
+//------------------------------ Section Image 
+//------------------------------ Picture Label	
+
+const { getShippingChecksheetImageResult,
+  errorGetShippingChecksheetImage,
+  fetchShippingChecksheetImage } = useGetShippingChecksheetImageService()
+
+const pictureLabel = ref(`https://sktdevwebapi.easetrackwms.com/api/v1/ShippingFile/ShippingChecksheetImage/${itemCodeModel.value}/Label.png`)
+const picturePackaging = ref(`https://sktdevwebapi.easetrackwms.com/api/v1/ShippingFile/ShippingChecksheetImage/${itemCodeModel.value}/Packaging.png`)
+
+const fetchPicture = type => {
+  try{
+    const result = fetchShippingChecksheetImage(urlApi.value, 
+      'ShippingChecksheetImage', whereHouse, accessTokenAtStore, 
+      itemCodeModel.value, type)
+
+    if(result){
+      getShippingChecksheetImageResult.value = result
+      errorGetShippingChecksheetImage.value = null
+      console.log('getShippingChecksheetImageResult', result)
+      
+      return result
+    }else{
+      console.log('errorGetShippingChecksheetImage !result ', errorGetShippingChecksheetImage.value)
+    }
+  } catch (error) {
+    errorGetShippingChecksheetImage.value = error.message
+  }
+}
+
+// watch(async () => {
+//   pictureLabel.value = await fetchPicture('Label.png')
+//   picturePackaging.value = await fetchPicture('Packaging.png')
+// })
+
 import image01 from '@/views/skt/shipping/image/01.png'
 import image02 from '@/views/skt/shipping/image/02.png'
+
+
+
 import image03 from '@/views/skt/shipping/image/03.png'
 import image04 from '@/views/skt/shipping/image/04.png'
 
@@ -440,7 +564,7 @@ const dessertsMockAmountView = [
     <span
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
-    >Resale / Product Shipping Check Sheet (Drum) on dd/mm/yyyy</span>
+    >Resale / Product Shipping Check Sheet (Drum) on {{ getCurrentDate() }}</span>
     <div class="my-6">
       <VRow>
         <VCol
@@ -455,7 +579,7 @@ const dessertsMockAmountView = [
                     colspan="9"
                     class="section-title text-center"
                   >
-                    Sale Order: xxxxxxxxx
+                    Sale Order: {{ salesOrderNoModel }}
                   </th>
                   <th
                     colspan="5"
@@ -556,7 +680,7 @@ const dessertsMockAmountView = [
               </thead>
               <tbody>
                 <tr
-                  v-for="(item, index) in resaleProductShipping"
+                  v-for="(item, index) in getShippingCheckSheetResult?.checkSheetItems"
                   :key="index"
                 >
                   <td>{{ index+1 }}</td>
@@ -870,10 +994,10 @@ const dessertsMockAmountView = [
                     <VImg
                       height="250"
                       width="150"
-                      :src="image02"
+                      :src="pictureLabel"
                       alt="Packaging Image"
                       class="image"
-                      @click="showDialogImageMuti(image02)"
+                      @click="showDialogImageMuti(pictureLabel)"
                     />
                   </div>
                 </td>
@@ -885,8 +1009,8 @@ const dessertsMockAmountView = [
                     <VImg
                       height="150"
                       width="150"
-                      :src="image01"
-                      @click="showDialogImageMuti(image01)"
+                      :src="picturePackaging"
+                      @click="showDialogImageMuti(picturePackaging)"
                     />
                   </div>
                 </td>
@@ -1017,7 +1141,7 @@ const dessertsMockAmountView = [
               </th>
             </tr>
             <tr
-              v-for="(item , index) in validateAfterPicking"
+              v-for="(item , index) in getShippingCheckSheetResult?.itemChecks"
               :key="index"
             >
               <td colspan="1">
@@ -1708,165 +1832,169 @@ const dessertsMockAmountView = [
         </section>
       </section>
 
-      <section
-        v-for="(truck, index) in resaleProductShipping"
-        :key="index"
-      >
-        <!-- Muti File Inpur Imge -->
-        <VRow v-if="!truck.files.length">
-          <VCol cols="4">
-            <table class="custom-table">
-              <thead>
-                <tr>
-                  <th class="text-center">
-                    Container No. /License Plate No.
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="text-center">
-                    {{ truck.truckNo }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </VCol>
-
-          <VCol cols="8">
-            <VFileInput
-              v-model="truck.files"
-              label="File input"
-              multiple
-            >
-              <template #selection>
-                <VRow
-                  class="d-flex align-center justify-center"
-                  style="height: 150px; border: 2px dashed #ccc; cursor: pointer;"
-                >
-                  <VCol
-                    class="d-flex flex-column align-center justify-center"
-                    cols="12"
-                  >
-                    <span>Upload your documents</span>
-                  </VCol>
-                </VRow>
-              </template>
-            </VFileInput>
-          </VCol>
-        </VRow>
-        <!-- Muti File Show Imge -->
-        <VRow
-          v-if="truck.files.length"
-          class="my-4"
+      <div v-if="false">
+        <section
+          v-for="(truck, index) in resaleProductShipping"
+        
+          :key="index"
         >
-          <VCol cols="3">
-            <table class="custom-table">
-              <thead>
-                <tr>
-                  <th class="text-center">
-                    เลขตู้ /ทะเบียนรถ
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="text-center">
-                    {{ truck.truckNo }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </VCol>
+          <!-- Muti File Inpur Imge -->
+          <VRow v-if="!truck.files.length">
+            <VCol cols="4">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      Container No. /License Plate No.
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">
+                      {{ truck.truckNo }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </VCol>
 
-          <VCol
-            style="border: 2px dashed black; border-radius: 10px;"
-            cols="9"
-          >
-            <VRow>
-              <VCol
-                v-for="(file, fileIndex) in truck.files"
-                :key="fileIndex"
-                cols="3"
-                md="3"
-                lg="3"
+            <VCol cols="8">
+              <VFileInput
+                v-model="truck.files"
+                label="File input"
+                multiple
               >
-                <VCard class="pa-2">
-                  <VImg
-                    role="presentation"
-                    :alt="file.name"
-                    :src="file.imagePreview" 
-                    height="100"
-                    contain
-                    @click="showDialogImageMuti(file.imagePreview, file.name)"
-                  />
+                <template #selection>
+                  <VRow
+                    class="d-flex align-center justify-center"
+                    style="height: 150px; border: 2px dashed #ccc; cursor: pointer;"
+                  >
+                    <VCol
+                      class="d-flex flex-column align-center justify-center"
+                      cols="12"
+                    >
+                      <span>Upload your documents</span>
+                    </VCol>
+                  </VRow>
+                </template>
+              </VFileInput>
+            </VCol>
+          </VRow>
+          <!-- Muti File Show Imge -->
+          <VRow
+            v-if="truck.files.length"
+            class="my-4"
+          >
+            <VCol cols="3">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      เลขตู้ /ทะเบียนรถ
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">
+                      {{ truck.truckNo }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </VCol>
+
+            <VCol
+              style="border: 2px dashed black; border-radius: 10px;"
+              cols="9"
+            >
+              <VRow>
+                <VCol
+                  v-for="(file, fileIndex) in truck.files"
+                  :key="fileIndex"
+                  cols="3"
+                  md="3"
+                  lg="3"
+                >
+                  <VCard class="pa-2">
+                    <VImg
+                      role="presentation"
+                      :alt="file.name"
+                      :src="file.imagePreview" 
+                      height="100"
+                      contain
+                      @click="showDialogImageMuti(file.imagePreview, file.name)"
+                    />
                   
 
-                  <VCardText class="pa-2">
-                    <div class="d-flex flex-column align-center text-center">
-                      <span>{{ file.fileName }}</span>
-                      <VBtn
-                        class="mt-2"
-                        icon="mdi-close"
-                        color="error"
-                        size="small"
-                        variant="tonal"
-                        @click="removeFile(truck, fileIndex)"
-                      />
-                    </div>
-                  </VCardText>
-                </VCard>
-              </VCol>
-            </VRow>
-            <VRow>
-              <Vcol
-                style="width: 100%;"
-                cols="12"
-              >
-                <VBtn
-                  class="mx-2 mb-2"
-                  color="red"
-                  width="98%"
-                  @click="removeFilesInTruck(index)"
+                    <VCardText class="pa-2">
+                      <div class="d-flex flex-column align-center text-center">
+                        <span>{{ file.fileName }}</span>
+                        <VBtn
+                          class="mt-2"
+                          icon="mdi-close"
+                          color="error"
+                          size="small"
+                          variant="tonal"
+                          @click="removeFile(truck, fileIndex)"
+                        />
+                      </div>
+                    </VCardText>
+                  </VCard>
+                </VCol>
+              </VRow>
+              <VRow>
+                <Vcol
+                  style="width: 100%;"
+                  cols="12"
                 >
-                  Delete Image
-                </VBtn>
-              </Vcol>
-            </VRow>
-          </VCol>
-
-
-          <VDialog
-            v-model="isDialogVisibleImgFileMuti"
-            width="500"
-          >
-            <!-- Dialog Content -->
-            <VCard>
-              <VCardTitle class="bg-primary">
-                <div class="d-flex justify-space-between">
-                  <span>{{ imgNameDialog }}</span>
                   <VBtn
-                    icon="mdi-close"
-                    color="white"
-                    size="small"
-                    variant="tonal"
-                    @click="isDialogVisibleImgFileMuti = false"
-                  />
-                </div>
-              </VCardTitle>
+                    class="mx-2 mb-2"
+                    color="red"
+                    width="98%"
+                    @click="removeFilesInTruck(index)"
+                  >
+                    Delete Image
+                  </VBtn>
+                </Vcol>
+              </VRow>
+            </VCol>
 
-              <VCardText>
-                <VImg
-                  role="presentation"
-                  :src="imgDialog"
-                  height="100%"
-                  contain
-                />
-              </VCardText>
-            </VCard>
-          </VDialog>
-        </VRow>
-      </section>
+
+            <VDialog
+              v-model="isDialogVisibleImgFileMuti"
+              width="500"
+            >
+              <!-- Dialog Content -->
+              <VCard>
+                <VCardTitle class="bg-primary">
+                  <div class="d-flex justify-space-between">
+                    <span>{{ imgNameDialog }}</span>
+                    <VBtn
+                      icon="mdi-close"
+                      color="white"
+                      size="small"
+                      variant="tonal"
+                      @click="isDialogVisibleImgFileMuti = false"
+                    />
+                  </div>
+                </VCardTitle>
+
+                <VCardText>
+                  <VImg
+                    role="presentation"
+                    :src="imgDialog"
+                    height="100%"
+                    contain
+                  />
+                </VCardText>
+              </VCard>
+            </VDialog>
+          </VRow>
+        </section>
+      </div>
+      
 
       <!-- Inspector / Btn -->
       <div class="mt-4">
