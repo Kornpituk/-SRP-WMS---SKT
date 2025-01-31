@@ -126,9 +126,10 @@ export const shipmentPlanRepository = {
   },
 
   async submitShipmentPlan(urlApi, form, whereHouse, accessToken, edId, comment) {
+    console.log('submitShipmentPlan repo...')
     try {
-      const response = null
-      if(type === 'approve' || type === 'submit'){
+      let response
+      if(form === 'approve' || form === 'submit'){
         response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
           headers: {
             'accept': '*/*',
@@ -136,7 +137,7 @@ export const shipmentPlanRepository = {
             Authorization: `Bearer ${accessToken}`,
           },
         })
-      }else if(type === 'reject'){
+      }else if(form === 'reject'){
         response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
           headers: {
             'accept': '*/*',
@@ -359,10 +360,10 @@ export const FileService = {
     }
   },
 
-  async deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+  async deleteFileForm(soEtlLogDetailJournalID,  form, urlApi, whereHouse, accessToken) {
 
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/DeleteAllCoA/${poEtlLogDetailJournalID}`, {}, {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, {}, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -379,7 +380,7 @@ export const FileService = {
       }
     } catch (error) {
       console.error('Error in deleteAllCoaForm:', error)
-      error = new Error(`Deleted to coa all for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      error = new Error(`Deleted to coa all for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
       throw { success: false, error }
     }
   },

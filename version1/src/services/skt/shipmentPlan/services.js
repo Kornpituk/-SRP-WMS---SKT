@@ -139,6 +139,7 @@ export const useSubmitShipmentPlanService = () => {
   const errorSubmitShipmentPlan = ref(null)
   
   const submitShipmentPlan = async (urlApi, form, whereHouse, accessToke, soeId, comment) => {
+    console.log('submitShipmentPlan sevice.')
     try {
       errorSubmitShipmentPlan.value = null
       console.log('submitShipmentPlan...')
@@ -252,7 +253,6 @@ export const useSaveFileFormService = () => {
       errorMessageSaveFileForm.value = null
 
       // console.log('Saving Draft Form COA...')
-
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
       const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
 
@@ -311,3 +311,38 @@ export const useGetFileFormService = () => {
     getFileFormFunction,
   }
 }
+
+export const useDeleteFileFormService = () => {
+  const deleteFileFormResult = ref(null)
+  const errorMessageDeleteFileForm = ref(null)
+
+  const deleteFileFormFunction = async (soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageDeleteFileForm.value = null
+
+      // console.log('Fetching File Form ...')
+
+      const result = await FileService.deleteFileForm(soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        // console.log('Received File Form:', result)
+        deleteFileFormResult.value = result
+        
+        return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา
+      } else {
+        // console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      // console.error('Error in deleteFileFormResult:', error)
+      errorMessageDeleteFileForm.value = error.message
+    }
+  }
+
+  return {
+    deleteFileFormResult,
+    errorMessageDeleteFileForm,
+    deleteFileFormFunction,
+  }
+}
+
+
