@@ -59,6 +59,7 @@ import { useGetUserPermissionService,
   useSaveSearchPlanService,
   useSubmitShipmentPlanService,
   useSaveFileFormService,
+  useDeleteFileFormService,
   usePrintShipmentPDFService,
   usePrintTruckOrderFormPDFService,
   useGetFileFormService,
@@ -628,6 +629,55 @@ const typeNameFileInput = ref('')
 
 
 //------------------------------- Section FIle Form -------------------------------------
+//------------------------------- Delete File --------------------------------
+const { deleteFileFormResult, errorMessageDeleteFileForm, deleteFileFormFunction } = useDeleteFileFormService()
+
+const handleDeleteFileForm =  async( file,
+  typeFile,
+  soEtlLogDetailJournalID) => {
+
+  try {
+    // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
+    const requestData = file
+
+    const response = await deleteFileFormFunction(
+      soEtlLogDetailJournalID,
+      typeFile,
+      urlApi.value,
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    console.log("Response from functionSaveFileForm:", response)
+
+    if (deleteFileFormResult.value?.success) {
+      // textAlertDialogFunction(alertWordConst.delete, true)
+      console.log(`Saved File Plan:`, deleteFileFormResult.value)
+
+      // Reload หลังแจ้งเตือนสำเร็จ
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 0.5 วินาที
+      
+      return true
+    } else {
+      // กรณีบันทึกไม่สำเร็จ
+      console.error(`Error saving File plan:`, errorMessageDeleteFileForm.value)
+
+      // textAlertDialogFunction(errorMessageDeleteFileForm.value, false)
+      
+      return false
+    }
+  } catch (error) {
+    // กรณีเกิดข้อผิดพลาดในกระบวนการ
+    console.error(`Error saving File plan:`, error)
+
+    // textAlertDialogFunction("An error occurred while saving the file.", false)
+    
+    return false
+  }
+}
+
 //------------------------------- Function Save File ------------------------
 const { resultSaveFielForm, errorMessageSaveFileForm, functionSaveFileForm } = useSaveFileFormService()
 
@@ -821,9 +871,21 @@ const saveShipmentPlan = async row => {
     ) {
       console.log("Uploading files...",  filesFromUploaderSO.value)
 
+      const deleteFie1 = await handleDeleteFileForm(
+        filesFromUploaderSO.value,
+        "DeleteSo",
+        row.soEtlLogDetailJournalID,
+      )
+
       const saveFile1 =  await saveFileFormShipment(
         filesFromUploaderSO.value,
         "SaveSo",
+        row.soEtlLogDetailJournalID,
+      )
+
+      const deleteFie2 = await handleDeleteFileForm(
+        filesFromUploaderSO.value,
+        "DeleteCOA",
         row.soEtlLogDetailJournalID,
       )
 
@@ -833,9 +895,21 @@ const saveShipmentPlan = async row => {
         row.soEtlLogDetailJournalID,
       )
 
+      const deleteFie3 = await handleDeleteFileForm(
+        filesFromUploaderSO.value,
+        "DeleteTruckOrder",
+        row.soEtlLogDetailJournalID,
+      )
+
       const saveFile3 =  await saveFileFormShipment(
         filesFromUploaderTruckOrder.value,
         "SaveTruckOrder",
+        row.soEtlLogDetailJournalID,
+      )
+
+      const deleteFie4 = await handleDeleteFileForm(
+        filesFromUploaderSO.value,
+        "DeleteDeliveryNote",
         row.soEtlLogDetailJournalID,
       )
 
@@ -844,6 +918,10 @@ const saveShipmentPlan = async row => {
         "SaveDeliveryNote",
         row.soEtlLogDetailJournalID,
       )
+
+      if(!deleteFie1||!deleteFie2||!deleteFie3||!deleteFie4){
+        throw 'Delete File Fiald!'
+      }
 
       if(!saveFile1||!saveFile2||!saveFile3||!saveFile4){
         throw 'Save File Fiald!'
@@ -890,7 +968,7 @@ const checkStatusBeforeAvtion = sataus => {
   if(sataus === 205){
     return true
   }else if(sataus === 206){
-    return true
+    return false
   }else{
     return false
   }
@@ -900,11 +978,18 @@ const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } 
 
 const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
   try{
-
+    console.log('submitShipmentPlanBySoEId start!!')
     if(type === 'submit'){
 
     }else if(type === 'approve' || type === 'reject'){
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+      console.log('submitShipmentPlanBySoEId start!! 2')
+    }
+
+    if(!statusCommnetValue.value){
+      textAlertDialogFunction('Please enter Reject Comment.', false)
+      
+      return
     }
     
     const result = submitShipmentPlan(urlApi.value,
@@ -912,8 +997,10 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
       whereHouse,
       accessTokenAtStore,
       soEtlLogDetailJournalID,
-      comment,
+      statusCommnetValue.value,
     )
+
+    console.log('submitShipmentPlanBySoEId start!! 3')
     
     if(result){
       if(type === 'submit'){
@@ -926,7 +1013,14 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'reject'){
+        textAlertDialogFunction(alertWordConst.reject, true)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
+
+      console.log('submitShipmentPlanBySoEId start!! 4')
       
     }else{
       if(type === 'submit'){
@@ -939,13 +1033,17 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'reject'){
+        textAlertDialogFunction(alertWordConst.reject, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
     }
   } catch (e) {
     console.error(`Error saving search plan:`, error)
   }
 }
-
 
 // const handlePageChange = newPage => {
 //   currentPage.value = newPage

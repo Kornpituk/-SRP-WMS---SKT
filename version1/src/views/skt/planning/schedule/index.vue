@@ -592,7 +592,7 @@ const headersDataTableNew = [
     sortable: false,
   },
   {
-    title: 'Actual Pcs1',
+    title: 'Product1UomCountActual',
     key: 'actualPcs1',
     sortable: false,
   },
@@ -624,7 +624,7 @@ const headersDataTableNew = [
     sortable: false,
   },
   {
-    title: 'Actual Pcs2',
+    title: 'Product2UomCountActual',
     key: 'actualPcs2',
     sortable: false,
   },
@@ -1994,7 +1994,7 @@ const statusText = statusId => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                <span v-if="item.raw.actualPcs1">{{ item.raw.actualPcs1 }}</span>
+                <span v-if="item.raw.actualPCS1">{{ item.raw.actualPCS1 }}</span>
                 <span v-else />
               </td>
 
@@ -2100,7 +2100,7 @@ const statusText = statusId => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                <span v-if="item.raw.actualPcs2">{{ item.raw.actualPcs2 }}</span>
+                <span v-if="item.raw.actualPCS2">{{ item.raw.actualPCS2 }}</span>
                 <span v-else />
               </td>
 
