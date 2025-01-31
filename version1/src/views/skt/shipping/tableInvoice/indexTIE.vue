@@ -883,27 +883,63 @@ const saveShipmentPlan = async row => {
 
 //------------------------------------- Function Submit shipment plan --------------------------------------
 
+const isDialogVisibleCommentDialog = ref(false)
+const statusCommnetValue = ref('')
+
+const checkStatusBeforeAvtion = sataus => {
+  if(sataus === 205){
+    return true
+  }else if(sataus === 206){
+    return true
+  }else{
+    return false
+  }
+}
 
 const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
 
-const submitShipmentPlanBySoEId = soEtlLogDetailJournalID => {
+const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
   try{
+
+    if(type === 'submit'){
+
+    }else if(type === 'approve' || type === 'reject'){
+      soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+    }
     
     const result = submitShipmentPlan(urlApi.value,
-      "submit",
+      type,
       whereHouse,
       accessTokenAtStore,
-      soEtlLogDetailJournalID)
+      soEtlLogDetailJournalID,
+      comment,
+    )
     
     if(result){
-      textAlertDialogFunction(alertWordConst.submit, true)
-      setTimeout(() => {
-        location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      if(type === 'submit'){
+        textAlertDialogFunction(alertWordConst.submit, true)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'approve'){
+        textAlertDialogFunction(alertWordConst.approve, true)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }
+      
     }else{
-      textAlertDialogFunction(alertWordConst.submit, false)
-      setTimeout(() => {
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      if(type === 'submit'){
+        textAlertDialogFunction(alertWordConst.submit, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'approve'){
+        textAlertDialogFunction(alertWordConst.approve, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }
     }
   } catch (e) {
     console.error(`Error saving search plan:`, error)
@@ -2562,11 +2598,23 @@ const handlePrintTruckOrderPDF = () => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00024' || userDataInfo.id === '00023'"
+              v-if="userDataInfo.id === '00024' || userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
+              :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="primary"
+              @click="submitShipmentPlanBySoEId('approve', '001')"
             >
               <span style="font-size: 12px;">Approve</span>
+            </VBtn>
+
+            <VBtn
+              v-if="userDataInfo.id === '00024' || userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
+              :disabled="selectedDataTables.length < 1"
+              class="mx-2"
+              color="error"
+              @click="isDialogVisibleCommentDialog = true"
+            >
+              <span style="font-size: 12px;">Reject</span>
             </VBtn>
 
             <VBtn
@@ -2856,7 +2904,7 @@ const handlePrintTruckOrderPDF = () => {
                 /></span>
               </th>
               <th
-                v-if="true"
+                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
                 class="text-center"
               >
                 <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
@@ -3006,6 +3054,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VCheckboxBtn
+                  v-if="checkStatusBeforeAvtion(product.statusId)"
                   v-model="selectedDataTables"
                   :value="product"
                 />
@@ -4001,7 +4050,7 @@ const handlePrintTruckOrderPDF = () => {
                   :disabled="accountINSP"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
-                  @Click="submitShipmentPlanBySoEId(product.soEtlLogDetailJournalID)"
+                  @Click="submitShipmentPlanBySoEId('submit', product.soEtlLogDetailJournalID)"
                 >
                   <span style="font-size: 12px;">Submit</span>
                 </VBtn>
@@ -4867,6 +4916,42 @@ const handlePrintTruckOrderPDF = () => {
               </VCol>
             </VRow>
           </VCardActions>
+        </VCard>
+      </VDialog>
+    </div>
+
+    <!-- comment reject  -->
+    <!-- dialogcomment -->
+    <div>
+      <VDialog
+        v-model="isDialogVisibleCommentDialog"
+        persistent
+        class="v-dialog-sm"
+      >
+        <!-- Dialog Content -->
+        <VCard title="Comment">
+          <DialogCloseBtn
+            variant="text"
+            size="default"
+            @click="isDialogVisibleCommentDialog = false"
+          />
+
+          <VCardText>
+            <VTextarea
+              v-model="statusCommnetValue"
+              counter
+              placeholder="Enter Commnet"
+            />
+          </VCardText>
+
+          <VCardText class="d-flex justify-end flex-wrap gap-4">
+            <VBtn
+              color="error"
+              @click="isDialogVisibleCommentDialog = false, submitShipmentPlanBySoEId('reject','101')"
+            >
+              Reject
+            </VBtn>
+          </VCardText>
         </VCard>
       </VDialog>
     </div>

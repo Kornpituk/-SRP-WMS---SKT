@@ -125,42 +125,29 @@ export const shipmentPlanRepository = {
     }
   },
 
-  async submitShipmentPlan(urlApi, form, whereHouse, accessToken, edId) {
+  async submitShipmentPlan(urlApi, form, whereHouse, accessToken, edId, comment) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
-        headers: {
-          'accept': '*/*',
-          'x-location': whereHouse,
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-    
-      if (response && response.data) {
-        console.log('success get repo submit Shipment Plan...')
-
-        // console.log('Service Response data submit Shipment Plan:', response.data)
-            
-        return { data: response.data, success: true }
-      } else {
-        console.log('Error repo Error If submit Shipment Plan...')
-        throw new Error('No data received from the server')
+      const response = null
+      if(type === 'approve' || type === 'submit'){
+        response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }else if(type === 'reject'){
+        response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            Comment: comment,
+          },
+        })
       }
-    } catch (error) {
-      console.log('Error repo Error Try submit Shipment Plan...')
-      console.error('Error in getProductionPlan:', error)
-      throw new Error(`Failed to fetch submit Shipment Plan ${error.response?.data?.message || error.message}`)
-    }
-  },
-
-  async submitShipmentPlan(urlApi, form, whereHouse, accessToken, edId) {
-    try {
-      const response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
-        headers: {
-          'accept': '*/*',
-          'x-location': whereHouse,
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
     
       if (response && response.data) {
         console.log('success get repo submit Shipment Plan...')

@@ -138,12 +138,12 @@ export const useSubmitShipmentPlanService = () => {
   const submitShipmentPlanResult = ref(null)
   const errorSubmitShipmentPlan = ref(null)
   
-  const submitShipmentPlan = async (urlApi, form, whereHouse, accessToke, soeId) => {
+  const submitShipmentPlan = async (urlApi, form, whereHouse, accessToke, soeId, comment) => {
     try {
       errorSubmitShipmentPlan.value = null
       console.log('submitShipmentPlan...')
   
-      const result = await shipmentPlanRepository.submitShipmentPlan(urlApi, form, whereHouse, accessToke, soeId)
+      const result = await shipmentPlanRepository.submitShipmentPlan(urlApi, form, whereHouse, accessToke, soeId, comment)
         
       if (result) {
         // console.log('submitShipmentPlan:', result)
