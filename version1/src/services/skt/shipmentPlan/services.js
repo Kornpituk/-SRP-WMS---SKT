@@ -253,6 +253,7 @@ export const useSaveFileFormService = () => {
       errorMessageSaveFileForm.value = null
 
       // console.log('Saving Draft Form COA...')
+
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
       const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
 
@@ -316,13 +317,13 @@ export const useDeleteFileFormService = () => {
   const deleteFileFormResult = ref(null)
   const errorMessageDeleteFileForm = ref(null)
 
-  const deleteFileFormFunction = async (soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) => {
+  const deleteFileFormFunction = async (soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageDeleteFileForm.value = null
 
       // console.log('Fetching File Form ...')
 
-      const result = await FileService.deleteFileForm(soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
+      const result = await FileService.deleteFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
       
       if (result) {
         // console.log('Received File Form:', result)

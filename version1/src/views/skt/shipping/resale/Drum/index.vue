@@ -24,9 +24,27 @@ const journalIdModel = ref(route.query.journalIdParams)
 const itemCodeModel = ref(route.query.itemCodeParams)
 const SoEtlLogDetailJournalIDModel = ref(route.query.SoEtlLogDetailJournalIDParams)
 const salesOrderNoModel = ref(route.query.salesOrderNoParams)
+const checkSheetTypeNameModel = ref(route.query.checkSheetTypeNameParams)
 const statusModel = ref(route.query.statusParams)
 
 console.log('journalIdModel', journalIdModel.value)
+
+//------------------------------- alert --------------------------------------------
+
+import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
+
+const isDialogVisibleAlertDialog = ref(false)
+const wordForSubmit = ref('')
+const subWordForSubmit = ref('')
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  subWordForSubmit.value = ''
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
 
 //------------------------------------- date time
 
@@ -43,6 +61,7 @@ function getCurrentDate() {
 
 import { useGenerateFormService, useGetShippingCheckSheetService,
   useGetShippingChecksheetImageService, useShippingCheckSheetService,
+  useSubmitCheckSheetService,
 } from '@/services/skt/shipmentPlan/checkSheetServices'
 
 //------------------------------------ generate section ----------------------
@@ -152,21 +171,102 @@ const payLoad = ref([{
   ],
 }])
 
+const appearanceCheckTrue = ref(true)
+
+const mapShippingCheckSheetData = data => {
+  return {
+    checkSheetItems: data.checkSheetItems.map(item => ({
+      soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+      supplierLotNo: item.supplierLotNo, // ค่า default เป็น true หรือกำหนดจากข้อมูลที่ได้
+      appearanceCheck: item.appearanceCheck,
+      remark: item.remark,
+    })), // ไม่มีข้อมูลใน getShippingCheckSheetResult
+    specialRequestChecks: data.specialRequestChecks.map(item => ({
+      soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+      checkedValue: item.checkedValue, // ค่า default เป็น true หรือกำหนดจากข้อมูลที่ได้
+    })),
+    itemChecks: data.itemChecks.map(item => ({
+      soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+      checkedValue: true,
+    })),
+    packagingChecks: data.packagingChecks.map(item => ({
+      soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+      checkedValue: true,
+    })),
+    unfIbc: data.unfIbc.map(item => ({
+      soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+      ibcIndex: item.ibcIndex,
+      ibcNo: item.ibcNo || "", // ถ้า ibcNo เป็น null ให้ใช้ค่าว่าง
+      grossWeightBeforeShipping: "", // ค่าเริ่มต้น เนื่องจากไม่มีข้อมูลจาก getShippingCheckSheetResult
+      rustFree: true,
+      noDents: true,
+      baseStrong: true,
+      labelIntact: true,
+      correctLotNo: true,
+      accurateWeight: true,
+      centeredLabel: true,
+      capSeal: true,
+      noLeakAtCap: true,
+      properCapSize: true,
+      capCondition: true,
+      topSeal: true,
+      bottomSeal: true,
+    })),
+  }
+}
+
+// ใช้งาน function
+
+
 const habdleSaveDraft = async () => {
+  const requestData = mapShippingCheckSheetData(getShippingCheckSheetResult.value)
+
+  console.log("requestData", requestData)
+
   try {
     const result = await saveShippingCheckSheet(
       urlApi.value, 'save', whereHouse, 
-      accessTokenAtStore, payLoad.value)
+      accessTokenAtStore, requestData)
 
     if(result){
       saveShippingCheckSheetResult.value = result
       errorSaveShippingCheckSheet.value = null
       console.log('saveShippingCheckSheetResult', result)
+      textAlertDialogFunction(alertWordConst.saveDraft, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 0.5 วินาที
     }else{
       console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
+      textAlertDialogFunction(alertWordConst.saveDraft, false)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 0.5 วินาที
     }
   } catch (error) {
     errorSaveShippingCheckSheet.value = error.message
+  }
+}
+
+//------------------------------------ Submit ---------------------------------------
+const { submitCheckSheetResult,
+  submitCheckSheetError,
+  submitCheckSheetFunction } = useSubmitCheckSheetService()
+
+const handleSubmit = () => {
+  try {
+    const result = submitCheckSheetFunction(urlApi.value, 'submit', whereHouse, 
+      accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
+
+    if(result){
+      submitCheckSheetResult.value = result
+      submitCheckSheetError.value = null
+      console.log('submitCheckSheetResult', result)
+    }else{
+      console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
+    }
+  } catch (error) {
+    submitCheckSheetError.value = error.message
   }
 }
 
@@ -187,6 +287,13 @@ const textAreaDialogActive = (type, data, index) => {
   titleDialogView.value = 'Remark'
   dialogDataTextArea.value = data // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogVisible.value = true
+
+  // ค้นหาและอัปเดตค่า remark ใน checkSheetItems
+  getShippingCheckSheetResult.value.checkSheetItems.forEach(item => {
+    if (item.containerNo_LicPlNo === index) {
+      item.remark = data
+    }
+  })
 }
 
 //-------------------------- for mat -------------- 
@@ -684,21 +791,21 @@ const dessertsMockAmountView = [
                   :key="index"
                 >
                   <td>{{ index+1 }}</td>
-                  <td>{{ item.truckNo }}</td>
-                  <td>{{ item.sKTLotNo }}</td>
+                  <td>{{ item.containerNo_LicPlNo }}</td>
+                  <td>{{ item.sktLotNo }}</td>
                   <td style="min-width: 200px;">
                     <VTextField
                       v-model="item.supplierLotNo"
                       density="compact"
                     />
                   </td>
-                  <td>{{ item.productCode }}</td>
+                  <td>{{ item.itemCode }}</td>
                   <td>{{ item.tradeName }}</td>
                   <td class="text-center">
-                    {{ item.packaging }}
+                    {{ item.packging }}
                   </td>
                   <td class="text-end">
-                    {{ formatNumber(item.netContent) }}
+                    {{ formatNumber(item.netCount) }}
                   </td>
                   <td>
                     <VRow>
@@ -722,7 +829,7 @@ const dessertsMockAmountView = [
                     </VRow>
                   </td>
                   <td class="text-end">
-                    {{ item.quantity }}
+                    {{ item.quantityKgs }}
                   </td>
                   <td style="min-width: 200px; font-size: 14px;">
                     <VTextField
@@ -739,14 +846,20 @@ const dessertsMockAmountView = [
                   <td>
                     <VRow>
                       <VCol cols="6">
-                        <VCheckbox>
+                        <VCheckbox
+                          v-model="item.appearanceCheck"
+                          :value="appearanceCheckTrue"
+                        >
                           <template #label>
                             <span class="font-size">YES</span>
                           </template>
                         </VCheckbox>
                       </VCol>
                       <VCol cols="6">
-                        <VCheckbox>
+                        <VCheckbox
+                          v-model="item.appearanceCheck"
+                          :value="false"
+                        >
                           <template #label>
                             <span class="font-size">NO</span>
                           </template>
@@ -759,7 +872,7 @@ const dessertsMockAmountView = [
                       style="min-width: 150px;"
                       variant="outlined"
                       :color="item.remark ? 'primary' : 'grey'"
-                      @click="textAreaDialogActive('RemarkLOG', item.remark, item.truckNo)"
+                      @click="textAreaDialogActive('RemarkLOG', item.remark, item.containerNo_LicPlNo)"
                     >
                       <span
                         v-if="item.remark"
@@ -1318,7 +1431,7 @@ const dessertsMockAmountView = [
         </VBtn>
       </div>
 
-      <section v-if="false">
+      <section v-if="checkSheetTypeNameModel === 'IBC'">
         <table class="custom-table my-4">
           <thead>
             <tr>
@@ -2134,6 +2247,7 @@ const dessertsMockAmountView = [
           <VBtn
             class="mx-2"
             color="warning"
+            @click="habdleSaveDraft"
           >
             SAVE DRAFT
           </VBtn>
@@ -2167,6 +2281,16 @@ const dessertsMockAmountView = [
         :type-btn="typeBtnView"
         :title-dialog="titleDialogView"
         @submit="handleDialogSubmit"
+      />
+    </div>
+
+    <div>
+      <!-- ใช้ AuthenticatorDialog Component -->
+      <AlertWord2
+        v-model="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :subword="subWordForSubmit"
+        :success="successDialAlert"
       />
     </div>
   </section>

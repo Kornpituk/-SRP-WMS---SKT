@@ -110,7 +110,7 @@ export const useShippingCheckSheetService = () => {
       errorSaveShippingCheckSheet.value = null
       console.log('Fetching saveShippingCheckSheet...')
   
-      const result = await shipmentPlanRepository.saveShippingCheckSheet(urlApi, form, whereHouse, accessToke, body)
+      const result = await checkSheetShipmentPlanRepository.saveShippingCheckSheet(urlApi, form, whereHouse, accessToke, body)
         
       if (result) {
         // console.log('Fetching data saveShippingCheckSheet:', result)
@@ -161,6 +161,6 @@ export const useSubmitCheckSheetService = () => {
   return {
     submitCheckSheetResult,
     submitCheckSheetError,
-    submitCheckSheetFunctio,
+    submitCheckSheetFunction,
   }
 }

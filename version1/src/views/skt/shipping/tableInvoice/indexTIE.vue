@@ -16,18 +16,14 @@ import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/item
 const itemStore = useItemStore()
 
 //------------------------------- alert --------------------------------------------
-import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
+
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
-import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 import alertWordConst from '@/utilities/constant'
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
 const subWordForSubmit = ref('')
 const successDialAlert = ref(false)
-const confirmDialog2 = ref(null)
-
-const statusId = ref(0)
 
 const textAlertDialogFunction = (word, success) => {
   subWordForSubmit.value = ''
@@ -1500,8 +1496,18 @@ function redirectBasedOnStatus(product) {
     10: "Flexi",
   }
 
+  const mainCheckSheetTypeName = (product.checkSheetTypeName)
+
+  const checkSheetTypeNameMapping = {
+    'N/A': 'Drum',
+    'General': 'Drum',
+    'IBC': 'IBC',
+    'Flexi': 'Flexi',
+    'Lorry': 'Lorry',
+  }
+
   // ตรวจสอบว่า status มีใน mapping หรือไม่
-  const subPath = statusMapping[mainStatus] || "unknown-status"
+  const subPath = checkSheetTypeNameMapping[mainCheckSheetTypeName] || "unknown-status"
 
   // ต่อ URL เดิมด้วย path ใหม่
   const currentPath = window.location.pathname // ดึง path ปัจจุบัน
@@ -1513,6 +1519,7 @@ function redirectBasedOnStatus(product) {
     statusParams: product.statusId,
     salesOrderNoParams: product.salesOrderNo,
     itemCodeParams: product.itemCode,
+    checkSheetTypeNameParams: product.checkSheetTypeName,
   }).toString()
 
   // 🔥 Redirect ไปยัง URL ใหม่พร้อม Query

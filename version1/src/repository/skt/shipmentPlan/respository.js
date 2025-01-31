@@ -525,7 +525,7 @@ export const checkSheetShipmentPlanRepository = {
         ],
       }
 
-      const response = await axios.post(`${urlApi}/api/v1/ShippingCheckSheet/${form}`, payload, {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingCheckSheet/${form}`, body, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
@@ -552,7 +552,7 @@ export const checkSheetShipmentPlanRepository = {
 
   async submitCheckSheet(urlApi, form, whereHouse, accessToken, SoEId) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/submit/${SoEId}`, {}, {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingCheckSheet$/${form}/${SoEId}`, {}, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
