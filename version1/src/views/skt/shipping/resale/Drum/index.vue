@@ -66,29 +66,17 @@ import { useGenerateFormService, useGetShippingCheckSheetService,
 
 //------------------------------------ generate section ----------------------
 
-const { generateFormResult, generateFormError, generateFormFunction } = useGenerateFormService()
-
-const generateForm = async () => {
-  try {
-    const result = await generateFormFunction(urlApi.value, 'ShippingForm', whereHouse, accessTokenAtStore, journalIdModel.value)
-    if(result){
-      generateFormResult.value = result
-      generateFormError.value = null
-      console.log('generateFormResult', result)
-    }else{
-      console.log('generateFormError !result ', generateFormError.value)
-    }
-
-  } catch (error) {
-    generateFormError.value = error.message
-  }
-}
-
-watch(async ()  => {
-  await generateForm()
-})
 
 //------------------------------------ Get ShippingCheckSheet  ----------------------
+
+import { GBSmockDataIm, specialRequestsIm,
+  validateAfterPickingIm, resaleProductShippingIm,
+} from './GBSMockData'
+
+
+
+const GBSMockData = ref(GBSmockDataIm)
+
 
 const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCheckSheet } = useGetShippingCheckSheetService()
 
@@ -101,6 +89,9 @@ const getShippingCheckSheet = async () => {
       getShippingCheckSheetResult.value = result
 
       specialRequests.value = result
+
+      
+
       errorGetShippingCheckSheet.value = null
       console.log('getShippingCheckSheetResult', result)
     }else{
@@ -111,8 +102,99 @@ const getShippingCheckSheet = async () => {
   }
 }
 
+const tableData = ref({
+  No: [],
+  ibcNo: [],
+  grossWeightBeforeShipping: [],
+
+  rustFree: [],
+  noDentOrDeform: [],
+  strongBaseSupport: [],
+
+  labelNotTorn: [],
+  correctLotNo: [],
+  correctWeight: [],
+  correctLabelPosition: [],
+
+  noTopVentHole: [],
+  capNoLeakAfterOpening: [],
+  correctCapSize: [],
+
+  goodCapCondition: [],
+  topSealTight: [],
+  bottomValveSealTight: [],
+})
+
+// ✅ ใช้ computed property แทน v-if ใน v-for
+// 📝 แปล key ภาษาอังกฤษเป็นภาษาไทย
+const translatedKeys = {
+  rustFree: "1. ไม่เป็นสนิม",
+  noDentOrDeform: "-ไม่บุบ ไม่เสียรูปทรง",
+  strongBaseSupport: "-ฐานรองรับแข็งแรง",
+  labelNotTorn: "2.Label ไม่ฉีกขาด",
+  correctLotNo: "- Lot No.ถูกต้อง",
+  correctWeight: "- น้ำหนักถูกต้อง",
+  correctLabelPosition: "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)",
+  noTopVentHole: "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า",
+  capNoLeakAfterOpening: "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น",
+  correctCapSize: "- ฝาเกลียวที่ใช้ขนาดถูกต้อง",
+  goodCapCondition: "- สภาพฝาที่ใช้ปิด ป้องกันการรั่วได้ดี",
+  topSealTight: "4.มีการ Seal ที่ฝาด้านบน แน่นเรียบร้อย",
+  bottomValveSealTight: "5.มีการ Seal ที่วาล์วด้านล่างแน่นเรียบร้อย ไม่รั่วซึม",
+}
+
+// ✅ เฉพาะ key ที่เป็น checkbox
+const checkboxKeys = [
+  'rustFree',
+  'noDentOrDeform',
+  'strongBaseSupport',
+  'labelNotTorn',
+  'correctLotNo',
+  'correctWeight',
+  'correctLabelPosition',
+  'noTopVentHole',
+  'capNoLeakAfterOpening',
+  'correctCapSize',
+  'goodCapCondition',
+  'topSealTight',
+  'bottomValveSealTight',
+]
+
+// ✅ ใช้ computed property เพื่อกรองเฉพาะข้อมูลที่ต้องการแสดงใน <tbody>
+const filteredTableData = computed(() => {
+  const { No, ibcNo, grossWeightBeforeShipping, ...filteredData } = tableData.value
+  
+  return filteredData
+})
+
 onMounted(async () => {
   await getShippingCheckSheet()
+
+  getShippingCheckSheetResult.value?.unfIbc.forEach(item => {
+    tableData.value.No.push(item.ibcIndex)
+    tableData.value.ibcNo.push(item.ibcNo || 'N/A')
+    tableData.value.grossWeightBeforeShipping.push(item.grossWeightBeforeShipping || 'N/A')
+
+    // ✅ ใช้ Boolean (`true` / `false`) แทน `Yes` / `No`
+    tableData.value.rustFree.push(!!item.rustFree)
+    tableData.value.noDentOrDeform.push(!!item.noDentOrDeform)
+    tableData.value.strongBaseSupport.push(!!item.strongBaseSupport)
+
+    tableData.value.labelNotTorn.push(!!item.labelNotTorn)
+    tableData.value.correctLotNo.push(!!item.correctLotNo)
+    tableData.value.correctWeight.push(!!item.correctWeight)
+    tableData.value.correctLabelPosition.push(!!item.correctLabelPosition)
+
+    tableData.value.noTopVentHole.push(!!item.noTopVentHole)
+    tableData.value.capNoLeakAfterOpening.push(!!item.capNoLeakAfterOpening)
+    tableData.value.correctCapSize.push(!!item.correctCapSize)
+
+    tableData.value.goodCapCondition.push(!!item.goodCapCondition)
+    tableData.value.topSealTight.push(!!item.topSealTight)
+    tableData.value.bottomValveSealTight.push(!!item.bottomValveSealTight)
+  })
+
+  console.log(tableData.value)
 })
 
 
@@ -203,27 +285,57 @@ const mapShippingCheckSheetData = data => {
       ibcIndex: item.ibcIndex,
       ibcNo: item.ibcNo || "", // ถ้า ibcNo เป็น null ให้ใช้ค่าว่าง
       grossWeightBeforeShipping: "", // ค่าเริ่มต้น เนื่องจากไม่มีข้อมูลจาก getShippingCheckSheetResult
-      rustFree: true,
-      noDents: true,
-      baseStrong: true,
-      labelIntact: true,
-      correctLotNo: true,
-      accurateWeight: true,
-      centeredLabel: true,
-      capSeal: true,
-      noLeakAtCap: true,
-      properCapSize: true,
-      capCondition: true,
-      topSeal: true,
-      bottomSeal: true,
+      rustFree: item.rustFree || false,
+      noDents: item.noDents || false,
+      baseStrong: item.baseStrong || false,
+      labelIntact: item.labelIntact || false,
+      correctLotNo: item.correctLotNo || false,
+      accurateWeight: item.accurateWeight || false,
+      centeredLabel: item.centeredLabel || false,
+      capSeal: item.capSeal || false,
+      noLeakAtCap: item.noLeakAtCap || false,
+      properCapSize: item.properCapSize || false,
+      capCondition: item.capCondition || false,
+      topSeal: item.topSeal || false,
+      bottomSeal: item.bottomSeal || false,
     })),
   }
 }
 
-// ใช้งาน function
-
+const updateShippingCheckSheetData = async ()  => {
+  // ตรวจสอบว่า getShippingCheckSheetResult.value?.unfIbc มีข้อมูลหรือไม่
+  if (getShippingCheckSheetResult.value?.unfIbc) {
+    getShippingCheckSheetResult.value.unfIbc = tableData.value.No.map((_, index) => ({
+      journalID: getShippingCheckSheetResult.value.unfIbc[index].journalID, // ใช้ journalID เดิมจาก unfIbc
+      soEtlLogDetailJournalID: getShippingCheckSheetResult.value.unfIbc[index].soEtlLogDetailJournalID, // ใช้ soEtlLogDetailJournalID เดิม
+      ibcIndex: tableData.value.No[index], // เอาข้อมูลจาก tableData.value
+      ibcNo: tableData.value.ibcNo[index] === 'N/A' ? null : tableData.value.ibcNo[index], // เปลี่ยน 'N/A' กลับเป็น null ถ้าต้องการ
+      grossWeightBeforeShipping: tableData.value.grossWeightBeforeShipping[index] === 'N/A' ? null : tableData.value.grossWeightBeforeShipping[index],
+      rustFree: tableData.value.rustFree[index], // Boolean
+      noDentOrDeform: tableData.value.noDentOrDeform[index], // Boolean
+      strongBaseSupport: tableData.value.strongBaseSupport[index], // Boolean
+      labelNotTorn: tableData.value.labelNotTorn[index], // Boolean
+      correctLotNo: tableData.value.correctLotNo[index], // Boolean
+      correctWeight: tableData.value.correctWeight[index], // Boolean
+      correctLabelPosition: tableData.value.correctLabelPosition[index], // Boolean
+      noTopVentHole: tableData.value.noTopVentHole[index], // Boolean
+      capNoLeakAfterOpening: tableData.value.capNoLeakAfterOpening[index], // Boolean
+      correctCapSize: tableData.value.correctCapSize[index], // Boolean
+      goodCapCondition: tableData.value.goodCapCondition[index], // Boolean
+      topSealTight: tableData.value.topSealTight[index], // Boolean
+      bottomValveSealTight: tableData.value.bottomValveSealTight[index], // Boolean
+    }))
+  }
+}
 
 const habdleSaveDraft = async () => {
+
+  // อัพเดตข้อมูลใน getShippingCheckSheetResult.value?.unfIbc ก่อน
+  await updateShippingCheckSheetData()
+
+  console.log('getShippingCheckSheetResult.value update', getShippingCheckSheetResult.value)
+
+  // ส่งข้อมูลที่อัพเดตไปบันทึก
   const requestData = mapShippingCheckSheetData(getShippingCheckSheetResult.value)
 
   console.log("requestData", requestData)
@@ -241,7 +353,7 @@ const habdleSaveDraft = async () => {
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       console.log("requestData 4")
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 0.5 วินาที
     }else{
       console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
@@ -269,8 +381,18 @@ const handleSubmit = () => {
       submitCheckSheetResult.value = result
       submitCheckSheetError.value = null
       console.log('submitCheckSheetResult', result)
+      textAlertDialogFunction(alertWordConst.submit, true)
+      console.log("requestData 4")
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 0.5 วินาที
     }else{
       console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
+      textAlertDialogFunction(alertWordConst.submit, false)
+      console.log("requestData 4")
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 0.5 วินาที
     }
   } catch (error) {
     submitCheckSheetError.value = error.message
@@ -381,14 +503,6 @@ const addItemsLang = item => {
   }
   console.log('Log Lang Add', selectedLanguage.value)
 }
-
-import { GBSmockDataIm, specialRequestsIm,
-  validateAfterPickingIm, resaleProductShippingIm,
-} from './GBSMockData'
-
-
-
-const GBSMockData = ref(GBSmockDataIm)
 
 const validateAfterPicking = ref(validateAfterPickingIm)
 const resaleProductShipping = ref(resaleProductShippingIm)
@@ -685,9 +799,15 @@ const dessertsMockAmountView = [
       </div>
     </div>
     <span
+      v-if="checkSheetTypeNameModel === 'General'"
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
     >Resale / Product Shipping Check Sheet (Drum) on {{ getCurrentDate() }}</span>
+    <span
+      v-if="checkSheetTypeNameModel === 'IBC'"
+      class="text-center d-flex justify-center"
+      style="font-weight: bolder;"
+    >Resale / Product Shipping Check Sheet (IBC) on {{ getCurrentDate() }}</span>
     <div class="my-6">
       <VRow>
         <VCol
@@ -1448,486 +1568,106 @@ const dessertsMockAmountView = [
       </div>
 
       <section v-if="checkSheetTypeNameModel === 'IBC'">
-        <table class="custom-table my-4">
-          <thead>
-            <tr>
-              <th
-                colspan="4"
-                class="text-center"
-              >
-                {{ currentData.no.title }}
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                {{ currentData.no.c1 }}
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                {{ currentData.no.c2 }}
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                {{ currentData.no.c3 }}
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                {{ currentData.no.c4 }}
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                {{ currentData.no.c5 }}
-              </th>
-            </tr>
-
-            <tr>
-              <th
-                colspan="4"
-                class="text-center"
-              >
-                {{ currentData.ubc.title }}
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.ubc.c1"
-                  density="compact"
-                />
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.ubc.c2"
-                  density="compact"
-                />
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.ubc.c3"
-                  density="compact"
-                />
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.ubc.c4"
-                  density="compact"
-                />
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.ubc.c5"
-                  density="compact"
-                />
-              </th>
-            </tr>
-
-            <tr>
-              <th
-                colspan="4"
-                class="text-center"
-              >
-                {{ currentData.gbs.title }}
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.gbs.c1"
-                  density="compact"
-                />
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.gbs.c2"
-                  density="compact"
-                />
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.gbs.c3"
-                  density="compact"
-                />
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.gbs.c4"
-                  density="compact"
-                />
-              </th>
-              <th
-                colspan="2"
-                class="text-center"
-              >
-                <VTextField
-                  v-model="currentData.gbs.c5"
-                  density="compact"
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody v-if="false">
-            <!-- วนลูปข้อมูล item1 และ item2 -->
-            <template
-              v-for="(items, key) in GBSMockData.rows1"
-              :key="key"
-            >
-              <!-- วนลูปแต่ละ row ใน item -->
-              <tr
-                v-for="(row, rowIndex) in items"
-                :key="rowIndex"
-              >
-                <td
-                  style="max-width: 250px;"
+        <div style="overflow-x: auto; white-space: nowrap;">
+          <table class="custom-table my-4">
+            <thead>
+              <tr>
+                <th
+                  style="position: sticky;z-index: 1;  left: 0; min-width: 350px;  background-color: #fafafa;"
                   colspan="4"
-                  :class="{ 'font-weight-bold': row.label.match(/^\d+\./) }"
+                  class="text-center"
                 >
-                  {{ row.label }}
+                  No.
+                </th>
+                <th
+                  v-for="(num, index) in tableData.No"
+                  :key="index"
+                  colspan="2"
+                  class="text-center"
+                >
+                  {{ num }}
+                </th>
+              </tr>
+              <tr>
+                <th
+                  style="position: sticky;z-index: 1;  left: 0; min-width: 350px; background-color: #fafafa;"
+                  colspan="4"
+                  class="text-center"
+                >
+                  IBC No.
+                </th>
+                <th
+                  v-for="(num, index) in tableData.ibcNo"
+                  :key="index"
+                  colspan="2"
+                  style="min-width: 150px;"
+                >
+                  <VTextField
+                    v-model="tableData.ibcNo[index]"
+                    variant="outlined"
+                    density="compact"
+                  />
+                </th>
+              </tr>
+              <tr>
+                <th
+                  colspan="4"
+                  class="text-center"
+                  style="position: sticky;z-index: 1;  left: 0; min-width: 350px; background-color: #fafafa;"
+                >
+                  GROSSWEIGHT Before Shipping
+                </th>
+                <th
+                  v-for="(num, index) in tableData.grossWeightBeforeShipping"
+                  :key="index"
+                  colspan="2"
+                >
+                  <VTextField
+                    v-model="tableData.grossWeightBeforeShipping[index]"
+                    variant="outlined"
+                    density="compact"
+                  />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(values, key) in filteredTableData"
+                :key="key"
+              >
+                <th
+                  v-if="key === 'rustFree' || key === 'labelNotTorn' || key === 'noTopVentHole' || key === 'topSealTight'|| key === 'bottomValveSealTight'"
+                  class="font-weight-bold"
+                  style="position: sticky; z-index: 1; left: 0; min-width: 350px; background-color: #fafafa;"
+                  colspan="4"
+                >
+                  <span>{{ translatedKeys[key] || key }}</span>
+                </th>
+                <td
+                  v-else
+                  style="position: sticky; z-index: 1; left: 0; min-width: 350px; background-color: #fafafa;"
+                  colspan="4"
+                >
+                  {{ translatedKeys[key] || key }}
                 </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value1"
-                      density="compact"
-                    />
+                <td
+                  v-for="(value, index) in values"
+                  :key="index"
+                  colspan="2"
+                >
+                  <div v-if="checkboxKeys.includes(key)">
+                    <VCheckbox v-model="tableData[key][index]" />
                   </div>
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value2"
-                      density="compact"
-                    />
-                  </div>
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value3"
-                      density="compact"
-                    />
-                  </div>
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value4"
-                      density="compact"
-                    />
-                  </div>
-                </td>
-                <td colspan="2">
-                  <div class="d-flex justify-center">
-                    <VCheckbox
-                      v-model="row.value5"
-                      density="compact"
-                    />
+                  <div v-else>
+                    {{ value }}
                   </div>
                 </td>
               </tr>
-            </template>
-          </tbody>
-
-          <tbody>
-            <tr
-              v-for="(item, index) in currentData.rows.item1"
-              :key="index"
-            >
-              <td
-                style="max-width: 250px;"
-                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
-                colspan="4"
-              >
-                {{ item.label }}
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value1"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value2"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value3"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value4"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value5"
-                    density="compact"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            <tr
-              v-for="(item, index) in currentData.rows.item2"
-              :key="index"
-            >
-              <td
-                style="max-width: 250px;"
-                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
-                colspan="4"
-              >
-                {{ item.label }}
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value1"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value2"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value3"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value4"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value5"
-                    density="compact"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            <tr
-              v-for="(item, index) in currentData.rows.item3"
-              :key="index"
-            >
-              <td
-                style="max-width: 250px;"
-                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
-                colspan="4"
-              >
-                {{ item.label }}
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value1"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value2"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value3"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value4"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value5"
-                    density="compact"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            <tr
-              v-for="(item, index) in currentData.rows.item4"
-              :key="index"
-            >
-              <td
-                style="max-width: 250px;"
-                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
-                colspan="4"
-              >
-                {{ item.label }}
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value1"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value2"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value3"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value4"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value5"
-                    density="compact"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            <tr
-              v-for="(item, index) in currentData.rows.item5"
-              :key="index"
-            >
-              <td
-                style="max-width: 250px;"
-                :class="{ 'font-weight-bold': item.label.match(/^\d+\./) }"
-                colspan="4"
-              >
-                {{ item.label }}
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value1"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value2"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value3"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value4"
-                    density="compact"
-                  />
-                </div>
-              </td>
-              <td colspan="2">
-                <div class="d-flex justify-center">
-                  <VCheckbox
-                    v-model="item.value5"
-                    density="compact"
-                  />
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
         
-        <section>
+        <section v-if="false">
           <div>
             <VRow>
               <VCol cols="6" />
@@ -2270,12 +2010,14 @@ const dessertsMockAmountView = [
           <VBtn
             class="mx-2"
             color="green"
+            @click="handleSubmit"
           >
             WH2
           </VBtn>
           <VBtn
             class="mx-2"
             color="green"
+            @click="handleSubmit"
           >
             WH1
           </VBtn>

@@ -942,7 +942,7 @@ const saveShipmentPlan = async row => {
     if (saveSearchPlanResult.value) {
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 500 มิลลิวินาที = 0.5 วินาที
     } else {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -1503,7 +1503,7 @@ function redirectBasedOnStatus(product) {
   const checkSheetTypeNameMapping = {
     'N/A': 'Drum',
     'General': 'Drum',
-    'IBC': 'IBC',
+    'IBC': 'Drum',
     'Flexi': 'Flexi',
     'Lorry': 'Lorry',
   }
