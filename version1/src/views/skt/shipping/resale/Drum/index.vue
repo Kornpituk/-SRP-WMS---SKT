@@ -32,6 +32,7 @@ console.log('journalIdModel', journalIdModel.value)
 //------------------------------- alert --------------------------------------------
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
+import alertWordConst from '@/utilities/constant'
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -44,7 +45,6 @@ const textAlertDialogFunction = (word, success) => {
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
 }
-
 
 //------------------------------------- date time
 
@@ -176,24 +176,29 @@ const appearanceCheckTrue = ref(true)
 const mapShippingCheckSheetData = data => {
   return {
     checkSheetItems: data.checkSheetItems.map(item => ({
+      journalID: item.journalID,
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
       supplierLotNo: item.supplierLotNo, // ค่า default เป็น true หรือกำหนดจากข้อมูลที่ได้
       appearanceCheck: item.appearanceCheck,
       remark: item.remark,
     })), // ไม่มีข้อมูลใน getShippingCheckSheetResult
     specialRequestChecks: data.specialRequestChecks.map(item => ({
+      journalID: item.journalID,
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
       checkedValue: item.checkedValue, // ค่า default เป็น true หรือกำหนดจากข้อมูลที่ได้
     })),
     itemChecks: data.itemChecks.map(item => ({
+      journalID: item.journalID,
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
       checkedValue: true,
     })),
     packagingChecks: data.packagingChecks.map(item => ({
+      journalID: item.journalID,
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
       checkedValue: true,
     })),
     unfIbc: data.unfIbc.map(item => ({
+      journalID: item.journalID,
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
       ibcIndex: item.ibcIndex,
       ibcNo: item.ibcNo || "", // ถ้า ibcNo เป็น null ให้ใช้ค่าว่าง
@@ -228,11 +233,13 @@ const habdleSaveDraft = async () => {
       urlApi.value, 'save', whereHouse, 
       accessTokenAtStore, requestData)
 
-    if(result){
+    if(saveShippingCheckSheetResult.value){
+      console.log("requestData 2")
       saveShippingCheckSheetResult.value = result
-      errorSaveShippingCheckSheet.value = null
+      console.log("requestData 3")
       console.log('saveShippingCheckSheetResult', result)
       textAlertDialogFunction(alertWordConst.saveDraft, true)
+      console.log("requestData 4")
       setTimeout(() => {
         location.reload()
       }, 500) // 0.5 วินาที
@@ -286,15 +293,24 @@ const textAreaDialogActive = (type, data, index) => {
   indexDataDialogTextArea.value = index
   titleDialogView.value = 'Remark'
   dialogDataTextArea.value = data // ตั้งค่า dialogDataTextArea ด้วยค่า data
-  dialogVisible.value = true
+  // dialogVisible.value = true
+  isDialogAreaVisible.value = true
 
+  
+}
+
+const saveRemark = () => {
   // ค้นหาและอัปเดตค่า remark ใน checkSheetItems
   getShippingCheckSheetResult.value.checkSheetItems.forEach(item => {
-    if (item.containerNo_LicPlNo === index) {
-      item.remark = data
+    if (item.journalID ===  indexDataDialogTextArea.value) {
+      item.remark = dialogDataTextArea.value
+      console.log("item.remark", item.remark, 'data', dialogDataTextArea.value)
     }
   })
+  isDialogAreaVisible.value = false
 }
+
+const isDialogAreaVisible = ref(false)
 
 //-------------------------- for mat -------------- 
 const formatNumber = value => {
@@ -872,7 +888,7 @@ const dessertsMockAmountView = [
                       style="min-width: 150px;"
                       variant="outlined"
                       :color="item.remark ? 'primary' : 'grey'"
-                      @click="textAreaDialogActive('RemarkLOG', item.remark, item.containerNo_LicPlNo)"
+                      @click="textAreaDialogActive('RemarkLOG', item.remark, item.journalID)"
                     >
                       <span
                         v-if="item.remark"
@@ -2276,12 +2292,48 @@ const dessertsMockAmountView = [
         :sap-in-value="sapInValueView"
         :lot-value="lotValueView"
         :model-value-text="dialogDataTextArea"
-        :model-value-text2="dialogData2TextArea"
-        :type-dialog="typeDialogView"
         :type-btn="typeBtnView"
         :title-dialog="titleDialogView"
         @submit="handleDialogSubmit"
       />
+    </div>
+
+    <div>
+      <VDialog
+        v-model="isDialogAreaVisible"
+        persistent
+        class="v-dialog-sm"
+      >
+        <!-- Dialog Content -->
+        <VCard>
+          <VCardTitle class="text-center">
+            Remark
+          </VCardTitle>
+          <DialogCloseBtn
+            variant="text"
+            size="default"
+            @click="saveRemark"
+          />
+
+          <VCardText>
+            <VTextarea
+              v-model="dialogDataTextArea"
+              counter
+              label="Text"
+              placeholder="Placeholder Text"
+            />
+          </VCardText>
+
+          <VCardText class="d-flex justify-center flex-wrap gap-4">
+            <VBtn
+              color="warning"
+              @click="saveRemark"
+            >
+              OK
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
     </div>
 
     <div>
