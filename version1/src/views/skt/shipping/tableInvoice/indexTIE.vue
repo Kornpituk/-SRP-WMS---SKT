@@ -534,6 +534,7 @@ const searchShipmentPlan = async () => {
           ...item,
           eta: formatToDate(item.eta),
           etd: formatToDate(item.etd),
+          logUpdatedDate: formatToDate(item.loadingDate),
 
           fileSo: await getFileForm('GetSo', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
           fileCoA: await getFileForm('GetCoA', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
@@ -704,7 +705,7 @@ const saveFileFormShipment = async (
 
       // Reload หลังแจ้งเตือนสำเร็จ
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 0.5 วินาที
       
       return true
@@ -833,6 +834,7 @@ const { saveSearchPlanResult, errorSaveSearchPlan, saveSearchPlan } = useSaveSea
 
 const mapRequestData = data => ({
   soEtlLogDetailJournalID: getOrDefault(data.soEtlLogDetailJournalID, 0),
+  loadingDate: formatDateSave(getOrDefault(data.logUpdatedDate, null)),
   updatedBy: getOrDefault(data.salUpdatedBy, "system"),
   shipperMark: getOrDefault(data.shipperMark, ""),
   shipperConditions: getOrDefault(data.shipperConditions, ""),
@@ -3011,7 +3013,7 @@ const handlePrintTruckOrderPDF = () => {
                 /></span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
+                v-if="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
                 class="text-center"
               >
                 <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
@@ -3783,7 +3785,7 @@ const handlePrintTruckOrderPDF = () => {
 
               <!-- 👉 truckOrder -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
+                v-if="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
                 class="text-start px-2 cursor-pointer"
                 style="min-width: 350px; font-size: 12px;"
                 :style="{ 
@@ -3815,7 +3817,7 @@ const handlePrintTruckOrderPDF = () => {
                   <VCol cols="9">
                     <FileInputDialogCarousels
                       title-dialog="Truck Order"
-                      :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute"
+                      :disabled-prop="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute"
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
                       :files-from-a-p-i="product.fileTruckOrder"
@@ -3884,7 +3886,7 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <AppDateTimePicker
                   v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canExecute"
-                  v-model="product.loadingDate"
+                  v-model="product.logUpdatedDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
