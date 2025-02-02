@@ -796,9 +796,7 @@ const showFileFormByTypeAndSoId = async (type, soId) => {
 // showFileFormByTypeAndSoId('GetSo', '152')
 
 const handleFileUpdatesSO = updatedFiles => {
-
   filesFromUploaderSO.value = updatedFiles
-  console.log("Updated files:", updatedFiles)
   
 }
 
@@ -857,6 +855,10 @@ const mapRequestData = data => ({
 
 const getOrDefault = (value, defaultValue) => value ?? defaultValue
 
+const showText = () => {
+  console.log("filesFromUploaderSO.value", filesFromUploaderSO.value)
+}
+
 const saveShipmentPlan = async row => {
   console.log("save plan start...", row)
 
@@ -870,11 +872,11 @@ const saveShipmentPlan = async row => {
     ) {
       console.log("Uploading files...",  filesFromUploaderSO.value)
 
-      const deleteFie1 = await handleDeleteFileForm(
-        filesFromUploaderSO.value,
-        "DeleteSo",
-        row.soEtlLogDetailJournalID,
-      )
+      // const deleteFie1 = await handleDeleteFileForm(
+      //   filesFromUploaderSO.value,
+      //   "DeleteSo",
+      //   row.soEtlLogDetailJournalID,
+      // )
 
       const saveFile1 =  await saveFileFormShipment(
         filesFromUploaderSO.value,
@@ -918,9 +920,9 @@ const saveShipmentPlan = async row => {
         row.soEtlLogDetailJournalID,
       )
 
-      if(!deleteFie1||!deleteFie2||!deleteFie3||!deleteFie4){
-        throw 'Delete File Fiald!'
-      }
+      // if(!deleteFie1||!deleteFie2||!deleteFie3||!deleteFie4){
+      //   throw 'Delete File Fiald!'
+      // }
 
       if(!saveFile1||!saveFile2||!saveFile3||!saveFile4){
         throw 'Save File Fiald!'
@@ -943,7 +945,7 @@ const saveShipmentPlan = async row => {
     if (saveSearchPlanResult.value) {
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 500 มิลลิวินาที = 0.5 วินาที
     } else {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -2709,6 +2711,7 @@ const handlePrintTruckOrderPDF = () => {
   <!-- Btn Approve / PROD APPROVE / NEW BATCH -->
   <div class="my-2">
     <VCard>
+      <VBtn @click="showText">asdasd</VBtn>
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
