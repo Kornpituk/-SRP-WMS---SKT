@@ -50,6 +50,7 @@ function checkDepartment(wareHouseName) {
   // อัปเดตค่าของ NameDepartment
   if (found) {
     NameDepartment.value = found.department
+    sessionStorage.setItem('department', found.department)
     result.value = found.department
     NameRole.value = found.role
   } else {

@@ -989,7 +989,7 @@ const dataTableCliclHighlightIsToggle = no => {
     </VDialog>
   </div>
 
-  <div>
+  <div v-if="false">
     <VBtn @click="testSelect">
       Test
     </VBtn>

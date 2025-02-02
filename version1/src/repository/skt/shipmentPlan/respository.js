@@ -170,8 +170,17 @@ export const shipmentPlanRepository = {
   //-------------------------------- Print ----------------------------------
   async printShipperPDFRepo(urlApi, type, whereHouse, accessToken, edId) {
     try {
+      const url = ref('')
+
+      if(type === 'ShippingCheckSheet'){
+        url.value = `${urlApi}/api/v1/PrintForm/Shipment/ShippingCheckSheet/Pdf`
+        
+      }else{
+        url.value = `${urlApi}/api/v1/PrintLabel/ShipmertPlan/Pdf/${type}/${edId}`
+      }
+
       const response = await axios.post(
-        `${urlApi}/api/v1/PrintLabel/ShipmertPlan/Pdf/${type}/${edId}`,
+        url.value,
         {},
         {
           headers: {
@@ -434,13 +443,14 @@ export const checkSheetShipmentPlanRepository = {
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getShippingChecksheetImage...')
-        throw new Error('No data received from the server')
+        // console.log('Error repo Error If getShippingChecksheetImage...')
+        // throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getShippingChecksheetImage...')
-      console.error('Error in getProductionPlan:', error)
-      throw new Error(`Failed to fetch getShippingChecksheetImage ${error.response?.data?.message || error.message}`)
+      // console.log('Error repo Error Try getShippingChecksheetImage...')
+      // console.error('Error in getProductionPlan:', error)
+
+      // throw new Error(`Failed to fetch getShippingChecksheetImage ${error.response?.data?.message || error.message}`)
     }
   },
 
@@ -578,41 +588,6 @@ export const checkSheetShipmentPlanRepository = {
   },
 
   //-------------------------------- Print ----------------------------------
-  async printShipperPDFRepo(urlApi, type, whereHouse, accessToken, edId) {
-    try {
-      const response = await axios.post(
-        `${urlApi}/api/v1/PrintLabel/ShipmertPlan/Pdf/${type}/${edId}`,
-        {},
-        {
-          headers: {
-            'accept': 'application/pdf', // รับไฟล์ PDF
-            'x-location': whereHouse,
-            Authorization: `Bearer ${accessToken}`,
-          },
-          responseType: 'blob', // รับ response เป็น Blob
-        },
-      )
   
-      if (response && response.data) {
-        console.log('Service Response print PDF  form:', response.data)
-  
-        // สร้าง Blob จาก response
-        const blob = new Blob([response.data], { type: 'application/pdf' })
-  
-        // สร้าง URL สำหรับ Blob
-        const blobUrl = URL.createObjectURL(blob)
-  
-        // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
-        window.open(blobUrl)
-  
-        return { success: true, data: blob }
-      } else {
-        throw new Error('No data Genterate print PDF  form')
-      }
-    } catch (error) {
-      console.error('Error in printPDF Barcode:', error)
-      throw new Error(`Failed to printPDF Barcode for Lot ${edId}: ${error.response?.data?.message || error.message}`)
-    }
-  },
 
 }

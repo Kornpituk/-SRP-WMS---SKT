@@ -15,6 +15,8 @@ import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/item
 
 const itemStore = useItemStore()
 
+const department = ref(sessionStorage.getItem('department'))
+
 //------------------------------- alert --------------------------------------------
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
@@ -46,7 +48,6 @@ function formatDateSave(date) {
 //------------------------------ Get User Data --------------------------------
 
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
-
 
 //------------------------------ fetch data from API --------------------------------
 import { useGetUserPermissionService,
@@ -974,6 +975,7 @@ const checkStatusBeforeAvtion = sataus => {
 
 const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
   try{
     console.log('submitShipmentPlanBySoEId start!!')
@@ -984,7 +986,7 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
       console.log('submitShipmentPlanBySoEId start!! 2')
     }
 
-    if(!statusCommnetValue.value){
+    if(!statusCommnetValue.value && type !== 'submit'){
       textAlertDialogFunction('Please enter Reject Comment.', false)
       
       return
@@ -1531,6 +1533,15 @@ function redirectBasedOnStatus(product) {
   window.location.href = finalPath
 }
 
+const actionIsDialogVisible = ref(false)
+const prouctRowAction = ref()
+
+function actionBtn(product) {
+  prouctRowAction.value = product
+  actionIsDialogVisible.value = true
+
+}
+
 const isSpinning = ref(false)
 
 const refeshPage = () => {
@@ -1543,10 +1554,17 @@ const refeshPage = () => {
 
 //----------------------------------------- Print Section -------------------------------
 
-const { printShipmentPDFResult, errorPrintShipmentPDF, printShipmentPDF  } = usePrintShipmentPDFService()
 
-const printShipmentPDFBySoEId = type => {
+const { printShipmentPDFResult, errorPrintShipmentPDF, printShipmentPDF  } = usePrintShipmentPDFService()
+const loadingPrint = ref(false)
+
+const printShipmentPDFBySoEId = async type => {
+  loadingPrint.value = true
+  console.log('loadingPrint', loadingPrint.value)
+
   try{
+    
+
     const result = printShipmentPDF(urlApi.value,
       type,
       whereHouse,
@@ -1554,17 +1572,22 @@ const printShipmentPDFBySoEId = type => {
       soEIdModel.value)
     
     if(result){
-      // textAlertDialogFunction(alertWordConst.print, true)
-      // setTimeout(() => {
-      //   location.reload()
-      // }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      loadingPrint.value = false
+      console.log('result print', result)
+      textAlertDialogFunction(alertWordConst.print, true)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      
     }else{
       textAlertDialogFunction(alertWordConst.print, false)
       setTimeout(() => {
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      loadingPrint.value = false
     }
   } catch (e) {
     console.error(`Error saving search plan:`, error)
+    loadingPrint.value = false
   }
 }
 
@@ -3013,7 +3036,7 @@ const handlePrintTruckOrderPDF = () => {
                 /></span>
               </th>
               <th
-                v-if="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
+                v-if="department === 'Warehouse'"
                 class="text-center"
               >
                 <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
@@ -3785,7 +3808,7 @@ const handlePrintTruckOrderPDF = () => {
 
               <!-- 👉 truckOrder -->
               <td
-                v-if="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
+                v-if="department === 'Warehouse'"
                 class="text-start px-2 cursor-pointer"
                 style="min-width: 350px; font-size: 12px;"
                 :style="{ 
@@ -4205,9 +4228,9 @@ const handlePrintTruckOrderPDF = () => {
                 <VBtn
                   :disabled="accountINSP"
                   :color="accountINSP ? 'grey' : 'pink-lighten-2'"
-                  @click="redirectBasedOnStatus(product)"
+                  @click="actionBtn(product)"
                 >
-                  <span style="font-size: 12px;">Check Sheet</span>
+                  <span style="font-size: 12px;">Action</span>
                 </VBtn>
               </td>
             </tr>
@@ -5074,6 +5097,91 @@ const handlePrintTruckOrderPDF = () => {
       :subword="subWordForSubmit"
       :success="successDialAlert"
     />
+  </div>
+
+
+  <!-- action Dialog Component -->
+  <div>
+    <VDialog
+      v-model="actionIsDialogVisible"
+      persistent
+      style="max-width: 405px;"
+      class="v-dialog-sm d-flex justify-center"
+    >
+      <!-- Dialog Content -->
+      <VCard
+        class="text-center"
+        title="Checksheet"
+        style="min-height: 160px;"
+      >
+        <DialogCloseBtn
+          variant="text"
+          size="default"
+          @click="actionIsDialogVisible = false"
+        />
+
+        <VCardText>
+          <VRow>
+            <VCol
+              cols="6"
+              style="min-width: 170px; max-width: 170px;"
+            >
+              <VBtn
+                color="warning"
+                style="min-width: 150px; max-width: 150px; height: 160px;"
+                @click="printShipmentPDFBySoEId('ShippingCheckSheet'), loadingPrint = true"
+              >
+                <VRow>
+                  <VCol cols="12">
+                    <VIcon
+                      v-if="!loadingPrint"
+                      size="60"
+                      icon="ri-printer-fill"
+                    />
+                    <VProgressCircular
+                      v-if="loadingPrint"
+                      :size="80"
+                      color="primary"
+                      indeterminate
+                    >
+                      <VIcon
+                        size="60"
+                        icon="ri-printer-fill"
+                      />
+                    </VProgressCircular>
+                  </VCol>
+                  <VCol cols="12">
+                    <span>Print</span>
+                  </VCol>
+                </VRow>
+              </VBtn>
+            </VCol>
+            <VCol
+              cols="6"
+              style="min-width: 170px; max-width: 170px;"
+            >
+              <VBtn
+                style="min-width: 150px; max-width: 150px; height: 160px;"
+                color="info"
+                @click="redirectBasedOnStatus(prouctRowAction)"
+              >
+                <VRow>
+                  <VCol cols="12">
+                    <VIcon
+                      size="60"
+                      icon="ri-article-fill"
+                    />
+                  </VCol>
+                  <VCol cols="12">
+                    <span>Check Sheet</span>
+                  </VCol>
+                </VRow>
+              </VBtn>
+            </VCol>
+          </VRow>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </div>
 </template>
 
