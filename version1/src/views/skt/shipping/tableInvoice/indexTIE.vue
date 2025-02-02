@@ -754,15 +754,15 @@ const getFileForm = async (
     if (getFileFormResult.value?.success) {
       // console.log(`Fetch File Form:`, getFileFormResult.value)
 
-      if(typeFile === 'GetSo'){
-        filesFromUploaderSO.value = response.data.data
-      }else if(typeFile === 'GetCoA'){
-        filesFromUploaderCOA.value = response.data.data
-      }else if(typeFile === 'GetTruckOrder'){
-        filesFromUploaderTruckOrder.value = response.data.data
-      }else if(typeFile === 'GetDeliveryNote'){
-        filesFromUploaderDeliNote.value = response.data.data
-      }
+      // if(typeFile === 'GetSo'){
+      //   filesFromUploaderSO.value = response.data.data
+      // }else if(typeFile === 'GetCoA'){
+      //   filesFromUploaderCOA.value = response.data.data
+      // }else if(typeFile === 'GetTruckOrder'){
+      //   filesFromUploaderTruckOrder.value = response.data.data
+      // }else if(typeFile === 'GetDeliveryNote'){
+      //   filesFromUploaderDeliNote.value = response.data.data
+      // }
       
       return response.data.data
     } else {
@@ -799,10 +799,6 @@ const handleFileUpdatesSO = updatedFiles => {
   filesFromUploaderSO.value = updatedFiles
   
 }
-
-watch(() => {
-  handleFileUpdatesSO
-})
 
 const handleFileUpdatesCOA = updatedFiles => {
   filesFromUploaderCOA.value = updatedFiles
@@ -857,26 +853,37 @@ const getOrDefault = (value, defaultValue) => value ?? defaultValue
 
 const showText = () => {
   console.log("filesFromUploaderSO.value", filesFromUploaderSO.value)
+  if(filesFromUploaderSO.value){
+    console.log("filesFromUploaderSO.value", filesFromUploaderSO.value.length)
+  }
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const saveShipmentPlan = async row => {
   console.log("save plan start...", row)
 
   try {
     // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
     if (
-      filesFromUploaderSO.value ||
-      filesFromUploaderCOA.value ||
-      filesFromUploaderTruckOrder.value ||
-      filesFromUploaderDeliNote.value
+      filesFromUploaderSO.value.length > 0 ||
+      filesFromUploaderCOA.value .length > 0||
+      filesFromUploaderTruckOrder.value.length > 0 ||
+      filesFromUploaderDeliNote.value.length > 0
     ) {
       console.log("Uploading files...",  filesFromUploaderSO.value)
 
-      // const deleteFie1 = await handleDeleteFileForm(
-      //   filesFromUploaderSO.value,
-      //   "DeleteSo",
-      //   row.soEtlLogDetailJournalID,
-      // )
+      const deleteFie1 = ref()
+      const deleteFie2 = ref()
+      const deleteFie3 = ref()
+      const deleteFie4 = ref()
+
+      if(filesFromUploaderSO.value.length > 0){
+        deleteFie1.value = await handleDeleteFileForm(
+          filesFromUploaderSO.value,
+          "DeleteSo",
+          row.soEtlLogDetailJournalID,
+        )
+      }
 
       const saveFile1 =  await saveFileFormShipment(
         filesFromUploaderSO.value,
@@ -884,11 +891,13 @@ const saveShipmentPlan = async row => {
         row.soEtlLogDetailJournalID,
       )
 
-      const deleteFie2 = await handleDeleteFileForm(
-        filesFromUploaderSO.value,
-        "DeleteCOA",
-        row.soEtlLogDetailJournalID,
-      )
+      if(filesFromUploaderCOA.value.length > 0){
+        deleteFie2.value = await handleDeleteFileForm(
+          filesFromUploaderCOA.value,
+          "DeleteCOA",
+          row.soEtlLogDetailJournalID,
+        )
+      }
 
       const saveFile2 =  await saveFileFormShipment(
         filesFromUploaderCOA.value,
@@ -896,11 +905,13 @@ const saveShipmentPlan = async row => {
         row.soEtlLogDetailJournalID,
       )
 
-      const deleteFie3 = await handleDeleteFileForm(
-        filesFromUploaderSO.value,
-        "DeleteTruckOrder",
-        row.soEtlLogDetailJournalID,
-      )
+      if(filesFromUploaderTruckOrder.value.length > 0){
+        deleteFie3.value = await handleDeleteFileForm(
+          filesFromUploaderTruckOrder.value,
+          "DeleteTruckOrder",
+          row.soEtlLogDetailJournalID,
+        )
+      }
 
       const saveFile3 =  await saveFileFormShipment(
         filesFromUploaderTruckOrder.value,
@@ -908,11 +919,13 @@ const saveShipmentPlan = async row => {
         row.soEtlLogDetailJournalID,
       )
 
-      const deleteFie4 = await handleDeleteFileForm(
-        filesFromUploaderSO.value,
-        "DeleteDeliveryNote",
-        row.soEtlLogDetailJournalID,
-      )
+      if(filesFromUploaderDeliNote.value.length > 0){
+        deleteFie4.value = await handleDeleteFileForm(
+          filesFromUploaderDeliNote.value,
+          "DeleteDeliveryNote",
+          row.soEtlLogDetailJournalID,
+        )
+      }
 
       const saveFile4 =  await saveFileFormShipment(
         filesFromUploaderDeliNote.value,
@@ -920,7 +933,7 @@ const saveShipmentPlan = async row => {
         row.soEtlLogDetailJournalID,
       )
 
-      // if(!deleteFie1||!deleteFie2||!deleteFie3||!deleteFie4){
+      // if(!deleteFie1.value||!deleteFie2.value||!deleteFie3.value||!deleteFie4.value){
       //   throw 'Delete File Fiald!'
       // }
 
@@ -945,7 +958,7 @@ const saveShipmentPlan = async row => {
     if (saveSearchPlanResult.value) {
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 500 มิลลิวินาที = 0.5 วินาที
     } else {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -2711,7 +2724,9 @@ const handlePrintTruckOrderPDF = () => {
   <!-- Btn Approve / PROD APPROVE / NEW BATCH -->
   <div class="my-2">
     <VCard>
-      <VBtn @click="showText">asdasd</VBtn>
+      <VBtn @click="showText">
+        asdasd
+      </VBtn>
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
