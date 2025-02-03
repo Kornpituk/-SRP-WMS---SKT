@@ -1156,7 +1156,7 @@ const dessertsMockAmountView = [
                   {{ item.displayText }}
                 </td>
               </tr>
-              <tr v-if="true">
+              <tr v-if="false">
                 <td
                   colspan="12"
                   style="height: 159px;"
