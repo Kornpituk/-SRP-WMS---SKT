@@ -17,6 +17,21 @@ const itemStore = useItemStore()
 
 const department = ref(sessionStorage.getItem('department'))
 
+
+const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
+  if(department.value === 'Warehouse' && whStatusId === 404){
+    return true
+  }else if(department.value === 'Logistic' && logStatusId === 504){
+    return true
+  }else if(department.value === 'Inspection' && statusId === 604){
+    return true
+  }else if(department.value === 'Sale and marketing' && salStatusId === 304){
+    return true
+  }else{
+    return false
+  }
+}
+
 //------------------------------- alert --------------------------------------------
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
@@ -247,19 +262,6 @@ const textAreaDialogActive = (type, data, index) => {
   dialogVisible.value = true
 }
 
-const textAreaShipDialogActive = (type, data, data2, index) => {
-  typeDialogTextArea.value = type
-  indexDataDialogTextArea.value = index
-
-  titleDialogView.value = 'Shipping Mark Con'
-  typeDialogView.value = 'ShipMC'
-  sapInValueView.value = 'TIX2406001'
-  typeBtnView.value = 'twinPrint'
-  dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
-  dialogData2TextArea.value = data2 // 
-  dialogVisible.value = true
-}
-
 const btnCloseShipCon = () => {
   // ค้นหาและอัปเดตค่าใน paginatedData
   paginatedData.value.forEach(item => {
@@ -308,7 +310,9 @@ const textAreaRemarkDialogActive = (type, data, soEId) => {
   console.log('Type dialog', typeDialogTextArea.value, '=', type)
 }
 
-const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMark) => {
+const dataRowForUse = ref()
+
+const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMark, dataProduct) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
   soEIdModel.value = soEId
@@ -317,6 +321,7 @@ const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMa
   dialogDataTextArea.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogData2TextArea.value = data2 // 
   activeShipMarkModel.value = activeShipMark
+  dataRowForUse.value = dataProduct
   dialogVisible.value = true
 }
 
@@ -852,9 +857,22 @@ const mapRequestData = data => ({
 const getOrDefault = (value, defaultValue) => value ?? defaultValue
 
 const showText = () => {
+  console.log("filesFromUploaderSO.value show")
   console.log("filesFromUploaderSO.value", filesFromUploaderSO.value)
   if(filesFromUploaderSO.value){
     console.log("filesFromUploaderSO.value", filesFromUploaderSO.value.length)
+  }
+  console.log("filesFromUploaderSO.value", filesFromUploaderCOA.value)
+  if(filesFromUploaderCOA.value){
+    console.log("filesFromUploaderCOA.value", filesFromUploaderCOA.value.length)
+  }
+  console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value)
+  if(filesFromUploaderTruckOrder.value){
+    console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value.length)
+  }
+  console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value)
+  if(filesFromUploaderDeliNote.value){
+    console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value.length)
   }
 }
 
@@ -865,10 +883,10 @@ const saveShipmentPlan = async row => {
   try {
     // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
     if (
-      filesFromUploaderSO.value.length > 0 ||
-      filesFromUploaderCOA.value .length > 0||
-      filesFromUploaderTruckOrder.value.length > 0 ||
-      filesFromUploaderDeliNote.value.length > 0
+      filesFromUploaderSO.value||
+      filesFromUploaderCOA.value||
+      filesFromUploaderTruckOrder.value||
+      filesFromUploaderDeliNote.value
     ) {
       console.log("Uploading files...",  filesFromUploaderSO.value)
 
@@ -877,71 +895,94 @@ const saveShipmentPlan = async row => {
       const deleteFie3 = ref()
       const deleteFie4 = ref()
 
-      if(filesFromUploaderSO.value.length > 0){
-        deleteFie1.value = await handleDeleteFileForm(
-          filesFromUploaderSO.value,
-          "DeleteSo",
-          row.soEtlLogDetailJournalID,
-        )
+      const saveFile1 = ref()
+      const saveFile2 = ref()
+      const saveFile3 = ref()
+      const saveFile4 = ref()
+
+      if(filesFromUploaderSO.value){
+        if(filesFromUploaderSO.value.length === 0){
+          console.log("SaveSo")
+        }else{
+          deleteFie1.value = await handleDeleteFileForm(
+            filesFromUploaderSO.value,
+            "DeleteSo",
+            row.soEtlLogDetailJournalID,
+          )
+
+          saveFile1.value =  await saveFileFormShipment(
+            filesFromUploaderSO.value,
+            "SaveSo",
+            row.soEtlLogDetailJournalID,
+          )
+        }
       }
 
-      const saveFile1 =  await saveFileFormShipment(
-        filesFromUploaderSO.value,
-        "SaveSo",
-        row.soEtlLogDetailJournalID,
-      )
+      if(filesFromUploaderCOA.value){
+        if(filesFromUploaderCOA.value.length === 0){
+          console.log("SaveCOA")
+        }else{
+          deleteFie2.value = await handleDeleteFileForm(
+            filesFromUploaderCOA.value,
+            "DeleteCOA",
+            row.soEtlLogDetailJournalID,
+          )
 
-      if(filesFromUploaderCOA.value.length > 0){
-        deleteFie2.value = await handleDeleteFileForm(
-          filesFromUploaderCOA.value,
-          "DeleteCOA",
-          row.soEtlLogDetailJournalID,
-        )
+          saveFile2.value =  await saveFileFormShipment(
+            filesFromUploaderCOA.value,
+            "SaveCOA",
+            row.soEtlLogDetailJournalID,
+          )
+        }
       }
 
-      const saveFile2 =  await saveFileFormShipment(
-        filesFromUploaderCOA.value,
-        "SaveCOA",
-        row.soEtlLogDetailJournalID,
-      )
+      if(filesFromUploaderTruckOrder.value){
+        if(filesFromUploaderTruckOrder.value.length === 0){
+          console.log("SaveTruckOrder")
+        }else{
+          deleteFie3.value = await handleDeleteFileForm(
+            filesFromUploaderTruckOrder.value,
+            "DeleteTruckOrder",
+            row.soEtlLogDetailJournalID,
+          )
 
-      if(filesFromUploaderTruckOrder.value.length > 0){
-        deleteFie3.value = await handleDeleteFileForm(
-          filesFromUploaderTruckOrder.value,
-          "DeleteTruckOrder",
-          row.soEtlLogDetailJournalID,
-        )
+          saveFile3.value =  await saveFileFormShipment(
+            filesFromUploaderTruckOrder.value,
+            "SaveTruckOrder",
+            row.soEtlLogDetailJournalID,
+          )
+        }
       }
 
-      const saveFile3 =  await saveFileFormShipment(
-        filesFromUploaderTruckOrder.value,
-        "SaveTruckOrder",
-        row.soEtlLogDetailJournalID,
-      )
+      if(filesFromUploaderDeliNote.value){
+        if(filesFromUploaderDeliNote.value.length === 0){
+          console.log("SaveDeliveryNote")
+        }else{
+          deleteFie4.value = await handleDeleteFileForm(
+            filesFromUploaderDeliNote.value,
+            "DeleteDeliveryNote",
+            row.soEtlLogDetailJournalID,
+          )
 
-      if(filesFromUploaderDeliNote.value.length > 0){
-        deleteFie4.value = await handleDeleteFileForm(
-          filesFromUploaderDeliNote.value,
-          "DeleteDeliveryNote",
-          row.soEtlLogDetailJournalID,
-        )
+          saveFile4.value =  await saveFileFormShipment(
+            filesFromUploaderDeliNote.value,
+            "SaveDeliveryNote",
+            row.soEtlLogDetailJournalID,
+          )
+        }
       }
-
-      const saveFile4 =  await saveFileFormShipment(
-        filesFromUploaderDeliNote.value,
-        "SaveDeliveryNote",
-        row.soEtlLogDetailJournalID,
-      )
 
       // if(!deleteFie1.value||!deleteFie2.value||!deleteFie3.value||!deleteFie4.value){
       //   throw 'Delete File Fiald!'
       // }
 
-      if(!saveFile1||!saveFile2||!saveFile3||!saveFile4){
-        throw 'Save File Fiald!'
-      }
+      // if(!saveFile1||!saveFile2||!saveFile3||!saveFile4){
+      //   throw 'Save File Fiald!'
+      // }
 
       console.log("File upload completed.", row.soEtlLogDetailJournalID)
+    }else{
+      console.log("File not foand", filesFromUploaderSO.value)
     }
 
     // Mapping request data และส่งคำขอ
@@ -958,7 +999,7 @@ const saveShipmentPlan = async row => {
     if (saveSearchPlanResult.value) {
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 500 มิลลิวินาที = 0.5 วินาที
     } else {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -1001,7 +1042,7 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
       console.log('submitShipmentPlanBySoEId start!! 2')
     }
 
-    if(!statusCommnetValue.value && type !== 'submit'){
+    if(!statusCommnetValue.value && type === 'reject'){
       textAlertDialogFunction('Please enter Reject Comment.', false)
       
       return
@@ -1576,6 +1617,16 @@ const loadingPrint = ref(false)
 const printShipmentPDFBySoEId = async type => {
   loadingPrint.value = true
   console.log('loadingPrint', loadingPrint.value)
+
+  await paginatedData.value.forEach(item  => {
+    if (item.soEtlLogDetailJournalID === soEIdModel.value) {
+      item.shipperMark = dialogDataTextArea.value
+      item.shipperConditions = dialogData2TextArea.value
+      item.shippingMarkActive = activeShipMarkModel.value
+    }
+  })
+
+  await saveShipmentPlan(dataRowForUse.value)
 
   try{
     
@@ -2724,7 +2775,10 @@ const handlePrintTruckOrderPDF = () => {
   <!-- Btn Approve / PROD APPROVE / NEW BATCH -->
   <div class="my-2">
     <VCard>
-      <VBtn @click="showText">
+      <VBtn
+        v-if="false"
+        @click="showText"
+      >
         asdasd
       </VBtn>
       <VCardText class="pa-2">
@@ -3278,6 +3332,7 @@ const handlePrintTruckOrderPDF = () => {
                 {{ product.salesOrderNo }}
               </td>
               <!-- 👉 soAttachment -->
+             
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
                 class="text-start px-1 cursor-pointer"
@@ -3294,17 +3349,25 @@ const handlePrintTruckOrderPDF = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <div>
-                  <FileInputDialogCarousels
-                    :files-from-a-p-i="product.fileSo"
-                    title-dialog="SO Attachment"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
-                    :type-file-input="typeFileInput"
-                    file-name="So Attachment" 
-                    @updateFiles="handleFileUpdatesSO"
-                  />
-                </div>
+                <VForm
+                  ref="product"
+                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  @submit.prevent="submitShipmentPlanBySoEId('submit', product.soEtlLogDetailJournalID)"
+                >
+                  <div>
+                    <FileInputDialogCarousels
+                      :files-from-a-p-i="product.fileSo"
+                      title-dialog="SO Attachment"
+                      :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                      :type-file-input="typeFileInput"
+                      file-name="So Attachment" 
+                      @updateFiles="handleFileUpdatesSO"
+                    />
+                    <span v-if="filesFromUploaderSO.value">asdads:{{ filesFromUploaderSO.value.length }}</span>
+                  </div>
+                </VForm>
               </td>
+              
               <!-- 👉 sapInvoiceNo -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
@@ -3381,7 +3444,6 @@ const handlePrintTruckOrderPDF = () => {
               >
                 {{ (product.shipperName) }}
               </td>
-
               <!-- 👉 shipperLocation -->
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
@@ -3421,11 +3483,11 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <div class="text-start cursor-pointer">
                   <VBtn
-                    :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
+                    :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                     style="min-width: 160px; max-width: 160px;"
                     variant="outlined"
                     :color="product.shipperConditions ? 'primary' : 'grey'"
-                    @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, product.shipperConditions, index, product.soEtlLogDetailJournalID, product.shippingMarkActive)"
+                    @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, product.shipperConditions, index, product.soEtlLogDetailJournalID, product.shippingMarkActive, product)"
                   >
                     <span
                       v-if="product.shipperConditions"
@@ -3459,7 +3521,7 @@ const handlePrintTruckOrderPDF = () => {
                 <VTextField
                   v-model="product.shippingEndUser"
                   density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   style=" min-width: 150px;"
                 >
                   <template #label>
@@ -3526,7 +3588,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  v-if=" product.lot.length > 1"
+                  v-if="false"
                   style="min-width: 50px; max-width: 80px;"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
                   variant="outlined"
@@ -3539,6 +3601,7 @@ const handlePrintTruckOrderPDF = () => {
                   <span v-else>Lot Number</span>
                 </VBtn>
                 <span v-else>{{ product.lot }}</span>
+                {{ product.lot.length }}
               </td>
 
               <!-- 👉 qty -->
@@ -3581,7 +3644,7 @@ const handlePrintTruckOrderPDF = () => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="COA"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.fileCoA"
                     file-name="COA" 
@@ -3609,6 +3672,7 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VSelect
                   v-model="product.freightForwarder"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   :items="freightForwarderModel"
                   class="truncate-select"
                   item-title="freightForwarder"
@@ -3646,7 +3710,7 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VSelect
                   v-model="product.carrier"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   :items="carrierModel"
                   class="truncate-select"
                   item-title="carrier"
@@ -3688,7 +3752,7 @@ const handlePrintTruckOrderPDF = () => {
                   :items="vesselsModel"
                   item-title="carrier"
                   item-value="carrier"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   density="compact"
                   eager
                 >
@@ -3722,12 +3786,11 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VTextField
                   v-model="product.voy"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VOY').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VOY').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   density="compact"
                   style=" min-width: 150px;"
                 />
               </td>
-
 
               <!-- 👉 COL_TRUCK -->
               <td
@@ -3756,7 +3819,7 @@ const handlePrintTruckOrderPDF = () => {
                       item-title="truck"
                       class="truncate-select"
                       item-value="truck"
-                      :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
+                      :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                       density="compact"
                       dense
                     >
@@ -3794,7 +3857,7 @@ const handlePrintTruckOrderPDF = () => {
                   v-if="true"
                   v-model="product.truckReservingNumber"
                   density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   style=" min-width: 150px;"
                 />
               </td>
@@ -3818,7 +3881,7 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VTextField
                   v-model="product.truckFee"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   density="compact"
                   style=" min-width: 150px;"
                 />
@@ -3847,6 +3910,7 @@ const handlePrintTruckOrderPDF = () => {
                       width="90px"
                       color="warning"
                       class="mx-2"
+                      :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                       @click="showDialogTruckOrder(product.salesOrderNo, product.soEtlLogDetailJournalID)"
                     >
                       <VIcon
@@ -3858,7 +3922,7 @@ const handlePrintTruckOrderPDF = () => {
                   <VCol cols="9">
                     <FileInputDialogCarousels
                       title-dialog="Truck Order"
-                      :disabled-prop="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute"
+                      :disabled-prop="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
                       :files-from-a-p-i="product.fileTruckOrder"
@@ -3926,12 +3990,13 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
-                  v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canExecute"
+                  v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canExecute && !disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   v-model="product.logUpdatedDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
                 />
+                <span v-else>{{ formatDate(product.logUpdatedDate) }}</span>
               </td>
 
               <!-- 👉 etd -->
@@ -3952,7 +4017,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
-                  v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canExecute"
+                  v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canExecute && !disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   v-model="product.etd"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -3979,7 +4044,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
-                  v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
+                  v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canExecute && !disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   v-model="product.eta"
                   disabeld
                   density="compact"
@@ -4009,7 +4074,7 @@ const handlePrintTruckOrderPDF = () => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="Delivery Note"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.fileDeliveryNote"
                     file-name="Delivery Note" 
@@ -4037,7 +4102,7 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   variant="outlined"
                   :color="product.saL_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID)"
@@ -4069,7 +4134,7 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute|| disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   variant="outlined"
                   :color="product.wH_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID)"
@@ -4102,7 +4167,7 @@ const handlePrintTruckOrderPDF = () => {
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   :color="product.loG_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID)"
                 >
@@ -4154,7 +4219,6 @@ const handlePrintTruckOrderPDF = () => {
                 {{ formatDate(product.updatedDate) }}
               </td>
 
-
               <!-- 👉 Actions -->
               <td
                 v-if="!accountWHSub"
@@ -4173,7 +4237,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="accountINSP"
+                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   :color="accountINSP ? 'grey' : 'warning'"
                   @click="saveShipmentPlan(product)"
                 >
@@ -4197,7 +4261,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="accountINSP"
+                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
                   @Click="submitShipmentPlanBySoEId('submit', product.soEtlLogDetailJournalID)"
@@ -4281,7 +4345,7 @@ const handlePrintTruckOrderPDF = () => {
           </tbody>
           <VDivider />
         </VTable>
-
+        
         <VDivider />
         <VCardText>
           <div class="d-flex align-center flex-no-wrap justify-end pa-2">
@@ -4336,561 +4400,6 @@ const handlePrintTruckOrderPDF = () => {
           </div>
         </VCardText>
       </section>
-      
-      <VCardText v-if="false">
-        {{ searchPlanData.length }}
-        <VDataTable
-          v-if="searchPlanData"
-          :headers="headersShipment"
-          :items="searchPlanData"
-          item-key="id"
-          show-select
-          class="elevation-1"
-        >
-          <template #item="{ item, index }">
-            <tr>
-              <td>
-                <VCheckboxBtn
-                  v-model="selectedDataTables"
-                  :value="item.raw"
-                  @update:modelValue="(selected) => handleSelection(selected, item.raw)"
-                />
-              </td>
-              <td>
-                <span>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</span>
-              </td>
-              <td>
-                <span>{{ item.raw.statusComments }}</span>
-              </td>
-              <!-- 👉 saleOrderNo -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
-                class="text-start px-1"
-                style="min-width: 120px; font-size: 12px;"
-              >
-                {{ item.raw.salesOrderNo }}
-              </td>
-              <!-- 👉 soAttachment -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
-                class="text-start px-1"
-                style="min-width: 250px; font-size: 12px;"
-              >
-                <div>
-                  <FileInputDialogCarousels
-                    title-dialog="So Attachment"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute"
-                    :type-file-input="typeFileInput"
-                    file-name="So Attachment" 
-                    @updateFiles="handleFileUpdates"
-                  />
-                </div>
-              </td>
-              <!-- 👉 sapInvoiceNo -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
-                class="text-start px-2"
-                style="min-width: 120px; font-size: 12px;"
-              >
-                {{ item.raw.sapInvoiceNo }}
-              </td>
-              <!-- 👉 payerName -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
-                class="text-start px-1"
-                style="min-width: 150px; font-size: 12px;"
-              >
-                {{ (item.raw.payerName) }}
-              </td>
-              <!-- 👉 user -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
-                class="text-start px-1"
-                style="min-width: 200px; font-size: 12px;"
-              >
-                <span class="d-felx align-start">{{ (item.raw.user) }}</span>
-              </td>
-              <!-- 👉 shipper -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
-                class="text-start px-1"
-                style="min-width: 200px; font-size: 12px;"
-              >
-                {{ (item.raw.shipperName) }}
-              </td>
-
-              <!-- 👉 shipperLocation -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
-                class="text-start px-1"
-                style="min-width: 300px; max-width: 300px;  font-size: 12px;"
-              >
-                {{ (item.raw.shipperLocation) }}
-              </td>
-
-              <!-- 👉 Shipping Condition -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
-                class="text-start px-1"
-                style="min-width: 180px; font-size: 12px;"
-              >
-                <div class="text-start">
-                  <VBtn
-                    :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
-                    style="min-width: 160px; max-width: 160px;"
-                    variant="outlined"
-                    :color="item.raw.shipperConditions ? 'primary' : 'grey'"
-                    @click="textAreaShipDialogActive('ShipMC',item.raw.shipperMark, item.raw.shipperConditions, index)"
-                  >
-                    <span
-                      v-if="item.raw.shipperConditions"
-                      style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
-                    >{{ item.raw.shipperConditions }}</span>
-                    <span v-else>Shipping Mark/Coundition.</span>
-                  </VBtn>
-                </div>
-              </td>
-
-              <!-- 👉 endUser -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible"
-                class="text-start px-1"
-                style="font-size: 12px;"
-              >
-                <VTextField
-                  v-model="item.raw.shippingEndUser"
-                  density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute"
-                  style=" min-width: 150px;"
-                >
-                  <template #label>
-                    <span style="font-size: 12px;">End User</span>
-                  </template>
-                </VTextField>
-              </td>
-
-              <!-- 👉 consignee -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
-                class="text-start px-1"
-                style="min-width: 200px; font-size: 12px;"
-              >
-                {{ (item.raw.consignee) }}
-              </td>
-
-              <!-- 👉 product -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
-                class="text-start px-1"
-                style="min-width: 250px; font-size: 12px;"
-              >
-                {{ (item.raw.itemName) }}
-              </td>
-
-              <!-- 👉 Lot Number -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible"
-                class="text-start px-1"
-                style="font-size: 12px;"
-              >
-                <VBtn
-                  v-if=" item.raw.lot.length > 1"
-                  style="min-width: 50px; max-width: 80px;"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
-                  variant="outlined"
-                  @click="textAreaDialogActive('Lot', product.lot)"
-                >
-                  <span
-                    v-if="item.raw.lot"
-                    style="overflow: hidden; max-width: 60px; text-overflow: ellipsis;"
-                  >{{ item.raw.lot[0].lotNUmber }}...</span>
-                  <span v-else>Lot Number</span>
-                </VBtn>
-                <span v-else>{{ item.raw.lot }}</span>
-              </td>
-
-              <!-- 👉 qty -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
-                class="text-end px-1"
-                style="min-width: 100px; font-size: 12px;"
-              >
-                {{ (item.raw.quantity) }}
-              </td>
-
-              <!-- 👉 coa -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
-                class="text-start px-1"
-                style="min-width: 250px; font-size: 12px;"
-              >
-                <div>
-                  <FileInputDialogCarousels
-                    title-dialog="COA"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute"
-                    :type-file-input="typeFileInput"
-                    file-name="COA" 
-                    @updateFiles="handleFileUpdates"
-                  />
-                </div>
-              </td>
-
-              <!-- 👉 Freight Forwarder -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
-                class="text-start px-1"
-                style="min-width: 200px; font-size: 12px;"
-              >
-                <VSelect
-                  v-model="item.raw.freightForwarder"
-                  :items="freightForwarderModel"
-                  item-title="freightForwarder"
-                  item-value="freightForwarder"
-                  density="compact"
-                  eager
-                />
-              </td>
-
-              <!-- 👉 carrier -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
-                class="text-start px-1"
-                style="min-width: 200px; font-size: 12px;"
-              >
-                <VSelect
-                  v-model="item.raw.carrier"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute"
-                  :items="carrierModel"
-                  item-title="carrier"
-                  item-value="carrier"
-                  density="compact"
-                  eager
-                />
-              </td>
-
-              <!-- 👉 vesselName -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
-                class="text-start px-1"
-                style="min-width: 200px; font-size: 12px;"
-              >
-                <VSelect
-                  v-model="item.raw.vesselName"
-                  :items="vesselsModel"
-                  item-title="carrier"
-                  item-value="carrier"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute"
-                  density="compact"
-                  eager
-                />
-              </td>
-
-              <!-- 👉 voy -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
-                style="font-size: 12px;"
-                class="text-start px-1"
-              >
-                <VTextField
-                  v-model="item.raw.voy"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VOY').canExecute"
-                  density="compact"
-                  style=" min-width: 150px;"
-                />
-              </td>
-
-
-              <!-- 👉 COL_TRUCK -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
-                class="text-start px-1"
-                :class="checkBgTruck(item.raw.truck)"
-                style="min-width: 120px; font-size: 12px;"
-              >
-                <VSelect
-                  v-model="item.raw.truck"
-                  :items="truckModel"
-                  item-title="truck"
-                  item-value="truck"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute"
-                  density="compact"
-                  eager
-                />
-              </td>
-
-              <!-- 👉 truckReserving -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
-                class="text-center px-1"
-                style="min-width: 250px; font-size: 12px;"
-              >
-                <VTextField
-                  v-if="false"
-                  v-model="item.raw.truckReserving"
-                  density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute"
-                  style=" min-width: 150px;"
-                />
-                {{ item.raw.truckReserving }}
-              </td>
-
-              <!-- 👉 truckFee -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible"
-                class="text-start px-1"
-                style="font-size: 12px;"
-              >
-                <VTextField
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute"
-                  density="compact"
-                  style=" min-width: 150px;"
-                />
-              </td>
-
-              <!-- 👉 truckOrder -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canVisible"
-                class="text-start px-2"
-                style="min-width: 350px; font-size: 12px;"
-              >
-                <VRow>
-                  <VCol cols="3">
-                    <VBtn
-                      width="90px"
-                      color="warning"
-                      class="mx-2"
-                      @click="isDialogVisiblePrintTruck = true"
-                    >
-                      <VIcon
-                        size="30"
-                        icon="ri-printer-fill"
-                      />
-                    </VBtn>
-                  </VCol>
-                  <VCol cols="9">
-                    <FileInputDialogCarousels
-                      title-dialog="Truck Order"
-                      :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute"
-                      :type-file-input="typeFileInput"
-                      file-name="Truck Order"
-                    
-                      @updateFiles="handleFileUpdates"
-                    />
-                  </VCol>
-                </VRow>
-              </td>
-
-              <!-- 👉 doEx -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
-                class="text-start px-4"
-                style="font-size: 12px;"
-              >
-                {{ (item.raw.doEx) }}
-              </td>
-
-              <!-- 👉 country -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
-                class="text-start px-1"
-                style="font-size: 12px;"
-              >
-                {{ (item.raw.country) }}
-              </td>
-
-              <!-- 👉 loadingDate -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
-                class="text-start px-1"
-                style="min-width: 120px; font-size: 12px;"
-              >
-                {{ (item.raw.loadingDate) }}
-              </td>
-
-              <!-- 👉 etd -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible"
-                class="text-start px-1"
-                style="min-width: 150px; font-size: 12px;"
-              >
-                <AppDateTimePicker
-                  v-if="!canVisibleUserPermission(statusPermission,'COL_ETD').canExecute"
-                  v-model="item.raw.etd"
-                  density="compact"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                />
-                <span v-else>{{ item.raw.etd }}</span>
-              </td>
-
-              <!-- 👉 eta -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible"
-                class="text-start px-1"
-                style="min-width: 150px; font-size: 12px;"
-              >
-                <AppDateTimePicker
-                  v-if="!canVisibleUserPermission(statusPermission,'COL_ETA').canExecute"
-                  disabeld
-                  density="compact"
-                  prepend-inner-icon="ri-calendar-schedule-fill"
-                  :config="{ dateFormat: 'd/m/Y' }"
-                />
-                <span v-else>{{ item.raw.etd }}</span>
-              </td>
-
-              <!-- 👉 deliveryNote -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
-                class="text-start px-1"
-                style="min-width: 250px; font-size: 12px;"
-              >
-                <div>
-                  <FileInputDialogCarousels
-                    title-dialog="Delivery Note"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute"
-                    :type-file-input="typeFileInput"
-                    file-name="Delivery Note" 
-                    @updateFiles="handleFileUpdates"
-                  />
-                </div>
-              </td>
-
-              <!-- 👉 remarkSAL -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible"
-                class="text-start px-1"
-                style="font-size: 12px;"
-              >
-                <VBtn
-                  style="min-width: 150px; max-width: 150px;"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
-                  variant="outlined"
-                  :color="item.raw.saL_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('RemarkSAL', item.raw.saL_Remarks, index)"
-                >
-                  <span
-                    v-if="item.raw.saL_Remarks"
-                    style="overflow: hidden; max-width: 150px; text-overflow: ellipsis;"
-                  >{{ item.raw.saL_Remarks }}</span>
-                  <span v-else>remark(SAL)</span>
-                </VBtn>
-              </td>
-
-              <!-- 👉 remarkWH -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible"
-                class="text-start px-1"
-                style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
-              >
-                <VBtn
-                  style="min-width: 150px; max-width: 150px;"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
-                  variant="outlined"
-                  :color="item.raw.wH_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive2('RemarkWH', item.raw.wH_Remarks, index)"
-                >
-                  <span
-                    v-if="item.raw.wH_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
-                  >{{ item.raw.wH_Remarks }}</span>
-                  <span v-else>remark(WH)</span>
-                </VBtn>
-              </td>
-
-              <!-- 👉 remarkLOG -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible"
-                class="text-start px-1"
-                style="font-size: 12px;"
-              >
-                <VBtn
-                  style="min-width: 150px;"
-                  variant="outlined"
-                  :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
-                  :color="item.raw.loG_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaDialogActive('RemarkLOG', item.raw.loG_Remarks, index)"
-                >
-                  <span
-                    v-if="item.raw.loG_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
-                  >{{ item.raw.loG_Remarks }}</span>
-                  <span v-else>remark(LOG)</span>
-                </VBtn>
-              </td>
-
-              <!-- 👉 update by -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
-                class="text-start px-1"
-                style="font-size: 12px;"
-              >
-                {{ (item.raw.updatedBy) }}
-              </td>
-
-              <!-- 👉 update date -->
-              <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
-                class="text-start px-1"
-                style="font-size: 12px;"
-              >
-                {{ (item.raw.updatedDate) }}
-              </td>
-
-              <!-- 👉 Actions -->
-              <td
-                v-if="!accountWHSub"
-                style="width: 8rem; font-size: 12px;"
-                class="text-center px-1"
-              >
-                <VBtn
-                  :disabled="accountINSP"
-                  :color="accountINSP ? 'grey' : 'warning'"
-                >
-                  <span style="font-size: 12px;">Save Draft</span>
-                </VBtn>
-              </td>
-              <td
-                v-if="!accountWHSub"
-                style="width: 8rem; font-size: 12px;"
-                class="text-center px-1"
-              >
-                <VBtn
-                  :disabled="accountINSP"
-                  class="mx-2"
-                  :color="accountINSP ? 'grey' : 'primary'"
-                >
-                  <span style="font-size: 12px;">Submit</span>
-                </VBtn>
-              </td>
-              <td
-                v-if="accountWHSub"
-                style="width: 8rem; font-size: 12px;"
-                class="text-center px-1"
-              >
-                <VBtn
-                  class="mx-2"
-                  :color="accountINSP ? 'grey' : 'primary'"
-                >
-                  <span style="font-size: 12px;">Approve</span>
-                </VBtn>
-              </td>
-              <td
-                style="width: 8rem; font-size: 12px;"
-                class="text-center px-1"
-              >
-                <VBtn
-                  :disabled="accountINSP"
-                  :color="accountINSP ? 'grey' : 'pink-lighten-2'"
-                  @click="redirectBasedOnStatus(item.raw.statusId)"
-                >
-                  <span style="font-size: 12px;">Check Sheet</span>
-                </VBtn>
-              </td>
-            </tr>
-          </template>
-        </VDataTable>
-      </VCardText>
     </VCard>
   </section>
 

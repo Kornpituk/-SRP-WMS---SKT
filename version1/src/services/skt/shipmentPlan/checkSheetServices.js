@@ -142,7 +142,7 @@ export const useSubmitCheckSheetService = () => {
       submitCheckSheetError.value = null
       console.log('submitCheckSheetFunctio...')
   
-      const result = await checkSheetCheckSheetRepository.submitCheckSheet(urlApi, form, whereHouse, accessToke, soeId)
+      const result = await checkSheetShipmentPlanRepository.submitCheckSheet(urlApi, form, whereHouse, accessToke, soeId)
         
       if (result) {
         // console.log('submitCheckSheetFunctio:', result)
