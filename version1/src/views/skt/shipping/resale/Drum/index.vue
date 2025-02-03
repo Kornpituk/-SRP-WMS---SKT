@@ -16,6 +16,8 @@ import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/item
 
 const itemStore = useItemStore()
 
+
+
 //------------------------------------ params section -------------------------------
 import { useRoute } from 'vue-router'
 
@@ -72,7 +74,6 @@ import { useGenerateFormService, useGetShippingCheckSheetService,
 import { GBSmockDataIm, specialRequestsIm,
   validateAfterPickingIm, resaleProductShippingIm,
 } from './GBSMockData'
-
 
 
 const GBSMockData = ref(GBSmockDataIm)
@@ -199,6 +200,9 @@ onMounted(async () => {
 
 
 //------------------------------------- Save Draft ---------------------------------------
+
+
+
 const { saveShippingCheckSheetResult,
   errorSaveShippingCheckSheet,
   saveShippingCheckSheet } = useShippingCheckSheetService()
@@ -254,6 +258,7 @@ const payLoad = ref([{
 }])
 
 const appearanceCheckTrue = ref(true)
+const checkThePackagingCheckTrue = ref(true)
 
 const mapShippingCheckSheetData = data => {
   return {
@@ -272,12 +277,12 @@ const mapShippingCheckSheetData = data => {
     itemChecks: data.itemChecks.map(item => ({
       journalID: item.journalID,
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
-      checkedValue: true,
+      checkedValue: item.checkedValue,
     })),
     packagingChecks: data.packagingChecks.map(item => ({
       journalID: item.journalID,
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
-      checkedValue: true,
+      checkedValue: item.checkedValue,
     })),
     unfIbc: data.unfIbc.map(item => ({
       journalID: item.journalID,
@@ -374,10 +379,13 @@ const { submitCheckSheetResult,
 
 const handleSubmit = () => {
   try {
+    console.log("requestData 1")
+
     const result = submitCheckSheetFunction(urlApi.value, 'submit', whereHouse, 
       accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
 
-    if(result){
+    console.log("requestData 2")
+    if(submitCheckSheetResult.value){
       submitCheckSheetResult.value = result
       submitCheckSheetError.value = null
       console.log('submitCheckSheetResult', result)
@@ -441,6 +449,15 @@ const formatNumber = value => {
   }
 
   return '0.00'
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, "0")
+  const month = String(date.getMonth() + 1).padStart(2, "0") // เดือนเริ่มจาก 0
+  const year = date.getFullYear()
+  
+  return `${day}/${month}/${year}`
 }
 
 const iconMock = [
@@ -1395,11 +1412,11 @@ const dessertsMockAmountView = [
             >
               <td colspan="1">
                 <div class="d-flex justify-center align-center">
-                  <VCheckbox />
+                  <VCheckbox v-model="item.checkedValue" />
                 </div>
               </td>
               <td colspan="3">
-                {{ item.item }}
+                {{ item.displayText }}
               </td>
             </tr>
           </table>
@@ -1476,70 +1493,33 @@ const dessertsMockAmountView = [
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr
+                v-for="(item , index) in getShippingCheckSheetResult?.packagingChecks"
+                :key="index"
+              >
                 <td colspan="4">
                   <div class="d-flex justify-center">
-                    Wrapping
+                    {{ item.displayText }}
                   </div>
                 </td>
                 <td colspan="4">
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
-                      <VCheckbox />
-                      Yes 
+                      <VCheckbox
+                        v-model="item.checkedValue"
+                        :value="checkThePackagingCheckTrue"
+                      />
+                      Yes
                     </div>
                   </div>
                 </td>
                 <td colspan="4">
                   <div class="d-flex justify-center">
                     <div class="d-flex justify-center align-center">
-                      <VCheckbox />
-                      NO 
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="4">
-                  <div class="d-flex justify-center">
-                    Strap
-                  </div>
-                </td>
-                <td colspan="4">
-                  <div class="d-flex justify-center">
-                    <div class="d-flex justify-center align-center">
-                      <VCheckbox />
-                      Yes 
-                    </div>
-                  </div>
-                </td>
-                <td colspan="4">
-                  <div class="d-flex justify-center">
-                    <div class="d-flex justify-center align-center">
-                      <VCheckbox />
-                      NO 
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="4">
-                  <div class="d-flex justify-center">
-                    Other
-                  </div>
-                </td>
-                <td colspan="4">
-                  <div class="d-flex justify-center">
-                    <div class="d-flex justify-center align-center">
-                      <VCheckbox />
-                      Yes 
-                    </div>
-                  </div>
-                </td>
-                <td colspan="4">
-                  <div class="d-flex justify-center">
-                    <div class="d-flex justify-center align-center">
-                      <VCheckbox />
+                      <VCheckbox
+                        v-model="item.checkedValue"
+                        :value="false"
+                      />
                       NO 
                     </div>
                   </div>
@@ -1880,119 +1860,71 @@ const dessertsMockAmountView = [
           </thead>
           <tbody>
             <tr>
-              <th colspan="4">
-                <VTextField
-                  v-model="varA"
-                  class="pa-0"
-                  density="compact"
-                  style="font-size: 16px;"
-                >
-                  <template #prepend>
-                    <span />
-                  </template>
-                  <template #label>
-                    <span>WH Staff 1</span>
-                  </template>
-                  <template #append>
-                    <span />
-                  </template>
-                </VTextField>
-              </th>
-              <th colspan="4">
-                <VTextField
-                  v-model="varA"
-                  class="pa-0"
-                  density="compact"
-                  style="font-size: 16px;"
-                >
-                  <template #prepend>
-                    <span />
-                  </template>
-                  <template #label>
-                    <span>WH Staff 2</span>
-                  </template>
-                  <template #append>
-                    <span />
-                  </template>
-                </VTextField>
-              </th>
-              <th colspan="4">
-                <VTextField
-                  v-model="varA"
-                  class="pa-0"
-                  density="compact"
-                  style="font-size: 16px;"
-                >
-                  <template #prepend>
-                    <span />
-                  </template>
-                  <template #label>
-                    <span>Supervisor</span>
-                  </template>
-                  <template #append>
-                    <span />
-                  </template>
-                </VTextField>
-              </th>
+              <td
+                class="text-start"
+                colspan="4"
+                style="min-width: 150px; max-width: 150px;"
+              >
+                <span
+                  v-if="getShippingCheckSheetResult?.reportCheckSheet"
+                  style="font-size: 12px;"
+                >WH Staff 1:{{ getShippingCheckSheetResult?.reportCheckSheet.updatedBy }}</span>
+              </td>
+              <td
+                class="text-start"
+                colspan="4"
+                style="min-width: 150px; max-width: 150px;"
+              >
+                <span
+                  v-if="getShippingCheckSheetResult?.reportCheckSheet"
+                  style="font-size: 12px;"
+                >WH Staff 2:{{ getShippingCheckSheetResult?.reportCheckSheet.leadedBy }}</span>
+              </td>
+              <td
+                class="text-start"
+                colspan="4"
+                style="min-width: 150px; max-width: 150px;"
+              >
+                <span
+                  v-if="getShippingCheckSheetResult?.reportCheckSheet"
+                  style="font-size: 12px;"
+                >Supervisor:{{ getShippingCheckSheetResult?.reportCheckSheet.approvedBy }}</span>
+              </td>
             </tr>
             <tr>
-              <th colspan="4">
-                <VTextField
-                  v-model="varA"
-                  class="pa-0"
-                  density="compact"
-                  style="font-size: 16px;"
-                >
-                  <template #prepend>
-                    <span />
-                  </template>
-                  <template #label>
-                    <span>Date</span>
-                  </template>
-                  <template #append>
-                    <span />
-                  </template>
-                </VTextField>
-              </th>
-              <th colspan="4">
-                <VTextField
-                  v-model="varA"
-                  class="pa-0"
-                  density="compact"
-                  style="font-size: 16px;"
-                >
-                  <template #prepend>
-                    <span />
-                  </template>
-                  <template #label>
-                    <span>Date</span>
-                  </template>
-                  <template #append>
-                    <span />
-                  </template>
-                </VTextField>
-              </th>
-              <th colspan="4">
-                <VTextField
-                  v-model="varA"
-                  class="pa-0"
-                  density="compact"
-                  style="font-size: 16px;"
-                >
-                  <template #prepend>
-                    <span />
-                  </template>
-                  <template #label>
-                    <span>Date</span>
-                  </template>
-                  <template #append>
-                    <span />
-                  </template>
-                </VTextField>
-              </th>
+              <td
+                class="text-start"
+                colspan="4"
+              >
+                <span
+                  v-if="getShippingCheckSheetResult?.reportCheckSheet"
+                  style="font-size: 12px;"
+                >{{ formatDate(getShippingCheckSheetResult?.reportCheckSheet.updatedDate) }}</span>
+              </td>
+              <td
+                class="text-start"
+                colspan="4"
+              >
+                <span
+                  v-if="getShippingCheckSheetResult?.reportCheckSheet"
+                  style="font-size: 12px;"
+                >{{ formatDate(getShippingCheckSheetResult?.reportCheckSheet.leadedDate) }}</span>
+              </td>
+              <td
+                class="text-start"
+                colspan="4"
+              >
+                <span
+                  v-if="getShippingCheckSheetResult?.reportCheckSheet"
+                  style="font-size: 12px;"
+                >{{ formatDate(getShippingCheckSheetResult?.reportCheckSheet.approvedDate) }}</span>
+              </td>
             </tr>
             <tr>
-              <td colspan="12">
+              <td
+                class="text-start"
+                colspan="12"
+              >
                 หมายเหตุ: คนขับรถ ตรวจรถสินค้าหลังนำขึ้นรถแล้ว สภาพปกติ ไม่รั่ว
               </td>
             </tr>
