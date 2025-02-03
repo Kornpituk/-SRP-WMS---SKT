@@ -239,9 +239,9 @@ const removeFile = index => {
                 class="d-flex justify-center align-center"
               >
                 <iframe 
-                  :src="file.objectUrl"
-                  type="application/pdf"
-                  style="width: 80%; height: 500px;"
+                  :src="'https://docs.google.com/viewer?url=' +file.fileUri + '&embedded=true'" 
+                  type="application/pdf" 
+                  style="width: 80%; height: 500px; border: none;"
                 />
               </div>
 
@@ -249,6 +249,7 @@ const removeFile = index => {
                 v-else-if="file.type === 'application/pdf'"
                 class="d-flex justify-center align-center"
               >
+                {{ file.objectUrl }}
                 <iframe 
                   :src="file.objectUrl"
                   type="application/pdf"
