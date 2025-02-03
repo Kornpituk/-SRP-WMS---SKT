@@ -17,7 +17,6 @@ const itemStore = useItemStore()
 
 const department = ref(sessionStorage.getItem('department'))
 
-
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
   if(department.value === 'Warehouse' && whStatusId === 404){
     return true
@@ -1537,7 +1536,7 @@ const imgDialogPDF = ref('')
 const imgDialogPng = ref('')
 
 //------------------------------------------ Check Sheet To Page Resale -----------------------
-function redirectBasedOnStatus(product) {
+async function  redirectBasedOnStatus (product)  {
   // ดึงเฉพาะตัวเลขหลักแรกของ status
   const mainStatus = Math.floor(product.statusId/ 100)
 
@@ -1580,10 +1579,13 @@ function redirectBasedOnStatus(product) {
     salesOrderNoParams: product.salesOrderNo,
     itemCodeParams: product.itemCode,
     checkSheetTypeNameParams: product.checkSheetTypeName,
+    csLfStatusIdParams: product.csLfStatusId,
   }).toString()
 
+  sessionStorage.setItem('productDataSession', JSON.stringify(product))
+
   // 🔥 Redirect ไปยัง URL ใหม่พร้อม Query
-  const finalPath = `${newPath}?${params}`
+  const finalPath = `${newPath}`
 
   console.log(`Redirecting to: ${finalPath}`)
   window.location.href = finalPath

@@ -22,14 +22,17 @@ const itemStore = useItemStore()
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const journalIdModel = ref(route.query.journalIdParams)
-const itemCodeModel = ref(route.query.itemCodeParams)
-const SoEtlLogDetailJournalIDModel = ref(route.query.SoEtlLogDetailJournalIDParams)
-const salesOrderNoModel = ref(route.query.salesOrderNoParams)
-const checkSheetTypeNameModel = ref(route.query.checkSheetTypeNameParams)
-const statusModel = ref(route.query.statusParams)
 
-console.log('journalIdModel', journalIdModel.value)
+const dataProductRow = ref(JSON.parse(sessionStorage.getItem("productDataSession")))
+
+const journalIdModel = ref(dataProductRow.value.journalID)
+const itemCodeModel = ref(dataProductRow.value.itemCode)
+const SoEtlLogDetailJournalIDModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
+const salesOrderNoModel = ref(dataProductRow.value.salesOrderNo)
+const checkSheetTypeNameModel = ref(dataProductRow.value.checkSheetTypeName)
+const statusModel = ref(dataProductRow.value.csLfStatusId)
+
+console.log('journalIdModel', dataProductRow.value.journalID)
 
 //------------------------------- alert --------------------------------------------
 
