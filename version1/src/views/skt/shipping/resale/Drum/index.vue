@@ -66,11 +66,39 @@ function getCurrentDate() {
 
 import { useGenerateFormService, useGetShippingCheckSheetService,
   useGetShippingChecksheetImageService, useShippingCheckSheetService,
-  useSubmitCheckSheetService,
+  useSubmitCheckSheetService, useGetShippingCheckSheetFileIconService,
 } from '@/services/skt/shipmentPlan/checkSheetServices'
 
 //------------------------------------ generate section ----------------------
 
+//------------------------------------ Get ShippingCheckSheet Icon  ----------------------
+
+const { getShippingCheckSheetFileResult,
+  errorGetShippingCheckSheetFile,
+  fetchShippingCheckSheetFile } = useGetShippingCheckSheetFileIconService()
+
+const handleShippingFileIcon = async (type, userCode, itemCode, fileName) => {
+  try {
+    const result = await fetchShippingCheckSheetFile(
+      urlApi.value, type, whereHouse, 
+      accessTokenAtStore, SoEtlLogDetailJournalIDModel.value,
+      userCode, itemCode, fileName,
+    )
+
+    if(result){
+      getShippingCheckSheetFileResult.value = result
+      console.log('getShippingCheckSheetFileResult', result)
+    }else{
+      console.log('errorGetShippingCheckSheetFile !result ', errorGetShippingCheckSheetFile.value)
+    }
+  }catch (e) {
+    console.log('errorGetShippingCheckSheetFileIcon', e)
+  }
+}
+
+onMounted( () => {
+  // handleShippingFileIcon('GetSpecialConditionIcon', dataProductRow.value.shippingUserCode, )
+})
 
 //------------------------------------ Get ShippingCheckSheet  ----------------------
 

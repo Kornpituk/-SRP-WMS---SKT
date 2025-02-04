@@ -454,6 +454,44 @@ export const checkSheetShipmentPlanRepository = {
     }
   },
 
+  async getShippingCheckSheetFile(urlApi, form, whereHouse, accessToken,  userCode, itemCode, fileName) {
+    try {
+
+      let response
+      if(form === 'GetSpecialConditionIcon'){
+        response = await axios.get(`${urlApi}/api/v1/ShippingCheckSheetFile/${userCode}/${itemCode}`, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }else if(form === 'ShippingSpecialConditionIcon'){
+        response = await axios.get(`${urlApi}/api/v1/ShippingCheckSheetFile/${form}/${fileName}`, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }
+      
+      if (response && response.data) {
+
+        // console.log('Service Response data getShippingCheckSheet:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getShippingCheckSheet...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getShippingCheckSheet...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getShippingCheckSheet ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   //---------------------------- post --------------------------------
   async generateForm(urlApi, form, whereHouse, accessToken, edId) {
     try {

@@ -35,6 +35,7 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
 import alertWordConst from '@/utilities/constant'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -46,6 +47,60 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
+}
+
+//------------------------------ Alert Confirm ---------------------------
+const confirmDialog2 = ref('')
+const typeConfirmDialog = ref('')
+const soEIdConfirmDialog = ref('')
+
+function openConfirmDialog(type, SoEId) {
+  console.log('openConfirmDialog', type, SoEId)
+
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+  if(type === 'submit'){
+    wordForSubmit.value = type
+    typeConfirmDialog.value = type
+    soEIdConfirmDialog.value = SoEId
+    console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
+    
+  }
+
+  confirmDialog2.value.openDialog()
+
+  // selectedDataTables.value.forEach(item => {
+  //   // กำหนดค่าเริ่มต้น
+  //   console.log("selectedDataTables", item.statusId)
+  //   selectedDataTablesStatusId.value = item.statusId
+
+  //   if (item.statusId === 102 || item.statusId === 107 ) {
+  //     wordForSubmit.value = alertWordConst.approve
+  //     confirmDialog2.value.openDialog()
+  //     isDialogVisibleAlertDialog.value = false
+  //     console.log("selectedDataTables 102")
+  //   }else if(item.statusId === 101){
+  //     textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
+  //     console.log("selectedDataTables 101")
+  //   }
+  //   else{
+  //     console.log("selectedDataTables failded")
+  //     isDialogVisibleAlertDialog.value = false
+  //   }
+
+  // })
+
+}
+
+function handleConfirmAction() {
+  if( wordForSubmit.value === 'submit'){
+    submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
+  }
+  
+  
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
 }
 
 //------------------------------ Formate --------------------------------------
@@ -227,6 +282,7 @@ const titleDialogView = ref('')
 const soEIdModel = ref('')
 const indexDataDialogTextArea = ref('')
 const activeShipMarkModel = ref('')
+const disabledModel = ref(false)
 
 //------ function for dialog text area ----------------------------------------------
 
@@ -299,7 +355,7 @@ const btnTextarea = () => {
   dialogVisibleTextarea.value = false
 }
 
-const textAreaRemarkDialogActive = (type, data, soEId) => {
+const textAreaRemarkDialogActive = (type, data, soEId, disabledRow) => {
  
   typeDialogTextArea.value = type
   soEIdModel.value = soEId
@@ -307,11 +363,13 @@ const textAreaRemarkDialogActive = (type, data, soEId) => {
   dialogRemark.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogVisibleTextarea.value = true
   console.log('Type dialog', typeDialogTextArea.value, '=', type)
+  disabledModel.value = disabledRow
 }
 
 const dataRowForUse = ref()
 
-const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMark, dataProduct) => {
+
+const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMark, dataProduct, disabledRow) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
   soEIdModel.value = soEId
@@ -322,6 +380,7 @@ const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMa
   activeShipMarkModel.value = activeShipMark
   dataRowForUse.value = dataProduct
   dialogVisible.value = true
+  disabledModel.value = disabledRow
 }
 
 const handleDialogSubmit = data => {
@@ -705,13 +764,23 @@ const saveFileFormShipment = async (
     console.log("Response from functionSaveFileForm:", response)
 
     if (resultSaveFielForm.value?.success) {
-      textAlertDialogFunction(alertWordConst.saveDraft, true)
-      console.log(`Saved File Plan:`, resultSaveFielForm.value)
+      if(disabledModel.value){
+        // textAlertDialogFunction('Print', true)
 
-      // Reload หลังแจ้งเตือนสำเร็จ
-      setTimeout(() => {
+        // // Reload หลังแจ้งเตือนสำเร็จ
+        // setTimeout(() => {
+        // // location.reload()
+        // }, 500) // 0.5 วินาที
+      }else{
+        textAlertDialogFunction(alertWordConst.saveDraft, true)
+        console.log(`Saved File Plan:`, resultSaveFielForm.value)
+
+        // Reload หลังแจ้งเตือนสำเร็จ
+        setTimeout(() => {
         // location.reload()
-      }, 500) // 0.5 วินาที
+        }, 500) // 0.5 วินาที
+      }
+      
       
       return true
     } else {
@@ -996,10 +1065,18 @@ const saveShipmentPlan = async row => {
     )
 
     if (saveSearchPlanResult.value) {
-      textAlertDialogFunction(alertWordConst.saveDraft, true)
-      setTimeout(() => {
+      if(disabledModel.value){
+        textAlertDialogFunction('Print', true)
+        setTimeout(() => {
         // location.reload()
-      }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+        }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+      }else{
+        textAlertDialogFunction(alertWordConst.saveDraft, true)
+        setTimeout(() => {
+        // location.reload()
+        }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+      }
+      
     } else {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
       setTimeout(() => {
@@ -1115,7 +1192,7 @@ const isSelected = item => {
   )
 }
 
-const dataTableCliclHighlightIsToggle = no => {
+const dataTableCliclHighlightIsToggle = no=> {
   // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
   if (dataTableNummberedToggle.value === no) {
     // ถ้าตรง ให้สลับกลับเป็น null
@@ -1124,6 +1201,7 @@ const dataTableCliclHighlightIsToggle = no => {
     // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
     dataTableNummberedToggle.value = no
   }
+  
 
   console.log("dataTableNum", dataTableNummberedToggle.value)
 }
@@ -1559,7 +1637,7 @@ async function  redirectBasedOnStatus (product)  {
 
   const checkSheetTypeNameMapping = {
     'N/A': 'Drum',
-    'General': 'Drum',
+    'Drum': 'Drum',
     'IBC': 'Drum',
     'Flexi': 'Flexi',
     'Lorry': 'Lorry',
@@ -1620,41 +1698,42 @@ const printShipmentPDFBySoEId = async type => {
   loadingPrint.value = true
   console.log('loadingPrint', loadingPrint.value)
 
-  await paginatedData.value.forEach(item  => {
+  // ✅ ใช้ for...of เพื่อรองรับ async/await
+  for (const item of paginatedData.value) {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
       item.shipperMark = dialogDataTextArea.value
       item.shipperConditions = dialogData2TextArea.value
       item.shippingMarkActive = activeShipMarkModel.value
     }
-  })
+  }
 
+  // ✅ บันทึกข้อมูลก่อนพิมพ์
   await saveShipmentPlan(dataRowForUse.value)
 
-  try{
-    
-
-    const result = printShipmentPDF(urlApi.value,
+  try {
+    // ✅ เรียก printShipmentPDF
+    const result = await printShipmentPDF(
+      urlApi.value,
       type,
       whereHouse,
       accessTokenAtStore,
-      soEIdModel.value)
+      soEIdModel.value,
+    )
     
-    if(result){
-      loadingPrint.value = false
+    if (result) {
       console.log('result print', result)
-      textAlertDialogFunction(alertWordConst.print, true)
-      setTimeout(() => {
-        // location.reload()
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      
-    }else{
+
+      // textAlertDialogFunction(alertWordConst.print, true)
+
+      // setTimeout(() => {
+      //   // location.reload()
+      // }, 500)
+    } else {
       textAlertDialogFunction(alertWordConst.print, false)
-      setTimeout(() => {
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      loadingPrint.value = false
     }
-  } catch (e) {
-    console.error(`Error saving search plan:`, error)
+  } catch (error) {
+    console.error(`Error printing shipment PDF:`, error)
+  } finally {
     loadingPrint.value = false
   }
 }
@@ -3485,11 +3564,16 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <div class="text-start cursor-pointer">
                   <VBtn
-                    :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                    :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
                     style="min-width: 160px; max-width: 160px;"
                     variant="outlined"
                     :color="product.shipperConditions ? 'primary' : 'grey'"
-                    @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, product.shipperConditions, index, product.soEtlLogDetailJournalID, product.shippingMarkActive, product)"
+                    @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, 
+                                                      product.shipperConditions, index, product.soEtlLogDetailJournalID, 
+                                                      product.shippingMarkActive, product, 
+                                                      disabledStatus(product.inspStatusId,
+                                                                     product.logStatusId,product.salStatusId,
+                                                                     product.whStatusId))"
                   >
                     <span
                       v-if="product.shipperConditions"
@@ -3691,6 +3775,12 @@ const handlePrintTruckOrderPDF = () => {
                     </div>
                   </template>
                 </VSelect>
+                <VTooltip
+                  activator="parent"
+                  location="end"
+                >
+                  {{ product.freightForwarder }}
+                </VTooltip>
               </td>
 
               <!-- 👉 carrier -->
@@ -3729,6 +3819,12 @@ const handlePrintTruckOrderPDF = () => {
                     </div>
                   </template>
                 </VSelect>
+                <VTooltip
+                  activator="parent"
+                  location="end"
+                >
+                  {{ product.carrier }}
+                </VTooltip>
               </td>
 
               <!-- 👉 vesselName -->
@@ -3767,6 +3863,12 @@ const handlePrintTruckOrderPDF = () => {
                     </div>
                   </template>
                 </VSelect>
+                <VTooltip
+                  activator="parent"
+                  location="end"
+                >
+                  {{ product.vesselName }}
+                </VTooltip>
               </td>
 
               <!-- 👉 voy -->
@@ -3836,6 +3938,12 @@ const handlePrintTruckOrderPDF = () => {
                     </VSelect>
                   </VCol>
                 </VRow>
+                <VTooltip
+                  activator="parent"
+                  location="end"
+                >
+                  {{ product.freightForwarder }}
+                </VTooltip>
               </td>
 
               <!-- 👉 truckReserving -->
@@ -3862,6 +3970,12 @@ const handlePrintTruckOrderPDF = () => {
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   style=" min-width: 150px;"
                 />
+                <VTooltip
+                  activator="parent"
+                  location="end"
+                >
+                  {{ product.truckReservingNumber }}
+                </VTooltip>
               </td>
 
               <!-- 👉 truckFee -->
@@ -3887,6 +4001,12 @@ const handlePrintTruckOrderPDF = () => {
                   density="compact"
                   style=" min-width: 150px;"
                 />
+                <VTooltip
+                  activator="parent"
+                  location="end"
+                >
+                  {{ product.truckFee }}
+                </VTooltip>
               </td>
 
               <!-- 👉 truckOrder -->
@@ -3998,7 +4118,7 @@ const handlePrintTruckOrderPDF = () => {
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
                 />
-                <span v-else>{{ formatDate(product.logUpdatedDate) }}</span>
+                <span v-else>{{ (product.logUpdatedDate) }}</span>
               </td>
 
               <!-- 👉 etd -->
@@ -4025,7 +4145,7 @@ const handlePrintTruckOrderPDF = () => {
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
                 />
-                <span v-else>{{ formatDate(product.etd) }}</span>
+                <span v-else>{{ (product.etd) }}</span>
               </td>
 
               <!-- 👉 eta -->
@@ -4053,7 +4173,7 @@ const handlePrintTruckOrderPDF = () => {
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   :config="{ dateFormat: 'd/m/Y' }"
                 />
-                <span v-else>{{ formatDate(product.eta) }}</span>
+                <span v-else>{{ (product.eta) }}</span>
               </td>
 
               <!-- 👉 deliveryNote -->
@@ -4104,10 +4224,10 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
                   variant="outlined"
                   :color="product.saL_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID)"
+                  @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID, disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId))"
                 >
                   <span
                     v-if="product.saL_Remarks"
@@ -4136,10 +4256,10 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute|| disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
                   variant="outlined"
                   :color="product.wH_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID)"
+                  @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID, disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId))"
                 >
                   <span
                     v-if="product.wH_Remarks"
@@ -4169,9 +4289,9 @@ const handlePrintTruckOrderPDF = () => {
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
                   :color="product.loG_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID)"
+                  @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID, disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId))"
                 >
                   <span
                     v-if="product.loG_Remarks"
@@ -4266,7 +4386,7 @@ const handlePrintTruckOrderPDF = () => {
                   :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
-                  @Click="submitShipmentPlanBySoEId('submit', product.soEtlLogDetailJournalID)"
+                  @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID)"
                 >
                   <span style="font-size: 12px;">Submit</span>
                 </VBtn>
@@ -4439,6 +4559,16 @@ const handlePrintTruckOrderPDF = () => {
       />
     </div>
 
+    <div>
+      <!-- ใช้ confirmDialog component -->
+      <ConfirmDialog2
+        ref="confirmDialog2"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
+      />
+    </div>
+
     <!-- Shipment mark/ con -->
     <div>
       <VDialog
@@ -4471,6 +4601,7 @@ const handlePrintTruckOrderPDF = () => {
               <VCol cols="6">
                 <VTextarea
                   v-model="dialogDataTextArea"
+                  :disabled="disabledModel"
                   auto-grow
                   rows="7"
                   counter
@@ -4479,6 +4610,7 @@ const handlePrintTruckOrderPDF = () => {
                 />
                 <VCheckbox
                   v-model="activeShipMarkModel"
+                  :disabled="disabledModel"
                   value="activeShipMarkModel"
                   label="Shipping Mark Active"
                 />
@@ -4486,6 +4618,7 @@ const handlePrintTruckOrderPDF = () => {
               <VCol cols="6">
                 <VTextarea
                   v-model="dialogData2TextArea"
+                  :disabled="disabledModel"
                   counter
                   class="text-center"
                   rows="15"
@@ -4551,6 +4684,7 @@ const handlePrintTruckOrderPDF = () => {
           <VCardText>
             <VTextarea
               v-model="dialogRemark"
+              :readonly="disabledModel"
               auto-grow
               rows="7"
               counter

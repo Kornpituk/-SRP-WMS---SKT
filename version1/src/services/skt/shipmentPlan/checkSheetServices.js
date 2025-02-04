@@ -35,6 +35,37 @@ export const useGetShippingCheckSheetService = () => {
   }
 }
 
+export const useGetShippingCheckSheetFileIconService = () => {
+  const getShippingCheckSheetFileResult = ref(null)
+  const errorGetShippingCheckSheetFile = ref(null)
+    
+  const fetchShippingCheckSheetFile = async (urlApi, form, whereHouse, accessToke,  userCode, itemCode, fileName) => {
+    try {
+      errorGetShippingCheckSheetFile.value = null
+    
+      const result = await checkSheetShipmentPlanRepository.getShippingCheckSheetFile(urlApi, form, whereHouse, accessToke,  userCode, itemCode, fileName)
+          
+      if (result) {
+        getShippingCheckSheetFileResult.value = result.data
+          
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchShippingCheckSheetFile:', error)
+      errorGetShippingCheckSheetFile.value = error.message
+    }
+  }
+    
+  return {
+    getShippingCheckSheetFileResult,
+    errorGetShippingCheckSheetFile,
+    fetchShippingCheckSheetFile,
+  }
+}
+
+
 export const useGetShippingChecksheetImageService = () => {
   const getShippingChecksheetImageResult = ref(null)
   const errorGetShippingChecksheetImage = ref(null)
