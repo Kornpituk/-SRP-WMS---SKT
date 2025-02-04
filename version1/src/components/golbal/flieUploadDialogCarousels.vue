@@ -28,13 +28,11 @@ watchEffect(() => {
   if(!filesModel.value || filesModel.value.length < 1){
     files.value = []
   }
-})
-
-watchEffect(()=> {
   if(props.filesFromAPI){
     files.value = props.filesFromAPI
   }
 })
+
 
 // ฟังก์ชันจัดการการอัปโหลดไฟล์
 const handleFileUpload = event => {

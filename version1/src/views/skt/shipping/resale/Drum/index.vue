@@ -1460,27 +1460,6 @@ const dessertsMockAmountView = [
           lg="6"
         >
           <table class="custom-table">
-            <!--  header table -->
-            <thead>
-              <tr>
-                <th
-                  colspan="6"
-                  class="text-center"
-                >
-                  <div class="d-flex justify-center align-center ">
-                    <VCheckbox label="Wood" />
-                  </div>
-                </th>
-                <th
-                  colspan="6"
-                  class="text-center"
-                >
-                  <div class="d-flex justify-center align-center ">
-                    <VCheckbox label="Plastic" />
-                  </div>
-                </th>
-              </tr>
-            </thead>
             <tbody>
               <!--  body table -->
               <tr>
@@ -1535,7 +1514,14 @@ const dessertsMockAmountView = [
                 </td>
                 <td colspan="4">
                   <div class="d-flex justify-center">
-                    <div class="d-flex justify-center align-center">
+                    <div v-if="item.option1Text === 'Wood'" class="d-flex justify-center align-center">
+                      <VCheckbox
+                        v-model="item.checkedValue"
+                        :value="checkThePackagingCheckTrue"
+                      />
+                      Wood
+                    </div>
+                    <div v-else class="d-flex justify-center align-center">
                       <VCheckbox
                         v-model="item.checkedValue"
                         :value="checkThePackagingCheckTrue"
@@ -1546,7 +1532,14 @@ const dessertsMockAmountView = [
                 </td>
                 <td colspan="4">
                   <div class="d-flex justify-center">
-                    <div class="d-flex justify-center align-center">
+                    <div v-if="item.option2Text === 'Plastic'" class="d-flex justify-center align-center">
+                      <VCheckbox
+                        v-model="item.checkedValue"
+                        :value="false"
+                      />
+                      Plastic 
+                    </div>
+                    <div v-else class="d-flex justify-center align-center">
                       <VCheckbox
                         v-model="item.checkedValue"
                         :value="false"

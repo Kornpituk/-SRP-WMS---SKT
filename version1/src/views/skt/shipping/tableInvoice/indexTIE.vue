@@ -22,7 +22,7 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
     return true
   }else if(department.value === 'Logistic' && logStatusId === 504){
     return true
-  }else if(department.value === 'Inspection' && statusId === 604){
+  }else if(department.value === 'Inspection' && inspStatusId === 604){
     return true
   }else if(department.value === 'Sale and marketing' && salStatusId === 304){
     return true
@@ -317,7 +317,7 @@ const textAreaDialogActive = (type, data, index) => {
   dialogVisible.value = true
 }
 
-const btnCloseShipCon = () => {
+const btnCloseShipCon = async () => {
   // ค้นหาและอัปเดตค่าใน paginatedData
   paginatedData.value.forEach(item => {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
@@ -326,7 +326,9 @@ const btnCloseShipCon = () => {
       item.shippingMarkActive = activeShipMarkModel.value
     }
   })
-  console.log('btnCloseShipCon...')
+  console.log('btnCloseShipCon...', paginatedData.value)
+
+  await saveShipmentPlan(dataRowForUse.value)
   dialogVisible.value = false
 }
 
@@ -347,6 +349,7 @@ const btnTextarea = () => {
 
         // console.log('btnCloseRemark... Remark LOG', dialogRemark.value)
       }
+      
     }else{
       console.log('btnCloseRemark... ELSe', typeDialogTextArea.value, soEIdModel.value, item.soEtlLogDetailJournalID)
     }
@@ -606,6 +609,8 @@ const searchShipmentPlan = async () => {
           fileDeliveryNote: await getFileForm('GetDeliveryNote', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
         })),
       )
+
+      console.log('searchPlanData.value', searchPlanData.value)
 
       // console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
@@ -4303,7 +4308,6 @@ const handlePrintTruckOrderPDF = () => {
 
               <!-- 👉 update by -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 110px; font-size: 12px;"
                 :style="{ 
@@ -4323,7 +4327,6 @@ const handlePrintTruckOrderPDF = () => {
 
               <!-- 👉 update date -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 120px; font-size: 12px;"
                 :style="{ 
@@ -4430,7 +4433,6 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="accountINSP"
                   :color="accountINSP ? 'grey' : 'pink-lighten-2'"
                   @click="actionBtn(product)"
                 >
@@ -4611,7 +4613,6 @@ const handlePrintTruckOrderPDF = () => {
                 <VCheckbox
                   v-model="activeShipMarkModel"
                   :disabled="disabledModel"
-                  value="activeShipMarkModel"
                   label="Shipping Mark Active"
                 />
               </VCol>
