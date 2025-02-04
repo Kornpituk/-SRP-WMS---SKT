@@ -460,7 +460,7 @@ const habdleSaveDraft = async () => {
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       console.log("requestData 4")
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 0.5 วินาที
     }else{
       console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
@@ -494,7 +494,7 @@ const handleSubmit = () => {
       textAlertDialogFunction(alertWordConst.submit, true)
       console.log("requestData 4")
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 0.5 วินาที
     }else{
       console.log('submitCheckSheetError !result ', submitCheckSheetError.value)

@@ -1081,7 +1081,7 @@ const saveShipmentPlan = async row => {
       }else{
         textAlertDialogFunction(alertWordConst.saveDraft, true)
         setTimeout(() => {
-        // location.reload()
+          location.reload()
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
       }
       
