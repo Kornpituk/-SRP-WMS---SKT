@@ -328,7 +328,10 @@ const btnCloseShipCon = async () => {
   })
   console.log('btnCloseShipCon...', paginatedData.value)
 
-  await saveShipmentPlan(dataRowForUse.value)
+  if(!disabledModel.value){
+    await saveShipmentPlan(dataRowForUse.value)
+  }
+  
   dialogVisible.value = false
 }
 
@@ -782,7 +785,7 @@ const saveFileFormShipment = async (
 
         // Reload หลังแจ้งเตือนสำเร็จ
         setTimeout(() => {
-        // location.reload()
+          // location.reload()
         }, 500) // 0.5 วินาที
       }
       
@@ -1073,7 +1076,7 @@ const saveShipmentPlan = async row => {
       if(disabledModel.value){
         textAlertDialogFunction('Print', true)
         setTimeout(() => {
-        // location.reload()
+          location.reload()
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
       }else{
         textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -1711,9 +1714,11 @@ const printShipmentPDFBySoEId = async type => {
       item.shippingMarkActive = activeShipMarkModel.value
     }
   }
-
-  // ✅ บันทึกข้อมูลก่อนพิมพ์
-  await saveShipmentPlan(dataRowForUse.value)
+  if(!disabledModel.value){
+    // ✅ บันทึกข้อมูลก่อนพิมพ์
+    await saveShipmentPlan(dataRowForUse.value)
+  }
+  
 
   try {
     // ✅ เรียก printShipmentPDF
@@ -3947,7 +3952,7 @@ const handlePrintTruckOrderPDF = () => {
                   activator="parent"
                   location="end"
                 >
-                  {{ product.freightForwarder }}
+                  {{ product.truck }}
                 </VTooltip>
               </td>
 

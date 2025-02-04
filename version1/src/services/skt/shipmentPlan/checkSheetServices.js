@@ -39,11 +39,14 @@ export const useGetShippingCheckSheetFileIconService = () => {
   const getShippingCheckSheetFileResult = ref(null)
   const errorGetShippingCheckSheetFile = ref(null)
     
-  const fetchShippingCheckSheetFile = async (urlApi, form, whereHouse, accessToke,  userCode, itemCode, fileName) => {
+  const fetchShippingCheckSheetFile = async (
+    urlApi, form, whereHouse, accessToke,  
+    userCode, itemCode, fileName, licensePlate) => {
     try {
       errorGetShippingCheckSheetFile.value = null
     
-      const result = await checkSheetShipmentPlanRepository.getShippingCheckSheetFile(urlApi, form, whereHouse, accessToke,  userCode, itemCode, fileName)
+      const result = await checkSheetShipmentPlanRepository.getShippingCheckSheetFile(
+        urlApi, form, whereHouse, accessToke,  userCode, itemCode, fileName, licensePlate)
           
       if (result) {
         getShippingCheckSheetFileResult.value = result.data

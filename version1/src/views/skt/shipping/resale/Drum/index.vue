@@ -109,11 +109,13 @@ import { GBSmockDataIm, specialRequestsIm,
 
 const GBSMockData = ref(GBSmockDataIm)
 
+const reportModel = ref()
 
 const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCheckSheet } = useGetShippingCheckSheetService()
 
 const specialRequests = ref()
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const getShippingCheckSheet = async () => {
   try {
     const result = await fetchShippingCheckSheet(urlApi.value, 'ShippingCheckSheet', whereHouse, accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
@@ -121,6 +123,36 @@ const getShippingCheckSheet = async () => {
       getShippingCheckSheetResult.value = result
 
       specialRequests.value = result
+
+      if(getShippingCheckSheetResult.value){
+        reportModel.value = getShippingCheckSheetResult.value.reportCheckSheet 
+      }
+
+      if (reportModel.value) {
+        const { 
+          labalChinese,
+          labalEnglish, 
+          labalJapanese, 
+          labalKorean,
+          labalMalaysia, 
+          labalThai, 
+          sds,
+        } = reportModel.value
+
+        const languages = []
+
+        if (labalChinese) languages.push('Chinese')
+        if (labalEnglish) languages.push('English')
+        if (labalJapanese) languages.push('Japanese')
+        if (labalKorean) languages.push('Korean')
+        if (labalMalaysia) languages.push('Korean')
+        if (labalThai) languages.push('Thai')
+        if (sds) languages.push('Thai')
+
+        selectedLanguage.value = languages
+
+        console.log('reportModel.value?.reportCheckSheet 1', labalChinese)
+      }
 
       
 
@@ -232,8 +264,6 @@ onMounted(async () => {
 
 //------------------------------------- Save Draft ---------------------------------------
 
-
-
 const { saveShippingCheckSheetResult,
   errorSaveShippingCheckSheet,
   saveShippingCheckSheet } = useShippingCheckSheetService()
@@ -292,6 +322,8 @@ const appearanceCheckTrue = ref(true)
 const checkThePackagingCheckTrue = ref(true)
 
 const mapShippingCheckSheetData = data => {
+  console.log('mapShippingCheckSheetData', data.reportCheckSheet)
+  
   return {
     checkSheetItems: data.checkSheetItems.map(item => ({
       journalID: item.journalID,
@@ -335,7 +367,24 @@ const mapShippingCheckSheetData = data => {
       topSeal: item.topSeal || false,
       bottomSeal: item.bottomSeal || false,
     })),
+
+    reportCheckSheet: data.reportCheckSheet 
+      ? {
+        soEtlLogDetailJournalID: data.reportCheckSheet.soEtlLogDetailJournalID,
+        labalThai: data.reportCheckSheet.labalThai,
+        labalEnglish: data.reportCheckSheet.labalEnglish,
+        labalJapanese: data.reportCheckSheet.labalJapanese,
+        labalChinese: data.reportCheckSheet.labalChinese,
+        labalMalaysia: data.reportCheckSheet.labalMalaysia,
+        labalKorean: data.reportCheckSheet.labalKorean,
+        sds: data.reportCheckSheet.sds,
+      }
+      : [],
+
+   
   }
+
+  
 }
 
 const updateShippingCheckSheetData = async ()  => {
@@ -362,12 +411,34 @@ const updateShippingCheckSheetData = async ()  => {
       bottomValveSealTight: tableData.value.bottomValveSealTight[index], // Boolean
     }))
   }
+
+  if (getShippingCheckSheetResult.value?.reportCheckSheet) {
+    console.log('reportCheckSheet start update .....')
+
+    const selectedLanguages = selectedLanguage.value || [] // เอาข้อมูลจาก selectedLanguage.value
+    const reportCheckSheet = getShippingCheckSheetResult.value.reportCheckSheet
+    if(selectedLanguage.value){
+      getShippingCheckSheetResult.value.reportCheckSheet = {
+        soEtlLogDetailJournalID: getShippingCheckSheetResult.value.reportCheckSheet.soEtlLogDetailJournalID,
+        labalThai: selectedLanguages.includes('Thai'),
+        labalEnglish: selectedLanguages.includes('English'),
+        labalJapanese: selectedLanguages.includes('Japanese'),
+        labalChinese: selectedLanguages.includes('Chinese'),
+        labalMalaysia: selectedLanguages.includes('Malay'),
+        labalKorean: selectedLanguages.includes('Korean'),
+        sds: selectedLanguages.includes('SDS'), // ถ้า SDS เป็นภาษาให้ใช้ ถ้าไม่ใช่ให้เอาออก
+      }
+    }
+
+    console.log('reportCheckSheet start update .....', getShippingCheckSheetResult.value?.reportCheckSheet)
+  }
 }
 
 const habdleSaveDraft = async () => {
 
   // อัพเดตข้อมูลใน getShippingCheckSheetResult.value?.unfIbc ก่อน
   await updateShippingCheckSheetData()
+  
 
   console.log('getShippingCheckSheetResult.value update', getShippingCheckSheetResult.value)
 
@@ -542,6 +613,7 @@ import image04 from '@/views/skt/shipping/image/04.png'
 
 const selectedLanguage = ref([])
 
+
 const addItemsLang = item => {
   const index = selectedLanguage.value.indexOf(item)
   if (index === -1) {
@@ -663,10 +735,12 @@ const isDialogVisibleImgFileMuti = ref(false)
 const imgDialog = ref('')
 const imgNameDialog = ref('')
 
-const showDialogImageMuti = (img, name) => {
-  isDialogVisibleImgFileMuti.value =true
+const showDialogImageMuti = img => {
+  isDialogVisibleImgFileMuti.value = true
   imgDialog.value = img
-  imgNameDialog.value = name
+
+  // imgNameDialog.value = name
+  console.log("showDialogImageMuti!", img, isDialogVisibleImgFileMuti.value)
 }
 
 resaleProductShipping.value.forEach(truck => {
@@ -876,9 +950,18 @@ const dessertsMockAmountView = [
                     colspan="5"
                     class="section-title text-center"
                   >
-                    <div class="checkbox-container pa-0">
-                      <VCheckbox />Export
-                      <VCheckbox />Domestic
+                    <div
+                      v-if="reportModel"
+                      class="checkbox-container pa-0"
+                    >
+                      <VCheckbox
+                        v-model="reportModel.doEx"
+                        value="EX"
+                      />Export
+                      <VCheckbox
+                        v-model="reportModel.doEx"
+                        value="DO"
+                      />Domestic
                     </div>
                   </th>
                 </tr>
@@ -1514,14 +1597,20 @@ const dessertsMockAmountView = [
                 </td>
                 <td colspan="4">
                   <div class="d-flex justify-center">
-                    <div v-if="item.option1Text === 'Wood'" class="d-flex justify-center align-center">
+                    <div
+                      v-if="item.option1Text === 'Wood'"
+                      class="d-flex justify-center align-center"
+                    >
                       <VCheckbox
                         v-model="item.checkedValue"
                         :value="checkThePackagingCheckTrue"
                       />
                       Wood
                     </div>
-                    <div v-else class="d-flex justify-center align-center">
+                    <div
+                      v-else
+                      class="d-flex justify-center align-center"
+                    >
                       <VCheckbox
                         v-model="item.checkedValue"
                         :value="checkThePackagingCheckTrue"
@@ -1532,14 +1621,20 @@ const dessertsMockAmountView = [
                 </td>
                 <td colspan="4">
                   <div class="d-flex justify-center">
-                    <div v-if="item.option2Text === 'Plastic'" class="d-flex justify-center align-center">
+                    <div
+                      v-if="item.option2Text === 'Plastic'"
+                      class="d-flex justify-center align-center"
+                    >
                       <VCheckbox
                         v-model="item.checkedValue"
                         :value="false"
                       />
                       Plastic 
                     </div>
-                    <div v-else class="d-flex justify-center align-center">
+                    <div
+                      v-else
+                      class="d-flex justify-center align-center"
+                    >
                       <VCheckbox
                         v-model="item.checkedValue"
                         :value="false"
@@ -1705,7 +1800,7 @@ const dessertsMockAmountView = [
         </section>
       </section>
 
-      <div v-if="false">
+      <div v-if="true">
         <section
           v-for="(truck, index) in resaleProductShipping"
         
@@ -1753,117 +1848,6 @@ const dessertsMockAmountView = [
                 </template>
               </VFileInput>
             </VCol>
-          </VRow>
-          <!-- Muti File Show Imge -->
-          <VRow
-            v-if="truck.files.length"
-            class="my-4"
-          >
-            <VCol cols="3">
-              <table class="custom-table">
-                <thead>
-                  <tr>
-                    <th class="text-center">
-                      เลขตู้ /ทะเบียนรถ
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="text-center">
-                      {{ truck.truckNo }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </VCol>
-
-            <VCol
-              style="border: 2px dashed black; border-radius: 10px;"
-              cols="9"
-            >
-              <VRow>
-                <VCol
-                  v-for="(file, fileIndex) in truck.files"
-                  :key="fileIndex"
-                  cols="3"
-                  md="3"
-                  lg="3"
-                >
-                  <VCard class="pa-2">
-                    <VImg
-                      role="presentation"
-                      :alt="file.name"
-                      :src="file.imagePreview" 
-                      height="100"
-                      contain
-                      @click="showDialogImageMuti(file.imagePreview, file.name)"
-                    />
-                  
-
-                    <VCardText class="pa-2">
-                      <div class="d-flex flex-column align-center text-center">
-                        <span>{{ file.fileName }}</span>
-                        <VBtn
-                          class="mt-2"
-                          icon="mdi-close"
-                          color="error"
-                          size="small"
-                          variant="tonal"
-                          @click="removeFile(truck, fileIndex)"
-                        />
-                      </div>
-                    </VCardText>
-                  </VCard>
-                </VCol>
-              </VRow>
-              <VRow>
-                <Vcol
-                  style="width: 100%;"
-                  cols="12"
-                >
-                  <VBtn
-                    class="mx-2 mb-2"
-                    color="red"
-                    width="98%"
-                    @click="removeFilesInTruck(index)"
-                  >
-                    Delete Image
-                  </VBtn>
-                </Vcol>
-              </VRow>
-            </VCol>
-
-
-            <VDialog
-              v-model="isDialogVisibleImgFileMuti"
-              width="500"
-            >
-              <!-- Dialog Content -->
-              <VCard>
-                <VCardTitle class="bg-primary">
-                  <div class="d-flex justify-space-between">
-                    <span>{{ imgNameDialog }}</span>
-                    <VBtn
-                      icon="mdi-close"
-                      color="white"
-                      size="small"
-                      variant="tonal"
-                      @click="isDialogVisibleImgFileMuti = false"
-                    />
-                  </div>
-                </VCardTitle>
-
-                <VCardText>
-                  <VImg
-                    role="presentation"
-                    :src="imgDialog"
-                    height="100%"
-                    contain
-                  />
-                </VCardText>
-              </VCard>
-            </VDialog>
           </VRow>
         </section>
       </div>
@@ -2043,6 +2027,36 @@ const dessertsMockAmountView = [
         :success="successDialAlert"
       />
     </div>
+
+    //------------------ Dialog img
+    <VDialog
+      v-model="isDialogVisibleImgFileMuti"
+      width="500"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardTitle class="bg-primary">
+          <div class="d-flex justify-space-between">
+            <VBtn
+              icon="mdi-close"
+              color="white"
+              size="small"
+              variant="tonal"
+              @click="isDialogVisibleImgFileMuti = false"
+            />
+          </div>
+        </VCardTitle>
+
+        <VCardText>
+          <VImg
+            role="presentation"
+            :src="imgDialog"
+            height="100%"
+            contain
+          />
+        </VCardText>
+      </VCard>
+    </VDialog>
   </section>
 </template>
 

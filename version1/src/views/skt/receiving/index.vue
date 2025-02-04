@@ -465,7 +465,7 @@ const colorStatusWithId = id => {
   case 10:
     return { color: 'green-darken-3', message: 'cycan' }
   case 11:
-    return { color: 'lime-lighten-4', message: 'cycan' }
+    return { color: 'lime-lighten-4', message: 'black' }
   case 12:
     return { color: 'yellow-darken-3', message: 'brown' }
   case 13:
@@ -3419,10 +3419,12 @@ const insetSwitch1 = ref('')
                   <span
                     v-if="debugMode === false"
                     style="font-size: 12px;"
+                    :style="{ color: colorStatusWithId(item.raw.statusId).message }"
                     class="text-wrap"
                   >{{ item.raw.statusText }}</span>
                   <span
                     v-if="debugMode === true"
+                    :style="{ color: colorStatusWithId(item.raw.statusId).message }"
                     style="font-size: 12px;"
                     class="text-wrap"
                   >{{ debugMode }} {{ item.raw.statusText }}[{{ item.raw.poEtlLogDetailJournalID }}]({{ item.raw.receiveTypeName }})</span>

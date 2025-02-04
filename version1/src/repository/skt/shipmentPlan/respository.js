@@ -454,7 +454,7 @@ export const checkSheetShipmentPlanRepository = {
     }
   },
 
-  async getShippingCheckSheetFile(urlApi, form, whereHouse, accessToken,  userCode, itemCode, fileName) {
+  async getShippingCheckSheetFile(urlApi, form, whereHouse, accessToken,  userCode, itemCode, fileName, licensePlate) {
     try {
 
       let response
@@ -468,6 +468,14 @@ export const checkSheetShipmentPlanRepository = {
         })
       }else if(form === 'ShippingSpecialConditionIcon'){
         response = await axios.get(`${urlApi}/api/v1/ShippingCheckSheetFile/${form}/${fileName}`, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }else if(form === 'licensePlate'){
+        response = await axios.get(`${urlApi}/api/v1/ShippingCheckSheetFile/${form}/${fileName}/${licensePlate }`, {
           headers: {
             'accept': '*/*',
             'x-location': whereHouse,
@@ -522,56 +530,6 @@ export const checkSheetShipmentPlanRepository = {
 
   async saveShippingCheckSheet(urlApi, form, whereHouse, accessToken, body) {
     try {
-
-      const payload = {
-        checkSheetItems: [
-          {
-            soEtlLogDetailJournalID: 0,
-            supplierLotNo: 'string',
-            appearanceCheck: true,
-            remark: 'string',
-          },
-        ],
-        specialRequestChecks: [
-          {
-            soEtlLogDetailJournalID: 0,
-            checkedValue: true,
-          },
-        ],
-        itemChecks: [
-          {
-            soEtlLogDetailJournalID: 0,
-            checkedValue: true,
-          },
-        ],
-        packagingChecks: [
-          {
-            soEtlLogDetailJournalID: 0,
-            checkedValue: true,
-          },
-        ],
-        unfIbc: [
-          {
-            soEtlLogDetailJournalID: 0,
-            ibcIndex: 0,
-            ibcNo: 'string',
-            grossWeightBeforeShipping: 'string',
-            rustFree: true,
-            noDents: true,
-            baseStrong: true,
-            labelIntact: true,
-            correctLotNo: true,
-            accurateWeight: true,
-            centeredLabel: true,
-            capSeal: true,
-            noLeakAtCap: true,
-            properCapSize: true,
-            capCondition: true,
-            topSeal: true,
-            bottomSeal: true,
-          },
-        ],
-      }
 
       const response = await axios.post(`${urlApi}/api/v1/ShippingCheckSheet/${form}`, body, {
         headers: {
