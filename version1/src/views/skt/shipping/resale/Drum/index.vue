@@ -227,6 +227,8 @@ const checkboxKeys = [
 // ✅ ใช้ computed property เพื่อกรองเฉพาะข้อมูลที่ต้องการแสดงใน <tbody>
 const filteredTableData = computed(() => {
   const { No, ibcNo, grossWeightBeforeShipping, ...filteredData } = tableData.value
+
+  console.log('filteredData', filteredData)
   
   return filteredData
 })
@@ -241,21 +243,21 @@ onMounted(async () => {
 
     // ✅ ใช้ Boolean (`true` / `false`) แทน `Yes` / `No`
     tableData.value.rustFree.push(!!item.rustFree)
-    tableData.value.noDentOrDeform.push(!!item.noDentOrDeform)
-    tableData.value.strongBaseSupport.push(!!item.strongBaseSupport)
+    tableData.value.noDentOrDeform.push(!!item.noDents)
+    tableData.value.strongBaseSupport.push(!!item.baseStrong)
 
-    tableData.value.labelNotTorn.push(!!item.labelNotTorn)
+    tableData.value.labelNotTorn.push(!!item.labelIntact)
     tableData.value.correctLotNo.push(!!item.correctLotNo)
-    tableData.value.correctWeight.push(!!item.correctWeight)
-    tableData.value.correctLabelPosition.push(!!item.correctLabelPosition)
+    tableData.value.correctWeight.push(!!item.accurateWeight)
+    tableData.value.correctLabelPosition.push(!!item.centeredLabel)
 
-    tableData.value.noTopVentHole.push(!!item.noTopVentHole)
-    tableData.value.capNoLeakAfterOpening.push(!!item.capNoLeakAfterOpening)
-    tableData.value.correctCapSize.push(!!item.correctCapSize)
+    tableData.value.noTopVentHole.push(!!item.capSeal)
+    tableData.value.capNoLeakAfterOpening.push(!!item.noLeakAtCap)
+    tableData.value.correctCapSize.push(!!item.properCapSize)
 
-    tableData.value.goodCapCondition.push(!!item.goodCapCondition)
-    tableData.value.topSealTight.push(!!item.topSealTight)
-    tableData.value.bottomValveSealTight.push(!!item.bottomValveSealTight)
+    tableData.value.goodCapCondition.push(!!item.capCondition)
+    tableData.value.topSealTight.push(!!item.topSeal)
+    tableData.value.bottomValveSealTight.push(!!item.bottomSeal)
   })
 
   console.log(tableData.value)
