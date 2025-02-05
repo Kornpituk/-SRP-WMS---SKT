@@ -284,6 +284,63 @@ export const shipmentPlanRepository = {
     throw new Error(`Failed to printPDF Barcode for Lot ${soId}: ${error.response?.data?.message || error.message}`)
   },
 
+  //------------------------------ Export Excel ------------------------------
+  async printExportExcel(urlApi, form, type, whereHouse, accessToken, params = {}, statusID) {
+    try {
+      const response = await axios.get(
+        `${urlApi}/api/v1/${form}/ExportExcel/${type}/Detail`,
+        {
+          headers: {
+            'accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            StatusId: statusID || '',
+            ETA: params.ETA || '',
+            ETD: params.ETD || '',
+            SalesOrderNoSearch: params.SalesOrderNoSearch || '',
+            PayerNameSearch: params.PayerNameSearch || '',
+            ItemNameSearch: params.ItemNameSearch || '',
+            LotSearch: params.LotSearch || '',
+            SortColumn: params.SortColumn || '',
+            SortDirection: params.SortDirection || '',
+          },
+          responseType: 'blob', // รับ response เป็น Blob
+        },
+      )
+  
+      if (response && response.data) {
+        console.log('Service Response export Excel form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // สร้างลิงก์สำหรับดาวน์โหลดไฟล์
+        const link = document.createElement('a')
+
+        link.href = blobUrl
+        link.download = 'exported_file.xlsx' // ตั้งชื่อไฟล์ที่ต้องการให้ดาวน์โหลด
+        document.body.appendChild(link)
+        link.click()
+  
+        // ลบลิงก์ออกหลังการดาวน์โหลด
+        document.body.removeChild(link)
+        URL.revokeObjectURL(blobUrl) // ปิด URL Blob
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data generated for export Excel form')
+      }
+    } catch (error) {
+      console.error('Error in export excel:', error)
+      throw new Error(`Failed to export Excel file: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
 }
 
 //--------------------------------- File ----------------------------------------
@@ -592,13 +649,6 @@ export const checkSheetShipmentPlanRepository = {
 export const FileShippingCheckSheetFileService = {
   async fetchShippingCheckSheetFileForm(soEtlLogDetailJournalID, LicensePlate, folderName, fileName, form, type, urlApi, whereHouse, accessToken) {
     try {
-      // const response = await axios.get(`${urlApi}/api/v1/${form}/${type}/${soEtlLogDetailJournalID}`, {
-      //   headers: {
-      //     'accept': '*/*',
-      //     'x-location': whereHouse,
-      //     Authorization: `Bearer ${accessToken}`,
-      //   },
-      // })
 
       let response
       if(type === 'type'){
@@ -632,7 +682,7 @@ export const FileShippingCheckSheetFileService = {
     }
   },
 
-  async saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
+  async saveShippingCheckSheetFileForm(files, soEtlLogDetailJournalID, licensePlate, form, urlApi, whereHouse, accessToken) {
     const formData = new FormData()
 
     // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
@@ -651,7 +701,7 @@ export const FileShippingCheckSheetFileService = {
     console.log("Files Upload", files)
 
     try {
-      const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, formData, {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingCheckSheetFile/${form}/${licensePlate}/${soEtlLogDetailJournalID}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,

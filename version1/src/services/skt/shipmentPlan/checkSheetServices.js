@@ -1,4 +1,4 @@
-import { checkSheetShipmentPlanRepository, FileService,
+import { checkSheetShipmentPlanRepository, FileShippingCheckSheetFileService,
 } from '@/repository/skt/shipmentPlan/respository'
 
 //----------------------- Get ----------------------
@@ -200,7 +200,7 @@ export const useSubmitCheckSheetService = () => {
 
 
 //----------------------- File ----------------------
-export const useSaveFileFormService = () => {
+export const useShippingCheckSheetFileFormService = () => {
   const resultSaveFielForm = ref(null) // เก็บข้อมูล response ของการบันทึก
   const errorMessageSaveFileForm = ref(null) // เก็บข้อความแจ้งข้อผิดพลาด
 

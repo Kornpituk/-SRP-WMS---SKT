@@ -3685,7 +3685,7 @@ const statusText = statusId => {
             <VTextarea
               v-model="statusCommnetValue"
               counter
-              placeholder="Enter Commnet"
+              placeholder="Enter Comment"
             />
           </VCardText>
 

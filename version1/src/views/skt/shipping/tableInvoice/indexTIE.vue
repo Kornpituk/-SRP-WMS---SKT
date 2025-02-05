@@ -129,6 +129,7 @@ import { useGetUserPermissionService,
   usePrintShipmentPDFService,
   usePrintTruckOrderFormPDFService,
   useGetFileFormService,
+  usePrintExportExcelService,
 } from '@/services/skt/shipmentPlan/services'
 
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
@@ -1748,6 +1749,87 @@ const printShipmentPDFBySoEId = async type => {
   }
 }
 
+//--------------------------- Export Excel
+
+const { printExportExcelResult,
+  printExportExcelErrorMessage,
+  printExportExcelService } = usePrintExportExcelService()
+
+const testExport = () => {
+  console.log('printShipmentPDFBySoEIdPlan')
+}
+
+const printShipmentPDFBySoEIdPlan = async () => {
+  console.log('printShipmentPDFBySoEIdPlan')
+  loadingPrint.value = true
+  console.log('loadingPrint', loadingPrint.value)
+
+  console.log('printShipmentPDFBySoEIdPlan')
+
+  const etaDateForApi = ref(etaDateModel.value)
+  const etdDateForApi = ref(etdDateModel.value)
+
+  filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
+  filterForSearchPlan.value.ETD = formatDateSave(etdDateForApi.value)
+
+  filterForSearchPlan.value.SortColumn = sortColumn.value
+  filterForSearchPlan.value.SortDirection = sortDirection.value
+
+  console.log('printShipmentPDFBySoEIdPlan')
+
+  saveHistoryFilter()
+
+  console.log('printShipmentPDFBySoEIdPlan')
+
+  const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
+
+  console.log('printShipmentPDFBySoEIdPlan')
+
+  const typeDepartment = () => {
+    
+    if(department.value === 'Warehouse'){
+      return 'ShipmentPlanSALE'
+    }else if(department.value === 'Logistic'){
+      return 'ShipmentPlanLOG'
+    }else if(department.value === 'Sale and marketing'){
+      return 'ShipmentPlanSALE'
+    }
+  }
+
+  console.log('printShipmentPDFBySoEIdPlan')
+  
+
+  try {
+    // ✅ เรียก printShipmentPDF
+    const result = await printExportExcelService(
+      urlApi.value,
+      'ShipmentPlan',
+      typeDepartment(),
+      whereHouse,
+      accessTokenAtStore,
+      filterForSearchPlan.value,
+      statusID,
+      
+    )
+    
+    if (result) {
+      console.log('result print', result)
+
+      // textAlertDialogFunction(alertWordConst.print, true)
+
+      // setTimeout(() => {
+      //   // location.reload()
+      // }, 500)
+    } else {
+      textAlertDialogFunction(alertWordConst.print, false)
+    }
+  } catch (error) {
+    console.error(`Error printing shipment PDF:`, error)
+  } finally {
+    loadingPrint.value = false
+  }
+}
+
 const { printTruckOrderFormPDFResult, errorPrintTruckOrderFormPDF, printTruckOrderFormPDF } = usePrintTruckOrderFormPDFService()
 
 const paramsTruckOrder = ref({
@@ -2203,7 +2285,7 @@ const handlePrintTruckOrderPDF = () => {
                         class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                         color="warning"
                         style="width: 100%; height: 40px;"
-                        @click="stockUpdateExcel"
+                        @click="printShipmentPDFBySoEIdPlan"
                       >
                         <img
                           src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
@@ -3392,6 +3474,7 @@ const handlePrintTruckOrderPDF = () => {
                     <VTooltip
                       activator="parent"
                       location="right"
+                      open-on-click
                     >
                       <p>{{ (product.csLfStatusText) }}</p>
                       <p>{{ (product.inspStatusText) }}</p>
@@ -3624,6 +3707,14 @@ const handlePrintTruckOrderPDF = () => {
                     <span style="font-size: 12px;">End User</span>
                   </template>
                 </VTextField>
+                <VTooltip
+                  v-if="product.shippingEndUser"
+                  activator="parent"
+                  location="end"
+                  open-on-click
+                >
+                  {{ product.shippingEndUser }}
+                </VTooltip>
               </td>
 
               <!-- 👉 consignee -->
@@ -3786,8 +3877,10 @@ const handlePrintTruckOrderPDF = () => {
                   </template>
                 </VSelect>
                 <VTooltip
+                  v-if="product.freightForwarder"
                   activator="parent"
                   location="end"
+                  open-on-click
                 >
                   {{ product.freightForwarder }}
                 </VTooltip>
@@ -3830,8 +3923,10 @@ const handlePrintTruckOrderPDF = () => {
                   </template>
                 </VSelect>
                 <VTooltip
+                  v-if="product.carrier"
                   activator="parent"
                   location="end"
+                  open-on-click
                 >
                   {{ product.carrier }}
                 </VTooltip>
@@ -3874,8 +3969,10 @@ const handlePrintTruckOrderPDF = () => {
                   </template>
                 </VSelect>
                 <VTooltip
+                  v-if="product.vesselName"
                   activator="parent"
                   location="end"
+                  open-on-click
                 >
                   {{ product.vesselName }}
                 </VTooltip>
@@ -3904,6 +4001,14 @@ const handlePrintTruckOrderPDF = () => {
                   density="compact"
                   style=" min-width: 150px;"
                 />
+                <VTooltip
+                  v-if="product.voy"
+                  activator="parent"
+                  location="end"
+                  open-on-click
+                >
+                  {{ product.vesselName }}
+                </VTooltip>
               </td>
 
               <!-- 👉 COL_TRUCK -->
@@ -3949,8 +4054,10 @@ const handlePrintTruckOrderPDF = () => {
                   </VCol>
                 </VRow>
                 <VTooltip
+                  v-if="product.truck"
                   activator="parent"
                   location="end"
+                  open-on-click
                 >
                   {{ product.truck }}
                 </VTooltip>
@@ -3981,8 +4088,10 @@ const handlePrintTruckOrderPDF = () => {
                   style=" min-width: 150px;"
                 />
                 <VTooltip
+                  v-if="product.truckReservingNumber"
                   activator="parent"
                   location="end"
+                  open-on-click
                 >
                   {{ product.truckReservingNumber }}
                 </VTooltip>
@@ -4012,8 +4121,10 @@ const handlePrintTruckOrderPDF = () => {
                   style=" min-width: 150px;"
                 />
                 <VTooltip
+                  v-if="product.truckFee"
                   activator="parent"
                   location="end"
+                  open-on-click
                 >
                   {{ product.truckFee }}
                 </VTooltip>
@@ -4796,9 +4907,10 @@ const handlePrintTruckOrderPDF = () => {
               style="min-width: 170px; max-width: 170px;"
             >
               <VBtn
+                disabled
                 color="warning"
                 style="min-width: 150px; max-width: 150px; height: 160px;"
-                @click="printShipmentPDFBySoEId('ShippingCheckSheet'), loadingPrint = true"
+                @click="printShipmentPDFBySoEIdPlan(), loadingPrint = true"
               >
                 <VRow>
                   <VCol cols="12">

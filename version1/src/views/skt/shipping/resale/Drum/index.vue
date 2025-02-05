@@ -268,59 +268,10 @@ const { saveShippingCheckSheetResult,
   errorSaveShippingCheckSheet,
   saveShippingCheckSheet } = useShippingCheckSheetService()
 
-const payLoad = ref([{
-  "checkSheetItems": [
-    {
-      "soEtlLogDetailJournalID": 0,
-      "supplierLotNo": "string",
-      "appearanceCheck": true,
-      "remark": "string",
-    },
-  ],
-  "specialRequestChecks": [
-    {
-      "soEtlLogDetailJournalID": 0,
-      "checkedValue": true,
-    },
-  ],
-  "itemChecks": [
-    {
-      "soEtlLogDetailJournalID": 0,
-      "checkedValue": true,
-    },
-  ],
-  "packagingChecks": [
-    {
-      "soEtlLogDetailJournalID": 0,
-      "checkedValue": true,
-    },
-  ],
-  "unfIbc": [
-    {
-      "soEtlLogDetailJournalID": 0,
-      "ibcIndex": 0,
-      "ibcNo": "string",
-      "grossWeightBeforeShipping": "string",
-      "rustFree": true,
-      "noDents": true,
-      "baseStrong": true,
-      "labelIntact": true,
-      "correctLotNo": true,
-      "accurateWeight": true,
-      "centeredLabel": true,
-      "capSeal": true,
-      "noLeakAtCap": true,
-      "properCapSize": true,
-      "capCondition": true,
-      "topSeal": true,
-      "bottomSeal": true,
-    },
-  ],
-}])
-
 const appearanceCheckTrue = ref(true)
 const checkThePackagingCheckTrue = ref(true)
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const mapShippingCheckSheetData = data => {
   console.log('mapShippingCheckSheetData', data.reportCheckSheet)
   
@@ -352,7 +303,7 @@ const mapShippingCheckSheetData = data => {
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
       ibcIndex: item.ibcIndex,
       ibcNo: item.ibcNo || "", // ถ้า ibcNo เป็น null ให้ใช้ค่าว่าง
-      grossWeightBeforeShipping: "", // ค่าเริ่มต้น เนื่องจากไม่มีข้อมูลจาก getShippingCheckSheetResult
+      grossWeightBeforeShipping: item.grossWeightBeforeShipping || "", // ค่าเริ่มต้น เนื่องจากไม่มีข้อมูลจาก getShippingCheckSheetResult
       rustFree: item.rustFree || false,
       noDents: item.noDents || false,
       baseStrong: item.baseStrong || false,
@@ -397,18 +348,18 @@ const updateShippingCheckSheetData = async ()  => {
       ibcNo: tableData.value.ibcNo[index] === 'N/A' ? null : tableData.value.ibcNo[index], // เปลี่ยน 'N/A' กลับเป็น null ถ้าต้องการ
       grossWeightBeforeShipping: tableData.value.grossWeightBeforeShipping[index] === 'N/A' ? null : tableData.value.grossWeightBeforeShipping[index],
       rustFree: tableData.value.rustFree[index], // Boolean
-      noDentOrDeform: tableData.value.noDentOrDeform[index], // Boolean
-      strongBaseSupport: tableData.value.strongBaseSupport[index], // Boolean
-      labelNotTorn: tableData.value.labelNotTorn[index], // Boolean
+      noDents: tableData.value.noDentOrDeform[index], // Boolean
+      baseStrong: tableData.value.strongBaseSupport[index], // Boolean
+      labelIntact: tableData.value.labelNotTorn[index], // Boolean
       correctLotNo: tableData.value.correctLotNo[index], // Boolean
-      correctWeight: tableData.value.correctWeight[index], // Boolean
-      correctLabelPosition: tableData.value.correctLabelPosition[index], // Boolean
-      noTopVentHole: tableData.value.noTopVentHole[index], // Boolean
-      capNoLeakAfterOpening: tableData.value.capNoLeakAfterOpening[index], // Boolean
-      correctCapSize: tableData.value.correctCapSize[index], // Boolean
-      goodCapCondition: tableData.value.goodCapCondition[index], // Boolean
-      topSealTight: tableData.value.topSealTight[index], // Boolean
-      bottomValveSealTight: tableData.value.bottomValveSealTight[index], // Boolean
+      accurateWeight: tableData.value.correctWeight[index], // Boolean
+      centeredLabel: tableData.value.correctLabelPosition[index], // Boolean
+      capSeal: tableData.value.noTopVentHole[index], // Boolean
+      noLeakAtCap: tableData.value.capNoLeakAfterOpening[index], // Boolean
+      properCapSize: tableData.value.correctCapSize[index], // Boolean
+      capCondition: tableData.value.goodCapCondition[index], // Boolean
+      topSeal: tableData.value.topSealTight[index], // Boolean
+      bottomSeal: tableData.value.bottomValveSealTight[index], // Boolean
     }))
   }
 
@@ -460,7 +411,7 @@ const habdleSaveDraft = async () => {
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       console.log("requestData 4")
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 0.5 วินาที
     }else{
       console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
@@ -1800,7 +1751,7 @@ const dessertsMockAmountView = [
         </section>
       </section>
 
-      <div v-if="true">
+      <div v-if="false">
         <section
           v-for="(truck, index) in getShippingCheckSheetResult?.checkSheetItems"
         
