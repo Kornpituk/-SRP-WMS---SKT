@@ -479,20 +479,20 @@ const { submitCheckSheetResult,
   submitCheckSheetError,
   submitCheckSheetFunction } = useSubmitCheckSheetService()
 
-const handleSubmit = () => {
+const handleSubmit = type => {
   try {
     console.log("requestData 1")
 
-    const result = submitCheckSheetFunction(urlApi.value, 'submit', whereHouse, 
+    const result = submitCheckSheetFunction(urlApi.value, type, whereHouse, 
       accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
 
     console.log("requestData 2")
-    if(submitCheckSheetResult.value){
+    if(result){
       submitCheckSheetResult.value = result
       submitCheckSheetError.value = null
       console.log('submitCheckSheetResult', result)
       textAlertDialogFunction(alertWordConst.submit, true)
-      console.log("requestData 4")
+      console.log("requestData 3")
       setTimeout(() => {
         location.reload()
       }, 500) // 0.5 วินาที
@@ -1802,12 +1802,12 @@ const dessertsMockAmountView = [
 
       <div v-if="true">
         <section
-          v-for="(truck, index) in resaleProductShipping"
+          v-for="(truck, index) in getShippingCheckSheetResult?.checkSheetItems"
         
           :key="index"
         >
           <!-- Muti File Inpur Imge -->
-          <VRow v-if="!truck.files.length">
+          <VRow>
             <VCol cols="4">
               <table class="custom-table">
                 <thead>
@@ -1820,7 +1820,7 @@ const dessertsMockAmountView = [
                 <tbody>
                   <tr>
                     <td class="text-center">
-                      {{ truck.truckNo }}
+                      {{ truck.containerNo_LicPlNo }}
                     </td>
                   </tr>
                 </tbody>
@@ -1939,8 +1939,36 @@ const dessertsMockAmountView = [
           </tbody>
         </table>
 
+        <div v-if="false" class="d-flex justify-end mt-4">
+          <VBtn
+            v-if="statusModel === 1002 || statusModel === 1003"
+            class="mx-2"
+            color="warning"
+            @click="habdleSaveDraft"
+          >
+            SAVE DRAFT
+          </VBtn>
+          <VBtn
+            v-if="statusModel === 1002 || statusModel === 1003"
+            class="mx-2"
+            color="green"
+            @click="handleSubmit('submit')"
+          >
+            WH1
+          </VBtn>
+          <VBtn
+            v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 1004"
+            class="mx-2"
+            color="green"
+            @click="handleSubmit('leaderapprove')"
+          >
+            WH2
+          </VBtn>
+        </div>
+
         <div class="d-flex justify-end mt-4">
           <VBtn
+           
             class="mx-2"
             color="warning"
             @click="habdleSaveDraft"
@@ -1950,16 +1978,16 @@ const dessertsMockAmountView = [
           <VBtn
             class="mx-2"
             color="green"
-            @click="handleSubmit"
+            @click="handleSubmit('submit')"
           >
-            WH2
+            WH1
           </VBtn>
           <VBtn
             class="mx-2"
             color="green"
-            @click="handleSubmit"
+            @click="handleSubmit('leaderapprove')"
           >
-            WH1
+            WH2
           </VBtn>
         </div>
       </div>
@@ -2028,7 +2056,7 @@ const dessertsMockAmountView = [
       />
     </div>
 
-    //------------------ Dialog img
+    <!-- Dialog img -->
     <VDialog
       v-model="isDialogVisibleImgFileMuti"
       width="500"
