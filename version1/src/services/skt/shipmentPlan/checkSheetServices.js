@@ -68,7 +68,6 @@ export const useGetShippingCheckSheetFileIconService = () => {
   }
 }
 
-
 export const useGetShippingChecksheetImageService = () => {
   const getShippingChecksheetImageResult = ref(null)
   const errorGetShippingChecksheetImage = ref(null)
@@ -196,5 +195,119 @@ export const useSubmitCheckSheetService = () => {
     submitCheckSheetResult,
     submitCheckSheetError,
     submitCheckSheetFunction,
+  }
+}
+
+
+//----------------------- File ----------------------
+export const useSaveFileFormService = () => {
+  const resultSaveFielForm = ref(null) // เก็บข้อมูล response ของการบันทึก
+  const errorMessageSaveFileForm = ref(null) // เก็บข้อความแจ้งข้อผิดพลาด
+
+  const functionSaveFileForm = async (files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) => {
+    try {
+      // ตรวจสอบว่ามีไฟล์และข้อมูลก่อนที่จะดำเนินการบันทึก
+      if (!files || files.length === 0) {
+        console.log('No files selected', files)
+        throw new Error('No files selected', files)
+      }
+
+      if (!soEtlLogDetailJournalID || !urlApi || !accessToken) {
+        throw new Error('Missing required parameters')
+      }
+
+      errorMessageSaveFileForm.value = null
+
+      // console.log('Saving Draft Form COA...')
+
+      // เรียกใช้ Service เพื่อบันทึกข้อมูล
+      const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
+
+      if (result) {
+        // console.log('Save data COA Controller:', result)
+        resultSaveFielForm.value = { data: result, success: true } // เก็บข้อมูล response
+        
+        return result
+      } else {
+        throw new Error('Failed to save data')
+      }
+    } catch (error) {
+      // console.error('Error in functionSaveFileForm:', error)
+
+      // เก็บข้อมูลข้อผิดพลาด
+      errorMessageSaveFileForm.value = { message: error.message, success: false }
+    }
+  }
+
+  return {
+    resultSaveFielForm,
+    errorMessageSaveFileForm,
+    functionSaveFileForm, // เปลี่ยนชื่อเป็น handleSaveDraftCoaForm เพื่อให้ชัดเจน
+  }
+}
+
+export const useGetFileFormService = () => {
+  const getFileFormResult = ref(null)
+  const errorMessageGetFileForm = ref(null)
+
+  const getFileFormFunction = async (soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageGetFileForm.value = null
+
+      // console.log('Fetching File Form ...')
+
+      const result = await FileService.fetchFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        // console.log('Received File Form:', result)
+        getFileFormResult.value = result
+        
+        return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา
+      } else {
+        // console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      // console.error('Error in getFileFormResult:', error)
+      errorMessageGetFileForm.value = error.message
+    }
+  }
+
+  return {
+    getFileFormResult,
+    errorMessageGetFileForm,
+    getFileFormFunction,
+  }
+}
+
+export const useDeleteFileFormService = () => {
+  const deleteFileFormResult = ref(null)
+  const errorMessageDeleteFileForm = ref(null)
+
+  const deleteFileFormFunction = async (soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) => {
+    try {
+      errorMessageDeleteFileForm.value = null
+
+      // console.log('Fetching File Form ...')
+
+      const result = await FileService.deleteFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
+      
+      if (result) {
+        // console.log('Received File Form:', result)
+        deleteFileFormResult.value = result
+        
+        return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา
+      } else {
+        // console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      // console.error('Error in deleteFileFormResult:', error)
+      errorMessageDeleteFileForm.value = error.message
+    }
+  }
+
+  return {
+    deleteFileFormResult,
+    errorMessageDeleteFileForm,
+    deleteFileFormFunction,
   }
 }

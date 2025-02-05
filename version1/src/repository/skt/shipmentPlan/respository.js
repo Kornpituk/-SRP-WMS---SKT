@@ -587,3 +587,131 @@ export const checkSheetShipmentPlanRepository = {
   
 
 }
+
+//---------------------------------- CheckSheet File -------------------
+export const FileShippingCheckSheetFileService = {
+  async fetchShippingCheckSheetFileForm(soEtlLogDetailJournalID, LicensePlate, folderName, fileName, form, type, urlApi, whereHouse, accessToken) {
+    try {
+      // const response = await axios.get(`${urlApi}/api/v1/${form}/${type}/${soEtlLogDetailJournalID}`, {
+      //   headers: {
+      //     'accept': '*/*',
+      //     'x-location': whereHouse,
+      //     Authorization: `Bearer ${accessToken}`,
+      //   },
+      // })
+
+      let response
+      if(type === 'type'){
+        response = await axios.get(`${urlApi}/api/v1/${form}/${type}/${soEtlLogDetailJournalID}/${LicensePlate}`, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }else{
+        response = await axios.get(`${urlApi}/api/v1/${form}/${LicensePlate}/${fileName}/${soEtlLogDetailJournalID}/${folderName}`, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }
+        
+      if (response && response.data) {
+        // console.log(`Service Response data File:`, response.data)
+          
+        return { success: true, data: response.data }
+      } else {
+        // throw { success: false, error }
+      }
+    } catch (error) {
+      // console.error('Error in fetchFileForm:', error)
+      // throw new Error(`Failed to fetch header for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
+    const formData = new FormData()
+
+    // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
+    // ตรวจสอบว่า files.files มีค่าหรือไม่
+    if (files?.files) {
+      console.log('Have File Selected', files.files)
+
+      // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
+      files.files.forEach(file => {
+        formData.append('files', file.file) // ใช้ file.file เพราะไฟล์ถูกเก็บใน key `file`
+      })
+    } else {
+      console.log('No File Selected', files)
+    }
+
+    console.log("Files Upload", files)
+
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-location': whereHouse,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+
+      return { success: true, data: response.data.data }
+    } catch (error) {
+      // throw { success: false, error }
+    }
+  },
+
+  async deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
+
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/${form}/DeleteCoa/${poEtlLogDetailJournalID}`, body, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data detelete coa:', response.data.messageResult)
+        
+        return { success: true, data: response.data.messageResult }
+      } else {
+        throw new Error('No data delete coa from the server')
+      }
+    } catch (error) {
+      console.error('Error in deleteCoaForm:', error)
+      error = new Error(`Deleted to coa by id for ID ${poEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
+    }
+  },
+
+  async deleteFileForm(soEtlLogDetailJournalID,  form, urlApi, whereHouse, accessToken) {
+
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, {}, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      
+      if (response && response.data) {
+        console.log('Service Response data all detelete coa:', response.data.messageResult)
+        
+        return { success: true, data: response.data.messageResult }
+      } else {
+        throw new Error('No data delete all coa from the server')
+      }
+    } catch (error) {
+      console.error('Error in deleteAllCoaForm:', error)
+      error = new Error(`Deleted to coa all for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      throw { success: false, error }
+    }
+  },
+}
