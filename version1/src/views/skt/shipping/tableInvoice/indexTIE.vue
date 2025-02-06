@@ -530,7 +530,7 @@ const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
 const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
 
 const filterForSearchPlan = ref({
-  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || 'ddddd',
+  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
   ETA: etaDateModel.value || '',
   ETD: etdDateModel.value || '',
   SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
@@ -567,6 +567,29 @@ function getStatusIdByName(statusName) {
   
   return matchedItem ? matchedItem.id : '' // คืนค่า id หรือ null หากไม่พบ
 }
+
+const checkValueFilter = (filterForSearchPlan, statusID) => {
+  return !!(filterForSearchPlan || statusID)
+}
+
+const disabledBtnExport = ref(false)
+
+watchEffect( () => {
+  const etaDateForApi = ref(etaDateModel.value)
+  const etdDateForApi = ref(etdDateModel.value)
+
+  filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
+  filterForSearchPlan.value.ETD = formatDateSave(etdDateForApi.value)
+
+  filterForSearchPlan.value.SortColumn = sortColumn.value
+  filterForSearchPlan.value.SortDirection = sortDirection.value
+
+  const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
+
+  disabledBtnExport.value = Object.values(filterForSearchPlan.value).some(value => value !== null && value !== "")
+
+  console.log('checkValueFilter', filterForSearchPlan.valu)
+})
 
 const searchShipmentPlan = async () => {
   isLoading.value = true
@@ -1782,7 +1805,7 @@ const printShipmentPDFBySoEIdPlan = async () => {
   const typeDepartment = () => {
     
     if(department.value === 'Warehouse'){
-      return 'ShipmentPlanSALE'
+      return 'ShipmentPlanWH'
     }else if(department.value === 'Logistic'){
       return 'ShipmentPlanLOG'
     }else if(department.value === 'Sale and marketing'){
@@ -2116,6 +2139,7 @@ const handlePrintTruckOrderPDF = () => {
                     :items="itemsStatus"
                     item-title="name"
                     item-value="name"
+                    clearable
                     density="compact"
                   >
                     <template #label>
@@ -2272,6 +2296,7 @@ const handlePrintTruckOrderPDF = () => {
                       md="4"
                     >
                       <VBtn
+                        :disabled="!disabledBtnExport"
                         density="compact"
                         class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
                         color="warning"
