@@ -239,7 +239,8 @@ export const useShippingCheckSheetFileFormService = () => {
   const resultSaveFielForm = ref(null) // เก็บข้อมูล response ของการบันทึก
   const errorMessageSaveFileForm = ref(null) // เก็บข้อความแจ้งข้อผิดพลาด
 
-  const functionSaveFileForm = async (files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) => {
+  const functionSaveFileForm = async (files, soEtlLogDetailJournalID, licensePlate, form, 
+    urlApi, whereHouse, accessToken) => {
     try {
       // ตรวจสอบว่ามีไฟล์และข้อมูลก่อนที่จะดำเนินการบันทึก
       if (!files || files.length === 0) {
@@ -256,7 +257,7 @@ export const useShippingCheckSheetFileFormService = () => {
       // console.log('Saving Draft Form COA...')
 
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
-      const result = await FileShippingCheckSheetFileService.saveShippingCheckSheetFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
+      const result = await FileShippingCheckSheetFileService.saveShippingCheckSheetFileForm(files, soEtlLogDetailJournalID, licensePlate, form, urlApi, whereHouse, accessToken)
 
       if (result) {
         // console.log('Save data COA Controller:', result)
@@ -264,7 +265,7 @@ export const useShippingCheckSheetFileFormService = () => {
         
         return result
       } else {
-        throw new Error('Failed to save data')
+        throw new Error('Failed to save data', accessToken)
       }
     } catch (error) {
       // console.error('Error in functionSaveFileForm:', error)

@@ -326,15 +326,16 @@ const { resultSaveFielForm,
   errorMessageSaveFileForm,
   functionSaveFileForm } = useShippingCheckSheetFileFormService()
 
-const handleSaveFile = async (files, soEtlLogDetailJournalID) => {
+const handleSaveFile = async (files, soEtlLogDetailJournalID, licensePlate ) => {
   try{
-    const result = await functionSaveFileForm(files, soEtlLogDetailJournalID, 'SaveLicensePlate', urlApi.value,  whereHouse, 
+    const result = await functionSaveFileForm(files, soEtlLogDetailJournalID, licensePlate,
+      'SaveLicensePlate', urlApi.value,  whereHouse, 
       accessTokenAtStore)
 
     if(result){
       console.log(`save file ${soEtlLogDetailJournalID} successed`, resultSaveFielForm.value)
     }else{
-      console.log(`save file ${soEtlLogDetailJournalID} fialed`, errorMessageSaveFileForm.value)
+      console.log(`save file ${soEtlLogDetailJournalID} fialed`, errorMessageSaveFileForm.value, accessTokenAtStore)
     }
   }catch(error){
     console.log(`save file catch ${soEtlLogDetailJournalID} fialed`, error)
@@ -470,7 +471,8 @@ const habdleSaveDraft = async () => {
   // รอให้การบันทึกไฟล์ทั้งหมดเสร็จก่อน
   const fileSavePromises = getShippingCheckSheetResult.value.checkSheetItems
     .filter(item => item.fileeLicensePlateMew && item.fileeLicensePlateMew.length > 0)
-    .map(item => handleSaveFile(item.fileeLicensePlateMew, item.soEtlLogDetailJournalID))
+    .map(item => handleSaveFile(item.fileeLicensePlateMew, 
+      item.soEtlLogDetailJournalID, item.containerNo_LicPlNo))
 
   await Promise.all(fileSavePromises) // รอให้ทุก Promise เสร็จสิ้น
   
@@ -1326,7 +1328,7 @@ const dessertsMockAmountView = [
                   {{ item.displayText }}
                 </td>
               </tr>
-              <tr v-if="true">
+              <tr v-if="getShippingSpecialConditionIconResult">
                 <td
                   colspan="12"
                   style="height: 159px;"
@@ -2181,7 +2183,7 @@ const dessertsMockAmountView = [
         </div>
 
         <div
-          v-if="false"
+          v-if="true"
           class="d-flex justify-end mt-4"
         >
           <VBtn

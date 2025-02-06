@@ -717,10 +717,14 @@ export const FileShippingCheckSheetFileService = {
       console.log('No File Selected', files)
     }
 
-    console.log("Files Upload", files)
+    console.log("Files Upload", files, soEtlLogDetailJournalID, licensePlate, form, urlApi, whereHouse, accessToken)
+
+    let url = `${urlApi}/api/v1/ShippingCheckSheetFile/${form}/
+    ${soEtlLogDetailJournalID}/${licensePlate}`
+    let url2 = `https://sktdevwebapi.easetrackwms.com/api/v1/ShippingCheckSheetFile/SaveLicensePlate/276/%E0%B8%81%E0%B8%A21556`
 
     try {
-      const response = await axios.post(`${urlApi}/api/v1/ShippingCheckSheetFile/${form}/${licensePlate}/${soEtlLogDetailJournalID}`, formData, {
+      const response = await axios.post(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'x-location': whereHouse,
