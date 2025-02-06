@@ -647,20 +647,12 @@ export const checkSheetShipmentPlanRepository = {
 
 //---------------------------------- CheckSheet File -------------------
 export const FileShippingCheckSheetFileService = {
-  async fetchShippingCheckSheetFileForm(soEtlLogDetailJournalID, LicensePlate, folderName, fileName, form, type, urlApi, whereHouse, accessToken) {
+  async fetchShippingCheckSheetFileForm(soEtlLogDetailJournalID, LicensePlate, form, type, urlApi, whereHouse, accessToken) {
     try {
 
       let response
-      if(type === 'type'){
+      if(type === 'GetLicensePlate'){
         response = await axios.get(`${urlApi}/api/v1/${form}/${type}/${soEtlLogDetailJournalID}/${LicensePlate}`, {
-          headers: {
-            'accept': '*/*',
-            'x-location': whereHouse,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        })
-      }else{
-        response = await axios.get(`${urlApi}/api/v1/${form}/${LicensePlate}/${fileName}/${soEtlLogDetailJournalID}/${folderName}`, {
           headers: {
             'accept': '*/*',
             'x-location': whereHouse,
@@ -687,12 +679,12 @@ export const FileShippingCheckSheetFileService = {
 
     // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
     // ตรวจสอบว่า files.files มีค่าหรือไม่
-    if (files?.files) {
-      console.log('Have File Selected', files.files)
+    if (files) {
+      console.log('Have File Selected', files)
 
       // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
-      files.files.forEach(file => {
-        formData.append('files', file.file) // ใช้ file.file เพราะไฟล์ถูกเก็บใน key `file`
+      files.forEach(file => {
+        formData.append('files', file) // ใช้ file.file เพราะไฟล์ถูกเก็บใน key `file`
       })
     } else {
       console.log('No File Selected', files)
@@ -711,7 +703,7 @@ export const FileShippingCheckSheetFileService = {
 
       return { success: true, data: response.data.data }
     } catch (error) {
-      // throw { success: false, error }
+      throw { success: false, error }
     }
   },
 

@@ -67,6 +67,7 @@ function getCurrentDate() {
 import { useGenerateFormService, useGetShippingCheckSheetService,
   useGetShippingChecksheetImageService, useShippingCheckSheetService,
   useSubmitCheckSheetService, useGetShippingCheckSheetFileIconService,
+  useGetFileFormService, useShippingCheckSheetFileFormService,
 } from '@/services/skt/shipmentPlan/checkSheetServices'
 
 //------------------------------------ generate section ----------------------
@@ -115,6 +116,8 @@ const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCh
 
 const specialRequests = ref()
 
+
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const getShippingCheckSheet = async () => {
   try {
@@ -126,7 +129,19 @@ const getShippingCheckSheet = async () => {
 
       if(getShippingCheckSheetResult.value){
         reportModel.value = getShippingCheckSheetResult.value.reportCheckSheet 
+
+
+        // ✅ ใช้ Promise.all เพื่อรอให้ fetchFileLicensePlate ทำงานเสร็จก่อน
+        getShippingCheckSheetResult.value.checkSheetItems = await Promise.all(
+          getShippingCheckSheetResult.value.checkSheetItems.map(async item => ({
+            ...item,
+            fileeLicensePlate: await fetchFileLicensePlate(item.soEtlLogDetailJournalID, item.containerNo_LicPlNo),
+            fileeLicensePlateMew: [],
+          })),
+        )
       }
+
+      
 
       if (reportModel.value) {
         const { 
@@ -145,9 +160,9 @@ const getShippingCheckSheet = async () => {
         if (labalEnglish) languages.push('English')
         if (labalJapanese) languages.push('Japanese')
         if (labalKorean) languages.push('Korean')
-        if (labalMalaysia) languages.push('Korean')
+        if (labalMalaysia) languages.push('Malaysia')
         if (labalThai) languages.push('Thai')
-        if (sds) languages.push('Thai')
+        if (sds) languages.push('SDS')
 
         selectedLanguage.value = languages
 
@@ -164,6 +179,14 @@ const getShippingCheckSheet = async () => {
   } catch (error) {
     errorGetShippingCheckSheet.value = error.message
   }
+}
+
+const showImagNew = file => {
+  return URL.createObjectURL(file)
+}
+
+const showData = () => {
+  console.log('Data Current', getShippingCheckSheetResult.value)
 }
 
 const tableData = ref({
@@ -263,6 +286,58 @@ onMounted(async () => {
   console.log(tableData.value)
 })
 
+//------------------------------------- File Section ---------------------------------------------------
+//------------------------------- Get
+const { getFileFormResult,
+  errorMessageGetFileForm,
+  getFileFormFunction } = useGetFileFormService()
+
+const fetchFileLicensePlate = async (soEtlLogDetailJournalID, LicensePlate) => {
+  try{
+    const result = await getFileFormFunction(soEtlLogDetailJournalID, 
+      LicensePlate, 'ShippingCheckSheetFile', 'GetLicensePlate', 
+      urlApi.value, whereHouse, 
+      accessTokenAtStore)
+
+    if(result){
+      console.log('result file', result.data.data)
+      
+      return result.data.data
+    }
+  }catch(error){
+    console.log('result error', error)
+  }
+}
+
+const convertFileUri = fileUri => {
+  const parts = fileUri.split("/")
+  
+  // แปลงค่าที่เป็นทะเบียนรถ (index ที่ 7 ของ URL) ให้เป็น URL Encoding
+  parts[7] = encodeURIComponent(parts[7])
+
+  // เปลี่ยน "ShippingFile" เป็น "ShippingCheckSheetFile"
+  return parts.join("/").replace("ShippingFile", "ShippingCheckSheetFile")
+}
+
+//-------------------------------- Save File
+const { resultSaveFielForm,
+  errorMessageSaveFileForm,
+  functionSaveFileForm } = useShippingCheckSheetFileFormService()
+
+const handleSaveFile = async (files, soEtlLogDetailJournalID) => {
+  try{
+    const result = await functionSaveFileForm(files, soEtlLogDetailJournalID, 'SaveLicensePlate', urlApi.value,  whereHouse, 
+      accessTokenAtStore)
+
+    if(result){
+      console.log(`save file ${soEtlLogDetailJournalID} successed`, resultSaveFielForm.value)
+    }else{
+      console.log(`save file ${soEtlLogDetailJournalID} fialed`, errorMessageSaveFileForm.value)
+    }
+  }catch(error){
+    console.log(`save file catch ${soEtlLogDetailJournalID} fialed`, error)
+  }
+}
 
 //------------------------------------- Save Draft ---------------------------------------
 
@@ -275,7 +350,6 @@ const checkThePackagingCheckTrue = ref(true)
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const mapShippingCheckSheetData = data => {
-  console.log('mapShippingCheckSheetData', data.reportCheckSheet)
   
   return {
     checkSheetItems: data.checkSheetItems.map(item => ({
@@ -366,7 +440,6 @@ const updateShippingCheckSheetData = async ()  => {
   }
 
   if (getShippingCheckSheetResult.value?.reportCheckSheet) {
-    console.log('reportCheckSheet start update .....')
 
     const selectedLanguages = selectedLanguage.value || [] // เอาข้อมูลจาก selectedLanguage.value
     const reportCheckSheet = getShippingCheckSheetResult.value.reportCheckSheet
@@ -377,13 +450,13 @@ const updateShippingCheckSheetData = async ()  => {
         labalEnglish: selectedLanguages.includes('English'),
         labalJapanese: selectedLanguages.includes('Japanese'),
         labalChinese: selectedLanguages.includes('Chinese'),
-        labalMalaysia: selectedLanguages.includes('Malay'),
+        labalMalaysia: selectedLanguages.includes('Malaysia'),
         labalKorean: selectedLanguages.includes('Korean'),
         sds: selectedLanguages.includes('SDS'), // ถ้า SDS เป็นภาษาให้ใช้ ถ้าไม่ใช่ให้เอาออก
       }
     }
 
-    console.log('reportCheckSheet start update .....', getShippingCheckSheetResult.value?.reportCheckSheet)
+    // console.log('reportCheckSheet start update .....', getShippingCheckSheetResult.value?.reportCheckSheet)
   }
 }
 
@@ -391,9 +464,15 @@ const habdleSaveDraft = async () => {
 
   // อัพเดตข้อมูลใน getShippingCheckSheetResult.value?.unfIbc ก่อน
   await updateShippingCheckSheetData()
-  
 
-  console.log('getShippingCheckSheetResult.value update', getShippingCheckSheetResult.value)
+  // รอให้การบันทึกไฟล์ทั้งหมดเสร็จก่อน
+  const fileSavePromises = getShippingCheckSheetResult.value.checkSheetItems
+    .filter(item => item.fileeLicensePlateMew && item.fileeLicensePlateMew.length > 0)
+    .map(item => handleSaveFile(item.fileeLicensePlateMew, item.soEtlLogDetailJournalID))
+
+  await Promise.all(fileSavePromises) // รอให้ทุก Promise เสร็จสิ้น
+  
+  // console.log('getShippingCheckSheetResult.value update', getShippingCheckSheetResult.value)
 
   // ส่งข้อมูลที่อัพเดตไปบันทึก
   const requestData = mapShippingCheckSheetData(getShippingCheckSheetResult.value)
@@ -406,12 +485,8 @@ const habdleSaveDraft = async () => {
       accessTokenAtStore, requestData)
 
     if(saveShippingCheckSheetResult.value){
-      console.log("requestData 2")
       saveShippingCheckSheetResult.value = result
-      console.log("requestData 3")
-      console.log('saveShippingCheckSheetResult', result)
       textAlertDialogFunction(alertWordConst.saveDraft, true)
-      console.log("requestData 4")
       setTimeout(() => {
         // location.reload()
       }, 500) // 0.5 วินาที
@@ -753,14 +828,20 @@ resaleProductShipping.value.forEach(truck => {
   })
 })
 
-const removeFile = (truck, fileIndex) => {
-  truck.files.splice(fileIndex, 1)
+const removeFileAll = (truck, fileIndex) => {
+  removeFileNew(truck, fileIndex)
+  removeFileOld(truck, fileIndex)
 }
 
-const removeFileO = index => {
-  files.value.splice(index, 1)
-  if (!files.value.length) {
-    fileMuti.value = null
+const removeFileNew = (truck, fileIndex) => {
+  if (truck && truck.fileeLicensePlateMew) {
+    truck.fileeLicensePlateMew.splice(fileIndex, 1)
+  }
+}
+
+const removeFileOld = (truck, fileIndex) => {
+  if (truck && truck.fileeLicensePlate) {
+    truck.fileeLicensePlate.splice(fileIndex, 1)
   }
 }
 
@@ -1718,50 +1799,24 @@ const dessertsMockAmountView = [
             </tbody>
           </table>
         </div>
-        
-        <section v-if="false">
-          <div>
-            <VRow>
-              <VCol cols="6" />
-              <VCol
-                cols="6"
-                class="d-flex justify-end"
-              >
-                <!-- ปุ่มย้อนกลับ (ไปที่ชุดข้อมูลก่อนหน้า) -->
-                <VBtn
-                  variant="text"
-                  icon
-                  class="mx-2"
-                  :disabled="currentDataIndex === 1"
-                  @click="switchDataSet(currentDataIndex - 1)"
-                >
-                  <VIcon icon="ri-arrow-left-s-line" />
-                </VBtn>
-
-                <!-- ปุ่มไปข้างหน้า (ไปที่ชุดข้อมูลถัดไป) -->
-                <VBtn
-                  variant="text"
-                  icon
-                  :disabled="currentDataIndex === 3"
-                  @click="switchDataSet(currentDataIndex + 1)"
-                >
-                  <VIcon icon="ri-arrow-right-s-line" />
-                </VBtn>
-              </VCol>
-            </VRow>
-          </div>
-        </section>
       </section>
 
-      <div v-if="false">
+      <VBtn @click="showData">
+        asdasd
+      </VBtn>
+
+      <div v-if="true">
         <section
           v-for="(truck, index) in getShippingCheckSheetResult?.checkSheetItems"
         
           :key="index"
         >
           <!-- Muti File Inpur Imge -->
-          <VRow>
-            <VCol cols="4">
+          <VRow
+            v-if="!truck.fileeLicensePlate"
+            class="my-4"
+          >
+            <VCol cols="3">
               <table class="custom-table">
                 <thead>
                   <tr>
@@ -1780,26 +1835,235 @@ const dessertsMockAmountView = [
               </table>
             </VCol>
 
-            <VCol cols="8">
-              <VFileInput
-                v-model="truck.files"
-                label="File input"
-                multiple
-              >
-                <template #selection>
-                  <VRow
-                    class="d-flex align-center justify-center"
-                    style="height: 150px; border: 2px dashed #ccc; cursor: pointer;"
-                  >
-                    <VCol
-                      class="d-flex flex-column align-center justify-center"
-                      cols="12"
+            <VCol
+              style="border: 2px dashed black; border-radius: 10px;"
+              cols="9"
+            >
+              <VRow>
+                <VCol cols="12">
+                  <VFileInput
+                    v-model="truck.fileeLicensePlateMew"
+                    label="File input"
+                    multiple
+                  />
+                </VCol>
+                <VCol
+                  v-for="(file, fileIndex) in truck.fileeLicensePlateMew"
+                  :key="fileIndex"
+                  cols="3"
+                  md="3"
+                  lg="3"
+                  class="bg-green-lighten-5"
+                >
+                  <VCard class="pa-2">
+                    <VChip
+                      variant="elevated"
+                      color="success"
                     >
-                      <span>Upload your documents</span>
-                    </VCol>
-                  </VRow>
-                </template>
-              </VFileInput>
+                      New
+                    </VChip>
+                    <VImg
+                      role="presentation"
+                      :alt="file.name"
+                      :src="showImagNew(file)"
+                      height="100"
+                      contain
+                      @click="showDialogImageMuti(showImagNew(file))"
+                    />
+
+                    <VCardText class="pa-2">
+                      <div class="d-flex flex-column align-center text-center">
+                        <VBtn
+                          class="mt-2"
+                          icon="mdi-close"
+                          color="error"
+                          size="small"
+                          variant="tonal"
+                          @click="removeFileNew(truck, fileIndex)"
+                        />
+                      </div>
+                    </VCardText>
+                  </VCard>
+                </VCol>
+                <VCol
+                  v-for="(file, fileIndex) in truck.fileeLicensePlate"
+                  :key="fileIndex"
+                  cols="3"
+                  md="3"
+                  lg="3"
+                >
+                  <VCard
+                    style="height: 210px;"
+                    class="pa-2"
+                  >
+                    <VImg
+                      role="presentation"
+                      :alt="file.name"
+                      :src="convertFileUri(file.fileUri)" 
+                      height="100"
+                      contain
+                      @click="showDialogImageMuti(convertFileUri(file.fileUri))"
+                    />
+
+                    <VCardText class="pa-2">
+                      <div class="d-flex flex-column align-center text-center">
+                        <span v-if="false">{{ file.fileName }}</span>
+                        <VBtn
+                          class="mt-2"
+                          icon="mdi-close"
+                          color="error"
+                          size="small"
+                          variant="tonal"
+                          @click="removeFileOld(truck, fileIndex)"
+                        />
+                      </div>
+                    </VCardText>
+                  </VCard>
+                </VCol>
+              </VRow>
+              <VRow>
+                <Vcol
+                  style="width: 100%;"
+                  cols="12"
+                >
+                  <VBtn
+                    class="mx-2 mb-2"
+                    color="red"
+                    width="98%"
+                    @click="removeFileAll(truck, fileIndex)"
+                  >
+                    Delete Image
+                  </VBtn>
+                </Vcol>
+              </VRow>
+            </VCol>
+          </VRow>
+          
+          <!-- Muti File Show Imge -->
+          <VRow
+            v-if="truck.fileeLicensePlate"
+            class="my-4"
+          >
+            <VCol cols="3">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      Container No. /License Plate No.
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">
+                      {{ truck.containerNo_LicPlNo }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </VCol>
+
+            <VCol
+              style="border: 2px dashed black; border-radius: 10px;"
+              cols="9"
+            >
+              <VRow>
+                <VCol cols="12">
+                  <VFileInput
+                    v-model="truck.fileeLicensePlateMew"
+                    label="File input"
+                    multiple
+                  />
+                </VCol>
+                <VCol
+                  v-for="(file, fileIndex) in truck.fileeLicensePlateMew"
+                  :key="fileIndex"
+                  cols="3"
+                  md="3"
+                  lg="3"
+                  class="bg-green-lighten-5"
+                >
+                  <VCard class="pa-2">
+                    <VChip
+                      variant="elevated"
+                      color="success"
+                    >
+                      New
+                    </VChip>
+                    <VImg
+                      role="presentation"
+                      :alt="file.name"
+                      :src="showImagNew(file)"
+                      height="100"
+                      contain
+                      @click="showDialogImageMuti(showImagNew(file))"
+                    />
+
+                    <VCardText class="pa-2">
+                      <div class="d-flex flex-column align-center text-center">
+                        <VBtn
+                          class="mt-2"
+                          icon="mdi-close"
+                          color="error"
+                          size="small"
+                          variant="tonal"
+                          @click="removeFileNew(truck, fileIndex)"
+                        />
+                      </div>
+                    </VCardText>
+                  </VCard>
+                </VCol>
+                <VCol
+                  v-for="(file, fileIndex) in truck.fileeLicensePlate"
+                  :key="fileIndex"
+                  cols="3"
+                  md="3"
+                  lg="3"
+                >
+                  <VCard
+                    style="height: 210px;"
+                    class="pa-2"
+                  >
+                    <VImg
+                      role="presentation"
+                      :alt="file.name"
+                      :src="convertFileUri(file.fileUri)" 
+                      height="100"
+                      contain
+                      @click="showDialogImageMuti(convertFileUri(file.fileUri))"
+                    />
+
+                    <VCardText class="pa-2">
+                      <div class="d-flex flex-column align-center text-center">
+                        <span v-if="false">{{ file.fileName }}</span>
+                        <VBtn
+                          class="mt-2"
+                          icon="mdi-close"
+                          color="error"
+                          size="small"
+                          variant="tonal"
+                          @click="removeFileOld(truck, fileIndex)"
+                        />
+                      </div>
+                    </VCardText>
+                  </VCard>
+                </VCol>
+              </VRow>
+              <VRow>
+                <Vcol
+                  style="width: 100%;"
+                  cols="12"
+                >
+                  <VBtn
+                    class="mx-2 mb-2"
+                    color="red"
+                    width="98%"
+                    @click="removeFileAll(truck, fileIndex)"
+                  >
+                    Delete Image
+                  </VBtn>
+                </Vcol>
+              </VRow>
             </VCol>
           </VRow>
         </section>
@@ -1892,7 +2156,10 @@ const dessertsMockAmountView = [
           </tbody>
         </table>
 
-        <div v-if="false" class="d-flex justify-end mt-4">
+        <div
+          v-if="true"
+          class="d-flex justify-end mt-4"
+        >
           <VBtn
             v-if="statusModel === 1002 || statusModel === 1003"
             class="mx-2"
@@ -1910,7 +2177,7 @@ const dessertsMockAmountView = [
             WH1
           </VBtn>
           <VBtn
-            v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 1004"
+            v-if="statusModel === 1004"
             class="mx-2"
             color="green"
             @click="handleSubmit('leaderapprove')"
@@ -1919,7 +2186,7 @@ const dessertsMockAmountView = [
           </VBtn>
         </div>
 
-        <div class="d-flex justify-end mt-4">
+        <div v-if="false" class="d-flex justify-end mt-4">
           <VBtn
            
             class="mx-2"

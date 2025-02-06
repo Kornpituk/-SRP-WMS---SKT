@@ -1760,11 +1760,9 @@ const testExport = () => {
 }
 
 const printShipmentPDFBySoEIdPlan = async () => {
-  console.log('printShipmentPDFBySoEIdPlan')
   loadingPrint.value = true
   console.log('loadingPrint', loadingPrint.value)
 
-  console.log('printShipmentPDFBySoEIdPlan')
 
   const etaDateForApi = ref(etaDateModel.value)
   const etdDateForApi = ref(etdDateModel.value)
@@ -1775,15 +1773,11 @@ const printShipmentPDFBySoEIdPlan = async () => {
   filterForSearchPlan.value.SortColumn = sortColumn.value
   filterForSearchPlan.value.SortDirection = sortDirection.value
 
-  console.log('printShipmentPDFBySoEIdPlan')
 
   saveHistoryFilter()
 
-  console.log('printShipmentPDFBySoEIdPlan')
 
   const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
-
-  console.log('printShipmentPDFBySoEIdPlan')
 
   const typeDepartment = () => {
     
@@ -1795,10 +1789,7 @@ const printShipmentPDFBySoEIdPlan = async () => {
       return 'ShipmentPlanSALE'
     }
   }
-
-  console.log('printShipmentPDFBySoEIdPlan')
   
-
   try {
     // ✅ เรียก printShipmentPDF
     const result = await printExportExcelService(
@@ -2975,7 +2966,7 @@ const handlePrintTruckOrderPDF = () => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00024' || userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
+              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="primary"
@@ -2985,7 +2976,7 @@ const handlePrintTruckOrderPDF = () => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00024' || userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
+              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="error"
@@ -3068,6 +3059,7 @@ const handlePrintTruckOrderPDF = () => {
             <tr>
               <th>
                 <VCheckbox
+                  v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
                   v-model="isSelectAll"
                   :indeterminate="isIndeterminate"
                   @click="toggleSelectAll"
@@ -3431,7 +3423,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VCheckboxBtn
-                  v-if="checkStatusBeforeAvtion(product.statusId)"
+                  v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
                   v-model="selectedDataTables"
                   :value="product"
                 />

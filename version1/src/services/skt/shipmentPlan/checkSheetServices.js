@@ -221,7 +221,7 @@ export const useShippingCheckSheetFileFormService = () => {
       // console.log('Saving Draft Form COA...')
 
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
-      const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
+      const result = await FileShippingCheckSheetFileService.saveShippingCheckSheetFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
 
       if (result) {
         // console.log('Save data COA Controller:', result)
@@ -250,13 +250,14 @@ export const useGetFileFormService = () => {
   const getFileFormResult = ref(null)
   const errorMessageGetFileForm = ref(null)
 
-  const getFileFormFunction = async (soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) => {
+  const getFileFormFunction = async (soEtlLogDetailJournalID, LicensePlate, form, type, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageGetFileForm.value = null
 
       // console.log('Fetching File Form ...')
 
-      const result = await FileService.fetchFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
+      const result = await FileShippingCheckSheetFileService
+        .fetchShippingCheckSheetFileForm(soEtlLogDetailJournalID, LicensePlate, form, type, urlApi, whereHouse, accessToken)
       
       if (result) {
         // console.log('Received File Form:', result)
@@ -289,7 +290,7 @@ export const useDeleteFileFormService = () => {
 
       // console.log('Fetching File Form ...')
 
-      const result = await FileService.deleteFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
+      const result = await FileShippingCheckSheetFileService.deleteFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
       
       if (result) {
         // console.log('Received File Form:', result)
