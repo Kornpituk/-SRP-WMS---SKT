@@ -101,6 +101,41 @@ export const useGetShippingChecksheetImageService = () => {
   }
 }
 
+export const useGetShippingSpecialConditionIconService = () => {
+  const getShippingSpecialConditionIconResult = ref(null)
+  const errorGetShippingSpecialConditionIcon = ref(null)
+    
+  const fetchShippingSpecialConditionIcon = async (urlApi, form, whereHouse, accessToken, ItemCode, fileName ) => {
+    try {
+      errorGetShippingSpecialConditionIcon.value = null
+  
+      // console.log('Fetching fetchShippingSpecialConditionIcon...')
+    
+      const result = await checkSheetShipmentPlanRepository.
+        getShippingSpecialConditionIcon(urlApi, form, whereHouse, 
+          accessToken, ItemCode, fileName  )
+          
+      if (result) {
+        // console.log('Fetching data fetchShippingSpecialConditionIcon:', result)
+        getShippingSpecialConditionIconResult.value = result.data
+          
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchShippingSpecialConditionIcon:', error)
+      errorGetShippingSpecialConditionIcon.value = error.message
+    }
+  }
+    
+  return {
+    getShippingSpecialConditionIconResult,
+    errorGetShippingSpecialConditionIcon,
+    fetchShippingSpecialConditionIcon,
+  }
+}
+
 //----------------------- Post ----------------------
 export const useGenerateFormService = () => {
   const generateFormResult = ref(null)

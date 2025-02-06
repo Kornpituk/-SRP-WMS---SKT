@@ -511,6 +511,33 @@ export const checkSheetShipmentPlanRepository = {
     }
   },
 
+  async getShippingSpecialConditionIcon(urlApi, form, whereHouse, accessToken, ItemCode, fileName  ) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/ShippingCheckSheetFile/${form}/${fileName}/${ItemCode}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+
+        // console.log('Service Response data getShippingCheckSheet:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        // console.log('Error repo Error If getShippingChecksheetImage...')
+        // throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      // console.log('Error repo Error Try getShippingChecksheetImage...')
+      // console.error('Error in getProductionPlan:', error)
+
+      // throw new Error(`Failed to fetch getShippingChecksheetImage ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   async getShippingCheckSheetFile(urlApi, form, whereHouse, accessToken,  userCode, itemCode, fileName, licensePlate) {
     try {
 

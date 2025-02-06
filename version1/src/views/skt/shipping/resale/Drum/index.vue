@@ -27,6 +27,7 @@ const dataProductRow = ref(JSON.parse(sessionStorage.getItem("productDataSession
 
 const journalIdModel = ref(dataProductRow.value.journalID)
 const itemCodeModel = ref(dataProductRow.value.itemCode)
+const userCodeModel = ref(dataProductRow.value.shippingUserCode)
 const SoEtlLogDetailJournalIDModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
 const salesOrderNoModel = ref(dataProductRow.value.salesOrderNo)
 const checkSheetTypeNameModel = ref(dataProductRow.value.checkSheetTypeName)
@@ -68,6 +69,7 @@ import { useGenerateFormService, useGetShippingCheckSheetService,
   useGetShippingChecksheetImageService, useShippingCheckSheetService,
   useSubmitCheckSheetService, useGetShippingCheckSheetFileIconService,
   useGetFileFormService, useShippingCheckSheetFileFormService,
+  useGetShippingSpecialConditionIconService,
 } from '@/services/skt/shipmentPlan/checkSheetServices'
 
 //------------------------------------ generate section ----------------------
@@ -626,10 +628,33 @@ const fetchPicture = type => {
   }
 }
 
-// watch(async () => {
-//   pictureLabel.value = await fetchPicture('Label.png')
-//   picturePackaging.value = await fetchPicture('Packaging.png')
-// })
+const { getShippingSpecialConditionIconResult,
+  errorGetShippingSpecialConditionIcon,
+  fetchShippingSpecialConditionIcon } = useGetShippingSpecialConditionIconService()
+
+const fetIconCondition = async () => {
+  try{
+    const result = fetchShippingSpecialConditionIcon(urlApi.value, 
+      'GetSpecialConditionIcon', whereHouse, accessTokenAtStore, 
+      itemCodeModel.value, userCodeModel.value)
+
+    if(result){
+      getShippingSpecialConditionIconResult.value = result
+      errorGetShippingSpecialConditionIcon.value = null
+      console.log('getShippingSpecialConditionIconResult', getShippingSpecialConditionIconResult.value)
+      
+      return result
+    }else{
+      console.log('errorGetShippingSpecialConditionIcon !result ', errorGetShippingSpecialConditionIcon.value)
+    }
+  } catch (error) {
+    errorGetShippingSpecialConditionIcon.value = error.message
+  }
+}
+
+onMounted(async () => {
+  fetIconCondition()
+})
 
 import image01 from '@/views/skt/shipping/image/01.png'
 import image02 from '@/views/skt/shipping/image/02.png'
@@ -1301,59 +1326,28 @@ const dessertsMockAmountView = [
                   {{ item.displayText }}
                 </td>
               </tr>
-              <tr v-if="false">
+              <tr v-if="true">
                 <td
                   colspan="12"
                   style="height: 159px;"
                 >
                   <VRow>
                     <VCol
-                      v-for="(file, index) in iconMock"
+                      v-for="(file, index) in getShippingSpecialConditionIconResult.data"
                       :key="index"
-                      cols="4"
                     >
                       <VCard class="pa-2 cursor-pointer">
                         <VImg
                           role="presentation"
                           :alt="file.iconName"
-                          :src="file.src"
+                          :src="`https://sktdevwebapi.easetrackwms.com/api/v1/ShippingCheckSheetFile/ShippingSpecialConditionIcon/${file}`"
                           height="100"
                           contain
-                          @click="showDialogImageMuti(file.src, file.iconName)"
+                          @click="showDialogImageMuti(`https://sktdevwebapi.easetrackwms.com/api/v1/ShippingCheckSheetFile/ShippingSpecialConditionIcon/${file}`, file.iconName)"
                         />
                       </VCard>
                     </VCol>
                   </VRow>
-
-                  <VDialog
-                    v-model="isDialogVisibleImgFileMuti"
-                    width="500"
-                  >
-                    <!-- Dialog Content -->
-                    <VCard>
-                      <VCardTitle class="bg-primary">
-                        <div class="d-flex justify-space-between">
-                          <span>Label</span>
-                          <VBtn
-                            icon="mdi-close"
-                            color="white"
-                            size="small"
-                            variant="tonal"
-                            @click="isDialogVisibleImgFileMuti = false"
-                          />
-                        </div>
-                      </VCardTitle>
-
-                      <VCardText class="cursor-pointer">
-                        <VImg
-                          role="presentation"
-                          :src="imgDialog"
-                          height="100%"
-                          contain
-                        />
-                      </VCardText>
-                    </VCard>
-                  </VDialog>
                 </td>
               </tr>
             </tbody>
@@ -2186,7 +2180,10 @@ const dessertsMockAmountView = [
           </VBtn>
         </div>
 
-        <div v-if="false" class="d-flex justify-end mt-4">
+        <div
+          v-if="false"
+          class="d-flex justify-end mt-4"
+        >
           <VBtn
            
             class="mx-2"
