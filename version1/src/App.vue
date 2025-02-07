@@ -57,16 +57,12 @@ let timeoutId
 const resetTimeout = () => {
   clearTimeout(timeoutId)
   timeoutId = setTimeout(() => {
-    // alert('Session Timed Out. You will be logged out.')
     logout()
   }, INACTIVITY_TIMEOUT)
 }
 
 const logout = () => {
-  // ล้างข้อมูลและ Log Out
   localStorage.removeItem('accessToken')
-
-  // location.reload()
   router.push('/login')
 }
 
@@ -76,6 +72,10 @@ onMounted(() => {
     window.addEventListener(event, resetTimeout),
   )
   resetTimeout()
+
+  // ตรวจจับว่าผู้ใช้ปิดแท็บ/หน้าเว็บ (แต่ไม่รวมการรีโหลด)
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  window.addEventListener('beforeunload', handleBeforeUnload)
 })
 
 onBeforeUnmount(() => {
@@ -84,7 +84,25 @@ onBeforeUnmount(() => {
     window.removeEventListener(event, resetTimeout),
   )
   clearTimeout(timeoutId)
+
+  // ลบ event ก่อนออกจากหน้า
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  window.removeEventListener('beforeunload', handleBeforeUnload)
 })
+
+// ตรวจสอบว่าแท็บถูกปิดหรือไม่
+const handleVisibilityChange = () => {
+  if (document.visibilityState === 'hidden') {
+    // แท็บถูกซ่อน (อาจปิดหรือเปลี่ยนแท็บ) → ไม่ทำอะไร
+  }
+}
+
+// ตรวจสอบว่าปิดแท็บหรือปิดเว็บ แต่ไม่รวมการรีโหลด
+const handleBeforeUnload = event => {
+  if (performance.getEntriesByType('navigation')[0].type !== 'reload') {
+    logout()
+  }
+}
 
 //---------------------------------------------------------------------------------
 
