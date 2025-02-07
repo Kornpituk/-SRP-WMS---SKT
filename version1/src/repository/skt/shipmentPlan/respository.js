@@ -669,7 +669,6 @@ export const checkSheetShipmentPlanRepository = {
 
   //-------------------------------- Print ----------------------------------
   
-
 }
 
 //---------------------------------- CheckSheet File -------------------
@@ -801,3 +800,36 @@ export const FileShippingCheckSheetFileService = {
     }
   },
 }
+
+
+//---------------------------------- check sheet Lorry /Flexi  -------------------
+
+export const checkSheetLorryFlexiRepository = {
+
+  async getShippingCheckSheetLorry(urlApi, form, whereHouse, accessToken, SoEId) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${form}/get/${SoEId}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+
+        // console.log('Service Response data getShippingCheckSheet:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getShippingCheckSheet...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getShippingCheckSheet...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getShippingCheckSheet ${error.response?.data?.message || error.message}`)
+    }
+  },
+}
+

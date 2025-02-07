@@ -20,6 +20,64 @@ const TitleResalse = ref('Filling Direction & Report to FLEXI')
 const imagePictureFlexi = ref([img01, img02, img03, img04])
 
 const imagePictureLorry = ref([img05, img06, img07, img08, img09])
+
+//--------------------------- Section import Services --------------------------------
+import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
+import { VDataTable } from 'vuetify/labs/VDataTable'
+
+const whereHouse = localStorage.getItem('whereHouseName')
+const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+
+import { useGetShippingCheckSheetService } from "@/services/skt/shipmentPlan/lorryFlexiServices"
+
+import { useRoute } from 'vue-router'
+import { onMounted, watch } from 'vue'
+
+const route = useRoute()
+
+const dataProductRow = ref(JSON.parse(sessionStorage.getItem("productDataSession")))
+
+const soEIdModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
+
+//-------------------------- formate -------------------------------
+
+const formatToDate = dateString => {
+  if (!dateString) return null // จัดการค่าว่าง
+  const date = new Date(dateString)
+  if (isNaN(date)) return null // จัดการค่าที่ไม่ใช่วันที่
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  
+  return `${day}/${month}/${year}`
+}
+
+//-------------------------- Section Get Data --------------------------------
+
+const { getShippingCheckSheetResult,
+  errorGetShippingCheckSheet,
+  fetchShippingCheckSheet } = useGetShippingCheckSheetService()
+
+const handleFetchDataLorry = async () => {
+  try{
+    const result = await fetchShippingCheckSheet(urlApi.value, 
+      'ShippingLorryFlexi', whereHouse, accessTokenAtStore, soEIdModel.value)
+
+    if(result){
+      console.log('Result: ', result)
+      getShippingCheckSheetResult.value = result.data.reportLorryFlexi
+      console.log('getShippingCheckSheetResult: ', getShippingCheckSheetResult.value)
+    }else{
+      console.error('Error: ', errorGetShippingCheckSheet.value)
+    }
+  }catch(e){
+    console.error(e)
+  }
+}
+
+watch(async() => {
+  await handleFetchDataLorry()
+})
 </script>
 
 <template>
@@ -100,19 +158,19 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
             class="text-center"
           >
-            <span>Customer Name: </span><span class="font-weight-body">FMT /SINGBURI,SO1100077656</span>
+            <span>Customer Name: </span><span class="font-weight-body">{{ dataProductRow.shippingUserName }}</span>
           </th>
           <th
             colspan="4"
             class="text-center"
           >
-            <span>Delivery Place: </span><span class="font-weight-body">10-04-2024</span>
+            <span>Delivery Place: </span><span class="font-weight-body">{{ }}</span>
           </th>
           <th
             colspan="4"
             class="text-center"
           >
-            <span> Weight: </span><span class="font-weight-body">12,500</span><span> Kg.</span>
+            <span> Weight: </span><span class="font-weight-body">{{ getShippingCheckSheetResult?.weight }}</span><span> Kg.</span>
           </th>
         </tr>
         <tr v-if="false">
@@ -152,7 +210,7 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="10"
             class="text-center "
           >
-            <span class="font-weight-body">F-190</span>
+            <span class="font-weight-body">{{ dataProductRow.itemName }}</span>
           </th>
         </tr>
         <tr>
@@ -165,8 +223,9 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
           <th
             colspan="2"
             class="text-center "
+            style="min-width: 150px;"
           >
-            <span class="font-weight-body">PA24020033</span>
+            <span class="font-weight-body">{{ dataProductRow.lot }}</span>
           </th>
           <td
             colspan="8"
@@ -210,13 +269,20 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
                   cols="6"
                   class="d-flex justify-center align-center"
                 >
-                  <VCheckbox /><span class="font-weight-body">YES</span>
+                  <VCheckbox
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.meshOption"
+                  /><span class="font-weight-body">YES</span>
                 </VCol>
                 <VCol
                   cols="6"
                   class="d-flex justify-center align-center"
                 >
-                  <VCheckbox /><span class="font-weight-body">NO</span>
+                  <VCheckbox
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.meshOption"
+                    value="false"
+                  /><span class="font-weight-body">NO</span>
                 </VCol>
               </VRow>
             </div>
@@ -245,13 +311,20 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
                   cols="6"
                   class="d-flex justify-center align-center"
                 >
-                  <VCheckbox /><span class="font-weight-body">YES</span>
+                  <VCheckbox
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.materialOption"
+                  /><span class="font-weight-body">YES</span>
                 </VCol>
                 <VCol
                   cols="6"
                   class="d-flex justify-center align-center"
                 >
-                  <VCheckbox /><span class="font-weight-body">NO</span>
+                  <VCheckbox
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.materialOption"
+                    value="false"
+                  /><span class="font-weight-body">NO</span>
                 </VCol>
               </VRow>
             </div>
@@ -292,13 +365,20 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
                   cols="6"
                   class="d-flex justify-center align-center"
                 >
-                  <VCheckbox /><span class="font-weight-body">YES</span>
+                  <VCheckbox
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.bagFilterOption"
+                  /><span class="font-weight-body">YES</span>
                 </VCol>
                 <VCol
                   cols="6"
                   class="d-flex justify-center align-center"
                 >
-                  <VCheckbox /><span class="font-weight-body">NO</span>
+                  <VCheckbox
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.bagFilterOption"
+                    value="false"
+                  /><span class="font-weight-body">NO</span>
                 </VCol>
               </VRow>
             </div>
@@ -339,6 +419,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
           >
             <div class="d-flex">
               <VTextField
+                v-if="getShippingCheckSheetResult"
+                v-model="getShippingCheckSheetResult.fillingEquipment"
                 density="compact"
                 variant="outlined"
                 @click:append-inner="visible = !visible"
@@ -367,6 +449,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
           >
             <div>
               <VTextField
+                v-if="getShippingCheckSheetResult"
+                v-model="getShippingCheckSheetResult.lotNoActual"
                 density="compact"
                 variant="outlined"
                 @click:append-inner="visible = !visible"
@@ -387,6 +471,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
           >
             <div>
               <VTextField
+                v-if="getShippingCheckSheetResult"
+                v-model="getShippingCheckSheetResult.container"
                 density="compact"
                 variant="outlined"
                 @click:append-inner="visible = !visible"
@@ -407,6 +493,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
           >
             <div Class="d-flex">
               <VTextField
+                v-if="getShippingCheckSheetResult"
+                v-model="getShippingCheckSheetResult.net"
                 density="compact"
                 variant="outlined"
                 suffix="Kg."
@@ -431,13 +519,21 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
                   class="d-flex justify-center align-center"
                   cols="6"
                 >
-                  <VCheckbox />Export
+                  <VCheckbox
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.pointOfDelivery"
+                    value="EX"
+                  />Export
                 </VCol>
                 <VCol
                   class="d-flex justify-center align-center"
                   cols="6"
                 >
-                  <VCheckbox />Domestic
+                  <VCheckbox
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.pointOfDelivery"
+                    value="DO"
+                  />Domestic
                 </VCol>
               </VRow>
             </div>
@@ -461,7 +557,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
               </VCol>
               <VCol cols="9">
                 <AppDateTimePicker
-                  v-model="date"
+                  v-if="getShippingCheckSheetResult"
+                  v-model="getShippingCheckSheetResult.dateTimeStart"
                   placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
@@ -537,6 +634,7 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              
               density="compact"
               variant="outlined"
             />
@@ -546,7 +644,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="2"
           >
             <AppDateTimePicker
-              v-model="date"
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.dateTimeBefore"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
@@ -582,6 +681,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.apprearanceBefore"
               density="compact"
               variant="outlined"
             />
@@ -591,7 +692,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="2"
           >
             <AppDateTimePicker
-              v-model="date"
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.dateTimeStart"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
@@ -602,6 +704,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.personInchargeStart"
               density="compact"
               variant="outlined"
             />
@@ -627,6 +731,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.apprearanceStart"
               density="compact"
               variant="outlined"
             />
@@ -636,7 +742,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="2"
           >
             <AppDateTimePicker
-              v-model="date"
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.dateTimeMiddle"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
@@ -647,6 +754,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.personInchargeMiddle"
               density="compact"
               variant="outlined"
             />
@@ -672,6 +781,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.apprearanceFinal"
               density="compact"
               variant="outlined"
             />
@@ -681,7 +792,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="2"
           >
             <AppDateTimePicker
-              v-model="date"
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.dateTimeFinal"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
@@ -692,6 +804,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.personInchargeFinal"
               density="compact"
               variant="outlined"
             />
@@ -717,6 +831,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.apprearanceInLorry"
               density="compact"
               variant="outlined"
             />
@@ -726,7 +842,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="2"
           >
             <AppDateTimePicker
-              v-model="date"
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.dateTimeInLorry"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               density="compact"
@@ -737,6 +854,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.personInchargeInLorry"
               density="compact"
               variant="outlined"
             />
@@ -761,6 +880,8 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
             >
               <div class="d-flex justify-space-between align-center">
                 Seal No. <VTextField
+                  v-if="getShippingCheckSheetResult"
+                  v-model="getShippingCheckSheetResult.sealNo"
                   class="mx-2"
                   density="compact"
                 />
@@ -812,24 +933,107 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
                     cols="6"
                     class="d-flex justify-center align-center"
                   >
-                    <VCheckbox class="px-10">
-                      <template #label>
-                        <span class="font-size">YES</span>
-                      </template>
-                    </VCheckbox>
+                    <div v-if="index === 0">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.flexiAlreadyCleanedOption"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 1">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.flexiShippingMarkOption"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 2">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.flexiInsideTankOption"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 3">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.flexiCleaningHoseAirBlowOption"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
                   </VCol>
                   <VCol
                     cols="6"
                     class="d-flex justify-center align-center"
                   >
-                    <VCheckbox
-                      class="px-10"
-                      label="NO"
-                    >
-                      <template #label>
-                        <span class="font-size">NO</span>
-                      </template>
-                    </VCheckbox>
+                    <div v-if="index === 0">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.flexiAlreadyCleanedOption"
+                        value="false"
+                        class="px-10"
+                        label="NO"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 1">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.flexiShippingMarkOption"
+                        class="px-10"
+                        label="NO"
+                        value="false"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 2">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.flexiInsideTankOption"
+                        value="false"
+                        class="px-10"
+                        label="NO"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 3">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.flexiCleaningHoseAirBlowOption"
+                        value="false"
+                        class="px-10"
+                        label="NO"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
                   </VCol>
                 </VRow>
               </div>
@@ -887,24 +1091,127 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
                     cols="6"
                     class="d-flex justify-center align-center"
                   >
-                    <VCheckbox class="px-10">
-                      <template #label>
-                        <span class="font-size">YES</span>
-                      </template>
-                    </VCheckbox>
+                    <div v-if="index === 0">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryAlreadyCleanedOption"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 1">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryAfterSealOption"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 2">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryInsideTankOption"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 3">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryCleaningHoseAirBlowOption"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 4">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryCoverByCopingOption"
+                        
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">YES</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
                   </VCol>
                   <VCol
                     cols="6"
                     class="d-flex justify-center align-center"
                   >
-                    <VCheckbox
-                      class="px-10"
-                      label="NO"
-                    >
-                      <template #label>
-                        <span class="font-size">NO</span>
-                      </template>
-                    </VCheckbox>
+                    <div v-if="index === 0">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryAlreadyCleanedOption"
+                        value="false"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 1">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryAfterSealOption"
+                        value="false"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 2">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryInsideTankOption"
+                        value="false"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 3">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryCleaningHoseAirBlowOption"
+                        value="false"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                    <div v-if="index === 4">
+                      <VCheckbox
+                        v-if="getShippingCheckSheetResult"
+                        v-model="getShippingCheckSheetResult.lorryCoverByCopingOption"
+                        value="false"
+                        class="px-10"
+                      >
+                        <template #label>
+                          <span class="font-size">NO</span>
+                        </template>
+                      </VCheckbox>
+                    </div>
                   </VCol>
                 </VRow>
               </div>
@@ -924,7 +1231,10 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
       <table class="custom-table">
         <tr>
           <th colspan="12">
-            <VTextarea>
+            <VTextarea
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.remark"
+            >
               <template #label>
                 <span class="font-size">Remark</span>
               </template>
@@ -948,116 +1258,35 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
         </thead>
         <tbody>
           <tr>
-            <th colspan="4">
-              <VTextField
-                v-model="varA"
-                class="pa-0"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template #prepend>
-                  <span />
-                </template>
-                <template #label>
-                  <span class="font-size">Staff</span>
-                </template>
-                <template #append>
-                  <span />
-                </template>
-              </VTextField>
-            </th>
-            <th colspan="4">
-              <VTextField
-                v-model="varA"
-                class="pa-0"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template #prepend>
-                  <span />
-                </template>
-                <template #label>
-                  <span class="font-size">Leader</span>
-                </template>
-                <template #append>
-                  <span />
-                </template>
-              </VTextField>
-            </th>
-            <th colspan="4">
-              <VTextField
-                v-model="varA"
-                class="pa-0"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template #prepend>
-                  <span />
-                </template>
-                <template #label>
-                  <span class="font-size">Supervisor</span>
-                </template>
-                <template #append>
-                  <span />
-                </template>
-              </VTextField>
-            </th>
+            <td
+              style="min-width: 150px;"
+              colspan="4"
+            >
+              Staff: <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.updatedBy }}</span>
+            </td>
+            <td
+              style="min-width: 150px;"
+              colspan="4"
+            >
+              Leader: <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.leadedBy }}</span>
+            </td>
+            <td
+              style="min-width: 150px;"
+              colspan="4"
+            >
+              Approver: <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.approvedBy }}</span>
+            </td>
           </tr>
           <tr>
-            <th colspan="4">
-              <VTextField
-                v-model="varA"
-                class="pa-0"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template #prepend>
-                  <span />
-                </template>
-                <template #label>
-                  <span class="font-size">Date</span>
-                </template>
-                <template #append>
-                  <span />
-                </template>
-              </VTextField>
-            </th>
-            <th colspan="4">
-              <VTextField
-                v-model="varA"
-                class="pa-0"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template #prepend>
-                  <span />
-                </template>
-                <template #label>
-                  <span class="font-size">Date</span>
-                </template>
-                <template #append>
-                  <span />
-                </template>
-              </VTextField>
-            </th>
-            <th colspan="4">
-              <VTextField
-                v-model="varA"
-                class="pa-0"
-                density="compact"
-                style="font-size: 16px;"
-              >
-                <template #prepend>
-                  <span />
-                </template>
-                <template #label>
-                  <span class="font-size">Date</span>
-                </template>
-                <template #append>
-                  <span />
-                </template>
-              </VTextField>
-            </th>
+            <td colspan="4">
+              <span v-if="getShippingCheckSheetResult">{{ formatToDate(getShippingCheckSheetResult.updatedDate) }}</span>
+            </td>
+            <td colspan="4">
+              <span v-if="getShippingCheckSheetResult">{{ formatToDate(getShippingCheckSheetResult.leadedDate) }}</span>
+            </td>
+            <td colspan="4">
+              <span v-if="getShippingCheckSheetResult">{{ formatToDate(getShippingCheckSheetResult.approvedDate) }}</span>
+            </td>
           </tr>
         </tbody>
       </table>

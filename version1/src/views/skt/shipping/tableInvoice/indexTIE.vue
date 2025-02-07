@@ -1672,7 +1672,7 @@ async function  redirectBasedOnStatus (product)  {
     'Drum': 'Drum',
     'IBC': 'Drum',
     'Flexi': 'Flexi',
-    'Lorry': 'Lorry',
+    'Lorry': 'Flexi',
   }
 
   // ตรวจสอบว่า status มีใน mapping หรือไม่
