@@ -233,7 +233,6 @@ export const useSubmitCheckSheetService = () => {
   }
 }
 
-
 //----------------------- File ----------------------
 export const useShippingCheckSheetFileFormService = () => {
   const resultSaveFielForm = ref(null) // เก็บข้อมูล response ของการบันทึก
@@ -320,13 +319,13 @@ export const useDeleteFileFormService = () => {
   const deleteFileFormResult = ref(null)
   const errorMessageDeleteFileForm = ref(null)
 
-  const deleteFileFormFunction = async (soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken) => {
+  const deleteFileFormFunction = async (soEtlLogDetailJournalID, licensePlate, fileName, type, form, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageDeleteFileForm.value = null
 
       // console.log('Fetching File Form ...')
 
-      const result = await FileShippingCheckSheetFileService.deleteFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
+      const result = await FileShippingCheckSheetFileService.deleteFileForm(soEtlLogDetailJournalID, licensePlate, fileName, type, form, urlApi, whereHouse, accessToken)
       
       if (result) {
         // console.log('Received File Form:', result)

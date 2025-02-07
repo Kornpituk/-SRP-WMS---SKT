@@ -69,7 +69,7 @@ import { useGenerateFormService, useGetShippingCheckSheetService,
   useGetShippingChecksheetImageService, useShippingCheckSheetService,
   useSubmitCheckSheetService, useGetShippingCheckSheetFileIconService,
   useGetFileFormService, useShippingCheckSheetFileFormService,
-  useGetShippingSpecialConditionIconService,
+  useGetShippingSpecialConditionIconService, useDeleteFileFormService,
 } from '@/services/skt/shipmentPlan/checkSheetServices'
 
 //------------------------------------ generate section ----------------------
@@ -139,6 +139,8 @@ const getShippingCheckSheet = async () => {
             ...item,
             fileeLicensePlate: await fetchFileLicensePlate(item.soEtlLogDetailJournalID, item.containerNo_LicPlNo),
             fileeLicensePlateMew: [],
+            fileeLicensePlateDeleteOne: [],
+            fileeLicensePlateDeleteAll: [],
           })),
         )
       }
@@ -342,6 +344,38 @@ const handleSaveFile = async (files, soEtlLogDetailJournalID, licensePlate ) => 
   }
 }
 
+//-------------------------------- Delete File
+const { deleteFileFormResult,
+  errorMessageDeleteFileForm,
+  deleteFileFormFunction } = useDeleteFileFormService()
+
+const testDelete = () => {
+  return "DeleFiel"
+}
+
+const handleDeleteFileForm = async (type, 
+  soEtlLogDetailJournalID, licensePlate, fileName) => {
+  console.log("handleDeleteFileForm start! .....")
+  console.log("handleDeleteFileForm", type, 
+    soEtlLogDetailJournalID, licensePlate, fileName)
+  try{
+    const result = await deleteFileFormFunction(
+      soEtlLogDetailJournalID, licensePlate, fileName,
+      type, 'ShippingCheckSheetFile',  urlApi.value, whereHouse, 
+      accessTokenAtStore)
+
+    if(result){
+      console.log('delete file successed', resultDeleteFileForm.value)
+      
+      return result
+    }else{
+      console.log('delete file fialed', errorMessageDeleteFileForm.value, accessTokenAtStore)
+    }
+  }catch(error){
+    console.log('delete file catch fialed', error)
+  }
+}
+
 //------------------------------------- Save Draft ---------------------------------------
 
 const { saveShippingCheckSheetResult,
@@ -414,7 +448,6 @@ const mapShippingCheckSheetData = data => {
    
   }
 
-  
 }
 
 const updateShippingCheckSheetData = async ()  => {
@@ -474,8 +507,55 @@ const habdleSaveDraft = async () => {
     .map(item => handleSaveFile(item.fileeLicensePlateMew, 
       item.soEtlLogDetailJournalID, item.containerNo_LicPlNo))
 
-  await Promise.all(fileSavePromises) // รอให้ทุก Promise เสร็จสิ้น
+  const fileDeleteOnePromises = getShippingCheckSheetResult.value.checkSheetItems
+    .flatMap(item => Array.isArray(item.fileeLicensePlateDeleteOne) ? item.fileeLicensePlateDeleteOne : []) 
+    .filter(item => item && item.containerNo_LicPlNo) // กรองค่าที่ไม่มี ID ออก
+    .map(item => handleDeleteFileForm('DeleteOneLicensePlate', item.soEtlLogDetailJournalID, 
+      item.containerNo_LicPlNo, item.fileName))
+
+  const fileDeleteAllPromises = getShippingCheckSheetResult.value.checkSheetItems
+    .flatMap(item => Array.isArray(item.fileeLicensePlateDeleteAll) ? item.fileeLicensePlateDeleteAll : []) 
+    .filter(item => item && item.containerNo_LicPlNo) // กรองค่าที่ไม่มี ID ออก
+    .map(item => handleDeleteFileForm('DeleteAllLicensePlate', item.soEtlLogDetailJournalID, 
+      item.containerNo_LicPlNo, 'fileNameAll'))
+
+  const file = await Promise.all(fileSavePromises) // รอให้ทุก Promise เสร็จสิ้น
+  const file2 = await Promise.all(fileDeleteOnePromises)
+  const file3 = await Promise.all(fileDeleteAllPromises)
   
+  if(!file){
+    textAlertDialogFunction('FILE', false)
+    setTimeout(() => {
+      // location.reload()
+    }, 500) // 0.5 วินาที
+    
+    return
+  }
+
+  if(!file2){
+    textAlertDialogFunction('FILE2', false)
+    setTimeout(() => {
+      // location.reload()
+    }, 500) // 0.5 วินาที
+    
+    return
+  }else{
+    console.log('FILE2', fileDeleteOnePromises)
+  }
+
+  if(!file3){
+    textAlertDialogFunction('FILE3', false)
+    setTimeout(() => {
+      // location.reload()
+    }, 500) // 0.5 วินาที
+    
+    return
+  }else{
+    console.log('FILE3', fileDeleteAllPromises)
+  }
+
+  console.log('getShippingCheckSheetResult.value', getShippingCheckSheetResult.value)
+
   // console.log('getShippingCheckSheetResult.value update', getShippingCheckSheetResult.value)
 
   // ส่งข้อมูลที่อัพเดตไปบันทึก
@@ -492,7 +572,7 @@ const habdleSaveDraft = async () => {
       saveShippingCheckSheetResult.value = result
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 0.5 วินาที
     }else{
       console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
@@ -856,19 +936,38 @@ resaleProductShipping.value.forEach(truck => {
 })
 
 const removeFileAll = (truck, fileIndex) => {
-  removeFileNew(truck, fileIndex)
-  removeFileOld(truck, fileIndex)
+  console.log("removeFileAll!", truck, fileIndex)
+  if(truck && truck.fileeLicensePlate){
+    truck.fileeLicensePlateDeleteAll.push({
+      containerNo_LicPlNo: truck.containerNo_LicPlNo,
+      soEtlLogDetailJournalID: truck.fileeLicensePlate[0].soEtlLogDetailJournalID,
+    })
+    truck.fileeLicensePlate.splice(fileIndex, 1)
+    truck.fileeLicensePlateMew.splice(fileIndex, 1)
+    console.log("removeFileAll!", truck)
+  }else{
+    console.log("not find!", truck)
+  }
+  
 }
 
-const removeFileNew = (truck, fileIndex) => {
+const removeFileNew = (truck, fileIndex, type) => {
   if (truck && truck.fileeLicensePlateMew) {
+    
     truck.fileeLicensePlateMew.splice(fileIndex, 1)
   }
 }
 
-const removeFileOld = (truck, fileIndex) => {
+const removeFileOld = (truck, fileIndex, type) => {
+  console.log("removeFileOld", truck)
   if (truck && truck.fileeLicensePlate) {
+    truck.fileeLicensePlateDeleteOne.push({
+      containerNo_LicPlNo: truck.containerNo_LicPlNo, 
+      fileName: truck.fileeLicensePlate[fileIndex].fileName, 
+      soEtlLogDetailJournalID: truck.fileeLicensePlate[fileIndex].soEtlLogDetailJournalID,
+    })
     truck.fileeLicensePlate.splice(fileIndex, 1)
+    
   }
 }
 
@@ -1916,8 +2015,6 @@ const dessertsMockAmountView = [
                     </VCardText>
                   </VCard>
                 </VCol>
-              </VRow>
-              <VRow>
                 <Vcol
                   style="width: 100%;"
                   cols="12"
@@ -1926,12 +2023,13 @@ const dessertsMockAmountView = [
                     class="mx-2 mb-2"
                     color="red"
                     width="98%"
-                    @click="removeFileAll(truck, fileIndex)"
+                    @click="removeFileAll(truck)"
                   >
                     Delete Image
                   </VBtn>
                 </Vcol>
               </VRow>
+              <VRow />
             </VCol>
           </VRow>
           
@@ -2044,8 +2142,6 @@ const dessertsMockAmountView = [
                     </VCardText>
                   </VCard>
                 </VCol>
-              </VRow>
-              <VRow>
                 <Vcol
                   style="width: 100%;"
                   cols="12"
@@ -2054,7 +2150,7 @@ const dessertsMockAmountView = [
                     class="mx-2 mb-2"
                     color="red"
                     width="98%"
-                    @click="removeFileAll(truck, fileIndex)"
+                    @click="removeFileAll(truck)"
                   >
                     Delete Image
                   </VBtn>
@@ -2183,7 +2279,7 @@ const dessertsMockAmountView = [
         </div>
 
         <div
-          v-if="true"
+          v-if="false"
           class="d-flex justify-end mt-4"
         >
           <VBtn

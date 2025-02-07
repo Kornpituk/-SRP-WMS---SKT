@@ -763,27 +763,40 @@ export const FileShippingCheckSheetFileService = {
     }
   },
 
-  async deleteFileForm(soEtlLogDetailJournalID,  form, urlApi, whereHouse, accessToken) {
+  async deleteFileForm(soEtlLogDetailJournalID, licensePlate, fileName, type, form, urlApi, whereHouse, accessToken) {
 
     try {
-      const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, {}, {
-        headers: {
-          'accept': '*/*',
-          'x-location': whereHouse,
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
+      let response
+
+      if(type === 'DeleteOneLicensePlate'){
+        response = await axios.post(`${urlApi}/api/v1/${form}/${type}/${soEtlLogDetailJournalID}/${licensePlate}/${fileName}`, {}, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }else if(type === 'DeleteAllLicensePlate'){
+        response = await axios.post(`${urlApi}/api/v1/${form}/${type}/${soEtlLogDetailJournalID}/${licensePlate}`, {}, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }
+      
       
       if (response && response.data) {
-        console.log('Service Response data all detelete coa:', response.data.messageResult)
+        console.log('Service Response data all delete :', response.data.messageResult)
         
         return { success: true, data: response.data.messageResult }
       } else {
-        throw new Error('No data delete all coa from the server')
+        throw new Error('No data delete all  from the server')
       }
     } catch (error) {
       console.error('Error in deleteAllCoaForm:', error)
-      error = new Error(`Deleted to coa all for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+      error = new Error(`Deleted to  all for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
       throw { success: false, error }
     }
   },

@@ -4737,7 +4737,6 @@ const handlePrintTruckOrderPDF = () => {
                 <VTextarea
                   v-model="dialogDataTextArea"
                   :disabled="disabledModel"
-                  auto-grow
                   rows="7"
                   counter
                   class="text-center"
