@@ -519,7 +519,7 @@ const itemsStatus = ([
 
   { name: 'In Submitting', id: 204, color: 'pink' },
   { name: 'Waiting for WH APVL', id: 205, color: 'brown' },
-  { name: 'Shipping Rejected', id: 205, color: 'red' },
+  { name: 'Shipping Rejected', id: 206, color: 'red' },
   { name: 'Shipping Completed', id: 207, color: 'green' },
 
   { name: 'All', id: 0, color: 'grey' },
@@ -1231,7 +1231,7 @@ const dataTableCliclHighlightIsToggle = no=> {
     dataTableNummberedToggle.value = null
   } else if (dataTableNummberedToggle.value === null) {
     // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
-    dataTableNummberedToggle.value = no
+    dataTableCliclHighlightIsToggle.value = no
   }
   
 
@@ -1955,165 +1955,6 @@ const handlePrintTruckOrderPDF = () => {
       </VCardTitle>
     </VCard>
   </div>
-  <!-- Expansion -->
-  <section v-if="false">
-    <div>
-      <VExpansionPanels
-        v-model="panel"
-        multiple
-      >
-        <VExpansionPanel value="filter">
-          <VExpansionPanelText>
-            <VForm @submit.prevent="submitSearchButton">
-              <!-- Barcode | Product code | Product Name | Button Export -->
-              <VRow>
-                <!-- 👉 Select Barcode -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <!-- 👉 Search Product code -->
-                  <AppDateTimePicker
-                    v-model="etaDateModel"
-                    placeholder="Select ETA"
-                    prepend-inner-icon="ri-calendar-schedule-fill"
-                    density="compact"
-                    :config="{ dateFormat: 'd/m/Y' }"
-                  />
-                </VCol>
-
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <!-- 👉 Search Product code -->
-                  <AppDateTimePicker
-                    v-model="etdDateModel"
-                    prepend-inner-icon="ri-calendar-schedule-fill"
-                    placeholder="Select ETD"
-                    density="compact"
-                    style="font-size: 14px;"
-                    :config="{ dateFormat: 'd/m/Y' }"
-                  >
-                    <template #label>
-                      <span style="font-size: 12px;">ETD</span>
-                    </template>
-                  </AppDateTimePicker>
-                </VCol>
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <!-- 👉 Search Product code -->
-                  <VTextField
-                    v-model="filterForSearchPlan.SalesOrderNoSearch"
-                    density="compact"
-                  >
-                    <template #label>
-                      <span style="font-size: 12px;">Sale Order No.</span>
-                    </template>
-                  </VTextField>
-                </VCol>
-
-                <!-- 👉 Select Product code -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VTextField
-                    v-model="filterForSearchPlan.PayerNameSearch"
-                    density="compact"
-                  >
-                    <template #label>
-                      <span style="font-size: 12px;">Payer Name</span>
-                    </template>
-                  </VTextField>
-                </VCol>
-
-                <!-- 👉 Select Product Name -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  sm="6"
-                  class="py-1"
-                >
-                  <VTextField
-                    v-model="filterForSearchPlan.ItemNameSearch"
-                    density="compact"
-                  >
-                    <template #label>
-                      <span style="font-size: 12px;">Item Name</span>
-                    </template>
-                  </VTextField>
-                </VCol>
-
-                <!-- 👉 Button Search and Export -->
-                <VCol
-                  cols="12"
-                  lg="4"
-                  class="py-1 d-flex"
-                >
-                  <VRow>
-                    <VCol cols="4">
-                      <VBtn
-                        height="100%"
-                        width="100%"
-                        color="green"
-                        density="compact"
-                        class="mx-0"
-                        
-                        @click="searchFilterPlanFunctionBtn"
-                      >
-                        <span style="font-size: 12px;">{{ $t('Search') }}</span>
-                      </VBtn>
-                    </VCol>
-                    <VCol cols="4">
-                      <VBtn
-                        color="red"
-                        height="100%"
-                        width="100%"
-                        density="compact"
-                        @click="clearFilterPlanFunctionBtn"
-                      >
-                        <span style="font-size: 12px;">{{ $t('Clear') }}</span>
-                      </VBtn>
-                    </VCol>
-                    <VCol
-                      cols="4"
-                      md="4"
-                    >
-                      <VBtn
-                        density="compact"
-                        class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
-                        color="warning"
-                        style="width: 100%; height: 40px;"
-                        @click="stockUpdateExcel"
-                      >
-                        <img
-                          src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
-                          style="width: 27px;"
-                          class="custom-small-img"
-                        >
-                        <span style="font-size: 12px;">{{ $t('Export file') }}</span>
-                      </VBtn>
-                    </VCol>
-                  </VRow>
-                </VCol>
-              </VRow>
-            </VForm>
-          </VExpansionPanelText>
-        </VExpansionPanel>
-      </VExpansionPanels>
-    </div>
-  </section>
 
   <!-- Expansion -->
   <section>
@@ -3500,6 +3341,7 @@ const handlePrintTruckOrderPDF = () => {
                       <p class="mb-0">{{ (product.whStatusText) }}</p>
                     </VTooltip>
                   </VChip>
+                  {{ product.checkSheetTypeName }}
                   
                 </span>
               </td>
