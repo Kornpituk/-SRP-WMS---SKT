@@ -521,7 +521,7 @@ watch(async() => {
                 >
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
-                    v-model="getShippingCheckSheetResult.pointOfDelivery"
+                    v-model="getShippingCheckSheetResult.startedDate"
                     value="EX"
                   />Export
                 </VCol>
@@ -531,7 +531,7 @@ watch(async() => {
                 >
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
-                    v-model="getShippingCheckSheetResult.pointOfDelivery"
+                    v-model="getShippingCheckSheetResult.finishedDate"
                     value="DO"
                   />Domestic
                 </VCol>

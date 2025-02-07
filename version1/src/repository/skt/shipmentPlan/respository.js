@@ -831,5 +831,74 @@ export const checkSheetLorryFlexiRepository = {
       throw new Error(`Failed to fetch getShippingCheckSheet ${error.response?.data?.message || error.message}`)
     }
   },
+
+  async saveShippingCheckSheetLorry(urlApi, form, whereHouse, accessToken, body) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingLorryFlexi/${form}`, body, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+        console.log('success get repo ShippingLorryFlexi...')
+
+        // console.log('Service Response data ShippingLorryFlexi:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If ShippingLorryFlexi...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try ShippingLorryFlexi...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch ShippingLorryFlexi ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async submitShippingCheckSheetLorry(urlApi, form, whereHouse, accessToken, edId, comment) {
+    console.log('submitShipmentPlan repo...')
+    try {
+      let response
+      if(form === 'approve' || form === 'submit'){
+        response = await axios.post(`${urlApi}/api/v1/ShippingLorryFlexi/${form}/${edId}`, {}, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      }else if(form === 'reject'){
+        response = await axios.post(`${urlApi}/api/v1/ShippingLorryFlexi/${form}/${edId}`, {}, {
+          headers: {
+            'accept': '*/*',
+            'x-location': whereHouse,
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            Comment: comment,
+          },
+        })
+      }
+    
+      if (response && response.data) {
+        console.log('success get repo submit Shipment Plan...')
+
+        // console.log('Service Response data submit Shipment Plan:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If submit Shipment Plan...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try submit Shipment Plan...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch submit Shipment Plan ${error.response?.data?.message || error.message}`)
+    }
+  },
 }
 
