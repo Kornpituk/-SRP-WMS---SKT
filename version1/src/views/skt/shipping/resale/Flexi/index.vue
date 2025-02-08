@@ -28,7 +28,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
-import { useGetShippingCheckSheetService } from "@/services/skt/shipmentPlan/lorryFlexiServices"
+import { useGetShippingCheckSheetService, useSaveShippingCheckSheetService } from "@/services/skt/shipmentPlan/lorryFlexiServices"
 
 import { useRoute } from 'vue-router'
 import { onMounted, watch } from 'vue'
@@ -38,6 +38,24 @@ const route = useRoute()
 const dataProductRow = ref(JSON.parse(sessionStorage.getItem("productDataSession")))
 
 const soEIdModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
+
+
+//------------------------------- alert --------------------------------------------
+
+import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
+import alertWordConst from '@/utilities/constant'
+
+const isDialogVisibleAlertDialog = ref(false)
+const wordForSubmit = ref('')
+const subWordForSubmit = ref('')
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  subWordForSubmit.value = ''
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
 
 //-------------------------- formate -------------------------------
 
@@ -52,6 +70,34 @@ const formatToDate = dateString => {
   return `${day}/${month}/${year}`
 }
 
+function formatDateTime(value) {
+  // ตรวจสอบว่าเป็นรูปแบบ ISO 8601 แบบมี "Z"
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(value)) {
+    return value.replace("T", " ").slice(0, 16)
+  }
+
+  // ตรวจสอบว่าเป็นรูปแบบ ISO 8601 แบบไม่มี "Z"
+  else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}$/.test(value)) {
+    return value.replace("T", " ").slice(0, 16)
+  }
+
+  // ตรวจสอบว่าเป็นรูปแบบ "YYYY-MM-DD HH:mm"
+  else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(value)) {
+    return new Date(value.replace(" ", "T") + ":00.000Z").toISOString()
+  }
+
+  // ตรวจสอบว่าเป็นรูปแบบ "YY/MM/DD HH:mm"
+  else if (/^\d{2}\/\d{2}\/\d{2} \d{2}:\d{2}$/.test(value)) {
+    let [yy, mm, dd, hh, min] = value.match(/\d+/g)
+    let year = parseInt(yy) + 2000 // แปลงปี 2 หลักให้เป็น 4 หลัก (เช่น 20 → 2020)
+    
+    return new Date(`${year}-${mm}-${dd}T${hh}:${min}:00.000Z`).toISOString()
+  } 
+  else {
+    throw new Error("Invalid date format")
+  }
+}
+
 //-------------------------- Section Get Data --------------------------------
 
 const { getShippingCheckSheetResult,
@@ -63,9 +109,30 @@ const handleFetchDataLorry = async () => {
     const result = await fetchShippingCheckSheet(urlApi.value, 
       'ShippingLorryFlexi', whereHouse, accessTokenAtStore, soEIdModel.value)
 
+  
     if(result){
-      console.log('Result: ', result)
+ 
       getShippingCheckSheetResult.value = result.data.reportLorryFlexi
+
+      console.log('getShippingCheckSheetResult: ', getShippingCheckSheetResult.value)
+
+      const dataNew =  await Promise.all(
+        getShippingCheckSheetResult.value.map(async item => ({
+          ...item,
+      
+          startedDate: formatDateTime(item.startedDate), // ใช้ await ที่นี่
+          finishedDate: formatDateTime(item.finishedDate), // ใช้ await ที่นี่
+      
+          dateTimeStart: formatDateTime(item.dateTimeStart), // ใช้ await ที่นี่
+          dateTimeBefore: formatDateTime(item.dateTimeBefore), // ใช้ await ที่นี่
+          dateTimeMiddle: formatDateTime(item.dateTimeMiddle), // ใช้ await ที่นี่
+          dateTimeFinal: formatDateTime(item.dateTimeFinal), // ใช้ await ที่นี่
+          dateTimeInLorry: formatDateTime(item.dateTimeInLorry), // ใช้ await ที่นี่
+        })),
+      )
+      
+      getShippingCheckSheetResult.value = dataNew
+
       console.log('getShippingCheckSheetResult: ', getShippingCheckSheetResult.value)
     }else{
       console.error('Error: ', errorGetShippingCheckSheet.value)
@@ -78,6 +145,123 @@ const handleFetchDataLorry = async () => {
 watch(async() => {
   await handleFetchDataLorry()
 })
+
+//--------------------------- Section Save -------------------------------------------
+const { saveShippingCheckSheetResult,
+  errorSaveShippingCheckSheet,
+  saveShippingCheckSheet } = useSaveShippingCheckSheetService()
+
+const prepareLorryFlexiData = data => {
+  return {
+    ...prepareCommonData(data),
+    ...prepareAppearanceData(data),
+    ...prepareDateTimeData(data),
+    ...preparePersonInchargeData(data),
+    ...prepareOptionsData(data),
+    remark: data.remark ?? "remark001",
+  }
+}
+
+const prepareCommonData = data => ({
+  ...prepareCommonDataPart1(data),
+  ...prepareCommonDataPart2(data),
+  ...prepareCommonDataPart3(data),
+})
+
+const prepareCommonDataPart1 = data => ({
+  soEtlLogDetailJournalID: data.soEtlLogDetailJournalID ?? null,
+  isLorry: data.isLorry ?? false,
+  weight: data.weight ?? 35,
+  lotNo: data.lotNo ?? "",
+  lotNote: data.lotNote ?? "",
+})
+
+const prepareCommonDataPart2 = data => ({
+  mesh: data.mesh ?? "",
+  material: data.material ?? "",
+  bagFilter: data.bagFilter ?? "",
+  fillingLineValveOpen: data.fillingLineValveOpen ?? "",
+  fillingEquipment: data.fillingEquipment ?? "",
+  fillingOrder: data.fillingOrder ?? "",
+})
+
+const prepareCommonDataPart3 = data => ({
+  lotNoActual: data.lotNoActual ?? "",
+  container: data.container ?? "",
+  net: data.net ?? 22,
+  pointOfDelivery: data.pointOfDelivery ?? "",
+
+  // startedDate: (data.startedDate),
+  // finishedDate: (data.startedDate),
+  startedDate: "2020-05-02T08:08:00.000Z",
+  finishedDate: "2020-05-02T08:08:00.000Z",
+})
+
+const prepareAppearanceData = data => ({
+  apprearanceBefore: data.apprearanceBefore ?? "",
+  apprearanceStart: data.apprearanceStart ?? "",
+  apprearanceMiddle: data.apprearanceMiddle ?? "",
+  apprearanceFinal: data.apprearanceFinal ?? "",
+  apprearanceInLorry: data.apprearanceInLorry ?? "",
+})
+
+const prepareDateTimeData = data => ({
+  dateTimeStart: formatDateTime(data.dateTimeStart) ?? new Date().toISOString(),
+  dateTimeBefore: formatDateTime(data.dateTimeBefore) ?? new Date().toISOString(),
+  dateTimeMiddle: formatDateTime(data.dateTimeMiddle) ?? new Date().toISOString(),
+  dateTimeFinal: formatDateTime(data.dateTimeFinal) ?? new Date().toISOString(),
+  dateTimeInLorry: formatDateTime(data.dateTimeInLorry) ?? new Date().toISOString(),
+})
+
+const preparePersonInchargeData = data => ({
+  personInchargeBefore: data.personInchargeBefore ?? "",
+  personInchargeStart: data.personInchargeStart ?? "",
+  personInchargeMiddle: data.personInchargeMiddle ?? "",
+  personInchargeFinal: data.personInchargeFinal ?? "",
+  personInchargeInLorry: data.personInchargeInLorry ?? "",
+})
+
+const prepareOptionsData = data => ({
+  meshOption: data.meshOption ?? null,
+  materialOption: data.materialOption ?? null,
+  bagFilterOption: data.bagFilterOption ?? null,
+  sealNo: data.sealNo ?? "",
+  lorryAfterSealOption: data.lorryAfterSealOption ?? true,
+  lorryAlreadyCleanedOption: data.lorryAlreadyCleanedOption ?? true,
+  lorryInsideTankOption: data.lorryInsideTankOption ?? true,
+  lorryCoverByCopingOption: data.lorryCoverByCopingOption ?? true,
+  lorryCleaningHoseAirBlowOption: data.lorryCleaningHoseAirBlowOption ?? true,
+  flexiAlreadyCleanedOption: data.flexiAlreadyCleanedOption ?? true,
+  flexiInsideTankOption: data.flexiInsideTankOption ?? true,
+  flexiShippingMarkOption: data.flexiShippingMarkOption ?? true,
+  flexiCleaningHoseAirBlowOption: data.flexiCleaningHoseAirBlowOption ?? true,
+})
+
+const handleSaveDraft = async () => {
+
+  const requestBody = prepareLorryFlexiData(getShippingCheckSheetResult.value)
+
+  try{
+    const result = await saveShippingCheckSheet(
+      urlApi.value, 
+      'save', whereHouse, accessTokenAtStore, requestBody,
+    )
+
+    if(result){
+      textAlertDialogFunction(alertWordConst.saveDraft, true)
+      setTimeout(() => {
+      // location.reload()
+      }, 500) // 0.5 วินาที
+    }else{
+      textAlertDialogFunction(alertWordConst.saveDraft, false)
+      setTimeout(() => {
+      // location.reload()
+      }, 500) // 0.5 วินาที
+    }
+  }catch(error){
+    console.log(error)
+  }
+}
 </script>
 
 <template>
@@ -173,32 +357,6 @@ watch(async() => {
             <span> Weight: </span><span class="font-weight-body">{{ getShippingCheckSheetResult?.weight }}</span><span> Kg.</span>
           </th>
         </tr>
-        <tr v-if="false">
-          <th
-            colspan="4"
-            class="text-center "
-          >
-            Date of Issue :  10-04-2024
-          </th>
-          <th
-            colspan="2"
-            class="text-center "
-          >
-            Issued By
-          </th>
-          <th
-            colspan="2"
-            class="text-center "
-          >
-            Checked By
-          </th>
-          <th
-            colspan="4"
-            class="text-center "
-          >
-            Approved By
-          </th>
-        </tr>
         <tr>
           <th
             colspan="2"
@@ -281,7 +439,7 @@ watch(async() => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.meshOption"
-                    value="false"
+                    :value="false"
                   /><span class="font-weight-body">NO</span>
                 </VCol>
               </VRow>
@@ -323,7 +481,7 @@ watch(async() => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.materialOption"
-                    value="false"
+                    :value="false"
                   /><span class="font-weight-body">NO</span>
                 </VCol>
               </VRow>
@@ -377,7 +535,7 @@ watch(async() => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.bagFilterOption"
-                    value="false"
+                    :value="false"
                   /><span class="font-weight-body">NO</span>
                 </VCol>
               </VRow>
@@ -399,6 +557,8 @@ watch(async() => {
           <th colspan="4">
             <div class="d-flex justify-space-between align-center">
               Checked By <VTextField
+                v-if="getShippingCheckSheetResult"
+                v-model="getShippingCheckSheetResult.fillingLineValveOpen"
                 class="mx-2"
                 density="compact"
               />
@@ -497,6 +657,7 @@ watch(async() => {
                 v-model="getShippingCheckSheetResult.net"
                 density="compact"
                 variant="outlined"
+                type="number"
                 suffix="Kg."
               />
             </div>
@@ -521,7 +682,7 @@ watch(async() => {
                 >
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
-                    v-model="getShippingCheckSheetResult.startedDate"
+                    v-model="getShippingCheckSheetResult.pointOfDelivery"
                     value="EX"
                   />Export
                 </VCol>
@@ -531,7 +692,7 @@ watch(async() => {
                 >
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
-                    v-model="getShippingCheckSheetResult.finishedDate"
+                    v-model="getShippingCheckSheetResult.pointOfDelivery"
                     value="DO"
                   />Domestic
                 </VCol>
@@ -558,7 +719,7 @@ watch(async() => {
               <VCol cols="9">
                 <AppDateTimePicker
                   v-if="getShippingCheckSheetResult"
-                  v-model="getShippingCheckSheetResult.dateTimeStart"
+                  v-model="getShippingCheckSheetResult.startedDate"
                   placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
@@ -579,7 +740,8 @@ watch(async() => {
               </VCol>
               <VCol cols="9">
                 <AppDateTimePicker
-                  v-model="date"
+                  v-if="getShippingCheckSheetResult"
+                  v-model="getShippingCheckSheetResult.finishedDate"
                   placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
@@ -634,7 +796,8 @@ watch(async() => {
             colspan="4"
           >
             <VTextField
-              
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.apprearanceBefore"
               density="compact"
               variant="outlined"
             />
@@ -647,7 +810,7 @@ watch(async() => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeBefore"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
               density="compact"
             />
           </th>
@@ -656,6 +819,8 @@ watch(async() => {
             colspan="4"
           >
             <VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.personInchargeBefore"
               density="compact"
               variant="outlined"
             />
@@ -682,7 +847,7 @@ watch(async() => {
           >
             <VTextField
               v-if="getShippingCheckSheetResult"
-              v-model="getShippingCheckSheetResult.apprearanceBefore"
+              v-model="getShippingCheckSheetResult.apprearanceStart"
               density="compact"
               variant="outlined"
             />
@@ -695,7 +860,7 @@ watch(async() => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeStart"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
               density="compact"
             />
           </th>
@@ -732,7 +897,7 @@ watch(async() => {
           >
             <VTextField
               v-if="getShippingCheckSheetResult"
-              v-model="getShippingCheckSheetResult.apprearanceStart"
+              v-model="getShippingCheckSheetResult.apprearanceMiddle"
               density="compact"
               variant="outlined"
             />
@@ -745,7 +910,7 @@ watch(async() => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeMiddle"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
               density="compact"
             />
           </th>
@@ -795,7 +960,7 @@ watch(async() => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeFinal"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
               density="compact"
             />
           </th>
@@ -845,7 +1010,7 @@ watch(async() => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeInLorry"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
               density="compact"
             />
           </th>
@@ -986,7 +1151,7 @@ watch(async() => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiAlreadyCleanedOption"
-                        value="false"
+                        :value="false"
                         class="px-10"
                         label="NO"
                       >
@@ -1001,7 +1166,7 @@ watch(async() => {
                         v-model="getShippingCheckSheetResult.flexiShippingMarkOption"
                         class="px-10"
                         label="NO"
-                        value="false"
+                        :value="false"
                       >
                         <template #label>
                           <span class="font-size">NO</span>
@@ -1012,7 +1177,7 @@ watch(async() => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiInsideTankOption"
-                        value="false"
+                        :value="false"
                         class="px-10"
                         label="NO"
                       >
@@ -1025,7 +1190,7 @@ watch(async() => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiCleaningHoseAirBlowOption"
-                        value="false"
+                        :value="false"
                         class="px-10"
                         label="NO"
                       >
@@ -1156,7 +1321,7 @@ watch(async() => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryAlreadyCleanedOption"
-                        value="false"
+                        :value="false"
                         class="px-10"
                       >
                         <template #label>
@@ -1168,7 +1333,7 @@ watch(async() => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryAfterSealOption"
-                        value="false"
+                        :value="false"
                         class="px-10"
                       >
                         <template #label>
@@ -1180,7 +1345,7 @@ watch(async() => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryInsideTankOption"
-                        value="false"
+                        :value="false"
                         class="px-10"
                       >
                         <template #label>
@@ -1192,7 +1357,7 @@ watch(async() => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryCleaningHoseAirBlowOption"
-                        value="false"
+                        :value="false"
                         class="px-10"
                       >
                         <template #label>
@@ -1204,7 +1369,7 @@ watch(async() => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryCoverByCopingOption"
-                        value="false"
+                        :value="false"
                         class="px-10"
                       >
                         <template #label>
@@ -1297,7 +1462,7 @@ watch(async() => {
         <VBtn
           class="mx-2"
           color="warning"
-          @click="submitForm"
+          @click="handleSaveDraft"
         >
           Save Draft
         </VBtn>
@@ -1307,6 +1472,20 @@ watch(async() => {
       </div>
     </VCol>
   </VRow>
+
+
+  <!--  Component -->
+  <section>
+    <div>
+      <!-- ใช้ AuthenticatorDialog Component -->
+      <AlertWord2
+        v-model="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :subword="subWordForSubmit"
+        :success="successDialAlert"
+      />
+    </div>
+  </section>
 </template>
 
 <style scoped src="../Flexi/flexi.scss">
