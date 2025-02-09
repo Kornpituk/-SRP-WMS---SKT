@@ -863,7 +863,7 @@ export const checkSheetLorryFlexiRepository = {
     console.log('submitShipmentPlan repo...')
     try {
       let response
-      if(form === 'approve' || form === 'submit'){
+      if(form === 'leaderapprove' || form === 'submit'){
         response = await axios.post(`${urlApi}/api/v1/ShippingLorryFlexi/${form}/${edId}`, {}, {
           headers: {
             'accept': '*/*',

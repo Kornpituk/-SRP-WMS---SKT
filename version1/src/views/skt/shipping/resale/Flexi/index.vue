@@ -28,7 +28,10 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
-import { useGetShippingCheckSheetService, useSaveShippingCheckSheetService } from "@/services/skt/shipmentPlan/lorryFlexiServices"
+import { useGetShippingCheckSheetService, useSaveShippingCheckSheetService,
+  useShippingCheckSheetLorryService,
+  
+} from "@/services/skt/shipmentPlan/lorryFlexiServices"
 
 import { useRoute } from 'vue-router'
 import { onMounted, watch } from 'vue'
@@ -38,7 +41,6 @@ const route = useRoute()
 const dataProductRow = ref(JSON.parse(sessionStorage.getItem("productDataSession")))
 
 const soEIdModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
-
 
 //------------------------------- alert --------------------------------------------
 
@@ -257,6 +259,48 @@ const handleSaveDraft = async () => {
       setTimeout(() => {
       // location.reload()
       }, 500) // 0.5 วินาที
+    }
+  }catch(error){
+    console.log(error)
+  }
+}
+
+//------------------------------------ Section Submit & Approv --------------------------
+const { submitShipmentPlanResult,
+  errorShippingCheckSheetLorry,
+  submitShipmentPlan } = useShippingCheckSheetLorryService()
+
+const handleSubmit = async type => {
+  try{
+    const result = await submitShipmentPlan(
+      urlApi.value, 
+      type, whereHouse, accessTokenAtStore, soEIdModel.value,
+    )
+
+    if(result){
+      if(type === 'submit'){
+        textAlertDialogFunction(alertWordConst.submit, true)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 0.5 วินาที
+      }else if(type === 'leaderapprove'){
+        textAlertDialogFunction(alertWordConst.approve, true)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 0.5 วินาที
+      }
+    }else{
+      if(type === 'submit'){
+        textAlertDialogFunction(alertWordConst.submit, false)
+        setTimeout(() => {
+          // location.reload()
+        }, 500) // 0.5 วินาที
+      }else if(type === 'leaderapprove'){
+        textAlertDialogFunction(alertWordConst.approve, false)
+        setTimeout(() => {
+          // location.reload()
+        }, 500) // 0.5 วินาที
+      }
     }
   }catch(error){
     console.log(error)
@@ -1466,8 +1510,17 @@ const handleSaveDraft = async () => {
         >
           Save Draft
         </VBtn>
-        <VBtn @click="resetForm">
+        <VBtn
+          class="mx-2"
+          @click="handleSubmit('submit')"
+        >
           Submit
+        </VBtn>
+        <VBtn
+          class="mx-2"
+          @click="handleSubmit('leaderapprove')"
+        >
+          Approve
         </VBtn>
       </div>
     </VCol>
