@@ -1224,18 +1224,20 @@ const isSelected = item => {
   )
 }
 
-const dataTableCliclHighlightIsToggle = no=> {
+const dataTableCliclHighlightIsToggle = no => {
   // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
   if (dataTableNummberedToggle.value === no) {
     // ถ้าตรง ให้สลับกลับเป็น null
     dataTableNummberedToggle.value = null
+    console.log("dataTableNum if", dataTableNummberedToggle.value, no)
   } else if (dataTableNummberedToggle.value === null) {
     // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
-    dataTableCliclHighlightIsToggle.value = no
+    dataTableNummberedToggle.value = no
+    console.log("dataTableNum else", dataTableNummberedToggle.value, no)
   }
   
 
-  console.log("dataTableNum", dataTableNummberedToggle.value)
+  console.log("dataTableNum", dataTableNummberedToggle.value, no)
 }
 
 //--------------------------------------- Function Pagination --------------------------------------------
@@ -1668,7 +1670,7 @@ async function  redirectBasedOnStatus (product)  {
   const mainCheckSheetTypeName = (product.checkSheetTypeName)
 
   const checkSheetTypeNameMapping = {
-    'N/A': 'Drum',
+    'N/A': 'Flexi',
     'Drum': 'Drum',
     'IBC': 'Drum',
     'Flexi': 'Flexi',

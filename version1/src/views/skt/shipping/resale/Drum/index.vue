@@ -1432,7 +1432,7 @@ const dessertsMockAmountView = [
                   colspan="12"
                   style="height: 159px;"
                 >
-                  <VRow>
+                  <VRow v-if="false">
                     <VCol
                       v-for="(file, index) in getShippingSpecialConditionIconResult.data"
                       :key="index"
@@ -1447,6 +1447,32 @@ const dessertsMockAmountView = [
                           @click="showDialogImageMuti(`https://sktdevwebapi.easetrackwms.com/api/v1/ShippingCheckSheetFile/ShippingSpecialConditionIcon/${file}`, file.iconName)"
                         />
                       </VCard>
+                    </VCol>
+                  </VRow>
+                  <VRow class="d-flex justify-start">
+                    <VCol
+                      v-for="(file, index) in getShippingSpecialConditionIconResult.data"
+                      :key="index"
+                      cols="4"
+                    >
+                      <VCard class="pa-2 cursor-pointer">
+                        <VImg
+                          role="presentation"
+                          :alt="file.iconName"
+                          :src="`https://sktdevwebapi.easetrackwms.com/api/v1/ShippingCheckSheetFile/ShippingSpecialConditionIcon/${file}`"
+                          height="100"
+                          contain
+                          @click="showDialogImageMuti(`https://sktdevwebapi.easetrackwms.com/api/v1/ShippingCheckSheetFile/ShippingSpecialConditionIcon/${file}`, file.iconName)"
+                        />
+                      </VCard>
+                    </VCol>
+                    <!-- เพิ่มช่องว่างถ้ามีรูป < 3 -->
+                    <VCol
+                      v-for="n in (3 - getShippingSpecialConditionIconResult.data.length)"
+                      :key="'empty-' + n"
+                      cols="4"
+                    >
+                      <div style="height: 100px;" /> <!-- เว้นที่ว่าง -->
                     </VCol>
                   </VRow>
                 </td>
@@ -1896,7 +1922,10 @@ const dessertsMockAmountView = [
         </div>
       </section>
 
-      <VBtn @click="showData">
+      <VBtn
+        v-if="false"
+        @click="showData"
+      >
         asdasd
       </VBtn>
 

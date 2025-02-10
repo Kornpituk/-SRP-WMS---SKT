@@ -148,6 +148,47 @@ watch(async() => {
   await handleFetchDataLorry()
 })
 
+const variantBtnMesh = ref('text')
+
+const meshVariant = computed(() => value => {
+  if (getShippingCheckSheetResult.value) {
+    return getShippingCheckSheetResult.value.mesh === value ? "flat" : "text"
+  }
+  
+  return "text"
+})
+
+// ฟังก์ชันเปลี่ยนค่า mesh
+const setMeshValue = value => {
+  
+  if(getShippingCheckSheetResult.value.mesh === value){
+    getShippingCheckSheetResult.value.mesh = ''
+  }else{
+    getShippingCheckSheetResult.value.mesh = value
+  }
+}
+
+
+const variantBtnBagFilter = ref('text')
+
+// ฟังก์ชันเช็คว่า bagFilter ตรงกับค่าที่ส่งเข้ามาหรือไม่
+const bagFilterVariant = value => {
+  if(getShippingCheckSheetResult.value){
+    return getShippingCheckSheetResult.value.bagFilter === value
+  }
+  
+}
+
+// ฟังก์ชันเปลี่ยนค่า bagFilter
+const setBagFilterValue = value => {
+  if(getShippingCheckSheetResult.value){
+    getShippingCheckSheetResult.value.bagFilter = getShippingCheckSheetResult.value.bagFilter === value ? "" : value
+  }
+  
+}
+
+
+
 //--------------------------- Section Save -------------------------------------------
 const { saveShippingCheckSheetResult,
   errorSaveShippingCheckSheet,
@@ -338,7 +379,6 @@ const handleSubmit = async type => {
       </div>
     </VCol>
 
-
     <VCol
       class="text-center d-flex justify-center align-center"
       cols="10"
@@ -369,7 +409,6 @@ const handleSubmit = async type => {
         Lorry
       </VBtn>
     </VCol>
-
 
     <VCol cols="12">
       <table class="custom-table">
@@ -422,18 +461,18 @@ const handleSubmit = async type => {
           >
             Lot No.
           </th>
-          <th
+          <td
             colspan="2"
             class="text-center "
             style="min-width: 150px;"
           >
-            <span class="font-weight-body">{{ dataProductRow.lot }}</span>
-          </th>
+            <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.lotNo }}</span>
+          </td>
           <td
             colspan="8"
             class="text-center "
           >
-            <span>Mix Lot no.PA24020032 = 8 IBC + PA24030012 = 8 IBC</span>
+            <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.lotNote }}</span>
           </td>
         </tr>
       </table>
@@ -459,7 +498,48 @@ const handleSubmit = async type => {
             colspan="6"
             class="text-center "
           >
-            <span class="font-weight-body">80&nbsp;&nbsp;&nbsp;100&nbsp;&nbsp;&nbsp;120&nbsp;&nbsp;&nbsp;150&nbsp;&nbsp;&nbsp;200&nbsp;&nbsp;&nbsp;300</span>
+            <VBtn
+              :variant="(meshVariant('80'))"
+              icon
+              @click="setMeshValue('80')"
+            >
+              80
+            </VBtn>
+            <VBtn
+              :variant="meshVariant('100')"
+              icon
+              @click="setMeshValue('100')"
+            >
+              100
+            </VBtn>
+            <VBtn
+              :variant="meshVariant('120')"
+              icon
+              @click="setMeshValue('120')"
+            >
+              120
+            </VBtn>
+            <VBtn
+              :variant="meshVariant('150')"
+              icon
+              @click="setMeshValue('150')"
+            >
+              150
+            </VBtn>
+            <VBtn
+              :variant="meshVariant('200')"
+              icon
+              @click="setMeshValue('200')"
+            >
+              200
+            </VBtn>
+            <VBtn
+              :variant="meshVariant('300')"
+              icon
+              @click="setMeshValue('300')"
+            >
+              300
+            </VBtn>
           </th>
           <th
             colspan="3"
@@ -501,7 +581,12 @@ const handleSubmit = async type => {
             colspan="6"
             class="text-center "
           >
-            <span class="font-weight-body">VESEL……….    LOT NO.…PA24020033</span>
+            <span class="font-weight-body"><VTextField
+              v-if="getShippingCheckSheetResult"
+              v-model="getShippingCheckSheetResult.material"
+              class="mx-2"
+              density="compact"
+            /></span>
           </th>
           <th
             colspan="3"
@@ -541,19 +626,35 @@ const handleSubmit = async type => {
           </th>
           <th
             colspan="5"
-            class="text-start"
+            class="text-start cursor-pointer"
+            ripple
+            :style="{
+              borderColor: bagFilterVariant('Cotton(Pieces)') ? 'green' : '',
+              borderWidth: bagFilterVariant('Cotton(Pieces)') ? '1px' : '1px',
+              borderStyle: 'solid'
+            }"
+            :class="{ 'bg-green-lighten-3': bagFilterVariant('Cotton(Pieces)') }"
+            @click="setBagFilterValue('Cotton(Pieces)')"
           >
             <div class="d-flex justify-center">
-              <span class="font-weight-body">Cotton( Pieces)</span>
+              <span class="font-weight-body">Cotton(Pieces)</span>
             </div>
           </th>
           <th
             colspan="1"
-            class="text-end "
+            class="text-end cursor-pointer"
+            ripple
+            :style="{
+              borderColor: bagFilterVariant('Flannel(pieces)') ? 'green' : '',
+              borderWidth: bagFilterVariant('Flannel(pieces)') ? '1px' : '1px',
+              borderStyle: 'solid'
+            }"
+            :class="{ 'bg-green-lighten-3': bagFilterVariant('Flannel(pieces)') }"
+            @click="setBagFilterValue('Flannel(pieces)')"
           >
             <span class="end">
               <div class="d-flex justify-center">
-                <span class="font-weight-body">Flannel( pieces)</span>
+                <span class="font-weight-body">Flannel(pieces)</span>
               </div>
             </span>
           </th>
@@ -595,18 +696,28 @@ const handleSubmit = async type => {
           <th colspan="1">
             Filling Valve Open
           </th>
-          <th colspan="5">
-            Filling Line Valve Open
-          </th>
-          <th colspan="4">
-            <div class="d-flex justify-space-between align-center">
-              Checked By <VTextField
-                v-if="getShippingCheckSheetResult"
-                v-model="getShippingCheckSheetResult.fillingLineValveOpen"
-                class="mx-2"
-                density="compact"
-              />
-            </div>
+          <th
+            style="max-width: 150px;"
+            colspan="11"
+          >
+            <VRow>
+              <VCol
+                class="d-flex justify-center align-center"
+                cols="3"
+              >
+                Filling Line Valve Open
+              </VCol>
+              <VCol ocls="9">
+                <div class="d-flex justify-space-between align-center">
+                  <VTextField
+                    v-if="getShippingCheckSheetResult"
+                    v-model="getShippingCheckSheetResult.fillingLineValveOpen"
+                    class="mx-2"
+                    density="compact"
+                  />
+                </div>
+              </VCol>
+            </VRow>
           </th>
         </tr>
         <tr>
@@ -618,7 +729,6 @@ const handleSubmit = async type => {
           </th>
           <th
             colspan="11"
-            rowspan="2"
             class="text-center "
           >
             <div class="d-flex">
@@ -638,6 +748,20 @@ const handleSubmit = async type => {
             class="text-start "
           >
             (Filling Order)
+          </th>
+          <th
+            colspan="11"
+            class="text-center "
+          >
+            <div class="d-flex">
+              <VTextField
+                v-if="getShippingCheckSheetResult"
+                v-model="getShippingCheckSheetResult.fillingOrder"
+                density="compact"
+                variant="outlined"
+                @click:append-inner="visible = !visible"
+              />
+            </div>
           </th>
         </tr>
         <tr>
@@ -727,6 +851,7 @@ const handleSubmit = async type => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.pointOfDelivery"
+                    readonly
                     value="EX"
                   />Export
                 </VCol>
@@ -737,6 +862,7 @@ const handleSubmit = async type => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.pointOfDelivery"
+                    readonly
                     value="DO"
                   />Domestic
                 </VCol>
@@ -812,13 +938,13 @@ const handleSubmit = async type => {
             colspan="3"
             class="text-center "
           >
-            Time Date
+            Date Time 
           </th>
           <th
             colspan="3"
             class="text-center "
           >
-            Person Incharge
+            Person In Charge
           </th>
         </tr>
 
