@@ -52,15 +52,19 @@ const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 
 //------------------------------ fetch data from API --------------------------------
-import { useGetUserPermissionService,
-  useGetSearchPlanService,
-} from '@/services/skt/shipmentPlan/services'
+// import { useGetUserPermissionService,
+//   useGetSearchPlanService,
+// } from '@/services/skt/shipmentPlan/services'
 
-
+import { useGetSearchPlanService } from '@/services/skt/stockUpdate/services'
 
 //------------------------------- Function Get Search plan -----------------
 
-const { getSearchPlanResult, errorGetSearchPlan, fetchSearchPlan } = useGetSearchPlanService()
+// const { getSearchPlanResult, errorGetSearchPlan, fetchSearchPlan } = useGetSearchPlanService()
+
+const { getSearchPlanResult,
+  errorGetSearchPlan,
+  fetchSearchPlan } =useGetSearchPlanService()
 
 const searchPlanData = ref([])
 const isLoading = ref(false)
@@ -133,6 +137,47 @@ const paginatedData = computed(() => {
 
 })
 
+const itemsStatus = ([
+  { name: 'Cancel', id: 200, color: 'blue-grey' },
+  { name: 'ETL Failed!', id: 201, color: 'deep-orange' },
+  { name: 'Waiting for Shipping', id: 202, color: 'pink' },
+  { name: 'Draft Shipping', id: 203, color: 'amber' },
+
+  // { name: 'Waiting for SAL Draft', id: 302, color: 'pink' },
+  // { name: 'SAL Draft Shipping', id: 303, color: 'amber' },
+  // { name: 'SAL Submitted', id: 304, color: 'teal' },
+
+  // { name: 'Waiting for WH Draft', id: 402, color: 'pink' },
+  // { name: 'WH Draft Shipping', id: 403, color: 'amber' },
+  // { name: 'WH Submitted', id: 404, color: 'teal' },
+
+  // { name: 'Waiting FOR LOG Draft', id: 502, color: 'pink' },
+  // { name: 'LOG Draft Shipping', id: 503, color: 'amber' },
+  // { name: 'LOG Submitted', id: 504, color: 'teal' },
+
+  // { name: 'Waiting FOR INSP Draft', id: 602, color: 'pink' },
+  // { name: 'INSP Draft Shipping', id: 603, color: 'amber' },
+  // { name: 'INSP Submitted', id: 604, color: 'teal' },
+
+  // { name: 'Waiting for CS Draft', id: 1002, color: 'pink' },
+  // { name: 'CS1 Draft Shipping', id: 1003, color: 'amber' },
+  // { name: 'CS2 Draft Shipping', id: 1004, color: 'amber' },
+  // { name: 'CS Submitted', id: 1005, color: 'teal' },
+
+  // { name: 'Waiting for Draft', id: 1102, color: 'pink' },
+  // { name: 'Draft Shipping LF', id: 1103, color: 'amber' },
+  // { name: 'Waiting for Lorry/Flex APVL', id: 1104, color: 'amber' },
+  // { name: 'Lorry/Flex Submitted', id: 1105, color: 'teal' },
+
+  { name: 'In Submitting', id: 204, color: 'pink' },
+  { name: 'Waiting for WH APVL', id: 205, color: 'brown' },
+  { name: 'Shipping Rejected', id: 206, color: 'red' },
+  { name: 'Shipping Completed', id: 207, color: 'green' },
+
+  { name: 'All', id: 0, color: 'grey' },
+
+])
+
 // --------------- Model Sort by
 
 const sortColumn = ref('')
@@ -141,26 +186,43 @@ const sortDirection = ref('')
 const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
 const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
 
+const sessionDataFilter = ref(sessionStorage.getItem("stockUpdateDataSession"))
+
 const filterForSearchPlan = ref({
-  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || 'ddddd',
-  ETA: etaDateModel.value || '',
-  ETD: etdDateModel.value || '',
-  SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
-  PayerNameSearch: sessionStorage.getItem("PayerNameSearchProductionFilter") || '',
-  ItemNameSearch: sessionStorage.getItem("ItemNameSearchProductionFilter") || '',
-  LotSearch: sessionStorage.getItem("LotSearchProductionFilter") || '',
-  SortColumn: '',
-  SortDirection: '',
+
+  categoryId: sessionDataFilter.categoryId || '',
+  typeId: sessionDataFilter.typeId || '',
+  subTypeId: sessionDataFilter.subTypeId || '',
+  barcode: sessionDataFilter.barcode || '',
+  productId: sessionDataFilter.productId || '',
+  productName: sessionDataFilter.productName || '',
+  unitId: sessionDataFilter.unitId || '',
+  serialNo: sessionDataFilter.serialNo || '',
+  zoneId: sessionDataFilter.zoneId || '',
+  areaId: sessionDataFilter.areaId || '',
+  subAreaId: sessionDataFilter.subAreaId || '',
+  searchByCategory: sessionDataFilter.searchByCategory || '',
+  searchByType: sessionDataFilter.searchByType || '',
+  searchBySubType: sessionDataFilter.searchBySubType || '',
+  searchByBarcode: sessionDataFilter.searchByBarcode || '',
+  searchByProductId: sessionDataFilter.searchByProductId || '',
+  searchByProductName: sessionDataFilter.searchByProductName || '',
+  searchByUnit: sessionDataFilter.searchByUnit || '',
+  sortByCategory: sessionDataFilter.sortByCategory || '',
+  sortByType: sessionDataFilter.sortByType || '',
+  sortBySubType: sessionDataFilter.sortBySubType || '',
+  sortByBarcode: sessionDataFilter.sortByBarcode || '',
+  sortByProductId: sessionDataFilter.sortByProductId || '',
+  sortByProductName: sessionDataFilter.sortByProductName || '',
+  sortByUnit: sessionDataFilter.sortByUnit || '',
+  sortByQty: sessionDataFilter.sortByQty || '',
+  sortByTags: sessionDataFilter.sortByTags || '',
+  sortByNonTags: sessionDataFilter.sortByNonTags || '',
 })
 
 const saveHistoryFilter = () => {
-  sessionStorage.setItem("StatusIdSearchProductionFilter", filterForSearchPlan.value.StatusId || ''),
-  sessionStorage.setItem("ETASearchProductionFilter", etaDateModel.value) || '',
-  sessionStorage.setItem("ETDSearchProductionFilter", etdDateModel.value) || '',
-  sessionStorage.setItem("SalesOrderNoSearchProductionFilter", filterForSearchPlan.value.SalesOrderNoSearch) || '',
-  sessionStorage.setItem("PayerNameSearchProductionFilter", filterForSearchPlan.value.PayerNameSearch) || '',
-  sessionStorage.setItem("LotSearchProductionFilter", filterForSearchPlan.value.LotSearch) || '',
-  sessionStorage.setItem("ItemNameSearchProductionFilter", filterForSearchPlan.value.ItemNameSearch) || ''
+  
+  sessionStorage.setItem('stockUpdateDataSession', JSON.stringify(filterForSearchPlan.value))
 }
 
 // ฟังก์ชันสำหรับสลับสถานะของไอคอนแต่ละตัว---------------------------------
@@ -186,14 +248,14 @@ const searchShipmentPlan = async () => {
   // Format ค่า ETA และ ETD ก่อนส่ง API
   // filterForSearchPlan.value.ETA = formatDateSave(filterForSearchPlan.value.ETA)
 
-  const etaDateForApi = ref(etaDateModel.value)
-  const etdDateForApi = ref(etdDateModel.value)
+  // const etaDateForApi = ref(etaDateModel.value)
+  // const etdDateForApi = ref(etdDateModel.value)
 
-  filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
-  filterForSearchPlan.value.ETD = formatDateSave(etdDateForApi.value)
+  // filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
+  // filterForSearchPlan.value.ETD = formatDateSave(etdDateForApi.value)
 
-  filterForSearchPlan.value.SortColumn = sortColumn.value
-  filterForSearchPlan.value.SortDirection = sortDirection.value
+  // filterForSearchPlan.value.SortColumn = sortColumn.value
+  // filterForSearchPlan.value.SortDirection = sortDirection.value
 
   saveHistoryFilter()
 
@@ -202,23 +264,16 @@ const searchShipmentPlan = async () => {
   try {
     const result = await fetchSearchPlan(
       urlApi.value,
-      'searchplans',
+      'StockUpdate',
       whereHouse,
       accessTokenAtStore,
       filterForSearchPlan.value,
       statusID,
     )
 
-    if (result && getSearchPlanResult.value.datas) {
-      searchPlanData.value = getSearchPlanResult.value.datas // เก็บข้อมูลใน reactive stat
-      
-      searchPlanData.value = getSearchPlanResult.value.datas.map(item => ({
-        ...item,
+    if (result) {
+      searchPlanData.value = getSearchPlanResult.value // เก็บข้อมูลใน reactive stat
 
-        eta: formatToDate(item.eta),
-        etd: formatToDate(item.etd),
-
-      }))
       console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
       console.error('No result from API')
@@ -232,6 +287,10 @@ const searchShipmentPlan = async () => {
     isLoading.value = false // Stop loading indicator
   }
 }
+
+watch(async () => {
+  await searchShipmentPlan()
+})
 
 const searchFilterPlanFunctionBtn = async () => {
   await searchShipmentPlan()
@@ -338,6 +397,7 @@ const dataTableCliclHighlightIsToggle = no => {
 //-------------------------- format decimal -------------------
 
 import { useGetCOAFormController } from '@/utilities/format'
+import { onMounted, watch } from 'vue'
 
 const { formatNumber } = useGetCOAFormController()
 
@@ -1021,7 +1081,7 @@ const isDialogPrintVisible = ref(false)
           <!-- 👉 table body -->
           <tbody>
             <template
-              v-for="(item, index) in mockDataImport"
+              v-for="(item, index) in paginatedData"
               :key="item.no"
             >
               <!-- แถวหลัก -->
@@ -1036,8 +1096,12 @@ const isDialogPrintVisible = ref(false)
                   </VBtn>
                 </td>
                 <td>{{ item.no }}</td>
-                <td class="cursor-pointer" @click="showImage(item.image)">
+                <td
+                  class="cursor-pointer"
+                  @click="showImage(item.image)"
+                >
                   <img
+                    v-if="item.image"
                     :src="item.image"
                     alt="Item Image"
                     width="50"
@@ -1048,19 +1112,19 @@ const isDialogPrintVisible = ref(false)
                   class="px-1"
                   style="min-width: 170px; max-width: 170px;  font-size: 14px;"
                 >
-                  {{ item.itemCode }}
+                  {{ item.productId }}
                 </td>
                 <td
                   class="px-1"
                   style="min-width: 200px; max-width: 200px;  font-size: 14px;"
                 >
-                  {{ item.itemName }}
+                  {{ item.productName }}
                 </td>
                 <td
                   class="px-1"
                   style="min-width: 110px; max-width: 110px;  font-size: 14px;"
                 >
-                  {{ item.categories }}
+                  {{ item.category }}
                 </td>
                 <td
                   class="px-1"
@@ -1072,7 +1136,7 @@ const isDialogPrintVisible = ref(false)
                   class="px-1"
                   style="min-width: 70px; max-width: 70px;  font-size: 14px;"
                 >
-                  {{ item.lotQty }}
+                  {{ item.locations.length }}
                 </td>
                 <td
                   class="px-1"
@@ -1084,35 +1148,35 @@ const isDialogPrintVisible = ref(false)
                   class="px-1"
                   style="min-width: 30px; max-width: 30px;  font-size: 14px;"
                 >
-                  {{ item.uom }}
+                  {{ item.unitName }}
                 </td>
                 <td
                   class="px-1"
                   style="min-width: 110px; max-width: 110px;  font-size: 14px;"
                 >
-                  {{ item.warehouse }}
+                  {{ item.stockName }}
                 </td>
                 <td
                   class="px-1"
                   style="min-width: 100px; max-width: 100px;  font-size: 14px;"
                 >
-                  {{ item.zone }}
+                  {{ item.zoneName }}
                 </td>
                 <td
                   class="px-1"
                   style="min-width: 120px; max-width: 120px;  font-size: 14px;"
                 >
-                  {{ item.Area }}
+                  {{ item.areaName }}
                 </td>
                 <td
                   class="px-1 text-end"
                   style="min-width: 150px; max-width: 150px;  font-size: 14px;"
                 >
                   <span
-                    v-if="item.shelfLife < 1"
+                    v-if="item.shelfLifeDays < 1"
                     class="text-red text-end"
-                  >{{ item.shelfLife }}</span>
-                  <span v-else>{{ item.shelfLife }}</span>
+                  >{{ item.shelfLifeDays }}</span>
+                  <span v-else>{{ item.shelfLifeDays }}</span>
                 </td>
                 <td
                   class="px-1"
@@ -1121,8 +1185,8 @@ const isDialogPrintVisible = ref(false)
                   <span
                     v-if="item.shelfLife < 1"
                     class="text-red text-end"
-                  >{{ formatToDate(item.expireDate) }}</span>
-                  <span v-else>{{ formatToDate(item.expireDate) }}</span>
+                  >{{ formatToDate(item.expirationDate) }}</span>
+                  <span v-else>{{ formatToDate(item.expirationDate) }}</span>
                 </td>
               </tr>
               <!-- แถวที่ขยาย (Expandable Row) -->
@@ -1144,7 +1208,7 @@ const isDialogPrintVisible = ref(false)
                       </thead>
                       <tbody>
                         <tr
-                          v-for="(batch, batchIndex) in item.lotBatch"
+                          v-for="(batch, batchIndex) in item.locations"
                           :key="batchIndex"
                         >
                           <td
@@ -1157,19 +1221,19 @@ const isDialogPrintVisible = ref(false)
                             style="font-size: 14px;"
                             :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                           >
-                            {{ batch.itemCode }}
+                            {{ batch.productId }}
                           </td>
                           <td
                             style="font-size: 14px;"
                             :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                           >
-                            {{ batch.itemName }}
+                            {{ batch.productName }}
                           </td>
                           <td
                             style="font-size: 14px;"
                             :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                           >
-                            {{ batch.lotNo }}
+                            {{ batch.lot }}
                           </td>
                           <td
                             style="font-size: 14px;"
@@ -1181,19 +1245,19 @@ const isDialogPrintVisible = ref(false)
                             style="font-size: 14px;"
                             :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                           >
-                            {{ batch.UoM }}
+                            {{ batch.unitName }}
                           </td>
                           <td
                             style="font-size: 14px;"
                             :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                           >
-                            {{ batch.noLotQty }}
+                            {{ batch.lotDescription }}
                           </td>
                           <td
                             style="font-size: 14px;"
                             :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                           >
-                            {{ batch.palletName }}
+                            {{ batch.productName }}
                           </td>
                         </tr>
                       </tbody>
