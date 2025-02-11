@@ -40,6 +40,40 @@ import { useGetCOAFormController } from '@/utilities/format'
 
 const { formatNumber } = useGetCOAFormController()
 
+const itemStore = useItemStore()
+
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+
+//----------------------------------- Permission -----------------------
+
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+const statusIdPermussion = ref('')
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: statusIdPermussion.value,
+  uiControlContextId: '6',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  statusIdPermussion.value = statusId
+  
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+}
+
 //----------------------------------- Dialog -------------------------------------------
 //------------------------ Dialog Confirm --------------------------------
 import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
@@ -341,7 +375,7 @@ const printExportExcel = async () => {
 
 const { getBatchProductionplanResult, errorMessageGetBatchProductionPlan, fetchGetBatchProductionplan } = useGetBatchProductionPlanService()
 
-const itemStore = useItemStore()
+
 
 const date = ref(new Date())
 
@@ -1277,22 +1311,26 @@ const statusText = statusId => {
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
+            <!-- selectedDataTablesStatusId !== 102 -->
             <VBtn
-              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 102"
+              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 102 && !canVisibleUserPermission(selectedDataTablesStatusId,'BTN_APPROVE').canExecute"
               @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">Approve</span>
             </VBtn>
+            <!-- selectedDataTablesStatusId !== 107 -->
             <VBtn
               class="mx-2"
               color="info"
-              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 107"
+              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 107 && !canVisibleUserPermission(selectedDataTablesStatusId,'BTN_PROD_APPROVE').canExecute"
               @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">PROD Approved</span>
+              {{ !canVisibleUserPermission(selectedDataTablesStatusId,'BTN_PROD_APPROVE').canExecute }}
             </VBtn>
             <VBtn
               class=""
+              :disabled="canVisibleUserPermission(selectedDataTablesStatusId,'BTN_NEW_BATCH').canExecute"
               color="warning"
               @click="newBatch(null)"
             >

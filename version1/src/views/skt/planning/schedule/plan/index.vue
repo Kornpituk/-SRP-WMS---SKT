@@ -12,6 +12,42 @@ import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 import alertWordConst from '@/utilities/constant'
 
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+
+//----------------------------------- Permission -----------------------
+
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+const statusIdPermussion = ref('')
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: statusIdPermussion.value,
+  uiControlContextId: '10',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  statusIdPermussion.value = statusId
+  
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+}
+
 const isDialogVisibleAlertDialog = ref(false)
 const isDialogVisibleConfirmLotValidateDialog = ref(false)
 const wordForSubmit = ref('')
@@ -128,9 +164,6 @@ const products = ref([]) //---------------- variable for get All Product From X-
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 ///--- import Cookie
-import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-
-const itemStore = useItemStore()
 
 const batchId = ref(itemStore.getItemDetails('guIDForBatchCookie'))
 
@@ -2462,6 +2495,8 @@ const statusText = statusId => {
     <VCard>
       <VCardText class="pa-2">
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'NEW_PLAN').canVisible"
+          :disabled="!canVisibleUserPermission(statusPermission,'NEW_PLAN').canExecute"
           class="mx-1"
           color="orange-darken-3"
           @click="addEmptyRowToPlan"
@@ -2469,6 +2504,8 @@ const statusText = statusId => {
           <span style="font-size: 12px;">New Plan</span>
         </VBtn>
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'SAVE_DRAFT').canVisible"
+          :disabled="!canVisibleUserPermission(statusPermission,'SAVE_DRAFT').canExecute"
           class="mx-1"
           color="warning"
           @click="saveProductionPlan"
@@ -2476,44 +2513,58 @@ const statusText = statusId => {
           <span style="font-size: 12px;">Save Draft</span>
         </VBtn>
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'GENLOT').canVisible"
+          :disabled="!canVisibleUserPermission(statusPermission,'GENLOT').canExecute && !productionPlan"
           color="info"
           class="mx-1"
-          :disabled="!productionPlan"
           @click="handleBtnGenerateLotBatch"
         >
           <span style="font-size: 12px;">Gen Lot</span>
         </VBtn>
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'DELETE_PLAN').canVisible"
           color="error"
-          :disabled="!activeBtnCancelPlan"
+          :disabled="!activeBtnCancelPlan || !canVisibleUserPermission(statusPermission,'DELETE_PLAN').canExecute"
           class="mx-1"
           @click="deletePlan"
         >
           <span style="font-size: 12px;">Delete Plan</span>
         </VBtn>
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'SUBMIT').canVisible"
           class="mx-1"
           color="light-green-darken-1"
-          :disabled="!activeBtnSubmit"
+          :disabled="!activeBtnSubmit || !canVisibleUserPermission(statusPermission,'DELETE_PLAN').canExecute"
           @click="btnSubmitConfirm"
         >
           <span style="font-size: 12px;">Submit</span>
         </VBtn>
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'APPROVE').canVisible"
           class="mx-1"
-          :disabled="!activeBtnApprove"
+          :disabled="!activeBtnApprove || !canVisibleUserPermission(statusPermission,'APPROVE').canExecute"
           @click="openConfirmDialog"
         >
           <span style="font-size: 12px;">Approve</span>
         </VBtn>
         <VBtn
-          v-if="true"
-          :disabled="!activeBtnRejectPlan"
+          v-if="canVisibleUserPermission(statusPermission,'REJECT_PLAN').canVisible"
+          :disabled="!activeBtnRejectPlan || !canVisibleUserPermission(statusPermission,'REJECT_PLAN').canExecute"
           color="error"
           class="mx-1"
           @click="btnRejectConfirm"
         >
           <span style="font-size: 12px;">Reject Plan</span>
+        </VBtn>
+
+        <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'SEND_BACK').canVisible"
+          :disabled="true|| !canVisibleUserPermission(statusPermission,'SEND_BACK').canExecute"
+          color="purple-accent-4"
+          class="mx-1"
+          @click="btnRejectConfirm"
+        >
+          <span style="font-size: 12px;">Send Back</span>
         </VBtn>
 
         <VBtn
