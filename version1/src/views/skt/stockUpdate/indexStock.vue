@@ -1001,7 +1001,6 @@ const isDialogPrintVisible = ref(false)
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
     <VCard class="mt-6">
-    -->{{ paginatedData }}
       <div>
         <div
           v-if="errorMessage"

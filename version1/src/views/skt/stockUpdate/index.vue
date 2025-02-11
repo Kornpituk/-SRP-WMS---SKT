@@ -52,11 +52,105 @@ const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 
 //------------------------------ fetch data from API --------------------------------
-// import { useGetUserPermissionService,
-//   useGetSearchPlanService,
-// } from '@/services/skt/shipmentPlan/services'
+import { 
+  useGetSearchPlanService,
+  useGetItemSelectService, usePrintExportExcelService,
+} from '@/services/skt/stockUpdate/services'
 
-import { useGetSearchPlanService } from '@/services/skt/stockUpdate/services'
+// import { useGetSearchPlanService } from '@/services/skt/stockUpdate/services'
+
+//--------------------------------- Section Get Item Select ------------------------------
+
+const { getItemSelectResult,
+  errorGetItemSelect,
+  fetchItemSelect } =  useGetItemSelectService()
+  
+const warehouseItemModel = ref()
+const categoriesItemModel = ref()
+const zoneItemModel = ref()
+const areaItemModel = ref()
+const subAreaItemModel = ref()
+
+const warehouseModel = ref()
+const categoriesModel = ref()
+const zoneModel = ref()
+const areaModel = ref()
+const subAreaModel = ref()
+
+const sessionDataFilter = ref(JSON.parse(sessionStorage.getItem("stockUpdateDataSession")))
+
+const filterForSearchPlan = ref({
+
+  categoryId: sessionDataFilter.value.categoryId || '',
+  typeId: sessionDataFilter.value.typeId || '',
+  subTypeId: sessionDataFilter.value.subTypeId || '',
+  barcode: sessionDataFilter.value.barcode || '',
+  productId: sessionDataFilter.value.productId || '',
+  productName: sessionDataFilter.value.productName || '',
+  unitId: sessionDataFilter.value.unitId || '',
+  serialNo: sessionDataFilter.value.serialNo || '',
+  zoneId: sessionDataFilter.value.zoneId || '',
+  areaId: sessionDataFilter.value.areaId || '',
+  subAreaId: sessionDataFilter.value.subAreaId || '',
+  searchByCategory: sessionDataFilter.value.searchByCategory || '',
+  searchByType: sessionDataFilter.value.searchByType || '',
+  searchBySubType: sessionDataFilter.value.searchBySubType || '',
+  searchByBarcode: sessionDataFilter.value.searchByBarcode || '',
+  searchByProductId: sessionDataFilter.value.searchByProductId || '',
+  searchByProductName: sessionDataFilter.value.searchByProductName || '',
+  searchByUnit: sessionDataFilter.value.searchByUnit || '',
+  sortByCategory: sessionDataFilter.value.sortByCategory || '',
+  sortByType: sessionDataFilter.value.sortByType || '',
+  sortBySubType: sessionDataFilter.value.sortBySubType || '',
+  sortByBarcode: sessionDataFilter.value.sortByBarcode || '',
+  sortByProductId: sessionDataFilter.value.sortByProductId || '',
+  sortByProductName: sessionDataFilter.value.sortByProductName || '',
+  sortByUnit: sessionDataFilter.value.sortByUnit || '',
+  sortByQty: sessionDataFilter.value.sortByQty || '',
+  sortByTags: sessionDataFilter.value.sortByTags || '',
+  sortByNonTags: sessionDataFilter.value.sortByNonTags || '',
+})
+
+
+const handleFetchItemSelectFilter = async (form, type, params) => {
+  try{
+    const result = await fetchItemSelect(
+      urlApi.value,
+      form,
+      whereHouse,
+      accessTokenAtStore,
+      params,
+      type,
+    )
+
+    if(result){
+      // console.log(`result ${type}`, result)
+
+      return result
+    }else{
+      console.log(errorGetItemSelect.value)
+    }
+  }catch(error){
+    console.log(error)
+  }
+}
+
+watch(async () => {
+  const [warehouse, zone, area, subarea, categories] = await Promise.all([
+    handleFetchItemSelectFilter('warehouse', '', ''),
+    handleFetchItemSelectFilter('zone', '', ''),
+    handleFetchItemSelectFilter('area', 'zoneCode', zoneModel.value),
+    handleFetchItemSelectFilter('subArea', zoneModel.value, areaModel.value),
+    handleFetchItemSelectFilter('Categories', 'Categories', ''),
+  ])
+
+  warehouseItemModel.value = warehouse
+  zoneItemModel.value = zone
+  areaItemModel.value = area
+  subAreaItemModel.value = subarea
+  categoriesItemModel.value = categories
+
+})
 
 //------------------------------- Function Get Search plan -----------------
 
@@ -186,40 +280,6 @@ const sortDirection = ref('')
 const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
 const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
 
-const sessionDataFilter = ref(sessionStorage.getItem("stockUpdateDataSession"))
-
-const filterForSearchPlan = ref({
-
-  categoryId: sessionDataFilter.categoryId || '',
-  typeId: sessionDataFilter.typeId || '',
-  subTypeId: sessionDataFilter.subTypeId || '',
-  barcode: sessionDataFilter.barcode || '',
-  productId: sessionDataFilter.productId || '',
-  productName: sessionDataFilter.productName || '',
-  unitId: sessionDataFilter.unitId || '',
-  serialNo: sessionDataFilter.serialNo || '',
-  zoneId: sessionDataFilter.zoneId || '',
-  areaId: sessionDataFilter.areaId || '',
-  subAreaId: sessionDataFilter.subAreaId || '',
-  searchByCategory: sessionDataFilter.searchByCategory || '',
-  searchByType: sessionDataFilter.searchByType || '',
-  searchBySubType: sessionDataFilter.searchBySubType || '',
-  searchByBarcode: sessionDataFilter.searchByBarcode || '',
-  searchByProductId: sessionDataFilter.searchByProductId || '',
-  searchByProductName: sessionDataFilter.searchByProductName || '',
-  searchByUnit: sessionDataFilter.searchByUnit || '',
-  sortByCategory: sessionDataFilter.sortByCategory || '',
-  sortByType: sessionDataFilter.sortByType || '',
-  sortBySubType: sessionDataFilter.sortBySubType || '',
-  sortByBarcode: sessionDataFilter.sortByBarcode || '',
-  sortByProductId: sessionDataFilter.sortByProductId || '',
-  sortByProductName: sessionDataFilter.sortByProductName || '',
-  sortByUnit: sessionDataFilter.sortByUnit || '',
-  sortByQty: sessionDataFilter.sortByQty || '',
-  sortByTags: sessionDataFilter.sortByTags || '',
-  sortByNonTags: sessionDataFilter.sortByNonTags || '',
-})
-
 const saveHistoryFilter = () => {
   
   sessionStorage.setItem('stockUpdateDataSession', JSON.stringify(filterForSearchPlan.value))
@@ -245,19 +305,7 @@ function getStatusIdByName(statusName) {
 const searchShipmentPlan = async () => {
   isLoading.value = true
 
-  // Format ค่า ETA และ ETD ก่อนส่ง API
-  // filterForSearchPlan.value.ETA = formatDateSave(filterForSearchPlan.value.ETA)
-
-  // const etaDateForApi = ref(etaDateModel.value)
-  // const etdDateForApi = ref(etdDateModel.value)
-
-  // filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
-  // filterForSearchPlan.value.ETD = formatDateSave(etdDateForApi.value)
-
-  // filterForSearchPlan.value.SortColumn = sortColumn.value
-  // filterForSearchPlan.value.SortDirection = sortDirection.value
-
-  saveHistoryFilter()
+  
 
   const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
 
@@ -288,12 +336,16 @@ const searchShipmentPlan = async () => {
   }
 }
 
-watch(async () => {
+onMounted(async () => {
   await searchShipmentPlan()
 })
 
 const searchFilterPlanFunctionBtn = async () => {
+
+  saveHistoryFilter()
+
   await searchShipmentPlan()
+
 }
 
 const clearFilterPlanFunctionBtn = async () => {
@@ -313,60 +365,52 @@ const clearFilterPlanFunctionBtn = async () => {
   etdDateModel.value = ''
 }
 
-const getOrDefault = (value, defaultValue) => value ?? defaultValue
+//-------------------------------------------- Export Excel -----------------------
 
-const saveShipmentPlan = async row => {
-  console.log("save plan start...", row)
+
+const { printExportExcelResult,
+  printExportExcelErrorMessage,
+  printExportExcelService } = usePrintExportExcelService()
+
+const  loadingPrint = ref(false) 
+
+const printShipmentPDFBySoEIdPlan = async () => {
+  loadingPrint.value = true
+  console.log('loadingPrint', loadingPrint.value)
+
+  saveHistoryFilter()
+
+  const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
 
   try {
-    // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
-    if (
-      filesFromUploaderSO.value ||
-      filesFromUploaderCOA.value ||
-      filesFromUploaderTruckOrder.value ||
-      filesFromUploaderDeliNote.value
-    ) {
-      console.log("Uploading files...")
-
-      const saveFile =  await saveFileFormShipment(
-        filesFromUploaderSO.value,
-        "SaveSo",
-        row.soEtlLogDetailJournalID,
-      )
-
-      console.log("File upload completed.", row.soEtlLogDetailJournalID)
-    }
-
-    if(!saveFile){
-      throw 'Save File Fiald!'
-    }
-
-    // Mapping request data และส่งคำขอ
-    const requestData = mapRequestData(row)
-
-    const response = await saveSearchPlan(
+    // ✅ เรียก printShipmentPDF
+    const result = await printExportExcelService(
       urlApi.value,
-      "save",
+      'StockUpdate',
+      'Excel',
       whereHouse,
       accessTokenAtStore,
-      requestData,
+      filterForSearchPlan.value,
+      statusID,
+      
     )
+    
+    if (result) {
+      console.log('result print', result)
 
-    if (saveSearchPlanResult.value) {
-      textAlertDialogFunction(alertWordConst.saveDraft, true)
-      setTimeout(() => {
-        // location.reload()
-      }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+      // textAlertDialogFunction(alertWordConst.print, true)
+
+      // setTimeout(() => {
+      //   // location.reload()
+      // }, 500)
     } else {
-      textAlertDialogFunction(alertWordConst.saveDraft, false)
-      setTimeout(() => {
-        // location.reload()
-      }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+      textAlertDialogFunction(alertWordConst.print, false)
     }
 
-    console.log(`Saved search plan:`, response)
   } catch (error) {
-    console.error(`Error saving search plan:`, error)
+    console.error(`Error printing shipment PDF:`, error)
+  } finally {
+    loadingPrint.value = false
   }
 }
 
@@ -560,8 +604,11 @@ const isDialogPrintVisible = ref(false)
                   class="py-1"
                 >
                   <VSelect
-                    :items="items"
+                    v-model="warehouseModel"
+                    :items="warehouseItemModel"
                     label="Warehouse"
+                    item-title="name"
+                    item-value="id"
                     density="compact"
                     eager
                   >
@@ -574,41 +621,6 @@ const isDialogPrintVisible = ref(false)
                       </span>
                     </template>
                   </VSelect>
-                  <VSelect
-                    v-if="false"
-                    v-model="filterForSearchPlan.StatusId"
-                    :items="itemsStatus"
-                    item-title="name"
-                    item-value="name"
-                    density="compact"
-                  >
-                    <template #label>
-                      <span
-                        class="d-flex align-center"
-                        style="font-size: 14px;"
-                      >
-                        Select Status
-                      </span>
-                    </template>
-
-                    <template #selection="{ item }">
-                      <VChip
-                        variant="elevated"
-                        size="x-small"
-                        style="min-height: 20px;"
-                        :color="item.raw.color? item.raw.color : 'grey'"
-                      >
-                        <span
-                          v-if="item.raw.name"
-                          class="text-white"
-                        >{{ item.raw.name }}</span>
-                        <span
-                          v-else
-                          class="text-white"
-                        >All</span>
-                      </VChip>
-                    </template>
-                  </VSelect>
                 </VCol>
 
                 <VCol
@@ -618,9 +630,12 @@ const isDialogPrintVisible = ref(false)
                   class="py-1"
                 >
                   <VSelect
-                    :items="items"
+                    v-model="filterForSearchPlan.zoneId"
+                    :items="zoneItemModel"
                     label="Warehouse"
                     density="compact"
+                    item-title="name"
+                    item-value="id"
                     eager
                   >
                     <template #label>
@@ -640,8 +655,11 @@ const isDialogPrintVisible = ref(false)
                   class="py-1"
                 >
                   <VSelect
-                    :items="items"
+                    v-model="filterForSearchPlan.areaId"
+                    :items="areaItemModel"
                     label="Warehouse"
+                    item-title="name"
+                    item-value="id"
                     density="compact"
                     eager
                   >
@@ -680,8 +698,11 @@ const isDialogPrintVisible = ref(false)
                 >
                   <!-- 👉 Search Product code -->
                   <VSelect
-                    :items="items"
+                    v-model="filterForSearchPlan.subAreaId"
+                    :items="subAreaItemModel"
                     label="Warehouse"
+                    item-title="name"
+                    item-value="id"
                     density="compact"
                     eager
                   >
@@ -704,7 +725,7 @@ const isDialogPrintVisible = ref(false)
                   class="py-1"
                 >
                   <VTextField
-                    v-model="filterForSearchPlan.LotSearch"
+                    v-model="filterForSearchPlan.searchByProductId"
                     density="compact"
                   >
                     <template #label>
@@ -720,7 +741,7 @@ const isDialogPrintVisible = ref(false)
                   class="py-1"
                 >
                   <VTextField
-                    v-model="filterForSearchPlan.LotSearch"
+                    v-model="filterForSearchPlan.searchByProductName"
                     density="compact"
                   >
                     <template #label>
@@ -774,7 +795,7 @@ const isDialogPrintVisible = ref(false)
                         class=""
                         color="warning"
                         style="width: 100%; height: 40px;"
-                        @click="isDialogPrintVisible = true"
+                        @click="printShipmentPDFBySoEIdPlan"
                       >
                         <img
                           src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
