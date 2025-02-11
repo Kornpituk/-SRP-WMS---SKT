@@ -72,32 +72,39 @@ const formatToDate = dateString => {
   return `${day}/${month}/${year}`
 }
 
-function formatDateTime(value) {
-  // ตรวจสอบว่าเป็นรูปแบบ ISO 8601 แบบมี "Z"
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(value)) {
-    return value.replace("T", " ").slice(0, 16)
+const extractTime = isoString => {
+  return new Date(isoString).toLocaleTimeString('en-GB', { hour12: false })
+}
+
+console.log('Date:', extractTime("2020-05-02T16:40:00")) // 21:25:00
+
+
+const convertToISO = dateString => {
+  const regex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/
+  const match = dateString.match(regex)
+
+  if (!match) {
+    return dateString // ถ้าไม่ตรงรูปแบบ ให้คืนค่าเดิม
   }
 
-  // ตรวจสอบว่าเป็นรูปแบบ ISO 8601 แบบไม่มี "Z"
-  else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}$/.test(value)) {
-    return value.replace("T", " ").slice(0, 16)
-  }
+  const [, day, month, year, hour, minute] = match
+  const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 6, 804))
 
-  // ตรวจสอบว่าเป็นรูปแบบ "YYYY-MM-DD HH:mm"
-  else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(value)) {
-    return new Date(value.replace(" ", "T") + ":00.000Z").toISOString()
-  }
+  return date.toISOString()
+}
 
-  // ตรวจสอบว่าเป็นรูปแบบ "YY/MM/DD HH:mm"
-  else if (/^\d{2}\/\d{2}\/\d{2} \d{2}:\d{2}$/.test(value)) {
-    let [yy, mm, dd, hh, min] = value.match(/\d+/g)
-    let year = parseInt(yy) + 2000 // แปลงปี 2 หลักให้เป็น 4 หลัก (เช่น 20 → 2020)
-    
-    return new Date(`${year}-${mm}-${dd}T${hh}:${min}:00.000Z`).toISOString()
-  } 
-  else {
-    throw new Error("Invalid date format")
-  }
+function toCustomFormat(isoString) {
+  const date = new Date(isoString)
+  
+  if (isNaN(date.getTime())) return isoString // ตรวจสอบว่าเป็น ISO 8601 จริงหรือไม่
+
+  const day = String(date.getUTCDate()).padStart(2, "0")
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0") // เดือนเริ่มจาก 0
+  const year = date.getUTCFullYear()
+  const hours = String(date.getUTCHours()).padStart(2, "0")
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0")
+
+  return `${day}/${month}/${year} ${hours}:${minutes}`
 }
 
 //-------------------------- Section Get Data --------------------------------
@@ -112,32 +119,46 @@ const handleFetchDataLorry = async () => {
       'ShippingLorryFlexi', whereHouse, accessTokenAtStore, soEIdModel.value)
 
   
-    if(result){
- 
-      getShippingCheckSheetResult.value = result.data.reportLorryFlexi
+    if (result && result.data.reportLorryFlexi) {
+      console.log('res', result.data.reportLorryFlexi) // แสดงข้อมูลดูก่อน
 
-      console.log('getShippingCheckSheetResult: ', getShippingCheckSheetResult.value)
+      const newData = ref()
 
-      const dataNew =  await Promise.all(
-        getShippingCheckSheetResult.value.map(async item => ({
+      if (Array.isArray(result.data.reportLorryFlexi)) {
+        // ถ้าเป็น array -> ใช้ .map() ได้
+        newData.value = result.data.reportLorryFlexi.map(item => ({
           ...item,
-      
-          startedDate: formatDateTime(item.startedDate), // ใช้ await ที่นี่
-          finishedDate: formatDateTime(item.finishedDate), // ใช้ await ที่นี่
-      
-          dateTimeStart: formatDateTime(item.dateTimeStart), // ใช้ await ที่นี่
-          dateTimeBefore: formatDateTime(item.dateTimeBefore), // ใช้ await ที่นี่
-          dateTimeMiddle: formatDateTime(item.dateTimeMiddle), // ใช้ await ที่นี่
-          dateTimeFinal: formatDateTime(item.dateTimeFinal), // ใช้ await ที่นี่
-          dateTimeInLorry: formatDateTime(item.dateTimeInLorry), // ใช้ await ที่นี่
-        })),
-      )
-      
-      getShippingCheckSheetResult.value = dataNew
+
+          startedDate: extractTime(item.startedDate),
+          finishedDate: extractTime(item.finishedDate),
+
+          dateTimeStart: toCustomFormat(item.dateTimeStart),
+          dateTimeBefore: toCustomFormat(item.dateTimeBefore),
+          dateTimeMiddle: toCustomFormat(item.dateTimeMiddle),
+          dateTimeFinal: toCustomFormat(item.dateTimeFinal),
+          dateTimeInLorry: toCustomFormat(item.dateTimeInLorry),
+        }))
+      } else {
+        // ถ้าเป็น object -> แปลงเป็น array ก่อน
+        newData.value = [{
+          ...result.data.reportLorryFlexi,
+
+          startedDate: extractTime(result.data.reportLorryFlexi.startedDate),
+          finishedDate: extractTime(result.data.reportLorryFlexi.finishedDate),
+
+          dateTimeStart: toCustomFormat(result.data.reportLorryFlexi.dateTimeStart),
+          dateTimeBefore: toCustomFormat(result.data.reportLorryFlexi.dateTimeBefore),
+          dateTimeMiddle: toCustomFormat(result.data.reportLorryFlexi.dateTimeMiddle),
+          dateTimeFinal: toCustomFormat(result.data.reportLorryFlexi.dateTimeFinal),
+          dateTimeInLorry: toCustomFormat(result.data.reportLorryFlexi.dateTimeInLorry),
+        }]
+      }
+
+      getShippingCheckSheetResult.value = newData.value[0]
 
       console.log('getShippingCheckSheetResult: ', getShippingCheckSheetResult.value)
-    }else{
-      console.error('Error: ', errorGetShippingCheckSheet.value)
+    } else {
+      console.error('Error: result.data.reportLorryFlexi เป็น null หรือ undefined', result.data.reportLorryFlexi)
     }
   }catch(e){
     console.error(e)
@@ -168,7 +189,6 @@ const setMeshValue = value => {
   }
 }
 
-
 const variantBtnBagFilter = ref('text')
 
 // ฟังก์ชันเช็คว่า bagFilter ตรงกับค่าที่ส่งเข้ามาหรือไม่
@@ -186,8 +206,6 @@ const setBagFilterValue = value => {
   }
   
 }
-
-
 
 //--------------------------- Section Save -------------------------------------------
 const { saveShippingCheckSheetResult,
@@ -234,10 +252,11 @@ const prepareCommonDataPart3 = data => ({
   net: data.net ?? 22,
   pointOfDelivery: data.pointOfDelivery ?? "",
 
-  // startedDate: (data.startedDate),
-  // finishedDate: (data.startedDate),
-  startedDate: "2020-05-02T08:08:00.000Z",
-  finishedDate: "2020-05-02T08:08:00.000Z",
+  startedDate: ('2020-05-02T'+data.startedDate),
+  finishedDate: ('2020-05-02T'+data.finishedDate),
+
+  // startedDate: "2020-05-02T08:08:00.000Z",
+  // finishedDate: "2020-05-02T08:08:00.000Z",
 })
 
 const prepareAppearanceData = data => ({
@@ -249,11 +268,11 @@ const prepareAppearanceData = data => ({
 })
 
 const prepareDateTimeData = data => ({
-  dateTimeStart: formatDateTime(data.dateTimeStart) ?? new Date().toISOString(),
-  dateTimeBefore: formatDateTime(data.dateTimeBefore) ?? new Date().toISOString(),
-  dateTimeMiddle: formatDateTime(data.dateTimeMiddle) ?? new Date().toISOString(),
-  dateTimeFinal: formatDateTime(data.dateTimeFinal) ?? new Date().toISOString(),
-  dateTimeInLorry: formatDateTime(data.dateTimeInLorry) ?? new Date().toISOString(),
+  dateTimeStart: convertToISO(data.dateTimeStart) ?? new Date().toISOString(),
+  dateTimeBefore: convertToISO(data.dateTimeBefore) ?? new Date().toISOString(),
+  dateTimeMiddle: convertToISO(data.dateTimeMiddle) ?? new Date().toISOString(),
+  dateTimeFinal: convertToISO(data.dateTimeFinal) ?? new Date().toISOString(),
+  dateTimeInLorry: convertToISO(data.dateTimeInLorry) ?? new Date().toISOString(),
 })
 
 const preparePersonInchargeData = data => ({
@@ -886,7 +905,10 @@ const handleSubmit = async type => {
               >
                 Start Time
               </VCol>
-              <VCol cols="9">
+              <VCol
+                v-if="getShippingCheckSheetResult"
+                cols="9"
+              >
                 <AppDateTimePicker
                   v-if="getShippingCheckSheetResult"
                   v-model="getShippingCheckSheetResult.startedDate"
@@ -980,7 +1002,7 @@ const handleSubmit = async type => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeBefore"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
             />
           </th>
@@ -1030,7 +1052,7 @@ const handleSubmit = async type => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeStart"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
             />
           </th>
@@ -1080,7 +1102,7 @@ const handleSubmit = async type => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeMiddle"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
             />
           </th>
@@ -1130,7 +1152,7 @@ const handleSubmit = async type => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeFinal"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
             />
           </th>
@@ -1180,7 +1202,7 @@ const handleSubmit = async type => {
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeInLorry"
               placeholder="Select date and time"
-              :config="{ enableTime: true, dateFormat: 'd/m/y H:i' }"
+              :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
             />
           </th>
