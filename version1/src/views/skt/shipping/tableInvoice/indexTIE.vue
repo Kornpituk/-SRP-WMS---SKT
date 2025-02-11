@@ -1814,6 +1814,8 @@ const printShipmentPDFBySoEIdPlan = async () => {
       return 'ShipmentPlanLOG'
     }else if(department.value === 'Sale and marketing'){
       return 'ShipmentPlanSALE'
+    }else if(department.value === 'Inspection'){
+      return 'ShipmentPlanInspection'
     }
   }
   
