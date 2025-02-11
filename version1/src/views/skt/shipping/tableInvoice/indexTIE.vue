@@ -132,9 +132,9 @@ import { useGetUserPermissionService,
   usePrintExportExcelService,
 } from '@/services/skt/shipmentPlan/services'
 
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
 
-const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 
 const paramsForGetPermission = ref({
   empId: String(userDataInfo.value.id) || '',
@@ -1670,8 +1670,10 @@ async function  redirectBasedOnStatus (product)  {
   const mainCheckSheetTypeName = (product.checkSheetTypeName)
 
   const checkSheetTypeNameMapping = {
-    'N/A': 'Flexi',
+    'N/A': '',
     'Drum': 'Drum',
+    'Paper bag': 'Drum',
+    'Can': 'Drum',
     'IBC': 'Drum',
     'Flexi': 'Flexi',
     'Lorry': 'Flexi',

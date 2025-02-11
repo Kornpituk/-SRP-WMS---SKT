@@ -225,7 +225,7 @@ const translatedKeys = {
   labelNotTorn: "2.Label ไม่ฉีกขาด",
   correctLotNo: "- Lot No.ถูกต้อง",
   correctWeight: "- น้ำหนักถูกต้อง",
-  correctLabelPosition: "- ตำแหน่ง Lable ถูกต้อง (อยู่ตรงกลาง)",
+  correctLabelPosition: "- ตำแหน่ง Label ถูกต้อง (อยู่ตรงกลาง)",
   noTopVentHole: "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า",
   capNoLeakAfterOpening: "- Check Leak ที่ CAPเปิดแล้วไม่รั่วแล้วปิดให้แน่น",
   correctCapSize: "- ฝาเกลียวที่ใช้ขนาดถูกต้อง",
@@ -794,7 +794,6 @@ const switchDataSet = index => {
 
 const currentPage = ref(1)  // หน้าที่กำลังแสดง
 const rowsPerPage = 5       // จำนวนแถวที่จะแสดงในแต่ละหน้า
-const totalRows = computed(() => Object.values(GBSMockData.value.rows1).flat().length)  // จำนวนแถวทั้งหมด
 
 const displayedRows = computed(() => {
   const startIndex = (currentPage.value - 1) * rowsPerPage
@@ -890,48 +889,52 @@ resaleProductShipping.value.forEach(truck => {
       }
     })
 
-    if (newFiles && newFiles.length > 0) {
-      newFiles.forEach((file, index) => {
-        const fileType = file.type
-        const fileName = file.name
+    if(newFiles){
+      if (newFiles.length > 0) {
+        newFiles.forEach((file, index) => {
+          const fileType = file.type
+          const fileName = file.name
 
-        if (fileType === 'application/pdf') {
-          const fileURL = URL.createObjectURL(file)
+          if (fileType === 'application/pdf') {
+            const fileURL = URL.createObjectURL(file)
 
-          truck.files[index] = {
-            ...file,
-            pdfPreview: fileURL,
-            imagePreview: null, // Clear image preview if any
-            fileName: fileName, // Add the file name
+            truck.files[index] = {
+              ...file,
+              pdfPreview: fileURL,
+              imagePreview: null, // Clear image preview if any
+              fileName: fileName, // Add the file name
+            }
+          } else if (fileType.startsWith('image/')) {
+            const fileURL = URL.createObjectURL(file)
+
+            truck.files[index] = {
+              ...file,
+              imagePreview: fileURL,
+              pdfPreview: null, // Clear PDF preview if any
+              fileName: fileName, // Add the file name
+            }
+          } else {
+            truck.files[index] = {
+              ...file,
+              pdfPreview: null,
+              imagePreview: null,
+              fileName: fileName, // Add the file name
+            }
           }
-        } else if (fileType.startsWith('image/')) {
-          const fileURL = URL.createObjectURL(file)
-
-          truck.files[index] = {
-            ...file,
-            imagePreview: fileURL,
-            pdfPreview: null, // Clear PDF preview if any
-            fileName: fileName, // Add the file name
-          }
-        } else {
+        })
+      } else {
+        truck.files.forEach((file, index) => {
           truck.files[index] = {
             ...file,
             pdfPreview: null,
             imagePreview: null,
-            fileName: fileName, // Add the file name
+            fileName: null, // Clear the file name if no file
           }
-        }
-      })
-    } else {
-      truck.files.forEach((file, index) => {
-        truck.files[index] = {
-          ...file,
-          pdfPreview: null,
-          imagePreview: null,
-          fileName: null, // Clear the file name if no file
-        }
-      })
+        })
+      }
     }
+
+    
   })
 })
 
@@ -996,6 +999,12 @@ const addTruck = () => {
 
 const removeFilesInTruck = index => {
   resaleProductShipping.value[index].files = []
+}
+
+const lengthGetShippingSpecialConditionIconResult = data => {
+  if(data){
+    return 3 -data.length
+  }
 }
 
 //------------------------ Dialog ----------------------------------------------------------------
@@ -1449,7 +1458,10 @@ const dessertsMockAmountView = [
                       </VCard>
                     </VCol>
                   </VRow>
-                  <VRow class="d-flex justify-start">
+                  <VRow
+                    v-if="getShippingSpecialConditionIconResult"
+                    class="d-flex justify-start"
+                  >
                     <VCol
                       v-for="(file, index) in getShippingSpecialConditionIconResult.data"
                       :key="index"
@@ -1468,7 +1480,7 @@ const dessertsMockAmountView = [
                     </VCol>
                     <!-- เพิ่มช่องว่างถ้ามีรูป < 3 -->
                     <VCol
-                      v-for="n in (3 - getShippingSpecialConditionIconResult.data.length)"
+                      v-for="n in (lengthGetShippingSpecialConditionIconResult(getShippingSpecialConditionIconResult.data))"
                       :key="'empty-' + n"
                       cols="4"
                     >
@@ -1869,7 +1881,7 @@ const dessertsMockAmountView = [
                   class="text-center"
                   style="position: sticky;z-index: 1;  left: 0; min-width: 350px; background-color: #fafafa;"
                 >
-                  GROSSWEIGHT Before Shipping
+                  GROSS WEIGHT Before Shipping
                 </th>
                 <th
                   v-for="(num, index) in tableData.grossWeightBeforeShipping"
