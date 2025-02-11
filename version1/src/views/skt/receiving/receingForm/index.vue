@@ -588,7 +588,6 @@ const textConfirmDialogFunction = async (word, success, confirm) => {
   successDialAlert.value = success
   isDialogConfirmVisible.value = true
 
-
 }
 
 const handleSelectLorryLoading = word => {
@@ -606,9 +605,9 @@ const handleSelectLorryLoading = word => {
     isDialogVisibleConfirmDialog2.value?.closeDialog()
     isDialogVisibleSelecrLorry.value = false
     if(selectLorryInfoKey.value === '13'){
-      window.location.href = 'receingForm'
+      window.location.href = 'receivingform'
     }else if(selectLorryInfoKey.value === '10'){
-      window.location.href = 'receingForm'
+      window.location.href = 'receivingform'
       2
     }
   }, 1000) // 10000 มิลลิวินาที = 10 วินาที
