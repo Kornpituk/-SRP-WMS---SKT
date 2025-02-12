@@ -3402,7 +3402,6 @@ const handlePrintTruckOrderPDF = () => {
                       file-name="So Attachment" 
                       @updateFiles="handleFileUpdatesSO"
                     />
-                    <span v-if="filesFromUploaderSO.value">asdads:{{ filesFromUploaderSO.value.length }}</span>
                   </div>
                 </VForm>
               </td>
@@ -3653,7 +3652,6 @@ const handlePrintTruckOrderPDF = () => {
                   <span v-else>Lot Number</span>
                 </VBtn>
                 <span v-else>{{ product.lot }}</span>
-                {{ product.lot.length }}
               </td>
 
               <!-- 👉 qty -->

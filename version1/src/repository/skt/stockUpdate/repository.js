@@ -38,8 +38,8 @@ export const checkSheetLorryFlexiRepository = {
         console.log('params repo', params)
       }
 
-      const response = await axios.post(
-        `${urlApi}/api/v1/${form}/${type}`,
+      const response = await axios.get(
+        `${urlApi}/api/v1/StockUpdate/ExportExcel/${form}/${type}`,
         {
           headers: {
             'accept': '*/*', 

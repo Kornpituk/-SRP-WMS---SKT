@@ -80,35 +80,34 @@ const subAreaModel = ref()
 const sessionDataFilter = ref(JSON.parse(sessionStorage.getItem("stockUpdateDataSession")))
 
 const filterForSearchPlan = ref({
-
-  categoryId: sessionDataFilter.value.categoryId || '',
-  typeId: sessionDataFilter.value.typeId || '',
-  subTypeId: sessionDataFilter.value.subTypeId || '',
-  barcode: sessionDataFilter.value.barcode || '',
-  productId: sessionDataFilter.value.productId || '',
-  productName: sessionDataFilter.value.productName || '',
-  unitId: sessionDataFilter.value.unitId || '',
-  serialNo: sessionDataFilter.value.serialNo || '',
-  zoneId: sessionDataFilter.value.zoneId || '',
-  areaId: sessionDataFilter.value.areaId || '',
-  subAreaId: sessionDataFilter.value.subAreaId || '',
-  searchByCategory: sessionDataFilter.value.searchByCategory || '',
-  searchByType: sessionDataFilter.value.searchByType || '',
-  searchBySubType: sessionDataFilter.value.searchBySubType || '',
-  searchByBarcode: sessionDataFilter.value.searchByBarcode || '',
-  searchByProductId: sessionDataFilter.value.searchByProductId || '',
-  searchByProductName: sessionDataFilter.value.searchByProductName || '',
-  searchByUnit: sessionDataFilter.value.searchByUnit || '',
-  sortByCategory: sessionDataFilter.value.sortByCategory || '',
-  sortByType: sessionDataFilter.value.sortByType || '',
-  sortBySubType: sessionDataFilter.value.sortBySubType || '',
-  sortByBarcode: sessionDataFilter.value.sortByBarcode || '',
-  sortByProductId: sessionDataFilter.value.sortByProductId || '',
-  sortByProductName: sessionDataFilter.value.sortByProductName || '',
-  sortByUnit: sessionDataFilter.value.sortByUnit || '',
-  sortByQty: sessionDataFilter.value.sortByQty || '',
-  sortByTags: sessionDataFilter.value.sortByTags || '',
-  sortByNonTags: sessionDataFilter.value.sortByNonTags || '',
+  categoryId: sessionDataFilter.value?.categoryId || '',
+  typeId: sessionDataFilter.value?.typeId || '',
+  subTypeId: sessionDataFilter.value?.subTypeId || '',
+  barcode: sessionDataFilter.value?.barcode || '',
+  productId: sessionDataFilter.value?.productId || '',
+  productName: sessionDataFilter.value?.productName || '',
+  unitId: sessionDataFilter.value?.unitId || '',
+  serialNo: sessionDataFilter.value?.serialNo || '',
+  zoneId: sessionDataFilter.value?.zoneId || '',
+  areaId: sessionDataFilter.value?.areaId || '',
+  subAreaId: sessionDataFilter.value?.subAreaId || '',
+  searchByCategory: sessionDataFilter.value?.searchByCategory || '',
+  searchByType: sessionDataFilter.value?.searchByType || '',
+  searchBySubType: sessionDataFilter.value?.searchBySubType || '',
+  searchByBarcode: sessionDataFilter.value?.searchByBarcode || '',
+  searchByProductId: sessionDataFilter.value?.searchByProductId || '',
+  searchByProductName: sessionDataFilter.value?.searchByProductName || '',
+  searchByUnit: sessionDataFilter.value?.searchByUnit || '',
+  sortByCategory: sessionDataFilter.value?.sortByCategory || '',
+  sortByType: sessionDataFilter.value?.sortByType || '',
+  sortBySubType: sessionDataFilter.value?.sortBySubType || '',
+  sortByBarcode: sessionDataFilter.value?.sortByBarcode || '',
+  sortByProductId: sessionDataFilter.value?.sortByProductId || '',
+  sortByProductName: sessionDataFilter.value?.sortByProductName || '',
+  sortByUnit: sessionDataFilter.value?.sortByUnit || '',
+  sortByQty: sessionDataFilter.value?.sortByQty || '',
+  sortByTags: sessionDataFilter.value?.sortByTags || '',
+  sortByNonTags: sessionDataFilter.value?.sortByNonTags || '',
 })
 
 
@@ -372,9 +371,12 @@ const { printExportExcelResult,
   printExportExcelErrorMessage,
   printExportExcelService } = usePrintExportExcelService()
 
+//--------------------------------------------- Print section --------------
+const isDialogPrintVisible = ref(false)
+
 const  loadingPrint = ref(false) 
 
-const printShipmentPDFBySoEIdPlan = async () => {
+const printShipmentPDFBySoEIdPlan = async type => {
   loadingPrint.value = true
   console.log('loadingPrint', loadingPrint.value)
 
@@ -386,8 +388,8 @@ const printShipmentPDFBySoEIdPlan = async () => {
     // ✅ เรียก printShipmentPDF
     const result = await printExportExcelService(
       urlApi.value,
-      'StockUpdate',
-      'Excel',
+      type,
+      'Detail',
       whereHouse,
       accessTokenAtStore,
       filterForSearchPlan.value,
@@ -530,9 +532,6 @@ const refeshPage = () => {
   }, 10 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   location.reload()
 }
-
-//--------------------------------------------- Print section --------------
-const isDialogPrintVisible = ref(false)
 </script>
 
 <template>
@@ -795,7 +794,7 @@ const isDialogPrintVisible = ref(false)
                         class=""
                         color="warning"
                         style="width: 100%; height: 40px;"
-                        @click="printShipmentPDFBySoEIdPlan"
+                        @click="isDialogPrintVisible = true"
                       >
                         <img
                           src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
@@ -873,6 +872,7 @@ const isDialogPrintVisible = ref(false)
                 color="green-lighten-1"
                 style="width: 100%; height: 150px;"
                 class="d-flex justify-center"
+                @click="printShipmentPDFBySoEIdPlan('StockUpdate')"
               >
                 <VRow class="d-flex justify-center">
                   <VCol cols="12">
@@ -896,6 +896,7 @@ const isDialogPrintVisible = ref(false)
                 color="info"
                 style="width: 100%; height: 100%;"
                 class="d-flex justify-center"
+                @click="printShipmentPDFBySoEIdPlan('StockUpdateByItem')"
               >
                 <VRow class="d-flex justify-center">
                   <VCol cols="12">
