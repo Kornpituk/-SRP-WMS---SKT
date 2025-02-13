@@ -461,12 +461,12 @@ export const usePrintExportPDFProductLabelService = () => {
   const printExportPDFResult = ref(null)
   const printExportPDFErrorMessage = ref(null)
 
-  const printExportPDFService = async (fileCode, LotNo, urlApi, whereHouse, accessToken) => {
+  const printExportPDFService = async (fileCode, productID, LotNo, urlApi, whereHouse, accessToken) => {
     try {
       printExportPDFErrorMessage.value = null
-      console.log('Print Export PDF Form Service Starting...')
+      console.log('Print Export PDF Form Service Starting...', fileCode, productID, LotNo)
   
-      const result = await globalService.printExportPDFProductLabel(fileCode, LotNo, urlApi, whereHouse, accessToken)
+      const result = await globalService.printExportPDFProductLabel(fileCode, productID, LotNo, urlApi, whereHouse, accessToken)
         
       if (result && result.success) {
         console.log('Print Export PDF Form Service Complete:', result)

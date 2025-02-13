@@ -98,16 +98,17 @@ const filterForSearchPlan = ref({
   searchByProductId: sessionDataFilter.value?.searchByProductId || '',
   searchByProductName: sessionDataFilter.value?.searchByProductName || '',
   searchByUnit: sessionDataFilter.value?.searchByUnit || '',
-  sortByCategory: sessionDataFilter.value?.sortByCategory || '',
-  sortByType: sessionDataFilter.value?.sortByType || '',
-  sortBySubType: sessionDataFilter.value?.sortBySubType || '',
-  sortByBarcode: sessionDataFilter.value?.sortByBarcode || '',
-  sortByProductId: sessionDataFilter.value?.sortByProductId || '',
-  sortByProductName: sessionDataFilter.value?.sortByProductName || '',
-  sortByUnit: sessionDataFilter.value?.sortByUnit || '',
-  sortByQty: sessionDataFilter.value?.sortByQty || '',
-  sortByTags: sessionDataFilter.value?.sortByTags || '',
-  sortByNonTags: sessionDataFilter.value?.sortByNonTags || '',
+
+  // sortByCategory: sessionDataFilter.value?.sortByCategory || '',
+  // sortByType: sessionDataFilter.value?.sortByType || '',
+  // sortBySubType: sessionDataFilter.value?.sortBySubType || '',
+  // sortByBarcode: sessionDataFilter.value?.sortByBarcode || '',
+  // sortByProductId: sessionDataFilter.value?.sortByProductId || '',
+  // sortByProductName: sessionDataFilter.value?.sortByProductName || '',
+  // sortByUnit: sessionDataFilter.value?.sortByUnit || '',
+  // sortByQty: sessionDataFilter.value?.sortByQty || '',
+  // sortByTags: sessionDataFilter.value?.sortByTags || '',
+  // sortByNonTags: sessionDataFilter.value?.sortByNonTags || '',
 })
 
 
@@ -319,7 +320,16 @@ const searchShipmentPlan = async () => {
     )
 
     if (result) {
-      searchPlanData.value = getSearchPlanResult.value // เก็บข้อมูลใน reactive stat
+      // searchPlanData.value = getSearchPlanResult.value // เก็บข้อมูลใน reactive stat
+
+      searchPlanData.value = getSearchPlanResult.value.map((item, index) => ({
+        ...item,
+        no: index + 1, // เพิ่มฟิลด์ no ในระดับหลัก
+        locations: item.locations?.map((loc, locIndex) => ({
+          ...loc,
+          no: locIndex + 1, // เพิ่มฟิลด์ no ข้างใน location
+        })) || [],
+      }))
 
       console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
@@ -697,8 +707,8 @@ const refeshPage = () => {
                 >
                   <!-- 👉 Search Product code -->
                   <VSelect
-                    v-model="filterForSearchPlan.subAreaId"
-                    :items="subAreaItemModel"
+                    v-model="filterForSearchPlan.searchByCategory"
+                    :items="categoriesItemModel"
                     label="Warehouse"
                     item-title="name"
                     item-value="id"
@@ -1158,13 +1168,13 @@ const refeshPage = () => {
                   class="px-1"
                   style="min-width: 70px; max-width: 70px;  font-size: 14px;"
                 >
-                  {{ item.locations.length }}
+                  {{ (item.locations.length).toLocaleString() }}
                 </td>
                 <td
                   class="px-1"
                   style="min-width: 80px; max-width: 80px;  font-size: 14px;"
                 >
-                  {{ item.qty }}
+                  {{ (item.qty).toLocaleString() }}
                 </td>
                 <td
                   class="px-1"
@@ -1197,8 +1207,8 @@ const refeshPage = () => {
                   <span
                     v-if="item.shelfLifeDays < 1"
                     class="text-red text-end"
-                  >{{ item.shelfLifeDays }}</span>
-                  <span v-else>{{ item.shelfLifeDays }}</span>
+                  >{{ (item.shelfLifeDays).toLocaleString() }}</span>
+                  <span v-else>{{ (item.shelfLifeDays).toLocaleString() }}</span>
                 </td>
                 <td
                   class="px-1"
@@ -1221,11 +1231,11 @@ const refeshPage = () => {
                           <th>No.</th>
                           <th>Item Code</th>
                           <th>Item Name</th>
-                          <th>Lot No.</th>
+                          <th>Lot</th>
                           <th>Qty</th>
                           <th>UoM</th>
-                          <th>No. Lot Qty</th>
-                          <th>Pallet Name</th>
+                          <th>No/Lot Qty</th>
+                          <th>Pallet No.</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1279,7 +1289,7 @@ const refeshPage = () => {
                             style="font-size: 14px;"
                             :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                           >
-                            {{ batch.productName }}
+                            {{ batch.plid }}
                           </td>
                         </tr>
                       </tbody>

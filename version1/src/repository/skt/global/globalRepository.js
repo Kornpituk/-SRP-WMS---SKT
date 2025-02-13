@@ -493,11 +493,11 @@ export const  globalService = {
     }
   },
 
-  async printExportPDFProductLabel(fileCode, LotNo, urlApi, whereHouse, accessToken) {
+  async printExportPDFProductLabel(fileCode, productID, LotNo, urlApi, whereHouse, accessToken) {
     console.log("Authorization", urlApi, whereHouse, accessToken)
     try {
       const response = await axios.post(
-        `${urlApi}/api/v1/PrintLabel/Label/Product/Pdf/${fileCode}?LotNo=${LotNo}`,
+        `${urlApi}/api/v1/PrintLabel/Label/Product/Pdf/${fileCode}/${LotNo}/${productID}`,
         {},
         {
           headers: {
