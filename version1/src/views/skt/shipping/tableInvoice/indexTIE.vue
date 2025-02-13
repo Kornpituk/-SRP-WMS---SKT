@@ -130,6 +130,7 @@ import { useGetUserPermissionService,
   usePrintTruckOrderFormPDFService,
   useGetFileFormService,
   usePrintExportExcelService,
+  usePrintPDFService, 
 } from '@/services/skt/shipmentPlan/services'
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
@@ -703,7 +704,7 @@ const toggleSelectAll = () => {
 //--------------------------- File INput --------------------------------
 
 import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
-import { onMounted, watchEffect } from 'vue'
+import { onMounted, watch, watchEffect } from 'vue'
 
 const viewAllData = () => {
   console.log(mockData.value)
@@ -909,7 +910,6 @@ const handleFileUpdatesCOA = updatedFiles => {
   filesFromUploaderCOA.value = updatedFiles
 }
 
-
 const handleFileUpdatesTruckOrder = updatedFiles => {
   filesFromUploaderTruckOrder.value = updatedFiles
 }
@@ -917,15 +917,6 @@ const handleFileUpdatesTruckOrder = updatedFiles => {
 const handleFileUpdatesDeliNote = updatedFiles => {
   filesFromUploaderDeliNote.value = updatedFiles
 }
-
-
-
-// watch( async ()  => {
-//   // await getFileForm('GetSo', '152')
-
-//   showFileFormByTypeAndSoId('GetSo', '152')
-// })
-
 
 
 //------------------------------- Function save Search plan -----------------
@@ -1208,11 +1199,6 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
     console.error(`Error saving search plan:`, error)
   }
 }
-
-// const handlePageChange = newPage => {
-//   currentPage.value = newPage
-//   console.log(`Page changed to: ${newPage}`)
-// }
 
 //--------------------------------------- hihtlight -------------------
 const dataTableColor = ref('#E0F7FA')
@@ -1747,7 +1733,6 @@ const printShipmentPDFBySoEId = async type => {
     await saveShipmentPlan(dataRowForUse.value)
   }
   
-
   try {
     // ✅ เรียก printShipmentPDF
     const result = await printShipmentPDF(
@@ -1773,6 +1758,140 @@ const printShipmentPDFBySoEId = async type => {
     console.error(`Error printing shipment PDF:`, error)
   } finally {
     loadingPrint.value = false
+  }
+}
+
+//-------------------------------- Print PDF -------------------------------------------------
+
+//-------------------------------- Call api checksheet for  containerNo_LicPlNo --------------------
+
+import { useGetShippingCheckSheetService } from '@/services/skt/shipmentPlan/checkSheetServices'
+
+const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCheckSheet } = useGetShippingCheckSheetService()
+
+const getShippingCheckSheet = async soEId => {
+  try {
+    const result = await fetchShippingCheckSheet(
+      urlApi.value, 'ShippingCheckSheet', whereHouse, 
+      accessTokenAtStore, soEId)
+
+    if(result){
+      getShippingCheckSheetResult.value = result
+
+      errorGetShippingCheckSheet.value = null
+      console.log('getShippingCheckSheetResult', result)
+    }else{
+      console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
+    }
+  } catch (error) {
+    errorGetShippingCheckSheet.value = error.message
+  }
+}
+
+const { printPDFResult,
+  printPDFErrorMessage,
+  printPDFService } = usePrintPDFService()
+
+const paramsPrintPDFCheckSheet = ref({
+  SoEtlLogDetailJournalID: '',
+  ItemName: '',
+  ItemCode: '',
+  UserCode: '',
+  Customer: '',
+  SaleOrder: '',
+  LicensePlate: [],
+})
+
+const mapProductRowToPramsPrint = async item => {
+  // ถ้า item ไม่ใช่ array ให้แปลงเป็น array
+  const items = Array.isArray(item) ? item : [item]
+
+  paramsPrintPDFCheckSheet.value = items.map(item => ({
+    SoEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+    ItemName: item.itemName,
+    ItemCode: item.itemCode,
+    UserCode: item.shippingUserCode,
+    Customer: item.shippingUserName,
+    SaleOrder: item.salesOrderNo,
+    LicensePlate: item.containerNo_LicPlNo, // ✅ ใช้ค่าที่ถูกต้อง
+  }))
+}
+
+const hanbleBtnPrintPDFCheckSheet = type => {
+  console.log('Check BtnPrintPDF start...', prouctRowAction.value.soEtlLogDetailJournalID)
+
+  if(prouctRowAction.value){
+    if(prouctRowAction.value.checkSheetTypeName === 'IBC'){
+      handlePrintDPFCheckSheet('ShippingCheckSheetIBC2')
+    }else if(prouctRowAction.value.checkSheetTypeName === 'Lorry'){
+      handlePrintDPFCheckSheet('ShippingLorry')
+    }else{
+      handlePrintDPFCheckSheet('ShippingCheckSheet')
+    }
+  }else{
+    console.log('Please prouctRowAction', prouctRowAction.value)
+  }
+}
+
+const handlePrintDPFCheckSheet = async type => {
+
+  if(prouctRowAction.value){
+    if(type === 'ShippingCheckSheetIBC2' || type === 'ShippingCheckSheet'){
+      console.log('getShippingCheckSheet start')
+      await getShippingCheckSheet(prouctRowAction.value.soEtlLogDetailJournalID)
+
+      if(getShippingCheckSheetResult.value){
+        console.log('getShippingCheckSheet start',  getShippingCheckSheetResult.value.containerNo_LicPlNo)
+        paramsPrintPDFCheckSheet.value.LicensePlate = getShippingCheckSheetResult.value.checkSheetItems.map(item => item.containerNo_LicPlNo)
+        console.log('getShippingCheckSheet start',  paramsPrintPDFCheckSheet.value.LicensePlate)
+      }
+      
+      
+    }else{
+      console.log('asdasd', type)
+    }
+    
+  }
+
+  await mapProductRowToPramsPrint(prouctRowAction.value)
+
+  console.log('paramsPrintPDFCheckSheet.value', paramsPrintPDFCheckSheet.value)
+  
+  if (type === 'ShippingCheckSheetIBC2' || type === 'ShippingCheckSheet') {
+    await callAPIPrintPDFChecksheet(type, '')
+
+    const licensePlates = Array.isArray(paramsPrintPDFCheckSheet.value.LicensePlate) 
+      ? paramsPrintPDFCheckSheet.value.LicensePlate 
+      : [paramsPrintPDFCheckSheet.value.LicensePlate]
+
+    for (const licensePlate of licensePlates) {
+      await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', licensePlate)
+    }
+   
+  }else{
+    callAPIPrintPDFChecksheet(type)
+  }
+
+}
+
+const callAPIPrintPDFChecksheet = async (type, LicensePlate) => {
+
+  try {
+    const result = printPDFService(
+      urlApi.value,
+      'Pdf',
+      type,
+      whereHouse,
+      accessTokenAtStore,
+      paramsPrintPDFCheckSheet.value,
+      LicensePlate,
+    )
+
+    if(result){
+      console.log(result)
+    }
+  }catch(error){
+    console.error(`Error printing PDF:`, error)
   }
 }
 
@@ -4769,10 +4888,15 @@ const handlePrintTruckOrderPDF = () => {
               style="min-width: 170px; max-width: 170px;"
             >
               <VBtn
-                disabled
+                :disabled="prouctRowAction.csLfStatusId !== '1003' || 
+                  prouctRowAction.csLfStatusId !== '1004' || 
+                  prouctRowAction.csLfStatusId !== '1005' || 
+                  prouctRowAction.csLfStatusId !== '1003' || 
+                  prouctRowAction.csLfStatusId !== '1104' || 
+                  prouctRowAction.csLfStatusId !== '1105'"
                 color="warning"
                 style="min-width: 150px; max-width: 150px; height: 160px;"
-                @click="printShipmentPDFBySoEIdPlan(), loadingPrint = true"
+                @click="hanbleBtnPrintPDFCheckSheet('test')"
               >
                 <VRow>
                   <VCol cols="12">

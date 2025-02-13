@@ -265,8 +265,8 @@ onMounted(async () => {
 
   getShippingCheckSheetResult.value?.unfIbc.forEach(item => {
     tableData.value.No.push(item.ibcIndex)
-    tableData.value.ibcNo.push(item.ibcNo || 'N/A')
-    tableData.value.grossWeightBeforeShipping.push(item.grossWeightBeforeShipping || 'N/A')
+    tableData.value.ibcNo.push(item.ibcNo || '')
+    tableData.value.grossWeightBeforeShipping.push(item.grossWeightBeforeShipping || '')
 
     // ✅ ใช้ Boolean (`true` / `false`) แทน `Yes` / `No`
     tableData.value.rustFree.push(!!item.rustFree)
@@ -599,14 +599,14 @@ const handleSubmit = type => {
       accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
 
     console.log("requestData 2")
-    if(result){
+    if(submitCheckSheetResult.value){
       submitCheckSheetResult.value = result
       submitCheckSheetError.value = null
       console.log('submitCheckSheetResult', result)
       textAlertDialogFunction(alertWordConst.submit, true)
       console.log("requestData 3")
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 0.5 วินาที
     }else{
       console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
@@ -1101,10 +1101,7 @@ const dessertsMockAmountView = [
     >Resale / Product Shipping Check Sheet (IBC) on {{ getCurrentDate() }}</span>
     <div class="my-6">
       <VRow>
-        <VCol
-          class="px-0"
-          cols="12"
-        >
+        <VCol cols="12">
           <div style="overflow-x: auto; white-space: nowrap;">
             <table class="custom-table">
               <thead>
@@ -1145,7 +1142,7 @@ const dessertsMockAmountView = [
                     colspan="1"
                     class="section-title text-center"
                   >
-                    Container No. /License plate No.
+                    Container No. /License Plate No.
                   </th>
                   <th
                     colspan="1"
@@ -1479,13 +1476,6 @@ const dessertsMockAmountView = [
                       </VCard>
                     </VCol>
                     <!-- เพิ่มช่องว่างถ้ามีรูป < 3 -->
-                    <VCol
-                      v-for="n in (lengthGetShippingSpecialConditionIconResult(getShippingSpecialConditionIconResult.data))"
-                      :key="'empty-' + n"
-                      cols="4"
-                    >
-                      <div style="height: 100px;" /> <!-- เว้นที่ว่าง -->
-                    </VCol>
                   </VRow>
                 </td>
               </tr>
@@ -1539,7 +1529,9 @@ const dessertsMockAmountView = [
                 >
                   <div class="d-flex justify-center cursor-pointer">
                     <VImg
-                      height="250"
+                      cover
+                      max-height="370"
+                      min-height="150"
                       width="150"
                       :src="pictureLabel"
                       alt="Packaging Image"
@@ -1554,7 +1546,8 @@ const dessertsMockAmountView = [
                 >
                   <div class="d-flex justify-center cursor-pointer">
                     <VImg
-                      height="150"
+                      cover
+                      max-height="370"
                       width="150"
                       :src="picturePackaging"
                       @click="showDialogImageMuti(picturePackaging)"
@@ -2294,7 +2287,7 @@ const dessertsMockAmountView = [
           class="d-flex justify-end mt-4"
         >
           <VBtn
-            v-if="statusModel === 1002 || statusModel === 1003"
+            v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0"
             class="mx-2"
             color="warning"
             @click="habdleSaveDraft"
@@ -2302,7 +2295,7 @@ const dessertsMockAmountView = [
             SAVE DRAFT
           </VBtn>
           <VBtn
-            v-if="statusModel === 1002 || statusModel === 1003"
+            v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0"
             class="mx-2"
             color="green"
             @click="handleSubmit('submit')"
@@ -2310,7 +2303,6 @@ const dessertsMockAmountView = [
             WH1
           </VBtn>
           <VBtn
-            v-if="statusModel === 1004"
             class="mx-2"
             color="green"
             @click="handleSubmit('leaderapprove')"

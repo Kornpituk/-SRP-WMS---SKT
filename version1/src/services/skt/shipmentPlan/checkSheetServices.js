@@ -347,3 +347,41 @@ export const useDeleteFileFormService = () => {
     deleteFileFormFunction,
   }
 }
+
+//-------------------- PDF  ---------------------------------
+export const usePrintPDFService = () => {
+  const printPDFResult = ref(null)
+  const printPDFErrorMessage = ref(null)
+
+  const printPDFService = async (urlApi, form, type, whereHouse, accessToken, params = {}) => {
+   
+    try {
+      printPDFErrorMessage.value = null
+  
+      const result = await checkSheetShipmentPlanRepository.printPDF(urlApi, form, type, whereHouse, accessToken, params)
+        
+      if (result && result.success) {
+        console.log('Print PDF Excel Form Service Complete:', result)
+        printPDFResult.value = result.data
+        
+        return { success: true, data: printPDFResult.value }
+      } else {
+        console.warn('Print PDF Excel Form Service Failed')
+        
+        return { success: false, error: 'Print PDF Excel Form Service Failed' }
+      }
+    } catch (error) {
+      console.error('Error in printPDFService:', error)
+      printPDFErrorMessage.value = error.message
+      printPDFResult.value = null
+      
+      return { success: false, error: error.message }
+    }
+  }
+  
+  return {
+    printPDFResult,
+    printPDFErrorMessage,
+    printPDFService,
+  }
+}

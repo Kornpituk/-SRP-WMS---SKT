@@ -40,6 +40,7 @@ const route = useRoute()
 
 const dataProductRow = ref(JSON.parse(sessionStorage.getItem("productDataSession")))
 
+const statusModel = ref(dataProductRow.value.csLfStatusId)
 const soEIdModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
 
 //------------------------------- alert --------------------------------------------
@@ -1652,6 +1653,7 @@ const handleSubmit = async type => {
     <VCol cols="12">
       <div class="d-flex justify-end">
         <VBtn
+          v-if="statusModel === 1102 || statusModel === 1103 || statusModel === 0"
           class="mx-2"
           color="warning"
           @click="handleSaveDraft"
@@ -1659,16 +1661,18 @@ const handleSubmit = async type => {
           Save Draft
         </VBtn>
         <VBtn
+          v-if="statusModel === 1102 || statusModel === 1103 || statusModel === 0"
           class="mx-2"
           @click="handleSubmit('submit')"
         >
-          Submit
+          WH1
         </VBtn>
         <VBtn
+          v-if="statusModel === 1104"
           class="mx-2"
           @click="handleSubmit('leaderapprove')"
         >
-          Approve
+          WH2
         </VBtn>
       </div>
     </VCol>

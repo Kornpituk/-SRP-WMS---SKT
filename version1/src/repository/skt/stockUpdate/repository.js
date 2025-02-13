@@ -94,7 +94,6 @@ export const checkSheetLorryFlexiRepository = {
   constructParams2(params) {
     return {
       ...this.constructSearchParams(params),
-      ...this.constructSortParams(params),
     }
   },
 

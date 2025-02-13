@@ -900,5 +900,119 @@ export const checkSheetLorryFlexiRepository = {
       throw new Error(`Failed to fetch submit Shipment Plan ${error.response?.data?.message || error.message}`)
     }
   },
+
+  //---------------------------- Print Check sheet PDF ----------------
+  async printPDF(urlApi, form, type, whereHouse, accessToken, params = {}, LicensePlate) {
+    try {
+      if(!params){
+        throw 'params not f', params
+      }else{
+        console.log('params repo', params)
+      }
+
+      let response
+
+      if(type === 'ShippingCheckSheet'){
+        response = await axios.post(
+          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/
+          ${params[0].SoEtlLogDetailJournalID}?SaleOrder=${params[0].SaleOrder}&UserCode=${params[0].UserCode}&itemCode=${params[0].ItemCode}`, {},
+          {
+            headers: {
+              'accept': '*/*', 
+              'x-location': whereHouse,
+              Authorization: `Bearer ${accessToken}`,
+            },
+
+            // params: {
+            //   SaleOrder: params[0].SaleOrder,
+            //   UserCode: params[0].UserCode,
+            //   itemCode: params[0].itemCode,
+            // },
+            responseType: 'blob', // รับ response เป็น Blob
+          },
+        )
+      }else if(type === 'ShippingCheckSheetIBC2'){
+        let dataParameters = {
+          SaleOrder: params[0].SaleOrder,
+          Customer: params[0].Customer, ///---- UserCode
+          ItemName: params[0].ItemName,
+          Code: params[0].ItemCode, /// -- ItemCode
+        }
+        response = await axios.post(
+          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}`, dataParameters,
+          {
+            headers: {
+              'accept': '*/*', 
+              'x-location': whereHouse,
+              Authorization: `Bearer ${accessToken}`,
+            },
+
+            // params: {
+            //   SaleOrder: params[0].SaleOrder,
+            //   Customer: params[0].Customer, ///---- UserCode
+            //   ItemName: params[0].ItemName,
+            //   Code: params[0].ItemCode, /// -- ItemCode
+            // },
+            responseType: 'blob', // รับ response เป็น Blob
+          },
+        )
+      }else if(type === 'ShippingCheckSheetContainer'){
+        response = await axios.post(
+          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}?LicensePlate=${LicensePlate}`, {}, 
+          {
+            headers: {
+              'accept': '*/*', 
+              'x-location': whereHouse,
+              Authorization: `Bearer ${accessToken}`,
+            },
+            responseType: 'blob', // รับ response เป็น Blob
+          },
+        )
+      }else if(type === 'ShippingLorry'|| type === 'ShippingFlexi'){
+        let dataParameters = {
+          Customer: params[0].Customer,
+          ItemName: params[0].ItemName,
+        }
+        response = await axios.post(
+          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}`, dataParameters,
+          {
+            headers: {
+              'accept': '*/*', 
+              'x-location': whereHouse,
+              Authorization: `Bearer ${accessToken}`,
+            },
+
+            // params: {
+            //   Customer: params[0].Customer,
+            //   ItemName: params[0].ItemName,
+            // },
+            responseType: 'blob', // รับ response เป็น Blob
+          },
+        )
+      }else{
+        throw 'Invalid Type: ' + type
+      }
+      if (response && response.data) {
+        console.log('Service Response print PDF  form:', response.data)
+  
+        // สร้าง Blob จาก response
+        const blob = new Blob([response.data], { type: 'application/pdf' })
+  
+        // สร้าง URL สำหรับ Blob
+        const blobUrl = URL.createObjectURL(blob)
+  
+        // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+        window.open(blobUrl)
+  
+        return { success: true, data: blob }
+      } else {
+        throw new Error('No data Genterate print PDF  form')
+      }
+    } catch (error) {
+      console.error('Error in export excel:', error)
+      throw new Error(`Failed to export Excel file: ${error.response?.data?.message || error.message}`)
+    }
+  },
+
 }
 
