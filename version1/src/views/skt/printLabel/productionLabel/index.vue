@@ -404,10 +404,12 @@ const IndexForPrintProductLabel = ref(null)
 
 const FileCodeForPrintProductLabel = ref(null)
 const LotNoForPrintProductLabel = ref(null)
+const productCodeForPrintProductLabel = ref(null)
 
 const actionPrintProductLabel = async (ItemCode, lot) => {
   try {
     ItemCodeForPrintProductLabel.value = ItemCode
+    productCodeForPrintProductLabel.value = ItemCode
     LotNoForPrintProductLabel.value = lot
 
     // เรียก API และรอให้เสร็จ
@@ -495,6 +497,7 @@ const printProdcutLabel = async () => {
     const result = await printExportPDFService(
       FileCodeForPrintProductLabel.value,
       LotNoForPrintProductLabel.value,
+      productCodeForPrintProductLabel.value,
       urlApi.value,
       whereHouse,
       accessTokenAtStore,

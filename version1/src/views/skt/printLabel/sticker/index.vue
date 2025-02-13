@@ -1164,17 +1164,6 @@ const dataTableCliclHighlightIsToggle = no => {
               </th>
             </tr>
           </template>
-          <template #column.seleOrderNo="{ column }">
-            <tr v-if="false" class="d-flex justify-center">
-              <th>
-                <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection(column.key)"
-                /></span>
-              </th>
-            </tr>
-          </template>
           <template #column.purchaseOrderNo="{ column }">
             <tr class="d-flex justify-center">
               <th>
