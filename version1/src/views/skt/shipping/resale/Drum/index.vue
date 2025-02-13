@@ -606,7 +606,7 @@ const handleSubmit = type => {
       textAlertDialogFunction(alertWordConst.submit, true)
       console.log("requestData 3")
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 0.5 วินาที
     }else{
       console.log('submitCheckSheetError !result ', submitCheckSheetError.value)

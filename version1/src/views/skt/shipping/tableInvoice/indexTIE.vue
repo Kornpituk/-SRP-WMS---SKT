@@ -1802,6 +1802,10 @@ const paramsPrintPDFCheckSheet = ref({
   LicensePlate: [],
 })
 
+const licensePlate = ref({
+
+})
+
 const mapProductRowToPramsPrint = async item => {
   // ถ้า item ไม่ใช่ array ให้แปลงเป็น array
   const items = Array.isArray(item) ? item : [item]
@@ -1815,6 +1819,10 @@ const mapProductRowToPramsPrint = async item => {
     SaleOrder: item.salesOrderNo,
     LicensePlate: item.containerNo_LicPlNo, // ✅ ใช้ค่าที่ถูกต้อง
   }))
+}
+
+const didabledPrintPDFCheckSheet = statusId => {
+  return !(statusId === 1003 || statusId === 1004 || statusId === 1005 || statusId === 1103 || statusId === 1104 || statusId === 1105)
 }
 
 const hanbleBtnPrintPDFCheckSheet = type => {
@@ -1833,6 +1841,7 @@ const hanbleBtnPrintPDFCheckSheet = type => {
   }
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const handlePrintDPFCheckSheet = async type => {
 
   if(prouctRowAction.value){
@@ -1842,8 +1851,8 @@ const handlePrintDPFCheckSheet = async type => {
 
       if(getShippingCheckSheetResult.value){
         console.log('getShippingCheckSheet start',  getShippingCheckSheetResult.value.containerNo_LicPlNo)
-        paramsPrintPDFCheckSheet.value.LicensePlate = getShippingCheckSheetResult.value.checkSheetItems.map(item => item.containerNo_LicPlNo)
-        console.log('getShippingCheckSheet start',  paramsPrintPDFCheckSheet.value.LicensePlate)
+        licensePlate.value = getShippingCheckSheetResult.value.checkSheetItems
+        console.log('getShippingCheckSheet start',  licensePlate.value)
       }
       
       
@@ -1857,18 +1866,30 @@ const handlePrintDPFCheckSheet = async type => {
 
   console.log('paramsPrintPDFCheckSheet.value', paramsPrintPDFCheckSheet.value)
   
-  if (type === 'ShippingCheckSheetIBC2' || type === 'ShippingCheckSheet') {
+  if (type === 'ShippingCheckSheetIBC2' ) {
+    await callAPIPrintPDFChecksheet('ShippingCheckSheet', '')
     await callAPIPrintPDFChecksheet(type, '')
 
-    const licensePlates = Array.isArray(paramsPrintPDFCheckSheet.value.LicensePlate) 
-      ? paramsPrintPDFCheckSheet.value.LicensePlate 
-      : [paramsPrintPDFCheckSheet.value.LicensePlate]
+    const licensePlates = Array.isArray(licensePlate.value) 
+      ? licensePlate.value 
+      : [licensePlate.value]
 
-    for (const licensePlate of licensePlates) {
-      await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', licensePlate)
+    for (const item of licensePlates) {
+      await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo)
     }
    
-  }else{
+  }else if(type === 'ShippingCheckSheet'){
+    await callAPIPrintPDFChecksheet(type, '')
+
+    const licensePlates = Array.isArray(licensePlate.value) 
+      ? licensePlate.value 
+      : [licensePlate.value]
+
+    for (const item of licensePlates) {
+      await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo)
+    }
+  }
+  else{
     callAPIPrintPDFChecksheet(type)
   }
 
@@ -4888,12 +4909,7 @@ const handlePrintTruckOrderPDF = () => {
               style="min-width: 170px; max-width: 170px;"
             >
               <VBtn
-                :disabled="prouctRowAction.csLfStatusId !== '1003' || 
-                  prouctRowAction.csLfStatusId !== '1004' || 
-                  prouctRowAction.csLfStatusId !== '1005' || 
-                  prouctRowAction.csLfStatusId !== '1003' || 
-                  prouctRowAction.csLfStatusId !== '1104' || 
-                  prouctRowAction.csLfStatusId !== '1105'"
+                :disabled="didabledPrintPDFCheckSheet(prouctRowAction.csLfStatusId)"
                 color="warning"
                 style="min-width: 150px; max-width: 150px; height: 160px;"
                 @click="hanbleBtnPrintPDFCheckSheet('test')"
