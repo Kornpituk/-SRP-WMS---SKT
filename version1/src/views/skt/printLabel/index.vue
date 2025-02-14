@@ -165,7 +165,6 @@ const itemsCategoriesOld = ['Packaging', 'Raw material', 'Lorry']
 const itemsCategories = [
   { name: 'Packaging', value: 'Packaging' },
   { name: 'Raw material', value: 'Raw material' },
-  { name: 'Lorry', value: 'Lorry' },
   { name: 'All', value: '' },
 ]
 

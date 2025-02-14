@@ -92,7 +92,6 @@ const itemsCategories = [
   { name: 'Raw material', value: 'Raw material' },
   { name: 'Product', value: 'Product' },
   { name: 'Resale', value: 'Resale' },
-  { name: 'Lorry', value: 'Lorry' },
   { name: 'Semi', value: 'Semi' },
 ]
 
