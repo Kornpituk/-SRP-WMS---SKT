@@ -48,11 +48,11 @@ const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
 
-const statusIdPermussion = ref('')
+const statusIdPermussion = ref('-1')
 
 const paramsForGetPermission = ref({
   empId: String(userDataInfo.value.id) || '',
-  statusId: statusIdPermussion.value,
+  statusId: '',
   uiControlContextId: '6',
 })
 
@@ -69,7 +69,6 @@ onMounted(async () => {
 const statusPermission = ref(-1)
 
 const canVisibleUserPermission = (statusId, uiControlContextId) => {
-  statusIdPermussion.value = statusId
   
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
@@ -1313,30 +1312,31 @@ const statusText = statusId => {
           <VCol cols="10">
             <!-- selectedDataTablesStatusId !== 102 -->
             <VBtn
-              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 102 && !canVisibleUserPermission(selectedDataTablesStatusId,'BTN_APPROVE').canExecute"
+              v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
+              :disabled="selectedDataTables.length === 0 || statusPermission !== 102 && !canVisibleUserPermission(statusPermission,'BTN_APPROVE').canExecute"
               @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">Approve</span>
             </VBtn>
-            <!-- selectedDataTablesStatusId !== 107 -->
+            <!-- statusPermission !== 107 -->
             <VBtn
+              v-if="canVisibleUserPermission(statusPermission,'BTN_PROD_APPROVE').canVisible"
               class="mx-2"
               color="info"
-              :disabled="selectedDataTables.length === 0 || selectedDataTablesStatusId !== 107 && !canVisibleUserPermission(selectedDataTablesStatusId,'BTN_PROD_APPROVE').canExecute"
+              :disabled="selectedDataTables.length === 0 || statusPermission !== 107 && !canVisibleUserPermission(statusPermission,'BTN_PROD_APPROVE').canExecute"
               @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">PROD Approved</span>
-              {{ !canVisibleUserPermission(selectedDataTablesStatusId,'BTN_PROD_APPROVE').canExecute }}
             </VBtn>
             <VBtn
-              class=""
-              :disabled="canVisibleUserPermission(selectedDataTablesStatusId,'BTN_NEW_BATCH').canExecute"
+              v-if="canVisibleUserPermission(statusPermission,'BTN_NEW_BATCH').canVisible"
+              class="mx-2"
+              :disabled="!canVisibleUserPermission(statusPermission,'BTN_NEW_BATCH').canExecute"
               color="warning"
               @click="newBatch(null)"
             >
               <span style="font-size: 12px;">New Batch</span>
             </VBtn>
-
             <VBtn
               v-if="false"
               color="info"

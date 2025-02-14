@@ -43,7 +43,6 @@ onMounted(async () => {
 const statusPermission = ref(-1)
 
 const canVisibleUserPermission = (statusId, uiControlContextId) => {
-  statusIdPermussion.value = statusId
   
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
