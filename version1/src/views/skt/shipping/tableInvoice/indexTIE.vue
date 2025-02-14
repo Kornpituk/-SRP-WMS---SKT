@@ -857,35 +857,16 @@ const getFileForm = async (
       accessTokenAtStore,
     )
 
-    // console.log("Response from getFileFormFunction:", response.data.data)
-
     if (getFileFormResult.value?.success) {
-      // console.log(`Fetch File Form:`, getFileFormResult.value)
-
-      // if(typeFile === 'GetSo'){
-      //   filesFromUploaderSO.value = response.data.data
-      // }else if(typeFile === 'GetCoA'){
-      //   filesFromUploaderCOA.value = response.data.data
-      // }else if(typeFile === 'GetTruckOrder'){
-      //   filesFromUploaderTruckOrder.value = response.data.data
-      // }else if(typeFile === 'GetDeliveryNote'){
-      //   filesFromUploaderDeliNote.value = response.data.data
-      // }
       
       return response.data.data
     } else {
-      // กรณีบันทึกไม่สำเร็จ
-      // console.error(`Error fetching File plan:`, errorMessageGetFileForm.value)
 
-      return false
+      return ''
     }
   } catch (error) {
-    // กรณีเกิดข้อผิดพลาดในกระบวนการ
-    // console.error(`Error fetching File plan:`, error)
     
-    // textAlertDialogFunction("An error occurred while fetching the file.", false)
-    
-    return false
+    return ''
   }
 }
 
@@ -1772,6 +1753,7 @@ import { useGetShippingCheckSheetService } from '@/services/skt/shipmentPlan/che
 const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCheckSheet } = useGetShippingCheckSheetService()
 
 const getShippingCheckSheet = async soEId => {
+  // isDialogLoadingVisible.value = true
   try {
     const result = await fetchShippingCheckSheet(
       urlApi.value, 'ShippingCheckSheet', whereHouse, 
@@ -1779,13 +1761,18 @@ const getShippingCheckSheet = async soEId => {
 
     if(result){
       getShippingCheckSheetResult.value = result
+      isDialogLoadingVisible.value = false
 
       errorGetShippingCheckSheet.value = null
-      console.log('getShippingCheckSheetResult', result)
+
+      // console.log('getShippingCheckSheetResult', result)
     }else{
-      console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
+      isDialogLoadingVisible.value = false
+
+      // console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
     }
   } catch (error) {
+    isDialogLoadingVisible.value = false
     errorGetShippingCheckSheet.value = error.message
   }
 }
@@ -4970,15 +4957,6 @@ const handlePrintTruckOrderPDF = () => {
       </VCard>
     </VDialog>
   </div>
-
-  
-  <!-- Dialog Activator -->
-  <VBtn
-    :disabled="isDialogLoadingVisible"
-    @click="isDialogLoadingVisible = true"
-  >
-    Start loading
-  </VBtn>
 
   <!-- Dialog -->
   <VDialog

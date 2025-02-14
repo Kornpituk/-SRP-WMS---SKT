@@ -572,7 +572,8 @@ const habdleSaveDraft = async () => {
       saveShippingCheckSheetResult.value = result
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
+        window.location.href = `${window.location.origin}/skt/shipping`
       }, 500) // 0.5 วินาที
     }else{
       console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
@@ -606,7 +607,7 @@ const handleSubmit = type => {
       textAlertDialogFunction(alertWordConst.submit, true)
       console.log("requestData 3")
       setTimeout(() => {
-        // location.reload()
+        window.location.href = `${window.location.origin}/skt/shipping`
       }, 500) // 0.5 วินาที
     }else{
       console.log('submitCheckSheetError !result ', submitCheckSheetError.value)

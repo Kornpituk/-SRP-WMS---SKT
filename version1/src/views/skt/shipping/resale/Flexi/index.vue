@@ -1,6 +1,5 @@
 <script setup>
 const vasss = ref('dd')
-import image02 from '@/views/skt/resale/ibc/img/02.png'
 import img01 from '@/views/skt/shipping/resale/Flexi/img/01.png'
 import img02 from '@/views/skt/shipping/resale/Flexi/img/02.png'
 import img03 from '@/views/skt/shipping/resale/Flexi/img/03.png'
@@ -22,19 +21,18 @@ const imagePictureFlexi = ref([img01, img02, img03, img04])
 const imagePictureLorry = ref([img05, img06, img07, img08, img09])
 
 //--------------------------- Section import Services --------------------------------
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
-import { VDataTable } from 'vuetify/labs/VDataTable'
+import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
-import { useGetShippingCheckSheetService, useSaveShippingCheckSheetService,
+import {
+  useGetShippingCheckSheetService, useSaveShippingCheckSheetService,
   useShippingCheckSheetLorryService,
-  
 } from "@/services/skt/shipmentPlan/lorryFlexiServices"
 
+import { watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { onMounted, watch } from 'vue'
 
 const route = useRoute()
 
@@ -103,7 +101,7 @@ function toCustomFormat(isoString) {
   let date = new Date(isoString)
   
   // ถ้า isoString เป็น "1969-12-31T03:00:06.803" หรือเป็นค่าว่างหรือไม่ถูกต้อง ให้ใช้เวลาปัจจุบันแทน
-  if (isoString === "1969-12-31T03:00:06.803" || isNaN(date.getTime())) {
+  if (isoString === "1969-12-31T03:00:06.803" || isNaN(date.getTime()) || !isoString) {
     date = new Date()
   }
 
@@ -321,7 +319,7 @@ const handleSaveDraft = async () => {
     if(result){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        window.location.href = `${window.location.origin}/skt/shipping`
       }, 500) // 0.5 วินาที
     }else{
       textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -350,12 +348,12 @@ const handleSubmit = async type => {
       if(type === 'submit'){
         textAlertDialogFunction(alertWordConst.submit, true)
         setTimeout(() => {
-          location.reload()
+          window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else if(type === 'leaderapprove'){
         textAlertDialogFunction(alertWordConst.approve, true)
         setTimeout(() => {
-          location.reload()
+          window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }
     }else{
@@ -1731,7 +1729,7 @@ const handleSubmit = async type => {
             </td>
           </tr>
           <tr>
-            <td colspan="4">
+            <td style="height: 35px;" colspan="4">
               <span v-if="getShippingCheckSheetResult">{{ formatToDate(getShippingCheckSheetResult.updatedDate) }}</span>
             </td>
             <td colspan="4">
@@ -1791,3 +1789,4 @@ const handleSubmit = async type => {
 <style scoped src="../Flexi/flexi.scss">
 
 </style>
+
