@@ -365,6 +365,8 @@ export const FileService = {
     } catch (error) {
       // console.error('Error in fetchFileForm:', error)
       // throw new Error(`Failed to fetch header for ID ${soEtlLogDetailJournalID}: ${error.response?.data?.message || error.message}`)
+
+      return { success: false, error: error.response?.data?.message || 'Unknown error' }
     }
   },
 

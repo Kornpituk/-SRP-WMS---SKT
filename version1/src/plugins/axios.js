@@ -64,51 +64,51 @@ axiosIns.interceptors.request.use(config => {
 //   }
 // })
 
-axios.interceptors.response.use(function (response) {
-  return response
-}, async function (error) {
+// axios.interceptors.response.use(function (response) {
+//   return response
+// }, async function (error) {
 
 
-  const authStore = useAuthExStore()
+//   const authStore = useAuthExStore()
   
-  const originalRequest = error.config
+//   const originalRequest = error.config
 
-  if (error.response.status === 401 && !originalRequest._retry) {
+//   if (error.response.status === 401 && !originalRequest._retry) {
 
-    originalRequest._retry = true
+//     originalRequest._retry = true
 
-    const refreshToken = localStorage.getItem('refreshToken')
-    const whereHouse = localStorage.getItem('whereHouseName')
-    try{
-      var responstRefreshToken =  await axios.post(`${urlApi.value}/api/Auth/refreshToken`, { refreshToken: refreshToken }, {
-        headers: {
-          'accept': '*/*',
-          'x-location': `${whereHouse}`,
-        },
-      })
-      if(responstRefreshToken.status == 200){
-        const { access_token, refresh_token } = responstRefreshToken.data
+//     const refreshToken = localStorage.getItem('refreshToken')
+//     const whereHouse = localStorage.getItem('whereHouseName')
+//     try{
+//       var responstRefreshToken =  await axios.post(`${urlApi.value}/api/Auth/refreshToken`, { refreshToken: refreshToken }, {
+//         headers: {
+//           'accept': '*/*',
+//           'x-location': `${whereHouse}`,
+//         },
+//       })
+//       if(responstRefreshToken.status == 200){
+//         const { access_token, refresh_token } = responstRefreshToken.data
 
-        authStore.setAuth(true)
+//         authStore.setAuth(true)
 
-        // Store access token in localStorage
-        localStorage.setItem('accessToken', access_token)
-        localStorage.setItem('accessTokenAtStore', access_token)
-        localStorage.setItem('refreshToken', refresh_token)
+//         // Store access token in localStorage
+//         localStorage.setItem('accessToken', access_token)
+//         localStorage.setItem('accessTokenAtStore', access_token)
+//         localStorage.setItem('refreshToken', refresh_token)
 
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
-        originalRequest.headers['Authorization'] = 'Bearer ' + access_token
+//         axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token
+//         originalRequest.headers['Authorization'] = 'Bearer ' + access_token
       
       
-        return axios(originalRequest)
-      }
-    }catch(err){
-      authStore.setAuth(false)
-    }
-  }
+//         return axios(originalRequest)
+//       }
+//     }catch(err){
+//       authStore.setAuth(false)
+//     }
+//   }
 
-  return Promise.reject(error)
-})
+//   return Promise.reject(error)
+// })
 
 
 export default axiosIns
