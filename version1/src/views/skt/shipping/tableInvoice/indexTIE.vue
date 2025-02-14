@@ -49,6 +49,9 @@ const textAlertDialogFunction = (word, success) => {
   isDialogVisibleAlertDialog.value = true
 }
 
+//------------------------------ Alert Loading -----------------------------------
+const isDialogLoadingVisible = ref(false)
+
 //------------------------------ Alert Confirm ---------------------------
 const confirmDialog2 = ref('')
 const typeConfirmDialog = ref('')
@@ -721,7 +724,6 @@ const typeNameFileInput = ref('')
 
 // ฟังก์ชันจัดการข้อมูลที่ส่งมาจาก FileUploader
 
-
 //------------------------------- Section FIle Form -------------------------------------
 //------------------------------- Delete File --------------------------------
 const { deleteFileFormResult, errorMessageDeleteFileForm, deleteFileFormFunction } = useDeleteFileFormService()
@@ -1157,7 +1159,7 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
 
     console.log('submitShipmentPlanBySoEId start!! 3')
     
-    if(result){
+    if(submitShipmentPlanResult.value || result){
       if(type === 'submit'){
         textAlertDialogFunction(alertWordConst.submit, true)
         setTimeout(() => {
@@ -1833,6 +1835,8 @@ const hanbleBtnPrintPDFCheckSheet = type => {
       handlePrintDPFCheckSheet('ShippingCheckSheetIBC2')
     }else if(prouctRowAction.value.checkSheetTypeName === 'Lorry'){
       handlePrintDPFCheckSheet('ShippingLorry')
+    }else if(prouctRowAction.value.checkSheetTypeName === 'Flexi'){
+      handlePrintDPFCheckSheet('ShippingFlexi')
     }else{
       handlePrintDPFCheckSheet('ShippingCheckSheet')
     }
@@ -4966,6 +4970,36 @@ const handlePrintTruckOrderPDF = () => {
       </VCard>
     </VDialog>
   </div>
+
+  
+  <!-- Dialog Activator -->
+  <VBtn
+    :disabled="isDialogLoadingVisible"
+    @click="isDialogLoadingVisible = true"
+  >
+    Start loading
+  </VBtn>
+
+  <!-- Dialog -->
+  <VDialog
+    v-model="isDialogLoadingVisible"
+    width="300"
+  >
+    <VCard
+      color="primary"
+      width="300"
+    >
+      <VCardText class="pt-3 text-white">
+        {{ wordForSubmit }} Proccessing .....
+        <VProgressLinear
+          indeterminate
+          class="mt-4"
+          color="#fff"
+        />
+      </VCardText>
+    </VCard>
+  </VDialog>
+  <div />
 </template>
 
 <style scoped lang="scss" src="./indexTIE.scss"></style>

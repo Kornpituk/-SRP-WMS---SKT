@@ -599,14 +599,14 @@ const handleSubmit = type => {
       accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
 
     console.log("requestData 2")
-    if(submitCheckSheetResult.value){
+    if(result || submitCheckSheetResult.value){
       submitCheckSheetResult.value = result
       submitCheckSheetError.value = null
       console.log('submitCheckSheetResult', result)
       textAlertDialogFunction(alertWordConst.submit, true)
       console.log("requestData 3")
       setTimeout(() => {
-        location.reload()
+        // location.reload()
       }, 500) // 0.5 วินาที
     }else{
       console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
@@ -666,12 +666,17 @@ const formatNumber = value => {
 }
 
 function formatDate(dateString) {
-  const date = new Date(dateString)
-  const day = String(date.getDate()).padStart(2, "0")
-  const month = String(date.getMonth() + 1).padStart(2, "0") // เดือนเริ่มจาก 0
-  const year = date.getFullYear()
+  if(dateString){
+    const date = new Date(dateString)
+    const day = String(date.getDate()).padStart(2, "0")
+    const month = String(date.getMonth() + 1).padStart(2, "0") // เดือนเริ่มจาก 0
+    const year = date.getFullYear()
   
-  return `${day}/${month}/${year}`
+    return `${day}/${month}/${year}`
+  }else{
+    return ``
+  }
+  
 }
 
 const iconMock = [
@@ -1122,10 +1127,12 @@ const dessertsMockAmountView = [
                     >
                       <VCheckbox
                         v-model="reportModel.doEx"
+                        readonly
                         value="EX"
                       />Export
                       <VCheckbox
                         v-model="reportModel.doEx"
+                        readonly
                         value="DO"
                       />Domestic
                     </div>
@@ -2246,6 +2253,7 @@ const dessertsMockAmountView = [
               <td
                 class="text-start"
                 colspan="4"
+                style="height: 38px;"
               >
                 <span
                   v-if="getShippingCheckSheetResult?.reportCheckSheet"
@@ -2269,6 +2277,10 @@ const dessertsMockAmountView = [
                   v-if="getShippingCheckSheetResult?.reportCheckSheet"
                   style="font-size: 12px;"
                 >{{ formatDate(getShippingCheckSheetResult?.reportCheckSheet.approvedDate) }}</span>
+                <span
+                  v-else
+                  style="font-size: 12px;"
+                />
               </td>
             </tr>
             <tr>
@@ -2303,6 +2315,7 @@ const dessertsMockAmountView = [
             WH1
           </VBtn>
           <VBtn
+            v-if="statusModel === 1004"
             class="mx-2"
             color="green"
             @click="handleSubmit('leaderapprove')"

@@ -8,6 +8,7 @@ const alertWordConst = {
   newPlan: 'NEWPLAN',
   generateLot: 'GENERATE LOT',
   plase: 'PLASE',
+  sendBack: 'SEND BACK',
 }
 
 

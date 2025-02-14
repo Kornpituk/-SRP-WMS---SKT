@@ -74,10 +74,15 @@ const formatToDate = dateString => {
 }
 
 const extractTime = isoString => {
-  return new Date(isoString).toLocaleTimeString('en-GB', { hour12: false })
-}
+  let date = new Date(isoString)
 
-console.log('Date:', extractTime("2020-05-02T16:40:00")) // 21:25:00
+  // ถ้า isoString เป็น "1969-12-31T03:00:06.803" หรือเป็นค่าว่างหรือไม่ถูกต้อง ให้ใช้เวลาปัจจุบันแทน
+  if (isoString === "1969-12-31T03:00:06.803" || isNaN(date.getTime())|| isoString === "2020-05-02T07:00:00" ) {
+    date = new Date()
+  }
+
+  return date.toLocaleTimeString("en-GB", { hour12: false }) // รูปแบบ HH:mm:ss
+}
 
 
 const convertToISO = dateString => {
@@ -95,15 +100,18 @@ const convertToISO = dateString => {
 }
 
 function toCustomFormat(isoString) {
-  const date = new Date(isoString)
+  let date = new Date(isoString)
   
-  if (isNaN(date.getTime())) return isoString // ตรวจสอบว่าเป็น ISO 8601 จริงหรือไม่
+  // ถ้า isoString เป็น "1969-12-31T03:00:06.803" หรือเป็นค่าว่างหรือไม่ถูกต้อง ให้ใช้เวลาปัจจุบันแทน
+  if (isoString === "1969-12-31T03:00:06.803" || isNaN(date.getTime())) {
+    date = new Date()
+  }
 
-  const day = String(date.getUTCDate()).padStart(2, "0")
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0") // เดือนเริ่มจาก 0
-  const year = date.getUTCFullYear()
-  const hours = String(date.getUTCHours()).padStart(2, "0")
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  const month = String(date.getMonth() + 1).padStart(2, "0") // เดือนเริ่มจาก 0
+  const year = date.getFullYear()
+  const hours = String(date.getHours()).padStart(2, "0")
+  const minutes = String(date.getMinutes()).padStart(2, "0")
 
   return `${day}/${month}/${year} ${hours}:${minutes}`
 }
@@ -239,9 +247,9 @@ const prepareCommonDataPart1 = data => ({
 })
 
 const prepareCommonDataPart2 = data => ({
-  mesh: data.mesh ?? "",
-  material: data.material ?? "",
-  bagFilter: data.bagFilter ?? "",
+  mesh: data.meshOption === false ? "" : data.mesh ?? "",
+  material: data.materialOption === false ? "" :  data.material ?? "",
+  bagFilter: data.bagFilterOption === false ? "" :  data.bagFilter ?? "",
   fillingLineValveOpen: data.fillingLineValveOpen ?? "",
   fillingEquipment: data.fillingEquipment ?? "",
   fillingOrder: data.fillingOrder ?? "",
@@ -313,7 +321,7 @@ const handleSaveDraft = async () => {
     if(result){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-      // location.reload()
+        location.reload()
       }, 500) // 0.5 วินาที
     }else{
       textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -338,7 +346,7 @@ const handleSubmit = async type => {
       type, whereHouse, accessTokenAtStore, soEIdModel.value,
     )
 
-    if(result){
+    if(result || submitShipmentPlanResult.value){
       if(type === 'submit'){
         textAlertDialogFunction(alertWordConst.submit, true)
         setTimeout(() => {
@@ -431,77 +439,80 @@ const handleSubmit = async type => {
     </VCol>
 
     <VCol cols="12">
-      <table class="custom-table">
-        <tr v-if="false">
-          <th
-            colspan="12"
-            class="text-center"
-          >
-            Filling Direction & Report to FLEXI
-          </th>
-        </tr>
-        <tr>
-          <th
-            colspan="4"
-            class="text-center"
-          >
-            <span>Customer Name: </span><span class="font-weight-body">{{ dataProductRow.shippingUserName }}</span>
-          </th>
-          <th
-            colspan="4"
-            class="text-center"
-          >
-            <span>Delivery Place: </span><span class="font-weight-body">{{ }}</span>
-          </th>
-          <th
-            colspan="4"
-            class="text-center"
-          >
-            <span> Weight: </span><span class="font-weight-body">{{ getShippingCheckSheetResult?.weight }}</span><span> Kg.</span>
-          </th>
-        </tr>
-        <tr>
-          <th
-            colspan="2"
-            class="text-center "
-          >
-            <span>Item Name</span>
-          </th>
-          <th
-            colspan="10"
-            class="text-center "
-          >
-            <span class="font-weight-body">{{ dataProductRow.itemName }}</span>
-          </th>
-        </tr>
-        <tr>
-          <th
-            colspan="2"
-            class="text-center "
-          >
-            Lot No.
-          </th>
-          <td
-            colspan="2"
-            class="text-center "
-            style="min-width: 150px;"
-          >
-            <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.lotNo }}</span>
-          </td>
-          <td
-            colspan="8"
-            class="text-center "
-          >
-            <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.lotNote }}</span>
-          </td>
-        </tr>
-      </table>
+      <div style="overflow-x: auto; white-space: nowrap;">
+        <table class="custom-table">
+          <tr v-if="false">
+            <th
+              colspan="12"
+              class="text-center"
+            >
+              Filling Direction & Report to FLEXI
+            </th>
+          </tr>
+          <tr>
+            <th
+              colspan="4"
+              class="text-center"
+            >
+              <span>Customer Name: </span><span class="font-weight-body">{{ dataProductRow?.shippingUserName }} , </span><span>SO No. </span><span class="font-weight-body">{{ dataProductRow?.salesOrderNo }}</span>
+            </th>
+            <th
+              colspan="4"
+              class="text-center"
+            >
+              <span>Delivery Place: </span><span class="font-weight-body">{{ dataProductRow?.etd }}</span>
+            </th>
+            <th
+              colspan="4"
+              class="text-center"
+            >
+              <span> Weight: </span><span class="font-weight-body">{{ getShippingCheckSheetResult?.weight }}</span><span> Kg.</span>
+            </th>
+          </tr>
+          <tr>
+            <th
+              colspan="2"
+              class="text-center "
+            >
+              <span>Item Name</span>
+            </th>
+            <th
+              colspan="10"
+              class="text-start "
+            >
+              <span class="font-weight-body">{{ dataProductRow.itemName }}</span>
+            </th>
+          </tr>
+          <tr>
+            <th
+              colspan="2"
+              class="text-center "
+            >
+              Lot No.
+            </th>
+            <td
+              colspan="2"
+              class="text-center "
+              style="min-width: 150px;"
+            >
+              <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.lotNo }}</span>
+            </td>
+            <td
+              colspan="8"
+              class="text-center "
+            >
+              <span v-if="getShippingCheckSheetResult">{{ getShippingCheckSheetResult.lotNote }}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
     </VCol>
 
     <VCol cols="12">
       <table class="custom-table">
         <tr>
           <th
+           
             colspan="1"
             rowspan="3"
             class="text-center "
@@ -515,6 +526,7 @@ const handleSubmit = async type => {
             <span class="font-weight-body">Mesh</span>
           </th>
           <th
+            v-if="getShippingCheckSheetResult?.meshOption"
             colspan="6"
             class="text-center "
           >
@@ -562,6 +574,54 @@ const handleSubmit = async type => {
             </VBtn>
           </th>
           <th
+            v-if="!getShippingCheckSheetResult?.meshOption"
+            colspan="6"
+            class="text-center "
+          >
+            <VBtn
+              variant="text"
+              icon
+              disabled
+            >
+              80
+            </VBtn>
+            <VBtn
+              variant="text"
+              icon
+              disabled
+            >
+              100
+            </VBtn>
+            <VBtn
+              disabled
+              variant="text"
+              icon
+            >
+              120
+            </VBtn>
+            <VBtn
+              disabled
+              variant="text"
+              icon
+            >
+              150
+            </VBtn>
+            <VBtn
+              disabled
+              variant="text"
+              icon
+            >
+              200
+            </VBtn>
+            <VBtn
+              disabled
+              variant="text"
+              icon
+            >
+              300
+            </VBtn>
+          </th>
+          <th
             colspan="3"
             class="text-center "
           >
@@ -599,14 +659,27 @@ const handleSubmit = async type => {
           </th>
           <th
             colspan="6"
-            class="text-center "
+            class="text-center"
+            style="height: 57px;"
           >
-            <span class="font-weight-body"><VTextField
-              v-if="getShippingCheckSheetResult"
+            <span
+              v-if="getShippingCheckSheetResult?.materialOption"
+              class="font-weight-body"
+            ><VTextField
+              v-if="getShippingCheckSheetResult?.materialOption"
               v-model="getShippingCheckSheetResult.material"
               class="mx-2"
               density="compact"
-            /></span>
+            >
+              <template #prepend-inner>
+                <span>VESSEL</span>
+              </template>
+            </VTextField>
+            </span>
+            <span
+              v-if="!getShippingCheckSheetResult?.materialOption"
+              class="font-weight-body"
+            />
           </th>
           <th
             colspan="3"
@@ -645,6 +718,7 @@ const handleSubmit = async type => {
             <span class="font-weight-body">Bag Filter</span>
           </th>
           <th
+            v-if="getShippingCheckSheetResult?.bagFilterOption"
             colspan="5"
             class="text-start cursor-pointer"
             ripple
@@ -661,6 +735,7 @@ const handleSubmit = async type => {
             </div>
           </th>
           <th
+            v-if="getShippingCheckSheetResult?.bagFilterOption"
             colspan="1"
             class="text-end cursor-pointer"
             ripple
@@ -671,6 +746,26 @@ const handleSubmit = async type => {
             }"
             :class="{ 'bg-green-lighten-3': bagFilterVariant('Flannel(pieces)') }"
             @click="setBagFilterValue('Flannel(pieces)')"
+          >
+            <span class="end">
+              <div class="d-flex justify-center">
+                <span class="font-weight-body">Flannel(pieces)</span>
+              </div>
+            </span>
+          </th>
+          <th
+            v-if="!getShippingCheckSheetResult?.bagFilterOption"
+            colspan="5"
+            class="text-start"
+          >
+            <div class="d-flex justify-center">
+              <span class="font-weight-body">Cotton(Pieces)</span>
+            </div>
+          </th>
+          <th
+            v-if="!getShippingCheckSheetResult?.bagFilterOption"
+            colspan="1"
+            class="text-end"
           >
             <span class="end">
               <div class="d-flex justify-center">

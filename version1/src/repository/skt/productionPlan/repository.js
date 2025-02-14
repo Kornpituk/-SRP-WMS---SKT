@@ -293,12 +293,22 @@ export const productionPlanRepository = {
 
   async approveProductionPlan(planningId, urlApi, form, type, whereHouse, accessToken) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/${form}/${type}`, planningId, {
-        headers: {
-          'x-location': whereHouse,
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      })
+      let response
+      if(type === 'back'){
+        response = await axios.post(`${urlApi}/api/v1/${form}/${type}?PlanningID=${planningId}`, {}, {
+          headers: {
+            'x-location': whereHouse,
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        })
+      }else{
+        response = await axios.post(`${urlApi}/api/v1/${form}/${type}`, planningId, {
+          headers: {
+            'x-location': whereHouse,
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        })
+      }
   
       if (response && response.data) {
         console.log('Repo Response data approve Batch production plan:', response.data.data)

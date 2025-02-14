@@ -123,6 +123,18 @@ function btnRejectConfirm() {
   })
 }
 
+function btnConfirmAll(type) {
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    typeConfirm.value = type
+    wordForSubmit.value = alertWordConst[type]
+    
+    confirmDialog2.value.openDialog()
+    isDialogVisibleAlertDialog.value = false
+  })
+}
+
+
 const btnConfirmLotValidate = async () => {
   isDialogVisibleConfirmLotValidateDialog.value = false
   await submitPlan()
@@ -144,6 +156,8 @@ async function handleConfirmAction () {
     trickerSubmit.value = false
 
     // await rejectPlan()
+  }else if(typeConfirm.value === "sendBack"){
+    sendBackPlan()
   }
   
 }
@@ -1529,6 +1543,35 @@ const approvePlan = async () => {
   console.log("body selectedDataTables", body)
 }
 
+const sendBackPlan = async () => {
+
+  // console.log("selectedDataTables", selectedDataTables.value)
+
+  const body = batchId.value
+
+  try {
+    // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
+    await approveProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', 'back', whereHouse, accessTokenAtStore)
+    if(responseApproveProductionPlan.value){
+      textAlertDialogFunction(alertWordConst.sendBack, true)
+      setTimeout(() => {
+        // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }else{
+      textAlertDialogFunction(alertWordConst.sendBack, false)
+      setTimeout(() => {
+      // location.reload()
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    }
+  } catch (error) {
+    // จัดการข้อผิดพลาด
+  
+    console.error("Error approved production plan:", error)
+  }
+
+  console.log("body selectedDataTables", body)
+}
+
 const cancelAllProducts = () => {
   productionPlan.value = []
 }
@@ -2559,10 +2602,10 @@ const statusText = statusId => {
 
         <VBtn
           v-if="canVisibleUserPermission(statusPermission,'SEND_BACK').canVisible"
-          :disabled="true|| !canVisibleUserPermission(statusPermission,'SEND_BACK').canExecute"
+          :disabled="false|| !canVisibleUserPermission(statusPermission,'SEND_BACK').canExecute"
           color="purple-accent-4"
           class="mx-1"
-          @click="btnRejectConfirm"
+          @click="btnConfirmAll('sendBack')"
         >
           <span style="font-size: 12px;">Send Back</span>
         </VBtn>
