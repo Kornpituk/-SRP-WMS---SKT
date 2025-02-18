@@ -668,11 +668,7 @@ const handleSubmit = async type => {
               v-model="getShippingCheckSheetResult.material"
               class="mx-2"
               density="compact"
-            >
-              <template #prepend-inner>
-                <span>VESSEL</span>
-              </template>
-            </VTextField>
+            />
             </span>
             <span
               v-if="!getShippingCheckSheetResult?.materialOption"
@@ -1729,7 +1725,10 @@ const handleSubmit = async type => {
             </td>
           </tr>
           <tr>
-            <td style="height: 35px;" colspan="4">
+            <td
+              style="height: 35px;"
+              colspan="4"
+            >
               <span v-if="getShippingCheckSheetResult">{{ formatToDate(getShippingCheckSheetResult.updatedDate) }}</span>
             </td>
             <td colspan="4">

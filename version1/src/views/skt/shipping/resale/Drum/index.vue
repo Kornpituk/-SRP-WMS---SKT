@@ -118,8 +118,6 @@ const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCh
 
 const specialRequests = ref()
 
-
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const getShippingCheckSheet = async () => {
   try {
@@ -392,6 +390,7 @@ const mapShippingCheckSheetData = data => {
     checkSheetItems: data.checkSheetItems.map(item => ({
       journalID: item.journalID,
       soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+      containerNo_LicPlNo: item.containerNo_LicPlNo,
       supplierLotNo: item.supplierLotNo, // ค่า default เป็น true หรือกำหนดจากข้อมูลที่ได้
       appearanceCheck: item.appearanceCheck,
       remark: item.remark,
@@ -572,8 +571,9 @@ const habdleSaveDraft = async () => {
       saveShippingCheckSheetResult.value = result
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
+        location.reload()
+
         // location.reload()
-        window.location.href = `${window.location.origin}/skt/shipping`
       }, 500) // 0.5 วินาที
     }else{
       console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
@@ -1095,16 +1095,17 @@ const dessertsMockAmountView = [
         </VBtn>
       </div>
     </div>
-    <span
-      v-if="checkSheetTypeNameModel === 'General'"
-      class="text-center d-flex justify-center"
-      style="font-weight: bolder;"
-    >Resale / Product Shipping Check Sheet (Drum) on {{ getCurrentDate() }}</span>
+    
     <span
       v-if="checkSheetTypeNameModel === 'IBC'"
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
     >Resale / Product Shipping Check Sheet (IBC) on {{ getCurrentDate() }}</span>
+    <span
+      v-else
+      class="text-center d-flex justify-center"
+      style="font-weight: bolder;"
+    >Resale / Product Shipping Check Sheet (Drum) on {{ getCurrentDate() }}</span>
     <div class="my-6">
       <VRow>
         <VCol cols="12">
@@ -1232,7 +1233,13 @@ const dessertsMockAmountView = [
                   :key="index"
                 >
                   <td>{{ index+1 }}</td>
-                  <td>{{ item.containerNo_LicPlNo }}</td>
+                  <td>
+                    <span v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0"><VTextField
+                      v-model="item.containerNo_LicPlNo"
+                      density="compact"
+                    /></span>
+                    <span v-else>{{ item.containerNo_LicPlNo }}</span>
+                  </td>
                   <td>{{ item.sktLotNo }}</td>
                   <td style="min-width: 200px;">
                     <VTextField
