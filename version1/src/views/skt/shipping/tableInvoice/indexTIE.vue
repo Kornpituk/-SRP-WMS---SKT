@@ -67,6 +67,10 @@ function openConfirmDialog(type, SoEId) {
     soEIdConfirmDialog.value = SoEId
     console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
     
+  }else if(type === 'back'){
+    wordForSubmit.value = "SEND BACK"
+    typeConfirmDialog.value = type
+    soEIdConfirmDialog.value = SoEId
   }
 
   confirmDialog2.value.openDialog()
@@ -97,6 +101,9 @@ function openConfirmDialog(type, SoEId) {
 function handleConfirmAction() {
   if( wordForSubmit.value === 'submit'){
     submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
+  }else if(wordForSubmit.value === 'SEND BACK'){
+    submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
+    console.log('back')
   }
   
   
@@ -1122,6 +1129,9 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
     }else if(type === 'approve' || type === 'reject'){
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
       console.log('submitShipmentPlanBySoEId start!! 2')
+    }else if(type === 'back'){
+      soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+      console.log('submitShipmentPlanBySoEId back !! 3')
     }
 
     if(!statusCommnetValue.value && type === 'reject'){
@@ -1156,6 +1166,11 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, true)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
 
       console.log('submitShipmentPlanBySoEId start!! 4')
@@ -1173,6 +1188,11 @@ const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }else if(type === 'reject'){
         textAlertDialogFunction(alertWordConst.reject, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, false)
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
@@ -2003,6 +2023,18 @@ const paramsTruckOrder = ref({
 
 const loadingPrintTruckOrderForm = ref(false)
 
+const clearParamsTruckOrder = () => {
+  console.log('clearParamsTruckOrder', CompanyPrint.value)
+  TruckCompanyModel.value = []
+  TruckTypeModel.value  = []
+  CompanyPrint.value  = []
+  AddressPrint.value  = []
+  TruckCompanyPrint.value = []
+  TruckTypePrint.value = []
+  paramsTruckOrder.value = ''
+  console.log('clearParamsTruckOrder', CompanyPrint.value)
+}
+
 const handlePrintTruckOrderPDF = () => {
 
   paramsTruckOrder.value.comName = CompanyPrint.value
@@ -2013,7 +2045,7 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.tel = selectedTruckCompany2('contact')
 
   loadingPrintTruckOrderForm.value = true
-
+  isDialogLoadingVisible.value = true 
 
   try{
     const result = printTruckOrderFormPDF(
@@ -2028,19 +2060,24 @@ const handlePrintTruckOrderPDF = () => {
       // setTimeout(() => {
       //   location.reload()
       // }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      loadingPrintTruckOrderForm.value = false
+      // loadingPrintTruckOrderForm.value = false
+      isDialogLoadingVisible.value = false
     
     }else{
       textAlertDialogFunction(alertWordConst.print, false)
       setTimeout(() => {
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
       loadingPrintTruckOrderForm.value = false
+      isDialogLoadingVisible.value = false
     }
   } catch (e) {
     console.error(`Error saving search plan:`, error)
     loadingPrintTruckOrderForm.value = false
+    isDialogLoadingVisible.value = false
   }
   loadingPrintTruckOrderForm.value = false
+  isDialogLoadingVisible.value = false
+  
 }
 </script>
 
@@ -2560,7 +2597,7 @@ const handlePrintTruckOrderPDF = () => {
         <DialogCloseBtn
           variant="text"
           size="default"
-          @click="isDialogVisiblePrintTruck = false"
+          @click="isDialogVisiblePrintTruck = false, clearParamsTruckOrder()"
         />
 
         <VCardText style="overflow-x: auto;">
@@ -2986,6 +3023,16 @@ const handlePrintTruckOrderPDF = () => {
               @click="isDialogVisibleCommentDialog = true"
             >
               <span style="font-size: 12px;">Reject</span>
+            </VBtn>
+
+            <VBtn
+              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
+              :disabled="selectedDataTables.length < 1"
+              class="mx-2"
+              color="purple-accent-4"
+              @click="openConfirmDialog('back', '001')"
+            >
+              <span style="font-size: 12px;">Send Back</span>
             </VBtn>
 
             <VBtn
@@ -4147,7 +4194,6 @@ const handlePrintTruckOrderPDF = () => {
                       width="90px"
                       color="warning"
                       class="mx-2"
-                      :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                       @click="showDialogTruckOrder(product.salesOrderNo, product.soEtlLogDetailJournalID)"
                     >
                       <VIcon

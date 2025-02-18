@@ -129,7 +129,7 @@ export const shipmentPlanRepository = {
     console.log('submitShipmentPlan repo...')
     try {
       let response
-      if(form === 'approve' || form === 'submit'){
+      if(form === 'approve' || form === 'submit' || form === 'back'){
         response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
           headers: {
             'accept': '*/*',
@@ -149,6 +149,7 @@ export const shipmentPlanRepository = {
           },
         })
       }
+      
     
       if (response && response.data) {
         console.log('success get repo submit Shipment Plan...')
