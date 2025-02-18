@@ -749,10 +749,11 @@ const activeBtnApprove = ref(false)
 const activeBtnSubmit = ref(false)
 const activeBtnCancelPlan = ref(false)
 const activeBtnRejectPlan = ref(false)
+const activeBtnSendBackPlan = ref(false)
 const activeBtnError =ref('primary')
 
 watch(()=> {
-  console.log("vselectedDataTables out func", activeBtnApprove.value)
+  
   activeBtnApprove.value = false
   activeBtnSubmit.value = false
   activeBtnCancelPlan.value = false
@@ -764,22 +765,32 @@ watch(()=> {
       if (item.statusId === 102 ) {
         activeBtnApprove.value = true
         activeBtnCancelPlan.value = true
+        activeBtnSendBackPlan.value = true
         console.log("vselectedDataTables", activeBtnApprove.value)
       }else if(item.statusId === 101){
         activeBtnCancelPlan.value = true
         activeBtnSubmit.value = true
-      }else if(item.statusId === 103 || item.statusId === 105){
+      }else if(item.statusId === 105){
+        activeBtnRejectPlan.value = true
+      }else if(item.statusId === 103){
+        activeBtnSendBackPlan.value = true
         activeBtnRejectPlan.value = true
       }
       else{
         activeBtnApprove.value = false
         activeBtnSubmit.value = false
         activeBtnCancelPlan.value = false
+        activeBtnSendBackPlan.value = false
       }
 
     })
+    console.log("vselectedDataTables out func", activeBtnSendBackPlan.value)
   }else{
     activeBtnCancelPlan.value = false
+    activeBtnApprove.value = false
+    activeBtnSubmit.value = false
+    activeBtnCancelPlan.value = false
+    activeBtnSendBackPlan.value = false
   }
 
 
@@ -1546,7 +1557,7 @@ const sendBackPlan = async () => {
 
   // console.log("selectedDataTables", selectedDataTables.value)
 
-  const body = batchId.value
+  const body = selectedDataTables.value.map(item => item.planningID)
 
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
@@ -2601,7 +2612,7 @@ const statusText = statusId => {
 
         <VBtn
           v-if="canVisibleUserPermission(statusPermission,'SEND_BACK').canVisible"
-          :disabled="false|| !canVisibleUserPermission(statusPermission,'SEND_BACK').canExecute"
+          :disabled="!activeBtnSendBackPlan"
           color="purple-accent-4"
           class="mx-1"
           @click="btnConfirmAll('sendBack')"

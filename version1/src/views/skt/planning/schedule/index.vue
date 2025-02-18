@@ -93,6 +93,9 @@ const confirmDialog2 = ref(null)
 
 const selectedDataTablesStatusId = ref('')
 
+const activeBtnApporve = ref(false)
+const activeBtnPRODApporve = ref(false)
+
 watch( () => {
   selectedDataTables.value.forEach(item => {
     // กำหนดค่าเริ่มต้น
@@ -109,11 +112,18 @@ function openConfirmDialog() {
     console.log("selectedDataTables", item.statusId)
     selectedDataTablesStatusId.value = item.statusId
 
-    if (item.statusId === 102 || item.statusId === 107 ) {
+    if (item.statusId === 102 ) {
       wordForSubmit.value = alertWordConst.approve
       confirmDialog2.value.openDialog()
       isDialogVisibleAlertDialog.value = false
+      activeBtnApporve.value = true
+      console.log("activeBtnApporve ", activeBtnApporve.value)
       console.log("selectedDataTables 102")
+    }else if(item.statusId === 107){
+      activeBtnPRODApporve.value = true
+      textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
+      console.log("activeBtnPRODApporve ", activeBtnPRODApporve.value)
+    // eslint-disable-next-line sonarjs/no-duplicated-branches
     }else if(item.statusId === 101){
       textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
       console.log("selectedDataTables 101")
@@ -126,6 +136,39 @@ function openConfirmDialog() {
   })
 
 }
+
+watchEffect(() => {
+  if(selectedDataTables.value?.length){
+    selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+      console.log("selectedDataTables", item.statusId)
+      selectedDataTablesStatusId.value = item.statusId
+
+      if (item.statusId === 102 ) {
+        activeBtnApporve.value = true
+        console.log("activeBtnApporve ", activeBtnApporve.value)
+      
+      }else if(item.statusId === 107){
+        activeBtnPRODApporve.value = true
+        console.log("activeBtnPRODApporve ", activeBtnPRODApporve.value)
+        // eslint-disable-next-line sonarjs/no-duplicated-branches
+      }else if(item.statusId === 101){
+      }
+      else{
+        console.log("selectedDataTables failded")
+        isDialogVisibleAlertDialog.value = false
+      }
+
+
+      console.log("selectedDataTables ", selectedDataTables.value.length)
+
+    })
+  }else{
+    activeBtnApporve.value = false
+    activeBtnPRODApporve.value = false
+  }
+  
+})
 
 function handleConfirmAction() {
   console.log('Confirmed! Executing action...')
@@ -1313,7 +1356,7 @@ const statusText = statusId => {
             <!-- selectedDataTablesStatusId !== 102 -->
             <VBtn
               v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
-              :disabled="selectedDataTables.length === 0 || statusPermission !== 102 && !canVisibleUserPermission(statusPermission,'BTN_APPROVE').canExecute"
+              :disabled="selectedDataTables.length === 0 || !activeBtnApporve"
               @click="openConfirmDialog"
             >
               <span style="font-size: 12px;">Approve</span>
@@ -1323,10 +1366,10 @@ const statusText = statusId => {
               v-if="canVisibleUserPermission(statusPermission,'BTN_PROD_APPROVE').canVisible"
               class="mx-2"
               color="info"
-              :disabled="selectedDataTables.length === 0 || statusPermission !== 107 && !canVisibleUserPermission(statusPermission,'BTN_PROD_APPROVE').canExecute"
+              :disabled="selectedDataTables.length === 0 || !activeBtnPRODApporve"
               @click="openConfirmDialog"
             >
-              <span style="font-size: 12px;">PROD Approved</span>
+              <span style="font-size: 12px;">PROD Approved</span>9
             </VBtn>
             <VBtn
               v-if="canVisibleUserPermission(statusPermission,'BTN_NEW_BATCH').canVisible"
