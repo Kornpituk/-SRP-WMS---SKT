@@ -35,6 +35,12 @@ const statusModel = ref(dataProductRow.value.csLfStatusId)
 
 console.log('journalIdModel', dataProductRow.value.journalID)
 
+//------------------------------- disabled input ---------------------------
+
+const disableInpit = () => {
+  return statusModel.value === 1005
+}
+
 //------------------------------- alert --------------------------------------------
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
@@ -571,7 +577,7 @@ const habdleSaveDraft = async () => {
       saveShippingCheckSheetResult.value = result
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        location.reload()
+        // location.reload()
 
         // location.reload()
       }, 500) // 0.5 วินาที
@@ -1100,7 +1106,10 @@ const dessertsMockAmountView = [
       v-if="checkSheetTypeNameModel === 'IBC'"
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
-    >Resale / Product Shipping Check Sheet (IBC) on {{ getCurrentDate() }}</span>
+    >Resale / Product Shipping Check Sheet (IBC) on {{ getCurrentDate() }}<span
+      v-if="getShippingCheckSheetResult?.reportCheckSheet"
+      style="font-size: 12px;"
+    >{{ formatDate(getShippingCheckSheetResult?.reportCheckSheet.updatedDate) }}</span></span>
     <span
       v-else
       class="text-center d-flex justify-center"
@@ -1234,10 +1243,12 @@ const dessertsMockAmountView = [
                 >
                   <td>{{ index+1 }}</td>
                   <td>
-                    <span v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0"><VTextField
-                      v-model="item.containerNo_LicPlNo"
-                      density="compact"
-                    /></span>
+                    <span v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0">
+                      <VTextField
+                        v-model="item.containerNo_LicPlNo"
+                        :readonly="disableInpit()"
+                        density="compact"
+                      /></span>
                     <span v-else>{{ item.containerNo_LicPlNo }}</span>
                   </td>
                   <td>{{ item.sktLotNo }}</td>
@@ -1245,6 +1256,7 @@ const dessertsMockAmountView = [
                     <VTextField
                       v-model="item.supplierLotNo"
                       density="compact"
+                      :readonly="disableInpit()"
                     />
                   </td>
                   <td>{{ item.itemCode }}</td>
@@ -1282,12 +1294,14 @@ const dessertsMockAmountView = [
                   <td style="min-width: 200px; font-size: 14px;">
                     <VTextField
                       v-model="item.customerName"
+                      :readonly="disableInpit()"
                       density="compact"
                     />
                   </td>
                   <td style="min-width: 250px;">
                     <VTextField
                       v-model="item.deliveryPlace"
+                      :readonly="disableInpit()"
                       density="compact"
                     />
                   </td>
@@ -1296,6 +1310,7 @@ const dessertsMockAmountView = [
                       <VCol cols="6">
                         <VCheckbox
                           v-model="item.appearanceCheck"
+                          :readonly="disableInpit()"
                           :value="appearanceCheckTrue"
                         >
                           <template #label>
@@ -1307,6 +1322,7 @@ const dessertsMockAmountView = [
                         <VCheckbox
                           v-model="item.appearanceCheck"
                           :value="false"
+                          :readonly="disableInpit()"
                         >
                           <template #label>
                             <span class="font-size">NO</span>
@@ -1441,7 +1457,10 @@ const dessertsMockAmountView = [
               >
                 <td colspan="4">
                   <div class="d-flex justify-center">
-                    <VCheckbox v-model="item.checkedValue" />
+                    <VCheckbox
+                      v-model="item.checkedValue"
+                      :readonly="disableInpit()"
+                    />
                   </div>
                 </td>
                 <td colspan="8">
@@ -1520,7 +1539,7 @@ const dessertsMockAmountView = [
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody v-if="!disableInpit()">
               <!--  Picture Label -->
               <tr>
                 <td
@@ -1674,6 +1693,153 @@ const dessertsMockAmountView = [
                 </td>
               </tr>
             </tbody>
+
+            <tbody v-if="disableInpit()">
+              <!--  Picture Label -->
+              <tr>
+                <td
+                  class="text-center"
+                  colspan="1"
+                  ripple
+                  :style="{
+                    borderColor: selectedLanguage.includes('Thai') ? 'green' : '',
+                    borderWidth: selectedLanguage.includes('Thai') ? '2px': '1px',
+                    borderStyle: 'solid',
+                  }"
+                  :class="{'bg-green-lighten-3': selectedLanguage.includes('Thai')}"
+                  style="height: 53px;"
+                >
+                  Thai
+                </td>
+                <td
+                  rowspan="9"
+                  colspan="5"
+                >
+                  <div class="d-flex justify-center cursor-pointer">
+                    <VImg
+                      cover
+                      max-height="370"
+                      min-height="150"
+                      width="150"
+                      :src="pictureLabel"
+                      alt="Packaging Image"
+                      class="image"
+                      @click="showDialogImageMuti(pictureLabel)"
+                    />
+                  </div>
+                </td>
+                <td
+                  rowspan="9"
+                  colspan="6"
+                >
+                  <div class="d-flex justify-center cursor-pointer">
+                    <VImg
+                      cover
+                      max-height="370"
+                      width="150"
+                      :src="picturePackaging"
+                    />
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  class="text-center "
+                  colspan="1"
+                  ripple
+                  :style="{
+                    borderColor: selectedLanguage.includes('English') ? 'green' : '',
+                    borderWidth: selectedLanguage.includes('English') ? '2px': '1px',
+                    borderStyle: 'solid',
+              
+                  }"
+                  :class="{'bg-green-lighten-3': selectedLanguage.includes('English')}"
+                  style="height: 53px;"
+                >
+                  English
+                </td>
+              </tr>
+              <tr>
+                <td
+                  class="text-center  "
+                  colspan="1"
+                  ripple
+                  :style="{
+                    borderColor: selectedLanguage.includes('Japanese') ? 'green' : '',
+                    borderWidth: selectedLanguage.includes('Japanese') ? '2px': '1px',
+                    borderStyle: 'solid',
+                  }"
+                  :class="{'bg-green-lighten-3': selectedLanguage.includes('Japanese')}"
+                  style="height: 53px;"
+                >
+                  Japanese
+                </td>
+              </tr>
+              <tr>
+                <td
+                  class="text-center  "
+                  colspan="1"
+                  ripple
+                  :style="{
+                    borderColor: selectedLanguage.includes('Chinese') ? 'green' : '',
+                    borderWidth: selectedLanguage.includes('Chinese') ? '2px': '1px',
+                    borderStyle: 'solid',
+                  }"
+                  :class="{'bg-green-lighten-3': selectedLanguage.includes('Chinese')}"
+                  style="height: 53px;"
+                >
+                  Chinese
+                </td>
+              </tr>
+              <tr>
+                <td
+                  class="text-center  "
+                  colspan="1"
+                  ripple
+                  :style="{
+                    borderColor: selectedLanguage.includes('Malaysia') ? 'green' : '',
+                    borderWidth: selectedLanguage.includes('Malaysia') ? '2px': '1px',
+                    borderStyle: 'solid',
+                  }"
+                  :class="{'bg-green-lighten-3': selectedLanguage.includes('Malaysia')}"
+                  style="height: 53px;"
+                >
+                  Malaysia
+                </td>
+              </tr>
+              <tr>
+                <td
+                  class="text-center  "
+                  colspan="1"
+                  ripple
+                  :style="{
+                    borderColor: selectedLanguage.includes('Korean') ? 'green' : '',
+                    borderWidth: selectedLanguage.includes('Korean') ? '2px': '1px',
+                    borderStyle: 'solid',
+                  }"
+                  :class="{'bg-green-lighten-3': selectedLanguage.includes('Korean')}"
+                  style="height: 53px;"
+                >
+                  Korean
+                </td>
+              </tr>
+              <tr>
+                <td
+                  class="text-center  "
+                  colspan="1"
+                  ripple
+                  :style="{
+                    borderColor: selectedLanguage.includes('SDS') ? 'green' : '',
+                    borderWidth: selectedLanguage.includes('SDS') ? '2px': '1px',
+                    borderStyle: 'solid',
+                  }"
+                  :class="{'bg-green-lighten-3': selectedLanguage.includes('SDS')}"
+                  style="height: 53px;"
+                >
+                  SDS
+                </td>
+              </tr>
+            </tbody>
           </table>
         </VCol>
       </VRow>
@@ -1701,7 +1867,10 @@ const dessertsMockAmountView = [
             >
               <td colspan="1">
                 <div class="d-flex justify-center align-center">
-                  <VCheckbox v-model="item.checkedValue" />
+                  <VCheckbox
+                    v-model="item.checkedValue"
+                    :readonly="disableInpit()"
+                  />
                 </div>
               </td>
               <td colspan="3">
@@ -1778,6 +1947,7 @@ const dessertsMockAmountView = [
                     >
                       <VCheckbox
                         v-model="item.checkedValue"
+                        :readonly="disableInpit()"
                         :value="checkThePackagingCheckTrue"
                       />
                       Wood
@@ -1788,6 +1958,7 @@ const dessertsMockAmountView = [
                     >
                       <VCheckbox
                         v-model="item.checkedValue"
+                        :readonly="disableInpit()"
                         :value="checkThePackagingCheckTrue"
                       />
                       Yes
@@ -1802,6 +1973,7 @@ const dessertsMockAmountView = [
                     >
                       <VCheckbox
                         v-model="item.checkedValue"
+                        :readonly="disableInpit()"
                         :value="false"
                       />
                       Plastic 
@@ -1812,6 +1984,7 @@ const dessertsMockAmountView = [
                     >
                       <VCheckbox
                         v-model="item.checkedValue"
+                        :readonly="disableInpit()"
                         :value="false"
                       />
                       NO 
@@ -1878,6 +2051,7 @@ const dessertsMockAmountView = [
                 >
                   <VTextField
                     v-model="tableData.ibcNo[index]"
+                    :readonly="disableInpit()"
                     variant="outlined"
                     density="compact"
                   />
@@ -1898,6 +2072,7 @@ const dessertsMockAmountView = [
                 >
                   <VTextField
                     v-model="tableData.grossWeightBeforeShipping[index]"
+                    :readonly="disableInpit()"
                     variant="outlined"
                     density="compact"
                   />
@@ -1930,7 +2105,10 @@ const dessertsMockAmountView = [
                   colspan="2"
                 >
                   <div v-if="checkboxKeys.includes(key)">
-                    <VCheckbox v-model="tableData[key][index]" />
+                    <VCheckbox
+                      v-model="tableData[key][index]"
+                      :readonly="disableInpit()"
+                    />
                   </div>
                   <div v-else>
                     {{ value }}
@@ -1986,6 +2164,7 @@ const dessertsMockAmountView = [
               <VRow>
                 <VCol cols="12">
                   <VFileInput
+                    v-if="disableInpit()"
                     v-model="truck.fileeLicensePlateMew"
                     label="File input"
                     multiple
@@ -2113,6 +2292,7 @@ const dessertsMockAmountView = [
               <VRow>
                 <VCol cols="12">
                   <VFileInput
+                    v-if="!disableInpit()"
                     v-model="truck.fileeLicensePlateMew"
                     label="File input"
                     multiple
@@ -2180,6 +2360,7 @@ const dessertsMockAmountView = [
                       <div class="d-flex flex-column align-center text-center">
                         <span v-if="false">{{ file.fileName }}</span>
                         <VBtn
+                          v-if="!disableInpit()"
                           class="mt-2"
                           icon="mdi-close"
                           color="error"
@@ -2196,6 +2377,7 @@ const dessertsMockAmountView = [
                   cols="12"
                 >
                   <VBtn
+                    :disabled="disableInpit()"
                     class="mx-2 mb-2"
                     color="red"
                     width="98%"
@@ -2397,6 +2579,7 @@ const dessertsMockAmountView = [
           <VCardText>
             <VTextarea
               v-model="dialogDataTextArea"
+              :readonly="disableInpit()"
               counter
               label="Text"
               placeholder="Placeholder Text"
@@ -2405,6 +2588,7 @@ const dessertsMockAmountView = [
 
           <VCardText class="d-flex justify-center flex-wrap gap-4">
             <VBtn
+              v-if="!disableInpit()"
               color="warning"
               @click="saveRemark"
             >

@@ -758,6 +758,7 @@ watch(()=> {
   activeBtnSubmit.value = false
   activeBtnCancelPlan.value = false
   activeBtnRejectPlan.value = false
+  activeBtnSendBackPlan.value = false
   if(selectedDataTables.value){
     selectedDataTables.value.forEach(item => {
       // กำหนดค่าเริ่มต้น
@@ -772,6 +773,7 @@ watch(()=> {
         activeBtnSubmit.value = true
       }else if(item.statusId === 105){
         activeBtnRejectPlan.value = true
+        activeBtnSendBackPlan.value = true
       }else if(item.statusId === 103){
         activeBtnSendBackPlan.value = true
         activeBtnRejectPlan.value = true
@@ -1565,7 +1567,7 @@ const sendBackPlan = async () => {
     if(responseApproveProductionPlan.value){
       textAlertDialogFunction(alertWordConst.sendBack, true)
       setTimeout(() => {
-        // location.reload()
+        location.reload()
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
     }else{
       textAlertDialogFunction(alertWordConst.sendBack, false)

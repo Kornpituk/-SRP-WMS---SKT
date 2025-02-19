@@ -219,43 +219,74 @@ function getCurrentDateFormatted() {
   return `${day}/${month}/${year}`
 }
 
-const selectedTruckCompany2 = type => {
-  // ตรวจสอบว่า type มีค่าหรือไม่
-  if (!type) {
-    console.error("Type is undefined or null")
-    
-    return null
-  }
+const addressTruckCompanyModel = ref('')
+const personInchargeTruckCompanyModel = ref('')
+const contactTruckCompanyModel = ref('')
 
-  // ตรวจสอบว่า TruckCompanyModel.value และ TruckCompanyPrint.value มีค่าหรือไม่
-  if (!TruckCompanyModel.value || !TruckCompanyPrint.value) {
-    console.error("TruckCompanyModel.value or TruckCompanyPrint.value is undefined or null")
+// const selectedTruckCompany2 = type => {
+//   // ตรวจสอบว่า type มีค่าหรือไม่
+//   if (!type) {
+//     console.error("Type is undefined or null")
     
-    return null
-  }
+//     return null
+//   }
 
-  // ค้นหาข้อมูลที่ตรงกับ TruckCompanyPrint.value
+//   // ตรวจสอบว่า TruckCompanyModel.value และ TruckCompanyPrint.value มีค่าหรือไม่
+//   if (!TruckCompanyModel.value || !TruckCompanyPrint.value) {
+//     console.error("TruckCompanyModel.value or TruckCompanyPrint.value is undefined or null")
+    
+//     return null
+//   }
+
+//   // ค้นหาข้อมูลที่ตรงกับ TruckCompanyPrint.value
+//   const foundItem = TruckCompanyModel.value.find(item => item.truck === TruckCompanyPrint.value)
+
+//   // ตรวจสอบว่าพบข้อมูลหรือไม่
+//   if (!foundItem) {
+//     // console.error("No item found with no:", TruckCompanyPrint.value)
+    
+//     return null
+//   }
+
+//   // คืนค่าตาม type
+//   if (type === 'address') {
+//     addressTruckCompanyModel.value = foundItem.address
+    
+    
+//     return foundItem.address
+//   }else if(type === 'personIncharge'){
+//     personInchargeTruckCompanyModel.value = foundItem.personIncharge
+//     console.log('foundItem.personIncharge', personInchargeTruckCompanyModel.value)
+
+//     return foundItem.personIncharge
+//   }else if(type === 'contact'){
+//     contactTruckCompanyModel.value = foundItem.contact
+//     console.log('foundItem.address', contactTruckCompanyModel.value)
+
+//     return foundItem.contact
+//   }
+
+//   // คืนค่า null หาก type ไม่ตรงกับเงื่อนไข
+//   return null
+// }
+
+const selectedTruckCompany2 = () => {
   const foundItem = TruckCompanyModel.value.find(item => item.truck === TruckCompanyPrint.value)
-
-  // ตรวจสอบว่าพบข้อมูลหรือไม่
-  if (!foundItem) {
-    // console.error("No item found with no:", TruckCompanyPrint.value)
-    
-    return null
+  if (foundItem) {
+    personInchargeTruckCompanyModel.value = foundItem.personIncharge || ''
+    contactTruckCompanyModel.value = foundItem.contact || ''
   }
-
-  // คืนค่าตาม type
-  if (type === 'address') {
-    return foundItem.address
-  }else if(type === 'personIncharge'){
-    return foundItem.personIncharge
-  }else if(type === 'contact'){
-    return foundItem.contact
-  }
-
-  // คืนค่า null หาก type ไม่ตรงกับเงื่อนไข
-  return null
 }
+
+// อัปเดตค่าเมื่อ TruckCompanyPrint เปลี่ยน
+watchEffect(() => {
+  selectedTruckCompany2()
+})
+
+// const personInchargeTruckCompany = computed({
+//   get: () => selectedTruckCompany2('personIncharge'), // ดึงค่า
+//   set: value => personInchargeTruckCompanyModel.value = value, // อัปเดตค่า
+// })
 
 
 const TruckTypePrint = ref([])
@@ -2032,6 +2063,8 @@ const clearParamsTruckOrder = () => {
   TruckCompanyPrint.value = []
   TruckTypePrint.value = []
   paramsTruckOrder.value = ''
+  personInchargeTruckCompanyModel.value = ''
+  contactTruckCompanyModel.value = ''
   console.log('clearParamsTruckOrder', CompanyPrint.value)
 }
 
@@ -2041,8 +2074,8 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.address = AddressPrint.value
   paramsTruckOrder.value.transportComName = TruckCompanyPrint.value
   paramsTruckOrder.value.truckType = TruckTypePrint.value
-  paramsTruckOrder.value.driverName = selectedTruckCompany2('personIncharge')
-  paramsTruckOrder.value.tel = selectedTruckCompany2('contact')
+  paramsTruckOrder.value.driverName = personInchargeTruckCompanyModel.value
+  paramsTruckOrder.value.tel = contactTruckCompanyModel.value
 
   loadingPrintTruckOrderForm.value = true
   isDialogLoadingVisible.value = true 
@@ -2777,15 +2810,14 @@ const handlePrintTruckOrderPDF = () => {
                   class="text-start"
                 >
                   <VTextField
-                    v-if="false"
-                    :v-model="selectedTruckCompany2('personIncharge')"
+                    v-model="personInchargeTruckCompanyModel"
                     style="min-width: 250px;"
                     density="compact"
                     label="Driver's Name"
-                    placeholder="MR. ABCD"
+                    placeholder="000000000"
                     class="text-center"
                   />
-                  <span v-if="selectedTruckCompany2('personIncharge')">{{ selectedTruckCompany2('personIncharge') }}</span>
+                  <span v-if="false">{{ selectedTruckCompany2('personIncharge') }}</span>
                 </td>
               </tr>
               <tr v-if="false">
@@ -2797,7 +2829,7 @@ const handlePrintTruckOrderPDF = () => {
                   class="text-center"
                 >
                   <VTextField
-                    v-if="false"
+                    v-model="personInchargeTruckCompanyModel"
                     style="min-width: 250px;"
                     density="compact"
                     label="Ref SO No."
@@ -2815,15 +2847,15 @@ const handlePrintTruckOrderPDF = () => {
                   colspan="8"
                   class="text-start"
                 >
+                  <span v-if="false">{{ (selectedTruckCompany2('contact')) }}</span>
                   <VTextField
-                    v-if="false"
+                    v-model="contactTruckCompanyModel"
                     style="min-width: 250px;"
                     density="compact"
                     label="Tel."
                     placeholder="000-0000000"
                     class="text-center"
                   />
-                  <span v-if="selectedTruckCompany2('contact')">{{ (selectedTruckCompany2('contact')) }}</span>
                 </td>
               </tr>
               <tr>
@@ -3026,7 +3058,7 @@ const handlePrintTruckOrderPDF = () => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
+              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_SENDBACK').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="purple-accent-4"
@@ -3817,19 +3849,17 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  v-if="false"
-                  style="min-width: 50px; max-width: 80px;"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute"
+                  style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
-                  @click="textAreaDialogActive('Lot', product.lot)"
+                  :color="product.lot ? 'primary' : 'grey'"
+                  @click="textAreaRemarkDialogActive('Lot', product.lot, product.soEtlLogDetailJournalID, disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId))"
                 >
                   <span
                     v-if="product.lot"
-                    style="overflow: hidden; max-width: 60px; text-overflow: ellipsis;"
-                  >{{ product.lot[0].lotNUmber }}...</span>
-                  <span v-else>Lot Number</span>
+                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                  >{{ product.lot }}</span>
+                  <span v-else>Lot</span>
                 </VBtn>
-                <span v-else>{{ product.lot }}</span>
               </td>
 
               <!-- 👉 qty -->

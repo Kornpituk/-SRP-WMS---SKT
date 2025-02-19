@@ -41,6 +41,12 @@ const dataProductRow = ref(JSON.parse(sessionStorage.getItem("productDataSession
 const statusModel = ref(dataProductRow.value.csLfStatusId)
 const soEIdModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
 
+//--------------------------------- disabled ----------------------------------
+
+const disabledInput = () => {
+  return statusModel.value === 1105
+}
+
 //------------------------------- alert --------------------------------------------
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
@@ -423,12 +429,14 @@ const handleSubmit = async type => {
       cols="2"
     >
       <VBtn
+        :disabled="disabledInput()"
         :variant="typeResalse === 'Lorry' ? 'tonal' : 'flat'"
         @click="typeResalse = 'Flexi'"
       >
         Flexi
       </VBtn>
       <VBtn
+        :disabled="disabledInput()"
         :variant="typeResalse === 'Flexi' ? 'tonal' : 'flat'"
         @click="typeResalse = 'Lorry'"
       >
@@ -458,7 +466,7 @@ const handleSubmit = async type => {
               colspan="4"
               class="text-center"
             >
-              <span>Delivery Place: </span><span class="font-weight-body">{{ dataProductRow?.etd }}</span>
+              <span>Delivery Place: </span><span class="font-weight-body">{{ dataProductRow?.shipperLocation }}</span>
             </th>
             <th
               colspan="4"
@@ -529,6 +537,7 @@ const handleSubmit = async type => {
             class="text-center "
           >
             <VBtn
+              :disabled="disabledInput()"
               :variant="(meshVariant('80'))"
               icon
               @click="setMeshValue('80')"
@@ -536,6 +545,7 @@ const handleSubmit = async type => {
               80
             </VBtn>
             <VBtn
+              :disabled="disabledInput()"
               :variant="meshVariant('100')"
               icon
               @click="setMeshValue('100')"
@@ -543,6 +553,7 @@ const handleSubmit = async type => {
               100
             </VBtn>
             <VBtn
+              :disabled="disabledInput()"
               :variant="meshVariant('120')"
               icon
               @click="setMeshValue('120')"
@@ -550,6 +561,7 @@ const handleSubmit = async type => {
               120
             </VBtn>
             <VBtn
+              :disabled="disabledInput()"
               :variant="meshVariant('150')"
               icon
               @click="setMeshValue('150')"
@@ -557,6 +569,7 @@ const handleSubmit = async type => {
               150
             </VBtn>
             <VBtn
+              :disabled="disabledInput()"
               :variant="meshVariant('200')"
               icon
               @click="setMeshValue('200')"
@@ -564,6 +577,7 @@ const handleSubmit = async type => {
               200
             </VBtn>
             <VBtn
+              :disabled="disabledInput()"
               :variant="meshVariant('300')"
               icon
               @click="setMeshValue('300')"
@@ -632,6 +646,7 @@ const handleSubmit = async type => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.meshOption"
+                    :readonly="disabledInput()"
                   /><span class="font-weight-body">YES</span>
                 </VCol>
                 <VCol
@@ -641,6 +656,7 @@ const handleSubmit = async type => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.meshOption"
+                    :readonly="disabledInput()"
                     :value="false"
                   /><span class="font-weight-body">NO</span>
                 </VCol>
@@ -666,6 +682,7 @@ const handleSubmit = async type => {
             ><VTextField
               v-if="getShippingCheckSheetResult?.materialOption"
               v-model="getShippingCheckSheetResult.material"
+              :readonly="disabledInput()"
               class="mx-2"
               density="compact"
             />
@@ -688,6 +705,7 @@ const handleSubmit = async type => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.materialOption"
+                    :readonly="disabledInput()"
                   /><span class="font-weight-body">YES</span>
                 </VCol>
                 <VCol
@@ -697,6 +715,7 @@ const handleSubmit = async type => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.materialOption"
+                    :readonly="disabledInput()"
                     :value="false"
                   /><span class="font-weight-body">NO</span>
                 </VCol>
@@ -712,7 +731,42 @@ const handleSubmit = async type => {
             <span class="font-weight-body">Bag Filter</span>
           </th>
           <th
-            v-if="getShippingCheckSheetResult?.bagFilterOption"
+            v-if="disabledInput()"
+            colspan="5"
+            class="text-start"
+            ripple
+            :style="{
+              borderColor: bagFilterVariant('Cotton(Pieces)') ? 'green' : '',
+              borderWidth: bagFilterVariant('Cotton(Pieces)') ? '1px' : '1px',
+              borderStyle: 'solid'
+            }"
+            :class="{ 'bg-green-lighten-3': bagFilterVariant('Cotton(Pieces)') }"
+          >
+            <div class="d-flex justify-center">
+              <span class="font-weight-body">Cotton(Pieces)</span>
+            </div>
+          </th>
+          <th
+            v-if="disabledInput()"
+            colspan="1"
+            class="text-end"
+            ripple
+            :style="{
+              borderColor: bagFilterVariant('Flannel(pieces)') ? 'green' : '',
+              borderWidth: bagFilterVariant('Flannel(pieces)') ? '1px' : '1px',
+              borderStyle: 'solid'
+            }"
+            :class="{ 'bg-green-lighten-3': bagFilterVariant('Flannel(pieces)') }"
+          >
+            <span class="end">
+              <div class="d-flex justify-center">
+                <span class="font-weight-body">Flannel(pieces)</span>
+              </div>
+            </span>
+          </th>
+
+          <th
+            v-if="getShippingCheckSheetResult?.bagFilterOption && !disabledInput()"
             colspan="5"
             class="text-start cursor-pointer"
             ripple
@@ -729,7 +783,7 @@ const handleSubmit = async type => {
             </div>
           </th>
           <th
-            v-if="getShippingCheckSheetResult?.bagFilterOption"
+            v-if="getShippingCheckSheetResult?.bagFilterOption && !disabledInput()"
             colspan="1"
             class="text-end cursor-pointer"
             ripple
@@ -747,8 +801,10 @@ const handleSubmit = async type => {
               </div>
             </span>
           </th>
+
+
           <th
-            v-if="!getShippingCheckSheetResult?.bagFilterOption"
+            v-if="!getShippingCheckSheetResult?.bagFilterOption && !disabledInput()"
             colspan="5"
             class="text-start"
           >
@@ -757,7 +813,7 @@ const handleSubmit = async type => {
             </div>
           </th>
           <th
-            v-if="!getShippingCheckSheetResult?.bagFilterOption"
+            v-if="!getShippingCheckSheetResult?.bagFilterOption && !disabledInput()"
             colspan="1"
             class="text-end"
           >
@@ -780,6 +836,7 @@ const handleSubmit = async type => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.bagFilterOption"
+                    :readonly="disabledInput()"
                   /><span class="font-weight-body">YES</span>
                 </VCol>
                 <VCol
@@ -789,6 +846,7 @@ const handleSubmit = async type => {
                   <VCheckbox
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.bagFilterOption"
+                    :readonly="disabledInput()"
                     :value="false"
                   /><span class="font-weight-body">NO</span>
                 </VCol>
@@ -821,6 +879,7 @@ const handleSubmit = async type => {
                   <VTextField
                     v-if="getShippingCheckSheetResult"
                     v-model="getShippingCheckSheetResult.fillingLineValveOpen"
+                    :readonly="disabledInput()"
                     class="mx-2"
                     density="compact"
                   />
@@ -844,6 +903,7 @@ const handleSubmit = async type => {
               <VTextField
                 v-if="getShippingCheckSheetResult"
                 v-model="getShippingCheckSheetResult.fillingEquipment"
+                :readonly="disabledInput()"
                 density="compact"
                 variant="outlined"
                 @click:append-inner="visible = !visible"
@@ -866,6 +926,7 @@ const handleSubmit = async type => {
               <VTextField
                 v-if="getShippingCheckSheetResult"
                 v-model="getShippingCheckSheetResult.fillingOrder"
+                :readonly="disabledInput()"
                 density="compact"
                 variant="outlined"
                 @click:append-inner="visible = !visible"
@@ -888,6 +949,7 @@ const handleSubmit = async type => {
               <VTextField
                 v-if="getShippingCheckSheetResult"
                 v-model="getShippingCheckSheetResult.lotNoActual"
+                :readonly="disabledInput()"
                 density="compact"
                 variant="outlined"
                 @click:append-inner="visible = !visible"
@@ -910,6 +972,7 @@ const handleSubmit = async type => {
               <VTextField
                 v-if="getShippingCheckSheetResult"
                 v-model="getShippingCheckSheetResult.container"
+                :readonly="disabledInput()"
                 density="compact"
                 variant="outlined"
                 @click:append-inner="visible = !visible"
@@ -932,6 +995,7 @@ const handleSubmit = async type => {
               <VTextField
                 v-if="getShippingCheckSheetResult"
                 v-model="getShippingCheckSheetResult.net"
+                :readonly="disabledInput()"
                 density="compact"
                 variant="outlined"
                 type="number"
@@ -1002,6 +1066,7 @@ const handleSubmit = async type => {
                 <AppDateTimePicker
                   v-if="getShippingCheckSheetResult"
                   v-model="getShippingCheckSheetResult.startedDate"
+                  :disabled="disabledInput()"
                   placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
@@ -1024,6 +1089,7 @@ const handleSubmit = async type => {
                 <AppDateTimePicker
                   v-if="getShippingCheckSheetResult"
                   v-model="getShippingCheckSheetResult.finishedDate"
+                  :disabled="disabledInput()"
                   placeholder="Select time"
                   :config="{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }"
                   density="compact"
@@ -1080,6 +1146,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.apprearanceBefore"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1091,6 +1158,7 @@ const handleSubmit = async type => {
             <AppDateTimePicker
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeBefore"
+              :disabled="disabledInput()"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
@@ -1103,6 +1171,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.personInchargeBefore"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1130,6 +1199,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.apprearanceStart"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1141,6 +1211,7 @@ const handleSubmit = async type => {
             <AppDateTimePicker
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeStart"
+              :disabled="disabledInput()"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
@@ -1153,6 +1224,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.personInchargeStart"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1180,6 +1252,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.apprearanceMiddle"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1191,6 +1264,7 @@ const handleSubmit = async type => {
             <AppDateTimePicker
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeMiddle"
+              :disabled="disabledInput()"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
@@ -1203,6 +1277,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.personInchargeMiddle"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1230,6 +1305,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.apprearanceFinal"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1241,6 +1317,7 @@ const handleSubmit = async type => {
             <AppDateTimePicker
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeFinal"
+              :disabled="disabledInput()"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
@@ -1253,6 +1330,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.personInchargeFinal"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1280,6 +1358,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.apprearanceInLorry"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1291,6 +1370,7 @@ const handleSubmit = async type => {
             <AppDateTimePicker
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.dateTimeInLorry"
+              :disabled="disabledInput()"
               placeholder="Select date and time"
               :config="{ enableTime: true, dateFormat: 'd/m/Y H:i' }"
               density="compact"
@@ -1303,6 +1383,7 @@ const handleSubmit = async type => {
             <VTextField
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.personInchargeInLorry"
+              :readonly="disabledInput()"
               density="compact"
               variant="outlined"
             />
@@ -1329,6 +1410,7 @@ const handleSubmit = async type => {
                 Seal No. <VTextField
                   v-if="getShippingCheckSheetResult"
                   v-model="getShippingCheckSheetResult.sealNo"
+                  :readonly="disabledInput()"
                   class="mx-2"
                   density="compact"
                 />
@@ -1384,6 +1466,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiAlreadyCleanedOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                       >
                         <template #label>
@@ -1395,6 +1478,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiShippingMarkOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                       >
                         <template #label>
@@ -1406,6 +1490,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiInsideTankOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                       >
                         <template #label>
@@ -1417,6 +1502,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiCleaningHoseAirBlowOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                       >
                         <template #label>
@@ -1433,6 +1519,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiAlreadyCleanedOption"
+                        :readonly="disabledInput()"
                         :value="false"
                         class="px-10"
                         label="NO"
@@ -1446,6 +1533,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiShippingMarkOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                         label="NO"
                         :value="false"
@@ -1459,6 +1547,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiInsideTankOption"
+                        :readonly="disabledInput()"
                         :value="false"
                         class="px-10"
                         label="NO"
@@ -1472,6 +1561,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.flexiCleaningHoseAirBlowOption"
+                        :readonly="disabledInput()"
                         :value="false"
                         class="px-10"
                         label="NO"
@@ -1542,6 +1632,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryAlreadyCleanedOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                       >
                         <template #label>
@@ -1553,6 +1644,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryAfterSealOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                       >
                         <template #label>
@@ -1564,6 +1656,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryInsideTankOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                       >
                         <template #label>
@@ -1575,6 +1668,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryCleaningHoseAirBlowOption"
+                        :readonly="disabledInput()"
                         class="px-10"
                       >
                         <template #label>
@@ -1586,6 +1680,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryCoverByCopingOption"
+                        :readonly="disabledInput()"
                         
                         class="px-10"
                       >
@@ -1603,6 +1698,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryAlreadyCleanedOption"
+                        :readonly="disabledInput()"
                         :value="false"
                         class="px-10"
                       >
@@ -1615,6 +1711,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryAfterSealOption"
+                        :readonly="disabledInput()"
                         :value="false"
                         class="px-10"
                       >
@@ -1627,6 +1724,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryInsideTankOption"
+                        :readonly="disabledInput()"
                         :value="false"
                         class="px-10"
                       >
@@ -1639,6 +1737,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryCleaningHoseAirBlowOption"
+                        :readonly="disabledInput()"
                         :value="false"
                         class="px-10"
                       >
@@ -1651,6 +1750,7 @@ const handleSubmit = async type => {
                       <VCheckbox
                         v-if="getShippingCheckSheetResult"
                         v-model="getShippingCheckSheetResult.lorryCoverByCopingOption"
+                        :readonly="disabledInput()"
                         :value="false"
                         class="px-10"
                       >
@@ -1681,6 +1781,7 @@ const handleSubmit = async type => {
             <VTextarea
               v-if="getShippingCheckSheetResult"
               v-model="getShippingCheckSheetResult.remark"
+              :readonly="disabledInput()"
             >
               <template #label>
                 <span class="font-size">Remark</span>

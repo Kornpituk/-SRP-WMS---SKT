@@ -276,7 +276,7 @@ const generatedJournalId = () => {
 //----------------------------------- Set configuration Status ---
 
 const readonlyAllInput = () => {
-  return statusId.value !== 3 && statusId.value !== 1 && statusId.value !== 8 && statusId.value !== 9
+  return statusId.value !== 3 && statusId.value !== 1 && statusId.value === 8 && statusId.value !== 9
 }
 
 const hidedAllIconInput = () => {
@@ -297,7 +297,7 @@ watch(() => {
   generatedJournalId()
   generatedReceivingForm()
 
-  if(statusId.value === 3 || statusId.value === 1){
+  if(statusId.value === 3 || statusId.value === 1 || statusId.value === 8){
     frozeCheck.value = false
   }
 })
@@ -1570,6 +1570,48 @@ watchEffect(() => {
   console.log("files.value", files.value)
 })
 
+
+//----------------------------------- Submit Partial -----------------------
+
+const purchasingQuantityPcsModel = ref()
+const purchasingAModel = ref()
+ 
+const handelBackToEdit = async () => {
+  console.log('Send start')
+  await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SavePoQtyKgsPcs/${data.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+    params: {
+      purchasingQuantityPcs: purchasingQuantityPcsModel.value,
+      purchasingAmountKgs: purchasingAModel.value,
+    },
+  },
+  {})
+    .then(response => {
+      isDialogConfirmVisible.value = false
+
+      textAlertDialogFunction('Partial RCVD', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        location.reload()
+
+        // window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+    
+    })
+    .catch(error => {
+    // Handle errors
+      textAlertDialogFunction('Partial RCVD', false)
+      console.error('Error:', error)
+
+      // isDialogSubmitFailedVisible.value = true
+    })
+}
+
 //---------------------------------- MOck Data Table --------------------------------
 const makerLotNo1 = ref('')
 const makerLotNo2 = ref('')
@@ -2468,7 +2510,6 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="2"
               >
                 <VTextField
-                
                   v-if="false"
                   v-model="purchaseOrder.actualNetCountKgs_1"
                   :style="{ width: '100%', minWidth: '150px' }"
@@ -3007,9 +3048,29 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
+                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && statusId !== 8">{{
                   formatNumber(data.purchasingAmountKgs) }}</span>
-                <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
+                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && statusId === 8"><VTextField
+                  v-model="purchasingAModel"
+                  :placeholder="dataHeaderReceving.purchasingAmountKgs"
+                  density="compact"
+                >
+                  <template #label>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextField></span>
+                <span v-if="data.receiveTypeId === 2 && statusId !== 8">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
+                <span v-if="data.receiveTypeId === 2 && statusId === 8">
+                  <VTextField
+                    v-model="purchasingAModel"
+                    :placeholder="dataHeaderReceving.packagingQtyKg"
+                    density="compact"
+                  >
+                    <template #label>
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </span>
               </td>
               <th
                 :disabled="!purchaseOrder.actualMakerLotNo_1"
@@ -3520,7 +3581,7 @@ const getDisabledFollowStatusNRole = () => {
               <VRow>
                 <VCol cols="12">
                   <VFileInput
-                    v-if="!frozeCheck"
+                    v-if="!frozeCheck && statusId !== 8"
                     v-model="fileCoaNew"
                     accept="image/png, image/jpeg, image/bmp, application/pdf"
                     prepend-icon="mdi-paperclip"
@@ -3610,7 +3671,7 @@ const getDisabledFollowStatusNRole = () => {
                     </VCardText>
                     <VCardActions>
                       <VBtn
-                        v-if="!frozeCheck"
+                        v-if="!frozeCheck && statusId !== 8"
                         variant="flat"
                         width="100%"
                         color="error"
@@ -3668,7 +3729,7 @@ const getDisabledFollowStatusNRole = () => {
 
                     <VCardActions>
                       <VBtn
-                        v-if="!frozeCheck"
+                        v-if="!frozeCheck && statusId !== 8"
                         variant="flat"
                         width="100%"
                         color="error"
@@ -3687,7 +3748,7 @@ const getDisabledFollowStatusNRole = () => {
                   cols="12"
                 >
                   <VBtn
-                    v-if="!frozeCheck"
+                    v-if="!frozeCheck && statusId !== 8"
                     color="red"
                     @click="removeFileAll"
                   >
@@ -3782,7 +3843,7 @@ const getDisabledFollowStatusNRole = () => {
 
       <!-- BTN -->
       <VCol
-        v-if="!frozeCheck"
+        v-if="!frozeCheck && statusId !== 8"
         cols="12"
         class="py-0"
       >
@@ -3814,6 +3875,28 @@ const getDisabledFollowStatusNRole = () => {
           </VBtn>
         </div>
       </VCol>
+
+      <VCol
+        v-if="!frozeCheck && statusId === 8"
+        cols="12"
+        class="py-0"
+      >
+        <div class="py-0 d-flex justify-end">
+          <VBtn
+            v-if="getDisabledFollowStatusNRole()"
+            class="mx-4"
+            color="success"
+            style="font-size: 12px;"
+            @click="submitButton('BACK TO EDIT')"
+          >
+            SUBMIT
+          </VBtn>
+        </div>
+      </VCol>
+
+
+
+      {{ statusId }}
 
       <VCol
         v-if="!frozeCheck"
@@ -4068,6 +4151,13 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="wordForSubmit === 'SUBMIT'"
                 color="green"
                 @click="submitReceivingForm"
+              >
+                {{ wordForSubmit }}
+              </VBtn>
+              <VBtn
+                v-if="wordForSubmit === 'BACK TO EDIT'"
+                color="purple-accent-4"
+                @click="handelBackToEdit"
               >
                 {{ wordForSubmit }}
               </VBtn>

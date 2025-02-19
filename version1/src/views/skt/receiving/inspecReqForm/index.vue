@@ -818,6 +818,75 @@ const approveReceivingPlant = () => {
     })
 }
 
+//-------------------------- Send Back ---------------------------
+
+const handelSendBack = async () => {
+  console.log('Send start')
+  await axiosIns.post(`${urlApi.value}/api/v1/Inspection/Back/${data.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+  },
+  {})
+    .then(response => {
+      isDialogConfirmVisible.value = false
+
+      textAlertDialogFunction('SEND BACK', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        // window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+    
+    })
+    .catch(error => {
+    // Handle errors
+      textAlertDialogFunction('SEND BACK', false)
+      console.error('Error:', error)
+
+      // isDialogSubmitFailedVisible.value = true
+    })
+}
+
+//--------------------------- Back To Edite ------------------
+
+const handelBackToEdit = async () => {
+  console.log('Send start')
+  await axiosIns.post(`${urlApi.value}/api/v1/Inspection/BackToEdit/${data.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`, 
+    },
+    params: {
+      statusComments: commentReject.value,
+    },
+  },
+  {})
+    .then(response => {
+      isDialogConfirmVisible.value = false
+
+      textAlertDialogFunction('Partial RCVD', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        location.reload()
+
+        // window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+    
+    })
+    .catch(error => {
+    // Handle errors
+      textAlertDialogFunction('Partial RCVD', false)
+      console.error('Error:', error)
+
+      // isDialogSubmitFailedVisible.value = true
+    })
+}
+
 //------------------- Btn ----------------------------
 
 const  coaFiles = ref([])
@@ -1142,6 +1211,11 @@ const submitButtonVisible = word => {
 }
 
 const approvetButtonVisible = word => {
+  wordForSubmit.value = word
+  isDialogConfirmVisible.value = true
+}
+
+const sendBackButtonVisible = word => {
   wordForSubmit.value = word
   isDialogConfirmVisible.value = true
 }
@@ -2795,13 +2869,22 @@ const getDisabledFollowStatusNRole = () => {
         class="d-flex justify-end px-0"
       >
         <VBtn
-          v-if="false"
+          v-if="true"
           class=""
-          color="info"
+          color="purple-accent-4"
           style="font-size: 12px;"
-          @click="areaTextRemarkButton('Back To Edit')"
+          @click="sendBackButtonVisible('SEND BACK')"
         >
-          Back To Edit
+          Send Back
+        </VBtn>
+        <VBtn
+          v-if="true"
+          class="mx-2"
+          color="warning"
+          style="font-size: 12px;"
+          @click="areaTextRemarkButton('Partial RCVD')"
+        >
+          Partial RCVD
         </VBtn>
         <VBtn
           class="mx-2"
@@ -2831,13 +2914,13 @@ const getDisabledFollowStatusNRole = () => {
         class="d-flex justify-end px-0"
       >
         <VBtn
-          v-if="false"
+          v-if="statusId"
           class=""
           color="info"
           style="font-size: 12px;"
           @click="areaTextRemarkButton('Back To Edit')"
         >
-          Back To Edit
+          Send Back
         </VBtn>
         <VBtn
           v-if="statusId === 7"
@@ -3081,6 +3164,14 @@ const getDisabledFollowStatusNRole = () => {
             >
               {{ wordForSubmit }}
             </VBtn>
+
+            <VBtn
+              v-if="['SEND BACK'].includes(wordForSubmit)"
+              color="purple-accent-4"
+              @click="handelSendBack"
+            >
+              {{ wordForSubmit }}
+            </VBtn>
             <VBtn
               v-if="['APPROVE REJECT'].includes(wordForSubmit)"
               color="warning"
@@ -3188,6 +3279,14 @@ const getDisabledFollowStatusNRole = () => {
                 <VIcon icon="ri-edit-line" />
               </template>
             </VTextarea>
+            <VTextarea
+              v-else
+              v-model="commentReject"
+            >
+              <template #label>
+                <VIcon icon="ri-edit-line" />
+              </template>
+            </VTextarea>
             <span
               v-if="textAlertError.success && textAlertError.comment"
               class="text-red"
@@ -3202,9 +3301,23 @@ const getDisabledFollowStatusNRole = () => {
             <VBtn
               v-if="wordForSubmit === 'Back To Edit'"
               :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'REJECT' ? 'error' : 'default')"
-              @click="backToEditReceivingPlan"
+              @click="handelSendBack"
             >
               Back To Edit
+            </VBtn>
+            <VBtn
+              v-if="wordForSubmit === 'Send Back'"
+              color="purple-accent-4"
+              @click="handelSendBack"
+            >
+              Send Back
+            </VBtn>
+            <VBtn
+              v-if="wordForSubmit === 'Partial RCVD'"
+              color="warning"
+              @click="handelBackToEdit"
+            >
+              INsP AcCept / Partial RCVD
             </VBtn>
             <VBtn
               v-if="wordForSubmit === 'REJECT'"
