@@ -1574,9 +1574,21 @@ watchEffect(() => {
 //----------------------------------- Submit Partial -----------------------
 
 const purchasingQuantityPcsModel = ref()
-const purchasingAModel = ref()
- 
+const purchasingAmountKgsModel = ref()
+const backUpPurchasingAmount = ref(0)
+
 const handelBackToEdit = async () => {
+
+  
+
+  if(data?.value.receiveTypeId === 3){
+    backUpPurchasingAmount.value =  data?.value.purchasingAmountKgs
+  }else if(data?.value.receiveTypeId === 2){
+    backUpPurchasingAmount.value =  dataHeaderReceving?.value.packagingQtyKg
+  }else{
+    console.log("not found data?.value.receiveTypeId")
+  }
+
   console.log('Send start')
   await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SavePoQtyKgsPcs/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
@@ -1585,10 +1597,11 @@ const handelBackToEdit = async () => {
       Authorization: `Bearer ${accessTokenAtStore}`, 
     },
     params: {
-      purchasingQuantityPcs: purchasingQuantityPcsModel.value,
-      purchasingAmountKgs: purchasingAModel.value,
+      purchasingQuantityPcs: purchasingQuantityPcsModel.value ||  data?.value.purchasingQuantityPcs || '15',
+      purchasingAmountKgs: purchasingAmountKgsModel.value || backUpPurchasingAmount.value || '12',
     },
   },
+
   {})
     .then(response => {
       isDialogConfirmVisible.value = false
@@ -1597,7 +1610,7 @@ const handelBackToEdit = async () => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
+        // location.reload()
 
         // window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 200) // 10000 มิลลิวินาที = 10 วินาที
@@ -1609,7 +1622,12 @@ const handelBackToEdit = async () => {
       console.error('Error:', error)
 
       // isDialogSubmitFailedVisible.value = true
+      console.log('backUpPurchasingAmount', backUpPurchasingAmount.value)
     })
+
+
+
+  console.log('backUpPurchasingAmount', backUpPurchasingAmount.value)
 }
 
 //---------------------------------- MOck Data Table --------------------------------
@@ -1918,6 +1936,7 @@ const isDialogSubmitFailedVisible = ref(false)
 
 //--------------------------- function --------------------------------------
 const successDialAlert = ref(false)
+
 
 const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
@@ -3051,7 +3070,7 @@ const getDisabledFollowStatusNRole = () => {
                 <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && statusId !== 8">{{
                   formatNumber(data.purchasingAmountKgs) }}</span>
                 <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && statusId === 8"><VTextField
-                  v-model="purchasingAModel"
+                  v-model="purchasingAmountKgsModel"
                   :placeholder="dataHeaderReceving.purchasingAmountKgs"
                   density="compact"
                 >
@@ -3062,7 +3081,7 @@ const getDisabledFollowStatusNRole = () => {
                 <span v-if="data.receiveTypeId === 2 && statusId !== 8">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
                 <span v-if="data.receiveTypeId === 2 && statusId === 8">
                   <VTextField
-                    v-model="purchasingAModel"
+                    v-model="purchasingAmountKgsModel"
                     :placeholder="dataHeaderReceving.packagingQtyKg"
                     density="compact"
                   >
@@ -3116,7 +3135,18 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                {{ formatNumberToLocal(data.purchasingQuantityPcs) }}
+                <span v-if="statusId === 8">{{ formatNumberToLocal(data.purchasingQuantityPcs) }}</span>
+                <span v-if="statusId !== 8 && data.receiveTypeId !== 3">
+                  <VTextField
+                    v-model="purchasingQuantityPcsModel"
+                    :placeholder="data.purchasingQuantityPcs"
+                    density="compact"
+                  >
+                    <template #label>
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </span>
               </td>
               <th
                 :disabled="!purchaseOrder.actualMakerLotNo_1"
@@ -3884,19 +3914,15 @@ const getDisabledFollowStatusNRole = () => {
         <div class="py-0 d-flex justify-end">
           <VBtn
             v-if="getDisabledFollowStatusNRole()"
-            class="mx-4"
-            color="success"
+            class=""
+            color="green"
             style="font-size: 12px;"
-            @click="submitButton('BACK TO EDIT')"
+            @click="submitButton('Partial RCVD')"
           >
             SUBMIT
           </VBtn>
         </div>
       </VCol>
-
-
-
-      {{ statusId }}
 
       <VCol
         v-if="!frozeCheck"
@@ -4155,8 +4181,8 @@ const getDisabledFollowStatusNRole = () => {
                 {{ wordForSubmit }}
               </VBtn>
               <VBtn
-                v-if="wordForSubmit === 'BACK TO EDIT'"
-                color="purple-accent-4"
+                v-if="wordForSubmit === 'Partial RCVD'"
+                color="warning"
                 @click="handelBackToEdit"
               >
                 {{ wordForSubmit }}
@@ -4257,7 +4283,7 @@ const getDisabledFollowStatusNRole = () => {
 
             <VCardText class="d-flex justify-end flex-wrap gap-4">
               <VBtn
-                :color="wordForSubmit === 'Back To Edit' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
+                :color="wordForSubmit === 'Partial RCVD' ? 'info' : (wordForSubmit === 'Reject' ? 'error' : 'default')"
                 @click="isDialogTextAreaVisible = false; isDialogVisibleAction = false"
               >
                 {{ wordForSubmit }}

@@ -87,6 +87,7 @@ const filterForSearchPlan = ref({
   productId: sessionDataFilter.value?.productId || '',
   productName: sessionDataFilter.value?.productName || '',
   unitId: sessionDataFilter.value?.unitId || '',
+  lot: sessionDataFilter.value?.lot || '',
   serialNo: sessionDataFilter.value?.serialNo || '',
   zoneId: sessionDataFilter.value?.zoneId || '',
   areaId: sessionDataFilter.value?.areaId || '',
@@ -98,6 +99,8 @@ const filterForSearchPlan = ref({
   searchByProductId: sessionDataFilter.value?.searchByProductId || '',
   searchByProductName: sessionDataFilter.value?.searchByProductName || '',
   searchByUnit: sessionDataFilter.value?.searchByUnit || '',
+
+  warehouseSearch: sessionDataFilter.value?.warehouseSearch || '',
 
   // sortByCategory: sessionDataFilter.value?.sortByCategory || '',
   // sortByType: sessionDataFilter.value?.sortByType || '',
@@ -158,7 +161,7 @@ watch(async () => {
 
 const { getSearchPlanResult,
   errorGetSearchPlan,
-  fetchSearchPlan } =useGetSearchPlanService()
+  fetchSearchPlan } = useGetSearchPlanService()
 
 const searchPlanData = ref([])
 const isLoading = ref(false)
@@ -313,7 +316,7 @@ const searchShipmentPlan = async () => {
     const result = await fetchSearchPlan(
       urlApi.value,
       'StockUpdate',
-      whereHouse,
+      filterForSearchPlan?.value.warehouseSearch || whereHouse,
       accessTokenAtStore,
       filterForSearchPlan.value,
       statusID,
@@ -370,8 +373,13 @@ const clearFilterPlanFunctionBtn = async () => {
     SortDirection: '',
   }
 
+  warehouseModel.value = ''
   etaDateModel.value = ''
   etdDateModel.value = ''
+
+  saveHistoryFilter()
+
+  await searchShipmentPlan()
 }
 
 //-------------------------------------------- Export Excel -----------------------
@@ -613,7 +621,7 @@ const refeshPage = () => {
                   class="py-1"
                 >
                   <VSelect
-                    v-model="warehouseModel"
+                    v-model="filterForSearchPlan.warehouseSearch"
                     :items="warehouseItemModel"
                     label="Warehouse"
                     item-title="name"
@@ -690,7 +698,7 @@ const refeshPage = () => {
                   class="py-1"
                 >
                   <VTextField
-                    v-model="filterForSearchPlan.SalesOrderNoSearch"
+                    v-model="filterForSearchPlan.lot"
                     density="compact"
                   >
                     <template #label>
@@ -1093,6 +1101,12 @@ const refeshPage = () => {
               <th class="px-1">
                 UoM
               </th>
+              <th class="px-1 text-end">
+                Pack(KGS)
+              </th>
+              <th class="px-1 text-end">
+                Total/QTY(KGS)
+              </th>
               <th class="px-1">
                 Warehouse
               </th>
@@ -1181,6 +1195,18 @@ const refeshPage = () => {
                   style="min-width: 30px; max-width: 30px;  font-size: 14px;"
                 >
                   {{ item.unitName }}
+                </td>
+                <td
+                  class="px-1 text-end"
+                  style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                >
+                  {{ item.packKgs.toFixed(2).toLocaleString() }}
+                </td>
+                <td
+                  class="px-1 text-end"
+                  style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                >
+                  {{ item.packKgs.toFixed(2).toLocaleString() }}
                 </td>
                 <td
                   class="px-1"

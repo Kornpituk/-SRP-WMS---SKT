@@ -143,6 +143,8 @@ import { useGetUserPermissionService,
   usePrintPDFService, 
 } from '@/services/skt/shipmentPlan/services'
 
+//-------------------------------------------- Permission -----------------------------------------
+
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
 
@@ -168,6 +170,19 @@ const statusPermission = ref(-1)
 const canVisibleUserPermission = (statusId, uiControlContextId) => {
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
+
+const disShowTableShipmentPLand = () => !['00011',
+  '00012', 
+  '00013',
+  '00014',
+  '00015',
+  '00029',
+  '00030',
+  '00031',
+  '00033',
+  '00032', 
+  '00034',
+  '00044'].includes(userDataInfo.value.id)
 
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
@@ -1905,31 +1920,43 @@ const handlePrintDPFCheckSheet = async type => {
   }
 
   await mapProductRowToPramsPrint(prouctRowAction.value)
-
   console.log('paramsPrintPDFCheckSheet.value', paramsPrintPDFCheckSheet.value)
-  
+
+  const countPage = ref(1)
+
   if (type === 'ShippingCheckSheetIBC2' ) {
-    await callAPIPrintPDFChecksheet('ShippingCheckSheet', '')
-    await callAPIPrintPDFChecksheet(type, '')
+    setTimeout(() => {
+      wordForSubmit.value = "PRINT CHECKSHEET"
+      isDialogLoadingVisible.value = true
+    }, 500)
+    await callAPIPrintPDFChecksheet('ShippingCheckSheet', '', countPage.value++)
+    await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
     const licensePlates = Array.isArray(licensePlate.value) 
       ? licensePlate.value 
       : [licensePlate.value]
 
     for (const item of licensePlates) {
-      await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo)
+      await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo, countPage.value++)
     }
+
+    setTimeout(() => {
+      wordForSubmit.value = "PRINT CHECKSHEET"
+      isDialogLoadingVisible.value = false
+    }, 500)
+    
    
   }else if(type === 'ShippingCheckSheet'){
-    await callAPIPrintPDFChecksheet(type, '')
+    await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
     const licensePlates = Array.isArray(licensePlate.value) 
       ? licensePlate.value 
       : [licensePlate.value]
 
     for (const item of licensePlates) {
-      await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo)
+      await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo, countPage.value++)
     }
+    console.log('Completed')
   }
   else{
     callAPIPrintPDFChecksheet(type)
@@ -1937,8 +1964,10 @@ const handlePrintDPFCheckSheet = async type => {
 
 }
 
-const callAPIPrintPDFChecksheet = async (type, LicensePlate) => {
-
+const callAPIPrintPDFChecksheet = async (type, LicensePlate, page) => {
+  
+  
+  console.log("callAPIPrintPDFChecksheet start1", isDialogLoadingVisible.value)
   try {
     const result = printPDFService(
       urlApi.value,
@@ -1948,14 +1977,27 @@ const callAPIPrintPDFChecksheet = async (type, LicensePlate) => {
       accessTokenAtStore,
       paramsPrintPDFCheckSheet.value,
       LicensePlate,
+      page, 
     )
 
-    if(result){
+    if(printPDFResult.value){
       console.log(result)
+      
+      console.log("callAPIPrintPDFChecksheet start2", isDialogLoadingVisible.value)
     }
   }catch(error){
     console.error(`Error printing PDF:`, error)
+    setTimeout(() => {
+      wordForSubmit.value = "PRINT CHECKSHEET"
+      isDialogLoadingVisible.value = false
+    }, 500)
+    console.log("callAPIPrintPDFChecksheet start3", isDialogLoadingVisible.value)
   }
+  setTimeout(() => {
+    wordForSubmit.value = "PRINT CHECKSHEET"
+    isDialogLoadingVisible.value = false
+  }, 500)
+  console.log("callAPIPrintPDFChecksheet start4", isDialogLoadingVisible.value)
 }
 
 //--------------------------- Export Excel
@@ -2056,8 +2098,6 @@ const loadingPrintTruckOrderForm = ref(false)
 
 const clearParamsTruckOrder = () => {
   console.log('clearParamsTruckOrder', CompanyPrint.value)
-  TruckCompanyModel.value = []
-  TruckTypeModel.value  = []
   CompanyPrint.value  = []
   AddressPrint.value  = []
   TruckCompanyPrint.value = []
@@ -3038,7 +3078,7 @@ const handlePrintTruckOrderPDF = () => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
+              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="primary"
@@ -3048,7 +3088,7 @@ const handlePrintTruckOrderPDF = () => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
+              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_REJECT').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="error"
@@ -3104,7 +3144,7 @@ const handlePrintTruckOrderPDF = () => {
   </div>
 
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
-  <section>
+  <section v-if="disShowTableShipmentPLand()">
     <VCard class="mt-6">
       <div>
         <div
@@ -3141,7 +3181,7 @@ const handlePrintTruckOrderPDF = () => {
             <tr>
               <th>
                 <VCheckbox
-                  v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
+                  v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                   v-model="isSelectAll"
                   :indeterminate="isIndeterminate"
                   @click="toggleSelectAll"
@@ -3505,7 +3545,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VCheckboxBtn
-                  v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023'|| userDataInfo.id === '00025'"
+                  v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023'|| checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00025' || checkStatusBeforeAvtion(product.statusId) && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                   v-model="selectedDataTables"
                   :value="product"
                 />
@@ -4533,7 +4573,7 @@ const handlePrintTruckOrderPDF = () => {
               <!-- 👉 Actions -->
               <td
                 v-if="!accountWHSub"
-                style="width: 8rem; font-size: 12px;"
+                style="width: 150px; font-size: 12px;"
                 class="text-center px-1 cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -4548,7 +4588,7 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || !canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
                   :color="accountINSP ? 'grey' : 'warning'"
                   @click="saveShipmentPlan(product)"
                 >
@@ -4557,6 +4597,7 @@ const handlePrintTruckOrderPDF = () => {
               </td>
               <td
                 v-if="!accountWHSub"
+                style="width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -4567,12 +4608,12 @@ const handlePrintTruckOrderPDF = () => {
                   borderBottom:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
                 }"
-                style="width: 8rem; font-size: 12px;"
                 class="text-center px-1"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) 
+                    || canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
                   @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID)"
@@ -4582,7 +4623,7 @@ const handlePrintTruckOrderPDF = () => {
               </td>
               <td
                 v-if="accountWHSub"
-                style="width: 8rem; font-size: 12px;"
+                style="max-width: 130px; font-size: 12px;"
                 class="text-center px-1"
                 :style="{ 
                   backgroundColor: 
@@ -4597,14 +4638,14 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  class="mx-2"
+                  width="100%"
                   :color="accountINSP ? 'grey' : 'primary'"
                 >
                   <span style="font-size: 12px;">Approve</span>
                 </VBtn>
               </td>
               <td
-                style="width: 8rem; font-size: 12px;"
+                style="max-width: 150px; font-size: 12px;"
                 class="text-center px-1"
                 :style="{ 
                   backgroundColor: 
@@ -5039,17 +5080,17 @@ const handlePrintTruckOrderPDF = () => {
     v-model="isDialogLoadingVisible"
     width="300"
   >
-    <VCard
-      color="primary"
-      width="300"
-    >
-      <VCardText class="pt-3 text-white">
-        {{ wordForSubmit }} Proccessing .....
+    <VCard width="300">
+      <VCardText class="pt-3 text-center">
+        {{ wordForSubmit }} 
         <VProgressLinear
           indeterminate
           class="mt-4"
-          color="#fff"
-        />
+          color="primary"
+          height="20"
+        >
+          <span>Proccessing ....</span>
+        </VProgressLinear>
       </VCardText>
     </VCard>
   </VDialog>

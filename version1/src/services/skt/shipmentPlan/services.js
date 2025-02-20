@@ -204,12 +204,12 @@ export const usePrintPDFService = () => {
   const printPDFResult = ref(null)
   const printPDFErrorMessage = ref(null)
 
-  const printPDFService = async (urlApi, form, type, whereHouse, accessToken, params = {}, LicensePlate) => {
+  const printPDFService = async (urlApi, form, type, whereHouse, accessToken, params = {}, LicensePlate, page) => {
    
     try {
       printPDFErrorMessage.value = null
   
-      const result = await checkSheetLorryFlexiRepository.printPDF(urlApi, form, type, whereHouse, accessToken, params, LicensePlate)
+      const result = await checkSheetLorryFlexiRepository.printPDF(urlApi, form, type, whereHouse, accessToken, params, LicensePlate, page)
         
       if (result && result.success) {
         console.log('Print PDF Excel Form Service Complete:', result)

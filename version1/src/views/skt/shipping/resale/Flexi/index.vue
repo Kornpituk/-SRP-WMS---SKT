@@ -472,7 +472,7 @@ const handleSubmit = async type => {
               colspan="4"
               class="text-center"
             >
-              <span> Weight: </span><span class="font-weight-body">{{ getShippingCheckSheetResult?.weight }}</span><span> Kg.</span>
+              <span> Weight: </span><span class="font-weight-body">{{ Number(getShippingCheckSheetResult?.weight).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span><span> Kg.</span>
             </th>
           </tr>
           <tr>

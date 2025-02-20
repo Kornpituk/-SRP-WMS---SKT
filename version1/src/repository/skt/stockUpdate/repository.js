@@ -113,6 +113,7 @@ export const checkSheetLorryFlexiRepository = {
       productId: params.productId || '',
       productName: params.productName || '',
       unitId: params.unitId || '',
+      lot: params.lot || '',
       serialNo: params.serialNo || '',
       zoneId: params.zoneId || '',
       areaId: params.areaId || '',

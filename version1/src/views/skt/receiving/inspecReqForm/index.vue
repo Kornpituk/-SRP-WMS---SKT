@@ -2842,6 +2842,15 @@ const getDisabledFollowStatusNRole = () => {
     >
       <div class="d-flex justify-end">
         <VBtn
+          v-if="true"
+          class=""
+          color="purple-accent-4"
+          style="font-size: 12px;"
+          @click="sendBackButtonVisible('SEND BACK')"
+        >
+          Send Back
+        </VBtn>
+        <VBtn
           class="mx-4"
           color="warning"
           style="font-size: 12px;"
@@ -2870,7 +2879,7 @@ const getDisabledFollowStatusNRole = () => {
       >
         <VBtn
           v-if="true"
-          class=""
+          class="mx-2"
           color="purple-accent-4"
           style="font-size: 12px;"
           @click="sendBackButtonVisible('SEND BACK')"
@@ -2895,6 +2904,7 @@ const getDisabledFollowStatusNRole = () => {
           Reject
         </VBtn>
         <VBtn
+          class="mx-2"
           color="green"
           style="font-size: 12px;"
           @click="approvetButtonVisible('ACCEPT')"
@@ -2914,8 +2924,8 @@ const getDisabledFollowStatusNRole = () => {
         class="d-flex justify-end px-0"
       >
         <VBtn
-          v-if="statusId"
-          class=""
+          v-if="statusId === 5"
+          class="mx-2"
           color="info"
           style="font-size: 12px;"
           @click="areaTextRemarkButton('Back To Edit')"
@@ -2933,6 +2943,7 @@ const getDisabledFollowStatusNRole = () => {
         </VBtn>
         <VBtn
           v-if="statusId === 15"
+          class="mx-2"
           color="green"
           style="font-size: 12px;"
           @click="approvetButtonVisible('APPROVE')"

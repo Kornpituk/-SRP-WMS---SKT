@@ -122,8 +122,9 @@ function openConfirmDialog() {
     }else if(item.statusId === 107){
 
       activeBtnPRODApporve.value = true
-      wordForSubmit.value = alertWordConst.approve
+      wordForSubmit.value = "PROD APPROVED"
       confirmDialog2.value.openDialog()
+      isDialogVisibleAlertDialog.value = false
 
       // textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
       console.log("activeBtnPRODApporve ", activeBtnPRODApporve.value)

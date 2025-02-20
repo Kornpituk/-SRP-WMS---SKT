@@ -64,6 +64,8 @@ function checkDepartment(wareHouseName) {
 
 watchEffect(() => {
   checkDepartment(itemStore.getItemDetails('UserDataCookies').firstName)
+
+  console.log('firstName', itemStore.getItemDetails('UserDataCookies').firstName)
 })
 
 import { urlApi } from '@/api'

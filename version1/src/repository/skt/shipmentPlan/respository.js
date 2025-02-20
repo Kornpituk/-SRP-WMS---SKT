@@ -905,7 +905,7 @@ export const checkSheetLorryFlexiRepository = {
   },
 
   //---------------------------- Print Check sheet PDF ----------------
-  async printPDF(urlApi, form, type, whereHouse, accessToken, params = {}, LicensePlate) {
+  async printPDF(urlApi, form, type, whereHouse, accessToken, params = {}, LicensePlate, page) {
     try {
       if(!params){
         throw 'params not f', params
@@ -918,7 +918,7 @@ export const checkSheetLorryFlexiRepository = {
       if(type === 'ShippingCheckSheet'){
         response = await axios.post(
           `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/
-          ${params[0].SoEtlLogDetailJournalID}?SaleOrder=${params[0].SaleOrder}&UserCode=${params[0].UserCode}&itemCode=${params[0].ItemCode}`, {},
+          ${params[0].SoEtlLogDetailJournalID}/${params[0].SaleOrder}/${params[0].UserCode}/${params[0].ItemCode}/${page}`, {},
           {
             headers: {
               'accept': '*/*', 
@@ -926,11 +926,6 @@ export const checkSheetLorryFlexiRepository = {
               Authorization: `Bearer ${accessToken}`,
             },
 
-            // params: {
-            //   SaleOrder: params[0].SaleOrder,
-            //   UserCode: params[0].UserCode,
-            //   itemCode: params[0].itemCode,
-            // },
             responseType: 'blob', // รับ response เป็น Blob
           },
         )
@@ -940,9 +935,11 @@ export const checkSheetLorryFlexiRepository = {
           Customer: params[0].Customer, ///---- UserCode
           ItemName: params[0].ItemName,
           Code: params[0].ItemCode, /// -- ItemCode
+          page: page,
         }
         response = await axios.post(
-          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}`, dataParameters,
+          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}
+          /${params[0].ItemName }/${params[0].ItemCode}/${params[0].Customer}/${params[0].SaleOrder}/${page}`, {},
           {
             headers: {
               'accept': '*/*', 
@@ -961,7 +958,7 @@ export const checkSheetLorryFlexiRepository = {
         )
       }else if(type === 'ShippingCheckSheetContainer'){
         response = await axios.post(
-          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}?LicensePlate=${LicensePlate}`, {}, 
+          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}/${LicensePlate}/${params[0].SaleOrder}/${page}`, {}, 
           {
             headers: {
               'accept': '*/*', 
@@ -975,9 +972,11 @@ export const checkSheetLorryFlexiRepository = {
         let dataParameters = {
           Customer: params[0].Customer,
           ItemName: params[0].ItemName,
+          SaleOrder: params[0].SaleOrder,
         }
         response = await axios.post(
-          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}`, dataParameters,
+          `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}
+          /${params[0].Customer}/${params[0].ItemName}/${params[0].SaleOrder}`, {},
           {
             headers: {
               'accept': '*/*', 

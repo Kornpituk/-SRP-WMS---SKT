@@ -9,14 +9,20 @@ import iconMock3 from '@images/icons/Icon.png'
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
+const department = ref(sessionStorage.getItem('department'))
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 
+//------------------------------------- Permissions ---------------------------------
+const showBtnCheckSheet = () => {
+  return !!(userDataInfo?.value.id === '00025' || userDataInfo?.value.id === '00023' || userDataInfo?.value.id === '00042' || userDataInfo?.value.id === '00043')
+}
 
 //------------------------------------ params section -------------------------------
 import { useRoute } from 'vue-router'
@@ -1106,9 +1112,9 @@ const dessertsMockAmountView = [
       v-if="checkSheetTypeNameModel === 'IBC'"
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
-    >Resale / Product Shipping Check Sheet (IBC) on {{ getCurrentDate() }}<span
+    >Resale / Product Shipping Check Sheet (IBC) on&nbsp;<span
       v-if="getShippingCheckSheetResult?.reportCheckSheet"
-      style="font-size: 12px;"
+      style="font-weight: bold;"
     >{{ formatDate(getShippingCheckSheetResult?.reportCheckSheet.updatedDate) }}</span></span>
     <span
       v-else
@@ -2483,9 +2489,8 @@ const dessertsMockAmountView = [
             </tr>
           </tbody>
         </table>
-
         <div
-          v-if="true"
+          v-if="department === 'Warehouse' || showBtnCheckSheet()"
           class="d-flex justify-end mt-4"
         >
           <VBtn
