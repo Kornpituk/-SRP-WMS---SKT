@@ -120,8 +120,12 @@ function openConfirmDialog() {
       console.log("activeBtnApporve ", activeBtnApporve.value)
       console.log("selectedDataTables 102")
     }else if(item.statusId === 107){
+
       activeBtnPRODApporve.value = true
-      textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
+      wordForSubmit.value = alertWordConst.approve
+      confirmDialog2.value.openDialog()
+
+      // textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
       console.log("activeBtnPRODApporve ", activeBtnPRODApporve.value)
     // eslint-disable-next-line sonarjs/no-duplicated-branches
     }else if(item.statusId === 101){
@@ -1369,7 +1373,7 @@ const statusText = statusId => {
               :disabled="selectedDataTables.length === 0 || !activeBtnPRODApporve"
               @click="openConfirmDialog"
             >
-              <span style="font-size: 12px;">PROD Approved</span>9
+              <span style="font-size: 12px;">PROD Approved</span>
             </VBtn>
             <VBtn
               v-if="canVisibleUserPermission(statusPermission,'BTN_NEW_BATCH').canVisible"
