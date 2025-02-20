@@ -9,14 +9,17 @@ import iconMock3 from '@images/icons/Icon.png'
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 const department = ref(sessionStorage.getItem('department'))
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
-import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
-const itemStore = useItemStore()
-const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+
 
 
 //------------------------------------- Permissions ---------------------------------

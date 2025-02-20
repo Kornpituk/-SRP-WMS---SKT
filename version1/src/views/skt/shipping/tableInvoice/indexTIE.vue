@@ -143,6 +143,10 @@ import { useGetUserPermissionService,
   usePrintPDFService, 
 } from '@/services/skt/shipmentPlan/services'
 
+import {
+  useGetShippingCheckSheetLorryFlexi2Service,
+} from "@/services/skt/shipmentPlan/lorryFlexiServices"
+
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
@@ -1843,6 +1847,35 @@ const getShippingCheckSheet = async soEId => {
   }
 }
 
+const { getShippingCheckSheetResult2,
+  errorGetShippingCheckSheet2,
+  fetchShippingCheckSheet2 } = useGetShippingCheckSheetLorryFlexi2Service()
+
+const getShippingCheckSheetLorryFlexi = async soEId => {
+  // isDialogLoadingVisible.value = true
+  try {
+    const result = await fetchShippingCheckSheet2(
+      urlApi.value, 'ShippingLorryFlexi', whereHouse, 
+      accessTokenAtStore, soEId)
+
+    if(result){
+      getShippingCheckSheetResult2.value = result.data.reportLorryFlexi
+      isDialogLoadingVisible.value = false
+
+      errorGetShippingCheckSheet.value = null
+
+      console.log('getShippingCheckSheetResult2', result)
+    }else{
+      isDialogLoadingVisible.value = false
+
+      // console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
+    }
+  } catch (error) {
+    isDialogLoadingVisible.value = false
+    errorGetShippingCheckSheet.value = error.message
+  }
+}
+
 const { printPDFResult,
   printPDFErrorMessage,
   printPDFService } = usePrintPDFService()
@@ -1914,7 +1947,8 @@ const handlePrintDPFCheckSheet = async type => {
       
       
     }else{
-      console.log('asdasd', type)
+      await getShippingCheckSheetLorryFlexi(prouctRowAction.value.soEtlLogDetailJournalID)
+      console.log('getShippingCheckSheetResult.value Lorry', getShippingCheckSheetResult2.value)
     }
     
   }
@@ -1957,6 +1991,12 @@ const handlePrintDPFCheckSheet = async type => {
       await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo, countPage.value++)
     }
     console.log('Completed')
+  }else if(getShippingCheckSheetResult2?.value.isLorry){
+    callAPIPrintPDFChecksheet('ShippingLorry')
+    console.log("getShippingCheckSheetResult?.value.isLorry", getShippingCheckSheetResult2?.value.isLorry)
+  }else if(!getShippingCheckSheetResult2?.value.isLorry){
+    callAPIPrintPDFChecksheet('ShippingFlexi')
+    console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
   }
   else{
     callAPIPrintPDFChecksheet(type)

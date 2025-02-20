@@ -3,7 +3,7 @@ import { checkSheetLorryFlexiRepository,
 
 
 //----------------------- Get ----------------------
-export const useGetShippingCheckSheetService = () => {
+export const useGetShippingCheckSheetLorryFlexiService = () => {
   const getShippingCheckSheetResult = ref(null)
   const errorGetShippingCheckSheet = ref(null)
     
@@ -34,6 +34,40 @@ export const useGetShippingCheckSheetService = () => {
     getShippingCheckSheetResult,
     errorGetShippingCheckSheet,
     fetchShippingCheckSheet,
+  }
+}
+
+export const useGetShippingCheckSheetLorryFlexi2Service = () => {
+  const getShippingCheckSheetResult2 = ref(null)
+  const errorGetShippingCheckSheet2 = ref(null)
+    
+  const fetchShippingCheckSheet2 = async (urlApi, form, whereHouse, accessToke, SoEId) => {
+    try {
+      errorGetShippingCheckSheet2.value = null
+  
+      // console.log('Fetching fetchShippingCheckSheet2...')
+    
+      const result = await checkSheetLorryFlexiRepository.
+        getShippingCheckSheetLorry(urlApi, form, whereHouse, accessToke, SoEId)
+          
+      if (result) {
+        // console.log('Fetching data fetchShippingCheckSheet2:', result)
+        getShippingCheckSheetResult2.value = result
+          
+        return result
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchShippingCheckSheet2:', error)
+      errorGetShippingCheckSheet2.value = error.message
+    }
+  }
+    
+  return {
+    getShippingCheckSheetResult2,
+    errorGetShippingCheckSheet2,
+    fetchShippingCheckSheet2,
   }
 }
 

@@ -1200,13 +1200,13 @@ const refeshPage = () => {
                   class="px-1 text-end"
                   style="min-width: 110px; max-width: 110px;  font-size: 14px;"
                 >
-                  {{ item.packKgs.toFixed(2).toLocaleString() }}
+                  {{ Number(item.packKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                 </td>
                 <td
                   class="px-1 text-end"
                   style="min-width: 110px; max-width: 110px;  font-size: 14px;"
                 >
-                  {{ item.packKgs.toFixed(2).toLocaleString() }}
+                  {{ Number(item.totalQtyKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                 </td>
                 <td
                   class="px-1"

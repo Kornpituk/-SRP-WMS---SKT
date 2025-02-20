@@ -23,16 +23,25 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
 //--------------------------- Section import Services --------------------------------
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+
+const itemStore = useItemStore()
+
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+const department = ref(sessionStorage.getItem('department'))
+
 import {
-  useGetShippingCheckSheetService, useSaveShippingCheckSheetService,
+  useGetShippingCheckSheetLorryFlexiService, useSaveShippingCheckSheetService,
   useShippingCheckSheetLorryService,
 } from "@/services/skt/shipmentPlan/lorryFlexiServices"
 
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
+
+
 
 const route = useRoute()
 
@@ -40,6 +49,11 @@ const dataProductRow = ref(JSON.parse(sessionStorage.getItem("productDataSession
 
 const statusModel = ref(dataProductRow.value.csLfStatusId)
 const soEIdModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
+
+//------------------------------------- Permissions ---------------------------------
+const showBtnCheckSheet = () => {
+  return !!(userDataInfo?.value.id === '00025' || userDataInfo?.value.id === '00023' || userDataInfo?.value.id === '00042' || userDataInfo?.value.id === '00043')
+}
 
 //--------------------------------- disabled ----------------------------------
 
@@ -124,7 +138,7 @@ function toCustomFormat(isoString) {
 
 const { getShippingCheckSheetResult,
   errorGetShippingCheckSheet,
-  fetchShippingCheckSheet } = useGetShippingCheckSheetService()
+  fetchShippingCheckSheet } = useGetShippingCheckSheetLorryFlexiService()
 
 const handleFetchDataLorry = async () => {
   try{
@@ -325,7 +339,8 @@ const handleSaveDraft = async () => {
     if(result){
       textAlertDialogFunction(alertWordConst.saveDraft, true)
       setTimeout(() => {
-        window.location.href = `${window.location.origin}/skt/shipping`
+        // window.location.href = `${window.location.origin}/skt/shipping`
+        location.reload()
       }, 500) // 0.5 วินาที
     }else{
       textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -430,15 +445,15 @@ const handleSubmit = async type => {
     >
       <VBtn
         :disabled="disabledInput()"
-        :variant="typeResalse === 'Lorry' ? 'tonal' : 'flat'"
-        @click="typeResalse = 'Flexi'"
+        :variant="getShippingCheckSheetResult?.isLorry ? 'tonal' : 'flat'"
+        @click="getShippingCheckSheetResult.isLorry = false"
       >
         Flexi
       </VBtn>
       <VBtn
         :disabled="disabledInput()"
-        :variant="typeResalse === 'Flexi' ? 'tonal' : 'flat'"
-        @click="typeResalse = 'Lorry'"
+        :variant="!getShippingCheckSheetResult?.isLorry ? 'tonal' : 'flat'"
+        @click="getShippingCheckSheetResult.isLorry = true"
       >
         Lorry
       </VBtn>
@@ -1843,7 +1858,10 @@ const handleSubmit = async type => {
       </table>
     </VCol>
 
-    <VCol cols="12">
+    <VCol
+      v-if="department === 'Warehouse' || showBtnCheckSheet()"
+      cols="12"
+    >
       <div class="d-flex justify-end">
         <VBtn
           v-if="statusModel === 1102 || statusModel === 1103 || statusModel === 0"
