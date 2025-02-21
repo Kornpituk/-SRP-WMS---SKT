@@ -1573,21 +1573,16 @@ watchEffect(() => {
 
 //----------------------------------- Submit Partial -----------------------
 
-const purchasingQuantityPcsModel = ref()
+const purchasingQuantityPcsModel = ref(data?.value.purchasingQuantityPcs)
 const purchasingAmountKgsModel = ref()
 const backUpPurchasingAmount = ref(0)
+const totalPurchasingAmount = ref(0)
+
+watchEffect(() => {
+  totalPurchasingAmount.value = dataHeaderReceving?.value.packagingQtyKg * purchasingQuantityPcsModel.value
+})
 
 const handelBackToEdit = async () => {
-
-  
-
-  if(data?.value.receiveTypeId === 3){
-    backUpPurchasingAmount.value =  data?.value.purchasingAmountKgs
-  }else if(data?.value.receiveTypeId === 2){
-    backUpPurchasingAmount.value =  dataHeaderReceving?.value.packagingQtyKg
-  }else{
-    console.log("not found data?.value.receiveTypeId")
-  }
 
   console.log('Send start')
   await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SavePoQtyKgsPcs/${data.value.poEtlLogDetailJournalID}`, {}, {
@@ -1597,8 +1592,8 @@ const handelBackToEdit = async () => {
       Authorization: `Bearer ${accessTokenAtStore}`, 
     },
     params: {
-      purchasingQuantityPcs: purchasingQuantityPcsModel.value ||  data?.value.purchasingQuantityPcs || '15',
-      purchasingAmountKgs: purchasingAmountKgsModel.value || backUpPurchasingAmount.value || '12',
+      purchasingQuantityPcs: purchasingQuantityPcsModel.value ||  data?.value.purchasingQuantityPcs,
+      purchasingAmountKgs: dataHeaderReceving?.value.packagingQtyKg * purchasingQuantityPcsModel.value || backUpPurchasingAmount.value,
     },
   },
 
@@ -1612,7 +1607,7 @@ const handelBackToEdit = async () => {
       setTimeout(() => {
         // location.reload()
 
-        // window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 200) // 10000 มิลลิวินาที = 10 วินาที
     
     })
@@ -1787,6 +1782,8 @@ function formatNumberWithCommas(value) {
 const formatNumber = value => {
   if (value !== null && value !== undefined) {
     return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }else{
+    return '0.00'
   }
 
   return '0.00'
@@ -3067,29 +3064,10 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && statusId !== 8">{{
+                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
                   formatNumber(data.purchasingAmountKgs) }}</span>
-                <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0 && statusId === 8"><VTextField
-                  v-model="purchasingAmountKgsModel"
-                  :placeholder="dataHeaderReceving.purchasingAmountKgs"
-                  density="compact"
-                >
-                  <template #label>
-                    <VIcon icon="ri-edit-line" />
-                  </template>
-                </VTextField></span>
-                <span v-if="data.receiveTypeId === 2 && statusId !== 8">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
-                <span v-if="data.receiveTypeId === 2 && statusId === 8">
-                  <VTextField
-                    v-model="purchasingAmountKgsModel"
-                    :placeholder="dataHeaderReceving.packagingQtyKg"
-                    density="compact"
-                  >
-                    <template #label>
-                      <VIcon icon="ri-edit-line" />
-                    </template>
-                  </VTextField>
-                </span>
+                
+                <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
               </td>
               <th
                 :disabled="!purchaseOrder.actualMakerLotNo_1"
@@ -3135,11 +3113,11 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                <span v-if="statusId === 8">{{ formatNumberToLocal(data.purchasingQuantityPcs) }}</span>
-                <span v-if="statusId !== 8 && data.receiveTypeId !== 3">
+                <span v-if="statusId !== 8">{{ formatNumberToLocal(data.purchasingQuantityPcs) }}</span>
+                <span v-if="statusId === 8 && data.receiveTypeId !== 3">
                   <VTextField
                     v-model="purchasingQuantityPcsModel"
-                    :placeholder="data.purchasingQuantityPcs"
+                    placeholder="0"
                     density="compact"
                   >
                     <template #label>
@@ -3192,7 +3170,8 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
                 style="min-width: 150px; max-width: 150px;"
               >
-                {{ formatNumber(data.purchasingAmountKgs) }}
+                <span v-if="statusId !== 8">{{ formatNumber(data.purchasingAmountKgs) }}</span>
+                <span v-if="statusId === 8">{{ isNaN(totalPurchasingAmount) || !totalPurchasingAmount ? '0.00' : formatNumber(totalPurchasingAmount) }}</span>
               </td>
               <th
                 class="text-center"

@@ -2878,7 +2878,7 @@ const getDisabledFollowStatusNRole = () => {
         class="d-flex justify-end px-0"
       >
         <VBtn
-          v-if="true"
+          v-if="data.receiveTypeId !== 3"
           class="mx-2"
           color="purple-accent-4"
           style="font-size: 12px;"
@@ -2895,6 +2895,7 @@ const getDisabledFollowStatusNRole = () => {
         >
           Partial RCVD
         </VBtn>
+        
         <VBtn
           class="mx-2"
           color="error"
