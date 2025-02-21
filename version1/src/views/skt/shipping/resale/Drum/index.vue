@@ -1115,7 +1115,7 @@ const dessertsMockAmountView = [
       v-if="checkSheetTypeNameModel === 'IBC'"
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
-    >Resale / Product Shipping Check Sheet (IBC) on&nbsp;<span
+    >Resale / Product Shipping Check Sheet ({{ dataProductRow?.checkSheetTypeName }}) on&nbsp;<span
       v-if="getShippingCheckSheetResult?.reportCheckSheet"
       style="font-weight: bold;"
     >{{ formatDate(getShippingCheckSheetResult?.reportCheckSheet.updatedDate) }}</span></span>
@@ -1123,7 +1123,7 @@ const dessertsMockAmountView = [
       v-else
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
-    >Resale / Product Shipping Check Sheet (Drum) on {{ getCurrentDate() }}</span>
+    >Resale / Product Shipping Check Sheet ({{ dataProductRow?.checkSheetTypeName }}) on {{ getCurrentDate() }}</span>
     <div class="my-6">
       <VRow>
         <VCol cols="12">

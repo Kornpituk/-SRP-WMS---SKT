@@ -1705,16 +1705,22 @@ async function  redirectBasedOnStatus (product)  {
     10: "Flexi",
   }
 
-  const mainCheckSheetTypeName = (product.checkSheetTypeName)
+  const mainCheckSheetTypeName = (product.packagingTypeID)
 
   const checkSheetTypeNameMapping = {
-    'N/A': '',
-    'Drum': 'Drum',
-    'Paper bag': 'Drum',
-    'Can': 'Drum',
-    'IBC': 'Drum',
-    'Flexi': 'Flexi',
-    'Lorry': 'Flexi',
+    0: '',
+    1: 'Drum',
+    2: 'Drum',
+    3: 'Drum',
+    4: 'Drum',
+    5: 'Drum',
+    6: 'Flexi',
+    7: 'Flexi',
+    8: 'Drum',
+    9: 'Drum',
+    10: 'Drum',
+    11: 'Flexi',
+    
   }
 
   // ตรวจสอบว่า status มีใน mapping หรือไม่
@@ -1822,7 +1828,6 @@ import { useGetShippingCheckSheetService } from '@/services/skt/shipmentPlan/che
 const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCheckSheet } = useGetShippingCheckSheetService()
 
 const getShippingCheckSheet = async soEId => {
-  // isDialogLoadingVisible.value = true
   try {
     const result = await fetchShippingCheckSheet(
       urlApi.value, 'ShippingCheckSheet', whereHouse, 
@@ -1830,18 +1835,15 @@ const getShippingCheckSheet = async soEId => {
 
     if(result){
       getShippingCheckSheetResult.value = result
-      isDialogLoadingVisible.value = false
 
       errorGetShippingCheckSheet.value = null
 
       // console.log('getShippingCheckSheetResult', result)
     }else{
-      isDialogLoadingVisible.value = false
 
       // console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
     }
   } catch (error) {
-    isDialogLoadingVisible.value = false
     errorGetShippingCheckSheet.value = error.message
   }
 }
@@ -1851,7 +1853,6 @@ const { getShippingCheckSheetResult2,
   fetchShippingCheckSheet2 } = useGetShippingCheckSheetLorryFlexi2Service()
 
 const getShippingCheckSheetLorryFlexi = async soEId => {
-  // isDialogLoadingVisible.value = true
   try {
     const result = await fetchShippingCheckSheet2(
       urlApi.value, 'ShippingLorryFlexi', whereHouse, 
@@ -1859,18 +1860,15 @@ const getShippingCheckSheetLorryFlexi = async soEId => {
 
     if(result){
       getShippingCheckSheetResult2.value = result.data.reportLorryFlexi
-      isDialogLoadingVisible.value = false
 
       errorGetShippingCheckSheet.value = null
 
       console.log('getShippingCheckSheetResult2', result)
     }else{
-      isDialogLoadingVisible.value = false
 
       // console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
     }
   } catch (error) {
-    isDialogLoadingVisible.value = false
     errorGetShippingCheckSheet.value = error.message
   }
 }
@@ -1958,10 +1956,7 @@ const handlePrintDPFCheckSheet = async type => {
   const countPage = ref(1)
 
   if (type === 'ShippingCheckSheetIBC2' ) {
-    setTimeout(() => {
-      wordForSubmit.value = "PRINT CHECKSHEET"
-      isDialogLoadingVisible.value = true
-    }, 500)
+    isDialogLoadingVisible.value = true
     await callAPIPrintPDFChecksheet('ShippingCheckSheet', '', countPage.value++)
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
@@ -1973,13 +1968,10 @@ const handlePrintDPFCheckSheet = async type => {
       await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo, countPage.value++)
     }
 
-    setTimeout(() => {
-      wordForSubmit.value = "PRINT CHECKSHEET"
-      isDialogLoadingVisible.value = false
-    }, 500)
     
    
   }else if(type === 'ShippingCheckSheet'){
+    isDialogLoadingVisible.value = true
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
     const licensePlates = Array.isArray(licensePlate.value) 
@@ -1991,13 +1983,16 @@ const handlePrintDPFCheckSheet = async type => {
     }
     console.log('Completed')
   }else if(getShippingCheckSheetResult2?.value.isLorry){
+    isDialogLoadingVisible.value = true
     callAPIPrintPDFChecksheet('ShippingLorry')
     console.log("getShippingCheckSheetResult?.value.isLorry", getShippingCheckSheetResult2?.value.isLorry)
   }else if(!getShippingCheckSheetResult2?.value.isLorry){
+    isDialogLoadingVisible.value = true
     callAPIPrintPDFChecksheet('ShippingFlexi')
     console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
   }
   else{
+    isDialogLoadingVisible.value = true
     callAPIPrintPDFChecksheet(type)
   }
 
@@ -2006,7 +2001,6 @@ const handlePrintDPFCheckSheet = async type => {
 const callAPIPrintPDFChecksheet = async (type, LicensePlate, page) => {
   
   
-  console.log("callAPIPrintPDFChecksheet start1", isDialogLoadingVisible.value)
   try {
     const result = printPDFService(
       urlApi.value,
@@ -2022,21 +2016,16 @@ const callAPIPrintPDFChecksheet = async (type, LicensePlate, page) => {
     if(printPDFResult.value){
       console.log(result)
       
-      console.log("callAPIPrintPDFChecksheet start2", isDialogLoadingVisible.value)
     }
   }catch(error){
     console.error(`Error printing PDF:`, error)
     setTimeout(() => {
       wordForSubmit.value = "PRINT CHECKSHEET"
-      isDialogLoadingVisible.value = false
     }, 500)
-    console.log("callAPIPrintPDFChecksheet start3", isDialogLoadingVisible.value)
   }
   setTimeout(() => {
     wordForSubmit.value = "PRINT CHECKSHEET"
-    isDialogLoadingVisible.value = false
   }, 500)
-  console.log("callAPIPrintPDFChecksheet start4", isDialogLoadingVisible.value)
 }
 
 //--------------------------- Export Excel
@@ -5114,22 +5103,50 @@ const handlePrintTruckOrderPDF = () => {
     </VDialog>
   </div>
 
+  <VBtn v-if="false" @click=" isDialogLoadingVisible = true">
+    asdM
+  </VBtn>
+
   <!-- Dialog -->
   <VDialog
     v-model="isDialogLoadingVisible"
-    width="300"
+    width="700"
   >
-    <VCard width="300">
-      <VCardText class="pt-3 text-center">
-        {{ wordForSubmit }} 
-        <VProgressLinear
-          indeterminate
-          class="mt-4"
-          color="primary"
-          height="20"
-        >
-          <span>Proccessing ....</span>
-        </VProgressLinear>
+    <DialogCloseBtn
+      variant="text"
+      size="default"
+      @click="isDialogLoadingVisible = false"
+    />
+    <VCard width="700">
+      <VCardText class="d-flex justify-center">
+        <VIcon
+          size="50"
+          color="success"
+          icon="ri-checkbox-circle-fill"
+        />
+        <VIcon
+          size="150"
+          color="success"
+          icon="ri-printer-fill"
+        />
+      </VCardText>
+
+      <VCardText class="d-flex justify-center text-center pb-1">
+        <div>
+          <span style="font-size: 22px; font-weight: bolder;">Check sheet printed successfully!</span>
+        </div>
+      </VCardText>
+
+      <VCardText class="d-flex justify-center text-center pb-1">
+        <div>
+          <span style="font-size: 22px; font-weight: bolder;">Please wait for the browser to downloading...</span>
+        </div>
+      </VCardText>
+
+      <VCardText class="d-flex justify-center text-center pb-4">
+        <div>
+          <span style="font-size: 14px;">You can close this dialog, and the check sheet will continue downloading until it's complete..</span>
+        </div>
       </VCardText>
     </VCard>
   </VDialog>
