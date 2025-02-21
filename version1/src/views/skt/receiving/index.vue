@@ -2031,6 +2031,7 @@ const insetSwitch1 = ref('')
                   item-title="statusText"
                   item-value="statusText"
                   density="compact"
+                  clearable
                 >
                   <template #label>
                     <span
@@ -2112,6 +2113,7 @@ const insetSwitch1 = ref('')
                   :config="{ mode: 'range',dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   class="custom-date-time-picker"
+                  clearable
                 >
                   <template #label>
                     <span>Delivery Date</span>

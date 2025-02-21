@@ -1030,7 +1030,7 @@ export const checkSheetLorryFlexiRepository = {
 
         const formattedDate = `date/${dd}/${mm}/${yyyy} time/(${hh}/${min})`
 
-        saveAs(blob, `${type}_page_${page}_report_${formattedDate}.pdf`)  // ตั้งชื่อไฟล์
+        saveAs(blob, `page_${page}_${type}_report_${formattedDate}.pdf`)  // ตั้งชื่อไฟล์
   
         return { success: true, data: blob }
       } else {

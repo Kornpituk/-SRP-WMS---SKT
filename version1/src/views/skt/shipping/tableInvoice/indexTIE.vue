@@ -51,6 +51,12 @@ const textAlertDialogFunction = (word, success) => {
 
 //------------------------------ Alert Loading -----------------------------------
 const isDialogLoadingVisible = ref(false)
+const wordLoading = ref('')
+
+const handleDialogLoading = type=> {
+  wordLoading.value = type
+  isDialogLoadingVisible.value = true
+}
 
 //------------------------------ Alert Confirm ---------------------------
 const confirmDialog2 = ref('')
@@ -839,6 +845,7 @@ const saveFileFormShipment = async (
   soEtlLogDetailJournalID,
 ) => {
   console.log("save file start...", soEtlLogDetailJournalID)
+  
   try {
     // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
     const requestData = file
@@ -1006,10 +1013,13 @@ const showText = () => {
   }
 }
 
+const saveDraftLoading = ref(false)
+const saveDraftLoadingSOERow = ref('')
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const saveShipmentPlan = async row => {
   console.log("save plan start...", row)
-
+  saveDraftLoadingSOERow.value = row.soEtlLogDetailJournalID
   try {
     // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
     if (
@@ -1127,16 +1137,19 @@ const saveShipmentPlan = async row => {
     )
 
     if (saveSearchPlanResult.value) {
+
       if(disabledModel.value){
         textAlertDialogFunction('Print', true)
         setTimeout(() => {
           location.reload()
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+        saveDraftLoading.value = false
       }else{
         textAlertDialogFunction(alertWordConst.saveDraft, true)
         setTimeout(() => {
           location.reload()
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+        saveDraftLoading.value = false
       }
       
     } else {
@@ -1144,6 +1157,7 @@ const saveShipmentPlan = async row => {
       setTimeout(() => {
         // location.reload()
       }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+      saveDraftLoading.value = false
     }
 
     console.log(`Saved search plan:`, response)
@@ -1778,6 +1792,7 @@ const printShipmentPDFBySoEId = async type => {
   loadingPrint.value = true
   console.log('loadingPrint', loadingPrint.value)
 
+
   // ✅ ใช้ for...of เพื่อรองรับ async/await
   for (const item of paginatedData.value) {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
@@ -1956,7 +1971,7 @@ const handlePrintDPFCheckSheet = async type => {
   const countPage = ref(1)
 
   if (type === 'ShippingCheckSheetIBC2' ) {
-    isDialogLoadingVisible.value = true
+    handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet('ShippingCheckSheet', '', countPage.value++)
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
@@ -1968,10 +1983,12 @@ const handlePrintDPFCheckSheet = async type => {
       await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo, countPage.value++)
     }
 
-    
+    setTimeout(() => {
+      isDialogLoadingVisible.value = false
+    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
    
   }else if(type === 'ShippingCheckSheet'){
-    isDialogLoadingVisible.value = true
+    handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
     const licensePlates = Array.isArray(licensePlate.value) 
@@ -1981,19 +1998,35 @@ const handlePrintDPFCheckSheet = async type => {
     for (const item of licensePlates) {
       await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo, countPage.value++)
     }
+
+    setTimeout(() => {
+      isDialogLoadingVisible.value = false
+    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
     console.log('Completed')
   }else if(getShippingCheckSheetResult2?.value.isLorry){
-    isDialogLoadingVisible.value = true
+    handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet('ShippingLorry')
     console.log("getShippingCheckSheetResult?.value.isLorry", getShippingCheckSheetResult2?.value.isLorry)
+
+    setTimeout(() => {
+      isDialogLoadingVisible.value = false
+    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   }else if(!getShippingCheckSheetResult2?.value.isLorry){
-    isDialogLoadingVisible.value = true
+    handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet('ShippingFlexi')
     console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
+
+    setTimeout(() => {
+      isDialogLoadingVisible.value = false
+    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   }
   else{
-    isDialogLoadingVisible.value = true
+    handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet(type)
+
+    setTimeout(() => {
+      isDialogLoadingVisible.value = false
+    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   }
 
 }
@@ -2137,7 +2170,9 @@ const clearParamsTruckOrder = () => {
 }
 
 const handlePrintTruckOrderPDF = () => {
-
+  setTimeout(() => {
+    loadingPrintTruckOrderForm.value = true
+  }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   paramsTruckOrder.value.comName = CompanyPrint.value
   paramsTruckOrder.value.address = AddressPrint.value
   paramsTruckOrder.value.transportComName = TruckCompanyPrint.value
@@ -2145,8 +2180,8 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.driverName = personInchargeTruckCompanyModel.value
   paramsTruckOrder.value.tel = contactTruckCompanyModel.value
 
-  loadingPrintTruckOrderForm.value = true
-  isDialogLoadingVisible.value = true 
+  console.log('loading.......')
+  
 
   try{
     const result = printTruckOrderFormPDF(
@@ -2162,22 +2197,35 @@ const handlePrintTruckOrderPDF = () => {
       //   location.reload()
       // }, 500) // 10000 มิลลิวินาที = 10 วินาที
       // loadingPrintTruckOrderForm.value = false
-      isDialogLoadingVisible.value = false
+      
+      
+      setTimeout(() => {
+        loadingPrintTruckOrderForm.value = false
+      }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
     
     }else{
+      setTimeout(() => {
+        loadingPrintTruckOrderForm.value = false
+      }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
       textAlertDialogFunction(alertWordConst.print, false)
       setTimeout(() => {
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
       loadingPrintTruckOrderForm.value = false
-      isDialogLoadingVisible.value = false
+      
     }
   } catch (e) {
+    setTimeout(() => {
+      
+    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
     console.error(`Error saving search plan:`, error)
     loadingPrintTruckOrderForm.value = false
-    isDialogLoadingVisible.value = false
+    
   }
+  setTimeout(() => {
+    
+  }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   loadingPrintTruckOrderForm.value = false
-  isDialogLoadingVisible.value = false
+  
   
 }
 </script>
@@ -3011,30 +3059,33 @@ const handlePrintTruckOrderPDF = () => {
           </table>
         </VCardText>
 
-        <VCardText class="d-flex justify-end flex-wrap gap-4">
+        <VCardText class="d-flex justify-end">
           <VBtn
             color="warning"
-            @click="handlePrintTruckOrderPDF"
+            class="d-flex justify-space-between"
+            @click="handlePrintTruckOrderPDF(), loadingPrintTruckOrderForm = true"
           >
-            <VIcon
-              v-if="!loadingPrintTruckOrderForm"
-              start
-              icon="ri-printer-fill"
-            />
-            <VProgressCircular
-              v-if="loadingPrintTruckOrderForm"
-              :rotate="360"
-              :size="30"
-              indeterminate
-              :model-value="progressValue"
-              color="primary"
-            >
+            <span v-if="!loadingPrintTruckOrderForm">
               <VIcon
                 start
                 icon="ri-printer-fill"
               />
-            </VProgressCircular>
-            Print
+
+              Print
+
+            </span>
+            
+            <div>
+              <VProgressCircular
+                v-if="loadingPrintTruckOrderForm"
+                start
+                :rotate="360"
+                :size="30"
+                indeterminate
+                :model-value="progressValue"
+                color="primary"
+              />
+            </div>
           </VBtn>
         </VCardText>
       </VCard>
@@ -4618,9 +4669,21 @@ const handlePrintTruckOrderPDF = () => {
                 <VBtn
                   :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || !canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
                   :color="accountINSP ? 'grey' : 'warning'"
-                  @click="saveShipmentPlan(product)"
+                  @click="saveShipmentPlan(product), saveDraftLoading = true"
                 >
-                  <span style="font-size: 12px;">Save Draft</span>
+                  <span
+                    v-if="saveDraftLoading && product.soEtlLogDetailJournalID === saveDraftLoadingSOERow"
+                    style="font-size: 12px;"
+                  ><VProgressCircular
+                    :size="30"
+                    color="primary"
+                    indeterminate
+                  /></span>
+
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >Save Draft</span>
                 </VBtn>
               </td>
               <td
@@ -5017,7 +5080,6 @@ const handlePrintTruckOrderPDF = () => {
     />
   </div>
 
-
   <!-- action Dialog Component -->
   <div>
     <VDialog
@@ -5103,7 +5165,10 @@ const handlePrintTruckOrderPDF = () => {
     </VDialog>
   </div>
 
-  <VBtn v-if="false" @click=" isDialogLoadingVisible = true">
+  <VBtn
+    v-if="false"
+    @click=" isDialogLoadingVisible = true"
+  >
     asdM
   </VBtn>
 
@@ -5119,33 +5184,23 @@ const handlePrintTruckOrderPDF = () => {
     />
     <VCard width="700">
       <VCardText class="d-flex justify-center">
-        <VIcon
-          size="50"
-          color="success"
-          icon="ri-checkbox-circle-fill"
-        />
-        <VIcon
-          size="150"
-          color="success"
-          icon="ri-printer-fill"
-        />
+        <VProgressCircular
+          :size="150"
+          :width="10"
+          color="primary"
+          indeterminate
+        >
+          <VIcon
+            size="100"
+            color="primary"
+            icon="ri-printer-fill"
+          />
+        </VProgressCircular>
       </VCardText>
 
       <VCardText class="d-flex justify-center text-center pb-1">
         <div>
-          <span style="font-size: 22px; font-weight: bolder;">Check sheet printed successfully!</span>
-        </div>
-      </VCardText>
-
-      <VCardText class="d-flex justify-center text-center pb-1">
-        <div>
-          <span style="font-size: 22px; font-weight: bolder;">Please wait for the browser to downloading...</span>
-        </div>
-      </VCardText>
-
-      <VCardText class="d-flex justify-center text-center pb-4">
-        <div>
-          <span style="font-size: 14px;">You can close this dialog, and the check sheet will continue downloading until it's complete..</span>
+          <span style="font-size: 22px; font-weight: bolder;">{{ wordLoading }}!</span>
         </div>
       </VCardText>
     </VCard>

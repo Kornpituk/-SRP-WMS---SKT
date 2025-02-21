@@ -921,6 +921,7 @@ const statusText = statusId => {
                     item-title="name"
                     item-value="id"
                     density="compact"
+                    clearable
                   >
                     <template #label>
                       <span
