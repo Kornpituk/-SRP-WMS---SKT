@@ -2108,7 +2108,7 @@ const insetSwitch1 = ref('')
               >
                 <AppDateTimePicker
                   v-model="tempFilters.deliveryDateRange"
-                  placeholder="Select Date"
+                  placeholder="Receivinging Date (dd/mm/YYYY To dd/mm/YYYY)"
                   density="compact"
                   :config="{ mode: 'range',dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"

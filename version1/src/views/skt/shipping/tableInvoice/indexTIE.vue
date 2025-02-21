@@ -2378,7 +2378,7 @@ const handlePrintTruckOrderPDF = () => {
                   <AppDateTimePicker
                     v-model="etdDateModel"
                     prepend-inner-icon="ri-calendar-schedule-fill"
-                    placeholder="Select ETD"
+                    placeholder="ETD (dd/mm/YYYY To dd/mm/YYYY)"
                     density="compact"
                     style="font-size: 14px;"
                     :config="{ dateFormat: 'd/m/Y' }"

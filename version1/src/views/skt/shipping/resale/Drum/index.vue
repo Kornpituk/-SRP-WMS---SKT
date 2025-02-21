@@ -607,7 +607,10 @@ const { submitCheckSheetResult,
   submitCheckSheetError,
   submitCheckSheetFunction } = useSubmitCheckSheetService()
 
-const handleSubmit = type => {
+const handleSubmit = async type => {
+
+  await habdleSaveDraft()
+
   try {
     console.log("requestData 1")
 

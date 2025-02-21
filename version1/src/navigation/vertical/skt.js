@@ -237,7 +237,7 @@ export default [
     title: 'Production Plan',
     icon: { icon: 'ri-calendar-schedule-fill' },
     to: 'skt-planning-schedule',
-
+    disable: false,
   },
 
   {

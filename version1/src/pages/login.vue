@@ -15,6 +15,7 @@ import { VForm } from 'vuetify/components/VForm'
 import { urlApi } from '../api'
 
 import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import { watchEffect } from 'vue'
 
 const itemStore = useItemStore()
 
@@ -141,6 +142,16 @@ const login = async () => {
     console.error('Error:', err) 
     
     return false
+  })
+
+  watchEffect(() => {
+    if(username.value === '' || !username.value){
+      usernameError.value = true
+    }
+
+    if(password.value === '' || !password.value){
+      passwordError.value = true
+    }
   })
 
 
@@ -281,7 +292,6 @@ function removeUsername(index) {
                   label="Username"
                   type="username"
                   :items="savedUsernames"
-                  :rules="[requiredValidator]"
                   :error-messages="usernameError" 
                 />
                 <VCombobox
@@ -289,7 +299,6 @@ function removeUsername(index) {
                   label="Username"
                   clearable
                   :items="savedUsernames "
-                  :rules="[requiredValidator]"
                   :error-messages="usernameError" 
                   placeholder="Enter Username"
                   @select="handleSelect"
@@ -320,10 +329,10 @@ function removeUsername(index) {
                   label="Password"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isPasswordVisible ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
-                  :rules="[requiredValidator]"
                   :error-messages="passwordError"
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
                 />
+
 
                 <!-- remember me checkbox -->
                 <div class="d-flex align-center flex-wrap justify-space-between mt-1 mb-4">
