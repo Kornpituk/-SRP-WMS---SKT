@@ -872,9 +872,9 @@ const handelBackToEdit = async () => {
 
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
-        location.reload()
+        //location.reload()
 
-        // window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 200) // 10000 มิลลิวินาที = 10 วินาที
     
     })

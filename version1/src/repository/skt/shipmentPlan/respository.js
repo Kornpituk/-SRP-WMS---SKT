@@ -1002,9 +1002,23 @@ export const checkSheetLorryFlexiRepository = {
   
         // สร้าง URL สำหรับ Blob
         const blobUrl = URL.createObjectURL(blob)
+
+        // เปิดไฟล์ PDF อัตโนมัติ
+        window.open(blobUrl, '_blank')
+
+        const link = document.createElement('a')
+
+        link.href = blobUrl
+        link.download = `${type}_page_${page}_report_${new Date().toISOString()}.pdf`  // ตั้งชื่อไฟล์
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // ล้าง URL blob หลังดาวน์โหลดเสร็จ
+        const blobUrlNew =  URL.revokeObjectURL(blobUrl)
   
         // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
-        window.open(blobUrl)
+        // window.open(blobUrlNew)
   
         return { success: true, data: blob }
       } else {

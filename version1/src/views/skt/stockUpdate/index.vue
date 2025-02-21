@@ -1260,6 +1260,7 @@ const refeshPage = () => {
                           <th>Lot</th>
                           <th>Qty</th>
                           <th>UoM</th>
+                          <th class="text-end">Pack(KGS)</th>
                           <th>No/Lot Qty</th>
                           <th>Pallet No.</th>
                         </tr>
@@ -1300,10 +1301,18 @@ const refeshPage = () => {
                             {{ batch.qty }}
                           </td>
                           <td
+                            
                             style="font-size: 14px;"
                             :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
                           >
                             {{ batch.unitName }}
+                          </td>
+                          <td
+                            class="text-end"
+                            style="font-size: 14px;"
+                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                          >
+                            {{ Number(batch.packKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                           </td>
                           <td
                             style="font-size: 14px;"

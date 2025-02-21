@@ -436,7 +436,6 @@ const textAreaRemarkDialogActive = (type, data, soEId, disabledRow) => {
 
 const dataRowForUse = ref()
 
-
 const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMark, dataProduct, disabledRow) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
@@ -4653,7 +4652,7 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VBtn
                   :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) 
-                    || canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
+                    || !canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
                   @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID)"
