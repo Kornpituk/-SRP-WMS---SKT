@@ -1,4 +1,5 @@
 import axios from '@axios'
+import { saveAs } from 'file-saver'
 
 export const shipmentPlanRepository = {
   async getPermissionUser(urlApi, form, whereHouse, accessToken, params = {}) {
@@ -1001,24 +1002,35 @@ export const checkSheetLorryFlexiRepository = {
         const blob = new Blob([response.data], { type: 'application/pdf' })
   
         // สร้าง URL สำหรับ Blob
-        const blobUrl = URL.createObjectURL(blob)
+        // const blobUrl = URL.createObjectURL(blob)
 
-        // เปิดไฟล์ PDF อัตโนมัติ
-        window.open(blobUrl, '_blank')
+        // // เปิดไฟล์ PDF อัตโนมัติ
+        // window.open(blobUrl, '_blank')
 
-        const link = document.createElement('a')
+        // const link = document.createElement('a')
 
-        link.href = blobUrl
-        link.download = `${type}_page_${page}_report_${new Date().toISOString()}.pdf`  // ตั้งชื่อไฟล์
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        // link.href = blobUrl
+        // link.download = `${type}_page_${page}_report_${new Date().toISOString()}.pdf`  // ตั้งชื่อไฟล์
+        // document.body.appendChild(link)
+        // link.click()
+        // document.body.removeChild(link)
 
-        // ล้าง URL blob หลังดาวน์โหลดเสร็จ
-        const blobUrlNew =  URL.revokeObjectURL(blobUrl)
+        // // ล้าง URL blob หลังดาวน์โหลดเสร็จ
+        // const blobUrlNew =  URL.revokeObjectURL(blobUrl)
   
         // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
         // window.open(blobUrlNew)
+
+        const now = new Date()
+        const dd = String(now.getDate()).padStart(2, '0')
+        const mm = String(now.getMonth() + 1).padStart(2, '0') // เดือนเริ่มจาก 0
+        const yyyy = now.getFullYear()
+        const hh = String(now.getHours()).padStart(2, '0')
+        const min = String(now.getMinutes()).padStart(2, '0')
+
+        const formattedDate = `date/${dd}/${mm}/${yyyy} time/(${hh}/${min})`
+
+        saveAs(blob, `${type}_page_${page}_report_${formattedDate}.pdf`)  // ตั้งชื่อไฟล์
   
         return { success: true, data: blob }
       } else {
