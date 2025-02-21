@@ -151,7 +151,9 @@ watch(async () => {
   zoneItemModel.value = zone
   areaItemModel.value = area
   subAreaItemModel.value = subarea
-  categoriesItemModel.value = categories
+  categoriesItemModel.value = categories.filter(item => item.id !== '00')
+
+  console.log('categoriesItemModel.value', categoriesItemModel.value)
 
 })
 
@@ -628,6 +630,7 @@ const refeshPage = () => {
                     item-value="id"
                     density="compact"
                     eager
+                    clearable
                   >
                     <template #label>
                       <span
@@ -654,6 +657,7 @@ const refeshPage = () => {
                     item-title="name"
                     item-value="id"
                     eager
+                    clearable
                   >
                     <template #label>
                       <span
@@ -679,6 +683,7 @@ const refeshPage = () => {
                     item-value="id"
                     density="compact"
                     eager
+                    clearable
                   >
                     <template #label>
                       <span
@@ -722,6 +727,7 @@ const refeshPage = () => {
                     item-value="id"
                     density="compact"
                     eager
+                    clearable
                   >
                     <template #label>
                       <span
