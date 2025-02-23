@@ -1,6 +1,7 @@
 import { useTheme } from 'vuetify'
 import { useLayouts } from '@layouts'
 import { themeConfig } from '@themeConfig'
+import { watchEffect } from 'vue'
 
 export const isDarkPreferred = usePreferredDark()
 export const useThemeConfig = () => {
@@ -31,6 +32,8 @@ export const useThemeConfig = () => {
   const syncVuetifyThemeWithTheme = () => {
     const vuetifyTheme = useTheme()
 
+    vuetifyTheme.global.name.value = 'light'
+
     // watch([theme, isDarkPreferred], ([val, _]) => {
     //   vuetifyTheme.global.name.value = val === 'system'  /// Gobal system 
     //     ? isDarkPreferred.value
@@ -39,9 +42,9 @@ export const useThemeConfig = () => {
     //     : val
     // })
 
-    watch([theme, isDarkPreferred], ([val, _]) => {
-      vuetifyTheme.global.name.value = 'light'
-    })
+    // watchEffect([theme, isDarkPreferred], ([val, _]) => {
+    //   vuetifyTheme.global.name.value = 'light'
+    // })
   }
 
 

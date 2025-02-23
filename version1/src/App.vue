@@ -57,6 +57,8 @@ let timeoutId
 const resetTimeout = () => {
   clearTimeout(timeoutId)
   timeoutId = setTimeout(() => {
+    sessionStorage.clear()  // ล้าง sessionStorage ทั้งหมด
+    localStorage.clear()    // ล้าง localStorage ทั้งหมด
     logout()
   }, INACTIVITY_TIMEOUT)
 }

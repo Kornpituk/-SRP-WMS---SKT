@@ -33,39 +33,13 @@ watch(isVerticalNavCollapsed, val => {
 const router = useRouter() 
 const authStore = useAuthExStore()
 
-const NameUser = ref('addmin001')
-const NameDepartment = ref('')
-const NameRole = ref('')
+const NameUser = ref(itemStore.getItemDetails('UserDataCookies').username)
+const NameDepartment = ref(itemStore.getItemDetails('UserDataCookies').departmentName)
+const NameRole = ref(itemStore.getItemDetails('UserDataCookies').positionName)
 const whereHouseName = localStorage.getItem('WarehouseNameAtIcons')
 
-function checkDepartment(wareHouseName) {
-  // ค้นหาในข้อมูล
-  const found = departmentData.value.find(
-    person =>
-      `${person.firstName}` === wareHouseName,
-  )
-
-  const result = ref('')
-
-  // อัปเดตค่าของ NameDepartment
-  if (found) {
-    NameDepartment.value = found.department
-    sessionStorage.setItem('department', found.department)
-    result.value = found.department
-    NameRole.value = found.role
-  } else {
-    NameDepartment.value = 'nothing'
-    result.value = 'nothing'
-    NameRole.value = 'nothing'
-
-    console.log('Not found', found, 'in departmentData', wareHouseName) 
-  }
-
-  return result.value
-}
 
 watchEffect(() => {
-  checkDepartment(itemStore.getItemDetails('UserDataCookies').firstName)
 
   console.log('firstName', itemStore.getItemDetails('UserDataCookies').firstName)
 })
@@ -151,6 +125,8 @@ watchEffect(() => {
 })
 
 const removeUserCheck = () => {
+  sessionStorage.clear()  // ล้าง sessionStorage ทั้งหมด
+  localStorage.clear()    // ล้าง localStorage ทั้งหมด
   localStorage.removeItem('userCheck')
 
   // Clear the access token from localStorage
