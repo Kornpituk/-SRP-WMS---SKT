@@ -14,7 +14,7 @@ import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/item
 const itemStore = useItemStore()
 
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
-const department = ref(sessionStorage.getItem('department'))
+const department = ref(userDataInfo.value.departmentName)
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 

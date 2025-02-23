@@ -31,7 +31,7 @@ const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
-const department = ref(sessionStorage.getItem('department'))
+const department = ref(userDataInfo.value.departmentName)
 
 import {
   useGetShippingCheckSheetLorryFlexiService, useSaveShippingCheckSheetService,
