@@ -990,7 +990,7 @@ const statusText = statusId => {
                 >
                   <AppDateTimePicker
                     v-model="datePickerFilter"
-                    placeholder="Producing Date (dd/mm/YYYY To dd/mm/YYYY)"
+                    placeholder="Producing Date (dd/mm/yyyy To dd/mm/yyyy)"
                     density="compact"
                     prepend-inner-icon="ri-calendar-schedule-fill"
                     :config="{ dateFormat: 'd/m/Y', mode: 'range' }"

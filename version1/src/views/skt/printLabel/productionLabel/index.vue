@@ -687,7 +687,7 @@ const dataTableColor = ref('#E0F7FA')
               >
                 <AppDateTimePicker
                   v-model="paramsFetchDataPrintLabel.producingDate"
-                  placeholder="Producing Date (dd/mm/YYYY To dd/mm/YYYY)"
+                  placeholder="Producing Date (dd/mm/yyyy To dd/mm/yyyy)"
                   density="compact"
                   :config="{ dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"

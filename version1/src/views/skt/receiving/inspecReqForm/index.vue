@@ -171,7 +171,7 @@ const covertFloatFixedTwo = convert => {
 
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 
-const generatedInsp = () => {
+const generatedInsp = async () => {
 
   axiosIns.post(`${urlApi.value}/api/v1/Inspection/Generate/${poEtlLogDetailJournalIDQueryParameters.value}`, {}, {
     headers: {
@@ -206,7 +206,7 @@ const isAccept = ref(null)
 const frozeCheck = ref(true)
 const poEiLog = ref()
 
-const generatedJournalId = () => {
+const generatedJournalId = async () => {
   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters.value}`, {
     headers: {
       'accept': '*/*',
@@ -236,15 +236,15 @@ const generatedJournalId = () => {
     })
 }
 
-// watchEffect(() => {
-//   if(statusId.value === 4 || statusId.value === 5){
-//     frozeCheck.value = false
-//   }
-// })
+watchEffect(() => {
+  if(statusId.value === 4 || statusId.value === 5){
+    frozeCheck.value = false
+  }
+})
 
-watch(() => {
-  generatedInsp()
-  generatedJournalId()
+watch( async () => {
+  await generatedInsp()
+  await generatedJournalId()
 
   if(statusId.value === 4 || statusId.value === 5){
     frozeCheck.value = false
@@ -477,9 +477,9 @@ const getAnalysistInsp = async () => {
 const loadingGenerated1 = ref(true)
 const loadingGenerated2 = ref(true)
 
-watch(() => {
-  getHearderInsp()
-  getAnalysistInsp()
+watch( async () => {
+  await getHearderInsp()
+  await getAnalysistInsp()
 })
 
 //--------------- save header --------------------------------
@@ -513,12 +513,6 @@ const saveHeaderInspect = async () => {
 const emptyFields = ref([])
 
 const showOnlyErrors = ref(false) // ตั้งเป็น true เพื่อแสดงเฉพาะค่า error
-
-watchEffect(() => {
-  // for (let i = 0; i < analysisItems.value.length; i++) {
-  //   console.log('Test', analysisItems.value[i])
-  // }
-})
 
 const textAlertErrorOkState = ref('')
 
@@ -1188,9 +1182,9 @@ const submitButton = word => {
   submitInspForm()
 }
 
-const saveDraftButton = word => {
+const saveDraftButton = async word => {
   trickerSubmit.value = false
-  submitButtonVisibleNew(word)
+  await submitButtonVisibleNew(word)
   wordForSubmit.value = word
 }
 
@@ -2878,7 +2872,7 @@ const getDisabledFollowStatusNRole = () => {
         class="d-flex justify-end px-0"
       >
         <VBtn
-          v-if="data.receiveTypeId !== 3"
+          
           class="mx-2"
           color="purple-accent-4"
           style="font-size: 12px;"
@@ -2887,7 +2881,7 @@ const getDisabledFollowStatusNRole = () => {
           Send Back
         </VBtn>
         <VBtn
-          v-if="true"
+          v-if="data.receiveTypeId !== 3"
           class="mx-2"
           color="warning"
           style="font-size: 12px;"
@@ -2915,44 +2909,7 @@ const getDisabledFollowStatusNRole = () => {
       </div>
     </section>
 
-    <!-- Btn Approval -->
-    <section
-      v-if="false"
-      class="mt-6"
-    >
-      <div
-        style="font-size: 12px;"
-        class="d-flex justify-end px-0"
-      >
-        <VBtn
-          v-if="statusId === 5"
-          class="mx-2"
-          color="info"
-          style="font-size: 12px;"
-          @click="areaTextRemarkButton('Back To Edit')"
-        >
-          Send Back
-        </VBtn>
-        <VBtn
-          v-if="statusId === 7"
-          class="mx-2"
-          color="error"
-          style="font-size: 12px;"
-          @click="areaTextRemarkButton('APPROVE REJECT')"
-        >
-          Approve Reject
-        </VBtn>
-        <VBtn
-          v-if="statusId === 15"
-          class="mx-2"
-          color="green"
-          style="font-size: 12px;"
-          @click="approvetButtonVisible('APPROVE')"
-        >
-          Approve
-        </VBtn>
-      </div>
-    </section>
+
 
     <section
       v-if="responseGener && responseGener.statusId === '7' && roleAccount === 'admin'"
@@ -3343,6 +3300,8 @@ const getDisabledFollowStatusNRole = () => {
       </VDialog>
     </section>
   </div>
+
+  {{ statusId }}
 </template>
 
 <style scoped src="./insp.scss"></style>

@@ -62,6 +62,8 @@ const resetTimeout = () => {
 }
 
 const logout = () => {
+  // sessionStorage.clear()  // ล้าง sessionStorage ทั้งหมด
+  // localStorage.clear()    // ล้าง localStorage ทั้งหมด
   localStorage.removeItem('accessToken')
   router.push('/login')
 }

@@ -33,6 +33,12 @@ export const departmentData = ref([
   { firstName: 'Poomphan', lastName: 'Phoseewang', department: 'Purchasing', role: 'Approval' },
   { firstName: 'Thanit', lastName: 'Sukthanom', department: 'Purchasing', role: 'Issuer' },
   { firstName: 'Autthawut', lastName: 'Chivapornthip', department: 'SCM', role: 'Admin' },
+
+  { firstName: 'Thamonwan.wh', lastName: 'Bamrung', department: 'Purchasing', role: 'Admin' },
+  { firstName: 'Poomphan.Pn', lastName: 'Phoseewang', department: 'Purchasing', role: 'Approval' },
+  { firstName: 'Thanit.Pn', lastName: 'Sukthanom', department: 'Purchasing', role: 'Issuer' },
+  { firstName: 'Autthawut.wh', lastName: 'Chivapornthip', department: 'SCM', role: 'Admin' },
+
   { firstName: 'Viewer I', lastName: 'Viewer I', department: 'Viewer', role: 'Viewer' },
   { firstName: 'Viewer II', lastName: 'Viewer II', department: 'Viewer', role: 'Viewer' },
 ])

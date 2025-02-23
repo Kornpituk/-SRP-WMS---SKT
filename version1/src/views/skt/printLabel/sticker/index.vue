@@ -559,7 +559,7 @@ const dataTableCliclHighlightIsToggle = no => {
               >
                 <AppDateTimePicker
                   v-model="paramsFetchDataPrintLabel.receivedDate"
-                  placeholder="Received Date (dd/mm/YYYY To dd/mm/YYYY)"
+                  placeholder="Received Date (dd/mm/yyyy To dd/mm/yyyy)"
                   density="compact"
                   :config="{ dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"

@@ -57,6 +57,8 @@ function checkDepartment(wareHouseName) {
     NameDepartment.value = 'nothing'
     result.value = 'nothing'
     NameRole.value = 'nothing'
+
+    console.log('Not found', found, 'in departmentData', wareHouseName) 
   }
 
   return result.value
@@ -160,6 +162,9 @@ const removeUserCheck = () => {
   // Clear the access token from localStorage
   localStorage.removeItem('whereHouseName')
 
+
+  // sessionStorage.clear()  // ล้าง sessionStorage ทั้งหมด
+  // localStorage.clear()    // ล้าง localStorage ทั้งหมด
 
   localStorage.removeItem('WarehouseNameAtIcons')
 
