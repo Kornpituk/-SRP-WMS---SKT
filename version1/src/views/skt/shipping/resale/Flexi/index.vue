@@ -326,6 +326,8 @@ const prepareOptionsData = data => ({
   flexiCleaningHoseAirBlowOption: data.flexiCleaningHoseAirBlowOption ?? true,
 })
 
+const trickerSaveDraft = ref(false)
+
 const handleSaveDraft = async () => {
 
   const requestBody = prepareLorryFlexiData(getShippingCheckSheetResult.value)
@@ -337,16 +339,22 @@ const handleSaveDraft = async () => {
     )
 
     if(result){
-      textAlertDialogFunction(alertWordConst.saveDraft, true)
-      setTimeout(() => {
+      if(!trickerSaveDraft.value){
+        textAlertDialogFunction(alertWordConst.saveDraft, true)
+        setTimeout(() => {
         // window.location.href = `${window.location.origin}/skt/shipping`
-        location.reload()
-      }, 500) // 0.5 วินาที
+          location.reload()
+        }, 500) // 0.5 วินาที
+      }
+      
     }else{
-      textAlertDialogFunction(alertWordConst.saveDraft, false)
-      setTimeout(() => {
-      // location.reload()
-      }, 500) // 0.5 วินาที
+      
+      if(!trickerSaveDraft.value){
+        textAlertDialogFunction(alertWordConst.saveDraft, false)
+        setTimeout(() => {
+          // location.reload()
+        }, 500) // 0.5 วินาที
+      }
     }
   }catch(error){
     console.log(error)
@@ -359,6 +367,11 @@ const { submitShipmentPlanResult,
   submitShipmentPlan } = useShippingCheckSheetLorryService()
 
 const handleSubmit = async type => {
+
+  trickerSaveDraft.value = true
+
+  await handleSaveDraft()
+
   try{
     const result = await submitShipmentPlan(
       urlApi.value, 

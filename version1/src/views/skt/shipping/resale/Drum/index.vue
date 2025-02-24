@@ -510,6 +510,8 @@ const updateShippingCheckSheetData = async ()  => {
   }
 }
 
+const trickerSaveDraft = ref(false)
+
 const habdleSaveDraft = async () => {
 
   // อัพเดตข้อมูลใน getShippingCheckSheetResult.value?.unfIbc ก่อน
@@ -584,18 +586,24 @@ const habdleSaveDraft = async () => {
 
     if(saveShippingCheckSheetResult.value){
       saveShippingCheckSheetResult.value = result
-      textAlertDialogFunction(alertWordConst.saveDraft, true)
-      setTimeout(() => {
+      if(!trickerSaveDraft.value){
+        textAlertDialogFunction(alertWordConst.saveDraft, true)
+        setTimeout(() => {
         // location.reload()
 
-        // location.reload()
-      }, 500) // 0.5 วินาที
+          location.reload()
+        }, 500) // 0.5 วินาที
+      }
+      
     }else{
       console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
-      textAlertDialogFunction(alertWordConst.saveDraft, false)
-      setTimeout(() => {
+      if(!trickerSaveDraft.value){
+        textAlertDialogFunction(alertWordConst.saveDraft, false)
+        setTimeout(() => {
         // location.reload()
-      }, 500) // 0.5 วินาที
+        }, 500) // 0.5 วินาที
+      }
+      
     }
   } catch (error) {
     errorSaveShippingCheckSheet.value = error.message
@@ -609,6 +617,8 @@ const { submitCheckSheetResult,
 
 const handleSubmit = async type => {
 
+  trickerSaveDraft.value = true
+  
   await habdleSaveDraft()
 
   try {

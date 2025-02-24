@@ -14,8 +14,8 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
-
-const department = ref(sessionStorage.getItem('department'))
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+const department = ref(userDataInfo.value.departmentName)
 
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
   if(department.value === 'Warehouse' && whStatusId === 404){
@@ -24,12 +24,14 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
     return true
   }else if(department.value === 'Inspection' && inspStatusId === 604){
     return true
-  }else if(department.value === 'Sale and marketing' && salStatusId === 304){
+  }else if(department.value === 'Sale and Marketing' && salStatusId === 304){
     return true
   }else{
     return false
   }
 }
+
+console.log("department", department.value)
 
 //------------------------------- alert --------------------------------------------
 
@@ -62,9 +64,11 @@ const handleDialogLoading = type=> {
 const confirmDialog2 = ref('')
 const typeConfirmDialog = ref('')
 const soEIdConfirmDialog = ref('')
+const productRowModel = ref(null)
 
-function openConfirmDialog(type, SoEId) {
+function openConfirmDialog(type, SoEId, productRow) {
   console.log('openConfirmDialog', type, SoEId)
+  productRowModel.value = productRow
 
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
   if(type === 'submit'){
@@ -129,10 +133,6 @@ function formatDateSave(date) {
   // สร้างวันที่ในรูปแบบ yyyy-mm-dd
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
-
-//------------------------------ Get User Data --------------------------------
-
-const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 //------------------------------ fetch data from API --------------------------------
 import { useGetUserPermissionService,
@@ -1016,6 +1016,8 @@ const showText = () => {
 const saveDraftLoading = ref(false)
 const saveDraftLoadingSOERow = ref('')
 
+const trikerSaveDrft = ref(false)
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const saveShipmentPlan = async row => {
   console.log("save plan start...", row)
@@ -1139,17 +1141,23 @@ const saveShipmentPlan = async row => {
     if (saveSearchPlanResult.value) {
 
       if(disabledModel.value){
-        textAlertDialogFunction('Print', true)
-        setTimeout(() => {
-          location.reload()
-        }, 500) // 500 มิลลิวินาที = 0.5 วินาที
-        saveDraftLoading.value = false
+        if(!trikerSaveDrft.value){
+          textAlertDialogFunction('Print', true)
+          setTimeout(() => {
+            location.reload()
+          }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+          saveDraftLoading.value = false
+        }
+        
       }else{
-        textAlertDialogFunction(alertWordConst.saveDraft, true)
-        setTimeout(() => {
-          location.reload()
-        }, 500) // 500 มิลลิวินาที = 0.5 วินาที
-        saveDraftLoading.value = false
+        
+        if(!trikerSaveDrft.value){
+          textAlertDialogFunction(alertWordConst.saveDraft, true)
+          setTimeout(() => {
+            location.reload()
+          }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+          saveDraftLoading.value = false
+        }
       }
       
     } else {
@@ -1184,7 +1192,11 @@ const checkStatusBeforeAvtion = sataus => {
 const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const submitShipmentPlanBySoEId = (type, soEtlLogDetailJournalID) => {
+const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
+
+  trikerSaveDrft.value = true
+  await saveShipmentPlan(productRowModel.value)
+
   try{
     console.log('submitShipmentPlanBySoEId start!!')
     if(type === 'submit'){
@@ -4707,9 +4719,9 @@ const handlePrintTruckOrderPDF = () => {
                     || !canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
-                  @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID)"
+                  @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product)"
                 >
-                  <span style="font-size: 12px;">Submit</span>
+                  <span style="font-size: 12px;">Submit </span>
                 </VBtn>
               </td>
               <td
