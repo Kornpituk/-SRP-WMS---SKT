@@ -512,6 +512,7 @@ const updateShippingCheckSheetData = async ()  => {
 
 const trickerSaveDraft = ref(false)
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const habdleSaveDraft = async () => {
 
   // อัพเดตข้อมูลใน getShippingCheckSheetResult.value?.unfIbc ก่อน
@@ -618,7 +619,7 @@ const { submitCheckSheetResult,
 const handleSubmit = async type => {
 
   trickerSaveDraft.value = true
-  
+
   await habdleSaveDraft()
 
   try {
