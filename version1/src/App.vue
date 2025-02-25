@@ -14,99 +14,72 @@ watchEffect(() => {
   }
 })
 
-//------------------------ Function check SessionsToken Time Out --------------------
-//-------*** ยังไม่จำเป็นปิดไปก่อน
-// const sessionExpiry = ref(null)
-
-// const checkSessionExpiry = () => {
-//   console.log('check session!')
-
-//   const now = new Date().getTime()
-//   const expiry = localStorage.getItem('sessionExpiry')
-
-//   if (expiry) {
-//     const timeLeft = expiry - now
-//     if (timeLeft > 0) {
-//       // แปลง timeLeft จาก milliseconds เป็น minutes and seconds
-//       const minutesLeft = Math.floor(timeLeft / (1000 * 60))
-//       const secondsLeft = Math.floor((timeLeft % (1000 * 60)) / 1000)
-
-//       console.log(`Time left before session expires: ${minutesLeft} minutes and ${secondsLeft} seconds`)
-//     } else {
-//       localStorage.removeItem('sessionExpiry')
-//       alert('Session expired. Please log in again.')
-//       router.push('/login') // เปลี่ยนเส้นทางไปยังหน้าเข้าสู่ระบบ
-//     }
-//   }
-// }
-
-// watchEffect(() => {
-//   console.log('sessionExpiry', localStorage.getItem('sessionExpiry'))
-
-//   sessionExpiry.value = localStorage.getItem('sessionExpiry')
-
-//   if (sessionExpiry.value) {
-//     setInterval(checkSessionExpiry, 1000 * 10) // ตรวจสอบทุกๆ นาที
-//   }
-
-// })
-
-const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 15 นาที
+const INACTIVITY_TIMEOUT = 15 * 60 * 1000 // 15 นาที
 let timeoutId
+let isLoggingOut = false
 
-const resetTimeout = () => {
-  clearTimeout(timeoutId)
-  timeoutId = setTimeout(() => {
-    sessionStorage.clear()  // ล้าง sessionStorage ทั้งหมด
-    localStorage.clear()    // ล้าง localStorage ทั้งหมด
-    logout()
-  }, INACTIVITY_TIMEOUT)
+const debounce = (func, delay) => {
+  let timer
+  
+  return (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => func(...args), delay)
+  }
 }
 
+const resetTimeout = debounce(() => {
+  clearTimeout(timeoutId)
+  timeoutId = setTimeout(() => {
+    sessionStorage.removeItem('userSession')  // ล้าง session เฉพาะที่เกี่ยวข้อง
+    localStorage.removeItem('accessToken')
+    logout()
+  }, INACTIVITY_TIMEOUT)
+}, 300)
+
 const logout = () => {
-  // sessionStorage.clear()  // ล้าง sessionStorage ทั้งหมด
-  // localStorage.clear()    // ล้าง localStorage ทั้งหมด
+  if (isLoggingOut) return
+  isLoggingOut = true
+
   localStorage.removeItem('accessToken')
   router.push('/login')
 }
 
+const handleVisibilityChange = () => {
+  if (document.visibilityState === 'hidden') {
+    timeoutId = setTimeout(() => {
+      logout()
+    }, 5 * 60 * 1000) // ถ้าเปลี่ยนแท็บนานกว่า 5 นาที → logout
+  } else {
+    clearTimeout(timeoutId)
+  }
+}
+
+const handleBeforeUnload = event => {
+  const navigationEntries = performance.getEntriesByType('navigation')
+  if (navigationEntries.length > 0 && navigationEntries[0].type !== 'reload') {
+    logout()
+  }
+}
+
 onMounted(() => {
-  // ติดตั้ง Event Listener
   ['mousemove', 'keydown', 'click'].forEach(event =>
     window.addEventListener(event, resetTimeout),
   )
   resetTimeout()
 
-  // ตรวจจับว่าผู้ใช้ปิดแท็บ/หน้าเว็บ (แต่ไม่รวมการรีโหลด)
   document.addEventListener('visibilitychange', handleVisibilityChange)
   window.addEventListener('beforeunload', handleBeforeUnload)
 })
 
 onBeforeUnmount(() => {
-  // ลบ Event Listener
   ['mousemove', 'keydown', 'click'].forEach(event =>
     window.removeEventListener(event, resetTimeout),
   )
   clearTimeout(timeoutId)
 
-  // ลบ event ก่อนออกจากหน้า
   document.removeEventListener('visibilitychange', handleVisibilityChange)
   window.removeEventListener('beforeunload', handleBeforeUnload)
 })
-
-// ตรวจสอบว่าแท็บถูกปิดหรือไม่
-const handleVisibilityChange = () => {
-  if (document.visibilityState === 'hidden') {
-    // แท็บถูกซ่อน (อาจปิดหรือเปลี่ยนแท็บ) → ไม่ทำอะไร
-  }
-}
-
-// ตรวจสอบว่าปิดแท็บหรือปิดเว็บ แต่ไม่รวมการรีโหลด
-const handleBeforeUnload = event => {
-  if (performance.getEntriesByType('navigation')[0].type !== 'reload') {
-    logout()
-  }
-}
 
 //---------------------------------------------------------------------------------
 
