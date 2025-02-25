@@ -14,7 +14,7 @@ watchEffect(() => {
   }
 })
 
-const INACTIVITY_TIMEOUT = 15 * 60 * 1000 // 15 นาที
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 15 นาที
 let timeoutId
 let isLoggingOut = false
 
