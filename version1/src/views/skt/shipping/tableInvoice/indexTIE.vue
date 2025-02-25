@@ -1195,13 +1195,14 @@ const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } 
 const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
 
   trikerSaveDrft.value = true
-  await saveShipmentPlan(productRowModel.value)
+  await saveShipmentPlan(selectedDataTables.value.map(item => item.soEtlLogDetailJournalID))
 
   try{
     console.log('submitShipmentPlanBySoEId start!!')
     if(type === 'submit'){
 
     }else if(type === 'approve' || type === 'reject'){
+      console.log('submitShipmentPlanBySoEId start!! 3')
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
       console.log('submitShipmentPlanBySoEId start!! 2')
     }else if(type === 'back'){
@@ -1938,20 +1939,33 @@ const didabledPrintPDFCheckSheet = statusId => {
 }
 
 const hanbleBtnPrintPDFCheckSheet = type => {
-  console.log('Check BtnPrintPDF start...', prouctRowAction.value.soEtlLogDetailJournalID)
+  console.log('Check BtnPrintPDF start...', prouctRowAction.value.packagingTypeID)
 
   if(prouctRowAction.value){
-    if(prouctRowAction.value.checkSheetTypeName === 'IBC'){
-      handlePrintDPFCheckSheet('ShippingCheckSheetIBC2')
-    }else if(prouctRowAction.value.checkSheetTypeName === 'Lorry'){
+    console.log('Check BtnPrintPDF start if', prouctRowAction.value.packagingTypeID)
+    if(prouctRowAction.value.packagingTypeID !== 11){
+      console.log('Check BtnPrintPDF start ===', prouctRowAction.value.packagingTypeID)
+      if(prouctRowAction?.value.checkSheetTypeName === 'IBC'){
+        handlePrintDPFCheckSheet('ShippingCheckSheetIBC2')
+      }else{
+        handlePrintDPFCheckSheet('ShippingCheckSheet')
+      }
+    }else if(prouctRowAction.value.packagingTypeID === 11){
       handlePrintDPFCheckSheet('ShippingLorry')
-    }else if(prouctRowAction.value.checkSheetTypeName === 'Flexi'){
-      handlePrintDPFCheckSheet('ShippingFlexi')
+      console.log('Check BtnPrintPDF start ===', prouctRowAction.value.packagingTypeID)
+      if(getShippingCheckSheetResult2?.value.isLorry){
+        console.log('Check getShippingCheckSheetResult2 start ===', getShippingCheckSheetResult2.value.isLorry)
+        handlePrintDPFCheckSheet('ShippingLorry')
+      }else if(!getShippingCheckSheetResult2?.value.isLorry){
+        handlePrintDPFCheckSheet('ShippingFlexi')
+      }else{
+        console.log('Please prouctRowAction3', prouctRowAction.value)
+      }
     }else{
-      handlePrintDPFCheckSheet('ShippingCheckSheet')
+      console.log('Please prouctRowAction2', prouctRowAction.value)
     }
   }else{
-    console.log('Please prouctRowAction', prouctRowAction.value)
+    console.log('Please prouctRowAction1', prouctRowAction.value)
   }
 }
 

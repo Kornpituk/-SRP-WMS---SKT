@@ -2095,7 +2095,7 @@ const dessertsMockAmountView = [
                 >
                   <VTextField
                     v-model="tableData.grossWeightBeforeShipping[index]"
-                    :readonly="disableInpit()"
+                    :readonly="!disableInpit()"
                     variant="outlined"
                     density="compact"
                   />
@@ -2187,7 +2187,7 @@ const dessertsMockAmountView = [
               <VRow>
                 <VCol cols="12">
                   <VFileInput
-                    v-if="disableInpit()"
+                    v-if="!disableInpit()"
                     v-model="truck.fileeLicensePlateMew"
                     label="File input"
                     multiple
@@ -2313,6 +2313,8 @@ const dessertsMockAmountView = [
               cols="9"
             >
               <VRow>
+
+             
                 <VCol cols="12">
                   <VFileInput
                     v-if="!disableInpit()"
