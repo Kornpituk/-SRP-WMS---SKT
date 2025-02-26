@@ -407,6 +407,102 @@ const handleSubmit = async type => {
     console.log(error)
   }
 }
+
+//-------------------------------------send back ------------------------
+
+import { 
+  useSubmitShipmentPlanService2,
+} from '@/services/skt/shipmentPlan/services'
+
+const { submitShipmentPlanResult2, errorSubmitShipmentPlan2, submitShipmentPlan2 } = useSubmitShipmentPlanService2()
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
+
+  try{
+    console.log('submitShipmentPlanBySoEId start!!')
+
+    // if(type === 'submit'){
+
+    // }else if(type === 'approve' || type === 'reject'){
+    //   console.log('submitShipmentPlanBySoEId start!! 3')
+    //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+    //   console.log('submitShipmentPlanBySoEId start!! 2')
+    // }else if(type === 'back'){
+    //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+    //   console.log('submitShipmentPlanBySoEId back !! 3')
+    // }
+
+    // if(!statusCommnetValue.value && type === 'reject'){
+    //   textAlertDialogFunction('Please enter Reject Comment.', false)
+      
+    //   return
+    // }
+
+    soEtlLogDetailJournalID = soEIdModel.value
+    
+    const result = submitShipmentPlan2(urlApi.value,
+      type,
+      whereHouse,
+      accessTokenAtStore,
+      soEtlLogDetailJournalID,
+      '',
+    )
+
+    console.log('submitShipmentPlanBySoEId start!! 3')
+    
+    if(submitShipmentPlanResult.value || result){
+      if(type === 'submit'){
+        textAlertDialogFunction(alertWordConst.submit, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'approve'){
+        textAlertDialogFunction(alertWordConst.approve, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'reject'){
+        textAlertDialogFunction(alertWordConst.reject, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }
+
+      console.log('submitShipmentPlanBySoEId start!! 4')
+      
+    }else{
+      if(type === 'submit'){
+        textAlertDialogFunction(alertWordConst.submit, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'approve'){
+        textAlertDialogFunction(alertWordConst.approve, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'reject'){
+        textAlertDialogFunction(alertWordConst.reject, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }
+    }
+  } catch (error) {
+    console.error(`Error saving search plan:`, error)
+  }
+}
 </script>
 
 <template>
@@ -1889,14 +1985,22 @@ const handleSubmit = async type => {
           class="mx-2"
           @click="handleSubmit('submit')"
         >
-          WH1
+          WH1 ACCEPT
+        </VBtn>
+        <VBtn
+          v-if="statusModel === 1104"
+          class="mx-2"
+          color="purple-accent-4"
+          @click="submitShipmentPlanBySoEId('back')"
+        >
+          Send Back
         </VBtn>
         <VBtn
           v-if="statusModel === 1104"
           class="mx-2"
           @click="handleSubmit('leaderapprove')"
         >
-          WH2
+          WH2 ACCEPT
         </VBtn>
       </div>
     </VCol>

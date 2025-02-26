@@ -48,7 +48,7 @@ const handleVisibilityChange = () => {
   if (document.visibilityState === 'hidden') {
     timeoutId = setTimeout(() => {
       logout()
-    }, 5 * 60 * 1000) // ถ้าเปลี่ยนแท็บนานกว่า 5 นาที → logout
+    }, 60 * 60 * 1000) // ถ้าเปลี่ยนแท็บนานกว่า 5 นาที → logout
   } else {
     clearTimeout(timeoutId)
   }

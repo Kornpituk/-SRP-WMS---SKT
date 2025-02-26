@@ -1294,11 +1294,11 @@ const processingPrintLabel = ref(false)
 const successGetPrintLabelView = ref(false)
 
 const disabledBtnLebal = () => {
-  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16, 13, 14, 12, 18].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 4, 5, 7, 10, 16, 13, 14, 12, 18].includes(idStatusDialogAction.value)
 }
 
 const disabledBtnLebalLorry = () => {
-  return [0, 1, 2, 3, 4, 5, 6, 7, 10, 16, 13, 14, 12, 18].includes(idStatusDialogAction.value)
+  return [0, 1, 2, 3, 4, 5, 7, 10, 16, 13, 14, 12, 18].includes(idStatusDialogAction.value)
 }
 
 const disabledTypeReceiving = ref(itemStore.getItemDetails('typeLorryInfoId'))

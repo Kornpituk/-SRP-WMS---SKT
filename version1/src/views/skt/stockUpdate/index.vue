@@ -439,6 +439,7 @@ const printShipmentPDFBySoEIdPlan = async type => {
 //--------------------------------------- highlight -------------------
 const dataTableColor = ref('#E0F7FA')
 const dataTableNummberedToggle = ref(null)
+const dataTableNummberedToggle2 = ref(null)
 
 const isSelected = item => {
   return selectedDataTables.value.some(
@@ -459,6 +460,18 @@ const dataTableCliclHighlightIsToggle = no => {
   console.log("dataTableNum", dataTableNummberedToggle.value)
 }
 
+const dataTableCliclHighlightIsToggle2 = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle2.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle2.value = null
+  } else if (dataTableNummberedToggle2.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle2.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle2.value)
+}
 
 //-------------------------- format decimal -------------------
 
@@ -1138,7 +1151,19 @@ const refeshPage = () => {
             >
               <!-- แถวหลัก -->
               <tr>
-                <td>
+                <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
+                >
                   <VBtn
                     variant="text"
                     icon
@@ -1147,10 +1172,35 @@ const refeshPage = () => {
                     <VIcon :icon="expandedRows.includes(index) ? 'ri-arrow-down-s-line' : 'ri-arrow-up-s-line'" />
                   </VBtn>
                 </td>
-                <td>{{ item.no }}</td>
+                <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
+                >
+                  {{ item.no }}
+                </td>
                 <td
                   class="cursor-pointer"
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   @click="showImage(item.image)"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   <img
                     v-if="item.image"
@@ -1161,80 +1211,224 @@ const refeshPage = () => {
                   >
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 170px; max-width: 170px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.productId }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 200px; max-width: 200px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.productName }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.category }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 120px; max-width: 120px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.lot }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 70px; max-width: 70px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ (item.locations.length).toLocaleString() }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 80px; max-width: 80px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ (item.qty).toLocaleString() }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 30px; max-width: 30px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.unitName }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1 text-end"
                   style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ Number(item.packKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                 </td>
                 <td
+
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1 text-end"
                   style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ Number(item.totalQtyKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.stockName }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 100px; max-width: 100px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.zoneName }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1"
                   style="min-width: 120px; max-width: 120px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.areaName }}
                 </td>
                 <td
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
                   class="px-1 text-end"
                   style="min-width: 150px; max-width: 150px;  font-size: 14px;"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   <span
                     v-if="item.shelfLifeDays < 1"
@@ -1243,8 +1437,19 @@ const refeshPage = () => {
                   <span v-else>{{ (item.shelfLifeDays).toLocaleString() }}</span>
                 </td>
                 <td
-                  class="px-1"
+                class="px-1"
                   style="min-width: 120px; max-width: 120px;  font-size: 14px;"
+                  :style="{ 
+                    backgroundColor: 
+                      dataTableNummberedToggle === item.no ? dataTableColor : 
+                      isSelected(item) ? '#E0F7FA' : 
+                      '',
+                    borderTop:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : '',
+                    borderBottom:
+                      dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
+                  }"
+                  @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   <span
                     v-if="item.shelfLife < 1"
@@ -1266,7 +1471,9 @@ const refeshPage = () => {
                           <th>Lot</th>
                           <th>Qty</th>
                           <th>UoM</th>
-                          <th class="text-end">Pack(KGS)</th>
+                          <th class="text-end">
+                            Pack(KGS)
+                          </th>
                           <th>No/Lot Qty</th>
                           <th>Pallet No.</th>
                         </tr>
@@ -1278,57 +1485,147 @@ const refeshPage = () => {
                         >
                           <td
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ batch.no }}
                           </td>
                           <td
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ batch.productId }}
                           </td>
                           <td
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ batch.productName }}
                           </td>
                           <td
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ batch.lot }}
                           </td>
                           <td
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ batch.qty }}
                           </td>
                           <td
                             
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ batch.unitName }}
                           </td>
                           <td
                             class="text-end"
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ Number(batch.packKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                           </td>
                           <td
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ batch.lotDescription }}
                           </td>
                           <td
                             style="font-size: 14px;"
-                            :style="{ backgroundColor: batchIndex % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                            :style="{ 
+                              backgroundColor: 
+                                dataTableNummberedToggle2 === batch.no ? dataTableColor : 
+                                isSelected(batch) ? '#E0F7FA' : 
+                                '',
+                              borderTop:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : '',
+                              borderBottom:
+                                dataTableNummberedToggle2 === batch.no ? '1px solid #BBDEFB' : ''
+                            }"
+                            @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
                             {{ batch.plid }}
                           </td>

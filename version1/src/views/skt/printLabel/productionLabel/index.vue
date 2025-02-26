@@ -58,6 +58,43 @@ const formatNumber = value => {
   return '0.00'
 }
 
+//--------------------------------------- highlight -------------------
+const dataTableColor = ref('#E0F7FA')
+const dataTableNummberedToggle = ref(null)
+const dataTableNummberedToggle2 = ref(null)
+
+const isSelected = item => {
+  return selectedDataTables.value.some(
+    selectedItem => selectedItem.journalID === item.journalID,
+  )
+}
+
+const dataTableCliclHighlightIsToggle = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle.value = null
+  } else if (dataTableNummberedToggle.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle.value)
+}
+
+const dataTableCliclHighlightIsToggle2 = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle2.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle2.value = null
+  } else if (dataTableNummberedToggle2.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle2.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle2.value)
+}
+
 ///--------------------------------- 
 
 const printLabelForm = () => {
@@ -523,31 +560,6 @@ const printProdcutLabel = async () => {
     console.error('Error fetching template by item code:', error)
   }
 }
-
-//------------------- Highlighter --------------------------------
-
-const selectedItemIdForColotRow = ref(null)
-
-watch(() => {
-  console.log('selected', selectedDataTables.value)
-})
-
-const isSelected = (item, type) => {
-  if(type === 1){
-    return selectedDataTables.value.some(
-      selectedItem => selectedItem.lot === item,
-    )
-  }
-
-  if(type === 2){
-    return selectedDataTables.value.some(
-      selectedItem => selectedItem.barcode === item,
-    )
-  }
-
-}
-
-const dataTableColor = ref('#E0F7FA')
 </script>
 
 
@@ -950,7 +962,7 @@ const dataTableColor = ref('#E0F7FA')
   <div>
     <VDialog
       v-model="isDialogPrintLabelVisible"
-      width="90%"
+      width="40%"
       :persistent="isLoadingPrintLabel"
     >
       <!-- Dialog Content -->
@@ -986,9 +998,15 @@ const dataTableColor = ref('#E0F7FA')
             <VTable>
               <thead>
                 <tr>
-                  <th>NO</th>
-                  <th>User Code</th>
-                  <th>User Name</th>
+                  <th v-if="false">
+                    NO
+                  </th>
+                  <th v-if="false">
+                    User Code
+                  </th>
+                  <th v-if="false">
+                    User Name
+                  </th>
                   <th>Language</th>
                   <th>Label Name</th>
                   <th>File Name</th>
@@ -1003,6 +1021,7 @@ const dataTableColor = ref('#E0F7FA')
                   :key="index"
                 >
                   <td
+                    v-if="false"
                     :style="{
                       background:
                         checkColorBgStatus(index).color
@@ -1011,6 +1030,7 @@ const dataTableColor = ref('#E0F7FA')
                     {{ index + 1 }}
                   </td>
                   <td
+                    v-if="false"
                     :style="{
                       background:
                         checkColorBgStatus(index).color
@@ -1019,6 +1039,7 @@ const dataTableColor = ref('#E0F7FA')
                     {{ item.userCode }}
                   </td>
                   <td
+                    v-if="false"
                     :style="{
                       background:
                         checkColorBgStatus(index).color
@@ -1288,7 +1309,20 @@ const dataTableColor = ref('#E0F7FA')
 
           <template #item="{item}">
             <tr>
-              <td style="position: sticky; z-index: 1; left: 0;">
+              <td
+                style="position: sticky; z-index: 1; left: 0;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <VBtn
                   color="warning"
                   @click="actionPrintProductLabel(item.raw.productId, item.raw.lot)"
@@ -1300,47 +1334,215 @@ const dataTableColor = ref('#E0F7FA')
                   />
                 </VBtn>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.no }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.category }}</span>
               </td>
               
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.plantName }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.reactorName }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.productionCode }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.productionName }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.productId }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.productName }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.lot }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.qtyKgs }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ item.raw.qtyPcs }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ convertDate(item.raw.producingDate) }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span class="text-capitalize">{{ (item.raw.updatedByName) }}</span>
               </td>
-              <td>
+              <td
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
                 <span
                   v-if="item.raw.updatedDate"
                   class="text-capitalize"

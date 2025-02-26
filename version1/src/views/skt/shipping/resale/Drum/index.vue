@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue"
+import { onMounted, ref, watch, watchEffect } from "vue"
 
 import iconMock1 from '@images/icons/Group 1000004801.png'
 import iconMock2 from '@images/icons/Group 1000004802.png'
@@ -302,6 +302,8 @@ onMounted(async () => {
 
   console.log(tableData.value)
 })
+
+const checkPackagingOther = ref(false)
 
 //------------------------------------- File Section ---------------------------------------------------
 //------------------------------- Get
@@ -648,6 +650,102 @@ const handleSubmit = async type => {
     }
   } catch (error) {
     submitCheckSheetError.value = error.message
+  }
+}
+
+import { 
+  useSubmitShipmentPlanService,
+} from '@/services/skt/shipmentPlan/services'
+
+//-------------------------------------send back ------------------------
+
+const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
+
+  try{
+    console.log('submitShipmentPlanBySoEId start!!')
+
+    // if(type === 'submit'){
+
+    // }else if(type === 'approve' || type === 'reject'){
+    //   console.log('submitShipmentPlanBySoEId start!! 3')
+    //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+    //   console.log('submitShipmentPlanBySoEId start!! 2')
+    // }else if(type === 'back'){
+    //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+    //   console.log('submitShipmentPlanBySoEId back !! 3')
+    // }
+
+    // if(!statusCommnetValue.value && type === 'reject'){
+    //   textAlertDialogFunction('Please enter Reject Comment.', false)
+      
+    //   return
+    // }
+
+    soEtlLogDetailJournalID = SoEtlLogDetailJournalIDModel.value
+    
+    const result = submitShipmentPlan(urlApi.value,
+      type,
+      whereHouse,
+      accessTokenAtStore,
+      soEtlLogDetailJournalID,
+      '',
+    )
+
+    console.log('submitShipmentPlanBySoEId start!! 3')
+    
+    if(submitShipmentPlanResult.value || result){
+      if(type === 'submit'){
+        textAlertDialogFunction(alertWordConst.submit, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'approve'){
+        textAlertDialogFunction(alertWordConst.approve, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'reject'){
+        textAlertDialogFunction(alertWordConst.reject, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }
+
+      console.log('submitShipmentPlanBySoEId start!! 4')
+      
+    }else{
+      if(type === 'submit'){
+        textAlertDialogFunction(alertWordConst.submit, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'approve'){
+        textAlertDialogFunction(alertWordConst.approve, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'reject'){
+        textAlertDialogFunction(alertWordConst.reject, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }else if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      }
+    }
+  } catch (error) {
+    console.error(`Error saving search plan:`, error)
   }
 }
 
@@ -2015,6 +2113,18 @@ const dessertsMockAmountView = [
                   </div>
                 </td>
               </tr>
+              <tr v-if="getShippingCheckSheetResult?.packagingChecks[3].checkedValue">
+                <td colspan="12">
+                  <div>
+                    <VTextarea
+                      v-model="textareaValue"
+                      counter
+                      label="Other"
+                      placeholder="Enter Other"
+                    />
+                  </div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </VCol>
@@ -2313,8 +2423,6 @@ const dessertsMockAmountView = [
               cols="9"
             >
               <VRow>
-
-             
                 <VCol cols="12">
                   <VFileInput
                     v-if="!disableInpit()"
@@ -2526,7 +2634,15 @@ const dessertsMockAmountView = [
             color="green"
             @click="handleSubmit('submit')"
           >
-            WH1
+            WH1 ACCEPT
+          </VBtn>
+          <VBtn
+            v-if="statusModel === 1004"
+            class="mx-2"
+            color="purple-accent-4"
+            @click="submitShipmentPlanBySoEId('back')"
+          >
+            Send Back
           </VBtn>
           <VBtn
             v-if="statusModel === 1004"
@@ -2534,7 +2650,7 @@ const dessertsMockAmountView = [
             color="green"
             @click="handleSubmit('leaderapprove')"
           >
-            WH2
+            WH2 ACCEPT
           </VBtn>
         </div>
 

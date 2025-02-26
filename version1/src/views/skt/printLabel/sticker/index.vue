@@ -22,9 +22,6 @@ const panel = ref(['filter']) //---------------- variable for
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 //------------------- 
-//----------------------------------- DBClicks hightlight --------------------------------
-
-const dataTableNummberedToggle = ref(null)
 
 //---------------- format
 function convertDate(dateString) {
@@ -310,8 +307,6 @@ const eXprtreeNode = () => {
   console.log('eXprtreeNode', selectedDataTables.value)
 }
 
-
-
 const headersNewEx = [
   { title: '', key: 'data-table-expand' },
   {
@@ -399,9 +394,10 @@ const headerSubtitle = [
   { title: '' },
 ]
 
-//------------------- Highlighter --------------------------------
+//--------------------------------------- highlight -------------------
 const dataTableColor = ref('#E0F7FA')
-const selectedItemIdForColotRow = ref(null)
+const dataTableNummberedToggle = ref(null)
+const dataTableNummberedToggle2 = ref(null)
 
 const isSelected = item => {
   return selectedDataTables.value.some(
@@ -410,6 +406,8 @@ const isSelected = item => {
 }
 
 const dataTableCliclHighlightIsToggle = no => {
+  console.log("dataTableNum", dataTableNummberedToggle.value)
+
   // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
   if (dataTableNummberedToggle.value === no) {
     // ถ้าตรง ให้สลับกลับเป็น null
@@ -420,6 +418,19 @@ const dataTableCliclHighlightIsToggle = no => {
   }
 
   console.log("dataTableNum", dataTableNummberedToggle.value)
+}
+
+const dataTableCliclHighlightIsToggle2 = no => {
+  // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
+  if (dataTableNummberedToggle2.value === no) {
+    // ถ้าตรง ให้สลับกลับเป็น null
+    dataTableNummberedToggle2.value = null
+  } else if (dataTableNummberedToggle2.value === null) {
+    // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
+    dataTableNummberedToggle2.value = no
+  }
+
+  console.log("dataTableNum", dataTableNummberedToggle2.value)
 }
 </script>
 
@@ -1089,7 +1100,10 @@ const dataTableCliclHighlightIsToggle = no => {
                   {{ sub.lotId }}
                 </div>
               </td>
-              <td v-if="false" class="px-2">
+              <td
+                v-if="false"
+                class="px-2"
+              >
                 <div
                   v-for="(sub, index) in item.raw.barcodes"
                   :key="sub.barcode + index"

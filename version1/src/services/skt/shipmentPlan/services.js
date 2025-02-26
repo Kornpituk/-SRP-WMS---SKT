@@ -167,6 +167,39 @@ export const useSubmitShipmentPlanService = () => {
   }
 }
 
+export const useSubmitShipmentPlanService2 = () => {
+  const submitShipmentPlanResult2 = ref(null)
+  const errorSubmitShipmentPlan2 = ref(null)
+  
+  const submitShipmentPlan2 = async (urlApi, form, whereHouse, accessToke, soeId, comment) => {
+    console.log('submitShipmentPlan sevice.')
+    try {
+      errorSubmitShipmentPlan2.value = null
+      console.log('submitShipmentPlan...')
+  
+      const result = await shipmentPlanRepository.submitShipmentPlan(urlApi, form, whereHouse, accessToke, soeId, comment)
+        
+      if (result) {
+        // console.log('submitShipmentPlan:', result)
+        submitShipmentPlanResult2.value = result.data
+        
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in submitShipmentPlan:', error)
+      errorSubmitShipmentPlan2.value = error.message
+    }
+  }
+  
+  return {
+    submitShipmentPlanResult2,
+    errorSubmitShipmentPlan2,
+    submitShipmentPlan2,
+  }
+}
+
 //-------------------------------- Print ----------------------------------
 export const usePrintShipmentPDFService = () => {
   const printShipmentPDFResult = ref(null)

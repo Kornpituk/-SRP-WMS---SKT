@@ -2081,7 +2081,7 @@ const statusText = statusId => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                <span v-if="item.raw.actualPCS1">{{ item.raw.actualPCS1 }}</span>
+                <span v-if="item.raw.product1UomCountActual">{{ item.raw.product1UomCountActual }}</span>
                 <span v-else />
               </td>
 
@@ -2187,7 +2187,7 @@ const statusText = statusId => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
-                <span v-if="item.raw.actualPCS2">{{ item.raw.actualPCS2 }}</span>
+                <span v-if="item.raw.product2SelectedPackagingCode">{{ item.raw.product2SelectedPackagingCode }}</span>
                 <span v-else />
               </td>
 
