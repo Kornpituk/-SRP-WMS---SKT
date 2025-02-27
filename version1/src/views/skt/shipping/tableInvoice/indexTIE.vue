@@ -696,10 +696,10 @@ const searchShipmentPlan = async () => {
           etd: formatToDate(item.etd),
           logUpdatedDate: formatToDate(item.loadingDate),
 
-          fileSo: await getFileForm('GetSo', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
-          fileCoA: await getFileForm('GetCoA', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
-          fileTruckOrder: await getFileForm('GetTruckOrder', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
-          fileDeliveryNote: await getFileForm('GetDeliveryNote', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          // fileSo: await getFileForm('GetSo', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          // fileCoA: await getFileForm('GetCoA', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          // fileTruckOrder: await getFileForm('GetTruckOrder', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          // fileDeliveryNote: await getFileForm('GetDeliveryNote', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
         })),
       )
 
@@ -3750,7 +3750,7 @@ const handlePrintTruckOrderPDF = () => {
                 >
                   <div>
                     <FileInputDialogCarousels
-                      :files-from-a-p-i="product.fileSo"
+                      :files-from-a-p-i="product.getSOFileData"
                       title-dialog="SO Attachment"
                       :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                       :type-file-input="typeFileInput"
@@ -4049,7 +4049,7 @@ const handlePrintTruckOrderPDF = () => {
                     title-dialog="COA"
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                     :type-file-input="typeFileInput"
-                    :files-from-a-p-i="product.fileCoA"
+                    :files-from-a-p-i="product.getCOAFileData"
                     file-name="COA" 
                     @updateFiles="handleFileUpdatesCOA"
                   />
@@ -4383,7 +4383,7 @@ const handlePrintTruckOrderPDF = () => {
                       :disabled-prop="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
-                      :files-from-a-p-i="product.fileTruckOrder"
+                      :files-from-a-p-i="product.getTruckOrderFileData"
                       @updateFiles="handleFileUpdatesTruckOrder"
                     />
                   </VCol>
@@ -4534,7 +4534,7 @@ const handlePrintTruckOrderPDF = () => {
                     title-dialog="Delivery Note"
                     :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                     :type-file-input="typeFileInput"
-                    :files-from-a-p-i="product.fileDeliveryNote"
+                    :files-from-a-p-i="product.getDeliveryNoteFileData"
                     file-name="Delivery Note" 
                     @updateFiles="handleFileUpdatesDeliNote"
                   />

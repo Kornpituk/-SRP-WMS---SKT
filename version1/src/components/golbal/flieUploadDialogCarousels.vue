@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, watchEffect } from 'vue'
+import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 
 const props = defineProps({
   fileName: { type: String, required: true },
@@ -72,6 +73,49 @@ const removeFile = index => {
 
   emitUpdateFiles() // อัปเดตข้อมูลไปยัง parent
 }
+
+const checkColorBtnShowImage = (files, filesModel) => {
+  if(files || filesModel){
+    if(props.disabledProp){
+      return 1
+    }else{
+      return 2
+    }
+  }else{
+    if(props.disabledProp){
+      return 0
+    }else{
+      return 3
+    }
+  }
+}
+
+const getIconType = (filesLength, filesModelLength) => {
+  const status = checkColorBtnShowImage(filesLength, filesModelLength)
+  if (status === 1) return 'ri-checkbox-circle-fill'
+  if (status === 2) return 'mdi-camera'
+  if (status === 3) return 'mdi-file-image'
+  
+  return 'mdi-help-circle' // Default icon
+}
+
+const getIconColor = (filesLength, filesModelLength) => {
+  const status = checkColorBtnShowImage(filesLength, filesModelLength)
+  if (status === 1) return 'green'
+  if (status === 2) return 'info'
+  if (status === 3) return 'blue'
+  
+  return 'grey' // Default color
+}
+
+const getVariantType = (filesLength, filesModelLength) => {
+  const status = checkColorBtnShowImage(filesLength, filesModelLength)
+  if (status === 1) return 'filled'
+  if (status === 2) return 'outlined'
+  if (status === 3) return 'outlined'
+  
+  return 'filled' // Default color
+}
 </script>
 
 <template>
@@ -85,10 +129,13 @@ const removeFile = index => {
         <VFileInput
           v-model="filesModel"
           multiple
+          :variant="getVariantType(files.length, filesModel.length)"
           :disabled="disabledProp"
           accept="image/*,.pdf"
-          style="max-width: 200px;"
           density="compact"
+          :color="disabledProp ? 'grey' : 'green'"
+          :prepend-icon="getIconType(files.length, filesModel.length)"
+          :prepend-icon-color="disabledProp ? 'red' : 'green'"
           @change="handleFileUpload"
         >
           <template #selection="{ fileNames }">
@@ -124,11 +171,11 @@ const removeFile = index => {
         <VBtn
           :disabled="files.length < 1"
           class="d-flex justify-center"
-          :color="files.length > 0 || filesModel.length? 'primary' : 'grey'"
+          :color="getIconColor(files.length, filesModel.length)"
           style="max-width: 70px;"
           @click="openDialog"
         >
-          <div><VIcon icon="ri-gallery-fill" /></div>
+          <div><VIcon :icon="getIconType(files.length, filesModel.length)" /></div>
           <div v-if="files.length > 0 || filesModel.length">
             {{ files.length }}+
           </div>
@@ -221,16 +268,18 @@ const removeFile = index => {
               <VImg src="https://sktdevwebapi.easetrackwms.com/api/v1/ShippingForm/SO/256801/c4fcb5cd-f0cb-4c39-a693-99240209fc6f.jpg" />
               
               <div v-if="file.contentType === 'image/jpeg' || file.contentType === 'image/png'">
-                <VImg :src="file.fileUri" />
+                <VImg :src="urlApi+file.fileUri" />
               </div>
               <VImg
                 v-if="file.type === 'image'"
                 :src="file.objectUrl"
               />
+              
 
               <div v-else-if="file.contentType === 'image/png'">
                 <VImg :src="file.fileUri" />
               </div>
+              
 
               <div
                 v-else-if="file.contentType === 'application/pdf'"

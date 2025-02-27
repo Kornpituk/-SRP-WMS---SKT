@@ -514,6 +514,8 @@ const updateShippingCheckSheetData = async ()  => {
 
 const trickerSaveDraft = ref(false)
 
+const loadingCycleBtn = ref(false)
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const habdleSaveDraft = async () => {
 
@@ -611,6 +613,8 @@ const habdleSaveDraft = async () => {
   } catch (error) {
     errorSaveShippingCheckSheet.value = error.message
   }
+
+  loadingCycleBtn.value = false
 }
 
 //------------------------------------ Submit ---------------------------------------
@@ -1078,10 +1082,12 @@ const removeFileAll = (truck, fileIndex) => {
       containerNo_LicPlNo: truck.containerNo_LicPlNo,
       soEtlLogDetailJournalID: truck.fileeLicensePlate[0].soEtlLogDetailJournalID,
     })
-    truck.fileeLicensePlate.splice(fileIndex, 1)
-    truck.fileeLicensePlateMew.splice(fileIndex, 1)
+    truck.fileeLicensePlate = []
+    truck.fileeLicensePlateMew = []
     console.log("removeFileAll!", truck)
   }else{
+    truck.fileeLicensePlate = []
+    truck.fileeLicensePlateMew = []
     console.log("not find!", truck)
   }
   
@@ -2621,12 +2627,18 @@ const dessertsMockAmountView = [
           class="d-flex justify-end mt-4"
         >
           <VBtn
-            v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0"
+            v-if="statusModel === 1002 && !loadingCycleBtn || statusModel === 1003 && !loadingCycleBtn || statusModel === 0 && !loadingCycleBtn"
             class="mx-2"
             color="warning"
-            @click="habdleSaveDraft"
+            @click="habdleSaveDraft(), loadingCycleBtn = true"
           >
             SAVE DRAFT
+          </VBtn>
+          <VBtn v-if="loadingCycleBtn" style="width: 134px;" color="warning">
+            <VProgressCircular
+              indeterminate
+              color="success"
+            />
           </VBtn>
           <VBtn
             v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0"
