@@ -596,7 +596,7 @@ const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
 const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
 
 const filterForSearchPlan = ref({
-  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
+  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || 'Waiting for Shipping',
   ETA: etaDateModel.value || '',
   ETD: etdDateModel.value || '',
   SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
@@ -725,7 +725,7 @@ const searchFilterPlanFunctionBtn = async () => {
 
 const clearFilterPlanFunctionBtn = async () => {
   filterForSearchPlan.value = {
-    StatusId: '',
+    StatusId: 'Waiting for Shipping',
     ETA: '',
     ETD: '',
     SalesOrderNoSearch: '',
@@ -867,7 +867,7 @@ const saveFileFormShipment = async (
 
         // // Reload หลังแจ้งเตือนสำเร็จ
         // setTimeout(() => {
-        // // location.reload()
+        // location.reload()
         // }, 500) // 0.5 วินาที
       }else{
         textAlertDialogFunction(alertWordConst.saveDraft, true)
@@ -875,7 +875,7 @@ const saveFileFormShipment = async (
 
         // Reload หลังแจ้งเตือนสำเร็จ
         setTimeout(() => {
-          // location.reload()
+          location.reload()
         }, 500) // 0.5 วินาที
       }
       
@@ -1144,7 +1144,7 @@ const saveShipmentPlan = async row => {
         if(!trikerSaveDrft.value){
           textAlertDialogFunction('Print', true)
           setTimeout(() => {
-            location.reload()
+            // location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
@@ -1154,7 +1154,7 @@ const saveShipmentPlan = async row => {
         if(!trikerSaveDrft.value){
           textAlertDialogFunction(alertWordConst.saveDraft, true)
           setTimeout(() => {
-            location.reload()
+            // location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
@@ -1912,6 +1912,7 @@ const paramsPrintPDFCheckSheet = ref({
   UserCode: '',
   Customer: '',
   SaleOrder: '',
+  location: '',
   LicensePlate: [],
 })
 
@@ -1930,6 +1931,7 @@ const mapProductRowToPramsPrint = async item => {
     UserCode: item.shippingUserCode,
     Customer: item.shippingUserName,
     SaleOrder: item.salesOrderNo,
+    location: item.shipperLocation,
     LicensePlate: item.containerNo_LicPlNo, // ✅ ใช้ค่าที่ถูกต้อง
   }))
 }
@@ -3258,14 +3260,7 @@ const handlePrintTruckOrderPDF = () => {
         >
           {{ errorMessage }}
         </div>
-        <VProgressLinear
-          v-if="!paginatedData && !isLoading || paginatedData.length < 1"
-          height="20"
-          color="secondary"
-          class="elevation-1"
-        >
-          <span>No Data....</span>
-        </VProgressLinear>
+        
         <VProgressLinear
           v-if="isLoading"
           height="20"
@@ -3632,7 +3627,7 @@ const handlePrintTruckOrderPDF = () => {
           <!-- 👉 table body -->
           <tbody>
             <tr
-              v-for="(product, index) in paginatedData"
+              v-for="(product, index) in paginatedData "
               :key="index"
             >
               <td
@@ -3730,7 +3725,7 @@ const handlePrintTruckOrderPDF = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 250px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -4031,7 +4026,7 @@ const handlePrintTruckOrderPDF = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 250px; font-size: 12px;"
+                style="min-width: 100px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -4350,7 +4345,7 @@ const handlePrintTruckOrderPDF = () => {
               <td
                 v-if="department === 'Warehouse'"
                 class="text-start px-2 cursor-pointer"
-                style="min-width: 350px; font-size: 12px;"
+                style="min-width: 200px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -4364,9 +4359,8 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VRow>
-                  <VCol cols="3">
+                  <VCol cols="6">
                     <VBtn
-                      width="90px"
                       color="warning"
                       class="mx-2"
                       @click="showDialogTruckOrder(product.salesOrderNo, product.soEtlLogDetailJournalID)"
@@ -4377,7 +4371,7 @@ const handlePrintTruckOrderPDF = () => {
                       />
                     </VBtn>
                   </VCol>
-                  <VCol cols="9">
+                  <VCol style="width: 50px;" cols="6">
                     <FileInputDialogCarousels
                       title-dialog="Truck Order"
                       :disabled-prop="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
@@ -4516,7 +4510,7 @@ const handlePrintTruckOrderPDF = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 250px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 

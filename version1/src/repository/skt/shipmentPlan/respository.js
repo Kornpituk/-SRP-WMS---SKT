@@ -977,7 +977,7 @@ export const checkSheetLorryFlexiRepository = {
         }
         response = await axios.post(
           `${urlApi}/api/v1/PrintForm/Shipment/${type}/${form}/${params[0].SoEtlLogDetailJournalID}
-          /${params[0].Customer}/${params[0].ItemName}/${params[0].SaleOrder}`, {},
+          /${params[0].Customer}/${params[0].ItemName}/${params[0].SaleOrder}/${params[0].location}`, {},
           {
             headers: {
               'accept': '*/*', 

@@ -351,11 +351,6 @@ const headersNewEx = [
   },
   
   {
-    title: 'Location',
-    key: 'locationName',
-    sortable: false,
-  },
-  {
     title: 'RCVD(PCS)',
     key: 'qtyPcs',
     sortable: false,
@@ -386,7 +381,7 @@ const headerSubtitle = [
   { title: 'Item Code', key: 'name', align: 'center' },
   { title: 'Item Name', key: 'calories', align: 'center' },
   { title: 'Lot', key: 'fat', align: 'center' },
-  { title: 'NO/Lot QTY', key: 'protein', align: 'center' },
+  { title: 'PACK (KGS)', key: 'protein', align: 'center' },
   { title: '' },
   { title: '' },
   { title: '' },
@@ -1113,7 +1108,7 @@ const dataTableCliclHighlightIsToggle2 = no => {
                   {{ sub.barcode }}
                 </div>
               </td>
-              <td class="px-2">
+              <td v-if="false" class="px-2">
                 <div
                   v-for="(sub, index) in item.raw.barcodes"
                   :key="sub.lotDescription + index"
@@ -1121,6 +1116,16 @@ const dataTableCliclHighlightIsToggle2 = no => {
                   class="d-flex justify-center align-center"
                 >
                   <span>{{ sub.lotDescription }}</span>
+                </div>
+              </td>
+              <td v-if="true" class="px-2">
+                <div
+                  v-for="(sub, index) in item.raw.barcodes"
+                  :key="sub.qtyKgs + index"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                  class="d-flex justify-center align-center"
+                >
+                  <span v-if="sub.qtyKgs > 0">{{ sub.qtyKgs }}</span>
                 </div>
               </td>
             </tr>
@@ -1210,7 +1215,7 @@ const dataTableCliclHighlightIsToggle2 = no => {
               </th>
             </tr>
           </template>
-          <template #column.locationName="{ column }">
+          <template v-if="false" #column.locationName="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon

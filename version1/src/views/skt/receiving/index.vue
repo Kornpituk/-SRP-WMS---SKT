@@ -666,9 +666,8 @@ const GetStockUpdate = async () => {
         productId: productId,
         productName: productName,
         supplierId: supplierId,
-        supplierName: supplierName,
+        lot: supplierName,
         statusName: fileterStatusInApiStr || '',
-        purchaseOrderNo: purchaseOrderNo,
       },
       headers: {
         accept: '*/*',
@@ -2145,13 +2144,13 @@ const insetSwitch1 = ref('')
               >
                 <VTextField
                   v-model="tempFilters.supplierName"
-                  :label="$t('Supplier Name')"
-                  type="Supplier Name"
+                  :label="$t('Lot')"
+                  type="Lot"
                   density="compact"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      Supplier Name
+                      Lot
                     </span>
                   </template>
                 </VTextField>
