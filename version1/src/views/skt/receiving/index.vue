@@ -20,7 +20,7 @@ const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
 
 const accountRole = ref('issues')
-
+const dataRowModel = ref()
 const roleAccount = ref('issues')
 
 watchEffect(() => {
@@ -665,7 +665,7 @@ const GetStockUpdate = async () => {
         deliveryDateTo: deliveryDateTo.value,
         productId: productId,
         productName: productName,
-        supplierId: supplierId,
+        purchaseOrderNo: purchaseOrderNo,
         lot: supplierName,
         statusName: fileterStatusInApiStr || '',
       },
@@ -1149,11 +1149,12 @@ const checkCurrentTabBeforIn = status => {
   return tabIndex
 }
 
-const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlLogDetailJournalID, receivingType, lot) => {
+const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlLogDetailJournalID, receivingType, lot, dataRow) => {
   // console.log('isDialogVisibleAction **', index, journalID, updateBy, status, itemCode)
   journalIDModel.value = journalID
   updateByReceivingPlan.value = updateBy
   detailsReceiv.value = products.value[index-1]
+  dataRowModel.value = dataRow
 
   itemStore.clearItemDetails()
   itemStore.setItemDetails(products.value[index-1], 'itemDataCookies')
@@ -1293,7 +1294,18 @@ const processingPrintLabel = ref(false)
 const successGetPrintLabelView = ref(false)
 
 const disabledBtnLebal = () => {
-  return [0, 1, 2, 3, 4, 5, 7, 10, 16, 13, 14, 12, 18].includes(idStatusDialogAction.value)
+  // return [0, 1, 2, 3, 4, 5, 7, 10, 16, 13, 14, 12, 18].includes(idStatusDialogAction.value)
+
+  if(dataRowModel.value.receiveTypeId === 3 && [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(idStatusDialogAction.value)){
+    return false
+  }else if(dataRowModel.value.receiveTypeId === 1 && [9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(idStatusDialogAction.value)) {
+    return false
+  }else if(dataRowModel.value.receiveTypeId === 2 && [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(idStatusDialogAction.value)){
+    return false
+  }
+  else{
+    return true
+  }
 }
 
 const disabledBtnLebalLorry = () => {
@@ -3225,7 +3237,6 @@ const insetSwitch1 = ref('')
                 class="mt-4"
               >
                 <VBtn
-                  v-if="!disabledBtnLebalLorry()"
                   style="width: 100%;"
                   :disabled="checkPersistent"
                   @click="btnPrintLabel"
@@ -3680,7 +3691,7 @@ const insetSwitch1 = ref('')
               >
                 <VBtn
                   color="info"
-                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode, item.raw.poEtlLogDetailJournalID, item.raw.receiveTypeId, item.raw.batch)"
+                  @click="viewDetailsReceive(item.raw.no, item.raw.journalID, item.raw.updatedBy, item.raw.statusId, item.raw.itemCode, item.raw.poEtlLogDetailJournalID, item.raw.receiveTypeId, item.raw.batch, item.raw)"
                 >
                   <div style="font-size: 12px;">
                     Action

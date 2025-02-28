@@ -378,6 +378,7 @@ const headerSubtitle = [
   { title: '' },
   { title: '' },
   { title: '', key: 'checkbox', align: 'center' },
+  { title: 'NO.', key: 'lotDescription', align: 'center' },
   { title: 'Item Code', key: 'name', align: 'center' },
   { title: 'Item Name', key: 'calories', align: 'center' },
   { title: 'Lot', key: 'fat', align: 'center' },
@@ -1063,6 +1064,16 @@ const dataTableCliclHighlightIsToggle2 = no => {
                     value="selectedDataTables"
                     @change="updateSelectedData(sub)" 
                   />
+                </div>
+              </td>
+              <td class="px-2">
+                <div
+                  v-for="(sub, index) in item.raw.barcodes"
+                  :key="sub.lotDescription +index"
+                  :style="{ backgroundColor: index % 2 === 0 ? '#f7f7f9' : '#f0f0f0', height: '36px' }"
+                  class="d-flex align-center"
+                >
+                  {{ sub.lotDescription }}
                 </div>
               </td>
               <td class="px-2">
