@@ -359,7 +359,7 @@ export const useSaveFileFormService = () => {
 
       errorMessageSaveFileForm.value = null
 
-      // console.log('Saving Draft Form COA...')
+      console.log('Saving Draft Form COA...')
 
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
       const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)

@@ -405,6 +405,65 @@ export const FileService = {
     }
   },
 
+  // async urlToFile(url, filename) {
+  //   try {
+  //     const response = await fetch(url)
+  //     const blob = await response.blob()
+      
+  //     return new File([blob], filename, { type: blob.type })
+  //   } catch (error) {
+  //     console.error(`Failed to convert URL to File: ${url}`, error)
+      
+  //     return null
+  //   }
+  // },
+
+  // async saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
+  //   const formData = new FormData()
+
+  //   console.log('Saving Draft Form COA repo 1...')
+  
+  //   // 1️⃣ แยกประเภทไฟล์
+  //   const fileUriFiles = files.filter(file => file.fileUri) // ไฟล์ที่มาจาก URL
+  //   const selectedFiles = files.filter(file => file.file)   // ไฟล์ที่ผู้ใช้เลือก
+  
+  //   // 2️⃣ โหลดไฟล์จาก `fileUri` แล้วแปลงเป็น `File`
+  //   const filePromises = fileUriFiles.map(file =>
+  //     urlToFile(`${urlApi}${file.fileUri}`, `file_${file.attachmentId}.png`),
+  //   )
+  
+  //   // 3️⃣ รอให้ทุกไฟล์จาก `fileUri` โหลดเสร็จ
+  //   const convertedFiles = await Promise.all(filePromises)
+  
+  //   // 4️⃣ เพิ่มไฟล์ที่แปลงแล้วลงใน `FormData`
+  //   convertedFiles.forEach(file => {
+  //     if (file) formData.append('files', file)
+  //   })
+  
+  //   // 5️⃣ เพิ่มไฟล์ที่ผู้ใช้เลือกลงใน `FormData`
+  //   selectedFiles.forEach(file => {
+  //     formData.append('files', file.file)
+  //   })
+
+  //   console.log('Saving Draft Form COA repo 2...')
+  
+  //   try {
+  //     const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //         'x-location': whereHouse,
+  //         'Authorization': `Bearer ${accessToken}`,
+  //       },
+  //     })
+  
+  //     return { success: true, data: response.data.data }
+  //   } catch (error) {
+  //     console.error("Upload failed", error)
+      
+  //     return { success: false, error }
+  //   }
+  // },
+
   async deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
 
     try {

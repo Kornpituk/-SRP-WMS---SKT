@@ -219,7 +219,10 @@ const getVariantType = (filesLength, filesModelLength) => {
       </VCol>
     </VRow>
 
-    <VBtn v-if="false" @click="testShowFIle">
+    <VBtn
+      v-if="false"
+      @click="testShowFIle"
+    >
       asd
     </VBtn>
 
@@ -238,13 +241,13 @@ const getVariantType = (filesLength, filesModelLength) => {
           style="width: 100%;"
           @click="openInputDialog"
         >
-          <div><VIcon icon="ri-upload-2-fill" /></div>
+          <div><VIcon icon="ri-upload-2-fill" />+{{ files.length }}</div>
         </VBtn>
       </VCol>
       <VCol
+        v-if="false"
         class="d-flex align-center px-2"
         cols="6"
-        v-if="false"
       >
         <!-- ปุ่มเปิด Carousel Dialog -->
         <VBtn
@@ -404,7 +407,10 @@ const getVariantType = (filesLength, filesModelLength) => {
       width="90%"
     >
       <!-- Dialog Content -->
-      <VCard title="Privacy Policy">
+      <VCard>
+        <VCardTitle class="text-center">
+          {{ props.titleDialog }}
+        </VCardTitle>
         <DialogCloseBtn
           variant="text"
           size="default"
@@ -469,7 +475,6 @@ const getVariantType = (filesLength, filesModelLength) => {
                     height="125"
                     :src="urlApi+file.fileUri"
                   />
-                  0
                 </div>
                 <div
                   v-if="file.type === 'image'"
@@ -484,7 +489,6 @@ const getVariantType = (filesLength, filesModelLength) => {
 
                 <div v-else-if="file.contentType === 'application/octet-stream'">
                   <VImg :src="file.fileUri" />
-                  33
                 </div>
                 
                 <div v-else-if="file.contentType === 'image/png'">
@@ -501,7 +505,6 @@ const getVariantType = (filesLength, filesModelLength) => {
                     type="application/pdf" 
                     style="width: 80%; height: 500px; border: none;"
                   />
-                  2
                 </div>
   
                 <div
@@ -514,7 +517,6 @@ const getVariantType = (filesLength, filesModelLength) => {
                     type="application/pdf"
                     style="width: 80%;"
                   />
-                  3
                 </div>
 
                 <div
