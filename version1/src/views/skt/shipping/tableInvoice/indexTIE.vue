@@ -23,14 +23,7 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
 
 
   if(department.value === 'Warehouse' && dataRow?.csLfStatusId === 1005 || department.value === 'Warehouse' && dataRow?.csLfStatusId === 1105){
-    console.log('disabledStatus 1')
-    if(userDataInfo.value.id === '00022' || userDataInfo.value.id === '00023' || userDataInfo.value.id === '00025'){
-      console.log('disabledStatus 2')
-      
-      return false
-    }else{
-      return true
-    }
+    return !(userDataInfo.value.id === '00022' || userDataInfo.value.id === '00023' || userDataInfo.value.id === '00025')
   }else if(department.value === 'Warehouse' && whStatusId === 404){
     return true
   }else if(department.value === 'Logistic' && logStatusId === 504){
