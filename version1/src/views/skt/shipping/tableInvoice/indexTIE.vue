@@ -396,7 +396,9 @@ const textAreaRemarkDialogActive = (type, data, soEId, disabledRow) => {
 
 const dataRowForUse = ref()
 
-const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMark, dataProduct, disabledRow) => {
+const textAreaShipDialogActive2 = (type, data, data2, 
+  index, soEId, activeShipMark, dataProduct, disabledRow, 
+  disabledPermission) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
   soEIdModel.value = soEId
@@ -407,7 +409,24 @@ const textAreaShipDialogActive2 = (type, data, data2, index, soEId, activeShipMa
   activeShipMarkModel.value = activeShipMark
   dataRowForUse.value = dataProduct
   dialogVisible.value = true
-  disabledModel.value = disabledRow
+
+  const disabledCanExecute = ref(false)
+
+  if(disabledPermission){
+    // eslint-disable-next-line sonarjs/no-all-duplicated-branches
+
+    if(disabledRow){
+      disabledCanExecute.value = true
+    }else{
+      disabledCanExecute.value = false
+    }
+  }else{
+    disabledCanExecute.value = true
+  }
+
+  console.log('disabledCanExecute', disabledCanExecute.value, 'status', disabledRow, 'permis', disabledPermission )
+
+  disabledModel.value = disabledCanExecute.value
 }
 
 const handleDialogSubmit = data => {
@@ -675,7 +694,7 @@ const searchFilterPlanFunctionBtn = async () => {
 
 const clearFilterPlanFunctionBtn = async () => {
   filterForSearchPlan.value = {
-    StatusId: 'Waiting for Shipping',
+    StatusId: '',
     ETA: '',
     ETD: '',
     SalesOrderNoSearch: '',
@@ -1076,14 +1095,14 @@ const saveShipmentPlan = async row => {
     console.log("File not foand", filesFromUploaderSO.value)
   }
 
-  if(row.csLfStatusId !== 1005 || row.csLfStatusId !== 1105){
+  if(row.statusId === 207){
     console.log('Saved Shipment plan if', row.csLfStatusId)
     saveDraftLoading.value = false
     if(disabledModel.value){
       if(!trikerSaveDrft.value){
         textAlertDialogFunction('Print', true)
         setTimeout(() => {
-          // location.reload()
+          location.reload()
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
         saveDraftLoading.value = false
       }
@@ -1093,7 +1112,7 @@ const saveShipmentPlan = async row => {
       if(!trikerSaveDrft.value){
         textAlertDialogFunction(alertWordConst.saveDraft, true)
         setTimeout(() => {
-          // location.reload()
+          location.reload()
           saveDraftLoading.value = false
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
        
@@ -1123,7 +1142,7 @@ const saveShipmentPlan = async row => {
         if(!trikerSaveDrft.value){
           textAlertDialogFunction('Print', true)
           setTimeout(() => {
-            // location.reload()
+            location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
@@ -1133,7 +1152,7 @@ const saveShipmentPlan = async row => {
         if(!trikerSaveDrft.value){
           textAlertDialogFunction(alertWordConst.saveDraft, true)
           setTimeout(() => {
-            // location.reload()
+            location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
@@ -1719,21 +1738,32 @@ async function  redirectBasedOnStatus (product)  {
     10: "Flexi",
   }
 
-  const mainCheckSheetTypeName = (product.packagingTypeID)
+  // const mainCheckSheetTypeName = (product.packagingTypeID)
+
+  const mainCheckSheetTypeName = (product.checkSheetTypeID)
+
+  // const checkSheetTypeNameMapping = {
+  //   0: '',
+  //   1: 'Drum',
+  //   2: 'Drum',
+  //   3: 'Drum',
+  //   4: 'Drum',
+  //   5: 'Drum',
+  //   6: 'Flexi',
+  //   7: 'Flexi',
+  //   8: 'Drum',
+  //   9: 'Drum',
+  //   10: 'Drum',
+  //   11: 'Flexi',
+    
+  // }
 
   const checkSheetTypeNameMapping = {
     0: '',
     1: 'Drum',
     2: 'Drum',
-    3: 'Drum',
-    4: 'Drum',
-    5: 'Drum',
-    6: 'Flexi',
-    7: 'Flexi',
-    8: 'Drum',
-    9: 'Drum',
-    10: 'Drum',
-    11: 'Flexi',
+    3: 'Flexi',
+    4: 'Flexi',
     
   }
 
@@ -2196,10 +2226,12 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.driverName = personInchargeTruckCompanyModel.value
   paramsTruckOrder.value.tel = contactTruckCompanyModel.value
   paramsTruckOrder.value.driverBy = contactTruckCompanyModel.value
+  paramsTruckOrder.value.orderBy = userDataInfo.value.firstName
   paramsTruckOrder.value.runningNum = dataRowModel?.value.truckReservingNumber
-  paramsTruckOrder.value.dateDriverBy = dataRowModel?.value.etd
-  paramsTruckOrder.value.dateOrderBy = dataRowModel?.value.etd
-  paramsTruckOrder.value.dateAuthorizedBy = dataRowModel?.value.etd
+
+  paramsTruckOrder.value.dateDriverBy = dataRowModel?.value.logUpdatedDate
+  paramsTruckOrder.value.dateOrderBy = dataRowModel?.value.logUpdatedDate
+  paramsTruckOrder.value.dateAuthorizedBy = dataRowModel?.value.logUpdatedDate
 
   console.log('loading.......')
   
@@ -2819,7 +2851,7 @@ const handlePrintTruckOrderPDF = () => {
                   colspan="8"
                   class="text-start"
                 >
-                  {{ dataRowModel?.etd }}
+                  {{ dataRowModel?.logUpdatedDate }}
                 </td>
               </tr>
               <tr>
@@ -2998,8 +3030,11 @@ const handlePrintTruckOrderPDF = () => {
                 </td>
               </tr>
               <tr>
-                <th colspan="4">
-                  หมายเหตุ (Remark) 
+                <th
+                  colspan="4"
+                  style="text-align: start; vertical-align: top;"
+                >
+                  <span>หมายเหตุ (Remark) </span>
                 </th>
                 <th
                   colspan="8"
@@ -3032,7 +3067,7 @@ const handlePrintTruckOrderPDF = () => {
               </th>
               <th colspan="4">
                 <VTextField
-                  v-model="paramsTruckOrder.orderBy"
+                  v-model="userDataInfo.firstName"
                   density="compact"
                   class="text-center"
                 >
@@ -3692,7 +3727,7 @@ const handlePrintTruckOrderPDF = () => {
                       <p class="mb-0">{{ (product.whStatusText) }}</p>
                     </VTooltip>
                   </VChip>
-                  <span v-if="false">{{ product.checkSheetTypeName }}</span>
+                  <span v-if="true">{{ product.checkSheetTypeName }}</span>
                   
                 </span>
               </td>
@@ -3866,7 +3901,6 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <div class="text-start cursor-pointer">
                   <VBtn
-                    :disabled="!canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute"
                     style="min-width: 160px; max-width: 160px;"
                     variant="outlined"
                     :color="product.shipperConditions ? 'primary' : 'grey'"
@@ -3875,7 +3909,8 @@ const handlePrintTruckOrderPDF = () => {
                                                       product.shippingMarkActive, product, 
                                                       disabledStatus(product.inspStatusId,
                                                                      product.logStatusId,product.salStatusId,
-                                                                     product.whStatusId,product))"
+                                                                     product.whStatusId,product), 
+                                                      canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute)"
                   >
                     <span
                       v-if="product.shipperConditions"
@@ -4941,7 +4976,7 @@ const handlePrintTruckOrderPDF = () => {
               <VCol cols="6">
                 <VTextarea
                   v-model="dialogDataTextArea"
-                  :disabled="disabledModel"
+                  :readonly="disabledModel"
                   rows="7"
                   counter
                   class="text-center"
@@ -4956,7 +4991,7 @@ const handlePrintTruckOrderPDF = () => {
               <VCol cols="6">
                 <VTextarea
                   v-model="dialogData2TextArea"
-                  :disabled="disabledModel"
+                  :readonly="disabledModel"
                   counter
                   class="text-center"
                   rows="15"

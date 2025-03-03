@@ -457,12 +457,18 @@ export const  globalService = {
         return { data: response.data, success: true }
       } else {
         console.log('Error repo Error If getTempateByItemCode...')
+
         throw new Error('No data received from the server')
+
+        // return { data: response, success: false }
       }
     } catch (error) {
       console.log('Error repo Error Try getTempateByItemCode...')
       console.error('Error in getProductionPlan:', error)
-      throw new Error(`Failed to fetch getTempateByItemCode ${error.response?.data?.message || error.message}`)
+
+      return { data: error.response?.data, success: false }
+
+      // throw new Error(`Failed to fetch getTempateByItemCode ${error.response?.data || error.message}`)
     }
   },
 

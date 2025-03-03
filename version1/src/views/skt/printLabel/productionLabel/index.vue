@@ -21,6 +21,24 @@ const panel = ref(['filter']) //---------------- variable for
 // Get access token from localStorage in another page
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
+//------------------------------- alert --------------------------------------------
+
+import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
+import alertWordConst from '@/utilities/constant'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+
+const isDialogVisibleAlertDialog = ref(false)
+const wordForSubmit = ref('')
+const subWordForSubmit = ref('')
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  subWordForSubmit.value = ''
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
 //---------------- format
 function convertDate(dateString) {
   if(dateString){
@@ -209,7 +227,8 @@ const itemsCategoriesOld = ['Packaging', 'Raw material', 'Lorry']
 
 const itemsCategories = [
   { name: 'Product', value: 'Product' },
-  { name: 'Resale', value: 'Resale' },
+
+  // { name: 'Resale', value: 'Resale' },
 ]
 
 const sortColumn = ref('')
@@ -465,11 +484,18 @@ const actionPrintProductLabel = async (ItemCode, lot) => {
 
     if (result) {
       dataTemplates.value = getTemplateByItemCodeResult.value.data
-      console.log('getTemplateByItemCodeResult', dataTemplates.value)
+      console.log('getTemplateByItemCodeResult result if', dataTemplates.value)
+      console.log('getTemplateByItemCodeResult error if', errorMessageGetTemplatesByFileCodeSearch.value)
 
       // แสดง Dialog หลังจาก API ทำงานเสร็จ
       isDialogPrintLabelVisible.value = true
     } else {
+      textAlertDialogFunction(getTemplateByItemCodeResult.value.data, false)
+      console.log('getTemplateByItemCodeResult error', errorMessageGetTemplatesByItemCodeSearch.value)
+
+      // setTimeout(() => {
+      //   // location.reload()
+      // }, 500) // 0.5 วินาที
       console.log(
         'errorMessageGetTemplatesByItemCodeSearch',
         errorMessageGetTemplatesByItemCodeSearch.value,
@@ -1563,6 +1589,19 @@ const printProdcutLabel = async () => {
         </VBtn>
       </VCardText>
     </VCard>
+  </section>
+
+  <!-- ALert -->
+  <section>
+    <div>
+      <!-- ใช้ AuthenticatorDialog Component -->
+      <AlertWord2
+        v-model="isDialogVisibleAlertDialog"
+        :word="wordForSubmit"
+        :subword="subWordForSubmit"
+        :success="successDialAlert"
+      />
+    </div>
   </section>
 </template>
 

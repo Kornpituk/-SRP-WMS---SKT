@@ -19,6 +19,48 @@ const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 
 
+//------------------------------ Alert Confirm ---------------------------
+const confirmDialog2 = ref('')
+const typeConfirmDialog = ref('')
+const soEIdConfirmDialog = ref('')
+const productRowModel = ref(null)
+
+function openConfirmDialog(type, SoEId, productRow) {
+  console.log('openConfirmDialog', type, SoEId)
+  productRowModel.value = productRow
+
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+  if(type === 'submit'){
+    wordForSubmit.value = type
+    typeConfirmDialog.value = type
+    soEIdConfirmDialog.value = SoEId
+    console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
+    
+  }else if(type === 'back'){
+    wordForSubmit.value = "SEND BACK"
+    typeConfirmDialog.value = type
+    soEIdConfirmDialog.value = SoEId
+  }
+
+  confirmDialog2.value.openDialog()
+
+}
+
+function handleConfirmAction() {
+  if( wordForSubmit.value === 'submit'){
+    submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
+  }else if(wordForSubmit.value === 'SEND BACK'){
+    // submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
+    handleSubmit('back')
+    console.log('back')
+  }
+  
+  
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
+}
 
 
 
@@ -458,6 +500,7 @@ const mapShippingCheckSheetData = data => {
         labalMalaysia: data.reportCheckSheet.labalMalaysia,
         labalKorean: data.reportCheckSheet.labalKorean,
         sds: data.reportCheckSheet.sds,
+        other: data.reportCheckSheet.other,
       }
       : [],
 
@@ -505,6 +548,7 @@ const updateShippingCheckSheetData = async ()  => {
         labalMalaysia: selectedLanguages.includes('Malaysia'),
         labalKorean: selectedLanguages.includes('Korean'),
         sds: selectedLanguages.includes('SDS'), // ถ้า SDS เป็นภาษาให้ใช้ ถ้าไม่ใช่ให้เอาออก
+        other: getShippingCheckSheetResult.value.reportCheckSheet.other,
       }
     }
 
@@ -636,21 +680,37 @@ const handleSubmit = async type => {
 
     console.log("requestData 2")
     if(result || submitCheckSheetResult.value){
-      submitCheckSheetResult.value = result
-      submitCheckSheetError.value = null
-      console.log('submitCheckSheetResult', result)
-      textAlertDialogFunction(alertWordConst.submit, true)
-      console.log("requestData 3")
-      setTimeout(() => {
-        window.location.href = `${window.location.origin}/skt/shipping`
-      }, 500) // 0.5 วินาที
+      if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
+      }else{
+        submitCheckSheetResult.value = result
+        submitCheckSheetError.value = null
+        console.log('submitCheckSheetResult', result)
+        textAlertDialogFunction(alertWordConst.submit, true)
+        console.log("requestData 3")
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
+      }
+      
     }else{
-      console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
-      textAlertDialogFunction(alertWordConst.submit, false)
-      console.log("requestData 4")
-      setTimeout(() => {
+      if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
+      }else{
+        console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
+        textAlertDialogFunction(alertWordConst.submit, false)
+        console.log("requestData 4")
+        setTimeout(() => {
         // location.reload()
-      }, 500) // 0.5 วินาที
+        }, 500) // 0.5 วินาที
+      }
+      
     }
   } catch (error) {
     submitCheckSheetError.value = error.message
@@ -719,7 +779,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       }else if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, true)
         setTimeout(() => {
-          window.location.href = `${window.location.origin}/skt/shipping`
+          // window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
 
@@ -2123,7 +2183,7 @@ const dessertsMockAmountView = [
                 <td colspan="12">
                   <div>
                     <VTextarea
-                      v-model="textareaValue"
+                      v-model="getShippingCheckSheetResult.reportCheckSheet.other"
                       counter
                       label="Other"
                       placeholder="Enter Other"
@@ -2550,7 +2610,7 @@ const dessertsMockAmountView = [
               <td
                 class="text-start"
                 colspan="4"
-                style="min-width: 150px; max-width: 150px;"
+                style="min-width: 150px; max-width: 150px; height: 38px;"
               >
                 <span
                   v-if="getShippingCheckSheetResult?.reportCheckSheet"
@@ -2634,7 +2694,11 @@ const dessertsMockAmountView = [
           >
             SAVE DRAFT
           </VBtn>
-          <VBtn v-if="loadingCycleBtn" style="width: 134px;" color="warning">
+          <VBtn
+            v-if="loadingCycleBtn"
+            style="width: 134px;"
+            color="warning"
+          >
             <VProgressCircular
               indeterminate
               color="success"
@@ -2652,7 +2716,7 @@ const dessertsMockAmountView = [
             v-if="statusModel === 1004"
             class="mx-2"
             color="purple-accent-4"
-            @click="submitShipmentPlanBySoEId('back')"
+            @click="openConfirmDialog('back')"
           >
             Send Back
           </VBtn>
@@ -2758,6 +2822,16 @@ const dessertsMockAmountView = [
         :word="wordForSubmit"
         :subword="subWordForSubmit"
         :success="successDialAlert"
+      />
+    </div>
+
+    <!-- ใช้ confirmDialog component -->
+    <div>
+      <ConfirmDialog2
+        ref="confirmDialog2"
+        :message="wordForSubmit"
+        @confirm="handleConfirmAction"
+        @cancel="handleCancel"
       />
     </div>
 

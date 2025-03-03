@@ -100,7 +100,7 @@ const filterForSearchPlan = ref({
   searchByProductName: sessionDataFilter.value?.searchByProductName || '',
   searchByUnit: sessionDataFilter.value?.searchByUnit || '',
 
-  warehouseSearch: sessionDataFilter.value?.warehouseSearch || '',
+  warehouseSearch: sessionDataFilter.value?.warehouseSearch || whereHouse,
 
   // sortByCategory: sessionDataFilter.value?.sortByCategory || '',
   // sortByType: sessionDataFilter.value?.sortByType || '',
@@ -125,6 +125,8 @@ const handleFetchItemSelectFilter = async (form, type, params) => {
       params,
       type,
     )
+
+    // const whereHouse = localStorage.getItem('whereHouseName', filterForSearchPlan?.value.warehouseSearch)
 
     if(result){
       // console.log(`result ${type}`, result)
@@ -153,7 +155,7 @@ watch(async () => {
   subAreaItemModel.value = subarea
   categoriesItemModel.value = categories.filter(item => item.id !== '00')
 
-  console.log('categoriesItemModel.value', categoriesItemModel.value)
+  console.log('areaItemModel.value', areaItemModel.value)
 
 })
 
@@ -375,7 +377,7 @@ const clearFilterPlanFunctionBtn = async () => {
     SortDirection: '',
   }
 
-  warehouseModel.value = ''
+  warehouseModel.value = whereHouse
   etaDateModel.value = ''
   etdDateModel.value = ''
 
@@ -1437,7 +1439,7 @@ const refeshPage = () => {
                   <span v-else>{{ (item.shelfLifeDays).toLocaleString() }}</span>
                 </td>
                 <td
-                class="px-1"
+                  class="px-1"
                   style="min-width: 120px; max-width: 120px;  font-size: 14px;"
                   :style="{ 
                     backgroundColor: 

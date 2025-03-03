@@ -7,79 +7,79 @@ import ErrorMan from '../src/pages/pages/misc/under-maintenance.vue'
 
 const router = useRouter() 
 
-watchEffect(() => {
-  if (!localStorage.getItem('accessTokenAtStore') | localStorage.getItem('nameCompany')){
-    // alert('You must log in before accessing this page. Please log in.')
-    router.replace('/login')
-  }
-})
+// watchEffect(() => {
+//   if (!localStorage.getItem('accessTokenAtStore') | localStorage.getItem('nameCompany')){
+//     // alert('You must log in before accessing this page. Please log in.')
+//     router.replace('/login')
+//   }
+// })
 
-const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 15 นาที
-let timeoutId
-let isLoggingOut = false
+// const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 15 นาที
+// let timeoutId
+// let isLoggingOut = false
 
-const debounce = (func, delay) => {
-  let timer
+// const debounce = (func, delay) => {
+//   let timer
   
-  return (...args) => {
-    clearTimeout(timer)
-    timer = setTimeout(() => func(...args), delay)
-  }
-}
+//   return (...args) => {
+//     clearTimeout(timer)
+//     timer = setTimeout(() => func(...args), delay)
+//   }
+// }
 
-const resetTimeout = debounce(() => {
-  clearTimeout(timeoutId)
-  timeoutId = setTimeout(() => {
-    sessionStorage.removeItem('userSession')  // ล้าง session เฉพาะที่เกี่ยวข้อง
-    localStorage.removeItem('accessToken')
-    logout()
-  }, INACTIVITY_TIMEOUT)
-}, 300)
+// const resetTimeout = debounce(() => {
+//   clearTimeout(timeoutId)
+//   timeoutId = setTimeout(() => {
+//     sessionStorage.removeItem('userSession')  // ล้าง session เฉพาะที่เกี่ยวข้อง
+//     localStorage.removeItem('accessToken')
+//     logout()
+//   }, INACTIVITY_TIMEOUT)
+// }, 300)
 
-const logout = () => {
-  if (isLoggingOut) return
-  isLoggingOut = true
+// const logout = () => {
+//   if (isLoggingOut) return
+//   isLoggingOut = true
 
-  localStorage.removeItem('accessToken')
-  router.push('/login')
-}
+//   localStorage.removeItem('accessToken')
+//   router.push('/login')
+// }
 
-const handleVisibilityChange = () => {
-  if (document.visibilityState === 'hidden') {
-    timeoutId = setTimeout(() => {
-      logout()
-    }, 60 * 60 * 1000) // ถ้าเปลี่ยนแท็บนานกว่า 5 นาที → logout
-  } else {
-    clearTimeout(timeoutId)
-  }
-}
+// const handleVisibilityChange = () => {
+//   if (document.visibilityState === 'hidden') {
+//     timeoutId = setTimeout(() => {
+//       logout()
+//     }, 60 * 60 * 1000) // ถ้าเปลี่ยนแท็บนานกว่า 5 นาที → logout
+//   } else {
+//     clearTimeout(timeoutId)
+//   }
+// }
 
-const handleBeforeUnload = event => {
-  const navigationEntries = performance.getEntriesByType('navigation')
-  if (navigationEntries.length > 0 && navigationEntries[0].type !== 'reload') {
-    logout()
-  }
-}
+// const handleBeforeUnload = event => {
+//   const navigationEntries = performance.getEntriesByType('navigation')
+//   if (navigationEntries.length > 0 && navigationEntries[0].type !== 'reload') {
+//     logout()
+//   }
+// }
 
-onMounted(() => {
-  ['mousemove', 'keydown', 'click'].forEach(event =>
-    window.addEventListener(event, resetTimeout),
-  )
-  resetTimeout()
+// onMounted(() => {
+//   ['mousemove', 'keydown', 'click'].forEach(event =>
+//     window.addEventListener(event, resetTimeout),
+//   )
+//   resetTimeout()
 
-  document.addEventListener('visibilitychange', handleVisibilityChange)
-  window.addEventListener('beforeunload', handleBeforeUnload)
-})
+//   document.addEventListener('visibilitychange', handleVisibilityChange)
+//   window.addEventListener('beforeunload', handleBeforeUnload)
+// })
 
-onBeforeUnmount(() => {
-  ['mousemove', 'keydown', 'click'].forEach(event =>
-    window.removeEventListener(event, resetTimeout),
-  )
-  clearTimeout(timeoutId)
+// onBeforeUnmount(() => {
+//   ['mousemove', 'keydown', 'click'].forEach(event =>
+//     window.removeEventListener(event, resetTimeout),
+//   )
+//   clearTimeout(timeoutId)
 
-  document.removeEventListener('visibilitychange', handleVisibilityChange)
-  window.removeEventListener('beforeunload', handleBeforeUnload)
-})
+//   document.removeEventListener('visibilitychange', handleVisibilityChange)
+//   window.removeEventListener('beforeunload', handleBeforeUnload)
+// })
 
 //---------------------------------------------------------------------------------
 

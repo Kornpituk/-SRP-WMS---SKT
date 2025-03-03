@@ -134,7 +134,7 @@ const getIconColor = (filesLength, filesModelLength) => {
 
 const getIconColorBtnInput = (filesLength, filesModelLength) => {
   const status = checkColorBtnShowImage(filesLength, filesModelLength)
-  if (status === 1) return 'grey'
+  if (status === 1) return 'blue'
   if (status === 2) return 'info'
   if (status === 3) return 'blue'
   
@@ -235,7 +235,6 @@ const getVariantType = (filesLength, filesModelLength) => {
         cols="12"
       >
         <VBtn
-          :disabled="disabledProp"
           class="d-flex justify-center"
           :color="getIconColorBtnInput(files.length, filesModel.length)"
           style="width: 100%;"
@@ -419,7 +418,7 @@ const getVariantType = (filesLength, filesModelLength) => {
 
         <VCardText>
           <VFileInput
-            v-model="filesModel"
+            v-if="!disabledProp"
             multiple
             :variant="getVariantType(files.length, filesModel.length)"
             :disabled="disabledProp"
@@ -535,7 +534,7 @@ const getVariantType = (filesLength, filesModelLength) => {
                   <div class="d-flex flex-column align-center text-center">
                     <span v-if="false">{{ file.fileName }}</span>
                     <VBtn
-                      v-if="true"
+                      v-if="false"
                       class="mt-2"
                       icon="mdi-close"
                       color="error"
@@ -548,6 +547,7 @@ const getVariantType = (filesLength, filesModelLength) => {
               </VCard>
             </VCol>
             <VCol
+              v-if="!disabledProp"
               style="width: 100%;"
               cols="12"
             >

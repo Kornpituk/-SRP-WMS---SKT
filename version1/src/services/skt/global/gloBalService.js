@@ -411,10 +411,17 @@ export const useGetTemplatesByItemCodeSearchService = () => {
         return result
       } else {
         console.warn('No data returned from the API')
+
+        // getTemplateByItemCodeResult.value = result.data
+
+        errorMessageGetTemplatesByItemCodeSearch.value = result.data
+        
+        return result
       }
     } catch (error) {
       console.log('Error in fetchGetTemplateByItemCode:', error)
-      errorMessageGetTemplatesByItemCodeSearch.value = error.message
+
+      // errorMessageGetTemplatesByItemCodeSearch.value = error.message
     }
   }
   

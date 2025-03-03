@@ -32,7 +32,7 @@ const errors = ref({
   password: undefined,
 })
 
-localStorage.setItem('versionWMS', '1.3.21-1')
+localStorage.setItem('versionWMS', '1')
 
 // localStorage.setItem('srp-theme-config', 'primary')
 

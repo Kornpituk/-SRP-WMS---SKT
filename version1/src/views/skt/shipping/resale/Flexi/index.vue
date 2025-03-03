@@ -132,6 +132,50 @@ function toCustomFormat(isoString) {
   const minutes = String(date.getMinutes()).padStart(2, "0")
 
   return `${day}/${month}/${year} ${hours}:${minutes}`
+  
+}
+
+//------------------------------ Alert Confirm ---------------------------
+const confirmDialog2 = ref('')
+const typeConfirmDialog = ref('')
+const soEIdConfirmDialog = ref('')
+const productRowModel = ref(null)
+
+function openConfirmDialog(type, SoEId, productRow) {
+  console.log('openConfirmDialog', type, SoEId)
+  productRowModel.value = productRow
+
+  // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
+  if(type === 'submit'){
+    wordForSubmit.value = type
+    typeConfirmDialog.value = type
+    soEIdConfirmDialog.value = SoEId
+    console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
+    
+  }else if(type === 'back'){
+    wordForSubmit.value = "SEND BACK"
+    typeConfirmDialog.value = type
+    soEIdConfirmDialog.value = SoEId
+  }
+
+  confirmDialog2.value.openDialog()
+
+}
+
+function handleConfirmAction() {
+  if( wordForSubmit.value === 'submit'){
+    submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
+  }else if(wordForSubmit.value === 'SEND BACK'){
+    // submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
+    handleSubmit('back')
+    console.log('back')
+  }
+  
+  
+}
+
+function handleCancel() {
+  console.log('Action canceled.')
 }
 
 //-------------------------- Section Get Data --------------------------------
@@ -389,6 +433,11 @@ const handleSubmit = async type => {
         setTimeout(() => {
           window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
+      }else if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
       }
     }else{
       if(type === 'submit'){
@@ -398,6 +447,11 @@ const handleSubmit = async type => {
         }, 500) // 0.5 วินาที
       }else if(type === 'leaderapprove'){
         textAlertDialogFunction(alertWordConst.approve, false)
+        setTimeout(() => {
+          // location.reload()
+        }, 500) // 0.5 วินาที
+      }else if(type === 'back'){
+        textAlertDialogFunction(alertWordConst.sendBack, false)
         setTimeout(() => {
           // location.reload()
         }, 500) // 0.5 วินาที
@@ -465,7 +519,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       }else if(type === 'reject'){
         textAlertDialogFunction(alertWordConst.reject, true)
         setTimeout(() => {
-          window.location.href = `${window.location.origin}/skt/shipping`
+          // window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }else if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, true)
@@ -1991,7 +2045,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
           v-if="statusModel === 1104"
           class="mx-2"
           color="purple-accent-4"
-          @click="submitShipmentPlanBySoEId('back')"
+          @click="openConfirmDialog('back')"
         >
           Send Back
         </VBtn>
@@ -2019,6 +2073,16 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       />
     </div>
   </section>
+
+  <!-- ใช้ confirmDialog component -->
+  <div>
+    <ConfirmDialog2
+      ref="confirmDialog2"
+      :message="wordForSubmit"
+      @confirm="handleConfirmAction"
+      @cancel="handleCancel"
+    />
+  </div>
 </template>
 
 <style scoped src="../Flexi/flexi.scss">

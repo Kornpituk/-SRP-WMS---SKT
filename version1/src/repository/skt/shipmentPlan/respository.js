@@ -372,87 +372,24 @@ export const FileService = {
     }
   },
 
-  // async saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
-  //   const formData = new FormData()
-
-  //   // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
-  //   // ตรวจสอบว่า files.files มีค่าหรือไม่
-  //   if (files?.files) {
-  //     console.log('Have File Selected', files.files)
-
-  //     // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
-  //     files.files.forEach(file => {
-  //       formData.append('files', file.file) // ใช้ file.file เพราะไฟล์ถูกเก็บใน key `file`
-  //     })
-  //   } else {
-  //     console.log('No File Selected', files)
-  //   }
-
-  //   console.log("Files Upload", files)
-
-  //   try {
-  //     const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, formData, {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //         'x-location': whereHouse,
-  //         'Authorization': `Bearer ${accessToken}`,
-  //       },
-  //     })
-
-  //     return { success: true, data: response.data.data }
-  //   } catch (error) {
-  //     // throw { success: false, error }
-  //   }
-  // },
-
   async saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
     const formData = new FormData()
-  
-    // แยกประเภทไฟล์
-    const fileList = files?.files || []
-    const apiFiles = fileList.filter(file => file.fileUri) // ไฟล์จาก API
-    const uploadedFiles = fileList.filter(file => file.file) // ไฟล์ที่เพิ่งอัปโหลด
-  
-    console.log("API Files:", apiFiles)
-    console.log("Uploaded Files:", uploadedFiles)
-  
-    // แปลง API Files ให้มีโครงสร้างแบบ Uploaded Files
-    const transformedApiFiles = await Promise.all(apiFiles.map(async file => {
-      try {
-        const response = await fetch(file.fileUri, { 
-          headers: { 'Authorization': `Bearer ${accessToken}` }, // ใช้ token ถ้าจำเป็น
-        })
 
-        const blob = await response.blob()
-        const objectUrl = URL.createObjectURL(blob)
-  
-        return {
-          file: blob,
-          name: file.fileName,
-          objectUrl: objectUrl,
-          type: file.contentType.includes("image") ? "image" : "other",
-        }
-      } catch (error) {
-        console.error("Failed to fetch file from API:", file.fileUri, error)
-        
-        return null
-      }
-    }))
-  
-    // รวมไฟล์ทั้งหมด (ที่โหลดจาก API + ที่อัปโหลดใหม่)
-    const allFiles = [...transformedApiFiles.filter(Boolean), ...uploadedFiles]
-  
-    // เพิ่มไฟล์ทั้งหมดลงใน FormData
-    allFiles.forEach(file => {
-      formData.append('files', file.file)
-    })
-  
-    if (allFiles.length === 0) {
-      console.log("No File Selected")
-      
-      return { success: false, error: "No files to upload" }
+    // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
+    // ตรวจสอบว่า files.files มีค่าหรือไม่
+    if (files?.files) {
+      console.log('Have File Selected', files.files)
+
+      // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
+      files.files.forEach(file => {
+        formData.append('files', file.file) // ใช้ file.file เพราะไฟล์ถูกเก็บใน key `file`
+      })
+    } else {
+      console.log('No File Selected', files)
     }
-  
+
+    console.log("Files Upload", files)
+
     try {
       const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, formData, {
         headers: {
@@ -461,14 +398,77 @@ export const FileService = {
           'Authorization': `Bearer ${accessToken}`,
         },
       })
-  
+
       return { success: true, data: response.data.data }
     } catch (error) {
-      console.error("Upload failed", error)
-      
-      return { success: false, error }
+      // throw { success: false, error }
     }
   },
+
+  // async saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken) {
+  //   const formData = new FormData()
+  
+  //   // แยกประเภทไฟล์
+  //   const fileList = files?.files || []
+  //   const apiFiles = fileList.filter(file => file.fileUri) // ไฟล์จาก API
+  //   const uploadedFiles = fileList.filter(file => file.file) // ไฟล์ที่เพิ่งอัปโหลด
+  
+  //   console.log("API Files:", apiFiles)
+  //   console.log("Uploaded Files:", uploadedFiles)
+  
+  //   // แปลง API Files ให้มีโครงสร้างแบบ Uploaded Files
+  //   const transformedApiFiles = await Promise.all(apiFiles.map(async file => {
+  //     try {
+  //       const response = await fetch(file.fileUri, { 
+  //         headers: { 'Authorization': `Bearer ${accessToken}` }, // ใช้ token ถ้าจำเป็น
+  //       })
+
+  //       const blob = await response.blob()
+  //       const objectUrl = URL.createObjectURL(blob)
+  
+  //       return {
+  //         file: blob,
+  //         name: file.fileName,
+  //         objectUrl: objectUrl,
+  //         type: file.contentType.includes("image") ? "image" : "other",
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to fetch file from API:", file.fileUri, error)
+        
+  //       return null
+  //     }
+  //   }))
+  
+  //   // รวมไฟล์ทั้งหมด (ที่โหลดจาก API + ที่อัปโหลดใหม่)
+  //   const allFiles = [...transformedApiFiles.filter(Boolean), ...uploadedFiles]
+  
+  //   // เพิ่มไฟล์ทั้งหมดลงใน FormData
+  //   allFiles.forEach(file => {
+  //     formData.append('files', file.file)
+  //   })
+  
+  //   if (allFiles.length === 0) {
+  //     console.log("No File Selected")
+      
+  //     return { success: false, error: "No files to upload" }
+  //   }
+  
+  //   try {
+  //     const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //         'x-location': whereHouse,
+  //         'Authorization': `Bearer ${accessToken}`,
+  //       },
+  //     })
+  
+  //     return { success: true, data: response.data.data }
+  //   } catch (error) {
+  //     console.error("Upload failed", error)
+      
+  //     return { success: false, error }
+  //   }
+  // },
 
   async deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) {
 
@@ -932,7 +932,7 @@ export const checkSheetLorryFlexiRepository = {
     console.log('submitShipmentPlan repo...')
     try {
       let response
-      if(form === 'leaderapprove' || form === 'submit'){
+      if(form === 'leaderapprove' || form === 'submit'|| form === 'back'){
         response = await axios.post(`${urlApi}/api/v1/ShippingLorryFlexi/${form}/${edId}`, {}, {
           headers: {
             'accept': '*/*',
