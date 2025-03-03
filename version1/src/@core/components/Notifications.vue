@@ -185,7 +185,7 @@ const markAllReadOrUnread = () => {
 }
 
 .notification-footer {
-  padding-block: 0.9375remz !important;
+  padding-block: 0.9375rem !important;
 }
 
 .list-item-hover-class {

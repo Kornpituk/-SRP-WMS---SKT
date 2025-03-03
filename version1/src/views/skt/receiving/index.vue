@@ -146,12 +146,21 @@ const checkBtnExportExcel = () => {
 const storedStatus = sessionStorage.getItem('fileterStatusInPAI')
 
 // ตรวจสอบว่ามีค่าหรือไม่ และแปลงค่าเป็น array
-const statusFilter = ref(sessionStorage.getItem('fileterStatusInPAI'))
+const statusFilter = ref('All')
+
+watch(() => {
+  if(sessionStorage.getItem('fileterStatusInPAI') === '' || sessionStorage.getItem('fileterStatusInPAI') === null|| sessionStorage.getItem('fileterStatusInPAI') === 'null'){
+    statusFilter.value = 'All'
+
+    console.log('fileterStatusInPAI if', sessionStorage.getItem('fileterStatusInPAI'))
+  }else{
+    statusFilter.value = sessionStorage.getItem('fileterStatusInPAI')
+    console.log('fileterStatusInPAI else', sessionStorage.getItem('fileterStatusInPAI'))
+
+  }
+})
 
 
-if(sessionStorage.getItem('fileterStatusInPAI') === ''){
-  statusFilter.value = 'All'
-}
 
 // ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
 const addStoredStatus = () => {
@@ -171,7 +180,7 @@ const addStoredStatus = () => {
 }
 
 watch(() => {
-  if(sessionStorage.getItem('fileterStatusInPAI') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {
+  if(sessionStorage.getItem('fileterStatusInPAI') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined || sessionStorage.getItem('fileterStatusInPAI') === 'null') {
     sessionStorage.setItem('fileterStatusInPAI', '')
   }
   if(sessionStorage.getItem('statusFilter') === null || sessionStorage.getItem('fileterStatusInPAI') === undefined) {

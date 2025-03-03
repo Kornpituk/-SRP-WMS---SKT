@@ -396,7 +396,7 @@ const handleSaveDraft = async () => {
       if(!trickerSaveDraft.value){
         textAlertDialogFunction(alertWordConst.saveDraft, false)
         setTimeout(() => {
-          // location.reload()
+          location.reload()
         }, 500) // 0.5 วินาที
       }
     }

@@ -22,17 +22,23 @@ const dataRowModel  =ref()
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
 
 
-  if(department.value === 'Warehouse' && dataRow?.csLfStatusId === 1005 || department.value === 'Warehouse' && dataRow?.csLfStatusId === 1105){
-    return !(userDataInfo.value.id === '00022' || userDataInfo.value.id === '00023' || userDataInfo.value.id === '00025')
-  }else if(department.value === 'Warehouse' && whStatusId === 404){
+  if( dataRow?.statusId === 205 ){
+    return true
+  }
+  else if(department.value === 'Warehouse' && whStatusId === 404){
     return true
   }else if(department.value === 'Logistic' && logStatusId === 504){
     return true
   }else if(department.value === 'Inspection' && inspStatusId === 604){
     return true
+  }else if (
+    department.value === 'Warehouse' &&
+  (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
+  ) {
+    return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
   }else if(department.value === 'Sale and Marketing' && salStatusId === 304){
     return true
-  }else{
+  }else{ 
     return false
   }
 }
@@ -1123,7 +1129,7 @@ const saveShipmentPlan = async row => {
         if(!trikerSaveDrft.value){
           textAlertDialogFunction('Print', true)
           setTimeout(() => {
-            // location.reload()
+            location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
@@ -1133,7 +1139,7 @@ const saveShipmentPlan = async row => {
         if(!trikerSaveDrft.value){
           textAlertDialogFunction(alertWordConst.saveDraft, true)
           setTimeout(() => {
-            // location.reload()
+            location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
@@ -1978,21 +1984,22 @@ const didabledPrintPDFCheckSheet = statusId => {
   return !(statusId === 1003 || statusId === 1004 || statusId === 1005 || statusId === 1103 || statusId === 1104 || statusId === 1105)
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const hanbleBtnPrintPDFCheckSheet = type => {
-  console.log('Check BtnPrintPDF start...', prouctRowAction.value.packagingTypeID)
+  console.log('Check BtnPrintPDF start...', prouctRowAction.value.checkSheetTypeID)
 
   if(prouctRowAction.value){
-    console.log('Check BtnPrintPDF start if', prouctRowAction.value.packagingTypeID)
-    if(prouctRowAction.value.packagingTypeID !== 11){
-      console.log('Check BtnPrintPDF start ===', prouctRowAction.value.packagingTypeID)
-      if(prouctRowAction?.value.checkSheetTypeName === 'IBC'){
+    console.log('Check BtnPrintPDF start if', prouctRowAction.value.checkSheetTypeID)
+    if(prouctRowAction.value.checkSheetTypeID !== 3 && prouctRowAction.value.checkSheetTypeID !== 4){
+      console.log('Check BtnPrintPDF start ===', prouctRowAction.value.checkSheetTypeID)
+      if(prouctRowAction.value.checkSheetTypeID === 2){
         handlePrintDPFCheckSheet('ShippingCheckSheetIBC2')
-      }else{
+      }else if(prouctRowAction.value.checkSheetTypeID === 1){
         handlePrintDPFCheckSheet('ShippingCheckSheet')
       }
-    }else if(prouctRowAction.value.packagingTypeID === 11){
+    }else if(prouctRowAction.value.checkSheetTypeID === 3 || prouctRowAction.value.checkSheetTypeID === 4){
       handlePrintDPFCheckSheet('ShippingLorry')
-      console.log('Check BtnPrintPDF start ===', prouctRowAction.value.packagingTypeID)
+      console.log('Check BtnPrintPDF start ===', prouctRowAction.value.checkSheetTypeID)
       if(getShippingCheckSheetResult2?.value.isLorry){
         console.log('Check getShippingCheckSheetResult2 start ===', getShippingCheckSheetResult2.value.isLorry)
         handlePrintDPFCheckSheet('ShippingLorry')
@@ -2037,6 +2044,7 @@ const handlePrintDPFCheckSheet = async type => {
   const countPage = ref(1)
 
   if (type === 'ShippingCheckSheetIBC2' ) {
+    console.log('type.value', type)
     handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet('ShippingCheckSheet', '', countPage.value++)
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
@@ -2054,6 +2062,7 @@ const handlePrintDPFCheckSheet = async type => {
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
    
   }else if(type === 'ShippingCheckSheet'){
+    console.log('type.value', type)
     handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
@@ -2087,12 +2096,14 @@ const handlePrintDPFCheckSheet = async type => {
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   }
   else{
-    handleDialogLoading("PRINT CHECK SHEETS")
-    callAPIPrintPDFChecksheet(type)
+    // handleDialogLoading("PRINT CHECK SHEETS")
+    // callAPIPrintPDFChecksheet(type)
 
-    setTimeout(() => {
-      isDialogLoadingVisible.value = false
-    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+    // setTimeout(() => {
+    //   isDialogLoadingVisible.value = false
+    // }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+
+    console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
   }
 
 }
@@ -3010,7 +3021,7 @@ const handlePrintTruckOrderPDF = () => {
                     label="Driver's Name"
                     class="text-center"
                   />
-                  <span v-if="true">gg{{ personInchargeTruckCompanyModel }}</span>
+                  <span v-if="false">gg{{ personInchargeTruckCompanyModel }}</span>
                 </td>
               </tr>
               <tr v-if="false">
@@ -3742,7 +3753,7 @@ const handlePrintTruckOrderPDF = () => {
                       open-on-click
                     >
                       <p>{{ (product.csLfStatusText) }}</p>
-                      <p>{{ (product.inspStatusText) }}</p>
+                      <p v-if="false">{{ (product.inspStatusText) }}</p>
                       <p>{{ (product.salStatusText) }}</p>
                       <p>{{ (product.logStatusText) }}</p>
                       <p class="mb-0">{{ (product.whStatusText) }}</p>
@@ -4743,7 +4754,8 @@ const handlePrintTruckOrderPDF = () => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product) || !canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
+                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product) || 
+                    !canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible "
                   :color="accountINSP ? 'grey' : 'warning'"
                   @click="saveShipmentPlan(product), saveDraftLoading = true"
                 >

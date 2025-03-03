@@ -2,6 +2,7 @@
 import { ref, watch, watchEffect } from 'vue'
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 
+
 const props = defineProps({
   fileName: { type: String, required: true },
   filesFromAPI: { type: Array, default: () => [] },  // ใช้สำหรับรับไฟล์จาก API
@@ -483,7 +484,7 @@ const getVariantType = (filesLength, filesModelLength) => {
                     max-height="125"
                     :src="file.objectUrl"
                   />
-                  <span class="text-green">New</span>
+                  <VChip color="success"><span class="text-green">New</span></VChip>
                 </div>
 
                 <div v-else-if="file.contentType === 'application/octet-stream'">
