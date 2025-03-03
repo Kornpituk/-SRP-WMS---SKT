@@ -79,7 +79,8 @@ export default defineConfig({
     DefineOptions(),
   ],
   define: { 'process.env': {
-    VITE_API_URL: "https://sktwebapi.easetrackwms.com",
+    // VITE_API_URL: "https://sktwebapi.easetrackwms.com",
+    VITE_API_URL: "https://webapi.sanyokaseithailand.com:8443",
   } },
   resolve: {
     alias: {
