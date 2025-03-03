@@ -37,6 +37,8 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
   }
 }
 
+
+
 const disabledStatusWithOutAdminUser = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
 
   if(department.value === 'Warehouse' && whStatusId === 404){
@@ -152,6 +154,24 @@ function formatDateSave(date) {
   // สร้างวันที่ในรูปแบบ yyyy-mm-dd
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
+
+const dateCurrent = ref()
+
+
+function getCurrentDateFormatted() {
+  const today = new Date()
+  const day = String(today.getDate()).padStart(2, '0')
+  const month = String(today.getMonth() + 1).padStart(2, '0') // เดือนเริ่มที่ 0 ต้อง +1
+  const year = today.getFullYear()
+
+  dateCurrent.value = `${day}/${month}/${year}`
+
+  return `${day}/${month}/${year}`
+}
+
+onMounted(() => {
+  getCurrentDateFormatted()
+})
 
 //------------------------------ fetch data from API --------------------------------
 import { useGetUserPermissionService,
@@ -2229,9 +2249,9 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.orderBy = userDataInfo.value.firstName
   paramsTruckOrder.value.runningNum = dataRowModel?.value.truckReservingNumber
 
-  paramsTruckOrder.value.dateDriverBy = dataRowModel?.value.logUpdatedDate
-  paramsTruckOrder.value.dateOrderBy = dataRowModel?.value.logUpdatedDate
-  paramsTruckOrder.value.dateAuthorizedBy = dataRowModel?.value.logUpdatedDate
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
 
   console.log('loading.......')
   
@@ -3091,7 +3111,7 @@ const handlePrintTruckOrderPDF = () => {
             <tr>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dataRowModel.etd"
+                  v-model="dateCurrent"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3099,7 +3119,7 @@ const handlePrintTruckOrderPDF = () => {
               </th>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dataRowModel.etd"
+                  v-model="dateCurrent"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3107,7 +3127,7 @@ const handlePrintTruckOrderPDF = () => {
               </th>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dataRowModel.etd"
+                  v-model="dateCurrent"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
