@@ -249,46 +249,7 @@ const router = useRouter()
 
 const serialProductCode = ref(null)
 
-//---------------------- Select Model ----------------------------------------------
-const freightForwarderModel = ref([])
-const carrierModel = ref([])
-const vesselsModel = ref([])
-const truckModel = ref([])
 
-const TruckCompanyModel = ref([])
-const TruckTypeModel = ref([])
-const CompanyModel = ref([])
-const AddressModel = ref([])
-
-const CompanyPrint = ref([])
-const AddressPrint = ref([])
-
-const TruckCompanyPrint = ref([])
-
-const addressTruckCompanyModel = ref('')
-const personInchargeTruckCompanyModel = ref('')
-const contactTruckCompanyModel = ref('')
-
-const selectedTruckCompany2 = () => {
-  const foundItem = TruckCompanyModel.value.find(item => item.truck === TruckCompanyPrint.value)
-  if (foundItem) {
-    personInchargeTruckCompanyModel.value = foundItem.personIncharge || ''
-    contactTruckCompanyModel.value = foundItem.contact || ''
-  }
-}
-
-// อัปเดตค่าเมื่อ TruckCompanyPrint เปลี่ยน
-watchEffect(() => {
-  selectedTruckCompany2()
-})
-
-// const personInchargeTruckCompany = computed({
-//   get: () => selectedTruckCompany2('personIncharge'), // ดึงค่า
-//   set: value => personInchargeTruckCompanyModel.value = value, // อัปเดตค่า
-// })
-
-
-const TruckTypePrint = ref([])
 
 /// ------------------------------ Import Component --------------------------------
 // --- Dialog Text Area --------------------------------
@@ -1142,7 +1103,7 @@ const saveShipmentPlan = async row => {
     
 
   }else{
-    console.log('saveShipmentPlan complated', row.csLfStatusId)
+    console.log('saveShipmentPlan complated', row)
 
     // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
     // Mapping request data และส่งคำขอ
@@ -1162,7 +1123,7 @@ const saveShipmentPlan = async row => {
         if(!trikerSaveDrft.value){
           textAlertDialogFunction('Print', true)
           setTimeout(() => {
-            location.reload()
+            // location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
@@ -1172,7 +1133,7 @@ const saveShipmentPlan = async row => {
         if(!trikerSaveDrft.value){
           textAlertDialogFunction(alertWordConst.saveDraft, true)
           setTimeout(() => {
-            location.reload()
+            // location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
@@ -1534,6 +1495,21 @@ const checkBgTruck = truck => {
 //----------------------------------------- fetch data ----------------------------------
 //---- select data --------------------------------
 
+const freightForwarderModel = ref([])
+const carrierModel = ref([])
+const vesselsModel = ref([])
+const truckModel = ref([])
+
+const TruckCompanyModel = ref([])
+const TruckTypeModel = ref([])
+const CompanyModel = ref([])
+const AddressModel = ref([])
+
+const CompanyPrint = ref([])
+const AddressPrint = ref([])
+
+const TruckCompanyPrint = ref([])
+
 const { getSelectDataResult, errorGetSelectData, fetchSelectData } = useGetSelectDataService()
 
 const getSelectData = async (format, type) => {
@@ -1590,6 +1566,31 @@ onMounted(async () => {
 const itemMock = ref([
   'Foo', 'Barหกฟหกฟหกฟหกฟหกฟหก', 'Fizz', 'Buzz',
 ])
+
+//---------------------- Select Model ----------------------------------------------
+
+
+const addressTruckCompanyModel = ref('')
+const personInchargeTruckCompanyModel = ref('')
+const contactTruckCompanyModel = ref('')
+
+const selectedTruckCompany2 = () => {
+  const foundItem = TruckCompanyModel.value.find(item => item.truck === TruckCompanyPrint.value)
+  if (foundItem) {
+    personInchargeTruckCompanyModel.value = foundItem.personIncharge || ''
+    contactTruckCompanyModel.value = foundItem.contact || ''
+  }else{
+    console.log('selectedTruckCompany2', TruckCompanyPrint.value, '==')
+  }
+}
+
+// อัปเดตค่าเมื่อ TruckCompanyPrint เปลี่ยน
+watchEffect(() => {
+  selectedTruckCompany2()
+})
+
+
+const TruckTypePrint = ref([])
 
 //------------------------------------------ Mock Data --------------------------------
 import mockData from './dataMock'
@@ -3009,7 +3010,7 @@ const handlePrintTruckOrderPDF = () => {
                     label="Driver's Name"
                     class="text-center"
                   />
-                  <span v-if="false">{{ selectedTruckCompany2('personIncharge') }}</span>
+                  <span v-if="true">gg{{ personInchargeTruckCompanyModel }}</span>
                 </td>
               </tr>
               <tr v-if="false">
