@@ -220,7 +220,7 @@ const getVariantType = (filesLength, filesModelLength) => {
     </VRow>
 
     <VBtn
-      v-if="true"
+      v-if="false"
       @click="testShowFIle"
     >
       asd

@@ -2196,7 +2196,7 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.driverName = personInchargeTruckCompanyModel.value
   paramsTruckOrder.value.tel = contactTruckCompanyModel.value
   paramsTruckOrder.value.driverBy = contactTruckCompanyModel.value
-  paramsTruckOrder.value.runningNum = dataRowModel?.value.etd
+  paramsTruckOrder.value.runningNum = dataRowModel?.value.truckReservingNumber
   paramsTruckOrder.value.dateDriverBy = dataRowModel?.value.etd
   paramsTruckOrder.value.dateOrderBy = dataRowModel?.value.etd
   paramsTruckOrder.value.dateAuthorizedBy = dataRowModel?.value.etd
@@ -3692,7 +3692,7 @@ const handlePrintTruckOrderPDF = () => {
                       <p class="mb-0">{{ (product.whStatusText) }}</p>
                     </VTooltip>
                   </VChip>
-                  {{ product.checkSheetTypeName }}
+                  <span v-if="false">{{ product.checkSheetTypeName }}</span>
                   
                 </span>
               </td>
