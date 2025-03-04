@@ -3781,7 +3781,7 @@ const handlePrintTruckOrderPDF = () => {
                       <p class="mb-0">{{ (product.whStatusText) }}</p>
                     </VTooltip>
                   </VChip>
-                  <span v-if="true">{{ product.checkSheetTypeName }}</span>
+                  <span v-if="false">{{ product.checkSheetTypeName }}</span>
                   
                 </span>
               </td>
