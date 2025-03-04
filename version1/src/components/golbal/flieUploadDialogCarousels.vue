@@ -236,6 +236,7 @@ const getVariantType = (filesLength, filesModelLength) => {
         cols="12"
       >
         <VBtn
+          variant="outlined"
           class="d-flex justify-center"
           :color="getIconColorBtnInput(files.length, filesModel.length)"
           style="width: 100%;"
@@ -255,6 +256,7 @@ const getVariantType = (filesLength, filesModelLength) => {
           class="d-flex justify-center"
           :color="getIconColor(files.length, filesModel.length)"
           style="width: 100%;"
+          variant="outlined"
           @click="openDialog"
         >
           <div><VIcon :icon="getIconType(files.length, filesModel.length)" /></div>
