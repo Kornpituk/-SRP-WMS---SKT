@@ -18,7 +18,7 @@ const props = defineProps({
 const switchLog = ref(false)
 
 watchEffect(() => {
-  console.log('***switchLog', switchLog.value)
+  // console.log('***switchLog', switchLog.value)
   if (sessionStorage.getItem('insetOpenLogSwitch1') === 'true') {
     switchLog.value = true
 
@@ -224,7 +224,7 @@ const generatedReceivingForm = () => {
 
       // itemsManufacturer.value = response.data.data
 
-      console.log('[*****generatedReceivingForm]!!: ', response.data)
+      // console.log('[*****generatedReceivingForm]!!: ', response.data)
       loadingGenerated1.value = false
 
     })
@@ -252,7 +252,7 @@ const generatedJournalId = () => {
   },
   {})
     .then(response => {
-      console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
+      // console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
 
       // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
       if (response.data && response.data.data && response.data.data.length > 0) {
@@ -293,7 +293,6 @@ const loadingGenerated1 = ref(true)
 const loadingGenerated2 = ref(true)
 
 watch(() => {
-  console.log('Gene 1')
   generatedJournalId()
   generatedReceivingForm()
 
@@ -358,7 +357,7 @@ const generated = () => {
 
       // itemsManufacturer.value = response.data.data
 
-      console.log('[generatedReceivingForm]!!: ', response.data)
+      // console.log('[generatedReceivingForm]!!: ', response.data)
 
     })
     .catch(error => {
@@ -482,15 +481,15 @@ const getHearderReceivingForm = async () => {
       deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
       deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
 
-      console.log('[*****Headers]]!!: ', data[0])
-      console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
+      // console.log('[*****Headers]]!!: ', data[0])
+      // console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
     } catch (error) {
       console.error('Error:', error)
     } finally {
       loadingGenerated1.value = false
     }
   } else {
-    console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    // console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
     loadingGenerated1.value = true
   }
 }
@@ -530,14 +529,14 @@ const getLotReceivingForm = async () => {
       NetCountPackage.value = lotData[0].actualNetCountKgs
       purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
 
-      console.log('[*****Headers Lot]]!!:', lotData[0])
+      // console.log('[*****Headers Lot]]!!:', lotData[0])
     } catch (error) {
       console.error('Error:', error)
     } finally {
       loadingGenerated1.value = false
     }
   } else {
-    console.log('**poEtlLogDetailJournalIDQueryParameters is missing')
+    // console.log('**poEtlLogDetailJournalIDQueryParameters is missing')
     loadingGenerated1.value = true
   }
 }
@@ -584,8 +583,8 @@ const rules = [
 ]
 
 watchEffect(() => {
-  console.log('fileMuti++', fileMuti.value)
-  console.log('files+++', files.value)
+  // console.log('fileMuti++', fileMuti.value)
+  // console.log('files+++', files.value)
 
   
 })
@@ -619,7 +618,8 @@ const getCOAReceivingForm = async () => {
       const lotData = response.data.data
 
       coaFiles.value = lotData
-      console.log('[*****Headers COA]]!!: ', lotData)
+
+      // console.log('[*****Headers COA]]!!: ', lotData)
     } catch (error) {
       console.error('Error:', error)
     } finally {
@@ -633,7 +633,7 @@ onBeforeUnmount(() => {
 })
 
 watch(() => {
-  console.log('Gene 2')
+  // console.log('Gene 2')
   getManufacturer()
   getLotReceivingForm()
   getHearderReceivingForm()
@@ -645,7 +645,7 @@ watchEffect(() => {
 })
 
 const saveReceivingForm = () => {
-  console.log('Submit buttonVisible Start In')
+  // console.log('Submit buttonVisible Start In')
   axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save`, purchaseOrder.value, {
     headers: {
       'accept': '*/*',
@@ -678,7 +678,8 @@ const textAlertError = ref({
 
 const validateHeader = () => {
   textAlertError.value.success = true
-  console.log("Start validateHeader!!++1")
+
+  // console.log("Start validateHeader!!++1")
 
   let value = 'NaN'
 
@@ -741,7 +742,7 @@ const saveHeaderReceivingForm = async () => {
       },
     })
 
-    console.log('[saveHeaderReceivingForm] success:', response.data)
+    // console.log('[saveHeaderReceivingForm] success:', response.data)
 
     return response.data  // คืนค่า response กลับไป
   } catch (error) {
@@ -889,7 +890,7 @@ const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
 
   const validate = ref(validateMissing(i))
 
-  console.log("validate++++3", validate.value)
+  // console.log("validate++++3", validate.value)
 
   if(validate.value === 0){
     alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot - missing.`
@@ -1007,7 +1008,7 @@ const saveLotReceivingForm = async () => {
       },
     })
 
-    console.log('[saveLotReceivingForm] success:', body)
+    // console.log('[saveLotReceivingForm] success:', body)
 
     return response.data
   } catch (error) {
@@ -1050,9 +1051,10 @@ const removeFileN = index => {
   if(file){
     if(file.length < 1){
       fileCoaNew.value = []
-      console.log('clear fileCoaNew complet!')
+
+      // console.log('clear fileCoaNew complet!')
     }else{
-      console.log('Test length < 1')
+      // console.log('Test length < 1')
     }
     
   }
@@ -1124,27 +1126,28 @@ const handleSaveDraftCoa = async () => {
         result.value -=1
         textAlertError.value.success = false
         textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
-        console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
+
+        // console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
         throw 'Failed To Save COA. Plase Upload COA Ones.'
       }else{
-        console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
+        // console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
       }
     }
     
   }else{
-    console.log("No tricker")
+    // console.log("No tricker")
   }
 
   if(getCoaForm.value){
-    console.log("getCoaForm Start++++")
+    // console.log("getCoaForm Start++++")
     result.value += 1
   }
 
   if(deleteAllStart.value === true){
-    console.log("Delete All Start++++")
+    // console.log("Delete All Start++++")
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success) {
-      console.log('Delete all coa  successful', resultDeleteAllCoa.value.success)
+      // console.log('Delete all coa  successful', resultDeleteAllCoa.value.success)
       result.value += 1
       
       
@@ -1156,7 +1159,7 @@ const handleSaveDraftCoa = async () => {
   }
 
   if(fileCoaNew.value){
-    console.log("Upload Start++++")
+    // console.log("Upload Start++++")
     await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (saveCoaForm) {
       // console.log('Save coa  successful', saveCoaForm.value.success)
@@ -1171,10 +1174,10 @@ const handleSaveDraftCoa = async () => {
   }
 
   if(coaIdForDelete.value.length > 0){
-    console.log("delete by id Start++++")
+    // console.log("delete by id Start++++")
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteByIdCoa.value.success === true) {
-      console.log('Delete coa by id successful', resultDeleteByIdCoa.value.success)
+      // console.log('Delete coa by id successful', resultDeleteByIdCoa.value.success)
       result.value += 1
       
       // return resultDeleteByIdCoa
@@ -1189,7 +1192,8 @@ const handleSaveDraftCoa = async () => {
   if(result.value <= 0) {
     throw 'Failed to handleSaveDraftCoa'
   }
-  console.log("Result COA", result.value)
+
+  // console.log("Result COA", result.value)
   
   return result
 
@@ -1250,7 +1254,8 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
         resolve()
       })
     }))
-    console.log('Added new files from files.value', formData)
+
+    // console.log('Added new files from files.value', formData)
   }
 
   // ถ้ามีไฟล์เก่า ให้นำไฟล์เก่ามาเพิ่มลงใน formData
@@ -1263,12 +1268,13 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
         resolve()
       })
     }))
-    console.log('Added old files from coaFiles', formData)
+
+    // console.log('Added old files from coaFiles', formData)
   }
 
   // ถ้าไม่มีไฟล์ใหม่หรือไฟล์เก่าเลย ให้หยุดการทำงาน
   if (!hasNewFiles && !hasOldFiles) {
-    console.log('No files to save.')
+    // console.log('No files to save.')
 
   }
 
@@ -1277,7 +1283,7 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
   // ส่ง formData ที่รวมไฟล์เก่าและไฟล์ใหม่ไปยัง API
 
   try {
-    console.log('formData++', formData)
+    // console.log('formData++', formData)
 
     const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-coas/${data.value.poEtlLogDetailJournalID}`, formData, {
       headers: {
@@ -1288,7 +1294,7 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
       },
     })
 
-    console.log('[products.value]!!: ', response.data)
+    // console.log('[products.value]!!: ', response.data)
   } catch (error) {
     console.error('Error:', error)
   }
@@ -1304,7 +1310,7 @@ const deleteCOARecevingFrom = () => {
     },
   })
     .then(response => {
-      console.log('[products.value]!!: ', response.data)
+      // console.log('[products.value]!!: ', response.data)
     })
     .catch(error => {
       console.error('Error:', error)
@@ -1371,13 +1377,14 @@ const showOnlyErrors = ref(false)
 const countErr = ref(0)
 
 const testWord = word => {
-  console.log('test word', word)
+  // console.log('test word', word)
 }
 
 const submitButtonVisibleNew = async word => {
   
   wordForSubmit.value = word
-  console.log("submit submitButtonVisibleNew1111", wordForSubmit.value, word)
+
+  // console.log("submit submitButtonVisibleNew1111", wordForSubmit.value, word)
   isDialogVisibleStepSaveDraft.value = true
 
   try { // Start Step 1
@@ -1387,7 +1394,8 @@ const submitButtonVisibleNew = async word => {
     // Step 1: saveLotReceivingForm
 
     await saveHeaderReceivingForm()
-    console.log('saveHeaderReceivingForm success')
+
+    // console.log('saveHeaderReceivingForm success')
 
     iconStep1.value = 'ri-check-line'
     colorStep1.value = 'success'
@@ -1418,7 +1426,8 @@ const submitButtonVisibleNew = async word => {
     // Step 2: saveHeaderReceivingForm
     // console.error('Error: actualMakerLotNo_1 is empty or undefined. out')
     await saveLotReceivingForm()
-    console.log('saveLotReceivingForm success')
+
+    // console.log('saveLotReceivingForm success')
     iconStep2.value = 'ri-check-line'
     colorStep2.value = 'success'
 
@@ -1449,7 +1458,8 @@ const submitButtonVisibleNew = async word => {
 
     // Step 3: saveCOARecevingFrom
     await handleSaveDraftCoa()
-    console.log('saveCOARecevingFrom success')
+
+    // console.log('saveCOARecevingFrom success')
     iconStep3.value = 'ri-check-line'
     colorStep3.value = 'success'
     loadindingSaveDatftSeccess3.value = true
@@ -1480,7 +1490,7 @@ const submitButtonVisibleNew = async word => {
   }
   
   // isDialogSubmitSuccessVisible.value = true
-  console.log("%ctrickerSubmit Step", "color: yellow; font-weight: bold",  trickerSubmit.value)
+  // console.log("%ctrickerSubmit Step", "color: yellow; font-weight: bold",  trickerSubmit.value)
   isDialogConfirmVisible.value = false
 
   return true
@@ -1492,19 +1502,20 @@ const submitReceivingForm = async () => {
 
     trickerSubmit.value = true
 
-    console.log("%ctrickerSubmit Submit", "color: yellow; font-weight: bold", trickerSubmit.value)
+    // console.log("%ctrickerSubmit Submit", "color: yellow; font-weight: bold", trickerSubmit.value)
     
     const isSuccess = await submitButtonVisibleNew()
 
     // ถ้า submitButtonVisibleNew() ไม่สำเร็จ (สมมติว่ามันคืนค่า false เมื่อไม่สำเร็จ)
     if (!isSuccess) {
-      console.log('submitButtonVisibleNew failed, stopping submission.')
+      // console.log('submitButtonVisibleNew failed, stopping submission.')
 
       return // หยุดการทำงาน
     }
 
     isDialogConfirmVisible.value = false
-    console.log('Submit buttonVisible Start In')
+
+    // console.log('Submit buttonVisible Start In')
 
     // throw "Success"
 
@@ -1516,7 +1527,7 @@ const submitReceivingForm = async () => {
       },
     })
       .then(response => {
-        console.log('[products.value]!!: ', response.data)
+        // console.log('[products.value]!!: ', response.data)
 
         // isDialogSubmitSuccessVisible.value = true
         // isDialogConfirmVisible.value = false
@@ -1565,9 +1576,9 @@ const submitButtonVisible = word => {
 }
 
 watchEffect(() => {
-  console.log("formData", formData)
-  console.log("coaFiles.value", coaFiles.value)
-  console.log("files.value", files.value)
+  // console.log("formData", formData)
+  // console.log("coaFiles.value", coaFiles.value)
+  // console.log("files.value", files.value)
 })
 
 
@@ -1584,7 +1595,7 @@ watchEffect(() => {
 
 const handelBackToEdit = async () => {
 
-  console.log('Send start')
+  // console.log('Send start')
   await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SavePoQtyKgsPcs/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
@@ -1617,12 +1628,12 @@ const handelBackToEdit = async () => {
       console.error('Error:', error)
 
       // isDialogSubmitFailedVisible.value = true
-      console.log('backUpPurchasingAmount', backUpPurchasingAmount.value)
+      // console.log('backUpPurchasingAmount', backUpPurchasingAmount.value)
     })
 
 
 
-  console.log('backUpPurchasingAmount', backUpPurchasingAmount.value)
+  // console.log('backUpPurchasingAmount', backUpPurchasingAmount.value)
 }
 
 //---------------------------------- MOck Data Table --------------------------------
@@ -1725,6 +1736,12 @@ watchEffect(() => {
 })
 
 // ฟังก์ชันสำหรับคำนวณค่า total
+
+const genAmounUnitLorry = () => {
+  if(purchaseOrder?.value.actualMakerLotNo_1){
+    purchaseOrder.value.actualAmountUnits_1 = 1
+  }
+}
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const calculationPONew = () => {
@@ -1840,6 +1857,11 @@ const handleInputAmount = (e, AmountUnits) => {
 
 // watchEffect จะเรียกใช้ calculateTotals ทุกครั้งที่ข้อมูลใน dataRaeMatRequest เปลี่ยนแปลง
 watchEffect(() => {
+  // console.log('data', data.value)
+  // if(data?.value.receiveTypeId === 3){
+  //   genAmounUnitLorry()
+  // }
+  
   calculationPONew()
 })
 
@@ -2799,6 +2821,7 @@ const getDisabledFollowStatusNRole = () => {
                 :style="{ minWidth: '170px' }"
               >
                 <VTextField
+                  v-if="true"
                   v-model="purchaseOrder.actualAmountUnits_1"
                   :readonly="readonlyAllInput()"
                   :rules="[
@@ -2819,6 +2842,7 @@ const getDisabledFollowStatusNRole = () => {
                     <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
                   </template>
                 </VTextField>
+                <span v-if="false">{{ purchaseOrder.actualAmountUnits_1 }}</span>
                 <span
                   v-if="validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) !== ''"
                   class="text-red"

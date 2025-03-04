@@ -3790,7 +3790,7 @@ const insetSwitch1 = ref('')
   </section>
 
   <!-- Footer -->
-  <section class="mt-3">
+  <section v-if="false" class="mt-3">
     <VCard>
       <VCardText
         class="pa-1"
