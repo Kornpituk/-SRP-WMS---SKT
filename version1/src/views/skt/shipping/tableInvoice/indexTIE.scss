@@ -56,3 +56,40 @@
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
+
+.sticky-column {
+  position: sticky;
+  z-index: 1;
+  inset-inline-start: 0;
+}
+
+.sticky-column:nth-child(1) { /* คอลัมน์ที่ 2 */
+  inset-inline-start: 0; /* ปรับตามความกว้างของคอลัมน์ */
+}
+
+.sticky-column:nth-child(2) { /* คอลัมน์ที่ 2 */
+  inset-inline-start: 60px; /* ปรับตามความกว้างของคอลัมน์ */
+}
+
+.sticky-column:nth-child(3) { /* คอลัมน์ที่ 3 */
+  inset-inline-start: 100px;
+}
+
+.sticky-columnBody {
+  position: sticky;
+  z-index: 1;
+  background-color: #f5f5f7;
+  inset-inline-start: 0;
+}
+
+.sticky-columnBody:nth-child(1) { /* คอลัมน์ที่ 2 */
+  inset-inline-start: 0; /* ปรับตามความกว้างของคอลัมน์ */
+}
+
+.sticky-columnBody:nth-child(2) { /* คอลัมน์ที่ 2 */
+  inset-inline-start: 60px; /* ปรับตามความกว้างของคอลัมน์ */
+}
+
+.sticky-columnBody:nth-child(3) { /* คอลัมน์ที่ 3 */
+  inset-inline-start: 100px;
+}

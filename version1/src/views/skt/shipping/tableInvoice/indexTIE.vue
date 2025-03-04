@@ -24,6 +24,11 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
 
   if( dataRow?.statusId === 205 ){
     return true
+  }else if (
+    department.value === 'Warehouse' &&
+  (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
+  ) {
+    return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
   }
   else if(department.value === 'Warehouse' && whStatusId === 404){
     return true
@@ -31,11 +36,6 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
     return true
   }else if(department.value === 'Inspection' && inspStatusId === 604){
     return true
-  }else if (
-    department.value === 'Warehouse' &&
-  (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
-  ) {
-    return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
   }else if(department.value === 'Sale and Marketing' && salStatusId === 304){
     return true
   }else{ 
@@ -1092,6 +1092,8 @@ const saveShipmentPlan = async row => {
           location.reload()
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
         saveDraftLoading.value = false
+
+        return true
       }
         
     }else{
@@ -1104,6 +1106,8 @@ const saveShipmentPlan = async row => {
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
        
       }
+
+      return true
     }
 
     
@@ -1132,6 +1136,8 @@ const saveShipmentPlan = async row => {
             location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
+
+          return true
         }
         
       }else{
@@ -1143,6 +1149,8 @@ const saveShipmentPlan = async row => {
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
           saveDraftLoading.value = false
         }
+
+        return true
       }
       
     } else {
@@ -1151,9 +1159,12 @@ const saveShipmentPlan = async row => {
         // location.reload()
       }, 500) // 500 มิลลิวินาที = 0.5 วินาที
       saveDraftLoading.value = false
+
+      return false
     }
     
     saveDraftLoading.value = false
+    
 
     console.log(`Saved search plan:`, response)
   }
@@ -1179,10 +1190,20 @@ const checkStatusBeforeAvtion = sataus => {
 const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
+const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData) => {
 
   trikerSaveDrft.value = true
-  await saveShipmentPlan(selectedDataTables.value.map(item => item.soEtlLogDetailJournalID))
+
+  console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
+
+  const saveDraftRes = await saveShipmentPlan(productRowModel.value)
+
+  console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
+
+  if(!saveDraftRes){
+    textAlertDialogFunction(alertWordConst.saveDraft, false)
+    throw 'saveDraftRes faliad', saveDraftRes
+  }
 
   try{
     console.log('submitShipmentPlanBySoEId start!!')
@@ -3341,7 +3362,7 @@ const handlePrintTruckOrderPDF = () => {
           <!-- 👉 table head -->
           <thead class="">
             <tr>
-              <th>
+              <th style="width: 60px;" class="sticky-column">
                 <VCheckbox
                   v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                   v-model="isSelectAll"
@@ -3351,11 +3372,11 @@ const handlePrintTruckOrderPDF = () => {
               </th>
               <th
                 scope="row"
-                class="text-center px-1"
+                class="sticky-column text-center px-1"
               >
                 <span style="font-weight: bold;">{{ $t('No.') }}</span>
               </th>
-              <th class="text-center">
+              <th class="sticky-column text-center">
                 <span style="font-weight: bold;">{{ $t('Status') }}</span>
               </th>
               <th
@@ -3693,7 +3714,8 @@ const handlePrintTruckOrderPDF = () => {
               :key="index"
             >
               <td
-                class="cursor-pointer"
+                style="min-width: 60px;"
+                class="sticky-columnBody cursor-pointer"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -3713,7 +3735,7 @@ const handlePrintTruckOrderPDF = () => {
                 />
               </td>
               <td
-                class="cursor-pointer"
+                class="sticky-columnBody cursor-pointer"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -3729,7 +3751,7 @@ const handlePrintTruckOrderPDF = () => {
                 <span>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</span>
               </td>
               <td
-                class="cursor-pointer"
+                class="sticky-columnBody cursor-pointer"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
@@ -4767,7 +4789,6 @@ const handlePrintTruckOrderPDF = () => {
                     color="primary"
                     indeterminate
                   /></span>
-
                   <span
                     v-else
                     style="font-size: 12px;"

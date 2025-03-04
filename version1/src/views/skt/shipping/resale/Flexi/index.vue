@@ -594,13 +594,13 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       cols="10"
     >
       <span
-        v-if="typeResalse ==='Flexi'"
+        v-if="!getShippingCheckSheetResult?.isLorry"
         style="font-weight: bold;"
       >Filling Direction & Report to FLEXI</span>
       <span
-        v-if="typeResalse ==='Lorry'"
+        v-if="getShippingCheckSheetResult?.isLorry"
         style="font-weight: bold;"
-      >Filling Direction & Report to Lorry</span>
+      >Filling Direction & Report to LORRY</span>
     </VCol>
     <VCol
       class="text-center d-flex justify-end align-center"
@@ -1596,7 +1596,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
             </th>
           </tr>
         </thead>
-        <tbody v-if="typeResalse === 'Flexi'">
+        <tbody v-if="!getShippingCheckSheetResult?.isLorry">
           <tr
             v-for="(image, index) in imagePictureFlexi"
             :key="index"
@@ -1756,7 +1756,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
           </tr>
         </tbody>
 
-        <tbody v-if="typeResalse === 'Lorry'">
+        <tbody v-if="getShippingCheckSheetResult?.isLorry">
           <tr
             v-for="(image, index) in imagePictureLorry"
             :key="index"
