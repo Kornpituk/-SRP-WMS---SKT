@@ -18,13 +18,14 @@ const urlApiSiixBkk = ref('https://siix_bkkwebapi.easetrackwms.com')
 
 const urlApiLocal = ref('https://localhost:7005')
 
+const urlSktTrue = ref('https://webapi.sanyokaseithailand.com:8443')
 const urlSkt = ref('https://sktwebapi.easetrackwms.com')
 const urlSktDev = ref('https://sktdevwebapi.easetrackwms.com')
 const urlTestSRP =ref('https://skttest1webapi.easetrackwms.com')
 
-// const urlEnv = ref(process.env.VITE_API_URL)
-
 const urlEnv = ref(process.env.VITE_API_URL)
+
+// const urlEnv = ref(urlSktTrue)
 
 export const urlApi = urlEnv
 

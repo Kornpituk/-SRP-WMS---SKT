@@ -351,12 +351,12 @@ const headersNewEx = [
   },
   
   {
-    title: 'RCVD(PCS)',
+    title: 'QTY(PCS)',
     key: 'qtyPcs',
     sortable: false,
   },
   {
-    title: 'RCVD(KGS)',
+    title: 'QTY(KGS)',
     key: 'qtyKgs',
     sortable: false,
   },
