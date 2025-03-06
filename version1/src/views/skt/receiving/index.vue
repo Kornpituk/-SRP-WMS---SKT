@@ -19,6 +19,9 @@ import { useCookie } from '@/stores/skt/receingFormStore/useCookie'
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
 
+const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+
 const accountRole = ref('issues')
 const dataRowModel = ref()
 const roleAccount = ref('issues')
@@ -42,6 +45,34 @@ watch(debugMode, newValue => {
 // Function to manually toggle debug mode
 const toggleDebugMode = () => {
   debugMode.value = !debugMode.value
+}
+
+//-------------------------------------------- Permission -----------------------------------------
+
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '1',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
 
 //-------------------------------------- Defined Version --------------------------------
@@ -784,6 +815,19 @@ const headers = [
   },
 ]
 
+//-------------------------- Permission
+const filteredHeaders = computed(() => {
+  return headers.filter(header => {
+    // ข้ามการตรวจสอบสิทธิ์สำหรับ 'Action'
+    if (header.key === 'action') {
+      return true
+    }
+
+    // ตรวจสอบสิทธิ์สำหรับทุกคอลัมน์อื่น ๆ
+    return canVisibleUserPermission(statusPermission, header.key).canVisible
+  })
+})
+
 const tableDataPerpage = ref(15)
 const tableDataHeight = ref(550)
 
@@ -1093,8 +1137,6 @@ const printForm = ref(false)
 const selectedPrintLabel = ref([])
 const copiesPrintForm = ref(1)
 const isDialogVisibleAction = ref(false)
-
-const itemStore = useItemStore()
 
 const cookieStore = useCookieStore()
 
@@ -3381,7 +3423,7 @@ const insetSwitch1 = ref('')
           v-model="selectedDataTables"
           show-select
           fixed-header
-          :headers="headers"
+          :headers="filteredHeaders"
           :items="products"
           height="550"
           :items-per-page="tableDataPerpage"
@@ -3403,6 +3445,7 @@ const insetSwitch1 = ref('')
           <template #item="{ item }">
             <tr>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -3421,6 +3464,7 @@ const insetSwitch1 = ref('')
                 />
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-center px-2"
                 :style="{ 
                   backgroundColor: 
@@ -3452,6 +3496,7 @@ const insetSwitch1 = ref('')
                 </VChip>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="px-2 text-center"
                 style="min-width: 30px;"
                 :style="{ 
@@ -3465,6 +3510,7 @@ const insetSwitch1 = ref('')
                 <span style="font-size: 12px;">{{ item.raw.no }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -3481,6 +3527,7 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.itemCode }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="px-2"
                 style="min-width: 300px; max-width: 350px;"
                 :style="{ 
@@ -3498,6 +3545,7 @@ const insetSwitch1 = ref('')
                 />
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="px-2 "
                 style="min-width: 250px; max-width: 350px;"
                 :style="{ 
@@ -3515,6 +3563,7 @@ const insetSwitch1 = ref('')
                 />
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="px-2 text-center"
                 style="min-width: 150px; justify-content: center;"
                 :style="{ 
@@ -3531,6 +3580,7 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.supplierId }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="px-2"
                 style="justify-content: start;"
                 :style="{ 
@@ -3548,6 +3598,7 @@ const insetSwitch1 = ref('')
                 />
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-start px-2"
                 :style="{ 
                   backgroundColor: 
@@ -3564,6 +3615,7 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.purchaseOrderNo }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-center px-2"
                 style="min-width: 150px;"
                 :style="{ 
@@ -3580,6 +3632,7 @@ const insetSwitch1 = ref('')
                 >{{ convertDate(item.raw.deliveryDate) }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-start px-2"
                 :style="{ 
                   backgroundColor: 
@@ -3595,6 +3648,7 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.batch }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-end px-2"
                 style="justify-content: end;"
                 :style="{ 
@@ -3611,6 +3665,7 @@ const insetSwitch1 = ref('')
                 >{{ (item.raw.purchasingQuantityPcs.toLocaleString()) }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-end px-2"
                 style="justify-content: end;"
                 :style="{ 
@@ -3627,6 +3682,7 @@ const insetSwitch1 = ref('')
                 >{{ formatNumber(item.raw.purchasingAmountKgs) }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-end px-2"
                 style="justify-content: end;"
                 :style="{ 
@@ -3643,6 +3699,7 @@ const insetSwitch1 = ref('')
                 >{{ (item.raw.purchasingQuantityRcvdPcs.toLocaleString()) }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-end px-2"
                 style="justify-content: end;"
                 :style="{ 
@@ -3659,6 +3716,7 @@ const insetSwitch1 = ref('')
                 >{{ formatNumber(item.raw.purchasingAmountRcvdKgs) }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-start px-2"
                 style="min-width: 150px;"
                 :style="{ 
@@ -3675,6 +3733,7 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.updatedBy }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-center"
                 style="min-width: 150px;"
                 :style="{ 
@@ -3688,6 +3747,7 @@ const insetSwitch1 = ref('')
                 <span style="font-size: 12px;">{{ convertDate(item.raw.updatedDate) }}</span>
               </td>
               <td
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 class="text-start px-2"
                 style="justify-content: center;"
                 :style="{ 
@@ -3790,7 +3850,10 @@ const insetSwitch1 = ref('')
   </section>
 
   <!-- Footer -->
-  <section v-if="false" class="mt-3">
+  <section
+    v-if="false"
+    class="mt-3"
+  >
     <VCard>
       <VCardText
         class="pa-1"
