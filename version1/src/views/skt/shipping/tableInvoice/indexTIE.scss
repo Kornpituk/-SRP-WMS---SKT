@@ -25,7 +25,23 @@
 }
 
 .v-text-field >>> input {
-  font-size: 12px;
+  font-size: 12px !important;
+}
+
+.v-input {
+  font-size: 12px !important;
+}
+
+.v-input input {
+  font-size: 0.75rem !important;
+}
+
+.v-input .v-label {
+  font-size: 0.75rem !important;
+}
+
+.v-field__input {
+  font-size: 12px !important;
 }
 
 .custom-table,

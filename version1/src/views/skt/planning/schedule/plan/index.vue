@@ -3187,6 +3187,7 @@ const statusText = statusId => {
                 <VChip
                   :color="colorStatusWithId(item.raw.statusId).color"
                   :style="{ color: colorStatusWithId(item.raw.statusId).color }"
+                  style="font-size: 12px;"
                 >
                   {{ statusText(item.raw.statusId) }}
                 </VChip>

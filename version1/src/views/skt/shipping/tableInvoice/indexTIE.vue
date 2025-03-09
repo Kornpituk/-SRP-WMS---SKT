@@ -3799,10 +3799,11 @@ const handlePrintTruckOrderPDF = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <span>
+                <span style="font-size: 12px;">
                   <VChip
                     :color="colorStatusWithId(product.statusId).color"
                     :style="{ color: colorStatusWithId(product.statusId).color }"
+                    style="font-size: 12px;"
                   >{{ product.statusText }} 
                     <VTooltip
                       activator="parent"
@@ -4003,7 +4004,7 @@ const handlePrintTruckOrderPDF = () => {
                   >
                     <span
                       v-if="product.shipperConditions"
-                      style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
+                      style="overflow: hidden; min-width: 100px; max-width: 150px; font-size: 12px; text-overflow: ellipsis;"
                     >{{ product.shipperConditions }}</span>
                     <span
                       v-else
@@ -4033,8 +4034,9 @@ const handlePrintTruckOrderPDF = () => {
                 <VTextField
                   v-model="product.shippingEndUser"
                   density="compact"
+                  class="text-field"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
-                  style=" min-width: 150px;"
+                  style=" min-width: 150px; font-size: 12px !important;"
                 >
                   <template #label>
                     <span style="font-size: 12px;">End User</span>
@@ -4117,9 +4119,9 @@ const handlePrintTruckOrderPDF = () => {
                 >
                   <span
                     v-if="product.lot"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.lot }}</span>
-                  <span v-else>Lot</span>
+                  <span style="font-size: 12px;" v-else>Lot</span>
                 </VBtn>
               </td>
 
@@ -4689,9 +4691,12 @@ const handlePrintTruckOrderPDF = () => {
                 >
                   <span
                     v-if="product.saL_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.saL_Remarks }}</span>
-                  <span v-else>remark(SAL)</span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >remark(SAL)</span>
                 </VBtn>
               </td>
 
@@ -4723,9 +4728,9 @@ const handlePrintTruckOrderPDF = () => {
                 >
                   <span
                     v-if="product.wH_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.wH_Remarks }}</span>
-                  <span v-else>remark(WH)</span>
+                  <span style="font-size: 12px;" v-else>remark(WH)</span>
                 </VBtn>
               </td>
 
@@ -4757,9 +4762,9 @@ const handlePrintTruckOrderPDF = () => {
                 >
                   <span
                     v-if="product.loG_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.loG_Remarks }}</span>
-                  <span v-else>remark(LOG)</span>
+                  <span style="font-size: 12px;" v-else>remark(LOG)</span>
                 </VBtn>
               </td>
 
@@ -4869,7 +4874,10 @@ const handlePrintTruckOrderPDF = () => {
                     color="primary"
                     indeterminate
                   /></span>
-                  <span v-else style="font-size: 12px;">Submit </span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >Submit </span>
                 </VBtn>
               </td>
               <td

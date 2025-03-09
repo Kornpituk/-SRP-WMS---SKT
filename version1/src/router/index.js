@@ -58,21 +58,21 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // ถ้ามี refreshToken และ accessToken ตรวจสอบการรีเฟรช token
-  if (refreshToken && !accessToken) {
-    try {
-      // ทำการรีเฟรช token
-      const response = await axios.post(`${urlApi.value}/api/Auth/refreshToken`, { refreshToken: refreshToken })
-      const newAccessToken = response.data.accessToken
+  // if (refreshToken && !accessToken) {
+  //   try {
+  //     // ทำการรีเฟรช token
+  //     const response = await axios.post(`${urlApi.value}/api/Auth/refreshToken`, { refreshToken: refreshToken })
+  //     const newAccessToken = response.data.accessToken
 
-      localStorage.setItem('accessToken', newAccessToken)
+  //     localStorage.setItem('accessToken', newAccessToken)
       
-      return next() // รีเฟรช token และอนุญาตให้เข้าถึงหน้า
-    } catch (error) {
-      console.error("Failed to refresh token", error)
+  //     return next() // รีเฟรช token และอนุญาตให้เข้าถึงหน้า
+  //   } catch (error) {
+  //     console.error("Failed to refresh token", error)
       
-      return next({ name: 'login' }) // ถ้าเกิดข้อผิดพลาดให้ส่งไปหน้า login
-    }
-  }
+  //     return next({ name: 'login' }) // ถ้าเกิดข้อผิดพลาดให้ส่งไปหน้า login
+  //   }
+  // }
 
   next() // ถ้าทุกอย่างถูกต้อง ให้ดำเนินการไปตามปกติ
 })
