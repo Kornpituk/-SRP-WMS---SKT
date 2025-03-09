@@ -191,7 +191,8 @@ import { useGetUserPermissionService,
   usePrintTruckOrderFormPDFService,
   useGetFileFormService,
   usePrintExportExcelService,
-  usePrintPDFService, 
+  usePrintPDFService, useGetDataTruckOrderService,
+  useSaveTruckOrderService,
 } from '@/services/skt/shipmentPlan/services'
 
 import {
@@ -1616,6 +1617,8 @@ onMounted(async () => {
 
 })
 
+
+
 const itemMock = ref([
   'Foo', 'Barหกฟหกฟหกฟหกฟหกฟหก', 'Fizz', 'Buzz',
 ])
@@ -1783,6 +1786,8 @@ const showDialogTruckOrder = (SoId, SoeId, rowData) => {
   CompanyPrint.value = rowData.shipperName
   AddressPrint.value = rowData.shipperLocation
   TruckCompanyPrint.value = rowData.truck
+
+  getDataTruckOrder()
 }
 
 ///------------ Dialog PDF
@@ -2274,10 +2279,87 @@ const paramsTruckOrder = ref({
   driverBy: contactTruckCompanyModel.value || '',
   dateDriverBy: '',
   orderBy: '',
-  dateOrderBy: '',
-  authorizedBy: '',
-  dateAuthorizedBy: '',
+  dateOrderBy: dateCurrent.value,
+  authorizedBy: dateCurrent.value,
+  dateAuthorizedBy: dateCurrent.value,
 })
+
+//------------------- formate truck date
+
+function convertToISO8601(dateStr) {
+  // แยกค่าจากรูปแบบ "DD/MM/YYYY"
+  const [day, month, year] = dateStr.split('/')
+  const date = new Date(`${year}-${month}-${day}T00:00:00.000Z`)
+  
+  return date.toISOString()
+}
+
+function convertToDDMMYYYY(isoDateStr) {
+  const date = new Date(isoDateStr)
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const year = date.getUTCFullYear()
+  
+  return `${day}/${month}/${year}`
+}
+
+const { getTruckOrderDataResult,
+  errorGetTruckOrderData,
+  fetchTruckOrderData } = useGetDataTruckOrderService()
+
+const getDataTruckOrder = async () => {
+
+
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
+
+  try{
+    const result = await fetchTruckOrderData(
+      urlApi.value,
+      soEIdModel.value,
+      'get',
+      'ShippingTruckOrder',
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if(result){
+      console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
+
+      if(getTruckOrderDataResult?.value){
+        if (paramsTruckOrder.value) {
+
+          paramsTruckOrder.value.address = getTruckOrderDataResult?.value.address
+          paramsTruckOrder.value.company = getTruckOrderDataResult?.value.company
+          paramsTruckOrder.value.contactAndTel = getTruckOrderDataResult?.value.contactAndTel
+          paramsTruckOrder.value.remark = getTruckOrderDataResult?.value.remark
+          paramsTruckOrder.value.transComName = getTruckOrderDataResult?.value.transComName
+          paramsTruckOrder.value.truckLicense = getTruckOrderDataResult?.value.truckLicense
+          paramsTruckOrder.value.truckType = getTruckOrderDataResult?.value.truckType
+          paramsTruckOrder.value.updatedDateTime = getTruckOrderDataResult?.value.updatedDateTime
+
+          paramsTruckOrder.value.contactDate = getTruckOrderDataResult?.value.contactDate
+          paramsTruckOrder.value.driverName = getTruckOrderDataResult?.value.driverName
+          paramsTruckOrder.value.orderBy = getTruckOrderDataResult?.value.orderBy
+          paramsTruckOrder.value.orderDate = getTruckOrderDataResult?.value.orderDate
+          paramsTruckOrder.value.authorizedBy = getTruckOrderDataResult?.value.authorizedBy
+          paramsTruckOrder.value.authorizedDate = getTruckOrderDataResult?.value.authorizedDate
+
+          TruckTypePrint.value =  getTruckOrderDataResult?.value.truckType
+          contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
+        }
+      }else{
+        // conslolr
+      }
+      
+      return getTruckOrderDataResult.value
+      
+    }
+  }catch(error){
+    console.log(error)
+  }
+}
 
 const loadingPrintTruckOrderForm = ref(false)
 
@@ -2359,6 +2441,63 @@ const handlePrintTruckOrderPDF = () => {
   loadingPrintTruckOrderForm.value = false
   
   
+}
+
+const { saveTruckOrderResult,
+  errorSaveTruckOrder,
+  saveTruckOrder } = useSaveTruckOrderService()
+
+const bodySaveTruckOrder = data => ({
+  soEtlLogDetailJournalID: soEIdModel.value,
+  company: data.company,
+  address: data.address,
+  transComName: data.transComName,
+  truckType: data.truckType,
+  truckLicense: data.truckLicense,
+  remark: data.remark,
+  
+  driverName: data.driverName,
+
+  orderBy: userDataInfo?.value.firstName,
+  contactAndTel: contactTruckCompanyModel.value,
+  authorizedBy: data.authorizedBy,
+
+  contactDate: convertToISO8601(data.dateDriverBy),
+  orderDate: data.orderDate,
+  authorizedDate: data.authorizedDate,
+  lastPrintDateTime: data.orderDate,
+})
+
+const loadingSaveTruckOrderForm = ref(false)
+
+const handleSavetruckOrder = async () => {
+
+  loadingSaveTruckOrderForm.value = true
+
+  const body = bodySaveTruckOrder(paramsTruckOrder.value)
+
+  try{
+    const result = await saveTruckOrder(
+      urlApi.value,
+      'save',
+      whereHouse,
+      accessTokenAtStore,
+      body,
+    )
+
+    if(result){
+      console.log('saveTruckOrderResult', saveTruckOrderResult?.value)
+      textAlertDialogFunction("SAVE TRUCK ORDER", true)
+      
+    }else{
+      console.log('errorSaveTruckOrder', errorSaveTruckOrder.value)
+      textAlertDialogFunction("SAVE TRUCK ORDER", false)
+    }
+  }catch(error){
+
+  }
+
+  loadingSaveTruckOrderForm.value = false
 }
 </script>
 
@@ -3170,7 +3309,7 @@ const handlePrintTruckOrderPDF = () => {
             <tr>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dateCurrent"
+                  v-model="paramsTruckOrder.dateDriverBy"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3178,7 +3317,7 @@ const handlePrintTruckOrderPDF = () => {
               </th>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dateCurrent"
+                  v-model="paramsTruckOrder.dateOrderBy"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3186,7 +3325,7 @@ const handlePrintTruckOrderPDF = () => {
               </th>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dateCurrent"
+                  v-model="paramsTruckOrder.dateAuthorizedBy"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3197,6 +3336,30 @@ const handlePrintTruckOrderPDF = () => {
         </VCardText>
 
         <VCardText class="d-flex justify-end">
+          <VBtn
+            color="warning"
+            class="d-flex justify-space-between mx-2"
+            @click="handleSavetruckOrder(), loadingSaveTruckOrderForm = true"
+          >
+            <span v-if="!loadingSaveTruckOrderForm">
+
+              Save
+
+            </span>
+            
+            <div>
+              <VProgressCircular
+                v-if="loadingSaveTruckOrderForm"
+                start
+                :rotate="360"
+                :size="30"
+                indeterminate
+                :model-value="progressValue"
+                color="primary"
+              />
+            </div>
+          </VBtn>
+
           <VBtn
             color="warning"
             class="d-flex justify-space-between"
@@ -4121,7 +4284,10 @@ const handlePrintTruckOrderPDF = () => {
                     v-if="product.lot"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.lot }}</span>
-                  <span style="font-size: 12px;" v-else>Lot</span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >Lot</span>
                 </VBtn>
               </td>
 
@@ -4730,7 +4896,10 @@ const handlePrintTruckOrderPDF = () => {
                     v-if="product.wH_Remarks"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.wH_Remarks }}</span>
-                  <span style="font-size: 12px;" v-else>remark(WH)</span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >remark(WH)</span>
                 </VBtn>
               </td>
 
@@ -4764,7 +4933,10 @@ const handlePrintTruckOrderPDF = () => {
                     v-if="product.loG_Remarks"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.loG_Remarks }}</span>
-                  <span style="font-size: 12px;" v-else>remark(LOG)</span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >remark(LOG)</span>
                 </VBtn>
               </td>
 
