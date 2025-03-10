@@ -3448,7 +3448,7 @@ const insetSwitch1 = ref('')
           v-model="selectedDataTables"
           show-select
           fixed-header
-          :headers="filteredHeaders"
+          :headers="headers"
           :items="products"
           height="550"
           :items-per-page="tableDataPerpage"
@@ -3532,7 +3532,6 @@ const insetSwitch1 = ref('')
                 <span style="font-size: 12px;">{{ item.raw.no }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_MATERIAL_CODE').canVisible"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -3549,7 +3548,6 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.itemCode }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_MATERIAL_NAME').canVisible"
                 class="px-2"
                 style="min-width: 300px; max-width: 350px;"
                 :style="{ 
@@ -3567,7 +3565,6 @@ const insetSwitch1 = ref('')
                 />
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRADE_NAME').canVisible"
                 class="px-2 "
                 style="min-width: 250px; max-width: 350px;"
                 :style="{ 
@@ -3585,7 +3582,6 @@ const insetSwitch1 = ref('')
                 />
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SUPPLIER').canVisible"
                 class="px-2 text-center"
                 style="min-width: 150px; justify-content: center;"
                 :style="{ 
@@ -3602,7 +3598,6 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.supplierId }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SUPPLIER_NAME').canVisible"
                 class="px-2"
                 style="justify-content: start;"
                 :style="{ 
@@ -3620,7 +3615,6 @@ const insetSwitch1 = ref('')
                 />
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PURCHASE_ORDER_NO').canVisible"
                 class="text-start px-2"
                 :style="{ 
                   backgroundColor: 
@@ -3637,7 +3631,6 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.purchaseOrderNo }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_DATE').canVisible"
                 class="text-center px-2"
                 style="min-width: 150px;"
                 :style="{ 
@@ -3654,7 +3647,6 @@ const insetSwitch1 = ref('')
                 >{{ convertDate(item.raw.deliveryDate) }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_BATCH').canVisible"
                 class="text-start px-2"
                 :style="{ 
                   backgroundColor: 
@@ -3670,7 +3662,6 @@ const insetSwitch1 = ref('')
                 >{{ item.raw.batch }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PURCHASING_AMOUNT').canVisible"
                 class="text-end px-2"
                 style="justify-content: end;"
                 :style="{ 
@@ -3687,7 +3678,6 @@ const insetSwitch1 = ref('')
                 >{{ (item.raw.purchasingQuantityPcs.toLocaleString()) }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PURCHASING_QUANTITY').canVisible"
                 class="text-end px-2"
                 style="justify-content: end;"
                 :style="{ 
@@ -3704,7 +3694,6 @@ const insetSwitch1 = ref('')
                 >{{ formatNumber(item.raw.purchasingAmountKgs) }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PURCHASING_AMOUNT').canVisible"
                 class="text-end px-2"
                 style="justify-content: end;"
                 :style="{ 
@@ -3721,7 +3710,6 @@ const insetSwitch1 = ref('')
                 >{{ (item.raw.purchasingQuantityRcvdPcs.toLocaleString()) }}</span>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PURCHASING_QUANTITY').canVisible"
                 class="text-end px-2"
                 style="justify-content: end;"
                 :style="{ 
