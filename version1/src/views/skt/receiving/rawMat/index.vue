@@ -17,6 +17,34 @@ const props = defineProps({
 
 const switchLog = ref(false)
 
+//-------------------------------------------- Permission -----------------------------------------
+
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '2',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+}
+
 watchEffect(() => {
   // console.log('***switchLog', switchLog.value)
   if (sessionStorage.getItem('insetOpenLogSwitch1') === 'true') {

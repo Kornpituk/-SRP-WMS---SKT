@@ -15,6 +15,34 @@ import image01 from '@/views/skt/receiving/lorryForm/c3/Diesel.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
 
+//-------------------------------------------- Permission -----------------------------------------
+
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '5',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+}
+
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 import alertWordConst from '@/utilities/constant'

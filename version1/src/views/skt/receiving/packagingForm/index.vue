@@ -21,6 +21,34 @@ import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
 
+//-------------------------------------------- Permission -----------------------------------------
+
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '4',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+}
+
 //--------------------------------------- Rule Page By Status -----------------------
 
 const frozeCheck = ref(false)
