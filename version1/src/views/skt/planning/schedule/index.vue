@@ -1856,11 +1856,13 @@ const statusText = statusId => {
                   <VChip
                     :color="colorStatusWithId(item.raw.statusId).color"
                     :style="{ color: colorStatusWithId(item.raw.statusId).color }"
+                    style="font-size: 12px;"
                   >{{ statusText(item.raw.statusId) }}</VChip>
                 </span>
               </td>
               <td
                 class="cursor-pointer"
+                style="font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1878,6 +1880,7 @@ const statusText = statusId => {
               </td>
               <td
                 class="cursor-pointer"
+                style="font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1895,6 +1898,7 @@ const statusText = statusId => {
               </td>
               <td
                 class="cursor-pointer"
+                style="font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1912,6 +1916,7 @@ const statusText = statusId => {
               </td>
               <td
                 class="cursor-pointer"
+                style="font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1929,6 +1934,7 @@ const statusText = statusId => {
               </td>
               <td
                 class="cursor-pointer"
+                style="font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1946,6 +1952,7 @@ const statusText = statusId => {
               </td>
               <td
                 class="cursor-pointer"
+                style="font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1963,7 +1970,7 @@ const statusText = statusId => {
               </td>
               <td
                 class="px-8 text-end cursor-pointer"
-                style="min-width: 150px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -1980,6 +1987,7 @@ const statusText = statusId => {
                 {{ formatNumber(item.raw.quantityKgs) }}
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-light-blue-lighten-5 cursor-pointer" 
                 :style="{ 
                   backgroundColor: 
@@ -1997,6 +2005,7 @@ const statusText = statusId => {
                 {{ item.raw.product1SelectedCode }}
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-light-blue-lighten-5 cursor-pointer" 
                 :style="{ 
                   backgroundColor: 
@@ -2014,6 +2023,7 @@ const statusText = statusId => {
                 {{ item.raw.product1Name }}
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-light-blue-lighten-5 cursor-pointer" 
                 :style="{ 
                   backgroundColor: 
@@ -2031,6 +2041,7 @@ const statusText = statusId => {
                 {{ item.raw.product1SelectedPackagingCode }}
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-light-blue-lighten-5 text-end cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2049,6 +2060,7 @@ const statusText = statusId => {
                 <span v-else />
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-light-blue-lighten-5 text-end cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2067,6 +2079,7 @@ const statusText = statusId => {
                 <span v-else />
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-light-blue-lighten-5 text-end cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2086,6 +2099,7 @@ const statusText = statusId => {
               </td>
 
               <td
+                style="font-size: 12px;"
                 class="bg-red-lighten-5 cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2103,6 +2117,7 @@ const statusText = statusId => {
                 {{ item.raw.product2SelectedCode }}
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-red-lighten-5 cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2120,6 +2135,7 @@ const statusText = statusId => {
                 {{ item.raw.product2Name }}
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-red-lighten-5  cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2137,6 +2153,7 @@ const statusText = statusId => {
                 {{ item.raw.product2SelectedPackagingCode }}
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-red-lighten-5 text-end  cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2155,6 +2172,7 @@ const statusText = statusId => {
                 <span v-else />
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-red-lighten-5 text-end  cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2173,6 +2191,7 @@ const statusText = statusId => {
                 <span v-else />
               </td>
               <td
+                style="font-size: 12px;"
                 class="bg-red-lighten-5 text-end  cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2193,7 +2212,7 @@ const statusText = statusId => {
 
               <td
                 class="px-1 cursor-pointer text-start"
-                style="min-width: 150px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -2211,7 +2230,7 @@ const statusText = statusId => {
               </td>
               <td
                 class="px-1 text-center cursor-pointer"
-                style="min-width: 150px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -2229,7 +2248,7 @@ const statusText = statusId => {
               </td>
               <td
                 class="px-1 text-center cursor-pointer"
-                style="min-width: 150px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -2246,6 +2265,7 @@ const statusText = statusId => {
                 {{ formatDate(item.raw.finishedDate) }}
               </td>
               <td
+               style="font-size: 12px;"
                 class="cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2264,6 +2284,7 @@ const statusText = statusId => {
               </td>
 
               <td
+               style="font-size: 12px;"
                 class="cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2282,6 +2303,7 @@ const statusText = statusId => {
               </td>
 
               <td
+               style="font-size: 12px;"
                 class="cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2302,6 +2324,7 @@ const statusText = statusId => {
               
               
               <td
+               style="font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -2318,6 +2341,7 @@ const statusText = statusId => {
                 <VBtn
                   color="info"
                   @click="newBatch(item.raw.batchID)"
+                   style="font-size: 12px;"
                 >
                   Action
                 </VBtn>
@@ -2339,7 +2363,10 @@ const statusText = statusId => {
   </section>
 
   <!-- Footer -->
-  <section v-if="false" class="mt-3">
+  <section
+    v-if="false"
+    class="mt-3"
+  >
     <VCard>
       <VCardText
         class="pa-1"

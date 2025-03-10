@@ -61,6 +61,32 @@ export const shipmentPlanRepository = {
     }
   },
 
+  async getDataTruckOrderRepo(urlApi, SoeId, form, type, whereHouse, accessToken) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/${type}/${form}/${SoeId}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+
+        // console.log('Service Response data getSelect:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If getSelect...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try getSelect...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getSelect ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   async getSearchPlan(urlApi, form, whereHouse, accessToken, params = {}, statusID) {
     try {
       const response = await axios.get(`${urlApi}/api/v1/ShipmentPlan/${form}`, {
@@ -123,6 +149,33 @@ export const shipmentPlanRepository = {
       console.log('Error repo Error Try saveSearchPlan...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch saveSearchPlan ${error.response?.data?.message || error.message}`)
+    }
+  },
+
+  async saveTruckOrderRepo(urlApi, form, whereHouse, accessToken, body) {
+    try {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingTruckOrder/${form}`, body, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+        console.log('success get repo saveTruckOrderRepo...')
+
+        // console.log('Service Response data saveTruckOrderRepo:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        console.log('Error repo Error If saveTruckOrderRepo...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      console.log('Error repo Error Try saveTruckOrderRepo...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch saveTruckOrderRepo ${error.response?.data?.message || error.message}`)
     }
   },
 

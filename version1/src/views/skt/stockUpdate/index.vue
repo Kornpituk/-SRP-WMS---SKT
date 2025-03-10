@@ -1175,6 +1175,7 @@ const refeshPage = () => {
                   </VBtn>
                 </td>
                 <td
+                  style="font-size: 12px;"
                   :style="{ 
                     backgroundColor: 
                       dataTableNummberedToggle === item.no ? dataTableColor : 
@@ -1190,6 +1191,7 @@ const refeshPage = () => {
                   {{ item.no }}
                 </td>
                 <td
+                 style="font-size: 12px;"
                   class="cursor-pointer"
                   :style="{ 
                     backgroundColor: 
@@ -1224,7 +1226,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 170px; max-width: 170px;  font-size: 14px;"
+                  style="min-width: 170px; max-width: 170px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.productId }}
@@ -1241,7 +1243,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 200px; max-width: 200px;  font-size: 14px;"
+                  style="min-width: 200px; max-width: 200px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.productName }}
@@ -1258,7 +1260,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                  style="min-width: 110px; max-width: 110px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.category }}
@@ -1275,7 +1277,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 120px; max-width: 120px;  font-size: 14px;"
+                  style="min-width: 120px; max-width: 120px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.lot }}
@@ -1292,7 +1294,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 70px; max-width: 70px;  font-size: 14px;"
+                  style="min-width: 70px; max-width: 70px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ (item.locations.length).toLocaleString() }}
@@ -1309,7 +1311,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 80px; max-width: 80px;  font-size: 14px;"
+                  style="min-width: 80px; max-width: 80px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ (item.qty).toLocaleString() }}
@@ -1326,7 +1328,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 30px; max-width: 30px;  font-size: 14px;"
+                  style="min-width: 30px; max-width: 30px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.unitName }}
@@ -1343,7 +1345,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1 text-end"
-                  style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                  style="min-width: 110px; max-width: 110px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ Number(item.packKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
@@ -1361,7 +1363,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1 text-end"
-                  style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                  style="min-width: 110px; max-width: 110px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ Number(item.totalQtyKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
@@ -1378,7 +1380,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 110px; max-width: 110px;  font-size: 14px;"
+                  style="min-width: 110px; max-width: 110px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.stockName }}
@@ -1395,7 +1397,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 100px; max-width: 100px;  font-size: 14px;"
+                  style="min-width: 100px; max-width: 100px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.zoneName }}
@@ -1412,7 +1414,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1"
-                  style="min-width: 120px; max-width: 120px;  font-size: 14px;"
+                  style="min-width: 120px; max-width: 120px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   {{ item.areaName }}
@@ -1429,7 +1431,7 @@ const refeshPage = () => {
                       dataTableNummberedToggle === item.no ? '1px solid #BBDEFB' : ''
                   }"
                   class="px-1 text-end"
-                  style="min-width: 150px; max-width: 150px;  font-size: 14px;"
+                  style="min-width: 150px; max-width: 150px;  font-size: 12px;"
                   @dblclick="dataTableCliclHighlightIsToggle(item.no)"
                 >
                   <span
@@ -1440,7 +1442,7 @@ const refeshPage = () => {
                 </td>
                 <td
                   class="px-1"
-                  style="min-width: 120px; max-width: 120px;  font-size: 14px;"
+                  style="min-width: 120px; max-width: 120px;  font-size: 12px;"
                   :style="{ 
                     backgroundColor: 
                       dataTableNummberedToggle === item.no ? dataTableColor : 
@@ -1486,7 +1488,7 @@ const refeshPage = () => {
                           :key="batchIndex"
                         >
                           <td
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 
@@ -1502,7 +1504,7 @@ const refeshPage = () => {
                             {{ batch.no }}
                           </td>
                           <td
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 
@@ -1518,7 +1520,7 @@ const refeshPage = () => {
                             {{ batch.productId }}
                           </td>
                           <td
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 
@@ -1534,7 +1536,7 @@ const refeshPage = () => {
                             {{ batch.productName }}
                           </td>
                           <td
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 
@@ -1550,7 +1552,7 @@ const refeshPage = () => {
                             {{ batch.lot }}
                           </td>
                           <td
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 
@@ -1567,7 +1569,7 @@ const refeshPage = () => {
                           </td>
                           <td
                             
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 
@@ -1584,7 +1586,7 @@ const refeshPage = () => {
                           </td>
                           <td
                             class="text-end"
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 
@@ -1600,7 +1602,7 @@ const refeshPage = () => {
                             {{ Number(batch.packKgs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                           </td>
                           <td
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 
@@ -1616,7 +1618,7 @@ const refeshPage = () => {
                             {{ batch.lotDescription }}
                           </td>
                           <td
-                            style="font-size: 14px;"
+                            style="font-size: 12px;"
                             :style="{ 
                               backgroundColor: 
                                 dataTableNummberedToggle2 === batch.no ? dataTableColor : 

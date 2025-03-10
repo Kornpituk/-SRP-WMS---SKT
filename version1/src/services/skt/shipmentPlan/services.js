@@ -68,6 +68,39 @@ export const useGetSelectDataService = () => {
   }
 }
 
+export const useGetDataTruckOrderService = () => {
+  const getTruckOrderDataResult = ref(null)
+  const errorGetTruckOrderData = ref(null)
+  
+  const fetchTruckOrderData = async (urlApi, SoeId, form, type, whereHouse, accessToke) => {
+    try {
+      errorGetTruckOrderData.value = null
+
+      // console.log('Fetching fetchTruckOrderData...')
+  
+      const result = await shipmentPlanRepository.getDataTruckOrderRepo(urlApi, SoeId, form, type, whereHouse, accessToke)
+        
+      if (result) {
+        // console.log('Fetching data fetchTruckOrderData:', result)
+        getTruckOrderDataResult.value = result.data.data
+        
+        return result.data.data
+      } else {
+        // console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in fetchTruckOrderData:', error)
+      errorGetTruckOrderData.value = error.message
+    }
+  }
+  
+  return {
+    getTruckOrderDataResult,
+    errorGetTruckOrderData,
+    fetchTruckOrderData,
+  }
+}
+
 export const useGetSearchPlanService = () => {
   const getSearchPlanResult = ref(null)
   const errorGetSearchPlan = ref(null)
@@ -131,6 +164,38 @@ export const useSaveSearchPlanService = () => {
     saveSearchPlanResult,
     errorSaveSearchPlan,
     saveSearchPlan,
+  }
+}
+
+export const useSaveTruckOrderService = () => {
+  const saveTruckOrderResult = ref(null)
+  const errorSaveTruckOrder = ref(null)
+  
+  const saveTruckOrder = async (urlApi, form, whereHouse, accessToke, body) => {
+    try {
+      errorSaveTruckOrder.value = null
+      console.log('Fetching saveTruckOrder...')
+  
+      const result = await shipmentPlanRepository.saveTruckOrderRepo(urlApi, form, whereHouse, accessToke, body)
+        
+      if (result) {
+        // console.log('Fetching data saveTruckOrder:', result)
+        saveTruckOrderResult.value = result.data
+        
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      console.log('Error in saveTruckOrder:', error)
+      errorSaveTruckOrder.value = error.message
+    }
+  }
+  
+  return {
+    saveTruckOrderResult,
+    errorSaveTruckOrder,
+    saveTruckOrder,
   }
 }
 

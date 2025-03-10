@@ -291,16 +291,23 @@ const printLabel = async () => {
 const expanded = ref([])
 
 const updateSelectedData = sub => {
-  // Add to selectedDataTables if selected, remove if deselected
-  if (sub.selected) {
-    selectedDataTables.value.push(sub)
-    console.log('selectedDataTables in updateSelectedData if', selectedDataTables.value)
-  } else {
+  if (!sub || !sub.lotDescription) return // ป้องกันค่าที่ไม่ถูกต้อง
 
-    const index = selectedDataTables.value.findIndex(item => item.name === sub.name)
-    if (index !== -1) selectedDataTables.value.splice(index, 1)
-    console.log('selectedDataTables in updateSelectedData else', selectedDataTables.value)
+  if (sub.selected) {
+    // เพิ่มเฉพาะถ้ายังไม่มีอยู่ใน selectedDataTables
+    const exists = selectedDataTables.value.some(item => item.lotDescription === sub.lotDescription)
+    if (!exists) {
+      selectedDataTables.value.push(sub)
+    }
+  } else {
+    // หา index ของตัวที่ต้องการลบ
+    const index = selectedDataTables.value.findIndex(item => item.lotDescription === sub.lotDescription)
+    if (index !== -1) {
+      selectedDataTables.value.splice(index, 1) // ลบเฉพาะ index นั้น
+    }
   }
+
+  console.log('selectedDataTables:', selectedDataTables.value)
 }
 
 const eXprtreeNode = () => {
@@ -351,12 +358,12 @@ const headersNewEx = [
   },
   
   {
-    title: 'RCVD(PCS)',
+    title: 'QTY(PCS)',
     key: 'qtyPcs',
     sortable: false,
   },
   {
-    title: 'RCVD(KGS)',
+    title: 'QTY(KGS)',
     key: 'qtyKgs',
     sortable: false,
   },

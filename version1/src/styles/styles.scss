@@ -1,1 +1,22 @@
 // Write your overrides
+.v-field__input {
+  font-size: 12px;
+}
+
+.v-select__selections {
+  align-self: center;
+  font-size: 12px;
+}
+
+.truncate-select {
+  align-self: center;
+}
+
+.v-table > .v-table__wrapper > table > tbody > tr > td,
+.v-table > .v-table__wrapper > table > tbody > tr > th,
+.v-table > .v-table__wrapper > table > thead > tr > td,
+.v-table > .v-table__wrapper > table > thead > tr > th,
+.v-table > .v-table__wrapper > table > tfoot > tr > td,
+.v-table > .v-table__wrapper > table > tfoot > tr > th {
+  font-size: 12px;
+}

@@ -346,7 +346,7 @@ const resolveCategories = val => {
   }
 
   .v-list-item-title {
-    font-size: 0.875rem !important;
+    font-size: 12px !important;
   }
 
   .app-bar-search-list {

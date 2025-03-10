@@ -2537,6 +2537,128 @@ const statusText = statusId => {
                 </template>
               </VDataTable>
             </VCol>
+
+            <!-- ตาราง 4: Semi -->
+            <VCol
+              v-if="false"
+              cols="3"
+            />
+            <VCol
+              v-if="false"
+              style="border: 1px solid grey; border-radius: 20px;"
+              cols="6"
+              class="mt-4"
+              :style="{
+                background:
+                  selectedProductionCode && btnSelectitem2
+                    ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                    : selectedProductionCode && btnSelectitem1
+                      ? '#D3E3FC' // เงื่อนไขแรก
+                      : '#FFFFFF', // ค่าเริ่มต้น
+              }"
+            >
+              <div class="d-flex justify-center">
+                <VTextField
+                  v-if="false"
+                  v-model="searchForMasterDataPlan"
+                  label="Search"
+                  prepend-inner-icon="mdi-magnify"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  single-line
+                />
+                <h5>Semi</h5>
+              </div>
+              <VDataTable
+                v-if="selectedProductionCode"
+                :headers="packagingKgsDataTable"
+                :items="dataMasterForSelectFilter.find(
+                  (data) => data.productionCode === selectedProductionCode
+                ).packagings"
+                :items-per-page="10"
+                class="text-no-wrap"
+              >
+                <template #item.id="{ item }">
+                  <span class="text-h6">{{ item.id }}</span>
+                </template>
+
+                <template #item="{ item }">
+                  <tr>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && item.raw.packingQtyKgs === selectPackagingQtySwitch
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && item.raw.packingQtyKgs === selectPackagingQtySwitch
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
+                      <span style="font-size: 12px;">{{ item.raw.itemCode }}</span>
+                    </td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && item.raw.packingQtyKgs === selectPackagingQtySwitch
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && item.raw.packingQtyKgs === selectPackagingQtySwitch
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
+                      <span style="font-size: 12px;">{{ item.raw.itemName }} </span>
+                    </td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && item.raw.packingQtyKgs === selectPackagingQtySwitch
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && item.raw.packingQtyKgs === selectPackagingQtySwitch
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
+                      <span
+                        class="text-end"
+                        style="font-size: 12px;"
+                      >{{ formatNumber(item.raw.packingQtyKgs) }}</span>
+                    </td>
+                    <td
+                      :style="{
+                        background:
+                          item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem2 && item.raw.packingQtyKgs === selectPackagingQtySwitch
+                            ? '#FFEBEE' // กรณีทั้งสองเงื่อนไขเป็นจริง
+                            : item.raw.itemCode === selectPackagingTypeSwitch && btnSelectitem1 && item.raw.packingQtyKgs === selectPackagingQtySwitch
+                              ? '#D3E3FC' // เงื่อนไขแรก
+                              : '#FFFFFF', // ค่าเริ่มต้น
+                      }"
+                    >
+                      <VBtn
+                        v-if="item.raw.itemCode === selectPackagingTypeSwitch && item.raw.packingQtyKgs === selectPackagingQtySwitch"
+                        :color="colorBtnSwitch()"
+                        variant="tonal"
+                        @click="selectPackaging(item.raw)"
+                      >
+                        Select
+                      </VBtn>
+                      <VBtn
+                        v-else
+                        :color="colorBtnSwitchActive()"
+                        variant="flat"
+                        @click="selectPackaging(item.raw)"
+                      >
+                        Select
+                      </VBtn>
+                    </td>
+                  </tr>
+                </template>
+              </VDataTable>
+            </VCol>
+            <VCol
+              v-if="false"
+              cols="3"
+            />
           </VRow>
         </VCardText>
       </VCard>
@@ -3065,6 +3187,7 @@ const statusText = statusId => {
                 <VChip
                   :color="colorStatusWithId(item.raw.statusId).color"
                   :style="{ color: colorStatusWithId(item.raw.statusId).color }"
+                  style="font-size: 12px;"
                 >
                   {{ statusText(item.raw.statusId) }}
                 </VChip>
@@ -3809,7 +3932,7 @@ const statusText = statusId => {
   </section>
 
   <!-- Footer -->
-  <section class="mt-3">
+  <section v-if="false" class="mt-3">
     <VCard>
       <VCardText
         class="pa-1"

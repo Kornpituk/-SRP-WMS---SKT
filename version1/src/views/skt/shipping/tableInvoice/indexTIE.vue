@@ -191,7 +191,8 @@ import { useGetUserPermissionService,
   usePrintTruckOrderFormPDFService,
   useGetFileFormService,
   usePrintExportExcelService,
-  usePrintPDFService, 
+  usePrintPDFService, useGetDataTruckOrderService,
+  useSaveTruckOrderService,
 } from '@/services/skt/shipmentPlan/services'
 
 import {
@@ -360,6 +361,8 @@ const btnTextarea = () => {
         item.loG_Remarks = dialogRemark.value
 
         // console.log('btnCloseRemark... Remark LOG', dialogRemark.value)
+      }else if(typeDialogTextArea.value === 'Lot'){
+        item.lot = dialogRemark.value
       }
       
     }else{
@@ -370,7 +373,7 @@ const btnTextarea = () => {
   dialogVisibleTextarea.value = false
 }
 
-const textAreaRemarkDialogActive = (type, data, soEId, disabledRow) => {
+const textAreaRemarkDialogActive = (type, data, soEId, disabledRow, disPermiss) => {
  
   typeDialogTextArea.value = type
   soEIdModel.value = soEId
@@ -378,7 +381,23 @@ const textAreaRemarkDialogActive = (type, data, soEId, disabledRow) => {
   dialogRemark.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogVisibleTextarea.value = true
   console.log('Type dialog', typeDialogTextArea.value, '=', type)
-  disabledModel.value = disabledRow
+  
+
+  const disabledCanExecute = ref(false)
+
+  if(disPermiss){
+    // eslint-disable-next-line sonarjs/no-all-duplicated-branches
+
+    if(disabledRow){
+      disabledCanExecute.value = true
+    }else{
+      disabledCanExecute.value = false
+    }
+  }else{
+    disabledCanExecute.value = true
+  }
+
+  disabledModel.value = disabledCanExecute.value
 }
 
 const dataRowForUse = ref()
@@ -826,13 +845,16 @@ const saveFileFormShipment = async (
         // location.reload()
         // }, 500) // 0.5 วินาที
       }else{
-        textAlertDialogFunction(alertWordConst.saveDraft, true)
-        console.log(`Saved File Plan:`, resultSaveFielForm.value)
+        if(trikerSaveDrft.value === false){
+          textAlertDialogFunction(alertWordConst.saveDraft, true)
+          console.log(`Saved File Plan:`, resultSaveFielForm.value)
 
-        // Reload หลังแจ้งเตือนสำเร็จ
-        setTimeout(() => {
+          // Reload หลังแจ้งเตือนสำเร็จ
+          setTimeout(() => {
           // location.reload()
-        }, 500) // 0.5 วินาที
+          }, 500) // 0.5 วินาที
+        }
+        
       }
       
       
@@ -1082,11 +1104,13 @@ const saveShipmentPlan = async row => {
     console.log("File not foand", filesFromUploaderSO.value)
   }
 
+
+  console.log("submitShipmentPlanBySoEId start. save draft", trikerSaveDrft.value)
   if(row.statusId === 207){
     console.log('Saved Shipment plan if', row.csLfStatusId)
     saveDraftLoading.value = false
-    if(disabledModel.value){
-      if(!trikerSaveDrft.value){
+    if(disabledModel.value !== true){
+      if(trikerSaveDrft.value === false){
         textAlertDialogFunction('Print', true)
         setTimeout(() => {
           location.reload()
@@ -1098,7 +1122,7 @@ const saveShipmentPlan = async row => {
         
     }else{
         
-      if(!trikerSaveDrft.value){
+      if(trikerSaveDrft.value !== true){
         textAlertDialogFunction(alertWordConst.saveDraft, true)
         setTimeout(() => {
           location.reload()
@@ -1130,7 +1154,7 @@ const saveShipmentPlan = async row => {
     if (saveSearchPlanResult.value) {
 
       if(disabledModel.value){
-        if(!trikerSaveDrft.value){
+        if(trikerSaveDrft.value === false){
           textAlertDialogFunction('Print', true)
           setTimeout(() => {
             location.reload()
@@ -1142,7 +1166,7 @@ const saveShipmentPlan = async row => {
         
       }else{
         
-        if(!trikerSaveDrft.value){
+        if(trikerSaveDrft.value === false){
           textAlertDialogFunction(alertWordConst.saveDraft, true)
           setTimeout(() => {
             location.reload()
@@ -1189,11 +1213,14 @@ const checkStatusBeforeAvtion = sataus => {
 
 const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
 
+const submitLoading = ref(false)
+const submitLoadingSOERow = ref('')
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData) => {
 
   trikerSaveDrft.value = true
-
+  submitLoadingSOERow.value = soEtlLogDetailJournalID
   console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
   const saveDraftRes = await saveShipmentPlan(productRowModel.value)
@@ -1590,6 +1617,8 @@ onMounted(async () => {
 
 })
 
+
+
 const itemMock = ref([
   'Foo', 'Barหกฟหกฟหกฟหกฟหกฟหก', 'Fizz', 'Buzz',
 ])
@@ -1757,6 +1786,8 @@ const showDialogTruckOrder = (SoId, SoeId, rowData) => {
   CompanyPrint.value = rowData.shipperName
   AddressPrint.value = rowData.shipperLocation
   TruckCompanyPrint.value = rowData.truck
+
+  getDataTruckOrder()
 }
 
 ///------------ Dialog PDF
@@ -2248,10 +2279,88 @@ const paramsTruckOrder = ref({
   driverBy: contactTruckCompanyModel.value || '',
   dateDriverBy: '',
   orderBy: '',
-  dateOrderBy: '',
-  authorizedBy: '',
-  dateAuthorizedBy: '',
+  dateOrderBy: dateCurrent.value,
+  authorizedBy: dateCurrent.value,
+  dateAuthorizedBy: dateCurrent.value,
 })
+
+
+//------------------- formate truck date
+
+function convertToISO8601(dateStr) {
+  // แยกค่าจากรูปแบบ "DD/MM/YYYY"
+  const [day, month, year] = dateStr.split('/')
+  const date = new Date(`${year}-${month}-${day}T00:00:00.000Z`)
+  
+  return date.toISOString() || ''
+}
+
+function convertToDDMMYYYY(isoDateStr) {
+  const date = new Date(isoDateStr)
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const year = date.getUTCFullYear()
+  
+  return `${day}/${month}/${year}` || ''
+}
+
+const { getTruckOrderDataResult,
+  errorGetTruckOrderData,
+  fetchTruckOrderData } = useGetDataTruckOrderService()
+
+const getDataTruckOrder = async () => {
+
+
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
+
+  try{
+    const result = await fetchTruckOrderData(
+      urlApi.value,
+      soEIdModel.value,
+      'get',
+      'ShippingTruckOrder',
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if(result){
+      console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
+
+      if(getTruckOrderDataResult?.value){
+        if (paramsTruckOrder.value) {
+
+          paramsTruckOrder.value.address = getTruckOrderDataResult?.value.address
+          paramsTruckOrder.value.company = getTruckOrderDataResult?.value.company
+          paramsTruckOrder.value.contactAndTel = getTruckOrderDataResult?.value.contactAndTel
+          paramsTruckOrder.value.remark = getTruckOrderDataResult?.value.remark
+          paramsTruckOrder.value.transComName = getTruckOrderDataResult?.value.transComName
+          paramsTruckOrder.value.truckLicense = getTruckOrderDataResult?.value.truckLicense
+          paramsTruckOrder.value.truckType = getTruckOrderDataResult?.value.truckType
+          paramsTruckOrder.value.updatedDateTime = getTruckOrderDataResult?.value.updatedDateTime
+
+          paramsTruckOrder.value.contactDate = getTruckOrderDataResult?.value.contactDate
+          paramsTruckOrder.value.driverName = getTruckOrderDataResult?.value.driverName
+          paramsTruckOrder.value.orderBy = getTruckOrderDataResult?.value.orderBy
+          paramsTruckOrder.value.orderDate = getTruckOrderDataResult?.value.orderDate
+          paramsTruckOrder.value.authorizedBy = getTruckOrderDataResult?.value.authorizedBy
+          paramsTruckOrder.value.authorizedDate = getTruckOrderDataResult?.value.authorizedDate
+
+          TruckTypePrint.value =  getTruckOrderDataResult?.value.truckType
+          contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
+        }
+      }else{
+        // conslolr
+      }
+      
+      return getTruckOrderDataResult.value
+      
+    }
+  }catch(error){
+    console.log(error)
+  }
+}
 
 const loadingPrintTruckOrderForm = ref(false)
 
@@ -2261,7 +2370,23 @@ const clearParamsTruckOrder = () => {
   AddressPrint.value  = []
   TruckCompanyPrint.value = []
   TruckTypePrint.value = []
-  paramsTruckOrder.value = ''
+  paramsTruckOrder.value = {
+    runningNum: '',
+    comName: '',
+    address: '',
+    transportComName: '',
+    truckType: '',
+    truckLicense: '',
+    driverName: '',
+    tel: '',
+    remark: '',
+    driverBy: contactTruckCompanyModel.value || '',
+    dateDriverBy: '',
+    orderBy: '',
+    dateOrderBy: dateCurrent.value,
+    authorizedBy: dateCurrent.value,
+    dateAuthorizedBy: dateCurrent.value,
+  }
   personInchargeTruckCompanyModel.value = ''
   contactTruckCompanyModel.value = ''
   console.log('clearParamsTruckOrder', CompanyPrint.value)
@@ -2282,9 +2407,9 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.orderBy = userDataInfo.value.firstName
   paramsTruckOrder.value.runningNum = dataRowModel?.value.truckReservingNumber
 
-  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
-  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
-  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value || ''
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value || ''
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value || ''
 
   console.log('loading.......')
   
@@ -2333,6 +2458,97 @@ const handlePrintTruckOrderPDF = () => {
   loadingPrintTruckOrderForm.value = false
   
   
+}
+
+const { saveTruckOrderResult,
+  errorSaveTruckOrder,
+  saveTruckOrder } = useSaveTruckOrderService()
+
+const bodySaveTruckOrder = data => ({
+  soEtlLogDetailJournalID: soEIdModel.value,
+  company: CompanyPrint.value,
+  address: AddressPrint.value,
+  transComName: TruckCompanyPrint.value,
+  truckType: TruckTypePrint.value,
+  truckLicense: data.truckLicense,
+  remark: data.remark,
+  
+  driverName: personInchargeTruckCompanyModel.value,
+
+  orderBy: userDataInfo?.value.firstName,
+  contactAndTel: contactTruckCompanyModel.value,
+  authorizedBy: data.authorizedBy,
+
+  contactDate: convertToISO8601(data.dateDriverBy)  || convertToISO8601(dateCurrent.value) || '',
+  orderDate: data.orderDate  || convertToISO8601(dateCurrent.value),
+  authorizedDate: data.authorizedDate  || convertToISO8601(dateCurrent.value),
+  lastPrintDateTime: data.orderDate  || convertToISO8601(dateCurrent.value),
+})
+
+const bodyFirstTruckOrder = ref(
+  {
+    "soEtlLogDetailJournalID": 0,
+    "company": "string",
+    "address": "string",
+    "transComName": "string",
+    "truckType": "string",
+    "truckLicense": "string",
+    "driverName": "string",
+    "contactAndTel": "string",
+    "remark": "string",
+    "orderBy": "string",
+    "authorizedBy": "string",
+    "contactDate": "2025-03-10T04:43:53.887Z",
+    "orderDate": "2025-03-10T04:43:53.887Z",
+    "authorizedDate": "2025-03-10T04:43:53.887Z",
+    "lastPrintDateTime": "2025-03-10T04:43:53.887Z",
+  },
+)
+
+const loadingSaveTruckOrderForm = ref(false)
+
+const handleSavetruckOrder = async type => {
+
+  loadingSaveTruckOrderForm.value = true
+  console.log('paramsTruckOrder', paramsTruckOrder.value)
+
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
+
+  // const body = null
+
+  // if(type ==='first'){
+  //   body = bodyFirstTruckOrder()
+  // }else{
+  //   body = bodySaveTruckOrder(paramsTruckOrder.value)
+  // }
+
+  const body = bodySaveTruckOrder(paramsTruckOrder.value)
+
+
+  try{
+    const result = await saveTruckOrder(
+      urlApi.value,
+      'save',
+      whereHouse,
+      accessTokenAtStore,
+      body,
+    )
+
+    if(result){
+      console.log('saveTruckOrderResult', saveTruckOrderResult?.value)
+      textAlertDialogFunction("SAVE TRUCK ORDER", true)
+      
+    }else{
+      console.log('errorSaveTruckOrder', errorSaveTruckOrder.value)
+      textAlertDialogFunction("SAVE TRUCK ORDER", false)
+    }
+  }catch(error){
+
+  }
+
+  loadingSaveTruckOrderForm.value = false
 }
 </script>
 
@@ -3144,7 +3360,7 @@ const handlePrintTruckOrderPDF = () => {
             <tr>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dateCurrent"
+                  v-model="paramsTruckOrder.dateDriverBy"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3152,7 +3368,7 @@ const handlePrintTruckOrderPDF = () => {
               </th>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dateCurrent"
+                  v-model="paramsTruckOrder.dateOrderBy"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3160,7 +3376,7 @@ const handlePrintTruckOrderPDF = () => {
               </th>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="dateCurrent"
+                  v-model="paramsTruckOrder.dateAuthorizedBy"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3171,6 +3387,30 @@ const handlePrintTruckOrderPDF = () => {
         </VCardText>
 
         <VCardText class="d-flex justify-end">
+          <VBtn
+            color="warning"
+            class="d-flex justify-space-between mx-2"
+            @click="handleSavetruckOrder(), loadingSaveTruckOrderForm = true"
+          >
+            <span v-if="!loadingSaveTruckOrderForm">
+
+              Save
+
+            </span>
+            
+            <div>
+              <VProgressCircular
+                v-if="loadingSaveTruckOrderForm"
+                start
+                :rotate="360"
+                :size="30"
+                indeterminate
+                :model-value="progressValue"
+                color="primary"
+              />
+            </div>
+          </VBtn>
+
           <VBtn
             color="warning"
             class="d-flex justify-space-between"
@@ -3362,7 +3602,10 @@ const handlePrintTruckOrderPDF = () => {
           <!-- 👉 table head -->
           <thead class="">
             <tr>
-              <th style="width: 60px;" class="sticky-column">
+              <th
+                style="width: 60px;"
+                class="sticky-column"
+              >
                 <VCheckbox
                   v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                   v-model="isSelectAll"
@@ -3696,13 +3939,19 @@ const handlePrintTruckOrderPDF = () => {
                   @click="toggleDirection('updatedDate')"
                 /></span>
               </th>
-              <th class="text-center">
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
+                class="text-center"
+              >
                 <span style="font-weight: bold;" />
               </th>
               <th class="text-center">
                 <span style="font-weight: bold;">{{ $t('Action') }}</span>
               </th>
-              <th class="text-center">
+              <th
+                v-if="canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
+                class="text-center"
+              >
                 <span style="font-weight: bold;" />
               </th>
             </tr>
@@ -3764,10 +4013,11 @@ const handlePrintTruckOrderPDF = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <span>
+                <span style="font-size: 12px;">
                   <VChip
                     :color="colorStatusWithId(product.statusId).color"
                     :style="{ color: colorStatusWithId(product.statusId).color }"
+                    style="font-size: 12px;"
                   >{{ product.statusText }} 
                     <VTooltip
                       activator="parent"
@@ -3781,7 +4031,7 @@ const handlePrintTruckOrderPDF = () => {
                       <p class="mb-0">{{ (product.whStatusText) }}</p>
                     </VTooltip>
                   </VChip>
-                  <span v-if="true">{{ product.checkSheetTypeName }}</span>
+                  <span v-if="false">{{ product.checkSheetTypeName }}</span>
                   
                 </span>
               </td>
@@ -3968,7 +4218,7 @@ const handlePrintTruckOrderPDF = () => {
                   >
                     <span
                       v-if="product.shipperConditions"
-                      style="overflow: hidden;min-width: 100px; max-width: 150px; text-overflow: ellipsis;"
+                      style="overflow: hidden; min-width: 100px; max-width: 150px; font-size: 12px; text-overflow: ellipsis;"
                     >{{ product.shipperConditions }}</span>
                     <span
                       v-else
@@ -3998,8 +4248,9 @@ const handlePrintTruckOrderPDF = () => {
                 <VTextField
                   v-model="product.shippingEndUser"
                   density="compact"
+                  class="text-field"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
-                  style=" min-width: 150px;"
+                  style=" min-width: 150px; font-size: 12px !important;"
                 >
                   <template #label>
                     <span style="font-size: 12px;">End User</span>
@@ -4076,13 +4327,18 @@ const handlePrintTruckOrderPDF = () => {
                   style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
                   :color="product.lot ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Lot', product.lot, product.soEtlLogDetailJournalID, disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product))"
+                  @click="textAreaRemarkDialogActive('Lot', product.lot, product.soEtlLogDetailJournalID, 
+                                                     disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product),
+                                                     canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute)"
                 >
                   <span
                     v-if="product.lot"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.lot }}</span>
-                  <span v-else>Lot</span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >Lot</span>
                 </VBtn>
               </td>
 
@@ -4646,13 +4902,18 @@ const handlePrintTruckOrderPDF = () => {
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
                   variant="outlined"
                   :color="product.saL_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID, disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId))"
+                  @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID, 
+                                                     disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId),
+                                                     canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute)"
                 >
                   <span
                     v-if="product.saL_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.saL_Remarks }}</span>
-                  <span v-else>remark(SAL)</span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >remark(SAL)</span>
                 </VBtn>
               </td>
 
@@ -4678,13 +4939,18 @@ const handlePrintTruckOrderPDF = () => {
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
                   variant="outlined"
                   :color="product.wH_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID, disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId))"
+                  @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID, 
+                                                     disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId),
+                                                     canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute)"
                 >
                   <span
                     v-if="product.wH_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.wH_Remarks }}</span>
-                  <span v-else>remark(WH)</span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >remark(WH)</span>
                 </VBtn>
               </td>
 
@@ -4710,13 +4976,18 @@ const handlePrintTruckOrderPDF = () => {
                   variant="outlined"
                   :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
                   :color="product.loG_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID, disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId))"
+                  @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID, 
+                                                     disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId),
+                                                     canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute)"
                 >
                   <span
                     v-if="product.loG_Remarks"
-                    style="overflow: hidden; max-width: 130px; text-overflow: ellipsis;"
+                    style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{ product.loG_Remarks }}</span>
-                  <span v-else>remark(LOG)</span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >remark(LOG)</span>
                 </VBtn>
               </td>
 
@@ -4760,7 +5031,7 @@ const handlePrintTruckOrderPDF = () => {
 
               <!-- 👉 Actions -->
               <td
-                v-if="!accountWHSub"
+                v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
                 style="width: 150px; font-size: 12px;"
                 class="text-center px-1 cursor-pointer"
                 :style="{ 
@@ -4777,7 +5048,7 @@ const handlePrintTruckOrderPDF = () => {
               >
                 <VBtn
                   :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product) || 
-                    !canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible "
+                    !canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
                   :color="accountINSP ? 'grey' : 'warning'"
                   @click="saveShipmentPlan(product), saveDraftLoading = true"
                 >
@@ -4796,7 +5067,7 @@ const handlePrintTruckOrderPDF = () => {
                 </VBtn>
               </td>
               <td
-                v-if="!accountWHSub"
+                v-if="canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
                 style="width: 150px; font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
@@ -4816,9 +5087,20 @@ const handlePrintTruckOrderPDF = () => {
                     || !canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
-                  @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product)"
+                  @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
                 >
-                  <span style="font-size: 12px;">Submit </span>
+                  <span
+                    v-if="submitLoading && product.soEtlLogDetailJournalID === submitLoadingSOERow"
+                    style="font-size: 12px;"
+                  ><VProgressCircular
+                    :size="30"
+                    color="primary"
+                    indeterminate
+                  /></span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >Submit </span>
                 </VBtn>
               </td>
               <td

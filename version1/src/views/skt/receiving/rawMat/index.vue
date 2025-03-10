@@ -17,6 +17,34 @@ const props = defineProps({
 
 const switchLog = ref(false)
 
+//-------------------------------------------- Permission -----------------------------------------
+
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '2',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+}
+
 watchEffect(() => {
   // console.log('***switchLog', switchLog.value)
   if (sessionStorage.getItem('insetOpenLogSwitch1') === 'true') {
@@ -1857,10 +1885,10 @@ const handleInputAmount = (e, AmountUnits) => {
 
 // watchEffect จะเรียกใช้ calculateTotals ทุกครั้งที่ข้อมูลใน dataRaeMatRequest เปลี่ยนแปลง
 watchEffect(() => {
-  // console.log('data', data.value)
-  // if(data?.value.receiveTypeId === 3){
-  //   genAmounUnitLorry()
-  // }
+  console.log('data', data.value)
+  if(data?.value.receiveTypeId === 3){
+    genAmounUnitLorry()
+  }
   
   calculationPONew()
 })
@@ -2815,13 +2843,13 @@ const getDisabledFollowStatusNRole = () => {
                 Amount (Unit)
               </th>
 
-              <th
+              <td
                 class="text-center"
                 colspan="2"
                 :style="{ minWidth: '170px' }"
               >
                 <VTextField
-                  v-if="true"
+                  v-if="data?.receiveTypeId !== 3"
                   v-model="purchaseOrder.actualAmountUnits_1"
                   :readonly="readonlyAllInput()"
                   :rules="[
@@ -2842,14 +2870,15 @@ const getDisabledFollowStatusNRole = () => {
                     <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
                   </template>
                 </VTextField>
-                <span v-if="false">{{ purchaseOrder.actualAmountUnits_1 }}</span>
+                <span v-if="data?.receiveTypeId === 3 && purchaseOrder.actualAmountUnits_1">{{ purchaseOrder.actualAmountUnits_1 }}</span>
+                <span v-if="data?.receiveTypeId === 3 && !purchaseOrder.actualAmountUnits_1">0</span>
                 <span
                   v-if="validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) !== ''"
                   class="text-red"
                 >
                   {{ validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) }}
                 </span>
-              </th>
+              </td>
 
               <th
                 class="text-center"
