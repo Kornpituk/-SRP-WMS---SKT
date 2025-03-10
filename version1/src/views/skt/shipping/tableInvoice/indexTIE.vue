@@ -2284,6 +2284,7 @@ const paramsTruckOrder = ref({
   dateAuthorizedBy: dateCurrent.value,
 })
 
+
 //------------------- formate truck date
 
 function convertToISO8601(dateStr) {
@@ -2291,7 +2292,7 @@ function convertToISO8601(dateStr) {
   const [day, month, year] = dateStr.split('/')
   const date = new Date(`${year}-${month}-${day}T00:00:00.000Z`)
   
-  return date.toISOString()
+  return date.toISOString() || ''
 }
 
 function convertToDDMMYYYY(isoDateStr) {
@@ -2300,7 +2301,7 @@ function convertToDDMMYYYY(isoDateStr) {
   const month = String(date.getUTCMonth() + 1).padStart(2, '0')
   const year = date.getUTCFullYear()
   
-  return `${day}/${month}/${year}`
+  return `${day}/${month}/${year}` || ''
 }
 
 const { getTruckOrderDataResult,
@@ -2369,7 +2370,23 @@ const clearParamsTruckOrder = () => {
   AddressPrint.value  = []
   TruckCompanyPrint.value = []
   TruckTypePrint.value = []
-  paramsTruckOrder.value = ''
+  paramsTruckOrder.value = {
+    runningNum: '',
+    comName: '',
+    address: '',
+    transportComName: '',
+    truckType: '',
+    truckLicense: '',
+    driverName: '',
+    tel: '',
+    remark: '',
+    driverBy: contactTruckCompanyModel.value || '',
+    dateDriverBy: '',
+    orderBy: '',
+    dateOrderBy: dateCurrent.value,
+    authorizedBy: dateCurrent.value,
+    dateAuthorizedBy: dateCurrent.value,
+  }
   personInchargeTruckCompanyModel.value = ''
   contactTruckCompanyModel.value = ''
   console.log('clearParamsTruckOrder', CompanyPrint.value)
@@ -2390,9 +2407,9 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.orderBy = userDataInfo.value.firstName
   paramsTruckOrder.value.runningNum = dataRowModel?.value.truckReservingNumber
 
-  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
-  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
-  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value || ''
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value || ''
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value || ''
 
   console.log('loading.......')
   
@@ -2449,32 +2466,66 @@ const { saveTruckOrderResult,
 
 const bodySaveTruckOrder = data => ({
   soEtlLogDetailJournalID: soEIdModel.value,
-  company: data.company,
-  address: data.address,
-  transComName: data.transComName,
-  truckType: data.truckType,
+  company: CompanyPrint.value,
+  address: AddressPrint.value,
+  transComName: TruckCompanyPrint.value,
+  truckType: TruckTypePrint.value,
   truckLicense: data.truckLicense,
   remark: data.remark,
   
-  driverName: data.driverName,
+  driverName: personInchargeTruckCompanyModel.value,
 
   orderBy: userDataInfo?.value.firstName,
   contactAndTel: contactTruckCompanyModel.value,
   authorizedBy: data.authorizedBy,
 
-  contactDate: convertToISO8601(data.dateDriverBy),
-  orderDate: data.orderDate,
-  authorizedDate: data.authorizedDate,
-  lastPrintDateTime: data.orderDate,
+  contactDate: convertToISO8601(data.dateDriverBy)  || convertToISO8601(dateCurrent.value) || '',
+  orderDate: data.orderDate  || convertToISO8601(dateCurrent.value),
+  authorizedDate: data.authorizedDate  || convertToISO8601(dateCurrent.value),
+  lastPrintDateTime: data.orderDate  || convertToISO8601(dateCurrent.value),
 })
+
+const bodyFirstTruckOrder = ref(
+  {
+    "soEtlLogDetailJournalID": 0,
+    "company": "string",
+    "address": "string",
+    "transComName": "string",
+    "truckType": "string",
+    "truckLicense": "string",
+    "driverName": "string",
+    "contactAndTel": "string",
+    "remark": "string",
+    "orderBy": "string",
+    "authorizedBy": "string",
+    "contactDate": "2025-03-10T04:43:53.887Z",
+    "orderDate": "2025-03-10T04:43:53.887Z",
+    "authorizedDate": "2025-03-10T04:43:53.887Z",
+    "lastPrintDateTime": "2025-03-10T04:43:53.887Z",
+  },
+)
 
 const loadingSaveTruckOrderForm = ref(false)
 
-const handleSavetruckOrder = async () => {
+const handleSavetruckOrder = async type => {
 
   loadingSaveTruckOrderForm.value = true
+  console.log('paramsTruckOrder', paramsTruckOrder.value)
+
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
+
+  // const body = null
+
+  // if(type ==='first'){
+  //   body = bodyFirstTruckOrder()
+  // }else{
+  //   body = bodySaveTruckOrder(paramsTruckOrder.value)
+  // }
 
   const body = bodySaveTruckOrder(paramsTruckOrder.value)
+
 
   try{
     const result = await saveTruckOrder(
