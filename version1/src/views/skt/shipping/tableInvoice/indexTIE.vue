@@ -1777,18 +1777,45 @@ const panel = ref(['filter'])
 const isDialogVisiblePrintTruck = ref(false)
 const saleOrderNo = ref('')
 
+const sOHistoryTruckOrder = ref()
+const sOeIdHistoryTruckOrder = ref()
+const rowDataHistoryTruckOrder = ref(JSON.parse(sessionStorage.getItem('rowDataHistoryTruckOrderSST')))
+
+
+
 const showDialogTruckOrder = (SoId, SoeId, rowData) => {
+
   dataRowModel.value = rowData
   isDialogVisiblePrintTruck.value = true
   saleOrderNo.value = SoId
   soEIdModel.value = SoeId
 
-  CompanyPrint.value = rowData.shipperName
-  AddressPrint.value = rowData.shipperLocation
-  TruckCompanyPrint.value = rowData.truck
+
+  console.log("RowData", rowData)
+
+  CompanyPrint.value = rowData.shipperName || ' '
+  AddressPrint.value = rowData.shipperLocation || ' '
+  TruckCompanyPrint.value = rowData.truck || ' '
+
+  // sessionStorage.setItem('savedTruckOrder', JSON.stringify({ SoId, SoeId, rowData }))
 
   getDataTruckOrder()
 }
+
+// 🚀 ฟังก์ชันสำหรับโหลดค่าที่บันทึกไว้เมื่อ reload หน้า
+// const loadSavedTruckOrder = () => {
+//   const savedData = sessionStorage.getItem('savedTruckOrder')
+//   if (savedData) {
+//     const { SoId, SoeId, rowData } = JSON.parse(savedData)
+
+//     showDialogTruckOrder(SoId, SoeId, rowData)
+//   }
+// }
+
+// // 🔥 เรียกใช้ `loadSavedTruckOrder` เมื่อหน้าโหลด
+// window.addEventListener('load', loadSavedTruckOrder)
+
+
 
 ///------------ Dialog PDF
 
@@ -2326,7 +2353,7 @@ const getDataTruckOrder = async () => {
     )
 
     if(result){
-      console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
+      
 
       if(getTruckOrderDataResult?.value){
         if (paramsTruckOrder.value) {
@@ -2349,6 +2376,8 @@ const getDataTruckOrder = async () => {
 
           TruckTypePrint.value =  getTruckOrderDataResult?.value.truckType
           contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
+
+          console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
         }
       }else{
         // conslolr
@@ -2362,10 +2391,28 @@ const getDataTruckOrder = async () => {
   }
 }
 
+// watch(() => {
+//   if(rowDataHistoryTruckOrder.value !== '' && 
+//   rowDataHistoryTruckOrder.value !== 'null' && 
+//   rowDataHistoryTruckOrder.value !== null){
+//     isDialogVisiblePrintTruck.value = true
+//     showDialogTruckOrder(sessionStorage.getItem('sOHistoryTruckOrderSST'), 
+//       sessionStorage.getItem('sOeIdHistoryTruckOrderSST'), 
+//       JSON.parse(sessionStorage.getItem('rowDataHistoryTruckOrderSST')))
+//   }
+// })
+
 const loadingPrintTruckOrderForm = ref(false)
 
 const clearParamsTruckOrder = () => {
   console.log('clearParamsTruckOrder', CompanyPrint.value)
+
+  sessionStorage.removeItem('savedTruckOrder')
+  dataRowModel.value = null
+  isDialogVisiblePrintTruck.value = false
+  saleOrderNo.value = null
+  soEIdModel.value = null
+
   CompanyPrint.value  = []
   AddressPrint.value  = []
   TruckCompanyPrint.value = []
@@ -2390,6 +2437,12 @@ const clearParamsTruckOrder = () => {
   personInchargeTruckCompanyModel.value = ''
   contactTruckCompanyModel.value = ''
   console.log('clearParamsTruckOrder', CompanyPrint.value)
+
+  // sessionStorage.setItem('sOHistoryTruckOrderSST', 'null')
+  // sessionStorage.setItem('sOeIdHistoryTruckOrderSST', 'null')
+  // sessionStorage.setItem('rowDataHistoryTruckOrderSST', null)
+
+  
 }
 
 const handlePrintTruckOrderPDF = () => {
@@ -2539,6 +2592,14 @@ const handleSavetruckOrder = async type => {
     if(result){
       console.log('saveTruckOrderResult', saveTruckOrderResult?.value)
       textAlertDialogFunction("SAVE TRUCK ORDER", true)
+
+      sessionStorage.removeItem('sOHistoryTruckOrderSST')
+      sessionStorage.removeItem('sOeIdHistoryTruckOrderSST')
+      sessionStorage.removeItem('rowDataHistoryTruckOrderSST')
+
+      setTimeout(() => {
+        location.reload()
+      }, 500)
       
     }else{
       console.log('errorSaveTruckOrder', errorSaveTruckOrder.value)

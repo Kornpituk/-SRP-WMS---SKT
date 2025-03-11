@@ -154,11 +154,28 @@ export const shipmentPlanRepository = {
 
   async saveTruckOrderRepo(urlApi, form, whereHouse, accessToken, body) {
     try {
-      const response = await axios.post(`${urlApi}/api/v1/ShippingTruckOrder/${form}`, body, {
+      const response = await axios.post(`${urlApi}/api/v1/ShippingTruckOrder/${form}`, {}, {
         headers: {
           'accept': '*/*',
           'x-location': whereHouse,
           Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          soEtlLogDetailJournalID: body.soEtlLogDetailJournalID,
+          company: body.company,
+          address: body.address,
+          transComName: body.transComName,
+          truckType: body.truckType,
+          truckLicense: body.truckLicense,
+          driverName: body.driverName,
+          contactAndTel: body.contactAndTel,
+          remark: body.remark,
+          orderBy: body.orderBy,
+          authorizedBy: body.authorizedBy,
+          contactDate: body.contactDate,
+          orderDate: body.orderDate,
+          authorizedDate: body.authorizedDate,
+          lastPrintDateTime: body.lastPrintDateTime,
         },
       })
     
