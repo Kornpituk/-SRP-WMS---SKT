@@ -2349,9 +2349,9 @@ const { getTruckOrderDataResult,
 const getDataTruckOrder = async () => {
 
 
-  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
-  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
-  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
+  paramsTruckOrder.value.dateOrderDate = dateCurrent.value
+  paramsTruckOrder.value.dateDriverDate = dateCurrent.value
+  paramsTruckOrder.value.dateAuthorizedDate = dateCurrent.value
 
   try{
     const result = await fetchTruckOrderData(
@@ -2387,6 +2387,7 @@ const getDataTruckOrder = async () => {
 
           TruckTypePrint.value =  getTruckOrderDataResult?.value.truckType
           contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
+          personInchargeTruckCompanyModel.value = getTruckOrderDataResult?.value.driverName
 
           console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
         }
@@ -3330,7 +3331,7 @@ const handleSavetruckOrder = async type => {
                     label="Driver's Name"
                     class="text-center"
                   />
-                  <span v-if="false">gg{{ personInchargeTruckCompanyModel }}</span>
+                  <span v-if="false">{{ personInchargeTruckCompanyModel }}</span>
                 </td>
               </tr>
               <tr v-if="false">
@@ -3432,7 +3433,7 @@ const handleSavetruckOrder = async type => {
             <tr>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="paramsTruckOrder.dateDriverBy"
+                  v-model="paramsTruckOrder.dateDriverDate"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3440,7 +3441,7 @@ const handleSavetruckOrder = async type => {
               </th>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="paramsTruckOrder.dateOrderBy"
+                  v-model="paramsTruckOrder.dateOrderDate"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"
@@ -3448,7 +3449,7 @@ const handleSavetruckOrder = async type => {
               </th>
               <th colspan="4">
                 <AppDateTimePicker
-                  v-model="paramsTruckOrder.dateAuthorizedBy"
+                  v-model="paramsTruckOrder.dateAuthorizedDate"
                   density="compact"
                   placeholder="Select date"
                   :config="{ dateFormat: 'd/m/Y' }"

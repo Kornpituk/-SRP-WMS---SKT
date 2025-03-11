@@ -2826,7 +2826,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="2"
               >
                 <AppDateTimePicker
-                  v-if="!frozeCheck"
+                  v-if="!readonlyAllInput()"
                   v-model="purchaseOrder.expectDeliveryDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -3945,7 +3945,7 @@ const getDisabledFollowStatusNRole = () => {
       >
         <div class="py-0 d-flex justify-end">
           <VBtn
-            v-if="getDisabledFollowStatusNRole()"
+            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
             class=""
             color="green"
             style="font-size: 12px;"

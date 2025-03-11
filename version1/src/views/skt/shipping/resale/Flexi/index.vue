@@ -53,6 +53,35 @@ const soEIdModel = ref(dataProductRow.value.soEtlLogDetailJournalID)
 //------------------------------------- Permissions ---------------------------------
 const showBtnCheckSheet = () => {
   return !!(userDataInfo?.value.id === '00025' || userDataInfo?.value.id === '00023' || userDataInfo?.value.id === '00042' || userDataInfo?.value.id === '00043')
+
+}
+
+//-------------------------------------------- Permission -----------------------------------------
+
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '9',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
 
 //--------------------------------- disabled ----------------------------------
@@ -2022,12 +2051,15 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
     </VCol>
 
     <VCol
-      v-if="department === 'Warehouse' || showBtnCheckSheet()"
+      v-if="department === 'Warehouse' || 
+        showBtnCheckSheet()"
       cols="12"
     >
       <div class="d-flex justify-end">
         <VBtn
-          v-if="statusModel === 1102 || statusModel === 1103 || statusModel === 0"
+          v-if="statusModel === 1102 || 
+            statusModel === 1103 || 
+            statusModel === 0"
           class="mx-2"
           color="warning"
           @click="handleSaveDraft"
@@ -2035,7 +2067,9 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
           Save Draft
         </VBtn>
         <VBtn
-          v-if="statusModel === 1102 || statusModel === 1103 || statusModel === 0"
+          v-if="statusModel === 1102 || 
+            statusModel === 1103 || 
+            statusModel === 0"
           class="mx-2"
           @click="handleSubmit('submit')"
         >

@@ -20,6 +20,7 @@ const route = useRoute()
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 //-------------------------------------------- Permission -----------------------------------------
 
@@ -58,7 +59,7 @@ const frozeCheckVif = ref(true)
 const data = ref(itemStore.getItemDetails('itemDataCookies'))
 
 if(data.value){
-  console.log('Data:', data)
+  //console.log('Data:', data)
 }
 
 const statusId = ref('')
@@ -136,7 +137,8 @@ const removeFile = index => {
   files.value.splice(index, 1)
   if (!files.value.length) {
     fileMuti.value = []
-    console.log('removeFile', fileMuti.value)
+
+    //console.log('removeFile', fileMuti.value)
   }
 }
 
@@ -144,7 +146,8 @@ const removeFileDraft = index => {
   coaFiles.value.splice(index, 1)
   if (!coaFiles.value.length) {
     coaFiles.value = []
-    console.log('coaFiles', coaFiles.value)
+
+    //console.log('coaFiles', coaFiles.value)
   }
 }
 
@@ -162,8 +165,8 @@ const interval = ref()
 const maxFileSizeMB = 2 // Set max file size to 1 MB
 
 watchEffect(() => {
-  console.log('fileMuti++',  fileMuti.value)
-  console.log('files+++',  files.value)
+  //console.log('fileMuti++',  fileMuti.value)
+  //console.log('files+++',  files.value)
 })
 
 const getCOAReceivingForm = () => {
@@ -195,7 +198,8 @@ const getCOAReceivingForm = () => {
         const lotData = response.data.data
 
         coaFiles.value = lotData
-        console.log('[*****Headers COA]]!!: ', lotData)
+
+        //console.log('[*****Headers COA]]!!: ', lotData)
       })
       .catch(error => {
         console.error('Error:', error)
@@ -264,7 +268,8 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
         resolve()
       })
     }))
-    console.log('Added new files from files.value', formData)
+
+    //console.log('Added new files from files.value', formData)
   }
 
   // ถ้ามีไฟล์เก่า ให้นำไฟล์เก่ามาเพิ่มลงใน formData
@@ -277,12 +282,13 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
         resolve()
       })
     }))
-    console.log('Added old files from coaFiles', formData)
+
+    //console.log('Added old files from coaFiles', formData)
   }
 
   // ถ้าไม่มีไฟล์ใหม่หรือไฟล์เก่าเลย ให้หยุดการทำงาน
   if (!hasNewFiles && !hasOldFiles) {
-    console.log('No files to save.')
+    //console.log('No files to save.')
     
 
   }
@@ -292,7 +298,7 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
   // ส่ง formData ที่รวมไฟล์เก่าและไฟล์ใหม่ไปยัง API
   
   try {
-    console.log('formData++', formData)
+    //console.log('formData++', formData)
 
     const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-coas/${data.value.poEtlLogDetailJournalID}`, formData, {
       headers: {
@@ -303,7 +309,7 @@ const saveCOARecevingFrom = async () => {  ////---- โค้ดใหม่ ย
       },
     })
 
-    console.log('[products.value]!!: ', response.data)
+    //console.log('[products.value]!!: ', response.data)
   } catch (error) {
     console.error('Error:', error)
   }
@@ -319,7 +325,7 @@ const deleteCOARecevingFrom = () => {
     },
   })
     .then(response => {
-      console.log('[products.value]!!: ', response.data)
+      //console.log('[products.value]!!: ', response.data)
     })
     .catch(error => {
       console.error('Error:', error)
@@ -357,7 +363,7 @@ const isDialogRejectVisible = ref(false)
 //---------------------------------- Controllers ----------------------------------------------------
 const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 
-console.log("poEtlLogDetailJournalID++**", itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+//console.log("poEtlLogDetailJournalID++**", itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 
 //--------------------------------- Component ---------------------------------------------
 //--------------------- alertDialog--------------------------------------------------------
@@ -529,7 +535,7 @@ const generatedJournalId = () => {
   },
   {})
     .then(response => {
-      console.log('%c[generatedJournalId] nre!!: ', "color: green; font-weight: bold", response.data)
+      //console.log('%c[generatedJournalId] nre!!: ', "color: green; font-weight: bold", response.data)
 
       // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
       if (response.data && response.data.data && response.data.data.length > 0) {
@@ -553,7 +559,8 @@ watch(() => {
 
   if(statusId.value === 10 || statusId.value === 1){
     frozeCheck.value = false
-    console.log("TfrozeCheckVifT", frozeCheck.value)
+
+    //console.log("TfrozeCheckVifT", frozeCheck.value)
   }else{
     frozeCheck.value = true
   } 
@@ -628,7 +635,7 @@ const saveDraftHeader = async () => {
   
   const bodyCheck = dataHeader.value
 
-  // console.log('Start saveDraftHeader!!', bodyCheck.actualCheck)
+  // //console.log('Start saveDraftHeader!!', bodyCheck.actualCheck)
 
   if(trickerSubmit.value){
     if(!bodyCheck.actualCheck || bodyCheck.actualCheck < 1){
@@ -655,7 +662,7 @@ const saveDraftHeader = async () => {
 
   if (result.success === true) {
     // isDialogSubmitSuccessVisible.value = true
-    console.log('Save header details successful')
+    //console.log('Save header details successful')
   } else {
     // isDialogSubmitFailedVisible.value = true
     throw 'Failed to save header details'+result.error
@@ -798,7 +805,7 @@ const handleAcceptPackaging = async () => {
 
     // ตรวจสอบถ้า packagingFormAccept สำเร็จ
     if (packagingFormAccept) {
-      console.log('accept reject successful')
+      //console.log('accept reject successful')
       alertLotErrorMessage.value.success = false
       isDialogRejectVisible.value = false
 
@@ -853,10 +860,10 @@ const handleRejectPackaging = async word => {
   }else{
     const result = await rejectPackagingForm(commentReject.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, "Packaging", whereHouse, accessTokenAtStore)
 
-    console.log("result Packaing", packagingFormReject.success)
+    //console.log("result Packaing", packagingFormReject.success)
     if (result.success === true) {
       
-      // console.log('Save lot reject successful')
+      // //console.log('Save lot reject successful')
       // alertLotErrorMessage.value.success = false
       // isDialogRejectVisible.value = false
 
@@ -897,9 +904,9 @@ const saveDraftLotDetails = async () => {
   // if(trickerSubmit.value){
   //   //validate
   //   bodyCheck.forEach((item, index) => {
-  //     console.log('Validate Lot')
+  //     //console.log('Validate Lot')
   //     if (!item.actualAnalysis || item.actualAnalysis === '') {
-  //       console.log('Validate Lot if')
+  //       //console.log('Validate Lot if')
 
   //       // เก็บข้อความแยกตามลำดับไอเท็มที่มีปัญหา
   //       alertLotErrorMessage.value.actualAnalysis[`item_${index + 1}`] = `Actual Analysis is required for item ${index + 1}. Please enter a value.`
@@ -920,9 +927,9 @@ const saveDraftLotDetails = async () => {
 
     // วนตรวจสอบแต่ละไอเท็ม
     bodyCheck.forEach((item, index) => {
-      console.log('Validate Lot')
+      //console.log('Validate Lot')
       if (!item.actualAnalysis || item.actualAnalysis === '') {
-        console.log('Validate Lot if')
+        //console.log('Validate Lot if')
         hasError = true // ตั้งค่าสถานะข้อผิดพลาดเมื่อพบข้อผิดพลาด
         alertLotErrorMessage.value.success = true
         alertLotErrorMessage.value.actualAnalysis[`item_${index + 1}`] = `Actual Analysis is required for item ${index + 1}. Please enter a value.`
@@ -938,7 +945,7 @@ const saveDraftLotDetails = async () => {
   const result = await handleSaveDraftLot(analyticalItemsData.value, urlApi.value, whereHouse, accessTokenAtStore)
 
   if (result.success) {
-    console.log('Save lot details successful')
+    //console.log('Save lot details successful')
     alertLotErrorMessage.value.success = false
   } else {
     console.error('Failed to save lot details')
@@ -981,7 +988,7 @@ const { getFileCoa, errorMessageFileCoa, fetchFileCoaHeader } = useGetCOAFilePac
 const getFileCoaByName = nameFiel => {
   fetchFileCoaHeader(nameFiel, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
-  console.log("+++++++getFileCoa.value", getFileCoa.value)
+  //console.log("+++++++getFileCoa.value", getFileCoa.value)
 
   return getFileCoa.value
 }
@@ -989,15 +996,15 @@ const getFileCoaByName = nameFiel => {
 getFileCoaByName('6aaf646f-d008-4e6a-aa46-75a17fc180b4.png')
 
 const testCoa = () => {
-  console.log('Test Coa')
+  //console.log('Test Coa')
 }
 
 const showValueUpload = index => {
-  console.log("Start Upload!!", index)
+  //console.log("Start Upload!!", index)
 }
 
 const testCoaO = () => {
-  console.log('Test Coa', getFormCoa.value)
+  //console.log('Test Coa', getFormCoa.value)
 }
 
 const fileUrls = ref({}) // เก็บ URLs ที่ถูกสร้างขึ้น
@@ -1014,7 +1021,7 @@ const getFileUrl = file => {
 const coaIdForDelete = ref([])
 
 const testCoaODelete = () => {
-  console.log('Test Coa', coaIdForDelete.value)
+  //console.log('Test Coa', coaIdForDelete.value)
 }
 
 // ฟังก์ชันสำหรับลบไฟล์และปล่อย URL
@@ -1029,9 +1036,10 @@ const removeFileN = index => {
   if(file){
     if(file.length < 1){
       fileCoaNew.value = []
-      console.log('clear fileCoaNew complet!')
+
+      //console.log('clear fileCoaNew complet!')
     }else{
-      console.log('Test length < 1')
+      //console.log('Test length < 1')
     }
     
   }
@@ -1052,9 +1060,10 @@ const removeFileO = (index, id) => {
   if(file){
     if(file.length < 1){
       getFormCoa.value = []
-      console.log('clear getFormCoa complet!')
+
+      //console.log('clear getFormCoa complet!')
     }else{
-      console.log('Test length < 1')
+      //console.log('Test length < 1')
     }
     
   }
@@ -1091,10 +1100,10 @@ const trickerSubmit = ref(false)
 const handleSaveDraftCoa = async () => {
   const result = ref(1)
 
-  console.log("trickerSubmit", trickerSubmit.value)
+  //console.log("trickerSubmit", trickerSubmit.value)
 
   if(trickerSubmit.value && wordForSubmit.value !== 'REJECT'){
-    console.log("trickerSubmit!++2", fileCoaNew.value, getFormCoa.value, wordForSubmit.value)
+    //console.log("trickerSubmit!++2", fileCoaNew.value, getFormCoa.value, wordForSubmit.value)
 
     // if (!fileCoaNew.value.length > 0 && !getFormCoa.value && !fileCoaNew.value.length > 0) {
     //   result.value -=1
@@ -1108,19 +1117,20 @@ const handleSaveDraftCoa = async () => {
         result.value -=1
         textAlertError.value.success = false
         textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
-        console.log("if", fileCoaNew.value.length, getFormCoa.value.length)
+
+        //console.log("if", fileCoaNew.value.length, getFormCoa.value.length)
         throw 'Failed To Save COA. Plase Upload COA Ones.'
       }else{
-        console.log("Test", fileCoaNew.value.length, getFormCoa.value.length)
+        //console.log("Test", fileCoaNew.value.length, getFormCoa.value.length)
       }
     }
 
-    // console.log("!151551deleteAllStart", deleteAllStart.value)
+    // //console.log("!151551deleteAllStart", deleteAllStart.value)
 
     if(deleteAllStart.value === true){
       await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
       if (resultDeleteAllCoa.value.success === true) {
-        console.log('Delete coa all  successful')
+        //console.log('Delete coa all  successful')
         result.value +=1
 
       // return resultDeleteAllCoa
@@ -1135,7 +1145,7 @@ const handleSaveDraftCoa = async () => {
   if(deleteAllStart.value === true){
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success === true) {
-      console.log('Delete coa all  successful')
+      //console.log('Delete coa all  successful')
       result.value +=1
 
       // return resultDeleteAllCoa
@@ -1151,7 +1161,7 @@ const handleSaveDraftCoa = async () => {
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'Packaging', whereHouse.value, accessTokenAtStore)
 
     if (resultDeleteByIdCoa.value.success === true) {
-      console.log('Delete coa by id  successful')
+      // //console.log('Delete coa by id  successful')
       result.value +=1
 
       // return resultDeleteByIdCoa
@@ -1166,7 +1176,7 @@ const handleSaveDraftCoa = async () => {
     await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, 'Packaging', urlApi.value, whereHouse.value, accessTokenAtStore)
 
     if (saveCoaForm) {
-      console.log('Save coa  successful')
+      // //console.log('Save coa  successful')
       result.value +=1
 
       // return saveCoaForm
@@ -1242,7 +1252,7 @@ const submitButtonVisibleNew = async word => {
       throw 'Please provide a comment to reject the packaging'
     }
   }else{
-    console.log('no function')
+    // //console.log('no function')
   }
   
 
@@ -1254,7 +1264,8 @@ const submitButtonVisibleNew = async word => {
     // Step 1: saveLotReceivingForm
 
     await saveDraftHeader()
-    console.log('saveHeaderReceivingForm success')
+
+    // //console.log('saveHeaderReceivingForm success')
 
     iconStep1.value = 'ri-check-line'
     colorStep1.value = 'success'
@@ -1285,7 +1296,8 @@ const submitButtonVisibleNew = async word => {
     // Step 2: saveHeaderReceivingForm
     // console.error('Error: actualMakerLotNo_1 is empty or undefined. out')
     await saveDraftLotDetails()
-    console.log('saveLotReceivingForm success')
+
+    // //console.log('saveLotReceivingForm success')
     iconStep2.value = 'ri-check-line'
     colorStep2.value = 'success'
 
@@ -1316,7 +1328,8 @@ const submitButtonVisibleNew = async word => {
 
     // Step 3: saveCOARecevingFrom
     await handleSaveDraftCoa()
-    console.log('saveCOARecevingFrom success')
+
+    // //console.log('saveCOARecevingFrom success')
     iconStep3.value = 'ri-check-line'
     colorStep3.value = 'success'
     loadindingSaveDatftSeccess3.value = true
@@ -1383,7 +1396,8 @@ const reject = word => {
 const submitForm = word => {
   trickerSubmit.value = true
   wordForSubmit.value = word
-  console.log("submitForm word", word)
+
+  // //console.log("submitForm word", word)
   isDialogConfirmVisible.value = true
 }
 
@@ -1392,7 +1406,8 @@ const saveDraftData = word => {
   trickerSubmit.value = false
   submitButtonVisibleNew()
   wordForSubmit.value = word
-  console.log('saveDraftData', trickerSubmit.value)
+
+  // //console.log('saveDraftData', trickerSubmit.value)
 }
 </script>
 
@@ -2598,7 +2613,7 @@ const saveDraftData = word => {
         class="d-flex justify-end"
       >
         <VBtn
-
+          v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
           height="100%"
           width="150px"
           color="warning"
@@ -2607,7 +2622,7 @@ const saveDraftData = word => {
           Save draft
         </VBtn>
         <VBtn
-
+          v-if="canVisibleUserPermission(statusPermission,'BTN_REJECT').canVisible"
           height="100%"
           width="150px"
           class="mx-2"
@@ -2617,6 +2632,7 @@ const saveDraftData = word => {
           Reject
         </VBtn>
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'BTN_ACCEPT').canVisible"
           height="4 0px"
           width="150px"
           @click="submitForm('ACCEPT')"

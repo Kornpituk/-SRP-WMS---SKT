@@ -16,28 +16,30 @@ const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, canVisibleUserPermissionPermissionAll, fetchUserPermissions, fetchUserPermissionsAll } from '@/utilities/permission'
 
 
-const paramsForGetPermission = ref({
+const paramsForGetPermissionAll = ref({
   empId: String(userDataInfo.value.id) || '',
   statusId: '',
   uiControlContextId: '2',
 })
 
+const getPermissionAll = ref()
+
 // เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
 onMounted(async () => {
-  await fetchUserPermissions(
+  getPermissionAll.value =  await fetchUserPermissionsAll(
     urlApi.value,
     whereHouse,
     accessTokenAtStore,
-    paramsForGetPermission.value,
+    paramsForGetPermissionAll.value,
   )
 })
 
 const statusPermission = ref(-1)
 
-const canVisibleUserPermission = (statusId, uiControlContextId) => {
+const canVisibleUserPermissionAll = (statusId, uiControlContextId) => {
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
 
@@ -48,7 +50,7 @@ const confirmValueCheck = ref(false)
 
 const poEtlLogDetailJournalID = itemStore.getItemDetails('poEtlLogDetailJournalIDCookies')
 
-console.log("setItemDetails", poEtlLogDetailJournalID)
+// console.log("setItemDetails", poEtlLogDetailJournalID)
 
 
 const route = useRoute()
@@ -242,7 +244,7 @@ const typeLorryOnce = ref(sessionStorage.getItem('typeLorryInfoId'))
 const typeLorryTwo = ref(null)
 
 const generatedJournalId = async () => {
-  console.log("generatedJournalId 0")
+  // console.log("generatedJournalId 0")
 
   try {
     // ใช้ await เพื่อรอการส่ง API เสร็จ
@@ -257,8 +259,8 @@ const generatedJournalId = async () => {
       },
     )
 
-    console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
-    console.log("generatedJournalId 1")
+    // console.log('%c[generatedJournalId] raw mat!!: ', "color: red; font-weight: bold", response.data)
+    // console.log("generatedJournalId 1")
 
     // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
     if (response.data && response.data.data && response.data.data.length > 0) {
@@ -292,14 +294,14 @@ const generatedJournalId = async () => {
       sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(statusId.value))
       currentTabNew.value = JSON.parse(sessionStorage.getItem('currentTabReceivingForm'))
 
-      console.log("lorryInfos", checkSelectLorry.value)
+      // console.log("lorryInfos", checkSelectLorry.value)
     } else {
       console.error("ไม่มีข้อมูลใน responseGener")
     }
 
-    console.log("generatedJournalId 3")
+    // console.log("generatedJournalId 3")
   } catch (error) {
-    console.log("generatedJournalId 4")
+    // console.log("generatedJournalId 4")
     console.error("Error:", error)
   }
 }
@@ -376,7 +378,7 @@ const componentLorryForm = ref(null)
 const matchingLorryInfoWithComponent = lorryInfoKey => {
   switch (lorryInfoKey) {
   case '01':
-    console.log("case 1", lorryInfoKey)
+    // console.log("case 1", lorryInfoKey)
     componentLorryForm.value = LorryLoadingA1IPA
     
     return LorryLoadingA1IPA
@@ -395,7 +397,7 @@ const matchingLorryInfoWithComponent = lorryInfoKey => {
   case '09':
     return LorryLoadingC2HAKU
   case '10':
-    console.log("case 10", lorryInfoKey)
+    // console.log("case 10", lorryInfoKey)
     
     return LorryLoadingC2EKIAA111
   case '11':
@@ -403,7 +405,7 @@ const matchingLorryInfoWithComponent = lorryInfoKey => {
   case '12':
     return LorryLoadingC4TELA
   case '13':
-    console.log("case 13", lorryInfoKey)
+    // console.log("case 13", lorryInfoKey)
     
     return LorryLoadingC4EKIAV432
   case '15':
@@ -411,7 +413,7 @@ const matchingLorryInfoWithComponent = lorryInfoKey => {
   case '16':
     return LorryLoadingC6SANNIX
   default:
-    console.warn(`No component found for key: ${lorryInfoKey}`)
+    // console.warn(`No component found for key: ${lorryInfoKey}`)
     
     return null
   }
@@ -439,10 +441,12 @@ const testComponent = () => {
   if(typeLorryOnce.value){
     result.value = typeLorryOnce.value
     sessionStorage.setItem('typeLorryInfoId', result.value)
-    console.log("Component type lorry result", result.value)
+
+    // console.log("Component type lorry result", result.value)
   }else{
     result.value = null
-    console.log("Component typeLorryOnce.value", typeLorryOnce.value)
+
+    // console.log("Component typeLorryOnce.value", typeLorryOnce.value)
   }
 
   return matchingLorryInfoWithComponent(sessionStorage.getItem('typeLorryInfoId'))
@@ -457,7 +461,7 @@ watch(() => {
     testComponent()
     checkSelectLorryLoadingForItem()
   }else{
-    console.log("find typeLorryOnce.value", typeLorryOnce.value)
+    // console.log("find typeLorryOnce.value", typeLorryOnce.value)
   }
 })
 
@@ -643,7 +647,7 @@ const handleSelectLorryLoading = word => {
 }
 
 const handleAcceptPackaging = word => {
-  console.log("StaertSSSSS!!")
+  // console.log("StaertSSSSS!!")
   axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/whapproval/${poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
@@ -694,19 +698,19 @@ function openConfirmDialog(word) {
 function handleConfirmAction() {
 
   if(selectLorryInfoKey.value){
-    console.log('Action selectLorryInfoKey.', selectLorryInfoKey.value)
+    // console.log('Action selectLorryInfoKey.', selectLorryInfoKey.value)
     handleSelectLorryLoading(selectLorryInfoKey.value)
   }else if(wordForSubmit.value === 'APPROVE'){
     handleAcceptPackaging()
   }
   else {
-    console.log('Action failed.', wordForSubmit.value)
+    // console.log('Action failed.', wordForSubmit.value)
   }
 
 }
 
 function handleCancel() {
-  console.log('Action canceled.')
+  // console.log('Action canceled.')
 }
 </script>
 
@@ -983,7 +987,7 @@ function handleCancel() {
     class="d-flex justify-start"
   >
     <VBtn
-    
+      v-if="canVisibleUserPermissionAll(statusPermission,'BTN_WH_APVL_APPROVE').canVisible"
       style="min-width: 320px;"
       class="mb-2"
       @click="btnApprove('APPROVE')"
@@ -1005,7 +1009,7 @@ function handleCancel() {
     >
       <VCol cols="12">
         <VBtn
-          v-if="canVisibleUserPermission(statusPermission,'BTN_WH_APVL_APPROVE').canVisible"
+          v-if="canVisibleUserPermissionAll(statusPermission,'BTN_WH_APVL_APPROVE').canVisible"
           width="100%"
           class="mb-2"
           @click="btnApprove('APPROVE')"

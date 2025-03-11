@@ -11,7 +11,7 @@ const route = useRoute()
 
 // const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
-// console.log('Data**', data)
+// //console.log('Data**', data)
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
@@ -215,7 +215,7 @@ const generatedInsp = async () => {
 
       // itemsManufacturer.value = response.data.data
 
-      console.log('[generatedReceivingForm]!!: ', response.data)
+      //console.log('[generatedReceivingForm]!!: ', response.data)
       loadingGenerated1.value = false
 
     })
@@ -234,6 +234,7 @@ const statusId = ref(null) // ตัวแปรสำหรับเก็บ�
 const isReject = ref(null)
 const isAccept = ref(null)
 const frozeCheck = ref(true)
+const receiveTypeIdData = ref(null)
 const poEiLog = ref()
 
 const generatedJournalId = async () => {
@@ -246,7 +247,7 @@ const generatedJournalId = async () => {
   },
   {})
     .then(response => {
-      console.log('%c[generatedJournalId] nre!!: ', "color: green; font-weight: bold", response.data)
+      //console.log('%c[generatedJournalId] nre!!: ', "color: green; font-weight: bold", response.data)
 
       // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
       if (response.data && response.data.data && response.data.data.length > 0) {
@@ -255,6 +256,7 @@ const generatedJournalId = async () => {
         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
         poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
+        receiveTypeIdData.value = item.receiveTypeId
         statusId.value = item.statusId // เก็บค่า statusId
         loadingGenerated2.value = false
       } else {
@@ -336,7 +338,7 @@ const getHearderInsp = async () => {
       // reject
       headerInsp.value.remarkReject = data[0].statusComments
 
-      console.log('[*****Headers]]!!: ', data[0])
+      //console.log('[*****Headers]]!!: ', data[0])
     } catch (error) {
       // Handle errors
       console.error('Error:', error)
@@ -345,7 +347,8 @@ const getHearderInsp = async () => {
     }
   } else {
     loadingGenerated1.value = true
-    console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+
+    //console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
   }
 }
 
@@ -419,7 +422,7 @@ const columnRadio = ref(1)
 const inlineRadio = ref('radio-1')
 
 const textValue = () => {
-  console.log("[textValue]", analysisItems.value)
+  //console.log("[textValue]", analysisItems.value)
 }
 
 // ข้อมูลต้นแบบที่เราจะเก็บเพื่อส่งไปยัง API
@@ -492,14 +495,14 @@ const getAnalysistInsp = async () => {
         }
       }
 
-      console.log("***************55555555", analysisItems.value)
+      //console.log("***************55555555", analysisItems.value)
     } catch (error) {
       console.error('Error:', error)
     } finally {
       loadingGenerated1.value = false
     }
   } else {
-    console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    //console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
     loadingGenerated1.value = true
   }
 }
@@ -528,7 +531,7 @@ const saveHeaderInspect = async () => {
       },
     })
 
-    // console.log('[products.value]!!: ', response.data)
+    // //console.log('[products.value]!!: ', response.data)
     // isDialogSubmitSuccessVisible.value = true
     return true
   } catch (error) {
@@ -643,7 +646,7 @@ const saveLotInspect = async () => {
   
   // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
   if (hasErrors.value) {
-    console.log('Cannot proceed: There are errors in the fields.')
+    //console.log('Cannot proceed: There are errors in the fields.')
 
     // แสดง dialog แจ้งเตือนถ้าจำเป็น
     // isDialogSubmitFailedVisible.value = true
@@ -671,7 +674,7 @@ const saveLotInspect = async () => {
           },
         })
 
-        console.log('[response]: ', response.data)
+        //console.log('[response]: ', response.data)
       }
     }
 
@@ -705,7 +708,7 @@ const submitInspForm = async () => {
         },
       })
 
-      console.log('[products.value]!!: ', response.data)
+      //console.log('[products.value]!!: ', response.data)
 
       // รีโหลดหน้าเมื่อส่งข้อมูลสำเร็จ
       textAlertDialogFunction('SUBMIT', true)
@@ -746,7 +749,7 @@ const textAlertError = ref({
 })
 
 const rejectInsp = () => {
-  console.log("StaertSSSSS!!")
+  //console.log("StaertSSSSS!!")
 
   if(!commentReject.value){
     textAlertError.value.success = true
@@ -767,7 +770,7 @@ const rejectInsp = () => {
   },
   {})
     .then(response => {
-      // console.log('[products.value]!!: ', response.data)
+      // //console.log('[products.value]!!: ', response.data)
       // isDialogSubmitSuccessVisible.value = true
       // isDialogConfirmVisible.value = false
 
@@ -788,7 +791,7 @@ const rejectInsp = () => {
 }
 
 const approveInsp = () => {
-  console.log("StaertSSSSS!!")
+  //console.log("StaertSSSSS!!")
   axiosIns.post(`${urlApi.value}/api/v1/Inspection/accept/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
@@ -828,7 +831,7 @@ const approveReceivingPlant = () => {
     },
   })
     .then(response => {
-      console.log(`Response for poEtlLogDetailJournalID ${data.value.poEtlLogDetailJournalID}:`, response.data)
+      //console.log(`Response for poEtlLogDetailJournalID ${data.value.poEtlLogDetailJournalID}:`, response.data)
 
       // isDialogSubmitSuccessVisible.value = true
       isDialogConfirmVisible.value = false
@@ -845,7 +848,7 @@ const approveReceivingPlant = () => {
 //-------------------------- Send Back ---------------------------
 
 const handelSendBack = async () => {
-  console.log('Send start')
+  //console.log('Send start')
   await axiosIns.post(`${urlApi.value}/api/v1/Inspection/Back/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
@@ -877,7 +880,7 @@ const handelSendBack = async () => {
 //--------------------------- Back To Edite ------------------
 
 const handelBackToEdit = async () => {
-  console.log('Send start')
+  //console.log('Send start')
   await axiosIns.post(`${urlApi.value}/api/v1/Inspection/BackToEdit/${data.value.poEtlLogDetailJournalID}`, {}, {
     headers: {
       'accept': '*/*',
@@ -965,7 +968,7 @@ const getCOAReceivingForm = () => {
 
         startTime.value = coaFiles.value.length
 
-        console.log('[*****Headers COA]]!!: ', lotData)
+        //console.log('[*****Headers COA]]!!: ', lotData)
         loadingGenerated1.value = false
       })
       .catch(error => {
@@ -1103,7 +1106,8 @@ const submitButtonVisibleNew = async word => {
     // Step 1: saveLotReceivingForm
 
     await saveHeaderInspect()
-    console.log('saveHeaderReceivingForm success')
+
+    //console.log('saveHeaderReceivingForm success')
 
     iconStep1.value = 'ri-check-line'
     colorStep1.value = 'success'
@@ -1134,7 +1138,8 @@ const submitButtonVisibleNew = async word => {
     // Step 2: saveHeaderReceivingForm
     // console.error('Error: actualMakerLotNo_1 is empty or undefined. out')
     await saveLotInspect()
-    console.log('saveLotReceivingForm success')
+
+    //console.log('saveLotReceivingForm success')
     iconStep2.value = 'ri-check-line'
     colorStep2.value = 'success'
 
@@ -1165,7 +1170,7 @@ const submitButtonVisibleNew = async word => {
 
   //   // Step 3: saveCOARecevingFrom
   //   await saveCOARecevingFrom()
-  //   console.log('saveCOARecevingFrom success')
+  //   //console.log('saveCOARecevingFrom success')
   //   iconStep3.value = 'ri-check-line'
   //   colorStep3.value = 'success'
   //   loadindingSaveDatftSeccess3.value = true
@@ -1271,7 +1276,8 @@ const textAlertDialogFunction = (word, success) => {
   wordForSubmit.value = word
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
-  console.log("textAlertDialogFunction Start!!")
+
+  //console.log("textAlertDialogFunction Start!!")
 }
 
 //--------------------------- Status Check --------------------------
@@ -1314,9 +1320,9 @@ const getDisabledFollowStatusNRole = () => {
   const status = dataProps.value.statusId
   const role = roleAccount.value
   
-  console.log('Status Raw:', status)
-  console.log('Role Raw:', role)
-  console.log('Disabled Tabs Raw:',  (tabDisablingConfig[status]?.[role] || false))
+  //console.log('Status Raw:', status)
+  //console.log('Role Raw:', role)
+  //console.log('Disabled Tabs Raw:',  (tabDisablingConfig[status]?.[role] || false))
   
   return tabDisablingConfig[status]?.[role] || false
 }
@@ -2865,7 +2871,7 @@ const getDisabledFollowStatusNRole = () => {
     >
       <div class="d-flex justify-end">
         <VBtn
-          v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_SEND_BACK').canVisible"
+          v-if="canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"
           class=""
           color="purple-accent-4"
           style="font-size: 12px;"
@@ -2912,7 +2918,7 @@ const getDisabledFollowStatusNRole = () => {
           Send Back
         </VBtn>
         <VBtn
-          v-if="canVisibleUserPermission(statusPermission,'BTN_PARTIAL_RCVD').canVisible"
+          v-if="canVisibleUserPermission(statusPermission,'BTN_PARTIAL_RCVD').canVisible && receiveTypeIdData !== 3"
           class="mx-2"
           color="warning"
           style="font-size: 12px;"
@@ -3333,8 +3339,6 @@ const getDisabledFollowStatusNRole = () => {
       </VDialog>
     </section>
   </div>
-
-  {{ statusId }}
 </template>
 
 <style scoped src="./insp.scss"></style>

@@ -67,6 +67,36 @@ function handleCancel() {
 //------------------------------------- Permissions ---------------------------------
 const showBtnCheckSheet = () => {
   return !!(userDataInfo?.value.id === '00025' || userDataInfo?.value.id === '00023' || userDataInfo?.value.id === '00042' || userDataInfo?.value.id === '00043')
+
+  
+}
+
+//-------------------------------------------- Permission -----------------------------------------
+
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '8',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
 
 //------------------------------------ params section -------------------------------
@@ -2184,6 +2214,7 @@ const dessertsMockAmountView = [
                   <div>
                     <VTextarea
                       v-model="getShippingCheckSheetResult.reportCheckSheet.other"
+                      :readonly="!frozeCheck"
                       counter
                       label="Other"
                       placeholder="Enter Other"
@@ -2689,7 +2720,9 @@ const dessertsMockAmountView = [
           class="d-flex justify-end mt-4"
         >
           <VBtn
-            v-if="statusModel === 1002 && !loadingCycleBtn || statusModel === 1003 && !loadingCycleBtn || statusModel === 0 && !loadingCycleBtn"
+            v-if="statusModel === 1002 && !loadingCycleBtn || 
+              statusModel === 1003 && !loadingCycleBtn || 
+              statusModel === 0 && !loadingCycleBtn"
             class="mx-2"
             color="warning"
             @click="habdleSaveDraft(), loadingCycleBtn = true"
@@ -2707,7 +2740,9 @@ const dessertsMockAmountView = [
             />
           </VBtn>
           <VBtn
-            v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0"
+            v-if="statusModel === 1002 || 
+              statusModel === 1003 || 
+              statusModel === 0"
             class="mx-2"
             color="green"
             @click="handleSubmit('submit')"

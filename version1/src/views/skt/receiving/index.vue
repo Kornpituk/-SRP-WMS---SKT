@@ -59,9 +59,11 @@ const paramsForGetPermission = ref({
   uiControlContextId: '1',
 })
 
+const resultPermission = ref()
+
 // เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
 onMounted(async () => {
-  await fetchUserPermissions(
+  resultPermission.value = await fetchUserPermissions(
     urlApi.value,
     whereHouse,
     accessTokenAtStore,
@@ -846,7 +848,7 @@ const headers = [
 const filteredHeaders = computed(() => {
   return headers.filter(header => {
     // ข้ามการตรวจสอบสิทธิ์สำหรับ 'Action'
-    if (header.key === 'action'|| header.key === 'no'|| header.key === 'statusText'|| header.key === 'updatedBy'|| header.key === 'updatedDate') {
+    if (header.key === 'action'|| header.key === 'no'|| header.key === 'statusText'|| header.key === 'updatedBy'|| header.key === 'updatedDate' || header.key === 'data-table-select') {
       return true
     }
 
@@ -3429,7 +3431,7 @@ const insetSwitch1 = ref('')
   </section>
 
   <!-- Data Table Beta1.0 -->
-  <section>
+  <section v-if="resultPermission?.length > 0">
     <VCard>
       <CardText>
         <VProgressLinear
