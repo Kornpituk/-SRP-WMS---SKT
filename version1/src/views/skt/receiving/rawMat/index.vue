@@ -18,6 +18,8 @@ const props = defineProps({
 const switchLog = ref(false)
 
 //-------------------------------------------- Permission -----------------------------------------
+const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
@@ -108,8 +110,6 @@ const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
 const route = useRoute()
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-
-const itemStore = useItemStore()
 
 const data = ref(itemStore.getItemDetails('itemDataCookies'))
 
@@ -3911,7 +3911,7 @@ const getDisabledFollowStatusNRole = () => {
       >
         <div class="py-0 d-flex justify-end">
           <VBtn
-            v-if="getDisabledFollowStatusNRole()"
+            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
             class="mx-4"
             color="warning"
             style="font-size: 12px;"
@@ -3920,7 +3920,7 @@ const getDisabledFollowStatusNRole = () => {
             SAVE DRAFT
           </VBtn>
           <VBtn
-            v-if="getDisabledFollowStatusNRole()"
+            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
             color="green"
             style="font-size: 12px;"
             @click="submitButton('SUBMIT')"

@@ -16,6 +16,8 @@ const route = useRoute()
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+
 
 //-------------------------------------------- Permission -----------------------------------------
 
@@ -2864,7 +2866,7 @@ const getDisabledFollowStatusNRole = () => {
     >
       <div class="d-flex justify-end">
         <VBtn
-          v-if="true"
+          v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_SEND_BACK').canVisible"
           class=""
           color="purple-accent-4"
           style="font-size: 12px;"
@@ -2873,6 +2875,7 @@ const getDisabledFollowStatusNRole = () => {
           Send Back
         </VBtn>
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
           class="mx-4"
           color="warning"
           style="font-size: 12px;"
@@ -2881,6 +2884,7 @@ const getDisabledFollowStatusNRole = () => {
           SAVE DRAFT
         </VBtn>
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
           color="green"
           style="font-size: 12px;"
           @click="submitButtonVisible('SUBMIT')"
@@ -2900,7 +2904,7 @@ const getDisabledFollowStatusNRole = () => {
         class="d-flex justify-end px-0"
       >
         <VBtn
-          
+          v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_SEND_BACK').canVisible"
           class="mx-2"
           color="purple-accent-4"
           style="font-size: 12px;"
@@ -2909,7 +2913,7 @@ const getDisabledFollowStatusNRole = () => {
           Send Back
         </VBtn>
         <VBtn
-          v-if="data.receiveTypeId !== 3"
+          v-if="canVisibleUserPermission(statusPermission,'BTN_PARTIAL_RCVD').canVisible"
           class="mx-2"
           color="warning"
           style="font-size: 12px;"
@@ -2919,6 +2923,7 @@ const getDisabledFollowStatusNRole = () => {
         </VBtn>
         
         <VBtn
+        v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_REJECT').canVisible"
           class="mx-2"
           color="error"
           style="font-size: 12px;"
@@ -2927,6 +2932,7 @@ const getDisabledFollowStatusNRole = () => {
           Reject
         </VBtn>
         <VBtn
+         v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_ACCEPT\r\n').canVisible"
           class="mx-2"
           color="green"
           style="font-size: 12px;"

@@ -2341,6 +2341,7 @@ const insetSwitch1 = ref('')
       <VCard>
         <VCardText class="pa-2 d-flex justify-space-between align-center">
           <VBtn
+            v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
             style="font-size: 12px;"
             :disabled="selectedDataTables.length < 1"
             @click="submitButton('Approve')"

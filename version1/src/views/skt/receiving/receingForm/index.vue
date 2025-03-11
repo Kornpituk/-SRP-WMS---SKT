@@ -13,11 +13,41 @@ import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
 import alertWordConst from '@/utilities/constant'
 
+//-------------------------------------------- Permission -----------------------------------------
+const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
+
+// const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+
+
+const paramsForGetPermission = ref({
+  empId: String(userDataInfo.value.id) || '',
+  statusId: '',
+  uiControlContextId: '2',
+})
+
+// เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
+onMounted(async () => {
+  await fetchUserPermissions(
+    urlApi.value,
+    whereHouse,
+    accessTokenAtStore,
+    paramsForGetPermission.value,
+  )
+})
+
+const statusPermission = ref(-1)
+
+const canVisibleUserPermission = (statusId, uiControlContextId) => {
+  return canVisibleUserPermissionPermission(statusId, uiControlContextId)
+}
+
+
 const isDialogVisibleConfirmDialog = ref(false)
 const isDialogVisibleConfirmDialog2 = ref(false)
 const confirmValueCheck = ref(false)
 
-const itemStore = useItemStore()
 const poEtlLogDetailJournalID = itemStore.getItemDetails('poEtlLogDetailJournalIDCookies')
 
 console.log("setItemDetails", poEtlLogDetailJournalID)
@@ -958,6 +988,7 @@ function handleCancel() {
     class="d-flex justify-start"
   >
     <VBtn
+    
       style="min-width: 320px;"
       class="mb-2"
       @click="btnApprove('APPROVE')"
@@ -979,6 +1010,7 @@ function handleCancel() {
     >
       <VCol cols="12">
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'BTN_WH_APVL_APPROVE').canVisible"
           width="100%"
           class="mb-2"
           @click="btnApprove('APPROVE')"

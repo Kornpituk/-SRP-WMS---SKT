@@ -19,6 +19,8 @@ import { hour, minute } from '@/utilities/time'
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
 
+const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 const paramsForGetPermission = ref({
   empId: String(userDataInfo.value.id) || '',
@@ -42,7 +44,6 @@ const canVisibleUserPermission = (statusId, uiControlContextId) => {
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
 
-const itemStore = useItemStore()
 var unMountedState = ref(false)
 
 var lorryItem = reactive(telaItemTemplate)
@@ -1063,7 +1064,7 @@ watchEffect(async () => {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
+        v-if="statusId !== 15 && statusId !== 18 && statusId !== 17 && canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
         type="text"
         color="warning"
         class="mx-1"
@@ -1072,7 +1073,7 @@ watchEffect(async () => {
         SAVE Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
+        v-if="statusId !== 15 && statusId !== 18 && statusId !== 17 && canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
         type="text"
         color="primary "
         class="mx-1"
@@ -1081,7 +1082,7 @@ watchEffect(async () => {
         Submit
       </VBtn>
       <VBtn
-        v-if="(statusId === 18)"
+        v-if="(statusId === 18) && canVisibleUserPermission(statusPermission,'BTN_WH_APVL_APPROVE').canVisible"
         type="text"
         color="primary"
         class="mx-1"
@@ -1132,7 +1133,7 @@ watchEffect(async () => {
   text-align: center;
 }
 
-.centered-input>>>input {
+.centered-input >>> input {
   padding: 0;
   block-size: 20px !important;
   text-align: center;

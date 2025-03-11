@@ -24,6 +24,8 @@ const finalRes = ref(0)
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
 
+const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 const paramsForGetPermission = ref({
   empId: String(userDataInfo.value.id) || '',

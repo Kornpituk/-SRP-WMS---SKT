@@ -21,6 +21,8 @@ import { ref } from 'vue'
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
 
+const itemStore = useItemStore()
+const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 const paramsForGetPermission = ref({
   empId: String(userDataInfo.value.id) || '',
@@ -50,8 +52,6 @@ import { currencyFormat } from '@/services/skt/inv/lorryLoading/akumaruService'
 import alertWordConst from '@/utilities/constant'
 import { hour, minute } from '@/utilities/time'
 
-
-const itemStore = useItemStore()
 
 var lorryItems = reactive(ItemTemplate)
 var lorryRequestData = ref({})
@@ -1030,7 +1030,7 @@ watchEffect(async () => {
       class="d-flex justify-end"
     >
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
+        v-if="statusId !== 15 && statusId !== 18 && statusId !== 17 && canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
         type="text"
         color="warning"
         class="mx-1"
@@ -1039,7 +1039,7 @@ watchEffect(async () => {
         SAVE Draft
       </VBtn>
       <VBtn
-        v-if="(statusId !== 15 && statusId !== 18 && statusId !== 17)"
+        v-if="statusId !== 15 && statusId !== 18 && statusId !== 17 && canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
         type="text"
         color="primary "
         class="mx-1"
@@ -1048,7 +1048,7 @@ watchEffect(async () => {
         Submit
       </VBtn>
       <VBtn
-        v-if="(statusId === 18)"
+        v-if="(statusId === 18) && canVisibleUserPermission(statusPermission,'BTN_WH_APVL_APPROVE').canVisible"
         type="text"
         color="primary"
         class="mx-1"
