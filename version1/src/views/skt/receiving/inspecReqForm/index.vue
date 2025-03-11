@@ -269,18 +269,25 @@ const generatedJournalId = async () => {
 }
 
 watchEffect(() => {
-  if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible || 
-  statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     frozeCheck.value = false
   }
+
+  if(statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+    frozeCheck.value = false
+  }
+  
 })
 
 watch( async () => {
   await generatedInsp()
   await generatedJournalId()
 
-  if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible || 
-  statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+    frozeCheck.value = false
+  }
+
+  if(statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     frozeCheck.value = false
   }
 })
@@ -2660,7 +2667,7 @@ const getDisabledFollowStatusNRole = () => {
         >
           Details of Limitation Condition
         </VCol>
-
+      --> {{ statusId}} || {{frozeCheck}}
         <VCol
           cols="12"
           class="py-0"
