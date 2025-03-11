@@ -1,9 +1,8 @@
 <script setup>
-import dashboard from '@/navigation/vertical/dashboard'
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { onMounted, ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -14,7 +13,7 @@ const whereHouseSelectedItem = ref('')
 const products = ref([])
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 
@@ -313,7 +312,6 @@ const onClickExportExcel = () => {
 
 /// ------------------------------- Time Picker ------------------------
 import AppDateTimePicker from "@core/components/app-form-elements/AppDateTimePicker.vue"
-import { containsProp } from '@vueuse/core'
 
 const date = ref('')
 

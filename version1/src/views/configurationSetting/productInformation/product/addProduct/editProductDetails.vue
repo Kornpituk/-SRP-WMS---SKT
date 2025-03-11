@@ -26,7 +26,7 @@ import { urlApi } from '@/api'
 
 const products = ref([])
 
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 

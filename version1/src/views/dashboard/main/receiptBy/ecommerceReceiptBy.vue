@@ -54,7 +54,7 @@ watchEffect(() => {
 
 import { urlApi } from '@/api'
  
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 const warehouseShowHeaderPerformance = ref('')
 
 const getDataProductNewData = () => {

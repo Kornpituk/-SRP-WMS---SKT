@@ -17,7 +17,7 @@ import { ref, watchEffect } from 'vue'
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
@@ -101,7 +101,7 @@ function handleCancel() {
 
 onMounted(async () => {
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   await generate(poEtlLogDetailJournalIDQueryParameters.value)
@@ -221,7 +221,7 @@ async function submit(e) {
     if (response.status != 200) 
       return
 
-    const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+    const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
     const whereHouse = localStorage.getItem('whereHouseName')
 
     // เรียก API หรือดำเนินการต่อ
@@ -245,7 +245,7 @@ async function submit(e) {
 }
 
 async function approve(e) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormHaku/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {
@@ -1240,13 +1240,13 @@ watchEffect(async () => {
 .tr-border-right-0 {
   border-inline-end: 0 !important;
   font-size: 16px;
-  
+
 }
 
 /* stylelint-disable-next-line block-closing-brace-empty-line-before */
 .tr-border-left-0 {
   border-inline-start: 0 !important;
   font-size: 16px;
-  
+
 }
 </style>

@@ -1,17 +1,10 @@
 <script setup>
-import axiosIns from '@axios'
-
-//// --------------------------------------------------------------------------------------
-
-//---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
-
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
-import { VDataTable } from 'vuetify/labs/VDataTable'
+import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
 const whereHouse = localStorage.getItem('whereHouseName')
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
-import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
@@ -63,8 +56,8 @@ const disabledStatusWithOutAdminUser = (inspStatusId, logStatusId, salStatusId, 
 //------------------------------- alert --------------------------------------------
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
-import alertWordConst from '@/utilities/constant'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+import alertWordConst from '@/utilities/constant'
 
 const isDialogVisibleAlertDialog = ref(false)
 const wordForSubmit = ref('')
@@ -180,19 +173,20 @@ onMounted(() => {
 })
 
 //------------------------------ fetch data from API --------------------------------
-import { useGetUserPermissionService,
-  useGetSelectDataService,
-  useGetSearchPlanService,
-  useSaveSearchPlanService,
-  useSubmitShipmentPlanService,
-  useSaveFileFormService,
+import {
   useDeleteFileFormService,
+  useGetDataTruckOrderService,
+  useGetFileFormService,
+  useGetSearchPlanService,
+  useGetSelectDataService,
+  usePrintExportExcelService,
+  usePrintPDFService,
   usePrintShipmentPDFService,
   usePrintTruckOrderFormPDFService,
-  useGetFileFormService,
-  usePrintExportExcelService,
-  usePrintPDFService, useGetDataTruckOrderService,
+  useSaveFileFormService,
+  useSaveSearchPlanService,
   useSaveTruckOrderService,
+  useSubmitShipmentPlanService,
 } from '@/services/skt/shipmentPlan/services'
 
 import {
@@ -202,7 +196,7 @@ import {
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 
 const paramsForGetPermission = ref({

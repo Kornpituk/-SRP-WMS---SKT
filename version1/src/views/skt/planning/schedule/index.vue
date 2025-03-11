@@ -18,7 +18,7 @@ const products = ref([]) //---------------- variable for get All Product From X-
 const selectedDataTables = ref([])
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 //------------------------------------------- compoennt ----------------------------------------------------------------
 import GTable from '@/pages/skt/planning/schedule/gridTable/index.vue'

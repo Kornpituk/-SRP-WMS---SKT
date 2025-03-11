@@ -28,7 +28,7 @@ sessionStorage.setItem('historyPropBlock', false)
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const perPage = ref(10)
 const page = ref(0)

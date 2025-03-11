@@ -1,11 +1,9 @@
 <script setup>
-import dashboard from '@/navigation/vertical/dashboard'
 import axiosIns from '@axios'
 
-import { useRouter } from 'vue-router'
  
 //// --------------------------------------------------------------------------------------
-import { onMounted, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 // ----------------- Route --------------------------.
 // import { useRoute } from 'vue-router'
@@ -25,7 +23,7 @@ const products = ref([])
 
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 
@@ -1228,8 +1226,8 @@ const saveConfirmStockAdjustId = async index => {
           :variant="exportButtonVariant"
           size="x-large "
           :disabled="!countingExport"
-          @click="countingAdjustExcel"
           style="width: 100%;"
+          @click="countingAdjustExcel"
         >
           <img
             src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"

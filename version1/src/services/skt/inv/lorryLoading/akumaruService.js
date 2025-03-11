@@ -50,7 +50,7 @@ export function passSubmitData(type, params) {
 }
 
 export async function save(poEtlLogDetailJournalIDQueryParameters, lorryRequestData){
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
   
   return await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/save/${poEtlLogDetailJournalIDQueryParameters.value}`, lorryRequestData.value, {

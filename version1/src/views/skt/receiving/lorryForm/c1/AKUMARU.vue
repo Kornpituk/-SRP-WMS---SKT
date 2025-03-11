@@ -13,7 +13,7 @@ import { ref, watchEffect } from 'vue'
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
@@ -90,7 +90,7 @@ function handleCancel() {
 }
 onMounted(async () => {
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, [], {
@@ -192,7 +192,7 @@ async function validateField(){
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 async function submit(e) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   for (var i of lorryItem) {
@@ -234,7 +234,7 @@ async function submit(e) {
 }
 
 async function approve(e) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormAkumaru/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {

@@ -1,6 +1,6 @@
 <script setup>
-import axiosIns from '@axios'
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
+import axiosIns from '@axios'
 import { ref, watch, watchEffect } from 'vue'
 
 const props = defineProps({
@@ -22,7 +22,7 @@ const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 
 const paramsForGetPermission = ref({
@@ -50,7 +50,7 @@ const canVisibleUserPermission = (statusId, uiControlContextId) => {
 const data = ref(itemStore.getItemDetails('itemDataCookies'))
 
 const whereHouse = ref(localStorage.getItem('whereHouseName'))
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 const userName = ref(localStorage.getItem('userCheck'))
 
 const roleAccount = ref('issues')
@@ -1048,7 +1048,6 @@ const showDialogCOA = img => {
   srcImagCOA.value = img
 }
 
-import image from '../inspecReqForm/COAคืออะไร.jpg'
 
 //--------------------------- Dialog Submit -------------------------------
 const isDialogConfirmVisible = ref(false)
@@ -1088,7 +1087,7 @@ const loadindingSaveDatftSeccess3 = ref(false)
 const wordForSubmit = ref('Word')
 
 //--------------------- alertDialog--------------------------------------------------------
-import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 
 const isDialogVisibleAlertDialog = ref(false)
 
@@ -2923,7 +2922,7 @@ const getDisabledFollowStatusNRole = () => {
         </VBtn>
         
         <VBtn
-        v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_REJECT').canVisible"
+          v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_REJECT').canVisible"
           class="mx-2"
           color="error"
           style="font-size: 12px;"
@@ -2932,7 +2931,7 @@ const getDisabledFollowStatusNRole = () => {
           Reject
         </VBtn>
         <VBtn
-         v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_ACCEPT\r\n').canVisible"
+          v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_ACCEPT\r\n').canVisible"
           class="mx-2"
           color="green"
           style="font-size: 12px;"

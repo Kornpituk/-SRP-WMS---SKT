@@ -30,7 +30,7 @@ const products = ref([])
 localStorage.setItem('productIdForGenCode', '')
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 

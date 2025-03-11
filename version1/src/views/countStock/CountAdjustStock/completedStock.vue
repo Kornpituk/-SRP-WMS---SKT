@@ -13,7 +13,7 @@ const whereHouseSelectedItem = ref('')
 const products = ref([])
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 

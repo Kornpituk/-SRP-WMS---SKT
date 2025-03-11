@@ -19,7 +19,7 @@ import { ref, watchEffect } from 'vue'
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
@@ -170,7 +170,7 @@ async function saveDraft(e) {
     }
   }
 
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   var response = await save(poEtlLogDetailJournalIDQueryParameters.value, lorryRequestData.value)
@@ -186,7 +186,7 @@ async function saveDraft(e) {
 }
 
 async function submit(e) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   for (var i of lorryItems) {
@@ -225,7 +225,7 @@ async function submit(e) {
 }
 
 async function approve(e) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormEA/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {

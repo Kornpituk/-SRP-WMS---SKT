@@ -2,7 +2,7 @@ import axiosIns from '@axios'
 import { onMounted, ref, watchEffect } from 'vue'
 import { urlApi } from '@/api'
 
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 

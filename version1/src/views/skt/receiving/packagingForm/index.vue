@@ -13,7 +13,7 @@ const props = defineProps({
 
 //---------------------- Import Api for Url *****
 const whereHouse = ref(localStorage.getItem('whereHouseName'))
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const route = useRoute()
 

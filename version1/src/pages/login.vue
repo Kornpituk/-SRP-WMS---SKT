@@ -164,6 +164,10 @@ const login = async () => {
     localStorage.setItem('accessToken', access_token)
     localStorage.setItem('accessTokenAtStore', access_token)
     localStorage.setItem('refreshToken', refresh_token)
+
+    sessionStorage.setItem('accessToken', access_token)
+    sessionStorage.setItem('accessTokenAtStore', access_token)
+    sessionStorage.setItem('refreshToken', refresh_token)
     
     // ... store other relevant data if needed
 

@@ -1,9 +1,8 @@
 <script setup>
-import dashboard from '@/navigation/vertical/dashboard'
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { onMounted, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 // ----------------- Route --------------------------.
 import { useRoute } from 'vue-router'
@@ -23,7 +22,7 @@ const products = ref([])
 
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 

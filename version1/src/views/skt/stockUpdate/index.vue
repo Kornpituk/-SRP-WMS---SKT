@@ -9,7 +9,7 @@ import { urlApi } from '@/api'  //---------------------- Import Api for Url ****
 import { VDataTable } from 'vuetify/labs/VDataTable'
 
 const whereHouse = localStorage.getItem('whereHouseName')
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 

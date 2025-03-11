@@ -30,7 +30,7 @@ const route = useRoute()
 const MAX= 100
 
 const whereHouse = localStorage.getItem('whereHouseName')
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 import ChartPerformancePickingPie from '@/views/dashboard/main/receiptBy/received/Chart/chartPerformancePie.vue'
 

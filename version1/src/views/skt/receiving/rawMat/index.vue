@@ -105,7 +105,7 @@ const whereHouse = ref(localStorage.getItem('whereHouseName'))
 const userName = ref(localStorage.getItem('userCheck'))
 const accountRole = ref(sessionStorage.getItem('accountRole'))
 
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const route = useRoute()
 

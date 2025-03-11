@@ -19,7 +19,7 @@ const products = ref([]) //---------------- variable for get All Product From X-
 const panel = ref(['filter']) //---------------- variable for
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 //------------------- 
 

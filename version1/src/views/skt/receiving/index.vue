@@ -50,7 +50,7 @@ const toggleDebugMode = () => {
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 
 const paramsForGetPermission = ref({
@@ -80,6 +80,8 @@ const buildDate = process.env.BUILD_DATE
 
 const showSection = ref(false)
 
+
+
 const handleScroll = () => {
   // เช็คว่าผู้ใช้เลื่อนถึงด้านล่างสุดหรือไม่
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
@@ -100,7 +102,7 @@ onUnmounted(() => {
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const perPage = ref(10)
 const page = ref(0)
@@ -844,12 +846,15 @@ const headers = [
 const filteredHeaders = computed(() => {
   return headers.filter(header => {
     // ข้ามการตรวจสอบสิทธิ์สำหรับ 'Action'
-    if (header.key === 'action') {
+    if (header.key === 'action'|| header.key === 'no'|| header.key === 'statusText'|| header.key === 'updatedBy'|| header.key === 'updatedDate') {
       return true
     }
 
+    console.log('header.permission', header.permission)
+    console.log('header.permission', canVisibleUserPermission(statusPermission.value, header.permission).canVisible)
+
     // ตรวจสอบสิทธิ์สำหรับทุกคอลัมน์อื่น ๆ
-    return !canVisibleUserPermission(statusPermission, header.permission).canVisible
+    return canVisibleUserPermission(statusPermission.value, header.permission).canVisible
   })
 })
 
@@ -3424,7 +3429,7 @@ const insetSwitch1 = ref('')
   </section>
 
   <!-- Data Table Beta1.0 -->
-  <section v-if="canVisibleUserPermission(statusPermission,'COL_MATERIAL_CODE').canVisible">
+  <section>
     <VCard>
       <CardText>
         <VProgressLinear
@@ -3482,7 +3487,7 @@ const insetSwitch1 = ref('')
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
-                  v-if="item.raw.statusId === 7 || item.raw.statusId === 15"
+                  v-if="item.raw.statusId === 7 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible || item.raw.statusId === 15 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"

@@ -21,6 +21,8 @@ export const fetchUserPermissions = async (urlApi, whereHouse, accessToken, para
       userPermissions.value = getUserPermissionResult.value || []
 
       console.log('Fetched User Permissions:', userPermissions.value)
+
+      return result
     } else {
       console.error('No result from API')
     }

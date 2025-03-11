@@ -347,7 +347,7 @@ const setDateData = () => {
 
 import axiosIns from '@axios'
 
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 
 const dates = computed(() => {

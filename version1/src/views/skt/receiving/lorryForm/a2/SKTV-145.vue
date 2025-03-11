@@ -18,7 +18,7 @@ import { ref } from 'vue'
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
@@ -214,7 +214,7 @@ async function submit(e) {
       return
 
 
-    const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+    const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
     const whereHouse = localStorage.getItem('whereHouseName')
 
 
@@ -242,7 +242,7 @@ async function submit(e) {
 }
 
 async function approve(e) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   var response = await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBeX/approve/${poEtlLogDetailJournalIDQueryParameters.value}`, null, {

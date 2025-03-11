@@ -1,34 +1,26 @@
 <script setup>
-import dashboard from '@/navigation/vertical/dashboard'
-import axios from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { onMounted, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
 //-------------------------------------------------------------  Search Table Nomaly-------------------
-import { urlApi } from '@/api'
 
 const whereHouseSelectedItem = ref('')
 const products = ref([])
 const stockAdjust = ref([])
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 
-import { VDataTable } from 'vuetify/labs/VDataTable'
 import { avatarText } from '@/@core/utils/formatters'
-import avatar1 from '@images/avatars/avatar-1.png'
 import avatar2 from '@images/avatars/avatar-2.png'
-import avatar3 from '@images/avatars/avatar-3.png'
-import avatar4 from '@images/avatars/avatar-4.png'
-import avatar5 from '@images/avatars/avatar-5.png'
-import avatar6 from '@images/avatars/avatar-6.png'
 import avatar7 from '@images/avatars/avatar-7.png'
 import avatar8 from '@images/avatars/avatar-8.png'
+import { VDataTable } from 'vuetify/labs/VDataTable'
 
 const data = [
   {
@@ -446,10 +438,16 @@ const isDialogVisibleSuccess = ref(false)
   <section>
     <VRow class="mt-2">
       <!-- Empty COl 1 -->
-      <VCol lg="3" cols="12" />
+      <VCol
+        lg="3"
+        cols="12"
+      />
       <!-- Btn Import File -->
       <!-- Employee Input Image -->
-      <VCol lg="6" cols="12">
+      <VCol
+        lg="6"
+        cols="12"
+      >
         <VRow>
           <!-- Import Image -->
           <VCol
@@ -546,18 +544,27 @@ const isDialogVisibleSuccess = ref(false)
                     <!-- AVatar img / Name File / Size File / Icon 1 2 3 -->
                     <VRow class="d-flex align-center">
                       <!-- AVatar img -->
-                      <VCol lg="1" cols="2">
+                      <VCol
+                        lg="1"
+                        cols="2"
+                      >
                         <VAvatar color="primary">
                           <VIcon icon="mdi-tooltip-image-outline" />
                         </VAvatar>
                       </VCol>
                       <!-- Name File / Size File -->
-                      <VCol lg="5" cols="10">
+                      <VCol
+                        lg="5"
+                        cols="10"
+                      >
                         <VRow><span class="mx-4">{{ nameImageUpload }}</span></VRow>
                         <VRow><span class="mx-4">{{ sizeImageUpload }}</span></VRow>
                       </VCol>
                       <!-- Icon 1 2 3 -->
-                      <VCol lg="6" cols="12">
+                      <VCol
+                        lg="6"
+                        cols="12"
+                      >
                         <VBtn color="white">
                           <VIcon icon="mdi-pencil" />
                         </VBtn>
@@ -604,7 +611,10 @@ const isDialogVisibleSuccess = ref(false)
         </VRow>
       </VCol>
       <!-- Check box Text & DeleteOP  -->
-      <VCol lg="3" cols="12">
+      <VCol
+        lg="3"
+        cols="12"
+      >
         <div>
           <VCheckbox
             v-model="checkText"
@@ -704,7 +714,17 @@ const isDialogVisibleSuccess = ref(false)
               cols="12"
               class="d-flex align-center justify-center"
             >
-              <VAvatar size="160" variant="tonal" color="success"><VIcon size="150" color="success" icon="mdi-check-circle" /></VAvatar>
+              <VAvatar
+                size="160"
+                variant="tonal"
+                color="success"
+              >
+                <VIcon
+                  size="150"
+                  color="success"
+                  icon="mdi-check-circle"
+                />
+              </VAvatar>
             </VCol>
             <VCol
               cols="12"

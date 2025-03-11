@@ -2,7 +2,7 @@ import { urlApi } from '@/api'
 import axios from '@axios'
 
 export async function generate(poEtlLogDetailJournalID) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/generate?poEtlLogDetailJournalID=${poEtlLogDetailJournalID}`, [], {
@@ -15,7 +15,7 @@ export async function generate(poEtlLogDetailJournalID) {
 }
 
 export async function get(poEtlLogDetailJournalID) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   return await axios.get(`${urlApi.value}/api/v1/LorryFormKaramu/get/${poEtlLogDetailJournalID}`, {
@@ -28,7 +28,7 @@ export async function get(poEtlLogDetailJournalID) {
 }
 
 export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryParameters) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${poEtlLogDetailJournalIDQueryParameters}`, {
@@ -41,7 +41,7 @@ export async function GetByPoEtlLogDetailJournalID(poEtlLogDetailJournalIDQueryP
 }
 
 export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   return await axios.post(`${urlApi.value}/api/v1/LorryFormKaramu/save/${poEtlLogDetailJournalIDQueryParameters}`, ipaRequestData, {

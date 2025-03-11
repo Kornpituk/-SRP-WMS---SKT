@@ -2,7 +2,7 @@ import { urlApi } from '@/api'
 import axios from '@axios'
 
 export async function generate(poEtllogDetailJournalID) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   await axios.post(`${urlApi.value}/api/v1/LorryFormSktEpBe/generate?poEtllogDetailJournalID=${poEtllogDetailJournalID}`, [], {
@@ -15,7 +15,7 @@ export async function generate(poEtllogDetailJournalID) {
 }
 
 export async function get(poEtllogDetailJournalID) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   return await axios.get(`${urlApi.value}/api/v1/LorryFormSktEpBe/get/${poEtllogDetailJournalID}`, {
@@ -28,7 +28,7 @@ export async function get(poEtllogDetailJournalID) {
 }
 
 export async function GetByPoEtlLogDetailJournalID(poEtllogDetailJournalIDQueryParameters) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   return await axios.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtllogDetailJournalID/${poEtllogDetailJournalIDQueryParameters}`, {
@@ -41,7 +41,7 @@ export async function GetByPoEtlLogDetailJournalID(poEtllogDetailJournalIDQueryP
 }
 
 export async function save(poEtlLogDetailJournalIDQueryParameters, ipaRequestData) {
-  const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+  const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
 
   // eslint-disable-next-line sonarjs/prefer-immediate-return

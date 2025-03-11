@@ -46,8 +46,8 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const accessToken = localStorage.getItem('accessToken')
-  const refreshToken = localStorage.getItem('refreshToken')
+  const accessToken = sessionStorage.getItem('accessToken')
+  const refreshToken = sessionStorage.getItem('refreshToken')
   
   // ถ้าไม่มี accessToken และไม่ใช่หน้า login หรือ selectWhereHouse
   if (!accessToken && to.name !== 'login' && to.name !== 'selectWhereHouse') {

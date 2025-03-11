@@ -23,12 +23,12 @@ const imagePictureLorry = ref([img05, img06, img07, img08, img09])
 //--------------------------- Section import Services --------------------------------
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
-import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
 
 const whereHouse = localStorage.getItem('whereHouseName')
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 const department = ref(userDataInfo.value.departmentName)
@@ -464,7 +464,7 @@ const handleSubmit = async type => {
 
 //-------------------------------------send back ------------------------
 
-import { 
+import {
   useSubmitShipmentPlanService2,
 } from '@/services/skt/shipmentPlan/services'
 

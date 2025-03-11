@@ -27,7 +27,7 @@ const route = useRoute()
 
 import { urlApi } from '@/api'
 
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 const whereHouseStock = ref(route.query.warehouseStock)
 const whereHouse = ref(route.query.warehouseStock)
 const productId = ref(route.query.productId)

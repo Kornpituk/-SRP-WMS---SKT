@@ -13,7 +13,7 @@ const whereHouseSelectedItem = ref(whereHouse)
 const Color = ref([])
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const perPage = ref(10)
 const page = ref(0)

@@ -174,7 +174,7 @@ const whereHouseSelectedItem = ref(whereHouse)
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 ///--- import Cookie
 

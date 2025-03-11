@@ -1,8 +1,8 @@
 
 <script setup>
-import axiosIns from '@axios'
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
-import { inject, defineProps, watchEffect, watch, onMounted } from 'vue'
+import axiosIns from '@axios'
+import { defineProps, onMounted, watch } from 'vue'
 
 const props = defineProps({
   Data: Array,
@@ -10,15 +10,13 @@ const props = defineProps({
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
-import ConfirmDialog from '@/components/dialogs/alert/confirmDialog.vue'
-import alertWordConst from '@/utilities/constant'
 
 //-------------------------------------------- Permission -----------------------------------------
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 
 const paramsForGetPermission = ref({
@@ -55,7 +53,7 @@ console.log("setItemDetails", poEtlLogDetailJournalID)
 
 const route = useRoute()
 const whereHouse = ref(localStorage.getItem('whereHouseName'))
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const dataProps = ref(JSON.parse(route.query.Data || '[]'))
 
@@ -66,20 +64,17 @@ const a = ref('A')
 
 const currentTableWatchSesstion = ref(0)
 
-import RawMatForm from '../rawMat/index.vue' 
-import LorryLoadingCal from '../lorryForm/flow/index.vue' 
 import RawMatInspec from '../inspecReqForm/index.vue'
 import PackagingInspec from '../packagingForm/index.vue'
-import PackagingInspec2 from '../packagingForm/index.vue'
-import PackagingInspec3 from '../packagingForm/index.vue'
+import RawMatForm from '../rawMat/index.vue'
 
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 
 //---------------- Import Lorry -------------------------------
 //--- A1
-import LorryLoadingA1IPA from '../lorryForm/a1/IPA.vue'
 import LorryLoadingA1EA11V1098C from '../lorryForm/a1/EA11V-1098C.vue'
 import LorryLoadingA1EPICHLO from '../lorryForm/a1/EPICHLO.vue'
+import LorryLoadingA1IPA from '../lorryForm/a1/IPA.vue'
 
 //--- A2
 import LorryLoadingA2SKTV144 from '../lorryForm/a2/SKTV-144.vue'
@@ -584,7 +579,7 @@ const getCurrentTabIndex = () => {
 const isActive = ref(true)
 
 //--------------------- alertDialog--------------------------------------------------------
-import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 
 const isDialogVisibleAlertDialog = ref(false)
 

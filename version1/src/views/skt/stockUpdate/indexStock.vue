@@ -1,23 +1,20 @@
 <script setup>
-import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
-import { VDataTable } from 'vuetify/labs/VDataTable'
+import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
 const whereHouse = localStorage.getItem('whereHouseName')
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
-import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
 
 //------------------------------- alert --------------------------------------------
 
-import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
 import alertWordConst from '@/utilities/constant'
 
 const isDialogVisibleAlertDialog = ref(false)
@@ -52,7 +49,7 @@ const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 
 //------------------------------ fetch data from API --------------------------------
-import { useGetUserPermissionService,
+import {
   useGetSearchPlanService,
 } from '@/services/skt/shipmentPlan/services'
 

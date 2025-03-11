@@ -1,9 +1,8 @@
 <script setup>
-import dashboard from '@/navigation/vertical/dashboard'
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { onMounted, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 // ----------------- Route --------------------------.
 import { useRoute } from 'vue-router'
@@ -21,7 +20,7 @@ const whereHouseSelectedItem = ref('')
 const products = ref([])
 
 // Get access token from localStorage in another page
-const accessTokenAtStore = localStorage.getItem('accessTokenAtStore')
+const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 const whereHouse = localStorage.getItem('whereHouseName')
 
@@ -1251,8 +1250,8 @@ const saveBarcodeWebAdjustID = async index => {
                     density="compact"
                     size="x-large"
                     class="px-lg-16 px-md-16 px-sm-12 custom-small-btn-search"
-                    @click="checkZoneSearchBtn(searchByZoneId)"
                     disabled
+                    @click="checkZoneSearchBtn(searchByZoneId)"
                   >
                     <VIcon icon="mdi-magnify" />
                     {{ $t('Search') }}
@@ -1273,8 +1272,8 @@ const saveBarcodeWebAdjustID = async index => {
                     size="x-large"
                     color="red"
                     class="px-lg-16 custom-small-btn-clear"
-                    @click="getCountingStockClear"
                     disabled
+                    @click="getCountingStockClear"
                   >
                     {{ $t('Clear') }}
                   </VBtn>
@@ -1393,9 +1392,9 @@ const saveBarcodeWebAdjustID = async index => {
             <VBtn
               prepend-icon="mdi-refresh"
               color="green"
-              @click="getCountingStock"
               size="large"
               style="width: 100%;"
+              @click="getCountingStock"
             >
               <template #prepend>
                 <VIcon color="white" />
@@ -1414,9 +1413,9 @@ const saveBarcodeWebAdjustID = async index => {
               variant="outlined"
               color="primary"
               :disabled="isConfirmRfid"
-              @click="saveRFIDWeb"
               size="large"
               style="width: 100%;"
+              @click="saveRFIDWeb"
             >
               <template #prepend>
                 <VIcon color="primary" />
@@ -1434,7 +1433,10 @@ const saveBarcodeWebAdjustID = async index => {
         lg="8"
         style="margin-top: 10px;"
       >
-        <span class="d-flex justify-center justify-lg-start justify-md-center justify-sm-center" style="color: red;">{{ $t('When [Save] button is pressed and the scanned tag is not found, the tag will be cleared to empty value. The stock will be saved as automatic barcode stock.') }}</span>
+        <span
+          class="d-flex justify-center justify-lg-start justify-md-center justify-sm-center"
+          style="color: red;"
+        >{{ $t('When [Save] button is pressed and the scanned tag is not found, the tag will be cleared to empty value. The stock will be saved as automatic barcode stock.') }}</span>
       </VCol>
     </VRow>
   </section>
