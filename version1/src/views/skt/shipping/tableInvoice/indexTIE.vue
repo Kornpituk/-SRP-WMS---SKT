@@ -1797,25 +1797,42 @@ const showDialogTruckOrder = (SoId, SoeId, rowData) => {
   AddressPrint.value = rowData.shipperLocation || ' '
   TruckCompanyPrint.value = rowData.truck || ' '
 
-  // sessionStorage.setItem('savedTruckOrder', JSON.stringify({ SoId, SoeId, rowData }))
+  // 🔹 บันทึกค่าไว้ใน sessionStorage
+  sessionStorage.setItem("savedTruckOrder", JSON.stringify({ SoId, SoeId, rowData }))
 
   getDataTruckOrder()
 }
 
-// 🚀 ฟังก์ชันสำหรับโหลดค่าที่บันทึกไว้เมื่อ reload หน้า
-// const loadSavedTruckOrder = () => {
-//   const savedData = sessionStorage.getItem('savedTruckOrder')
-//   if (savedData) {
-//     const { SoId, SoeId, rowData } = JSON.parse(savedData)
+const clearHistoryTruckOrder = () => {
+  saleOrderNo.value = ""
+  soEIdModel.value = ""
+  dataRowModel.value = null
+  isDialogVisiblePrintTruck.value = false
 
-//     showDialogTruckOrder(SoId, SoeId, rowData)
-//   }
-// }
+  // 🔹 ลบค่าจาก sessionStorage
+  sessionStorage.removeItem("savedTruckOrder")
+}
 
-// // 🔥 เรียกใช้ `loadSavedTruckOrder` เมื่อหน้าโหลด
-// window.addEventListener('load', loadSavedTruckOrder)
+// ⏳ ตรวจสอบเมื่อเปิดหน้าใหม่ (onMounted)
+onMounted(() => {
+  const savedData = sessionStorage.getItem("savedTruckOrder")
+  if (savedData) {
+    const { SoId, SoeId, rowData } = JSON.parse(savedData)
+    
+    // if (isDialogVisiblePrintTruck.value) {
+    //   showDialogTruckOrder(SoId, SoeId, rowData)
+    // }
 
+    showDialogTruckOrder(SoId, SoeId, rowData)
+  }
+})
 
+// 🎯 ถ้า Dialog ปิด → เรียก clearParamsTruckOrder()
+watch(isDialogVisiblePrintTruck, newVal => {
+  if (!newVal) {
+    clearParamsTruckOrder()
+  }
+})
 
 ///------------ Dialog PDF
 
@@ -3129,7 +3146,7 @@ const handleSavetruckOrder = async type => {
         <DialogCloseBtn
           variant="text"
           size="default"
-          @click="isDialogVisiblePrintTruck = false, clearParamsTruckOrder()"
+          @click="isDialogVisiblePrintTruck = false, clearParamsTruckOrder(), clearHistoryTruckOrder()"
         />
 
         <VCardTitle class="text-center">
