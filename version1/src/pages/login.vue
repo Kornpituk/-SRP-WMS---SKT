@@ -79,7 +79,7 @@ const getInfoCompany = () => {
     .then(response => {
       inFoCompany.value = response.data
 
-      // console.log('inFoCompany.value At login:', inFoCompany.value)
+      // //console.log('inFoCompany.value At login:', inFoCompany.value)
 
       localStorage.setItem('companyId', inFoCompany.value.comId)
       localStorage.setItem('companyName', inFoCompany.value.companyName)
@@ -89,9 +89,9 @@ const getInfoCompany = () => {
 
       
 
-      // console.log('companyId', localStorage.getItem('companyId'))
-      // console.log('companyName', localStorage.getItem('companyName'))
-      // console.log('companyLogo', localStorage.getItem('companyLogo'))
+      // //console.log('companyId', localStorage.getItem('companyId'))
+      // //console.log('companyName', localStorage.getItem('companyName'))
+      // //console.log('companyLogo', localStorage.getItem('companyLogo'))
     })
     .catch(error => {
       console.error('Error:', error)
@@ -156,7 +156,7 @@ const login = async () => {
 
 
   if(response.status == 200){
-    console.log(response.data)
+    //console.log(response.data)
 
     const { access_token, refresh_token } = response.data
 
@@ -198,17 +198,19 @@ const getInfoUserData = async () => {
   if(response.status == 200){
     userData.value  = response.data
     itemStore.setItemDetails(userData.value, 'UserDataCookies')
-    console.log('getInfoUserData: name', userData.username)
+
+    //console.log('getInfoUserData: name', userData.username)
     localStorage.setItem('userName', userData.username)
-    console.log("localStorage.setItem('userData', userData)", localStorage.getItem('userDate'))
+
+    //console.log("localStorage.setItem('userData', userData)", localStorage.getItem('userDate'))
   }
 }
 
 // watchEffect(getInfoUserData)
 
 const checkIsLogin = () => {
-  // console.log('Check islogon userData:', localStorage.getItem('userDate'))
-  // console.log('Check islogon accessToken:', localStorage.getItem('accessToken'))
+  // //console.log('Check islogon userData:', localStorage.getItem('userDate'))
+  // //console.log('Check islogon accessToken:', localStorage.getItem('accessToken'))
 }
 
 const onSubmit = async () => {

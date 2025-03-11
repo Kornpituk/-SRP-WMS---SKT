@@ -7,12 +7,13 @@ export const useGenerateViewFormService = () => {
   const fetchGenerateView = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageGenerateView.value = null
-      console.log('Fetching Packaging Form Generate view...')
+
+      //console.log('Fetching Packaging Form Generate view...')
   
       const result = await gobalService.generateViewForm(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
         
       if (result) {
-        console.log('Packaging data Generate view Controller:', result)
+        //console.log('Packaging data Generate view Controller:', result)
           
         generateView.value = result
   
@@ -44,12 +45,13 @@ export const usePrintReceivingFormService = () => {
   const printReceivingFormService = async (typeReceiving, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageGenerateView.value = null
-      console.log('Print Receiving Form Service Starting...')
+
+      //console.log('Print Receiving Form Service Starting...')
   
       const result = await globalService.printReceivingFormPDF(typeReceiving, poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
         
       if (result) {
-        console.log('Print Receiving Form Service Complate:', result)
+        //console.log('Print Receiving Form Service Complate:', result)
           
         printReceivingFormResult.value = result
   
@@ -83,12 +85,13 @@ export const usePrintInspectionFormService = () => {
   const printInspectionFormService = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
     try {
       errorMessageInspection.value = null
-      console.log('Print Inspection Form Service Starting...')
+
+      //console.log('Print Inspection Form Service Starting...')
   
       const result = await globalService.printInspectionFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
         
       if (result) {
-        console.log('Print Inspection Form Service Complate:', result)
+        //console.log('Print Inspection Form Service Complate:', result)
           
         printInspectionFormResult.value = result
   
@@ -122,12 +125,13 @@ export const usePrintPackagingFormService = () => {
   const printPackagingFormService = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
     try {
       errorMessagePackaging.value = null
-      console.log('Print PackagingForm Form Service Starting...')
+
+      //console.log('Print PackagingForm Form Service Starting...')
   
       const result = await globalService.printPackagingFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
         
       if (result) {
-        console.log('Print PackagingForm Form Service Complate:', result)
+        //console.log('Print PackagingForm Form Service Complate:', result)
           
         printPackagingFormResult.value = result
   
@@ -163,12 +167,13 @@ export const useViewPrintLabelFormService = () => {
   const printLabelFormViewService = async (urlApi, whereHouse, accessToken, lot) => {
     try {
       errorMessagePrintLabelView.value = null
-      console.log('Print Inspection Form Service Starting...')
+
+      //console.log('Print Inspection Form Service Starting...')
   
       const result = await globalService.printLabelView(urlApi, whereHouse, accessToken, lot)
         
       if (result) {
-        console.log('Print Inspection Form Service Complate:', result)
+        //console.log('Print Inspection Form Service Complate:', result)
           
         printLabelFormViewResult.value = result
   
@@ -202,12 +207,13 @@ export const useFetchPrintLabelData = () => {
   const printLabelFormViewService = async (form, urlApi, whereHouse, accessToken, params = {}) => {
     try {
       errorMessagePrintLabelView.value = null
-      console.log('Print Inspection Form Service Starting...')
+
+      //console.log('Print Inspection Form Service Starting...')
   
       const result = await globalService.getPrintLabel(form, urlApi, whereHouse, accessToken, params)
         
       if (result) {
-        console.log('Print Inspection Form Service Complete:', result)
+        //console.log('Print Inspection Form Service Complete:', result)
         printLabelFormViewResult.value = result.map((item, index) => ({
           ...item,
           index: index + 1, // เริ่มนับจาก 1
@@ -242,12 +248,13 @@ export const useFetchPrintLabelDataSticker = () => {
   const printLabelFormViewService = async (form, urlApi, whereHouse, accessToken, params = {}) => {
     try {
       errorMessagePrintLabelView.value = null
-      console.log('Print Inspection Sticker Form Service Starting...')
+
+      //console.log('Print Inspection Sticker Form Service Starting...')
   
       const result = await globalService.getPrintLabelSticker(form, urlApi, whereHouse, accessToken, params)
         
       if (result) {
-        console.log('Print Inspection Sticker Form Service Complete:', result)
+        //console.log('Print Inspection Sticker Form Service Complete:', result)
         printLabelFormViewResult.value = result.map((item, index) => ({
           ...item,
           index: index + 1, // เริ่มนับจาก 1
@@ -282,12 +289,13 @@ export const useSavePrintBarcodeFormService = () => {
   const saveToPrintLabelFormBarcodeService = async (urlApi, whereHouse, accessToken, barcode) => {
     try {
       errorMessageSaveToPrintLabelBarcode.value = null
-      console.log('Save To Print Barcode Form Service Starting...')
+
+      //console.log('Save To Print Barcode Form Service Starting...')
   
       const result = await globalService.saveToPrintLotByBarcode(urlApi, whereHouse, accessToken, barcode)
         
       if (result) {
-        console.log('Save To Print Barcode Form Service Complate:', result)
+        //console.log('Save To Print Barcode Form Service Complate:', result)
           
         saveToPrintLabelFormBarcodeResult.value = result
   
@@ -321,12 +329,13 @@ export const usePrintLabelBarcodeFormService = () => {
   const printLabelFormBarcodeService = async (urlApi, whereHouse, accessToken) => {
     try {
       errorMessagePrintLabelBarcode.value = null
-      console.log('Print Barcode Form Service Starting...')
+
+      //console.log('Print Barcode Form Service Starting...')
   
       const result = await globalService.printLabelBarcode(urlApi, whereHouse, accessToken)
         
       if (result) {
-        console.log('Print Barcode Form Service Complate:', result)
+        //console.log('Print Barcode Form Service Complate:', result)
           
         printLabelBarcodeFormViewResult.value = result
   
@@ -361,12 +370,13 @@ export const usePrintExportExcelService = () => {
   const printExportExcelService = async (urlApi, whereHouse, accessToken, params = {}) => {
     try {
       printExportExcelErrorMessage.value = null
-      console.log('Print Export Excel Form Service Starting...')
+
+      //console.log('Print Export Excel Form Service Starting...')
   
       const result = await globalService.printExportExcel(urlApi, whereHouse, accessToken, params)
         
       if (result && result.success) {
-        console.log('Print Export Excel Form Service Complete:', result)
+        //console.log('Print Export Excel Form Service Complete:', result)
         printExportExcelResult.value = result.data
         
         return { success: true, data: printExportExcelResult.value }
@@ -400,12 +410,13 @@ export const useGetTemplatesByItemCodeSearchService = () => {
   const fetchGetTemplateByItemCode = async (ItemCode, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetTemplatesByItemCodeSearch.value = null
-      console.log('Fetching getTemplatesByItemCodeSearch...')
+
+      //console.log('Fetching getTemplatesByItemCodeSearch...')
   
       const result = await globalService.getTempateByItemCode(ItemCode, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Fetching data getTemplatesByItemCodeSearch:', result)
+        //console.log('Fetching data getTemplatesByItemCodeSearch:', result)
         getTemplateByItemCodeResult.value = result
         
         return result
@@ -419,7 +430,7 @@ export const useGetTemplatesByItemCodeSearchService = () => {
         return result
       }
     } catch (error) {
-      console.log('Error in fetchGetTemplateByItemCode:', error)
+      //console.log('Error in fetchGetTemplateByItemCode:', error)
 
       // errorMessageGetTemplatesByItemCodeSearch.value = error.message
     }
@@ -439,12 +450,13 @@ export const useGetTemplatesByFileCodeSearchService = () => {
   const fetchGetTemplateByFileCode = async (FileCode, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetTemplatesByFileCodeSearch.value = null
-      console.log('Fetching getTemplatesByFileCodeSearch...')
+
+      //console.log('Fetching getTemplatesByFileCodeSearch...')
   
       const result = await globalService.getTempateByFileCode(FileCode, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Fetching data getTemplatesByFileCodeSearch:', result)
+        //console.log('Fetching data getTemplatesByFileCodeSearch:', result)
         getTemplateByFileCodeResult.value = result
         
         return result
@@ -452,7 +464,7 @@ export const useGetTemplatesByFileCodeSearchService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchGetTemplateByFileCode:', error)
+      //console.log('Error in fetchGetTemplateByFileCode:', error)
       errorMessageGetTemplatesByFileCodeSearch.value = error.message
     }
   }
@@ -471,12 +483,13 @@ export const usePrintExportPDFProductLabelService = () => {
   const printExportPDFService = async (fileCode, productID, LotNo, urlApi, whereHouse, accessToken) => {
     try {
       printExportPDFErrorMessage.value = null
-      console.log('Print Export PDF Form Service Starting...', fileCode, productID, LotNo)
+
+      //console.log('Print Export PDF Form Service Starting...', fileCode, productID, LotNo)
   
       const result = await globalService.printExportPDFProductLabel(fileCode, productID, LotNo, urlApi, whereHouse, accessToken)
         
       if (result && result.success) {
-        console.log('Print Export PDF Form Service Complete:', result)
+        //console.log('Print Export PDF Form Service Complete:', result)
         printExportPDFResult.value = result.data
         
         return { success: true, data: printExportPDFResult.value }
@@ -508,12 +521,13 @@ export const useGetStatusTextService = () => {
   const fetchGetStatusText = async (urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetStatusText.value = null
-      console.log('Fetching fetchGetStatusText...')
+
+      //console.log('Fetching fetchGetStatusText...')
   
       const result = await globalService.getStatusText(urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Fetching data fetchGetStatusText:', result)
+        //console.log('Fetching data fetchGetStatusText:', result)
         getStatusTextCodeResult.value = result
         
         return result
@@ -521,7 +535,7 @@ export const useGetStatusTextService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchGetStatusText:', error)
+      //console.log('Error in fetchGetStatusText:', error)
       errorMessageGetStatusText.value = error.message
     }
   }

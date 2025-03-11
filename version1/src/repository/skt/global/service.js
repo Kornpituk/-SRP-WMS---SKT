@@ -14,7 +14,7 @@ export const coaService = {
       })
         
       if (response && response.data) {
-        console.log(`Service Response data COA:`, response.data.data)
+        //console.log(`Service Response data COA:`, response.data.data)
           
         return response.data.data
       } else {
@@ -61,7 +61,7 @@ export const coaService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data detelete coa:', response.data.data)
+        //console.log('Service Response data detelete coa:', response.data.data)
         
         return response.data.data
       } else {
@@ -85,7 +85,7 @@ export const coaService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data all detelete coa:', response.data.data)
+        //console.log('Service Response data all detelete coa:', response.data.data)
         
         return response.data.data
       } else {

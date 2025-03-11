@@ -136,11 +136,11 @@ const supplierCode = ref(null)
 const deliveryDateRange = ref(null)
 
 const testMoldelSearch = () => {
-  console.log(itemsCode.value)
-  console.log(itemsName.value)
-  console.log(supplierCode.value)
-  console.log(supplierName.value)
-  console.log(deliveryDateRange.value)
+  //console.log(itemsCode.value)
+  //console.log(itemsName.value)
+  //console.log(supplierCode.value)
+  //console.log(supplierName.value)
+  //console.log(deliveryDateRange.value)
 }
 
 //------------------------ Model Name for search SKT ------------------------------
@@ -187,10 +187,11 @@ watch(() => {
   if(sessionStorage.getItem('fileterStatusInPAI') === '' || sessionStorage.getItem('fileterStatusInPAI') === null|| sessionStorage.getItem('fileterStatusInPAI') === 'null'){
     statusFilter.value = 'All'
 
-    console.log('fileterStatusInPAI if', sessionStorage.getItem('fileterStatusInPAI'))
+    //console.log('fileterStatusInPAI if', sessionStorage.getItem('fileterStatusInPAI'))
   }else{
     statusFilter.value = sessionStorage.getItem('fileterStatusInPAI')
-    console.log('fileterStatusInPAI else', sessionStorage.getItem('fileterStatusInPAI'))
+
+    //console.log('fileterStatusInPAI else', sessionStorage.getItem('fileterStatusInPAI'))
 
   }
 })
@@ -199,7 +200,7 @@ watch(() => {
 
 // ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
 const addStoredStatus = () => {
-  console.log("statusFilter addStoredStatus", statusFilter.value)
+  //console.log("statusFilter addStoredStatus", statusFilter.value)
   if (storedStatus && storedStatus !== null && storedStatus !== '') {
     const newItems = storedStatus.split(',')
 
@@ -207,10 +208,11 @@ const addStoredStatus = () => {
     sessionStorage.setItem('fileterStatusInPAI', statusFilter.value)
     sessionStorage.setItem('statusFilter', statusFilter.value)
 
-    console.log("statusFilter if", sessionStorage.getItem('fileterStatusInPAI', statusFilter.value))
+    //console.log("statusFilter if", sessionStorage.getItem('fileterStatusInPAI', statusFilter.value))
   }else if(statusFilter.value){
     sessionStorage.setItem('fileterStatusInPAI', statusFilter.value)
-    console.log("statusFilter addStoredStatus else", statusFilter.value)
+
+    //console.log("statusFilter addStoredStatus else", statusFilter.value)
   }
 }
 
@@ -236,11 +238,11 @@ const validateFields = () => {
   }
 
   if (!hasValue && statusFilter.value === 'All') {
-    console.log('tempFilters.value.deliveryDateRange', tempFilters.value.deliveryDateRange)
+    //console.log('tempFilters.value.deliveryDateRange', tempFilters.value.deliveryDateRange)
     
     return false // คืนค่า false ถ้าไม่มีฟิลด์ไหนที่มีค่า
   } else {
-    console.log("filter Validate", tempFilters.value)
+    //console.log("filter Validate", tempFilters.value)
 
     sessionStorage.setItem('deliveryDateFrom', tempFilters.value.deliveryDateRange || '')
     sessionStorage.setItem('deliveryDateTo', tempFilters.value.deliveryDateTo || '')
@@ -280,7 +282,8 @@ watch(tempFilters.value.deliveryDateTo, newValue => {
 })
 watch(tempFilters.value.productId, newValue => {
   sessionStorage.setItem('productId', newValue)
-  console.log("Update Filter", tempFilters.value.productId, newValue)
+
+  //console.log("Update Filter", tempFilters.value.productId, newValue)
 })
 watch(tempFilters.value.productName, newValue => {
   sessionStorage.setItem('productName', newValue)
@@ -361,10 +364,10 @@ const toggleSortType = sortBy => {
       sortRefs[key].value = '' // ล้างค่าที่ไม่เกี่ยวข้อง
     }
 
-    // console.log("Sort type:",sortRefs[key],'Key',[key])
+    // //console.log("Sort type:",sortRefs[key],'Key',[key])
   }
 
-  // console.log("Sort type:",sortRefs[key],'Key',[key])
+  // //console.log("Sort type:",sortRefs[key],'Key',[key])
 }
 
 const router = useRouter()
@@ -476,7 +479,7 @@ const getStatusReceiving = async () => {
       ...response.data.data, // ข้อมูลจาก API
     ]
 
-    console.log('itemStatus', itemStatus.value)
+    //console.log('itemStatus', itemStatus.value)
   } catch (error) {
     // จัดการข้อผิดพลาด
     selectError.value = 'Where house not selected!!'
@@ -735,7 +738,7 @@ const GetStockUpdate = async () => {
       selectable: item.statusId === 15,
     }))
 
-    console.log('[products.value]:', products.value)
+    //console.log('[products.value]:', products.value)
 
   } catch (error) {
     // จัดการข้อผิดพลาด
@@ -852,8 +855,8 @@ const filteredHeaders = computed(() => {
       return true
     }
 
-    console.log('header.permission', header.permission)
-    console.log('header.permission', canVisibleUserPermission(statusPermission.value, header.permission).canVisible)
+    //console.log('header.permission', header.permission)
+    //console.log('header.permission', canVisibleUserPermission(statusPermission.value, header.permission).canVisible)
 
     // ตรวจสอบสิทธิ์สำหรับทุกคอลัมน์อื่น ๆ
     return canVisibleUserPermission(statusPermission.value, header.permission).canVisible
@@ -907,9 +910,9 @@ const paginationData = computed(() => {
   const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
   const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
-  // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
-  // console.log('products.value.length: ',products.value.length)
+  // //console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
+  // //console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
+  // //console.log('products.value.length: ',products.value.length)
   
   return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
 })
@@ -1010,10 +1013,10 @@ const checkRFID = ref ('')
 watchEffect(() =>{
   const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
   if(checkRFIDUpdate.value === 'true'){
-    console.log('RFID Check True:'+ checkRFIDUpdate.value)
+    //console.log('RFID Check True:'+ checkRFIDUpdate.value)
     checkRFID.value = true
   } else if (checkRFIDUpdate.value === 'false') {
-    // console.log('RFID Check False:'+ checkRFIDUpdate.value)
+    // //console.log('RFID Check False:'+ checkRFIDUpdate.value)
     checkRFID.value = false
   }
 })
@@ -1046,7 +1049,8 @@ const showDialogImage = (code, name, img, barcode, categories, group, groupSup, 
   unitNameProduct.value = unitName
   detailsProduct.value = details
   isDialogImageVisible.value = true
-  console.log('showImageFunction!!')
+
+  //console.log('showImageFunction!!')
 }
 
 const showExpansionDialog = ref(false)
@@ -1233,7 +1237,7 @@ const checkCurrentTabBeforIn = status => {
 }
 
 const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlLogDetailJournalID, receivingType, lot, dataRow) => {
-  // console.log('isDialogVisibleAction **', index, journalID, updateBy, status, itemCode)
+  // //console.log('isDialogVisibleAction **', index, journalID, updateBy, status, itemCode)
   journalIDModel.value = journalID
   updateByReceivingPlan.value = updateBy
   detailsReceiv.value = products.value[index-1]
@@ -1248,12 +1252,13 @@ const viewDetailsReceive = (index, journalID, updateBy, status, itemCode, poEtlL
   itemStore.setItemDetails(products.value[index-1].lorryInfoKey, 'typeLorryInfoId')
 
 
-  // console.log("setItemDetails", itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
+  // //console.log("setItemDetails", itemStore.getItemDetails('poEtlLogDetailJournalIDCookies'))
 
   idStatusDialogAction.value = status
   receivingTypeAction.value = receivingType
   lotAction.value = lot
-  console.log('')
+
+  //console.log('')
   sessionStorage.setItem('currentTabReceivingForm', checkCurrentTabBeforIn(status))
 
   selectedPrintLabel.value = []
@@ -1315,7 +1320,7 @@ const findProductByJournalID = journalID => {
   const foundProduct = products.value.find(product => product.poEtlLogDetailJournalID === journalID)
   
   if (foundProduct) {
-    console.log('Found Product:', foundProduct)
+    //console.log('Found Product:', foundProduct)
 
     const typeLorryIDOld = ref(sessionStorage.getItem('typeLorryInfoId'))
     if(foundProduct.lorryInfos.length > 0){
@@ -1327,37 +1332,41 @@ const findProductByJournalID = journalID => {
         itemStore.setItemDetails(typeLorryOnce, 'typeLorryInfoId')
         sessionStorage.setItem('typeLorryInfoId', typeLorryOnce)
         
-        console.log('Found Product typeLorryOnce:', typeLorryOnce)
+        //console.log('Found Product typeLorryOnce:', typeLorryOnce)
       }
       else if(foundProduct.lorryInfos.length >= 1 && typeLorryIDOld.value){
         itemStore.clearItemDetails('typeLorryInfoId')
         sessionStorage.removeItem('typeLorryInfoId')
-        console.log('Clear typeLorryOnce2:', sessionStorage.getItem('typeLorryInfoId'), typeLorryIDOld.value)
+
+        //console.log('Clear typeLorryOnce2:', sessionStorage.getItem('typeLorryInfoId'), typeLorryIDOld.value)
       }
+      // eslint-disable-next-line sonarjs/no-duplicated-branches
       else{
         itemStore.clearItemDetails('typeLorryInfoId')
         sessionStorage.removeItem('typeLorryInfoId')
-        console.log('Clear typeLorryOnce:', sessionStorage.getItem('typeLorryInfoId'), typeLorryIDOld.value)
+        
+
+        //console.log('Clear typeLorryOnce:', sessionStodddrage.getItem('typeLorryInfddddoId'), typeLorryIDOld.value)
       }
     }else{
-      console.log('No typeLorryOnce')
+      //console.log('No typeLorryOnce')
     }
     resultDetailsAvtion.value = foundProduct
     
     return foundProduct
   } else {
-    console.log('No product found with poEtlLogDetailJournalID:', journalID)
+    //console.log('No product found with poEtlLogDetailJournalID:', journalID)
     
     return null
   }
 }
 
-if (resultDetailsAvtion.value) {
-  // สามารถจัดการกับข้อมูลที่พบได้ที่นี่
-  console.log('Product Details:', resultDetailsAvtion.value)
-} else {
-  console.log('No matching product found')
-}
+// if (resultDetailsAvtion.value) {
+//   // สามารถจัดการกับข้อมูลที่พบได้ที่นี่
+//   //console.log('Product Details:', resultDetailsAvtion.value)
+// } else {
+//   //console.log('No matching product found')
+// }
 
 const dataPrintlabel = ref([])
 
@@ -1398,7 +1407,7 @@ const disabledBtnLebalLorry = () => {
 const disabledTypeReceiving = ref(itemStore.getItemDetails('typeLorryInfoId'))
 
 const getPrintLabelView = async lot => {
-  // console.log('searchByCategoryName: ',searchByCategoryName)
+  // //console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/PrintLabel/Label?lot=${lot}`, {
     headers: {
       'accept': '*/*',
@@ -1414,7 +1423,8 @@ const getPrintLabelView = async lot => {
       const data = response.data
 
       dataPrintlabel.value = data
-      console.log("getPrintLabelView 55555+", data)
+
+      //console.log("getPrintLabelView 55555+", data)
       
       successGetPrintLabelView.value = true
     })
@@ -1427,7 +1437,7 @@ const getPrintLabelView = async lot => {
   // const result = printLabelFormViewService(urlApi.value, searchByWareHouseId.value, accessTokenAtStore, lot)
 
   // if(printLabelFormViewResult){
-  //   console.log('printLabelFormViewService Success')
+  //   //console.log('printLabelFormViewService Success')
   // }
 
 }
@@ -1472,7 +1482,7 @@ const savePrintLabel = async () => {
     const data = response.data
     const success = false
 
-    console.log("save Print Label success:", response.data)
+    //console.log("save Print Label success:", response.data)
     
     successSavePrintLabel.value = true
   } catch (error) {
@@ -1506,7 +1516,7 @@ const printLabelSmallPdf = async () => {
     )
   
     if (response && response.data) {
-      console.log('Service Response print Label form:', response.data)
+      //console.log('Service Response print Label form:', response.data)
   
       // สร้าง Blob จาก response
       const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -1535,34 +1545,34 @@ const printLabelSmallPdf = async () => {
 const btnPrintLabel = async () => {
   processingPrintLabel.value = true
   
-  console.log('btnPrintLabel start!')
+  //console.log('btnPrintLabel start!')
   try {
     // เรียกใช้ savePrintLabel ก่อน
-    console.log('get PrintLabel start!')
+    //console.log('get PrintLabel start!')
 
     await getPrintLabelView(lotAction.value)
     if(!successGetPrintLabelView.value){
       throw 'get PrintLabel:'+successGetPrintLabelView.value
     }
 
-    console.log('save PrintLabel start!')
+    //console.log('save PrintLabel start!')
 
     await savePrintLabel()
     if(!successSavePrintLabel.value){
       throw 'save PrintLabel:'+successSavePrintLabel.value
     }
 
-    console.log('savePrintLabel end!')
+    //console.log('savePrintLabel end!')
 
 
-    console.log('printLabelSmallPdf start!')
+    //console.log('printLabelSmallPdf start!')
 
     const printResponse = await printLabelSmallPdf()
 
-    console.log('printLabelSmallPdf end!')
+    //console.log('printLabelSmallPdf end!')
 
     if (printResponse.success) {
-      console.log('Print label PDF successfully generated and displayed.')
+      //console.log('Print label PDF successfully generated and displayed.')
     } else {
       processingPrintLabel.value = false
       console.error('Error generating print label PDF.')
@@ -1660,7 +1670,7 @@ const printFormAll = async () => {
   const printPromises = selectedPrintLabel.value.map(async label => {
     if (label === 'Receiving Form') {
       processingPrintForm1.value = true // เริ่มพิมพ์
-      console.log('Printing Receiving Form...')
+      //console.log('Printing Receiving Form...')
 
       if(receivingTypeAction.value === 2){
         typeReceiving.value = 'ReceivingForm'
@@ -1676,7 +1686,7 @@ const printFormAll = async () => {
     }
     if (label === 'Inspection Request Form') {
       processingPrintForm2.value = true // เริ่มพิมพ์
-      console.log('Printing Inspection Request Form...')
+      //console.log('Printing Inspection Request Form...')
 
       try {
         return await printInspectionFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) 
@@ -1686,7 +1696,7 @@ const printFormAll = async () => {
     }
     if (label === 'Packaging Inspection Request Form') {
       processingPrintForm3.value = true // เริ่มพิมพ์
-      console.log('Printing Packaging Inspection Request Form...')
+      //console.log('Printing Packaging Inspection Request Form...')
 
       try {
         return await printPackagingFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
@@ -1697,12 +1707,12 @@ const printFormAll = async () => {
 
     if (label === 'Lorry Loading Checklist') {
       processingPrintForm4.value = true // เริ่มพิมพ์
-      console.log('Printing Lorry Loading Checklist...')
+      //console.log('Printing Lorry Loading Checklist...')
 
       const typeLorryID = ref(checkTypeLorryToPrintPDF())
 
       try {
-        console.log('Printing Lorry Loading Checklist...', typeLorryID.value)
+        //console.log('Printing Lorry Loading Checklist...', typeLorryID.value)
         
         return await printIPAFormService(typeLorryID.value, poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore)
       } finally {
@@ -1716,25 +1726,21 @@ const printFormAll = async () => {
     const results = await Promise.all(printPromises)
 
     processingPrint.value = false
-    console.log('All forms printed:', results)
+
+    //console.log('All forms printed:', results)
   } catch (error) {
     console.error('Error printing forms:', error)
   }
 }
 
 const printReceivingForm = () => {
-  console.log('Printing Receiving Form...')
+  //console.log('Printing Receiving Form...')
 
   // การพิมพ์ฟอร์มสามารถใช้ window.print หรืออื่นๆ ตามต้องการ
 }
 
 const checkPersistent = computed(() => {
-  if (processingPrintLabel.value === true || processingPrint.value === true) {
-    return true
-  }
-  console.log("false")
-  
-  return false
+  return !!(processingPrintLabel.value === true || processingPrint.value === true)
 })
 
 //-------------------- print Excel---------------------------------
@@ -1743,7 +1749,7 @@ const { printExportExcelResult, printExportExcelService } = usePrintExportExcelS
 const loadingPrintExportExcel = ref(false)
 
 const printExportExcelFunction = async () => {
-  console.log('Staet Export!')
+  //console.log('Staet Export!')
   loadingPrintExportExcel.value = true
 
   const { deliveryDateRange, productId, productName, supplierId, supplierName, purchaseOrderNo } = searchFilters.value
@@ -1784,7 +1790,8 @@ const printExportExcelFunction = async () => {
   try {
     // รอให้ printExportExcel ทำงานและได้ผลลัพธ์กลับมา
     await printExportExcelService(urlApi.value, whereHouse, accessTokenAtStore, params)
-    console.log('การส่งออก Excel เสร็จสมบูรณ์')
+
+    //console.log('การส่งออก Excel เสร็จสมบูรณ์')
     loadingPrintExportExcel.value = false
   } catch (error) {
     loadingPrintExportExcel.value = false
@@ -1824,7 +1831,7 @@ const selectedDataTables = ref([])
 const selectedItemIdForColotRow = ref(null)
 
 const testCheckBox = () => {
-  console.log("%c selectedDataTables: ", "color: blue; background-color: yellow; font-size: 16px", selectedDataTables.value)
+  //console.log("%c selectedDataTables: ", "color: blue; background-color: yellow; font-size: 16px", selectedDataTables.value)
 
 }
 
@@ -1849,7 +1856,7 @@ const approveReceivingPlant = () => {
         },
       })
         .then(response => {
-          console.log(`Response for poEtlLogDetailJournalID ${item.poEtlLogDetailJournalID}:`, response.data)
+          //console.log(`Response for poEtlLogDetailJournalID ${item.poEtlLogDetailJournalID}:`, response.data)
 
           // isDialogSubmitSuccessVisible.value = true
           isDialogConfirmVisible.value = false
@@ -1865,7 +1872,8 @@ const approveReceivingPlant = () => {
     } else {
       
       statusCheckApprove.value = item.statusId
-      console.log(`Status ID not equal to 17 for poEtlLogDetailJournalID ${item.poEtlLogDetailJournalID}:`, item.statusId, statusCheckApprove.value)
+
+      //console.log(`Status ID not equal to 17 for poEtlLogDetailJournalID ${item.poEtlLogDetailJournalID}:`, item.statusId, statusCheckApprove.value)
     }
     
   })
@@ -1878,7 +1886,7 @@ const isSelected = item => {
 }
 
 const testBtn = () => {
-  console.log('selectedDataTables', selectedDataTables.value)
+  //console.log('selectedDataTables', selectedDataTables.value)
 }
 
 //-------- Fuction Cancel --------------------------------
@@ -1893,7 +1901,7 @@ const cancelReceivingPlan = () => {
   }
 
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
+  // //console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/Cancel`, data, {
     headers: {
       'accept': '*/*',
@@ -1904,7 +1912,7 @@ const cancelReceivingPlan = () => {
     .then(response => {
       const result = response.data.datas
 
-      console.log('subTypeId', result)
+      //console.log('subTypeId', result)
       wordForSubmit.value = 'Cancel'
       isDialogSubmitSuccessVisible.value = true
       location.reload()
@@ -1926,7 +1934,7 @@ const backToEditReceivingPlan = () => {
     updatedBy: updateByReceivingPlan.value, // ใส่ข้อมูลที่ต้องการ
   }
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
+  // //console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/BackToEdit?`, data, {
     headers: {
       'accept': '*/*',
@@ -1937,7 +1945,7 @@ const backToEditReceivingPlan = () => {
     .then(response => {
       const result = response.data.datas
 
-      console.log('subTypeId', result)
+      //console.log('subTypeId', result)
       wordForSubmit.value = 'Cancel'
       isDialogSubmitSuccessVisible.value = true
     })
@@ -1958,7 +1966,7 @@ const rejectReceivingPlan = () => {
     updatedBy: updateByReceivingPlan.value, // ใส่ข้อมูลที่ต้องการ
   }
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
+  // //console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/Reject?`, data, {
     headers: {
       'accept': '*/*',
@@ -1969,7 +1977,7 @@ const rejectReceivingPlan = () => {
     .then(response => {
       const result = response.data.datas
 
-      console.log('subTypeId', result)
+      //console.log('subTypeId', result)
       wordForSubmit.value = 'Cancel'
       isDialogSubmitSuccessVisible.value = true
     })
@@ -2014,7 +2022,7 @@ const isDialogVisibleDetailsRCVD = ref(false)
 const itemCodeDialogDetails = ref('asdasd')
 
 const showDialogItemDetails = code => {
-  console.log(code)
+  //console.log(code)
   isDialogVisibleDetailsRCVD.value = true
   itemCodeDialogDetails.value = code
 }

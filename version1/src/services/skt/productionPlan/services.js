@@ -8,12 +8,13 @@ export const useNewProductionPlanService = () => {
   const newProdutcionPlanFunc = async (batchId, planningId, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageNewProductionPlan.value = null
-      console.log('New Produtcion Plan Func...')
+
+      //console.log('New Produtcion Plan Func...')
   
       const result = await productionPlanRepository.newProductionPlan(batchId, planningId, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('New Produtcion Plan Func result:', result)
+        //console.log('New Produtcion Plan Func result:', result)
         responseNewProductionPlan.value = result
       } else {
         console.warn('No data returned from the API')
@@ -38,12 +39,13 @@ export const useDeleteBatchProductionPlanService = () => {
   const deleteBatchProdutcionPlanFunc = async (batchId, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageDeleteBatchProductionPlan.value = null
-      console.log('Delete Batch Produtcion Plan Func...')
+
+      //console.log('Delete Batch Produtcion Plan Func...')
   
       const result = await productionPlanRepository.deleteBatchProductionPlan(batchId, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Delete Batch Produtcion Plan Func result:', result)
+        //console.log('Delete Batch Produtcion Plan Func result:', result)
         responseDeleteBatchProductionPlan.value = result
       } else {
         console.warn('No data returned from the API')
@@ -68,12 +70,13 @@ export const useDeleteProductionPlanService = () => {
   const deleteProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageDeleteProductionPlan.value = null
-      console.log('Delete Produtcion Plan Func...')
+
+      //console.log('Delete Produtcion Plan Func...')
   
       const result = await productionPlanRepository.deleteProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Delete Produtcion Plan Func result:', result)
+        //console.log('Delete Produtcion Plan Func result:', result)
         responseDeleteProductionPlan.value = result
       } else {
         console.warn('No data returned from the API')
@@ -98,12 +101,13 @@ export const useRejectProductionPlanService = () => {
   const rejectProdutcionPlanFunc = async (statusComment, planningId, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageRejectProductionPlan.value = null
-      console.log('Reject Produtcion Plan Func...')
+
+      //console.log('Reject Produtcion Plan Func...')
   
       const result = await productionPlanRepository.rejectBatchProductionPlan(statusComment, planningId, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Reject Produtcion Plan Func result:', result)
+        //console.log('Reject Produtcion Plan Func result:', result)
         responseRejectProductionPlan.value = result
       } else {
         console.warn('No data returned from the API')
@@ -128,12 +132,13 @@ export const useValidateBatchProductionPlanService = () => {
   const validateLotBatchProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageValidateLotBatchProductionPlan.value = null
-      console.log('Genertate Batch lot Produtcion Plan Func...')
+
+      //console.log('Genertate Batch lot Produtcion Plan Func...')
   
       const result = await productionPlanRepository.validateLotBatchProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Genertate Batch lot Produtcion Plan Func result:', result)
+        //console.log('Genertate Batch lot Produtcion Plan Func result:', result)
         responseValidateLotBatchProductionPlan.value = result.data.message
       } else {
         console.warn('No data returned from the API')
@@ -158,12 +163,13 @@ export const useGenerateBatchProductionPlanService = () => {
   const generateLotBatchProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGenerateLotBatchProductionPlan.value = null
-      console.log('Genertate Batch lot Produtcion Plan Func...')
+
+      //console.log('Genertate Batch lot Produtcion Plan Func...')
   
       const result = await productionPlanRepository.generateLotBatchProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Genertate Batch lot Produtcion Plan Func result:', result)
+        //console.log('Genertate Batch lot Produtcion Plan Func result:', result)
         responseGenerateLotBatchProductionPlan.value = result
       } else {
         console.warn('No data returned from the API')
@@ -188,12 +194,13 @@ export const useSubmitProductionPlanService = () => {
   const submitProdutcionPlanFunc = async (planningId, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageSubmitProductionPlan.value = null
-      console.log('Submit Produtcion Plan Func...')
+
+      //console.log('Submit Produtcion Plan Func...')
   
       const result = await productionPlanRepository.submitProductionPlan(planningId, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Submit Produtcion Plan Func result:', result)
+        //console.log('Submit Produtcion Plan Func result:', result)
         if(result.success){
           responseSubmitProductionPlan.value = result
         }else{
@@ -223,12 +230,13 @@ export const useApproveProductionPlanService = () => {
   const approveProdutcionPlanFunc = async (planningId, urlApi, form, type, whereHouse, accessToke) => {
     try {
       errorMessageApproveProductionPlan.value = null
-      console.log('Approve Produtcion Plan Func...')
+
+      //console.log('Approve Produtcion Plan Func...')
   
       const result = await productionPlanRepository.approveProductionPlan(planningId, urlApi, form, type, whereHouse, accessToke)
         
       if (result) {
-        console.log('Approve Produtcion Plan Func result:', result)
+        //console.log('Approve Produtcion Plan Func result:', result)
         responseApproveProductionPlan.value = result
       } else {
         console.warn('No data returned from the API')
@@ -253,12 +261,13 @@ export const useGetProductionPlanSearchService = () => {
   const fetchGetProductionplanSearch = async (filter, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetProductionPlanSearch.value = null
-      console.log('Fetching getProductionPlanSearch...')
+
+      //console.log('Fetching getProductionPlanSearch...')
   
       const result = await productionPlanRepository.getProductionPlanSearch(filter, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Fetching data getProductionPlanSearch:', result)
+        //console.log('Fetching data getProductionPlanSearch:', result)
         getProductionplanSearchResult.value = result
         
         return result
@@ -266,7 +275,7 @@ export const useGetProductionPlanSearchService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchGetProductionplanSearch:', error)
+      //console.log('Error in fetchGetProductionplanSearch:', error)
       errorMessageGetProductionPlanSearch.value = error.message
     }
   }
@@ -285,12 +294,13 @@ export const useGetProductionPlanService = () => {
   const fetchGetProductionplan = async (batchId, sortColumn, sortDirection, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetProductionPlan.value = null
-      console.log('Fetching getProductionplan...')
+
+      //console.log('Fetching getProductionplan...')
   
       const result = await productionPlanRepository.getProductionPlan(batchId, sortColumn, sortDirection, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Fetching data getProductionplan:', result)
+        //console.log('Fetching data getProductionplan:', result)
         getProductionplanResult.value = result
       } else {
         console.warn('No data returned from the API')
@@ -314,12 +324,13 @@ export const useGetProductionPlanMasterService = () => {
   const fetchGetProductionplanMaster = async (search, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetProductionPlanMaster.value = null
-      console.log('Fetching fetchGetProductionplanMaster...')
+
+      //console.log('Fetching fetchGetProductionplanMaster...')
   
       const result = await productionPlanRepository.getProductionPlanMaster(search, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Fetching data fetchGetProductionplanMaster:', result)
+        //console.log('Fetching data fetchGetProductionplanMaster:', result)
         getProductionplanMasterResult.value = result
       } else {
         console.warn('No data returned from the API')
@@ -343,12 +354,13 @@ export const useGetBatchProductionPlanService = () => {
   const fetchGetBatchProductionplan = async (urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetBatchProductionPlan.value = null
-      console.log('Fetching fetchGetBatchProductionplan...')
+
+      //console.log('Fetching fetchGetBatchProductionplan...')
   
       const result = await productionPlanRepository.getProductionPlanBatch(urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        // console.log('Fetching data fetchGetBatchProductionplan:', result.data)
+        // //console.log('Fetching data fetchGetBatchProductionplan:', result.data)
         getBatchProductionplanResult.value = result.data
       } else {
         console.warn('No data returned from the API')
@@ -373,12 +385,13 @@ export const useSaveProductionPlanService = () => {
   const saveProdutcionPlanFunc = async (formData, urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageSaveProductionPlan.value = null
-      console.log('Save Produtcion Plan Func...')
+
+      //console.log('Save Produtcion Plan Func...')
   
       const result = await productionPlanRepository.saveProductionPlan(formData, urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Save Produtcion Plan Func result:', result)
+        //console.log('Save Produtcion Plan Func result:', result)
         responseSaveProductionPlan.value = result
       } else {
         console.warn('No data returned from the API')
@@ -405,12 +418,13 @@ export const usePrintExportExcelService = () => {
   const printExportExcelService = async (urlApi, whereHouse, accessToken, params = {}) => {
     try {
       printExportExcelErrorMessage.value = null
-      console.log('Print Export Excel Form Service Starting...')
+
+      //console.log('Print Export Excel Form Service Starting...')
   
       const result = await productionPlanRepository.printExportExcel(urlApi, whereHouse, accessToken, params)
         
       if (result && result.success) {
-        console.log('Print Export Excel Form Service Complete:', result)
+        //console.log('Print Export Excel Form Service Complete:', result)
         printExportExcelResult.value = result.data
         
         return { success: true, data: printExportExcelResult.value }
@@ -442,12 +456,13 @@ export const useGetStatusTextService = () => {
   const fetchGetStatusText = async (urlApi, form, whereHouse, accessToke) => {
     try {
       errorMessageGetStatusText.value = null
-      console.log('Fetching fetchGetStatusText...')
+
+      //console.log('Fetching fetchGetStatusText...')
   
       const result = await productionPlanRepository.getStatusText(urlApi, form, whereHouse, accessToke)
         
       if (result) {
-        console.log('Fetching data fetchGetStatusText:', result)
+        //console.log('Fetching data fetchGetStatusText:', result)
         getStatusTextCodeResult.value = result
         
         return result
@@ -455,7 +470,7 @@ export const useGetStatusTextService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchGetStatusText:', error)
+      //console.log('Error in fetchGetStatusText:', error)
       errorMessageGetStatusText.value = error.message
     }
   }

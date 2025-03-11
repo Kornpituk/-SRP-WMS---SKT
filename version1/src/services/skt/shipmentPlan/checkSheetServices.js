@@ -10,12 +10,12 @@ export const useGetShippingCheckSheetService = () => {
     try {
       errorGetShippingCheckSheet.value = null
   
-      // console.log('Fetching fetchShippingCheckSheet...')
+      // //console.log('Fetching fetchShippingCheckSheet...')
     
       const result = await checkSheetShipmentPlanRepository.getShippingCheckSheet(urlApi, form, whereHouse, accessToke, SoEId)
           
       if (result) {
-        // console.log('Fetching data fetchShippingCheckSheet:', result)
+        // //console.log('Fetching data fetchShippingCheckSheet:', result)
         getShippingCheckSheetResult.value = result.data
           
         return result.data
@@ -23,7 +23,7 @@ export const useGetShippingCheckSheetService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchShippingCheckSheet:', error)
+      //console.log('Error in fetchShippingCheckSheet:', error)
       errorGetShippingCheckSheet.value = error.message
     }
   }
@@ -56,7 +56,7 @@ export const useGetShippingCheckSheetFileIconService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchShippingCheckSheetFile:', error)
+      //console.log('Error in fetchShippingCheckSheetFile:', error)
       errorGetShippingCheckSheetFile.value = error.message
     }
   }
@@ -76,12 +76,12 @@ export const useGetShippingChecksheetImageService = () => {
     try {
       errorGetShippingChecksheetImage.value = null
   
-      // console.log('Fetching fetchShippingChecksheetImage...')
+      // //console.log('Fetching fetchShippingChecksheetImage...')
     
       const result = await checkSheetShipmentPlanRepository.getShippingChecksheetImage(urlApi, form, whereHouse, accessToken, ItemCode, fileName  )
           
       if (result) {
-        // console.log('Fetching data fetchShippingChecksheetImage:', result)
+        // //console.log('Fetching data fetchShippingChecksheetImage:', result)
         getShippingChecksheetImageResult.value = result.data
           
         return result.data
@@ -89,7 +89,7 @@ export const useGetShippingChecksheetImageService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchShippingChecksheetImage:', error)
+      //console.log('Error in fetchShippingChecksheetImage:', error)
       errorGetShippingChecksheetImage.value = error.message
     }
   }
@@ -109,14 +109,14 @@ export const useGetShippingSpecialConditionIconService = () => {
     try {
       errorGetShippingSpecialConditionIcon.value = null
   
-      // console.log('Fetching fetchShippingSpecialConditionIcon...')
+      // //console.log('Fetching fetchShippingSpecialConditionIcon...')
     
       const result = await checkSheetShipmentPlanRepository.
         getShippingSpecialConditionIcon(urlApi, form, whereHouse, 
           accessToken, ItemCode, fileName  )
           
       if (result) {
-        // console.log('Fetching data fetchShippingSpecialConditionIcon:', result)
+        // //console.log('Fetching data fetchShippingSpecialConditionIcon:', result)
         getShippingSpecialConditionIconResult.value = result.data
           
         return result.data
@@ -124,7 +124,7 @@ export const useGetShippingSpecialConditionIconService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchShippingSpecialConditionIcon:', error)
+      //console.log('Error in fetchShippingSpecialConditionIcon:', error)
       errorGetShippingSpecialConditionIcon.value = error.message
     }
   }
@@ -144,12 +144,13 @@ export const useGenerateFormService = () => {
   const generateFormFunction = async (urlApi, form, whereHouse, accessToke, soeId) => {
     try {
       generateFormError.value = null
-      console.log('generateFormFunction...')
+
+      //console.log('generateFormFunction...')
   
       const result = await checkSheetShipmentPlanRepository.generateForm(urlApi, form, whereHouse, accessToke, soeId)
         
       if (result) {
-        // console.log('generateFormFunction:', result)
+        // //console.log('generateFormFunction:', result)
         generateFormResult.value = result.data
         
         return result.data
@@ -157,7 +158,7 @@ export const useGenerateFormService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in generateFormFunction:', error)
+      //console.log('Error in generateFormFunction:', error)
       generateFormError.value = error.message
     }
   }
@@ -176,12 +177,13 @@ export const useShippingCheckSheetService = () => {
   const saveShippingCheckSheet = async (urlApi, form, whereHouse, accessToke, body) => {
     try {
       errorSaveShippingCheckSheet.value = null
-      console.log('Fetching saveShippingCheckSheet...')
+
+      //console.log('Fetching saveShippingCheckSheet...')
   
       const result = await checkSheetShipmentPlanRepository.saveShippingCheckSheet(urlApi, form, whereHouse, accessToke, body)
         
       if (result) {
-        // console.log('Fetching data saveShippingCheckSheet:', result)
+        // //console.log('Fetching data saveShippingCheckSheet:', result)
         saveShippingCheckSheetResult.value = result.data
         
         return result.data
@@ -189,7 +191,7 @@ export const useShippingCheckSheetService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in saveShippingCheckSheet:', error)
+      //console.log('Error in saveShippingCheckSheet:', error)
       errorSaveShippingCheckSheet.value = error.message
     }
   }
@@ -208,12 +210,13 @@ export const useSubmitCheckSheetService = () => {
   const submitCheckSheetFunction = async (urlApi, form, whereHouse, accessToke, soeId) => {
     try {
       submitCheckSheetError.value = null
-      console.log('submitCheckSheetFunctio...')
+
+      //console.log('submitCheckSheetFunctio...')
   
       const result = await checkSheetShipmentPlanRepository.submitCheckSheet(urlApi, form, whereHouse, accessToke, soeId)
         
       if (result) {
-        // console.log('submitCheckSheetFunctio:', result)
+        // //console.log('submitCheckSheetFunctio:', result)
         submitCheckSheetResult.value = result.data
         
         return result.data
@@ -221,7 +224,7 @@ export const useSubmitCheckSheetService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in submitCheckSheetFunctio:', error)
+      //console.log('Error in submitCheckSheetFunctio:', error)
       submitCheckSheetError.value = error.message
     }
   }
@@ -243,7 +246,7 @@ export const useShippingCheckSheetFileFormService = () => {
     try {
       // ตรวจสอบว่ามีไฟล์และข้อมูลก่อนที่จะดำเนินการบันทึก
       if (!files || files.length === 0) {
-        console.log('No files selected', files)
+        //console.log('No files selected', files)
         throw new Error('No files selected', files)
       }
 
@@ -253,13 +256,13 @@ export const useShippingCheckSheetFileFormService = () => {
 
       errorMessageSaveFileForm.value = null
 
-      // console.log('Saving Draft Form COA...')
+      // //console.log('Saving Draft Form COA...')
 
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
       const result = await FileShippingCheckSheetFileService.saveShippingCheckSheetFileForm(files, soEtlLogDetailJournalID, licensePlate, form, urlApi, whereHouse, accessToken)
 
       if (result) {
-        // console.log('Save data COA Controller:', result)
+        // //console.log('Save data COA Controller:', result)
         resultSaveFielForm.value = { data: result, success: true } // เก็บข้อมูล response
         
         return result
@@ -289,13 +292,13 @@ export const useGetFileFormService = () => {
     try {
       errorMessageGetFileForm.value = null
 
-      // console.log('Fetching File Form ...')
+      // //console.log('Fetching File Form ...')
 
       const result = await FileShippingCheckSheetFileService
         .fetchShippingCheckSheetFileForm(soEtlLogDetailJournalID, LicensePlate, form, type, urlApi, whereHouse, accessToken)
       
       if (result) {
-        // console.log('Received File Form:', result)
+        // //console.log('Received File Form:', result)
         getFileFormResult.value = result
         
         return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา
@@ -323,12 +326,12 @@ export const useDeleteFileFormService = () => {
     try {
       errorMessageDeleteFileForm.value = null
 
-      // console.log('Fetching File Form ...')
+      // //console.log('Fetching File Form ...')
 
       const result = await FileShippingCheckSheetFileService.deleteFileForm(soEtlLogDetailJournalID, licensePlate, fileName, type, form, urlApi, whereHouse, accessToken)
       
       if (result) {
-        // console.log('Received File Form:', result)
+        // //console.log('Received File Form:', result)
         deleteFileFormResult.value = result
         
         return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา
@@ -361,7 +364,7 @@ export const usePrintPDFService = () => {
       const result = await checkSheetShipmentPlanRepository.printPDF(urlApi, form, type, whereHouse, accessToken, params)
         
       if (result && result.success) {
-        console.log('Print PDF Excel Form Service Complete:', result)
+        //console.log('Print PDF Excel Form Service Complete:', result)
         printPDFResult.value = result.data
         
         return { success: true, data: printPDFResult.value }

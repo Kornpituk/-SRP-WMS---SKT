@@ -174,10 +174,11 @@ const fetchData = async () => {
         ...item,
         no: index + 1, // เพิ่มฟิลด์ลำดับ
       }))
-      console.log('printLabelFormViewService successfully fetched data', dataPrintLabel.value)
+
+      //console.log('printLabelFormViewService successfully fetched data', dataPrintLabel.value)
       progressLinearNoData.value = true
     } else {
-      console.log('No data found in API response')
+      //console.log('No data found in API response')
       dataPrintLabel.value = []
       progressLinearNoData.value = true
     }
@@ -192,7 +193,8 @@ const fetchData = async () => {
 const toggleDirection = async key => {
   if (key) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+
+    //console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
   }
   sortColumn.value = key
   await fetchData()
@@ -205,7 +207,7 @@ const groupDataByLot = data => {
 
   data.forEach(item => {
     // ถ้า lot เดิมเหมือนกับแถวปัจจุบัน
-    console.log("start ForEach")
+    //console.log("start ForEach")
     if (item.lot === previousLot) {
       // เพิ่ม barcode และ lotDescription ไปยังรายการล่าสุดใน groupedData
       groupedData[groupedData.length - 1].items.push({
@@ -227,8 +229,8 @@ const groupDataByLot = data => {
 }
 
 const testSelect = () => {
-  console.log('selectedDataTables', selectedDataTables.value)
-  console.log('selectedDataTables', selectedDataTables.value)
+  //console.log('selectedDataTables', selectedDataTables.value)
+  //console.log('selectedDataTables', selectedDataTables.value)
 }
 
 const dataFilterPrintLabel = [{ key: 'lot' }]
@@ -250,8 +252,8 @@ const removeDuplicates = arr => {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const printLabel = async () => {
-  console.log("12355", typePrintLabel.value)
-  console.log('Raw Mat Label print start .....')
+  //console.log("12355", typePrintLabel.value)
+  //console.log('Raw Mat Label print start .....')
 
   const barcodes = Array.isArray(selectedDataTables.value)
     ? selectedDataTables.value.flatMap(item => 
@@ -261,7 +263,7 @@ const printLabel = async () => {
     )
     : [selectedDataTables.value.barcode]  // ถ้า `selectedDataTables.value` ไม่ใช่อาเรย์ ให้ใช้ `barcode` ตรง ๆ
 
-  console.log('Semi Label print start .....', barcodes)
+  //console.log('Semi Label print start .....', barcodes)
 
   const uniqueBarcodes = removeDuplicates(barcodes)
 
@@ -272,7 +274,7 @@ const printLabel = async () => {
     await printLabelFormBarcodeService(urlApi.value, whereHouse, accessTokenAtStore)
     isLoadingPrintLabel.value = false
     if(printLabelBarcodeFormViewResult.value){
-      console.log('print label by barcode success', printLabelBarcodeFormViewResult)
+      //console.log('print label by barcode success', printLabelBarcodeFormViewResult)
       isLoadingPrintLabel.value = false
       successPrintLabel.value = true
     }else {
@@ -307,11 +309,11 @@ const updateSelectedData = sub => {
     }
   }
 
-  console.log('selectedDataTables:', selectedDataTables.value)
+  //console.log('selectedDataTables:', selectedDataTables.value)
 }
 
 const eXprtreeNode = () => {
-  console.log('eXprtreeNode', selectedDataTables.value)
+  //console.log('eXprtreeNode', selectedDataTables.value)
 }
 
 const headersNewEx = [
@@ -409,7 +411,7 @@ const isSelected = item => {
 }
 
 const dataTableCliclHighlightIsToggle = no => {
-  console.log("dataTableNum", dataTableNummberedToggle.value)
+  //console.log("dataTableNum", dataTableNummberedToggle.value)
 
   // เช็คว่า no ที่รับเข้ามาตรงกับค่าเดิมหรือไม่
   if (dataTableNummberedToggle.value === no) {
@@ -420,7 +422,7 @@ const dataTableCliclHighlightIsToggle = no => {
     dataTableNummberedToggle.value = no
   }
 
-  console.log("dataTableNum", dataTableNummberedToggle.value)
+  //console.log("dataTableNum", dataTableNummberedToggle.value)
 }
 
 const dataTableCliclHighlightIsToggle2 = no => {
@@ -433,7 +435,7 @@ const dataTableCliclHighlightIsToggle2 = no => {
     dataTableNummberedToggle2.value = no
   }
 
-  console.log("dataTableNum", dataTableNummberedToggle2.value)
+  //console.log("dataTableNum", dataTableNummberedToggle2.value)
 }
 </script>
 

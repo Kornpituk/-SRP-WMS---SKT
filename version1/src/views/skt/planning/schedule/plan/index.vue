@@ -67,7 +67,8 @@ const textAlertDialogFunction = (word, success) => {
 const textAlertSubDialogFunction = (word, subWord, success) => {
   wordForSubmit.value = word
   subWordForSubmit.value = subWord
-  console.log(subWord, subWordForSubmit.value)
+
+  //console.log(subWord, subWordForSubmit.value)
   successDialAlert.value = success
   isDialogVisibleAlertDialog.value = true
 }
@@ -79,20 +80,22 @@ function openConfirmDialog() {
 
   selectedDataTables.value.forEach(item => {
     // กำหนดค่าเริ่มต้น
-    console.log("selectedDataTables", item.statusId)
+    //console.log("selectedDataTables", item.statusId)
 
     if (item.statusId === 102 ) {
       typeConfirm.value = 'approve'
       wordForSubmit.value = alertWordConst.approve
       confirmDialog2.value.openDialog()
       isDialogVisibleAlertDialog.value = false
-      console.log("selectedDataTables 102")
+
+      //console.log("selectedDataTables 102")
     }else if(item.statusId === 101){
       textAlertSubDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
-      console.log("selectedDataTables 101")
+
+      //console.log("selectedDataTables 101")
     }
     else{
-      console.log("selectedDataTables failded")
+      //console.log("selectedDataTables failded")
       isDialogVisibleAlertDialog.value = false
     }
 
@@ -140,7 +143,7 @@ const btnConfirmLotValidate = async () => {
 }
 
 async function handleConfirmAction () {
-  console.log('Confirmed! Executing action...')
+  //console.log('Confirmed! Executing action...')
   if(typeConfirm.value === "approve"){
     approvePlan()
   }else if(typeConfirm.value === "submit"){
@@ -204,7 +207,7 @@ const dataTableCliclHighlightIsToggle = no => {
     dataTableNummberedToggle.value = no
   }
 
-  console.log("dataTableNum", dataTableNummberedToggle.value)
+  //console.log("dataTableNum", dataTableNummberedToggle.value)
 }
 
 //------------------------------------------ Data --------------------------------
@@ -270,13 +273,14 @@ const formatDateYMDWhyQ = date => {
     return `${year}-${month}-${day}`
   }else if(date === null){
     date = new Date().toISOString()
-    console.log("Data null", date)
+
+    //console.log("Data null", date)
     
     return date
   }
 
   // คืนค่าว่างหรือข้อความแสดงข้อผิดพลาด หากไม่อยู่ในรูปแบบที่รองรับ
-  console.log('Invalid date format:', date)
+  //console.log('Invalid date format:', date)
   
   return 'null'
 }
@@ -320,6 +324,7 @@ function getRandomDate(start, end) {
 const toDayDate = format(new Date())
 const toDayDatePFinished = ref('NaN')
 
+// eslint-disable-next-line sonarjs/no-unused-collection
 const itemsStatus = [
   { name: "All", id: null },
   { name: "Draft PROD plan", id: 101 },
@@ -487,7 +492,7 @@ watchEffect(async () => {
 
     // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
     if (getProductionplanMasterResult.value?.data && Array.isArray(getProductionplanMasterResult.value.data)) {
-      // console.log("getProductionplanMasterResult", getProductionplanMasterResult.value.data)
+      // //console.log("getProductionplanMasterResult", getProductionplanMasterResult.value.data)
       dataMasterForSelectFilter.value = getProductionplanMasterResult.value.data
     } else {
       // console.warn("getProductionplanMasterResult.data is not an array")
@@ -502,7 +507,8 @@ watchEffect(async () => {
 const toggleDirection = async key => {
   if (key) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+
+    //console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
   }
   sortColumn.value = key
   await fetchGetProductionplan()
@@ -615,7 +621,7 @@ watch(async () => {
       item.hasError = resultValidate // true: error, false: no error
     })
 
-    console.log("productionPlan", productionPlan.value)
+    //console.log("productionPlan", productionPlan.value)
     
     selectedProductionCode.value = productionPlan.value[0].productionCode
 
@@ -645,8 +651,8 @@ const selectItemCodeSwitch = computed(() => {
 })
 
 const showDebug = () => {
-  console.log("selectedItemCode", selectedItemCode.value)
-  console.log("selectedItemCode2", selectedItemCode2.value)
+  //console.log("selectedItemCode", selectedItemCode.value)
+  //console.log("selectedItemCode2", selectedItemCode2.value)
 }
 
 const selectPackagingTypeSwitch = computed(() => {
@@ -716,12 +722,14 @@ const selectItemCode = plan => {
   if(btnSelectitem1.value){
     selectedItemCode.value = plan.itemCode
     selectedItemName.value = plan.itemName
-    console.log("selectedItemCode", selectedItemCode.value)
+
+    //console.log("selectedItemCode", selectedItemCode.value)
   }
   if(btnSelectitem2.value){
     selectedItemCode2.value = plan.itemCode
     selectedItemName2.value = plan.itemName
-    console.log("selectedItemCode2", selectedItemCode2.value)
+
+    //console.log("selectedItemCode2", selectedItemCode2.value)
   }
 }
 
@@ -731,14 +739,16 @@ const selectPackaging = plan => {
     selectedPackagingName.value = plan.itemName
     selectedPackagingKgs.value = plan.packingQtyKgs
     packag1QtyOle.value = plan.packingQtyKgs
-    console.log("selectedPackagingType", selectedPackagingType.value)
+
+    //console.log("selectedPackagingType", selectedPackagingType.value)
   }
   if(btnSelectitem2.value){
     selectedPackagingType2.value = plan.itemCode
     selectedPackagingName2.value = plan.itemName
     selectedPackagingKgs2.value = plan.packingQtyKgs
     packag2QtyOle.value = plan.packingQtyKgs
-    console.log("selectedProductionCode2", selectedPackagingType2.value)
+
+    //console.log("selectedProductionCode2", selectedPackagingType2.value)
   }
 }
 
@@ -762,12 +772,13 @@ watch(()=> {
   if(selectedDataTables.value){
     selectedDataTables.value.forEach(item => {
       // กำหนดค่าเริ่มต้น
-      console.log("vselectedDataTables in", activeBtnApprove.value)
+      //console.log("vselectedDataTables in", activeBtnApprove.value)
       if (item.statusId === 102 ) {
         activeBtnApprove.value = true
         activeBtnCancelPlan.value = true
         activeBtnSendBackPlan.value = true
-        console.log("vselectedDataTables", activeBtnApprove.value)
+
+        //console.log("vselectedDataTables", activeBtnApprove.value)
       }else if(item.statusId === 101){
         activeBtnCancelPlan.value = true
         activeBtnSubmit.value = true
@@ -786,7 +797,8 @@ watch(()=> {
       }
 
     })
-    console.log("vselectedDataTables out func", activeBtnSendBackPlan.value)
+
+    //console.log("vselectedDataTables out func", activeBtnSendBackPlan.value)
   }else{
     activeBtnCancelPlan.value = false
     activeBtnApprove.value = false
@@ -843,11 +855,11 @@ const validateBatchSale = (batchSale, kgs1, pcs1, kgs2, pcs2) => {
   calculatedValues.totalKgs2 = (parseInt(kgs2 || 0) * parseInt(pcs2 || 0))
   calculatedValues.total = calculatedValues.totalKgs1 + calculatedValues.totalKgs2
 
-  // console.log("Batch Sale:", batchSale)
-  // console.log("Total Kgs1:", kgs1, '*', pcs1, '=', calculatedValues.totalKgs1)
-  // console.log("Total Kgs2:", kgs2, '*', pcs2, '=', calculatedValues.totalKgs2)
-  // console.log("Total:", calculatedValues.total)
-  // console.log("Result:", batchSale, '>=', calculatedValues.total)
+  // //console.log("Batch Sale:", batchSale)
+  // //console.log("Total Kgs1:", kgs1, '*', pcs1, '=', calculatedValues.totalKgs1)
+  // //console.log("Total Kgs2:", kgs2, '*', pcs2, '=', calculatedValues.totalKgs2)
+  // //console.log("Total:", calculatedValues.total)
+  // //console.log("Result:", batchSale, '>=', calculatedValues.total)
 
   return parseInt(batchSale || 0) >= calculatedValues.total
 }
@@ -867,7 +879,8 @@ watch(
     )
 
     textAlert.value = !isValid.value
-    console.log("Validation passed:", isValid.value)
+
+    //console.log("Validation passed:", isValid.value)
   },
   { immediate: true }, // ให้ทำงานทันทีเมื่อ mount
 )
@@ -919,7 +932,7 @@ const validateSpecificRow = (batchSale, kgs1, pcs1, kgs2, pcs2) =>  {
 }
 
 watch(()=> {
-  console.log("realTimeValue", validationData.packagingkgs1)
+  //console.log("realTimeValue", validationData.packagingkgs1)
   
 })
 
@@ -942,7 +955,7 @@ const formatDateDMY = date => {
 const { responseGenerateLotBatchProductionPlan, errorMessageGenerateLotBatchProductionPlan, generateLotBatchProdutcionPlanFunc } = useGenerateBatchProductionPlanService()
 
 const handleBtnGenerateLotBatch = async () => {
-  console.log("Alert: GenerateLotBatch", isDialogVisibleAlertDialog.value)
+  //console.log("Alert: GenerateLotBatch", isDialogVisibleAlertDialog.value)
   try {
     await generateLotBatchProdutcionPlanFunc(batchId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
 
@@ -986,11 +999,13 @@ const selectFilterProduction = (planningID, item) => {
   if (item === 1) {
     btnSelectitem1.value = true
     btnSelectitem2.value = false
-    console.log("Item", item, planningID)
+
+    //console.log("Item", item, planningID)
   } else if (item === 2) {
     btnSelectitem2.value = true
     btnSelectitem1.value = false
-    console.log("Item", item)
+
+    //console.log("Item", item)
   }
   isDialogVisibleFilterSelect.value = true
 
@@ -1005,20 +1020,22 @@ const selectFilterProduction = (planningID, item) => {
   selectedPackagingType2.value = selectedPlan.product2SelectedPackagingCode
   packag2QtyOle.value = selectedPlan.product2PackingQtyKgs
 
-  console.log("Selected item", selectedItemCode.value)
+  //console.log("Selected item", selectedItemCode.value)
 }
 
 const comprePorductionCode = () => {
   const success = ref(false)
   if(productionCodeOld.value === selectedProductionCode.value){
-    console.log("IF")
+    //console.log("IF")
     success.value = true
-    console.log("Selected", productionCodeOld.value, "=", selectedProductionCode.value, success.value)
+
+    //console.log("Selected", productionCodeOld.value, "=", selectedProductionCode.value, success.value)
     
   }else{
-    console.log("ELSE")
+    //console.log("ELSE")
     success.value = false
-    console.log("Selected", productionCodeOld.value, "=", selectedProductionCode.value, success.value)
+
+    //console.log("Selected", productionCodeOld.value, "=", selectedProductionCode.value, success.value)
     
   }
 
@@ -1048,7 +1065,7 @@ const compireHightlight = (itemCodeNew, itemOld, ComProductionCode) => {
 const addSelectProductionCode = planningID => {
   const selectedPlan = productionPlan.value.find(plan => plan.planningID === planningID)
 
-  console.log('addSelectProductionCode start.....')
+  //console.log('addSelectProductionCode start.....')
 
   if (!selectedPlan) {
     console.error(`PlanningID ${planningID} not found.`)
@@ -1060,10 +1077,12 @@ const addSelectProductionCode = planningID => {
 
   if (selectedPlan.productionCode !== selectedProductionCode.value) {
     trickerItem1N2.value = true
-    console.log("Tricker true", trickerItem1N2.value, selectedPlan.productionCode, selectedProductionCode.value)
+
+    //console.log("Tricker true", trickerItem1N2.value, selectedPlan.productionCode, selectedProductionCode.value)
   } else {
     trickerItem1N2.value = false
-    console.log("Tricker false", trickerItem1N2.value, selectedPlan.productionCode, selectedProductionCode.value)
+
+    //console.log("Tricker false", trickerItem1N2.value, selectedPlan.productionCode, selectedProductionCode.value)
   }
 
   if (trickerItem1N2.value) {
@@ -1114,13 +1133,13 @@ const addSelectProductionCode = planningID => {
   if (selectedProductionbatchScaleKgs.value) selectedPlan.quantityKgs = selectedProductionbatchScaleKgs.value
   if (selectedProductionPlanName.value) selectedPlan.plantName = selectedProductionPlanName.value
 
-  console.log("Updated row:", selectedPlan)
+  //console.log("Updated row:", selectedPlan)
 }
 
 const confirmFilterSelectProduction = () => {
   dataPlanningForSave.value.productionCode = selectedProductionCode.value
 
-  console.log('confirmFilterSelectProduction start....')
+  //console.log('confirmFilterSelectProduction start....')
 
   const planningID = indexSelectBoxFilter.value // Update to store planningID instead of index
   if (planningID !== null) {
@@ -1136,7 +1155,7 @@ const { responseSaveProductionPlan, errorMessageSaveProductionPlan, saveProdutci
 const trickerSubmit = ref(false)
 
 const saveProductionPlan = async () => {
-  console.log("saveProductionPlan staret")
+  //console.log("saveProductionPlan staret")
 
   // ตรวจสอบฟิลด์ inputDate และ producingDate
   productionPlan.value = productionPlan.value.map(item => ({
@@ -1176,7 +1195,7 @@ const saveProductionPlan = async () => {
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-        console.log("Filtered Production Plan Saved:", filteredData)
+        //console.log("Filtered Production Plan Saved:", filteredData)
       }
       
     }else{
@@ -1230,20 +1249,20 @@ const genPlanningIdGUID = async () => {
 // add plan productionPlan
 const addEmptyRowToPlan = async () => {
 
-  console.log("guIDForBatchCookie", itemStore.getItemDetails('guIDForBatchCookie'))
+  //console.log("guIDForBatchCookie", itemStore.getItemDetails('guIDForBatchCookie'))
 
   planningId.value = await genPlanningIdGUID()
 
   await newProdutcionPlanFunc(batchId.value, planningId.value, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
 
   if(responseNewProductionPlan.value){
-    console.log("New Plan Success")
+    //console.log("New Plan Success")
     textAlertDialogFunction(alertWordConst.newPlan, true)
     setTimeout(() => {
       location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
   }else{
-    console.log("New Plan Not Success")
+    //console.log("New Plan Not Success")
     textAlertDialogFunction(alertWordConst.newPlan, false)
     setTimeout(() => {
       // location.reload()
@@ -1259,12 +1278,12 @@ const addEmptyRowToPlan = async () => {
 const { responseDeleteProductionPlan, errorMessageDeleteProductionPlan, deleteProdutcionPlanFunc } = useDeleteProductionPlanService()
 
 const showSelectBox = () => {
-  console.log("selectedDataTables", selectedDataTables.value)
+  //console.log("selectedDataTables", selectedDataTables.value)
 }
 
 const deletePlan = async () => {
 
-  // console.log("selectedDataTables", selectedDataTables.value)
+  // //console.log("selectedDataTables", selectedDataTables.value)
 
   const body = selectedDataTables.value.map(item => item.planningID)
 
@@ -1280,7 +1299,7 @@ const deletePlan = async () => {
     console.error("Error deleted production plan:", error)
   }
 
-  console.log("body selectedDataTables", body)
+  //console.log("body selectedDataTables", body)
 }
 
 //------------------------- reject plan
@@ -1308,7 +1327,7 @@ const rejectPlan = async () => {
     console.error("Error deleted production plan:", error)
   }
 
-  console.log("body selectedDataTables", body)
+  //console.log("body selectedDataTables", body)
 }
 
 //------------------------  validate lot --------------------------------------------------
@@ -1405,7 +1424,7 @@ const validateLotBeforeSubmit = async () => {
     console.error("Error deleted production plan:", errorMessageValidateLotBatchProductionPlan.value)
   }
 
-  console.log("body selectedDataTables", body)
+  //console.log("body selectedDataTables", body)
 }
 
 //------------------------- submit plan
@@ -1509,7 +1528,7 @@ const submitPlan = async () => {
       }, 1000)
       trickerSubmit.value = false
 
-      console.log("AlertDialog Submit", errorMessageSubmitProductionPlan.value, responseSubmitProductionPlan.value)
+      //console.log("AlertDialog Submit", errorMessageSubmitProductionPlan.value, responseSubmitProductionPlan.value)
     }
   } catch (error) {
     console.error("Error submitting production plan:", error)
@@ -1528,7 +1547,7 @@ const { responseApproveProductionPlan, errorMessageApproveProductionPlan, approv
 
 const approvePlan = async () => {
 
-  // console.log("selectedDataTables", selectedDataTables.value)
+  // //console.log("selectedDataTables", selectedDataTables.value)
 
   const body = selectedDataTables.value.map(item => item.planningID)
 
@@ -1552,12 +1571,12 @@ const approvePlan = async () => {
     console.error("Error approved production plan:", error)
   }
 
-  console.log("body selectedDataTables", body)
+  //console.log("body selectedDataTables", body)
 }
 
 const sendBackPlan = async () => {
 
-  // console.log("selectedDataTables", selectedDataTables.value)
+  // //console.log("selectedDataTables", selectedDataTables.value)
 
   const body = selectedDataTables.value.map(item => item.planningID)
 
@@ -1581,7 +1600,7 @@ const sendBackPlan = async () => {
     console.error("Error approved production plan:", error)
   }
 
-  console.log("body selectedDataTables", body)
+  //console.log("body selectedDataTables", body)
 }
 
 const cancelAllProducts = () => {
@@ -1589,7 +1608,7 @@ const cancelAllProducts = () => {
 }
 
 const viewAllData = () => {
-  console.log('ALl Data Date', productionPlan.value)
+  //console.log('ALl Data Date', productionPlan.value)
 }
 
 const selectedDateInput = ref(toDayDate)
@@ -1770,20 +1789,20 @@ const isDialogVisibleFilterSelect = ref(false)
 
 // ตัวอย่างฟังก์ชันของแต่ละ action
 const saveDraft = () => {
-  console.log('Draft saved')
+  //console.log('Draft saved')
 }
 
 const deleteItem = () => {
-  console.log('Item deleted')
+  //console.log('Item deleted')
 }
 
 const submit = () => {
-  console.log('Submitted')
+  //console.log('Submitted')
   window.location.href = '/skt/planning/schedule/plan'
 }
 
 const print = () => {
-  console.log('Printed')
+  //console.log('Printed')
 }
 
 //----------------------- staus text --------------------------------
@@ -1806,7 +1825,7 @@ watch(async () => {
         name: item.statusName|| '', // ค่า item-title
       }))
 
-      console.log('Status Text Code Result:', itemsStatus.value)
+      //console.log('Status Text Code Result:', itemsStatus.value)
     } else {
       console.error('Invalid data structure:', result)
     }
@@ -3932,7 +3951,10 @@ const statusText = statusId => {
   </section>
 
   <!-- Footer -->
-  <section v-if="false" class="mt-3">
+  <section
+    v-if="false"
+    class="mt-3"
+  >
     <VCard>
       <VCardText
         class="pa-1"

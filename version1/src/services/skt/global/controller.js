@@ -7,12 +7,13 @@ export const useGetCOAFormController = () => {
   const fetchCoaForm = async (poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
     try {
       errorMessageGetCoa.value = null
-      console.log('Fetching Form COA...')
+
+      //console.log('Fetching Form COA...')
   
       const result = await gobalService.fetchGenerateView(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
         
       if (result) {
-        console.log('data COA Controller:', result)
+        //console.log('data COA Controller:', result)
         getCoaForm.value = result
       } else {
         console.warn('No data returned from the API')
@@ -37,12 +38,13 @@ export const useDeleteCoaFormController = () => {
   const deleteCoaForm = async (body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
     try {
       errorMessageDeleteCoa.value = null
-      console.log('delete coa form ...')
+
+      //console.log('delete coa form ...')
 
       const result = await SaveCOAService.deleteCoaForm(body, poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
       if (result) {
-        console.log('delete coa Controller:', result)
+        //console.log('delete coa Controller:', result)
         packagingFormGenerate.value = result
       } else {
         console.warn('No data returned from the API')
@@ -67,12 +69,13 @@ export const useDeleteAllCoaFormController = () => {
   const deleteAllCoaForm = async (poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken) => {
     try {
       errorMessageDeleteAllCoa.value = null
-      console.log('delete coa form ...')
+
+      //console.log('delete coa form ...')
 
       const result = await SaveCOAService.deleteAllCoaForm(poEtlLogDetailJournalID, urlApi, form, whereHouse, accessToken)
       
       if (result) {
-        console.log('delete all coa Controller:', result)
+        //console.log('delete all coa Controller:', result)
         resultDeleteAllCoa.value = result
       } else {
         console.warn('No data returned from the API')
@@ -107,13 +110,14 @@ export const useSaveCOAFormController = () => {
       }
   
       errorMessageSaveCoa.value = null
-      console.log('Saving Draft Form COA...')
+
+      //console.log('Saving Draft Form COA...')
   
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
       const result = await coaService.saveDraftCOAForm(files, poEtlLogDetailJournalID,  urlApi, form, whereHouse, accessToken)
   
       if (result?.success) {
-        console.log('Save data COA Controller:', result)
+        //console.log('Save data COA Controller:', result)
         saveCoaForm.value = { data: result, success: true } // เก็บข้อมูล response
       } else {
         throw new Error('Failed to save data')

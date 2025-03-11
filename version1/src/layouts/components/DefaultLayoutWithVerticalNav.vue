@@ -41,7 +41,7 @@ const whereHouseName = localStorage.getItem('WarehouseNameAtIcons')
 
 watchEffect(() => {
 
-  console.log('firstName', itemStore.getItemDetails('UserDataCookies').firstName)
+  //console.log('firstName', itemStore.getItemDetails('UserDataCookies').firstName)
 })
 
 import { urlApi } from '@/api'
@@ -56,7 +56,7 @@ const items = []
 // Get access token from localStorage in another page
 const accessToken = localStorage.getItem('accessTokenAtStore')
 
-// console.log("accessToken:",accessToken)
+// //console.log("accessToken:",accessToken)
 
 const wareHouseName = ref('adasdsdad')
 const wareHouseId = ref('')
@@ -82,26 +82,26 @@ const GetWhereHouse = () => {
       }
 
       for (let i = 0; i < items.length; i++) {
-        // console.log('items loop:'+[i],items[i])
+        // //console.log('items loop:'+[i],items[i])
 
         if ( items[i].id ===  whereHouseName){
-          // console.log('items[i].Name:',items[i].name)
+          // //console.log('items[i].Name:',items[i].name)
           wareHouseName.value = items[i].name
           wareHouseId.value = items[i].id
           localStorage.setItem('WarehouseNameAtIcons', items[i].name)
           localStorage.setItem('WarehouseIDAtIcons', items[i].id)
           break
         } else {
-          // console.log('items'+items[i].id,'Not Match',whereHouseName)
+          // //console.log('items'+items[i].id,'Not Match',whereHouseName)
         }
       }
 
 
-      // console.log('localStorage Warehouse: ',localStorage.getItem('WarehouseNameAtIcons'))
+      // //console.log('localStorage Warehouse: ',localStorage.getItem('WarehouseNameAtIcons'))
       whereRoomNameSet.value = localStorage.getItem('WarehouseNameAtIcons')
 
       // Now `items` contains an array of objects with id and name properties
-      // console.log('items location whereHouse At menu Warehouse:',items)
+      // //console.log('items location whereHouse At menu Warehouse:',items)
 
     })
     .catch(error => {
@@ -115,7 +115,7 @@ const GetWhereHouse = () => {
 watchEffect(() => {
   NameUser.value = localStorage.getItem('userCheck')
 
-  // console.log("AUTH : " + authStore.getAuth())
+  // //console.log("AUTH : " + authStore.getAuth())
   if(authStore.getAuth()===false){
    
     authStore.setAuth(false)
@@ -148,7 +148,7 @@ const removeUserCheck = () => {
   localStorage.removeItem('companyName')
   localStorage.removeItem('companyLogo')
 
-  console.log("LOout!")
+  //console.log("LOout!")
 
   router.replace('/login')
   

@@ -11,13 +11,13 @@ export const useGetShippingCheckSheetLorryFlexiService = () => {
     try {
       errorGetShippingCheckSheet.value = null
   
-      // console.log('Fetching fetchShippingCheckSheet...')
+      // //console.log('Fetching fetchShippingCheckSheet...')
     
       const result = await checkSheetLorryFlexiRepository.
         getShippingCheckSheetLorry(urlApi, form, whereHouse, accessToke, SoEId)
           
       if (result) {
-        // console.log('Fetching data fetchShippingCheckSheet:', result)
+        // //console.log('Fetching data fetchShippingCheckSheet:', result)
         getShippingCheckSheetResult.value = result
           
         return result
@@ -25,7 +25,7 @@ export const useGetShippingCheckSheetLorryFlexiService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchShippingCheckSheet:', error)
+      //console.log('Error in fetchShippingCheckSheet:', error)
       errorGetShippingCheckSheet.value = error.message
     }
   }
@@ -45,13 +45,13 @@ export const useGetShippingCheckSheetLorryFlexi2Service = () => {
     try {
       errorGetShippingCheckSheet2.value = null
   
-      // console.log('Fetching fetchShippingCheckSheet2...')
+      // //console.log('Fetching fetchShippingCheckSheet2...')
     
       const result = await checkSheetLorryFlexiRepository.
         getShippingCheckSheetLorry(urlApi, form, whereHouse, accessToke, SoEId)
           
       if (result) {
-        // console.log('Fetching data fetchShippingCheckSheet2:', result)
+        // //console.log('Fetching data fetchShippingCheckSheet2:', result)
         getShippingCheckSheetResult2.value = result
           
         return result
@@ -59,7 +59,7 @@ export const useGetShippingCheckSheetLorryFlexi2Service = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchShippingCheckSheet2:', error)
+      //console.log('Error in fetchShippingCheckSheet2:', error)
       errorGetShippingCheckSheet2.value = error.message
     }
   }
@@ -78,12 +78,13 @@ export const useSaveShippingCheckSheetService = () => {
   const saveShippingCheckSheet = async (urlApi, form, whereHouse, accessToke, body) => {
     try {
       errorSaveShippingCheckSheet.value = null
-      console.log('Fetching saveShippingCheckSheet...')
+
+      //console.log('Fetching saveShippingCheckSheet...')
   
       const result = await checkSheetLorryFlexiRepository.saveShippingCheckSheetLorry(urlApi, form, whereHouse, accessToke, body)
         
       if (result) {
-        // console.log('Fetching data saveShippingCheckSheet:', result)
+        // //console.log('Fetching data saveShippingCheckSheet:', result)
         saveShippingCheckSheetResult.value = result.data
         
         return result.data
@@ -91,7 +92,7 @@ export const useSaveShippingCheckSheetService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in saveShippingCheckSheet:', error)
+      //console.log('Error in saveShippingCheckSheet:', error)
       errorSaveShippingCheckSheet.value = error.message
     }
   }
@@ -108,15 +109,16 @@ export const useShippingCheckSheetLorryService = () => {
   const errorShippingCheckSheetLorry = ref(null)
   
   const submitShipmentPlan = async (urlApi, form, whereHouse, accessToke, soeId, comment) => {
-    console.log('submitShipmentPlan sevice.')
+    //console.log('submitShipmentPlan sevice.')
     try {
       errorShippingCheckSheetLorry.value = null
-      console.log('submitShipmentPlan...')
+
+      //console.log('submitShipmentPlan...')
   
       const result = await checkSheetLorryFlexiRepository.submitShippingCheckSheetLorry(urlApi, form, whereHouse, accessToke, soeId, comment)
         
       if (result) {
-        // console.log('submitShipmentPlan:', result)
+        // //console.log('submitShipmentPlan:', result)
         submitShipmentPlanResult.value = result.data
         
         return result.data
@@ -124,7 +126,7 @@ export const useShippingCheckSheetLorryService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in submitShipmentPlan:', error)
+      //console.log('Error in submitShipmentPlan:', error)
       errorShippingCheckSheetLorry.value = error.message
     }
   }

@@ -28,11 +28,11 @@ const items = ref([])
 // Get access token from localStorage in another page
 const accessToken = localStorage.getItem('accessTokenAtStore')
 
-console.log("accessToken:", accessToken)
+//console.log("accessToken:", accessToken)
 
 const userName = localStorage.getItem('userCheck')
 
-console.log("userName:", userName)
+//console.log("userName:", userName)
 
 const url = ref(`${urlApi.value}/api/Auth/GetLocation/all`)
 
@@ -67,10 +67,10 @@ const GetWhereHouse = () => {
 
       
       // Now `items` contains an array of objects with id and name properties
-      console.log('items location whereHouse', items)
+      //console.log('items location whereHouse', items)
 
       // You can use `items` for select or any other purpose
-      console.log(response.data)
+      //console.log(response.data)
 
       
     })
@@ -84,7 +84,7 @@ const GetWhereHouse = () => {
 }
 
 // ----------------------------------  When Select Where House and Submit ------------------------
-console.log('whereHouseSelectedItem.value: ', whereHouseSelectedItem.value)
+//console.log('whereHouseSelectedItem.value: ', whereHouseSelectedItem.value)
 
 const saveToLocalStorage = () => {
   localStorage.setItem('whereHouseName', whereHouseSelectedItem.value)
@@ -101,12 +101,13 @@ const onSubmitWhereHouse = () => {
 
   if ( whereHouseSelectedItem.value.length === 0) {
     usernameError.value = 'Please Select A Warehouse'
-    console.log('Please Select A Warehouse!!!')
+
+    //console.log('Please Select A Warehouse!!!')
   } else {
     saveToLocalStorage()
 
     // บันทึกข้อมูลลงใน localStorage
-    console.log(whereHouseSelectedItem)
+    //console.log(whereHouseSelectedItem)
 
     // router.replace(route.query.to ? String(route.query.to) : '/dashboard/store')
 
@@ -118,7 +119,7 @@ const onSubmitWhereHouse = () => {
   // saveToLocalStorage()
 
   // // บันทึกข้อมูลลงใน localStorage
-  // console.log(whereHouseSelectedItem)
+  // //console.log(whereHouseSelectedItem)
 
   // // router.replace(route.query.to ? String(route.query.to) : '/dashboard/store')
 
@@ -146,13 +147,15 @@ const getInfoUser = () => {
 
   
       // You can use `items` for select or any other purpose
-      console.log('inFoUser.value', inFoUser.value)
-      console.log('inFoUser.value.companyName', inFoUser.value.companyName)
+      //console.log('inFoUser.value', inFoUser.value)
+      //console.log('inFoUser.value.companyName', inFoUser.value.companyName)
 
       nameCompany.value = inFoUser.value.companyName
-      console.log('nameCompany: ', nameCompany.value)
+
+      //console.log('nameCompany: ', nameCompany.value)
       localStorage.setItem('nameCompany', inFoUser.value.companyName)
-      console.log('localStorag Name Company:', localStorage.getItem('nameCompany'))
+
+      //console.log('localStorag Name Company:', localStorage.getItem('nameCompany'))
       
     })
     .catch(error => {

@@ -99,7 +99,7 @@ const activeBtnPRODApporve = ref(false)
 watch( () => {
   selectedDataTables.value.forEach(item => {
     // กำหนดค่าเริ่มต้น
-    console.log("selectedDataTables", item.statusId)
+    //console.log("selectedDataTables", item.statusId)
     selectedDataTablesStatusId.value = item.statusId
   })
 })
@@ -109,7 +109,7 @@ function openConfirmDialog() {
 
   selectedDataTables.value.forEach(item => {
     // กำหนดค่าเริ่มต้น
-    console.log("selectedDataTables", item.statusId)
+    //console.log("selectedDataTables", item.statusId)
     selectedDataTablesStatusId.value = item.statusId
 
     if (item.statusId === 102 ) {
@@ -117,8 +117,9 @@ function openConfirmDialog() {
       confirmDialog2.value.openDialog()
       isDialogVisibleAlertDialog.value = false
       activeBtnApporve.value = true
-      console.log("activeBtnApporve ", activeBtnApporve.value)
-      console.log("selectedDataTables 102")
+
+      //console.log("activeBtnApporve ", activeBtnApporve.value)
+      //console.log("selectedDataTables 102")
     }else if(item.statusId === 107){
 
       activeBtnPRODApporve.value = true
@@ -127,14 +128,15 @@ function openConfirmDialog() {
       isDialogVisibleAlertDialog.value = false
 
       // textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
-      console.log("activeBtnPRODApporve ", activeBtnPRODApporve.value)
+      //console.log("activeBtnPRODApporve ", activeBtnPRODApporve.value)
     // eslint-disable-next-line sonarjs/no-duplicated-branches
     }else if(item.statusId === 101){
       textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
-      console.log("selectedDataTables 101")
+
+      //console.log("selectedDataTables 101")
     }
     else{
-      console.log("selectedDataTables failded")
+      //console.log("selectedDataTables failded")
       isDialogVisibleAlertDialog.value = false
     }
 
@@ -146,26 +148,28 @@ watchEffect(() => {
   if(selectedDataTables.value?.length){
     selectedDataTables.value.forEach(item => {
     // กำหนดค่าเริ่มต้น
-      console.log("selectedDataTables", item.statusId)
+      //console.log("selectedDataTables", item.statusId)
       selectedDataTablesStatusId.value = item.statusId
 
       if (item.statusId === 102 ) {
         activeBtnApporve.value = true
-        console.log("activeBtnApporve ", activeBtnApporve.value)
+
+        //console.log("activeBtnApporve ", activeBtnApporve.value)
       
       }else if(item.statusId === 107){
         activeBtnPRODApporve.value = true
-        console.log("activeBtnPRODApporve ", activeBtnPRODApporve.value)
+
+        //console.log("activeBtnPRODApporve ", activeBtnPRODApporve.value)
         // eslint-disable-next-line sonarjs/no-duplicated-branches
       }else if(item.statusId === 101){
       }
       else{
-        console.log("selectedDataTables failded")
+        //console.log("selectedDataTables failded")
         isDialogVisibleAlertDialog.value = false
       }
 
 
-      console.log("selectedDataTables ", selectedDataTables.value.length)
+      //console.log("selectedDataTables ", selectedDataTables.value.length)
 
     })
   }else{
@@ -176,7 +180,7 @@ watchEffect(() => {
 })
 
 function handleConfirmAction() {
-  console.log('Confirmed! Executing action...')
+  //console.log('Confirmed! Executing action...')
   if(selectedDataTablesStatusId.value === 102){
     approvePlan('approve')
   }else if(selectedDataTablesStatusId.value === 107){
@@ -186,7 +190,7 @@ function handleConfirmAction() {
 }
 
 function handleCancel() {
-  console.log('Action canceled.')
+  //console.log('Action canceled.')
 }
 
 const textAlertDialogFunction = (word, success) => {
@@ -222,7 +226,7 @@ const dataTableCliclHighlightIsToggle = no => {
     dataTableNummberedToggle.value = no
   }
 
-  console.log("dataTableNum", dataTableNummberedToggle.value)
+  //console.log("dataTableNum", dataTableNummberedToggle.value)
 }
 
 //----------------------------------- Get Batch Production plan ---------------------------
@@ -307,7 +311,7 @@ const fetchDataProductingPlan = async () => {
   try {
     progressLinearNoData.value = false
     if (datePickerFilter.value) {
-      console.log("datePickerFilter:", datePickerFilter.value)
+      //console.log("datePickerFilter:", datePickerFilter.value)
 
       if (datePickerFilter.value.includes(" to ")) {
         // กรณีเป็นช่วงวันที่
@@ -341,7 +345,8 @@ const fetchDataProductingPlan = async () => {
           ...item,
           no: index + 1, // เพิ่มฟิลด์ "no" โดยเริ่มจาก 1
         }))
-        console.log("productionPlanItems", productionPlanItems.value)
+
+        //console.log("productionPlanItems", productionPlanItems.value)
       } else {
         console.warn("getProductionplanSearchResult.data is not an array")
         productionPlanItems.value = []
@@ -372,7 +377,7 @@ const checkBtnExportExcel = () => {
 
   filledParamsCount.value = Object.values(filterForSearchBatchProductionPlan.value).filter(value => value !== null && value !== '' && value !== -1).length
 
-  console.log('filledParamsCount', filterForSearchBatchProductionPlan.value)
+  //console.log('filledParamsCount', filterForSearchBatchProductionPlan.value)
 
   return filledParamsCount.value === 0
 }
@@ -380,7 +385,7 @@ const checkBtnExportExcel = () => {
 const printExportExcel = async () => {
   try {
     if (datePickerFilter.value) {
-      console.log("datePickerFilter:", datePickerFilter.value)
+      //console.log("datePickerFilter:", datePickerFilter.value)
 
       if (datePickerFilter.value.includes(" to ")) {
         // กรณีเป็นช่วงวันที่
@@ -407,7 +412,7 @@ const printExportExcel = async () => {
 
     if(resultFetchGet){
       // ตรวจสอบว่า getProductionplanMasterResult มี data และเป็น array
-      console.log("printExportExcelResult", printExportExcelResult.value)
+      //console.log("printExportExcelResult", printExportExcelResult.value)
     }else{
       console.error("Error export production plan master data:", printExportExcelErrorMessage.value)
     }
@@ -435,7 +440,7 @@ const newBatchGenBatch = async () => {
     if(batchIDDataPlan.value){
       itemStore.setItemDetails(batchIDDataPlan.value, 'guIDForBatchCookie')
 
-      console.log("getBatchProductionplanResult", itemStore.getItemDetails('guIDForBatchCookie'))
+      //console.log("getBatchProductionplanResult", itemStore.getItemDetails('guIDForBatchCookie'))
     }else{
       // เรียกใช้ fetch และรอให้ทำงานเสร็จ
       await fetchGetBatchProductionplan(urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
@@ -444,7 +449,7 @@ const newBatchGenBatch = async () => {
       if (getBatchProductionplanResult.value) {
         itemStore.setItemDetails(getBatchProductionplanResult.value, 'guIDForBatchCookie')
 
-        console.log("getBatchProductionplanResult", itemStore.getItemDetails('guIDForBatchCookie'))
+        //console.log("getBatchProductionplanResult", itemStore.getItemDetails('guIDForBatchCookie'))
       } else {
         console.error("getBatchProductionplanResult.value is undefined or null")
       }
@@ -482,7 +487,7 @@ const approvePlan = async type => {
     console.error("Error approved production plan:", error)
   }
 
-  console.log("body selectedDataTables", body)
+  //console.log("body selectedDataTables", body)
 }
 
 // In case of a range picker, you'll receive [Date, Date]
@@ -751,7 +756,7 @@ const headersDataTableNew = [
 ]
 
 const row_classes = item => {
-  console.log('itemdd', item)
+  //console.log('itemdd', item)
 
   // const classes = []
   // if (item.statusId === 'active') {
@@ -779,7 +784,8 @@ const iconsSort = ref({
 const toggleDirection = async key => {
   if (key) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+
+    //console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
   }
   sortColumn.value = key
   await fetchDataProductingPlan()
@@ -826,7 +832,7 @@ watch(async () => {
         name: item.statusName|| '', // ค่า item-title
       }))
 
-      console.log('Status Text Code Result:', itemsStatus.value)
+      //console.log('Status Text Code Result:', itemsStatus.value)
     } else {
       console.error('Invalid data structure:', result)
     }
@@ -2265,7 +2271,7 @@ const statusText = statusId => {
                 {{ formatDate(item.raw.finishedDate) }}
               </td>
               <td
-               style="font-size: 12px;"
+                style="font-size: 12px;"
                 class="cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2284,7 +2290,7 @@ const statusText = statusId => {
               </td>
 
               <td
-               style="font-size: 12px;"
+                style="font-size: 12px;"
                 class="cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2303,7 +2309,7 @@ const statusText = statusId => {
               </td>
 
               <td
-               style="font-size: 12px;"
+                style="font-size: 12px;"
                 class="cursor-pointer"
                 :style="{ 
                   backgroundColor: 
@@ -2324,7 +2330,7 @@ const statusText = statusId => {
               
               
               <td
-               style="font-size: 12px;"
+                style="font-size: 12px;"
                 :style="{ 
                   backgroundColor: 
                     dataTableNummberedToggle === item.raw.no ? dataTableColor : 
@@ -2340,8 +2346,8 @@ const statusText = statusId => {
               >
                 <VBtn
                   color="info"
+                  style="font-size: 12px;"
                   @click="newBatch(item.raw.batchID)"
-                   style="font-size: 12px;"
                 >
                   Action
                 </VBtn>

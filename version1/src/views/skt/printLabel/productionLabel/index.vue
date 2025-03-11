@@ -97,7 +97,7 @@ const dataTableCliclHighlightIsToggle = no => {
     dataTableNummberedToggle.value = no
   }
 
-  console.log("dataTableNum", dataTableNummberedToggle.value)
+  //console.log("dataTableNum", dataTableNummberedToggle.value)
 }
 
 const dataTableCliclHighlightIsToggle2 = no => {
@@ -110,14 +110,14 @@ const dataTableCliclHighlightIsToggle2 = no => {
     dataTableNummberedToggle2.value = no
   }
 
-  console.log("dataTableNum", dataTableNummberedToggle2.value)
+  //console.log("dataTableNum", dataTableNummberedToggle2.value)
 }
 
 ///--------------------------------- 
 
 const printLabelForm = () => {
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
+  // //console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/StockUpdatsdsde?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
     params: {
       categoryId: searchByCategoryId.value,
@@ -167,15 +167,15 @@ const printLabelForm = () => {
       totalPage.value = response.data.totalPages
       rowPerPage.value = response.data.perPage
 
-      console.log('[products.value]!!: ', products)
-      console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
+      //console.log('[products.value]!!: ', products)
+      //console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
 
-      // console.log('perPage: ',perPage)
-      // console.log('currentPage: ',currentPage)
-      // console.log('totalCount: ',totalCount)
-      // console.log('totalPages: ',totalPage)
+      // //console.log('perPage: ',perPage)
+      // //console.log('currentPage: ',currentPage)
+      // //console.log('totalCount: ',totalCount)
+      // //console.log('totalPages: ',totalPage)
 
-      // console.log('subTypeId',searchBySubTypeId.value)
+      // //console.log('subTypeId',searchBySubTypeId.value)
 
     
     })
@@ -206,7 +206,7 @@ const selectedDataTables = ref([''])
 const isDialogPrintLabelVisible = ref(false)
 
 const showSelectBox = () => {
-  console.log("showSelectBox", selectedDataTables.value)
+  //console.log("showSelectBox", selectedDataTables.value)
 }
 
 const itemsTypeLabel = ref([
@@ -292,13 +292,15 @@ const fetchData = async () => {
         no: index + 1,
       }))
       statusData.value = null
-      console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
+
+      //console.log("printLabelFormViewService successfully view", dataPrintLabel.value)
     } else {
       // กรณี API ส่งผลลัพธ์ที่ไม่สำเร็จ
       printLabelFormViewResult.value = false
       dataPrintLabel.value = []
       statusData.value = "No data found"
-      console.log("printLabelFormViewService failed view with result", result)
+
+      //console.log("printLabelFormViewService failed view with result", result)
     }
   } catch (error) {
     // จัดการข้อผิดพลาด เช่น Network Error
@@ -315,7 +317,8 @@ const fetchData = async () => {
 const toggleDirection = async key => {
   if (key) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+
+    //console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
   }
   sortColumn.value = key
   await fetchData()
@@ -336,7 +339,7 @@ const groupDataByLot = data => {
 
   data.forEach(item => {
     // ถ้า lot เดิมเหมือนกับแถวปัจจุบัน
-    console.log("start ForEach")
+    //console.log("start ForEach")
     if (item.lot === previousLot) {
       // เพิ่ม barcode และ lotDescription ไปยังรายการล่าสุดใน groupedData
       groupedData[groupedData.length - 1].items.push({
@@ -484,22 +487,24 @@ const actionPrintProductLabel = async (ItemCode, lot) => {
 
     if (result) {
       dataTemplates.value = getTemplateByItemCodeResult.value.data
-      console.log('getTemplateByItemCodeResult result if', dataTemplates.value)
-      console.log('getTemplateByItemCodeResult error if', errorMessageGetTemplatesByFileCodeSearch.value)
+
+      //console.log('getTemplateByItemCodeResult result if', dataTemplates.value)
+      //console.log('getTemplateByItemCodeResult error if', errorMessageGetTemplatesByFileCodeSearch.value)
 
       // แสดง Dialog หลังจาก API ทำงานเสร็จ
       isDialogPrintLabelVisible.value = true
     } else {
       textAlertDialogFunction(getTemplateByItemCodeResult.value.data, false)
-      console.log('getTemplateByItemCodeResult error', errorMessageGetTemplatesByItemCodeSearch.value)
+
+      //console.log('getTemplateByItemCodeResult error', errorMessageGetTemplatesByItemCodeSearch.value)
 
       // setTimeout(() => {
       //   // location.reload()
       // }, 500) // 0.5 วินาที
-      console.log(
-        'errorMessageGetTemplatesByItemCodeSearch',
-        errorMessageGetTemplatesByItemCodeSearch.value,
-      )
+      //console.log(
+      //   'errorMessageGetTemplatesByItemCodeSearch',
+      //   errorMessageGetTemplatesByItemCodeSearch.value,
+      // )
     }
   } catch (error) {
     console.error('Error fetching template by item code:', error)
@@ -518,19 +523,19 @@ const checkColorBgStatus = function (index) {
 
 const selectTemplate = async (item, index) => {
   try {
-    console.log('selectTemplate', item)
+    //console.log('selectTemplate', item)
     ItemCodeForPrintProductLabel.value = item
     IndexForPrintProductLabel.value = index
 
     if (item) {
-      console.log('selectTemplate Start')
+      //console.log('selectTemplate Start')
       FileCodeForPrintProductLabel.value = item.fileCode
 
       if (dataTemplatesByFileCode.value) {
         dataTemplatesByFileCode.value = null
         IndexForPrintProductLabel.value = null
       } else {
-        console.log('selectTemplate Starting...')
+        //console.log('selectTemplate Starting...')
         
         // รอ fetchGetTemplateByFileCode จนเสร็จ
         const result = await fetchGetTemplateByFileCode(
@@ -543,9 +548,10 @@ const selectTemplate = async (item, index) => {
 
         if (result) {
           dataTemplatesByFileCode.value = getTemplateByFileCodeResult.value.data
-          console.log('getTemplateByFileCodeResult', dataTemplatesByFileCode.value)
+
+          //console.log('getTemplateByFileCodeResult', dataTemplatesByFileCode.value)
         } else {
-          console.log('errorMessageGetTemplatesByFileCodeSearch', errorMessageGetTemplatesByFileCodeSearch.value)
+          //console.log('errorMessageGetTemplatesByFileCodeSearch', errorMessageGetTemplatesByFileCodeSearch.value)
         }
       }
     }
@@ -559,7 +565,8 @@ const selectTemplate = async (item, index) => {
 
 const printProdcutLabel = async () => {
   isLoadingPrintLabel.value = true
-  console.log("Authorization view", urlApi.value, whereHouse, accessTokenAtStore)
+
+  //console.log("Authorization view", urlApi.value, whereHouse, accessTokenAtStore)
   try {
     // เรียก API และรอให้เสร็จ
     const result = await printExportPDFService(
@@ -571,14 +578,15 @@ const printProdcutLabel = async () => {
       accessTokenAtStore,
     )
 
+    // eslint-disable-next-line sonarjs/no-all-duplicated-branches
     if (result) {
       // แสดง Dialog หลังจาก API ทำงานเสร็จ
       isLoadingPrintLabel.value = false
     } else {
-      console.log(
-        'errorMessageGetTemplatesByItemCodeSearch',
-        printExportPDFErrorMessage.value,
-      )
+      //console.log(
+      //   'errorMessageGetTemplatesByItemCodeSearch',
+      //   printExportPDFErrorMessage.value,
+      // )
       isLoadingPrintLabel.value = false
     }
   } catch (error) {

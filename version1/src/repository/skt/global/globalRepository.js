@@ -14,7 +14,7 @@ export const  globalService = {
       })
         
       if (response && response.data) {
-        console.log('Service Response data Genterate View:', response.data.data)
+        //console.log('Service Response data Genterate View:', response.data.data)
           
         return response.data.data
       } else {
@@ -42,7 +42,7 @@ export const  globalService = {
       )
   
       if (response && response.data) {
-        console.log('Service Response print receiving form:', response.data)
+        //console.log('Service Response print receiving form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -79,7 +79,7 @@ export const  globalService = {
       )
   
       if (response && response.data) {
-        console.log('Service Response print Inspection form:', response.data)
+        //console.log('Service Response print Inspection form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -116,7 +116,7 @@ export const  globalService = {
       )
   
       if (response && response.data) {
-        console.log('Service Response print PackagingForm form:', response.data)
+        //console.log('Service Response print PackagingForm form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -155,7 +155,7 @@ export const  globalService = {
       )
   
       if (response && response.data) {
-        console.log('Service Response print Label form:', response.data)
+        //console.log('Service Response print Label form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -177,7 +177,7 @@ export const  globalService = {
   },
 
   async printLabelView(urlApi, whereHouse, accessToken, lot) {
-    console.log('printLabelView Response print label View:', urlApi, whereHouse, accessToken, lot)
+    //console.log('printLabelView Response print label View:', urlApi, whereHouse, accessToken, lot)
     try {
       const response = await axios.get(
         `${urlApi}/api/v1/PrintLabel/Label?lot=${lot}`, {},
@@ -190,12 +190,12 @@ export const  globalService = {
         },
       )
 
-      console.log('Print label Service try...', urlApi, whereHouse, accessToken, lot)
+      //console.log('Print label Service try...', urlApi, whereHouse, accessToken, lot)
   
       if (response && response.data) {
-        console.log('Service Response print label View:', response.data.data)
+        //console.log('Service Response print label View:', response.data.data)
 
-        console.log('Print label Service Response ...', response.data.data)
+        //console.log('Print label Service Response ...', response.data.data)
           
         return response.data.data
       } else {
@@ -297,7 +297,7 @@ export const  globalService = {
       })
 
       if (response && response.data) {
-        console.log('Service Response save to print Barcode form:', response.data)
+        //console.log('Service Response save to print Barcode form:', response.data)
         
         return { success: true, data: response.data }
       } else {
@@ -324,7 +324,7 @@ export const  globalService = {
       )
   
       if (response && response.data) {
-        console.log('Service Response print Label form:', response.data)
+        //console.log('Service Response print Label form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -361,7 +361,7 @@ export const  globalService = {
       )
   
       if (response && response.data) {
-        console.log('Service Response print Label form:', response.data)
+        //console.log('Service Response print Label form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -407,7 +407,7 @@ export const  globalService = {
       )
   
       if (response && response.data) {
-        console.log('Service Response export Excel form:', response.data)
+        //console.log('Service Response export Excel form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
@@ -440,7 +440,7 @@ export const  globalService = {
   //---------------------- Pritn Production --------------------------------
   
   async getTempateByItemCode(ItemCode, urlApi, form, whereHouse, accessToken) {
-    console.log('get repo getTempateByItemCode...')
+    //console.log('get repo getTempateByItemCode...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${form}/GetTemplatesByItemCode/${ItemCode}`, {
         headers: {
@@ -451,19 +451,19 @@ export const  globalService = {
       })
 
       if (response && response.data) {
-        console.log('success get repo getTempateByItemCode...')
-        console.log('Service Response data getTempateByItemCode:', response.data)
+        //console.log('success get repo getTempateByItemCode...')
+        //console.log('Service Response data getTempateByItemCode:', response.data)
         
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getTempateByItemCode...')
+        //console.log('Error repo Error If getTempateByItemCode...')
 
         throw new Error('No data received from the server')
 
         // return { data: response, success: false }
       }
     } catch (error) {
-      console.log('Error repo Error Try getTempateByItemCode...')
+      //console.log('Error repo Error Try getTempateByItemCode...')
       console.error('Error in getProductionPlan:', error)
 
       return { data: error.response?.data, success: false }
@@ -473,7 +473,7 @@ export const  globalService = {
   },
 
   async getTempateByFileCode(FileCode, urlApi, form, whereHouse, accessToken) {
-    console.log('get repo getTempateByFileCode...')
+    //console.log('get repo getTempateByFileCode...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${form}/GetSettingsByFileCode/${FileCode}`, {
         headers: {
@@ -484,23 +484,23 @@ export const  globalService = {
       })
 
       if (response && response.data) {
-        console.log('success get repo getTempateByFileCode...')
-        console.log('Service Response data getTempateByFileCode:', response.data)
+        //console.log('success get repo getTempateByFileCode...')
+        //console.log('Service Response data getTempateByFileCode:', response.data)
         
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getTempateByFileCode...')
+        //console.log('Error repo Error If getTempateByFileCode...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getTempateByFileCode...')
+      //console.log('Error repo Error Try getTempateByFileCode...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getTempateByFileCode ${error.response?.data?.message || error.message}`)
     }
   },
 
   async printExportPDFProductLabel(fileCode, productID, LotNo, urlApi, whereHouse, accessToken) {
-    console.log("Authorization", urlApi, whereHouse, accessToken)
+    //console.log("Authorization", urlApi, whereHouse, accessToken)
     try {
       const response = await axios.post(
         `${urlApi}/api/v1/PrintLabel/Label/Product/Pdf/${fileCode}/${LotNo}/${productID}`,
@@ -516,7 +516,7 @@ export const  globalService = {
       )
   
       if (response && response.data) {
-        console.log('Service Response export PDF:', response.data)
+        //console.log('Service Response export PDF:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })

@@ -87,7 +87,7 @@ const soEIdConfirmDialog = ref('')
 const productRowModel = ref(null)
 
 function openConfirmDialog(type, SoEId, productRow) {
-  console.log('openConfirmDialog', type, SoEId)
+  //console.log('openConfirmDialog', type, SoEId)
   productRowModel.value = productRow
 
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
@@ -95,7 +95,8 @@ function openConfirmDialog(type, SoEId, productRow) {
     wordForSubmit.value = type
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
-    console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
+
+    //console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
     
   }else if(type === 'back'){
     wordForSubmit.value = "SEND BACK"
@@ -107,20 +108,20 @@ function openConfirmDialog(type, SoEId, productRow) {
 
   // selectedDataTables.value.forEach(item => {
   //   // กำหนดค่าเริ่มต้น
-  //   console.log("selectedDataTables", item.statusId)
+  //   //console.log("selectedDataTables", item.statusId)
   //   selectedDataTablesStatusId.value = item.statusId
 
   //   if (item.statusId === 102 || item.statusId === 107 ) {
   //     wordForSubmit.value = alertWordConst.approve
   //     confirmDialog2.value.openDialog()
   //     isDialogVisibleAlertDialog.value = false
-  //     console.log("selectedDataTables 102")
+  //     //console.log("selectedDataTables 102")
   //   }else if(item.statusId === 101){
   //     textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
-  //     console.log("selectedDataTables 101")
+  //     //console.log("selectedDataTables 101")
   //   }
   //   else{
-  //     console.log("selectedDataTables failded")
+  //     //console.log("selectedDataTables failded")
   //     isDialogVisibleAlertDialog.value = false
   //   }
 
@@ -133,14 +134,15 @@ function handleConfirmAction() {
     submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
   }else if(wordForSubmit.value === 'SEND BACK'){
     submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
-    console.log('back')
+
+    //console.log('back')
   }
   
   
 }
 
 function handleCancel() {
-  console.log('Action canceled.')
+  //console.log('Action canceled.')
 }
 
 //------------------------------ Formate --------------------------------------
@@ -330,7 +332,8 @@ const btnCloseShipCon = async () => {
       item.shippingMarkActive = activeShipMarkModel.value
     }
   })
-  console.log('btnCloseShipCon...', paginatedData.value)
+
+  //console.log('btnCloseShipCon...', paginatedData.value)
 
   if(!disabledModel.value){
     await saveShipmentPlan(dataRowForUse.value)
@@ -340,30 +343,31 @@ const btnCloseShipCon = async () => {
 }
 
 const btnTextarea = () => {
-  console.log('textAreaRemarkDialogActive', typeDialogTextArea.value)
+  //console.log('textAreaRemarkDialogActive', typeDialogTextArea.value)
   paginatedData.value.forEach(item => {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
       if(typeDialogTextArea.value === 'Remark WH'){
         item.wH_Remarks = dialogRemark.value
 
-        // console.log('btnCloseRemark... Remark WH', dialogRemark.value)
+        // //console.log('btnCloseRemark... Remark WH', dialogRemark.value)
       }else if(typeDialogTextArea.value === 'Remark SAL'){
         item.saL_Remarks = dialogRemark.value
 
-        // console.log('btnCloseRemark... Remark SAL', dialogRemark.value, item.saL_Remarks)
+        // //console.log('btnCloseRemark... Remark SAL', dialogRemark.value, item.saL_Remarks)
       }else if(typeDialogTextArea.value === 'Remark LOG'){
         item.loG_Remarks = dialogRemark.value
 
-        // console.log('btnCloseRemark... Remark LOG', dialogRemark.value)
+        // //console.log('btnCloseRemark... Remark LOG', dialogRemark.value)
       }else if(typeDialogTextArea.value === 'Lot'){
         item.lot = dialogRemark.value
       }
       
     }else{
-      console.log('btnCloseRemark... ELSe', typeDialogTextArea.value, soEIdModel.value, item.soEtlLogDetailJournalID)
+      //console.log('btnCloseRemark... ELSe', typeDialogTextArea.value, soEIdModel.value, item.soEtlLogDetailJournalID)
     }
   })
-  console.log('btnCloseRemark...')
+
+  //console.log('btnCloseRemark...')
   dialogVisibleTextarea.value = false
 }
 
@@ -374,7 +378,8 @@ const textAreaRemarkDialogActive = (type, data, soEId, disabledRow, disPermiss) 
   titleDialogView.value = 'Shipping Mark Con'
   dialogRemark.value = data  // ตั้งค่า dialogDataTextArea ด้วยค่า data
   dialogVisibleTextarea.value = true
-  console.log('Type dialog', typeDialogTextArea.value, '=', type)
+
+  //console.log('Type dialog', typeDialogTextArea.value, '=', type)
   
 
   const disabledCanExecute = ref(false)
@@ -424,7 +429,7 @@ const textAreaShipDialogActive2 = (type, data, data2,
     disabledCanExecute.value = true
   }
 
-  console.log('disabledCanExecute', disabledCanExecute.value, 'status', disabledRow, 'permis', disabledPermission )
+  //console.log('disabledCanExecute', disabledCanExecute.value, 'status', disabledRow, 'permis', disabledPermission )
 
   disabledModel.value = disabledCanExecute.value
 }
@@ -456,7 +461,7 @@ const handleDialogSubmit = data => {
     console.warn(`Index ${index} is out of range for mockData.`)
   }
 
-  console.log('Updated mockData:', data)
+  //console.log('Updated mockData:', data)
 }
 
 //------------------------------- Function Get Search plan -----------------
@@ -594,7 +599,8 @@ const saveHistoryFilter = () => {
 const toggleDirection = async key => {
   if (key) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+
+    //console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
   }
   sortColumn.value = key
   await searchShipmentPlan()
@@ -623,7 +629,7 @@ watchEffect( () => {
 
   disabledBtnExport.value = Object.values(filterForSearchPlan.value).some(value => value !== null && value !== "")
 
-  console.log('checkValueFilter', filterForSearchPlan.valu)
+  //console.log('checkValueFilter', filterForSearchPlan.valu)
 })
 
 const searchShipmentPlan = async () => {
@@ -672,9 +678,9 @@ const searchShipmentPlan = async () => {
         })),
       )
 
-      console.log('searchPlanData.value', searchPlanData.value)
+      //console.log('searchPlanData.value', searchPlanData.value)
 
-      // console.log(`Fetched search plan:`, searchPlanData.value)
+      // //console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
       console.error('No result from API')
       searchPlanData.value = [] // Set empty data if no result
@@ -716,7 +722,7 @@ const allData = ref([]) // ข้อมูลทั้งหมดที่แ�
 const isSelectAll = ref(false) // สถานะของ Checkbox "Select All"
 
 const testValue = () => {
-  console.log('Test Value', selectedDataTables.value)
+  //console.log('Test Value', selectedDataTables.value)
 }
 
 // คำนวณว่าทุกแถวถูกเลือกหรือไม่
@@ -728,10 +734,10 @@ const isAllSelected = computed(() => {
 const toggleSelectAll = () => {
   if (isAllSelected.value) {
     selectedDataTables.value = [] // ยกเลิกการเลือกทั้งหมด
-    console.log('clear data checkbox...')
+    //console.log('clear data checkbox...')
   } else {
     selectedDataTables.value = [...paginatedData.value] // เลือกทั้งหมด
-    console.log('add all data checkbox...')
+    //console.log('add all data checkbox...')
   }
 }
 
@@ -741,7 +747,7 @@ import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarous
 import { onMounted, watch, watchEffect } from 'vue'
 
 const viewAllData = () => {
-  console.log(mockData.value)
+  //console.log(mockData.value)
 }
 
 const typeFileInput = ref('hideInput')
@@ -775,11 +781,11 @@ const handleDeleteFileForm =  async( file,
       accessTokenAtStore,
     )
 
-    console.log("Response from functionSaveFileForm:", response)
+    //console.log("Response from functionSaveFileForm:", response)
 
     if (deleteFileFormResult.value?.success) {
       // textAlertDialogFunction(alertWordConst.delete, true)
-      console.log(`Saved File Plan:`, deleteFileFormResult.value)
+      //console.log(`Saved File Plan:`, deleteFileFormResult.value)
 
       // Reload หลังแจ้งเตือนสำเร็จ
       setTimeout(() => {
@@ -813,7 +819,7 @@ const saveFileFormShipment = async (
   typeFile,
   soEtlLogDetailJournalID,
 ) => {
-  console.log("save file start...", soEtlLogDetailJournalID)
+  //console.log("save file start...", soEtlLogDetailJournalID)
   
   try {
     // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
@@ -828,7 +834,7 @@ const saveFileFormShipment = async (
       accessTokenAtStore,
     )
 
-    console.log("Response from functionSaveFileForm:", response)
+    //console.log("Response from functionSaveFileForm:", response)
 
     if (resultSaveFielForm.value?.success) {
       if(disabledModel.value){
@@ -841,7 +847,8 @@ const saveFileFormShipment = async (
       }else{
         if(trikerSaveDrft.value === false){
           textAlertDialogFunction(alertWordConst.saveDraft, true)
-          console.log(`Saved File Plan:`, resultSaveFielForm.value)
+
+          //console.log(`Saved File Plan:`, resultSaveFielForm.value)
 
           // Reload หลังแจ้งเตือนสำเร็จ
           setTimeout(() => {
@@ -907,11 +914,11 @@ const getFileForm = async (
 
 const showFileFormByTypeAndSoId = async (type, soId) => {
   if(type === 'GetSo'){
-    console.log('showFileFormByTypeAndSoId', await getFileForm(type, soId))
+    //console.log('showFileFormByTypeAndSoId', await getFileForm(type, soId))
 
     getSoFileModel.value = await getFileForm(type, soId)
 
-    console.log(`showFileFormByTypeAnd${soId}`, getSoFileModel.value)
+    //console.log(`showFileFormByTypeAnd${soId}`, getSoFileModel.value)
 
     // return await getFileForm(type, soId)
   }
@@ -966,22 +973,25 @@ const mapRequestData = data => ({
 const getOrDefault = (value, defaultValue) => value ?? defaultValue
 
 const showText = () => {
-  console.log("filesFromUploaderSO.value show")
-  console.log("filesFromUploaderSO.value", filesFromUploaderSO.value)
+  //console.log("filesFromUploaderSO.value show")
+  //console.log("filesFromUploaderSO.value", filesFromUploaderSO.value)
   if(filesFromUploaderSO.value){
-    console.log("filesFromUploaderSO.value", filesFromUploaderSO.value.length)
+    //console.log("filesFromUploaderSO.value", filesFromUploaderSO.value.length)
   }
-  console.log("filesFromUploaderSO.value", filesFromUploaderCOA.value)
+
+  //console.log("filesFromUploaderSO.value", filesFromUploaderCOA.value)
   if(filesFromUploaderCOA.value){
-    console.log("filesFromUploaderCOA.value", filesFromUploaderCOA.value.length)
+    //console.log("filesFromUploaderCOA.value", filesFromUploaderCOA.value.length)
   }
-  console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value)
+
+  //console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value)
   if(filesFromUploaderTruckOrder.value){
-    console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value.length)
+    //console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value.length)
   }
-  console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value)
+
+  //console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value)
   if(filesFromUploaderDeliNote.value){
-    console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value.length)
+    //console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value.length)
   }
 }
 
@@ -992,7 +1002,7 @@ const trikerSaveDrft = ref(false)
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const saveShipmentPlan = async row => {
-  console.log("save plan start...", row.csLfStatusId)
+  //console.log("save plan start...", row.csLfStatusId)
   saveDraftLoadingSOERow.value = row.soEtlLogDetailJournalID
 
   if (
@@ -1001,7 +1011,7 @@ const saveShipmentPlan = async row => {
       filesFromUploaderTruckOrder.value||
       filesFromUploaderDeliNote.value
   ) {
-    console.log("Uploading files...",  filesFromUploaderSO.value)
+    //console.log("Uploading files...",  filesFromUploaderSO.value)
 
     const deleteFie1 = ref()
     const deleteFie2 = ref()
@@ -1015,7 +1025,7 @@ const saveShipmentPlan = async row => {
 
     if(filesFromUploaderSO.value){
       if(filesFromUploaderSO.value.length === 0){
-        console.log("SaveSo")
+        //console.log("SaveSo")
       }else{
         deleteFie1.value = await handleDeleteFileForm(
           filesFromUploaderSO.value,
@@ -1033,7 +1043,7 @@ const saveShipmentPlan = async row => {
 
     if(filesFromUploaderCOA.value){
       if(filesFromUploaderCOA.value.length === 0){
-        console.log("SaveCOA")
+        //console.log("SaveCOA")
       }else{
         deleteFie2.value = await handleDeleteFileForm(
           filesFromUploaderCOA.value,
@@ -1051,7 +1061,7 @@ const saveShipmentPlan = async row => {
 
     if(filesFromUploaderTruckOrder.value){
       if(filesFromUploaderTruckOrder.value.length === 0){
-        console.log("SaveTruckOrder")
+        //console.log("SaveTruckOrder")
       }else{
         deleteFie3.value = await handleDeleteFileForm(
           filesFromUploaderTruckOrder.value,
@@ -1069,7 +1079,7 @@ const saveShipmentPlan = async row => {
 
     if(filesFromUploaderDeliNote.value){
       if(filesFromUploaderDeliNote.value.length === 0){
-        console.log("SaveDeliveryNote")
+        //console.log("SaveDeliveryNote")
       }else{
         deleteFie4.value = await handleDeleteFileForm(
           filesFromUploaderDeliNote.value,
@@ -1093,15 +1103,15 @@ const saveShipmentPlan = async row => {
     //   throw 'Save File Fiald!'
     // }
 
-    console.log("File upload completed.", row.soEtlLogDetailJournalID)
+    //console.log("File upload completed.", row.soEtlLogDetailJournalID)
   }else{
-    console.log("File not foand", filesFromUploaderSO.value)
+    //console.log("File not foand", filesFromUploaderSO.value)
   }
 
 
-  console.log("submitShipmentPlanBySoEId start. save draft", trikerSaveDrft.value)
+  //console.log("submitShipmentPlanBySoEId start. save draft", trikerSaveDrft.value)
   if(row.statusId === 207){
-    console.log('Saved Shipment plan if', row.csLfStatusId)
+    //console.log('Saved Shipment plan if', row.csLfStatusId)
     saveDraftLoading.value = false
     if(disabledModel.value !== true){
       if(trikerSaveDrft.value === false){
@@ -1131,7 +1141,7 @@ const saveShipmentPlan = async row => {
     
 
   }else{
-    console.log('saveShipmentPlan complated', row)
+    //console.log('saveShipmentPlan complated', row)
 
     // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
     // Mapping request data และส่งคำขอ
@@ -1184,7 +1194,7 @@ const saveShipmentPlan = async row => {
     saveDraftLoading.value = false
     
 
-    console.log(`Saved search plan:`, response)
+    //console.log(`Saved search plan:`, response)
   }
 
   saveDraftLoading.value = false
@@ -1215,11 +1225,12 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
 
   trikerSaveDrft.value = true
   submitLoadingSOERow.value = soEtlLogDetailJournalID
-  console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
+
+  //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
   const saveDraftRes = await saveShipmentPlan(productRowModel.value)
 
-  console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
+  //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
   if(!saveDraftRes){
     textAlertDialogFunction(alertWordConst.saveDraft, false)
@@ -1227,16 +1238,18 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
   }
 
   try{
-    console.log('submitShipmentPlanBySoEId start!!')
+    //console.log('submitShipmentPlanBySoEId start!!')
     if(type === 'submit'){
 
     }else if(type === 'approve' || type === 'reject'){
-      console.log('submitShipmentPlanBySoEId start!! 3')
+      //console.log('submitShipmentPlanBySoEId start!! 3')
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-      console.log('submitShipmentPlanBySoEId start!! 2')
+
+      //console.log('submitShipmentPlanBySoEId start!! 2')
     }else if(type === 'back'){
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-      console.log('submitShipmentPlanBySoEId back !! 3')
+
+      //console.log('submitShipmentPlanBySoEId back !! 3')
     }
 
     if(!statusCommnetValue.value && type === 'reject'){
@@ -1253,7 +1266,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
       statusCommnetValue.value,
     )
 
-    console.log('submitShipmentPlanBySoEId start!! 3')
+    //console.log('submitShipmentPlanBySoEId start!! 3')
     
     if(submitShipmentPlanResult.value || result){
       if(type === 'submit'){
@@ -1278,7 +1291,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
 
-      console.log('submitShipmentPlanBySoEId start!! 4')
+      //console.log('submitShipmentPlanBySoEId start!! 4')
       
     }else{
       if(type === 'submit'){
@@ -1323,15 +1336,17 @@ const dataTableCliclHighlightIsToggle = no => {
   if (dataTableNummberedToggle.value === no) {
     // ถ้าตรง ให้สลับกลับเป็น null
     dataTableNummberedToggle.value = null
-    console.log("dataTableNum if", dataTableNummberedToggle.value, no)
+
+    //console.log("dataTableNum if", dataTableNummberedToggle.value, no)
   } else if (dataTableNummberedToggle.value === null) {
     // ถ้าเป็น null ให้ตั้งค่าเป็น no ใหม่
     dataTableNummberedToggle.value = no
-    console.log("dataTableNum else", dataTableNummberedToggle.value, no)
+
+    //console.log("dataTableNum else", dataTableNummberedToggle.value, no)
   }
   
 
-  console.log("dataTableNum", dataTableNummberedToggle.value, no)
+  //console.log("dataTableNum", dataTableNummberedToggle.value, no)
 }
 
 //--------------------------------------- Function Pagination --------------------------------------------
@@ -1414,10 +1429,10 @@ const checkRFID = ref ('')
 watchEffect(() =>{
   const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
   if(checkRFIDUpdate.value === 'true'){
-    // console.log('RFID Check True:'+ checkRFIDUpdate.value)
+    // //console.log('RFID Check True:'+ checkRFIDUpdate.value)
     checkRFID.value = true
   } else if (checkRFIDUpdate.value === 'false') {
-    // console.log('RFID Check False:'+ checkRFIDUpdate.value)
+    // //console.log('RFID Check False:'+ checkRFIDUpdate.value)
     checkRFID.value = false
   }
 })
@@ -1571,7 +1586,7 @@ const getSelectData = async (format, type) => {
     )
 
     if (result) {
-      // console.log(`Fetched ${type}:`, getSelectDataResult.value)
+      // //console.log(`Fetched ${type}:`, getSelectDataResult.value)
       
       return getSelectDataResult.value
     } else {
@@ -1630,7 +1645,7 @@ const selectedTruckCompany2 = () => {
     personInchargeTruckCompanyModel.value = foundItem.personIncharge || ''
     contactTruckCompanyModel.value = foundItem.contact || ''
   }else{
-    console.log('selectedTruckCompany2', TruckCompanyPrint.value, '==')
+    //console.log('selectedTruckCompany2', TruckCompanyPrint.value, '==')
   }
 }
 
@@ -1755,7 +1770,7 @@ const setAccount = role => {
     accountAll.value = true
   }
 
-  console.log('Switch Acc', accountAmin.value, accountViewerKK.value, accountINSP.value, accountSALLOG.value, accountWH.value, accountAll.value)
+  //console.log('Switch Acc', accountAmin.value, accountViewerKK.value, accountINSP.value, accountSALLOG.value, accountWH.value, accountAll.value)
 
   // สามารถเพิ่มเงื่อนไขสำหรับ role อื่นๆ ได้ที่นี่
 }
@@ -1785,7 +1800,7 @@ const showDialogTruckOrder = (SoId, SoeId, rowData) => {
   soEIdModel.value = SoeId
 
 
-  console.log("RowData", rowData)
+  //console.log("RowData", rowData)
 
   CompanyPrint.value = rowData.shipperName || ' '
   AddressPrint.value = rowData.shipperLocation || ' '
@@ -1906,7 +1921,7 @@ async function  redirectBasedOnStatus (product)  {
   // 🔥 Redirect ไปยัง URL ใหม่พร้อม Query
   const finalPath = `${newPath}`
 
-  console.log(`Redirecting to: ${finalPath}`)
+  //console.log(`Redirecting to: ${finalPath}`)
   window.location.href = finalPath
 }
 
@@ -1937,7 +1952,8 @@ const loadingPrint = ref(false)
 
 const printShipmentPDFBySoEId = async type => {
   loadingPrint.value = true
-  console.log('loadingPrint', loadingPrint.value)
+
+  //console.log('loadingPrint', loadingPrint.value)
 
 
   // ✅ ใช้ for...of เพื่อรองรับ async/await
@@ -1964,7 +1980,7 @@ const printShipmentPDFBySoEId = async type => {
     )
     
     if (result) {
-      console.log('result print', result)
+      //console.log('result print', result)
 
       // textAlertDialogFunction(alertWordConst.print, true)
 
@@ -2000,10 +2016,10 @@ const getShippingCheckSheet = async soEId => {
 
       errorGetShippingCheckSheet.value = null
 
-      // console.log('getShippingCheckSheetResult', result)
+      // //console.log('getShippingCheckSheetResult', result)
     }else{
 
-      // console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
+      // //console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
     }
   } catch (error) {
     errorGetShippingCheckSheet.value = error.message
@@ -2025,10 +2041,10 @@ const getShippingCheckSheetLorryFlexi = async soEId => {
 
       errorGetShippingCheckSheet.value = null
 
-      console.log('getShippingCheckSheetResult2', result)
+      //console.log('getShippingCheckSheetResult2', result)
     }else{
 
-      // console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
+      // //console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
     }
   } catch (error) {
     errorGetShippingCheckSheet.value = error.message
@@ -2076,12 +2092,12 @@ const didabledPrintPDFCheckSheet = statusId => {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const hanbleBtnPrintPDFCheckSheet = type => {
-  console.log('Check BtnPrintPDF start...', prouctRowAction.value.checkSheetTypeID)
+  //console.log('Check BtnPrintPDF start...', prouctRowAction.value.checkSheetTypeID)
 
   if(prouctRowAction.value){
-    console.log('Check BtnPrintPDF start if', prouctRowAction.value.checkSheetTypeID)
+    //console.log('Check BtnPrintPDF start if', prouctRowAction.value.checkSheetTypeID)
     if(prouctRowAction.value.checkSheetTypeID !== 3 && prouctRowAction.value.checkSheetTypeID !== 4){
-      console.log('Check BtnPrintPDF start ===', prouctRowAction.value.checkSheetTypeID)
+      //console.log('Check BtnPrintPDF start ===', prouctRowAction.value.checkSheetTypeID)
       if(prouctRowAction.value.checkSheetTypeID === 2){
         handlePrintDPFCheckSheet('ShippingCheckSheetIBC2')
       }else if(prouctRowAction.value.checkSheetTypeID === 1){
@@ -2089,20 +2105,21 @@ const hanbleBtnPrintPDFCheckSheet = type => {
       }
     }else if(prouctRowAction.value.checkSheetTypeID === 3 || prouctRowAction.value.checkSheetTypeID === 4){
       handlePrintDPFCheckSheet('ShippingLorry')
-      console.log('Check BtnPrintPDF start ===', prouctRowAction.value.checkSheetTypeID)
+
+      //console.log('Check BtnPrintPDF start ===', prouctRowAction.value.checkSheetTypeID)
       if(getShippingCheckSheetResult2?.value.isLorry){
-        console.log('Check getShippingCheckSheetResult2 start ===', getShippingCheckSheetResult2.value.isLorry)
+        //console.log('Check getShippingCheckSheetResult2 start ===', getShippingCheckSheetResult2.value.isLorry)
         handlePrintDPFCheckSheet('ShippingLorry')
       }else if(!getShippingCheckSheetResult2?.value.isLorry){
         handlePrintDPFCheckSheet('ShippingFlexi')
       }else{
-        console.log('Please prouctRowAction3', prouctRowAction.value)
+        //console.log('Please prouctRowAction3', prouctRowAction.value)
       }
     }else{
-      console.log('Please prouctRowAction2', prouctRowAction.value)
+      //console.log('Please prouctRowAction2', prouctRowAction.value)
     }
   }else{
-    console.log('Please prouctRowAction1', prouctRowAction.value)
+    //console.log('Please prouctRowAction1', prouctRowAction.value)
   }
 }
 
@@ -2111,30 +2128,33 @@ const handlePrintDPFCheckSheet = async type => {
 
   if(prouctRowAction.value){
     if(type === 'ShippingCheckSheetIBC2' || type === 'ShippingCheckSheet'){
-      console.log('getShippingCheckSheet start')
+      //console.log('getShippingCheckSheet start')
       await getShippingCheckSheet(prouctRowAction.value.soEtlLogDetailJournalID)
 
       if(getShippingCheckSheetResult.value){
-        console.log('getShippingCheckSheet start',  getShippingCheckSheetResult.value.containerNo_LicPlNo)
+        //console.log('getShippingCheckSheet start',  getShippingCheckSheetResult.value.containerNo_LicPlNo)
         licensePlate.value = getShippingCheckSheetResult.value.checkSheetItems
-        console.log('getShippingCheckSheet start',  licensePlate.value)
+
+        //console.log('getShippingCheckSheet start',  licensePlate.value)
       }
       
       
     }else{
       await getShippingCheckSheetLorryFlexi(prouctRowAction.value.soEtlLogDetailJournalID)
-      console.log('getShippingCheckSheetResult.value Lorry', getShippingCheckSheetResult2.value)
+
+      //console.log('getShippingCheckSheetResult.value Lorry', getShippingCheckSheetResult2.value)
     }
     
   }
 
   await mapProductRowToPramsPrint(prouctRowAction.value)
-  console.log('paramsPrintPDFCheckSheet.value', paramsPrintPDFCheckSheet.value)
+
+  //console.log('paramsPrintPDFCheckSheet.value', paramsPrintPDFCheckSheet.value)
 
   const countPage = ref(1)
 
   if (type === 'ShippingCheckSheetIBC2' ) {
-    console.log('type.value', type)
+    //console.log('type.value', type)
     handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet('ShippingCheckSheet', '', countPage.value++)
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
@@ -2152,7 +2172,7 @@ const handlePrintDPFCheckSheet = async type => {
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
    
   }else if(type === 'ShippingCheckSheet'){
-    console.log('type.value', type)
+    //console.log('type.value', type)
     handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
@@ -2167,11 +2187,12 @@ const handlePrintDPFCheckSheet = async type => {
     setTimeout(() => {
       isDialogLoadingVisible.value = false
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
-    console.log('Completed')
+    //console.log('Completed')
   }else if(getShippingCheckSheetResult2?.value.isLorry){
     handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet('ShippingLorry')
-    console.log("getShippingCheckSheetResult?.value.isLorry", getShippingCheckSheetResult2?.value.isLorry)
+
+    //console.log("getShippingCheckSheetResult?.value.isLorry", getShippingCheckSheetResult2?.value.isLorry)
 
     setTimeout(() => {
       isDialogLoadingVisible.value = false
@@ -2179,7 +2200,8 @@ const handlePrintDPFCheckSheet = async type => {
   }else if(!getShippingCheckSheetResult2?.value.isLorry){
     handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet('ShippingFlexi')
-    console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
+
+    //console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
 
     setTimeout(() => {
       isDialogLoadingVisible.value = false
@@ -2193,7 +2215,7 @@ const handlePrintDPFCheckSheet = async type => {
     //   isDialogLoadingVisible.value = false
     // }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
 
-    console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
+    //console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
   }
 
 }
@@ -2214,7 +2236,7 @@ const callAPIPrintPDFChecksheet = async (type, LicensePlate, page) => {
     )
 
     if(printPDFResult.value){
-      console.log(result)
+      //console.log(result)
       
     }
   }catch(error){
@@ -2235,12 +2257,13 @@ const { printExportExcelResult,
   printExportExcelService } = usePrintExportExcelService()
 
 const testExport = () => {
-  console.log('printShipmentPDFBySoEIdPlan')
+  //console.log('printShipmentPDFBySoEIdPlan')
 }
 
 const printShipmentPDFBySoEIdPlan = async () => {
   loadingPrint.value = true
-  console.log('loadingPrint', loadingPrint.value)
+
+  //console.log('loadingPrint', loadingPrint.value)
 
 
   const etaDateForApi = ref(etaDateModel.value)
@@ -2285,7 +2308,7 @@ const printShipmentPDFBySoEIdPlan = async () => {
     )
     
     if (result) {
-      console.log('result print', result)
+      //console.log('result print', result)
 
       // textAlertDialogFunction(alertWordConst.print, true)
 
@@ -2389,7 +2412,7 @@ const getDataTruckOrder = async () => {
           contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
           personInchargeTruckCompanyModel.value = getTruckOrderDataResult?.value.driverName
 
-          console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
+          //console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
         }
       }else{
         // conslolr
@@ -2399,7 +2422,7 @@ const getDataTruckOrder = async () => {
       
     }
   }catch(error){
-    console.log(error)
+    //console.log(error)
   }
 }
 
@@ -2417,7 +2440,7 @@ const getDataTruckOrder = async () => {
 const loadingPrintTruckOrderForm = ref(false)
 
 const clearParamsTruckOrder = () => {
-  console.log('clearParamsTruckOrder', CompanyPrint.value)
+  //console.log('clearParamsTruckOrder', CompanyPrint.value)
 
   sessionStorage.removeItem('savedTruckOrder')
   dataRowModel.value = null
@@ -2448,7 +2471,8 @@ const clearParamsTruckOrder = () => {
   }
   personInchargeTruckCompanyModel.value = ''
   contactTruckCompanyModel.value = ''
-  console.log('clearParamsTruckOrder', CompanyPrint.value)
+
+  //console.log('clearParamsTruckOrder', CompanyPrint.value)
 
   // sessionStorage.setItem('sOHistoryTruckOrderSST', 'null')
   // sessionStorage.setItem('sOeIdHistoryTruckOrderSST', 'null')
@@ -2476,7 +2500,7 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.dateOrderBy = dateCurrent.value || ''
   paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value || ''
 
-  console.log('loading.......')
+  //console.log('loading.......')
   
 
   try{
@@ -2575,7 +2599,8 @@ const loadingSaveTruckOrderForm = ref(false)
 const handleSavetruckOrder = async type => {
 
   loadingSaveTruckOrderForm.value = true
-  console.log('paramsTruckOrder', paramsTruckOrder.value)
+
+  //console.log('paramsTruckOrder', paramsTruckOrder.value)
 
   paramsTruckOrder.value.dateOrderBy = dateCurrent.value
   paramsTruckOrder.value.dateDriverBy = dateCurrent.value
@@ -2602,7 +2627,7 @@ const handleSavetruckOrder = async type => {
     )
 
     if(result){
-      console.log('saveTruckOrderResult', saveTruckOrderResult?.value)
+      //console.log('saveTruckOrderResult', saveTruckOrderResult?.value)
       textAlertDialogFunction("SAVE TRUCK ORDER", true)
 
       sessionStorage.removeItem('sOHistoryTruckOrderSST')
@@ -2614,7 +2639,7 @@ const handleSavetruckOrder = async type => {
       }, 500)
       
     }else{
-      console.log('errorSaveTruckOrder', errorSaveTruckOrder.value)
+      //console.log('errorSaveTruckOrder', errorSaveTruckOrder.value)
       textAlertDialogFunction("SAVE TRUCK ORDER", false)
     }
   }catch(error){

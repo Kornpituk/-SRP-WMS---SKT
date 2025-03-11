@@ -26,7 +26,7 @@ const soEIdConfirmDialog = ref('')
 const productRowModel = ref(null)
 
 function openConfirmDialog(type, SoEId, productRow) {
-  console.log('openConfirmDialog', type, SoEId)
+  //console.log('openConfirmDialog', type, SoEId)
   productRowModel.value = productRow
 
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
@@ -34,7 +34,8 @@ function openConfirmDialog(type, SoEId, productRow) {
     wordForSubmit.value = type
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
-    console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
+
+    //console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
     
   }else if(type === 'back'){
     wordForSubmit.value = "SEND BACK"
@@ -52,14 +53,15 @@ function handleConfirmAction() {
   }else if(wordForSubmit.value === 'SEND BACK'){
     // submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
     handleSubmit('back')
-    console.log('back')
+
+    //console.log('back')
   }
   
   
 }
 
 function handleCancel() {
-  console.log('Action canceled.')
+  //console.log('Action canceled.')
 }
 
 
@@ -114,7 +116,7 @@ const salesOrderNoModel = ref(dataProductRow.value.salesOrderNo)
 const checkSheetTypeNameModel = ref(dataProductRow.value.checkSheetTypeName)
 const statusModel = ref(dataProductRow.value.csLfStatusId)
 
-console.log('journalIdModel', dataProductRow.value.journalID)
+//console.log('journalIdModel', dataProductRow.value.journalID)
 
 //------------------------------- disabled input ---------------------------
 
@@ -177,12 +179,13 @@ const handleShippingFileIcon = async (type, userCode, itemCode, fileName) => {
 
     if(result){
       getShippingCheckSheetFileResult.value = result
-      console.log('getShippingCheckSheetFileResult', result)
+
+      //console.log('getShippingCheckSheetFileResult', result)
     }else{
-      console.log('errorGetShippingCheckSheetFile !result ', errorGetShippingCheckSheetFile.value)
+      //console.log('errorGetShippingCheckSheetFile !result ', errorGetShippingCheckSheetFile.value)
     }
   }catch (e) {
-    console.log('errorGetShippingCheckSheetFileIcon', e)
+    //console.log('errorGetShippingCheckSheetFileIcon', e)
   }
 }
 
@@ -255,15 +258,16 @@ const getShippingCheckSheet = async () => {
 
         selectedLanguage.value = languages
 
-        console.log('reportModel.value?.reportCheckSheet 1', labalChinese)
+        //console.log('reportModel.value?.reportCheckSheet 1', labalChinese)
       }
 
       
 
       errorGetShippingCheckSheet.value = null
-      console.log('getShippingCheckSheetResult', result)
+
+      //console.log('getShippingCheckSheetResult', result)
     }else{
-      console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
+      //console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
     }
   } catch (error) {
     errorGetShippingCheckSheet.value = error.message
@@ -275,7 +279,7 @@ const showImagNew = file => {
 }
 
 const showData = () => {
-  console.log('Data Current', getShippingCheckSheetResult.value)
+  //console.log('Data Current', getShippingCheckSheetResult.value)
 }
 
 const tableData = ref({
@@ -340,7 +344,7 @@ const checkboxKeys = [
 const filteredTableData = computed(() => {
   const { No, ibcNo, grossWeightBeforeShipping, ...filteredData } = tableData.value
 
-  console.log('filteredData', filteredData)
+  //console.log('filteredData', filteredData)
   
   return filteredData
 })
@@ -372,7 +376,7 @@ onMounted(async () => {
     tableData.value.bottomValveSealTight.push(!!item.bottomSeal)
   })
 
-  console.log(tableData.value)
+  //console.log(tableData.value)
 })
 
 const checkPackagingOther = ref(false)
@@ -391,12 +395,12 @@ const fetchFileLicensePlate = async (soEtlLogDetailJournalID, LicensePlate) => {
       accessTokenAtStore)
 
     if(result){
-      console.log('result file', result.data.data)
+      //console.log('result file', result.data.data)
       
       return result.data.data
     }
   }catch(error){
-    console.log('result error', error)
+    //console.log('result error', error)
   }
 }
 
@@ -421,13 +425,13 @@ const handleSaveFile = async (files, soEtlLogDetailJournalID, licensePlate ) => 
       'SaveLicensePlate', urlApi.value,  whereHouse, 
       accessTokenAtStore)
 
-    if(result){
-      console.log(`save file ${soEtlLogDetailJournalID} successed`, resultSaveFielForm.value)
-    }else{
-      console.log(`save file ${soEtlLogDetailJournalID} fialed`, errorMessageSaveFileForm.value, accessTokenAtStore)
-    }
+    // if(result){
+    //   //console.log(`save file ${soEtlLogDetailJournalID} successed`, resultSaveFielForm.value)
+    // }else{
+    //   //console.log(`save file ${soEtlLogDetailJournalID} fialed`, errorMessageSaveFileForm.value, accessTokenAtStore)
+    // }
   }catch(error){
-    console.log(`save file catch ${soEtlLogDetailJournalID} fialed`, error)
+    //console.log(`save file catch ${soEtlLogDetailJournalID} fialed`, error)
   }
 }
 
@@ -442,9 +446,9 @@ const testDelete = () => {
 
 const handleDeleteFileForm = async (type, 
   soEtlLogDetailJournalID, licensePlate, fileName) => {
-  console.log("handleDeleteFileForm start! .....")
-  console.log("handleDeleteFileForm", type, 
-    soEtlLogDetailJournalID, licensePlate, fileName)
+  //console.log("handleDeleteFileForm start! .....")
+  //console.log("handleDeleteFileForm", type, 
+  // soEtlLogDetailJournalID, licensePlate, fileName)
   try{
     const result = await deleteFileFormFunction(
       soEtlLogDetailJournalID, licensePlate, fileName,
@@ -452,14 +456,14 @@ const handleDeleteFileForm = async (type,
       accessTokenAtStore)
 
     if(result){
-      console.log('delete file successed', resultDeleteFileForm.value)
+      //console.log('delete file successed', resultDeleteFileForm.value)
       
       return result
     }else{
-      console.log('delete file fialed', errorMessageDeleteFileForm.value, accessTokenAtStore)
+      //console.log('delete file fialed', errorMessageDeleteFileForm.value, accessTokenAtStore)
     }
   }catch(error){
-    console.log('delete file catch fialed', error)
+    //console.log('delete file catch fialed', error)
   }
 }
 
@@ -582,7 +586,7 @@ const updateShippingCheckSheetData = async ()  => {
       }
     }
 
-    // console.log('reportCheckSheet start update .....', getShippingCheckSheetResult.value?.reportCheckSheet)
+    // //console.log('reportCheckSheet start update .....', getShippingCheckSheetResult.value?.reportCheckSheet)
   }
 }
 
@@ -635,7 +639,7 @@ const habdleSaveDraft = async () => {
     
     return
   }else{
-    console.log('FILE2', fileDeleteOnePromises)
+    //console.log('FILE2', fileDeleteOnePromises)
   }
 
   if(!file3){
@@ -646,17 +650,17 @@ const habdleSaveDraft = async () => {
     
     return
   }else{
-    console.log('FILE3', fileDeleteAllPromises)
+    //console.log('FILE3', fileDeleteAllPromises)
   }
 
-  console.log('getShippingCheckSheetResult.value', getShippingCheckSheetResult.value)
+  //console.log('getShippingCheckSheetResult.value', getShippingCheckSheetResult.value)
 
-  // console.log('getShippingCheckSheetResult.value update', getShippingCheckSheetResult.value)
+  // //console.log('getShippingCheckSheetResult.value update', getShippingCheckSheetResult.value)
 
   // ส่งข้อมูลที่อัพเดตไปบันทึก
   const requestData = mapShippingCheckSheetData(getShippingCheckSheetResult.value)
 
-  console.log("requestData", requestData)
+  //console.log("requestData", requestData)
 
   try {
     const result = await saveShippingCheckSheet(
@@ -675,7 +679,7 @@ const habdleSaveDraft = async () => {
       }
       
     }else{
-      console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
+      //console.log('errorSaveShippingCheckSheet !result ', errorSaveShippingCheckSheet.value)
       if(!trickerSaveDraft.value){
         textAlertDialogFunction(alertWordConst.saveDraft, false)
         setTimeout(() => {
@@ -703,12 +707,12 @@ const handleSubmit = async type => {
   await habdleSaveDraft()
 
   try {
-    console.log("requestData 1")
+    //console.log("requestData 1")
 
     const result = submitCheckSheetFunction(urlApi.value, type, whereHouse, 
       accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
 
-    console.log("requestData 2")
+    //console.log("requestData 2")
     if(result || submitCheckSheetResult.value){
       if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, true)
@@ -718,9 +722,11 @@ const handleSubmit = async type => {
       }else{
         submitCheckSheetResult.value = result
         submitCheckSheetError.value = null
-        console.log('submitCheckSheetResult', result)
+
+        //console.log('submitCheckSheetResult', result)
         textAlertDialogFunction(alertWordConst.submit, true)
-        console.log("requestData 3")
+
+        //console.log("requestData 3")
         setTimeout(() => {
           window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
@@ -733,9 +739,10 @@ const handleSubmit = async type => {
           window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else{
-        console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
+        //console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
         textAlertDialogFunction(alertWordConst.submit, false)
-        console.log("requestData 4")
+
+        //console.log("requestData 4")
         setTimeout(() => {
         // location.reload()
         }, 500) // 0.5 วินาที
@@ -759,17 +766,17 @@ const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } 
 const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
 
   try{
-    console.log('submitShipmentPlanBySoEId start!!')
+    //console.log('submitShipmentPlanBySoEId start!!')
 
     // if(type === 'submit'){
 
     // }else if(type === 'approve' || type === 'reject'){
-    //   console.log('submitShipmentPlanBySoEId start!! 3')
+    //   //console.log('submitShipmentPlanBySoEId start!! 3')
     //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-    //   console.log('submitShipmentPlanBySoEId start!! 2')
+    //   //console.log('submitShipmentPlanBySoEId start!! 2')
     // }else if(type === 'back'){
     //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-    //   console.log('submitShipmentPlanBySoEId back !! 3')
+    //   //console.log('submitShipmentPlanBySoEId back !! 3')
     // }
 
     // if(!statusCommnetValue.value && type === 'reject'){
@@ -788,7 +795,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       '',
     )
 
-    console.log('submitShipmentPlanBySoEId start!! 3')
+    //console.log('submitShipmentPlanBySoEId start!! 3')
     
     if(submitShipmentPlanResult.value || result){
       if(type === 'submit'){
@@ -813,7 +820,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
 
-      console.log('submitShipmentPlanBySoEId start!! 4')
+      //console.log('submitShipmentPlanBySoEId start!! 4')
       
     }else{
       if(type === 'submit'){
@@ -870,7 +877,8 @@ const saveRemark = () => {
   getShippingCheckSheetResult.value.checkSheetItems.forEach(item => {
     if (item.journalID ===  indexDataDialogTextArea.value) {
       item.remark = dialogDataTextArea.value
-      console.log("item.remark", item.remark, 'data', dialogDataTextArea.value)
+
+      //console.log("item.remark", item.remark, 'data', dialogDataTextArea.value)
     }
   })
   isDialogAreaVisible.value = false
@@ -926,11 +934,12 @@ const fetchPicture = type => {
     if(result){
       getShippingChecksheetImageResult.value = result
       errorGetShippingChecksheetImage.value = null
-      console.log('getShippingChecksheetImageResult', result)
+
+      //console.log('getShippingChecksheetImageResult', result)
       
       return result
     }else{
-      console.log('errorGetShippingChecksheetImage !result ', errorGetShippingChecksheetImage.value)
+      //console.log('errorGetShippingChecksheetImage !result ', errorGetShippingChecksheetImage.value)
     }
   } catch (error) {
     errorGetShippingChecksheetImage.value = error.message
@@ -950,11 +959,12 @@ const fetIconCondition = async () => {
     if(result){
       getShippingSpecialConditionIconResult.value = result
       errorGetShippingSpecialConditionIcon.value = null
-      console.log('getShippingSpecialConditionIconResult', getShippingSpecialConditionIconResult.value)
+
+      //console.log('getShippingSpecialConditionIconResult', getShippingSpecialConditionIconResult.value)
       
       return result
     }else{
-      console.log('errorGetShippingSpecialConditionIcon !result ', errorGetShippingSpecialConditionIcon.value)
+      //console.log('errorGetShippingSpecialConditionIcon !result ', errorGetShippingSpecialConditionIcon.value)
     }
   } catch (error) {
     errorGetShippingSpecialConditionIcon.value = error.message
@@ -983,7 +993,8 @@ const addItemsLang = item => {
   } else {
     selectedLanguage.value.splice(index, 1)
   }
-  console.log('Log Lang Add', selectedLanguage.value)
+
+  //console.log('Log Lang Add', selectedLanguage.value)
 }
 
 const validateAfterPicking = ref(validateAfterPickingIm)
@@ -1062,7 +1073,7 @@ const removeFilesInLabel = index => {
 }
 
 const seeLabelItems = () => {
-  console.log(labelImages.value)
+  //console.log(labelImages.value)
 }
 
 // ติดตามการเปลี่ยนแปลงของไฟล์ที่เลือก
@@ -1101,7 +1112,7 @@ const showDialogImageMuti = img => {
   imgDialog.value = img
 
   // imgNameDialog.value = name
-  console.log("showDialogImageMuti!", img, isDialogVisibleImgFileMuti.value)
+  //console.log("showDialogImageMuti!", img, isDialogVisibleImgFileMuti.value)
 }
 
 resaleProductShipping.value.forEach(truck => {
@@ -1166,7 +1177,7 @@ resaleProductShipping.value.forEach(truck => {
 })
 
 const removeFileAll = (truck, fileIndex) => {
-  console.log("removeFileAll!", truck, fileIndex)
+  //console.log("removeFileAll!", truck, fileIndex)
   if(truck && truck.fileeLicensePlate){
     truck.fileeLicensePlateDeleteAll.push({
       containerNo_LicPlNo: truck.containerNo_LicPlNo,
@@ -1174,11 +1185,13 @@ const removeFileAll = (truck, fileIndex) => {
     })
     truck.fileeLicensePlate = []
     truck.fileeLicensePlateMew = []
-    console.log("removeFileAll!", truck)
+
+    //console.log("removeFileAll!", truck)
   }else{
     truck.fileeLicensePlate = []
     truck.fileeLicensePlateMew = []
-    console.log("not find!", truck)
+
+    //console.log("not find!", truck)
   }
   
 }
@@ -1191,7 +1204,7 @@ const removeFileNew = (truck, fileIndex, type) => {
 }
 
 const removeFileOld = (truck, fileIndex, type) => {
-  console.log("removeFileOld", truck)
+  //console.log("removeFileOld", truck)
   if (truck && truck.fileeLicensePlate) {
     truck.fileeLicensePlateDeleteOne.push({
       containerNo_LicPlNo: truck.containerNo_LicPlNo, 
@@ -1204,7 +1217,7 @@ const removeFileOld = (truck, fileIndex, type) => {
 }
 
 const seeTruck = () => {
-  console.log('data truck', resaleProductShipping.value)
+  //console.log('data truck', resaleProductShipping.value)
 }
 
 const addTruck = () => {
@@ -2720,9 +2733,9 @@ const dessertsMockAmountView = [
           class="d-flex justify-end mt-4"
         >
           <VBtn
-            v-if="statusModel === 1002 && !loadingCycleBtn || 
-              statusModel === 1003 && !loadingCycleBtn || 
-              statusModel === 0 && !loadingCycleBtn"
+            v-if="statusModel === 1002 && !loadingCycleBtn && canVisibleUserPermission(statusPermission,'BTN_CS_SAVE_DRAFT').canVisible || 
+              statusModel === 1003 && !loadingCycleBtn && canVisibleUserPermission(statusPermission,'BTN_CS_SAVE_DRAFT').canVisible || 
+              statusModel === 0 && !loadingCycleBtn && canVisibleUserPermission(statusPermission,'BTN_CS_SAVE_DRAFT').canVisible"
             class="mx-2"
             color="warning"
             @click="habdleSaveDraft(), loadingCycleBtn = true"
@@ -2740,9 +2753,9 @@ const dessertsMockAmountView = [
             />
           </VBtn>
           <VBtn
-            v-if="statusModel === 1002 || 
-              statusModel === 1003 || 
-              statusModel === 0"
+            v-if="statusModel === 1002 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
+              statusModel === 1003 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
+              statusModel === 0 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible"
             class="mx-2"
             color="green"
             @click="handleSubmit('submit')"
@@ -2750,7 +2763,7 @@ const dessertsMockAmountView = [
             WH1 ACCEPT
           </VBtn>
           <VBtn
-            v-if="statusModel === 1004"
+            v-if="statusModel === 1004 && canVisibleUserPermission(statusPermission,'BTN_CS_WH2_SUBMIT').canVisible"
             class="mx-2"
             color="purple-accent-4"
             @click="openConfirmDialog('back')"
@@ -2758,7 +2771,7 @@ const dessertsMockAmountView = [
             Send Back
           </VBtn>
           <VBtn
-            v-if="statusModel === 1004"
+            v-if="statusModel === 1004 && canVisibleUserPermission(statusPermission,'BTN_CS_SENDBACK').canVisible"
             class="mx-2"
             color="green"
             @click="handleSubmit('leaderapprove')"

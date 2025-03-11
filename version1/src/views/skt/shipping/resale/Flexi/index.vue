@@ -171,7 +171,7 @@ const soEIdConfirmDialog = ref('')
 const productRowModel = ref(null)
 
 function openConfirmDialog(type, SoEId, productRow) {
-  console.log('openConfirmDialog', type, SoEId)
+  //console.log('openConfirmDialog', type, SoEId)
   productRowModel.value = productRow
 
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
@@ -179,7 +179,8 @@ function openConfirmDialog(type, SoEId, productRow) {
     wordForSubmit.value = type
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
-    console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
+
+    //console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
     
   }else if(type === 'back'){
     wordForSubmit.value = "SEND BACK"
@@ -197,14 +198,15 @@ function handleConfirmAction() {
   }else if(wordForSubmit.value === 'SEND BACK'){
     // submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
     handleSubmit('back')
-    console.log('back')
+
+    //console.log('back')
   }
   
   
 }
 
 function handleCancel() {
-  console.log('Action canceled.')
+  //console.log('Action canceled.')
 }
 
 //-------------------------- Section Get Data --------------------------------
@@ -220,7 +222,7 @@ const handleFetchDataLorry = async () => {
 
   
     if (result && result.data.reportLorryFlexi) {
-      console.log('res', result.data.reportLorryFlexi) // แสดงข้อมูลดูก่อน
+      //console.log('res', result.data.reportLorryFlexi) // แสดงข้อมูลดูก่อน
 
       const newData = ref()
 
@@ -256,7 +258,7 @@ const handleFetchDataLorry = async () => {
 
       getShippingCheckSheetResult.value = newData.value[0]
 
-      console.log('getShippingCheckSheetResult: ', getShippingCheckSheetResult.value)
+      //console.log('getShippingCheckSheetResult: ', getShippingCheckSheetResult.value)
     } else {
       console.error('Error: result.data.reportLorryFlexi เป็น null หรือ undefined', result.data.reportLorryFlexi)
     }
@@ -430,7 +432,7 @@ const handleSaveDraft = async () => {
       }
     }
   }catch(error){
-    console.log(error)
+    //console.log(error)
   }
 }
 
@@ -487,7 +489,7 @@ const handleSubmit = async type => {
       }
     }
   }catch(error){
-    console.log(error)
+    //console.log(error)
   }
 }
 
@@ -503,17 +505,17 @@ const { submitShipmentPlanResult2, errorSubmitShipmentPlan2, submitShipmentPlan2
 const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
 
   try{
-    console.log('submitShipmentPlanBySoEId start!!')
+    //console.log('submitShipmentPlanBySoEId start!!')
 
     // if(type === 'submit'){
 
     // }else if(type === 'approve' || type === 'reject'){
-    //   console.log('submitShipmentPlanBySoEId start!! 3')
+    //   //console.log('submitShipmentPlanBySoEId start!! 3')
     //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-    //   console.log('submitShipmentPlanBySoEId start!! 2')
+    //   //console.log('submitShipmentPlanBySoEId start!! 2')
     // }else if(type === 'back'){
     //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-    //   console.log('submitShipmentPlanBySoEId back !! 3')
+    //   //console.log('submitShipmentPlanBySoEId back !! 3')
     // }
 
     // if(!statusCommnetValue.value && type === 'reject'){
@@ -532,7 +534,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       '',
     )
 
-    console.log('submitShipmentPlanBySoEId start!! 3')
+    //console.log('submitShipmentPlanBySoEId start!! 3')
     
     if(submitShipmentPlanResult.value || result){
       if(type === 'submit'){
@@ -557,7 +559,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
 
-      console.log('submitShipmentPlanBySoEId start!! 4')
+      //console.log('submitShipmentPlanBySoEId start!! 4')
       
     }else{
       if(type === 'submit'){
@@ -2057,9 +2059,9 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
     >
       <div class="d-flex justify-end">
         <VBtn
-          v-if="statusModel === 1102 || 
-            statusModel === 1103 || 
-            statusModel === 0"
+          v-if="statusModel === 1102 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
+            statusModel === 1103 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
+            statusModel === 0 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible"
           class="mx-2"
           color="warning"
           @click="handleSaveDraft"
@@ -2067,16 +2069,16 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
           Save Draft
         </VBtn>
         <VBtn
-          v-if="statusModel === 1102 || 
-            statusModel === 1103 || 
-            statusModel === 0"
+          v-if="statusModel === 1102 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
+            statusModel === 1103 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
+            statusModel === 0 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible"
           class="mx-2"
           @click="handleSubmit('submit')"
         >
           WH1 ACCEPT
         </VBtn>
         <VBtn
-          v-if="statusModel === 1104"
+          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_CS_WH2_SUBMIT').canVisible"
           class="mx-2"
           color="purple-accent-4"
           @click="openConfirmDialog('back')"
@@ -2084,7 +2086,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
           Send Back
         </VBtn>
         <VBtn
-          v-if="statusModel === 1104"
+          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_CS_SENDBACK').canVisible"
           class="mx-2"
           @click="handleSubmit('leaderapprove')"
         >

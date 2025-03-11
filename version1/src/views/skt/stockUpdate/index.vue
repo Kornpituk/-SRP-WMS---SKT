@@ -129,14 +129,14 @@ const handleFetchItemSelectFilter = async (form, type, params) => {
     // const whereHouse = localStorage.getItem('whereHouseName', filterForSearchPlan?.value.warehouseSearch)
 
     if(result){
-      // console.log(`result ${type}`, result)
+      // //console.log(`result ${type}`, result)
 
       return result
     }else{
-      console.log(errorGetItemSelect.value)
+      //console.log(errorGetItemSelect.value)
     }
   }catch(error){
-    console.log(error)
+    //console.log(error)
   }
 }
 
@@ -155,7 +155,7 @@ watch(async () => {
   subAreaItemModel.value = subarea
   categoriesItemModel.value = categories.filter(item => item.id !== '00')
 
-  console.log('areaItemModel.value', areaItemModel.value)
+  //console.log('areaItemModel.value', areaItemModel.value)
 
 })
 
@@ -187,11 +187,13 @@ const indexExpendRow = ref('')
 const toggleRow = index => {
   if (expandedRows.value.includes(index)) {
     expandedRows.value = expandedRows.value.filter(i => i !== index)
-    console.log('expandedRows if', expandedRows.value)
+
+    //console.log('expandedRows if', expandedRows.value)
     expendTest.value = false
   } else {
     expandedRows.value.push(index)
-    console.log('expandedRows else', expandedRows.value)
+
+    //console.log('expandedRows else', expandedRows.value)
     expendTest.value = true
   }
 }
@@ -296,7 +298,8 @@ const saveHistoryFilter = () => {
 const toggleDirection = async key => {
   if (key) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-    console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
+
+    //console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
   }
   sortColumn.value = key
   await searchShipmentPlan()
@@ -338,7 +341,7 @@ const searchShipmentPlan = async () => {
         })) || [],
       }))
 
-      console.log(`Fetched search plan:`, searchPlanData.value)
+      //console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
       console.error('No result from API')
       searchPlanData.value = [] // Set empty data if no result
@@ -400,7 +403,8 @@ const  loadingPrint = ref(false)
 
 const printShipmentPDFBySoEIdPlan = async type => {
   loadingPrint.value = true
-  console.log('loadingPrint', loadingPrint.value)
+
+  //console.log('loadingPrint', loadingPrint.value)
 
   saveHistoryFilter()
 
@@ -420,7 +424,7 @@ const printShipmentPDFBySoEIdPlan = async type => {
     )
     
     if (result) {
-      console.log('result print', result)
+      //console.log('result print', result)
 
       // textAlertDialogFunction(alertWordConst.print, true)
 
@@ -459,7 +463,7 @@ const dataTableCliclHighlightIsToggle = no => {
     dataTableNummberedToggle.value = no
   }
 
-  console.log("dataTableNum", dataTableNummberedToggle.value)
+  //console.log("dataTableNum", dataTableNummberedToggle.value)
 }
 
 const dataTableCliclHighlightIsToggle2 = no => {
@@ -472,7 +476,7 @@ const dataTableCliclHighlightIsToggle2 = no => {
     dataTableNummberedToggle2.value = no
   }
 
-  console.log("dataTableNum", dataTableNummberedToggle2.value)
+  //console.log("dataTableNum", dataTableNummberedToggle2.value)
 }
 
 //-------------------------- format decimal -------------------
@@ -506,7 +510,7 @@ const urlImage = ref('')
 const nameImage = ref('')
 
 const showImage = url => {
-  console.log('Show Image:', url)
+  //console.log('Show Image:', url)
   urlImage.value = url
   isDialogImageVisible.value = true
 }
@@ -516,10 +520,10 @@ const checkRFID = ref ('')
 watchEffect(() =>{
   const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
   if(checkRFIDUpdate.value === 'true'){
-    // console.log('RFID Check True:'+ checkRFIDUpdate.value)
+    // //console.log('RFID Check True:'+ checkRFIDUpdate.value)
     checkRFID.value = true
   } else if (checkRFIDUpdate.value === 'false') {
-    // console.log('RFID Check False:'+ checkRFIDUpdate.value)
+    // //console.log('RFID Check False:'+ checkRFIDUpdate.value)
     checkRFID.value = false
   }
 })
@@ -1191,7 +1195,7 @@ const refeshPage = () => {
                   {{ item.no }}
                 </td>
                 <td
-                 style="font-size: 12px;"
+                  style="font-size: 12px;"
                   class="cursor-pointer"
                   :style="{ 
                     backgroundColor: 

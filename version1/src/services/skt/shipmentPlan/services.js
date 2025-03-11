@@ -9,12 +9,12 @@ export const useGetUserPermissionService = () => {
     try {
       errorGetUserPermission.value = null
 
-      // console.log('Fetching fetchUserPermission...')
+      // //console.log('Fetching fetchUserPermission...')
   
       const result = await shipmentPlanRepository.getPermissionUser(urlApi, form, whereHouse, accessToke, params)
         
       if (result) {
-        // console.log('Fetching data fetchUserPermission:', result)
+        // //console.log('Fetching data fetchUserPermission:', result)
         getUserPermissionResult.value = result.data
         
         return result.data
@@ -22,7 +22,7 @@ export const useGetUserPermissionService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchUserPermission:', error)
+      //console.log('Error in fetchUserPermission:', error)
       errorGetUserPermission.value = error.message
     }
   }
@@ -43,12 +43,12 @@ export const useGetSelectDataService = () => {
     try {
       errorGetSelectData.value = null
 
-      // console.log('Fetching fetchSelectData...')
+      // //console.log('Fetching fetchSelectData...')
   
       const result = await shipmentPlanRepository.getSelect(urlApi, form, type, whereHouse, accessToke)
         
       if (result) {
-        // console.log('Fetching data fetchSelectData:', result)
+        // //console.log('Fetching data fetchSelectData:', result)
         getSelectDataResult.value = result.data.data
         
         return result.data.data
@@ -56,7 +56,7 @@ export const useGetSelectDataService = () => {
         // console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchSelectData:', error)
+      //console.log('Error in fetchSelectData:', error)
       errorGetSelectData.value = error.message
     }
   }
@@ -76,12 +76,12 @@ export const useGetDataTruckOrderService = () => {
     try {
       errorGetTruckOrderData.value = null
 
-      // console.log('Fetching fetchTruckOrderData...')
+      // //console.log('Fetching fetchTruckOrderData...')
   
       const result = await shipmentPlanRepository.getDataTruckOrderRepo(urlApi, SoeId, form, type, whereHouse, accessToke)
         
       if (result) {
-        // console.log('Fetching data fetchTruckOrderData:', result)
+        // //console.log('Fetching data fetchTruckOrderData:', result)
         getTruckOrderDataResult.value = result.data.data
         
         return result.data.data
@@ -89,7 +89,7 @@ export const useGetDataTruckOrderService = () => {
         // console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchTruckOrderData:', error)
+      //console.log('Error in fetchTruckOrderData:', error)
       errorGetTruckOrderData.value = error.message
     }
   }
@@ -109,12 +109,12 @@ export const useGetSearchPlanService = () => {
     try {
       errorGetSearchPlan.value = null
 
-      // console.log('Fetching fetchSearchPlan...')
+      // //console.log('Fetching fetchSearchPlan...')
   
       const result = await shipmentPlanRepository.getSearchPlan(urlApi, form, whereHouse, accessToke, params, statusID)
         
       if (result) {
-        // console.log('Fetching data fetchSearchPlan:', result)
+        // //console.log('Fetching data fetchSearchPlan:', result)
         getSearchPlanResult.value = result.data
         
         return result.data
@@ -122,7 +122,7 @@ export const useGetSearchPlanService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in fetchSearchPlan:', error)
+      //console.log('Error in fetchSearchPlan:', error)
       errorGetSearchPlan.value = error.message
     }
   }
@@ -142,12 +142,13 @@ export const useSaveSearchPlanService = () => {
   const saveSearchPlan = async (urlApi, form, whereHouse, accessToke, body) => {
     try {
       errorSaveSearchPlan.value = null
-      console.log('Fetching saveSearchPlan...')
+
+      //console.log('Fetching saveSearchPlan...')
   
       const result = await shipmentPlanRepository.saveSearchPlan(urlApi, form, whereHouse, accessToke, body)
         
       if (result) {
-        // console.log('Fetching data saveSearchPlan:', result)
+        // //console.log('Fetching data saveSearchPlan:', result)
         saveSearchPlanResult.value = result.data
         
         return result.data
@@ -155,7 +156,7 @@ export const useSaveSearchPlanService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in saveSearchPlan:', error)
+      //console.log('Error in saveSearchPlan:', error)
       errorSaveSearchPlan.value = error.message
     }
   }
@@ -174,12 +175,13 @@ export const useSaveTruckOrderService = () => {
   const saveTruckOrder = async (urlApi, form, whereHouse, accessToke, body) => {
     try {
       errorSaveTruckOrder.value = null
-      console.log('Fetching saveTruckOrder...')
+
+      //console.log('Fetching saveTruckOrder...')
   
       const result = await shipmentPlanRepository.saveTruckOrderRepo(urlApi, form, whereHouse, accessToke, body)
         
       if (result) {
-        // console.log('Fetching data saveTruckOrder:', result)
+        // //console.log('Fetching data saveTruckOrder:', result)
         saveTruckOrderResult.value = result.data
         
         return result.data
@@ -187,7 +189,7 @@ export const useSaveTruckOrderService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in saveTruckOrder:', error)
+      //console.log('Error in saveTruckOrder:', error)
       errorSaveTruckOrder.value = error.message
     }
   }
@@ -204,15 +206,16 @@ export const useSubmitShipmentPlanService = () => {
   const errorSubmitShipmentPlan = ref(null)
   
   const submitShipmentPlan = async (urlApi, form, whereHouse, accessToke, soeId, comment) => {
-    console.log('submitShipmentPlan sevice.')
+    //console.log('submitShipmentPlan sevice.')
     try {
       errorSubmitShipmentPlan.value = null
-      console.log('submitShipmentPlan...')
+
+      //console.log('submitShipmentPlan...')
   
       const result = await shipmentPlanRepository.submitShipmentPlan(urlApi, form, whereHouse, accessToke, soeId, comment)
         
       if (result) {
-        // console.log('submitShipmentPlan:', result)
+        // //console.log('submitShipmentPlan:', result)
         submitShipmentPlanResult.value = result.data
         
         return result.data
@@ -220,7 +223,7 @@ export const useSubmitShipmentPlanService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in submitShipmentPlan:', error)
+      //console.log('Error in submitShipmentPlan:', error)
       errorSubmitShipmentPlan.value = error.message
     }
   }
@@ -237,15 +240,16 @@ export const useSubmitShipmentPlanService2 = () => {
   const errorSubmitShipmentPlan2 = ref(null)
   
   const submitShipmentPlan2 = async (urlApi, form, whereHouse, accessToke, soeId, comment) => {
-    console.log('submitShipmentPlan sevice.')
+    //console.log('submitShipmentPlan sevice.')
     try {
       errorSubmitShipmentPlan2.value = null
-      console.log('submitShipmentPlan...')
+
+      //console.log('submitShipmentPlan...')
   
       const result = await shipmentPlanRepository.submitShipmentPlan(urlApi, form, whereHouse, accessToke, soeId, comment)
         
       if (result) {
-        // console.log('submitShipmentPlan:', result)
+        // //console.log('submitShipmentPlan:', result)
         submitShipmentPlanResult2.value = result.data
         
         return result.data
@@ -253,7 +257,7 @@ export const useSubmitShipmentPlanService2 = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in submitShipmentPlan:', error)
+      //console.log('Error in submitShipmentPlan:', error)
       errorSubmitShipmentPlan2.value = error.message
     }
   }
@@ -273,12 +277,13 @@ export const usePrintShipmentPDFService = () => {
   const printShipmentPDF = async (urlApi, form, whereHouse, accessToke, soeId) => {
     try {
       errorPrintShipmentPDF.value = null
-      console.log('printShipmentPDF...')
+
+      //console.log('printShipmentPDF...')
   
       const result = await shipmentPlanRepository.printShipperPDFRepo(urlApi, form, whereHouse, accessToke, soeId)
         
       if (result) {
-        // console.log('printShipmentPDF:', result)
+        // //console.log('printShipmentPDF:', result)
         printShipmentPDFResult.value = result.data
         
         return result.data
@@ -286,7 +291,7 @@ export const usePrintShipmentPDFService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in printShipmentPDF:', error)
+      //console.log('Error in printShipmentPDF:', error)
       errorPrintShipmentPDF.value = error.message
     }
   }
@@ -310,7 +315,7 @@ export const usePrintPDFService = () => {
       const result = await checkSheetLorryFlexiRepository.printPDF(urlApi, form, type, whereHouse, accessToken, params, LicensePlate, page)
         
       if (result && result.success) {
-        console.log('Print PDF Excel Form Service Complete:', result)
+        //console.log('Print PDF Excel Form Service Complete:', result)
         printPDFResult.value = result.data
         
         return { success: true, data: printPDFResult.value }
@@ -342,12 +347,13 @@ export const usePrintTruckOrderFormPDFService = () => {
   const printTruckOrderFormPDF = async (urlApi, param = {}, whereHouse, accessToke, soeId) => {
     try {
       errorPrintTruckOrderFormPDF.value = null
-      console.log('printTruckOrderFormPDF...')
+
+      //console.log('printTruckOrderFormPDF...')
   
       const result = await shipmentPlanRepository.printTruckOrderFormPDFRepo(urlApi, param, whereHouse, accessToke, soeId)
         
       if (result) {
-        // console.log('printTruckOrderFormPDF:', result)
+        // //console.log('printTruckOrderFormPDF:', result)
         printTruckOrderFormPDFResult.value = result.data
         
         return result.data
@@ -355,7 +361,7 @@ export const usePrintTruckOrderFormPDFService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      console.log('Error in printTruckOrderFormPDF:', error)
+      //console.log('Error in printTruckOrderFormPDF:', error)
       errorPrintTruckOrderFormPDF.value = error.message
     }
   }
@@ -375,12 +381,13 @@ export const usePrintExportExcelService = () => {
   const printExportExcelService = async (urlApi, form, type, whereHouse, accessToken, params = {}, statusID) => {
     try {
       printExportExcelErrorMessage.value = null
-      console.log('Print Export Excel Form Service Starting...')
+
+      //console.log('Print Export Excel Form Service Starting...')
   
       const result = await shipmentPlanRepository.printExportExcel(urlApi, form, type, whereHouse, accessToken, params, statusID)
         
       if (result && result.success) {
-        console.log('Print Export Excel Form Service Complete:', result)
+        //console.log('Print Export Excel Form Service Complete:', result)
         printExportExcelResult.value = result.data
         
         return { success: true, data: printExportExcelResult.value }
@@ -414,7 +421,7 @@ export const useSaveFileFormService = () => {
     try {
       // ตรวจสอบว่ามีไฟล์และข้อมูลก่อนที่จะดำเนินการบันทึก
       if (!files || files.length === 0) {
-        console.log('No files selected', files)
+        //console.log('No files selected', files)
         throw new Error('No files selected', files)
       }
 
@@ -424,13 +431,13 @@ export const useSaveFileFormService = () => {
 
       errorMessageSaveFileForm.value = null
 
-      console.log('Saving Draft Form COA...')
+      //console.log('Saving Draft Form COA...')
 
       // เรียกใช้ Service เพื่อบันทึกข้อมูล
       const result = await FileService.saveDraftFileForm(files, soEtlLogDetailJournalID, form, urlApi, whereHouse, accessToken)
 
       if (result) {
-        // console.log('Save data COA Controller:', result)
+        // //console.log('Save data COA Controller:', result)
         resultSaveFielForm.value = { data: result, success: true } // เก็บข้อมูล response
         
         return result
@@ -460,12 +467,12 @@ export const useGetFileFormService = () => {
     try {
       errorMessageGetFileForm.value = null
 
-      // console.log('Fetching File Form ...')
+      // //console.log('Fetching File Form ...')
 
       const result = await FileService.fetchFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
       
       if (result) {
-        // console.log('Received File Form:', result)
+        // //console.log('Received File Form:', result)
         getFileFormResult.value = result
         
         return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา
@@ -493,12 +500,12 @@ export const useDeleteFileFormService = () => {
     try {
       errorMessageDeleteFileForm.value = null
 
-      // console.log('Fetching File Form ...')
+      // //console.log('Fetching File Form ...')
 
       const result = await FileService.deleteFileForm(soEtlLogDetailJournalID, form, type, urlApi, whereHouse, accessToken)
       
       if (result) {
-        // console.log('Received File Form:', result)
+        // //console.log('Received File Form:', result)
         deleteFileFormResult.value = result
         
         return result // ส่งค่า��ลับเป็นข้อมูลที่ได้รับมา

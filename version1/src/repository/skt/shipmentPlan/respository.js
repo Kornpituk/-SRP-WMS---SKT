@@ -18,17 +18,17 @@ export const shipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        // console.log('success get repo getPermissionUser...')
+        // //console.log('success get repo getPermissionUser...')
 
-        // console.log('Service Response data getPermissionUser:', response.data)
+        // //console.log('Service Response data getPermissionUser:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getPermissionUser...')
+        //console.log('Error repo Error If getPermissionUser...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getPermissionUser...')
+      //console.log('Error repo Error Try getPermissionUser...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getPermissionUser ${error.response?.data?.message || error.message}`)
     }
@@ -47,15 +47,15 @@ export const shipmentPlanRepository = {
     
       if (response && response.data) {
 
-        // console.log('Service Response data getSelect:', response.data)
+        // //console.log('Service Response data getSelect:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getSelect...')
+        //console.log('Error repo Error If getSelect...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getSelect...')
+      //console.log('Error repo Error Try getSelect...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getSelect ${error.response?.data?.message || error.message}`)
     }
@@ -73,15 +73,15 @@ export const shipmentPlanRepository = {
     
       if (response && response.data) {
 
-        // console.log('Service Response data getSelect:', response.data)
+        // //console.log('Service Response data getSelect:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getSelect...')
+        //console.log('Error repo Error If getSelect...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getSelect...')
+      //console.log('Error repo Error Try getSelect...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getSelect ${error.response?.data?.message || error.message}`)
     }
@@ -110,15 +110,15 @@ export const shipmentPlanRepository = {
     
       if (response && response.data) {
 
-        // console.log('Service Response data getSearchPlan:', response.data)
+        // //console.log('Service Response data getSearchPlan:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getSearchPlan...')
+        //console.log('Error repo Error If getSearchPlan...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getSearchPlan...')
+      //console.log('Error repo Error Try getSearchPlan...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getSearchPlan ${error.response?.data?.message || error.message}`)
     }
@@ -136,17 +136,17 @@ export const shipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo saveSearchPlan...')
+        //console.log('success get repo saveSearchPlan...')
 
-        // console.log('Service Response data saveSearchPlan:', response.data)
+        // //console.log('Service Response data saveSearchPlan:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If saveSearchPlan...')
+        //console.log('Error repo Error If saveSearchPlan...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try saveSearchPlan...')
+      //console.log('Error repo Error Try saveSearchPlan...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch saveSearchPlan ${error.response?.data?.message || error.message}`)
     }
@@ -180,24 +180,24 @@ export const shipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo saveTruckOrderRepo...')
+        //console.log('success get repo saveTruckOrderRepo...')
 
-        // console.log('Service Response data saveTruckOrderRepo:', response.data)
+        // //console.log('Service Response data saveTruckOrderRepo:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If saveTruckOrderRepo...')
+        //console.log('Error repo Error If saveTruckOrderRepo...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try saveTruckOrderRepo...')
+      //console.log('Error repo Error Try saveTruckOrderRepo...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch saveTruckOrderRepo ${error.response?.data?.message || error.message}`)
     }
   },
 
   async submitShipmentPlan(urlApi, form, whereHouse, accessToken, edId, comment) {
-    console.log('submitShipmentPlan repo...')
+    //console.log('submitShipmentPlan repo...')
     try {
       let response
       if(form === 'approve' || form === 'submit' || form === 'back'){
@@ -223,17 +223,17 @@ export const shipmentPlanRepository = {
       
     
       if (response && response.data) {
-        console.log('success get repo submit Shipment Plan...')
+        //console.log('success get repo submit Shipment Plan...')
 
-        // console.log('Service Response data submit Shipment Plan:', response.data)
+        // //console.log('Service Response data submit Shipment Plan:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If submit Shipment Plan...')
+        //console.log('Error repo Error If submit Shipment Plan...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try submit Shipment Plan...')
+      //console.log('Error repo Error Try submit Shipment Plan...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch submit Shipment Plan ${error.response?.data?.message || error.message}`)
     }
@@ -265,7 +265,7 @@ export const shipmentPlanRepository = {
       )
   
       if (response && response.data) {
-        console.log('Service Response print PDF  form:', response.data)
+        //console.log('Service Response print PDF  form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -337,7 +337,7 @@ export const shipmentPlanRepository = {
   },
 
   handleResponse(response) {
-    console.log('Service Response print PDF  form:', response.data)
+    //console.log('Service Response print PDF  form:', response.data)
   
     // สร้าง Blob จาก response
     const blob = new Blob([response.data], { type: 'application/pdf' })
@@ -383,7 +383,7 @@ export const shipmentPlanRepository = {
       )
   
       if (response && response.data) {
-        console.log('Service Response export Excel form:', response.data)
+        //console.log('Service Response export Excel form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
@@ -428,7 +428,7 @@ export const FileService = {
       })
         
       if (response && response.data) {
-        // console.log(`Service Response data File:`, response.data)
+        // //console.log(`Service Response data File:`, response.data)
           
         return { success: true, data: response.data }
       } else {
@@ -448,17 +448,17 @@ export const FileService = {
     // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
     // ตรวจสอบว่า files.files มีค่าหรือไม่
     if (files?.files) {
-      console.log('Have File Selected', files.files)
+      //console.log('Have File Selected', files.files)
 
       // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
       files.files.forEach(file => {
         formData.append('files', file.file) // ใช้ file.file เพราะไฟล์ถูกเก็บใน key `file`
       })
     } else {
-      console.log('No File Selected', files)
+      //console.log('No File Selected', files)
     }
 
-    console.log("Files Upload", files)
+    //console.log("Files Upload", files)
 
     try {
       const response = await axios.post(`${urlApi}/api/v1/ShippingFile/${form}/${soEtlLogDetailJournalID}`, formData, {
@@ -483,8 +483,8 @@ export const FileService = {
   //   const apiFiles = fileList.filter(file => file.fileUri) // ไฟล์จาก API
   //   const uploadedFiles = fileList.filter(file => file.file) // ไฟล์ที่เพิ่งอัปโหลด
   
-  //   console.log("API Files:", apiFiles)
-  //   console.log("Uploaded Files:", uploadedFiles)
+  //   //console.log("API Files:", apiFiles)
+  //   //console.log("Uploaded Files:", uploadedFiles)
   
   //   // แปลง API Files ให้มีโครงสร้างแบบ Uploaded Files
   //   const transformedApiFiles = await Promise.all(apiFiles.map(async file => {
@@ -518,7 +518,7 @@ export const FileService = {
   //   })
   
   //   if (allFiles.length === 0) {
-  //     console.log("No File Selected")
+  //     //console.log("No File Selected")
       
   //     return { success: false, error: "No files to upload" }
   //   }
@@ -552,7 +552,7 @@ export const FileService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data detelete coa:', response.data.messageResult)
+        //console.log('Service Response data detelete coa:', response.data.messageResult)
         
         return { success: true, data: response.data.messageResult }
       } else {
@@ -577,7 +577,7 @@ export const FileService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data all detelete coa:', response.data.messageResult)
+        //console.log('Service Response data all detelete coa:', response.data.messageResult)
         
         return { success: true, data: response.data.messageResult }
       } else {
@@ -609,15 +609,15 @@ export const checkSheetShipmentPlanRepository = {
     
       if (response && response.data) {
 
-        // console.log('Service Response data getShippingCheckSheet:', response.data)
+        // //console.log('Service Response data getShippingCheckSheet:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getShippingCheckSheet...')
+        //console.log('Error repo Error If getShippingCheckSheet...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getShippingCheckSheet...')
+      //console.log('Error repo Error Try getShippingCheckSheet...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getShippingCheckSheet ${error.response?.data?.message || error.message}`)
     }
@@ -635,15 +635,15 @@ export const checkSheetShipmentPlanRepository = {
     
       if (response && response.data) {
 
-        // console.log('Service Response data getShippingCheckSheet:', response.data)
+        // //console.log('Service Response data getShippingCheckSheet:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        // console.log('Error repo Error If getShippingChecksheetImage...')
+        // //console.log('Error repo Error If getShippingChecksheetImage...')
         // throw new Error('No data received from the server')
       }
     } catch (error) {
-      // console.log('Error repo Error Try getShippingChecksheetImage...')
+      // //console.log('Error repo Error Try getShippingChecksheetImage...')
       // console.error('Error in getProductionPlan:', error)
 
       // throw new Error(`Failed to fetch getShippingChecksheetImage ${error.response?.data?.message || error.message}`)
@@ -662,15 +662,15 @@ export const checkSheetShipmentPlanRepository = {
     
       if (response && response.data) {
 
-        // console.log('Service Response data getShippingCheckSheet:', response.data)
+        // //console.log('Service Response data getShippingCheckSheet:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        // console.log('Error repo Error If getShippingChecksheetImage...')
+        // //console.log('Error repo Error If getShippingChecksheetImage...')
         // throw new Error('No data received from the server')
       }
     } catch (error) {
-      // console.log('Error repo Error Try getShippingChecksheetImage...')
+      // //console.log('Error repo Error Try getShippingChecksheetImage...')
       // console.error('Error in getProductionPlan:', error)
 
       // throw new Error(`Failed to fetch getShippingChecksheetImage ${error.response?.data?.message || error.message}`)
@@ -709,15 +709,15 @@ export const checkSheetShipmentPlanRepository = {
       
       if (response && response.data) {
 
-        // console.log('Service Response data getShippingCheckSheet:', response.data)
+        // //console.log('Service Response data getShippingCheckSheet:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getShippingCheckSheet...')
+        //console.log('Error repo Error If getShippingCheckSheet...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getShippingCheckSheet...')
+      //console.log('Error repo Error Try getShippingCheckSheet...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getShippingCheckSheet ${error.response?.data?.message || error.message}`)
     }
@@ -735,17 +735,17 @@ export const checkSheetShipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log(`success get repo generate ${form}...`)
+        //console.log(`success get repo generate ${form}...`)
 
-        // console.log('Service Response data generate ${form}:', response.data)
+        // //console.log('Service Response data generate ${form}:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log(`Error repo Error If generate ${form}...`)
+        //console.log(`Error repo Error If generate ${form}...`)
         throw new Error(`No data received from the server`)
       }
     } catch (error) {
-      console.log(`Error repo Error Try generate ${form}...`)
+      //console.log(`Error repo Error Try generate ${form}...`)
       console.error(`Error in getProductionShippingForm:`, error)
       throw new Error(`Failed to fetch generate ${form} ${error.response?.data?.message || error.message}`)
     }
@@ -763,17 +763,17 @@ export const checkSheetShipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo ShippingCheckSheet...')
+        //console.log('success get repo ShippingCheckSheet...')
 
-        // console.log('Service Response data ShippingCheckSheet:', response.data)
+        // //console.log('Service Response data ShippingCheckSheet:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If ShippingCheckSheet...')
+        //console.log('Error repo Error If ShippingCheckSheet...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try ShippingCheckSheet...')
+      //console.log('Error repo Error Try ShippingCheckSheet...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch ShippingCheckSheet ${error.response?.data?.message || error.message}`)
     }
@@ -790,17 +790,17 @@ export const checkSheetShipmentPlanRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo submit CheckSheet...')
+        //console.log('success get repo submit CheckSheet...')
 
-        // console.log('Service Response data submit CheckSheet:', response.data)
+        // //console.log('Service Response data submit CheckSheet:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If submit CheckSheet...')
+        //console.log('Error repo Error If submit CheckSheet...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try submit CheckSheet...')
+      //console.log('Error repo Error Try submit CheckSheet...')
       console.error('Error in submitCheckSheet:', error)
       throw new Error(`Failed to fetch submit CheckSheet ${error.response?.data?.message || error.message}`)
     }
@@ -827,7 +827,7 @@ export const FileShippingCheckSheetFileService = {
       }
         
       if (response && response.data) {
-        // console.log(`Service Response data File:`, response.data)
+        // //console.log(`Service Response data File:`, response.data)
           
         return { success: true, data: response.data }
       } else {
@@ -845,17 +845,17 @@ export const FileShippingCheckSheetFileService = {
     // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
     // ตรวจสอบว่า files.files มีค่าหรือไม่
     if (files) {
-      console.log('Have File Selected', files)
+      //console.log('Have File Selected', files)
 
       // Loop ผ่านไฟล์ที่ต้องการอัปโหลด
       files.forEach(file => {
         formData.append('files', file) // ใช้ file.file เพราะไฟล์ถูกเก็บใน key `file`
       })
     } else {
-      console.log('No File Selected', files)
+      //console.log('No File Selected', files)
     }
 
-    console.log("Files Upload", files, soEtlLogDetailJournalID, licensePlate, form, urlApi, whereHouse, accessToken)
+    //console.log("Files Upload", files, soEtlLogDetailJournalID, licensePlate, form, urlApi, whereHouse, accessToken)
 
     let url = `${urlApi}/api/v1/ShippingCheckSheetFile/${form}/
     ${soEtlLogDetailJournalID}/${licensePlate}`
@@ -888,7 +888,7 @@ export const FileShippingCheckSheetFileService = {
       })
       
       if (response && response.data) {
-        console.log('Service Response data detelete coa:', response.data.messageResult)
+        //console.log('Service Response data detelete coa:', response.data.messageResult)
         
         return { success: true, data: response.data.messageResult }
       } else {
@@ -926,7 +926,7 @@ export const FileShippingCheckSheetFileService = {
       
       
       if (response && response.data) {
-        console.log('Service Response data all delete :', response.data.messageResult)
+        //console.log('Service Response data all delete :', response.data.messageResult)
         
         return { success: true, data: response.data.messageResult }
       } else {
@@ -957,15 +957,15 @@ export const checkSheetLorryFlexiRepository = {
     
       if (response && response.data) {
 
-        // console.log('Service Response data getShippingCheckSheet:', response.data)
+        // //console.log('Service Response data getShippingCheckSheet:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getShippingCheckSheet...')
+        //console.log('Error repo Error If getShippingCheckSheet...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getShippingCheckSheet...')
+      //console.log('Error repo Error Try getShippingCheckSheet...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getShippingCheckSheet ${error.response?.data?.message || error.message}`)
     }
@@ -982,24 +982,24 @@ export const checkSheetLorryFlexiRepository = {
       })
     
       if (response && response.data) {
-        console.log('success get repo ShippingLorryFlexi...')
+        //console.log('success get repo ShippingLorryFlexi...')
 
-        // console.log('Service Response data ShippingLorryFlexi:', response.data)
+        // //console.log('Service Response data ShippingLorryFlexi:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If ShippingLorryFlexi...')
+        //console.log('Error repo Error If ShippingLorryFlexi...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try ShippingLorryFlexi...')
+      //console.log('Error repo Error Try ShippingLorryFlexi...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch ShippingLorryFlexi ${error.response?.data?.message || error.message}`)
     }
   },
 
   async submitShippingCheckSheetLorry(urlApi, form, whereHouse, accessToken, edId, comment) {
-    console.log('submitShipmentPlan repo...')
+    //console.log('submitShipmentPlan repo...')
     try {
       let response
       if(form === 'leaderapprove' || form === 'submit'|| form === 'back'){
@@ -1024,17 +1024,17 @@ export const checkSheetLorryFlexiRepository = {
       }
     
       if (response && response.data) {
-        console.log('success get repo submit Shipment Plan...')
+        //console.log('success get repo submit Shipment Plan...')
 
-        // console.log('Service Response data submit Shipment Plan:', response.data)
+        // //console.log('Service Response data submit Shipment Plan:', response.data)
             
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If submit Shipment Plan...')
+        //console.log('Error repo Error If submit Shipment Plan...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try submit Shipment Plan...')
+      //console.log('Error repo Error Try submit Shipment Plan...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch submit Shipment Plan ${error.response?.data?.message || error.message}`)
     }
@@ -1046,7 +1046,7 @@ export const checkSheetLorryFlexiRepository = {
       if(!params){
         throw 'params not f', params
       }else{
-        console.log('params repo', params)
+        //console.log('params repo', params)
       }
 
       let response
@@ -1131,7 +1131,7 @@ export const checkSheetLorryFlexiRepository = {
         throw 'Invalid Type: ' + type
       }
       if (response && response.data) {
-        console.log('Service Response print PDF  form:', response.data)
+        //console.log('Service Response print PDF  form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/pdf' })

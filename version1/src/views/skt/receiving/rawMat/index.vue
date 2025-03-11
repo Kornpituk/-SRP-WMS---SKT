@@ -304,7 +304,10 @@ const generatedJournalId = () => {
 //----------------------------------- Set configuration Status ---
 
 const readonlyAllInput = () => {
-  return statusId.value !== 3 && statusId.value !== 1 && statusId.value === 8 && statusId.value !== 9
+  return statusId.value !== 3 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible && 
+  statusId.value !== 1 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible && 
+  statusId.value === 8 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible && 
+  statusId.value !== 9 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible
 }
 
 const hidedAllIconInput = () => {
@@ -324,7 +327,9 @@ watch(() => {
   generatedJournalId()
   generatedReceivingForm()
 
-  if(statusId.value === 3 || statusId.value === 1 || statusId.value === 8){
+  if(statusId.value === 3 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible || 
+  statusId.value === 1 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible || 
+  statusId.value === 8 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible ){
     frozeCheck.value = false
   }
 })

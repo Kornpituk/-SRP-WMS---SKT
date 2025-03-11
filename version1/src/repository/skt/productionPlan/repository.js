@@ -3,7 +3,7 @@ import axios from '@axios'
 export const productionPlanRepository = {
 
   async getProductionPlan(batchId, sortColumn, sortDirection, urlApi, form, whereHouse, accessToken) {
-    console.log('get repo Production Plan...')
+    //console.log('get repo Production Plan...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${form}/get/${batchId}`, {
         headers: {
@@ -17,25 +17,25 @@ export const productionPlanRepository = {
         },
       })
 
-      console.log("response", response)
+      //console.log("response", response)
       if (response && response.data) {
-        console.log('success get repo Production Plan...')
-        console.log('Service Response data Production Plan:', response.data.data)
+        //console.log('success get repo Production Plan...')
+        //console.log('Service Response data Production Plan:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
-        console.log('Error repo Error If Production Plan...')
+        //console.log('Error repo Error If Production Plan...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try Production Plan...')
+      //console.log('Error repo Error Try Production Plan...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch Production Plan for batch ID ${batchId}: ${error.response?.data?.message || error.message}`)
     }
   },
 
   async getProductionPlanSearch(filter, urlApi, form, whereHouse, accessToken) {
-    console.log('get repo Production Plan Search...')
+    //console.log('get repo Production Plan Search...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${form}/searchplans`, {
         headers: {
@@ -55,25 +55,25 @@ export const productionPlanRepository = {
         },
       })
 
-      console.log("response", response)
+      //console.log("response", response)
       if (response && response.data) {
-        console.log('success get repo Production Plan Search...')
-        console.log('Service Response data Production Plan Search:', response.data.data)
+        //console.log('success get repo Production Plan Search...')
+        //console.log('Service Response data Production Plan Search:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
-        console.log('Error repo Error If Production Plan Search...')
+        //console.log('Error repo Error If Production Plan Search...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try Production Plan Search...')
+      //console.log('Error repo Error Try Production Plan Search...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch Production Plan Search ${error.response?.data?.message || error.message}`)
     }
   },
 
   async getProductionPlanMaster(search, urlApi, form, whereHouse, accessToken) {
-    console.log('get repo Production Plan...')
+    //console.log('get repo Production Plan...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${form}/getmasters`, {
         headers: {
@@ -86,25 +86,25 @@ export const productionPlanRepository = {
         },
       })
 
-      console.log("response", response)
+      //console.log("response", response)
       if (response && response.data) {
-        console.log('success get repo Production Plan Master...')
-        console.log('Service Response data Production Plan Master:', response.data.data)
+        //console.log('success get repo Production Plan Master...')
+        //console.log('Service Response data Production Plan Master:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
-        console.log('Error repo Error If Production Plan Master...')
+        //console.log('Error repo Error If Production Plan Master...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try Production Plan Master...')
+      //console.log('Error repo Error Try Production Plan Master...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch Production Plan Master${error.response?.data?.message || error.message}`)
     }
   },
 
   async getProductionPlanBatch(urlApi, form, whereHouse, accessToken) {
-    console.log('get batch repo Production Plan...')
+    //console.log('get batch repo Production Plan...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${form}/newId/`, {
         headers: {
@@ -115,17 +115,17 @@ export const productionPlanRepository = {
       })
 
       if (response && response.data) {
-        console.log('success get batch repo Production Plan...')
+        //console.log('success get batch repo Production Plan...')
 
-        // console.log('Service Response data Production Plan:', response.data)
+        // //console.log('Service Response data Production Plan:', response.data)
         
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If Production Plan...')
+        //console.log('Error repo Error If Production Plan...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try Production Plan...')
+      //console.log('Error repo Error Try Production Plan...')
       console.error('Error in getProductionPlanBatch:', error)
       throw new Error(`Failed to fetch Production Plan for batch }: ${error.response?.data?.message || error.message}`)
     }
@@ -146,7 +146,7 @@ export const productionPlanRepository = {
       })
   
       if (response && response.data) {
-        console.log('Repo Response data new production plan:', response.data.data)
+        //console.log('Repo Response data new production plan:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
@@ -168,7 +168,7 @@ export const productionPlanRepository = {
       })
   
       if (response && response.data) {
-        console.log('Repo Response data delete Batch production plan:', response.data.data)
+        //console.log('Repo Response data delete Batch production plan:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
@@ -192,7 +192,7 @@ export const productionPlanRepository = {
       })
   
       if (response && response.data) {
-        console.log('Repo Response data reject Batch production plan:', response.data.data)
+        //console.log('Repo Response data reject Batch production plan:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
@@ -213,7 +213,7 @@ export const productionPlanRepository = {
       })
   
       if (response && response.data) {
-        console.log('Repo Response data genlot Batch production plan:', response.data.data)
+        //console.log('Repo Response data genlot Batch production plan:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
@@ -234,7 +234,7 @@ export const productionPlanRepository = {
       })
   
       if (response && response.data) {
-        console.log('Repo Response data validate lot Batch production plan:', response.data)
+        //console.log('Repo Response data validate lot Batch production plan:', response.data)
         
         return { data: response.data, success: true }
       } else {
@@ -255,7 +255,7 @@ export const productionPlanRepository = {
       })
   
       if (response && response.data) {
-        console.log('Repo Response data submit Batch production plan:', response.data.data)
+        //console.log('Repo Response data submit Batch production plan:', response.data.data)
   
         return { data: response.data.data, success: true }
       } else {
@@ -311,7 +311,7 @@ export const productionPlanRepository = {
       }
   
       if (response && response.data) {
-        console.log('Repo Response data approve Batch production plan:', response.data.data)
+        //console.log('Repo Response data approve Batch production plan:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
@@ -333,7 +333,7 @@ export const productionPlanRepository = {
       })
   
       if (response && response.data) {
-        console.log('Repo Response data delete production plan:', response.data.data)
+        //console.log('Repo Response data delete production plan:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
@@ -354,7 +354,7 @@ export const productionPlanRepository = {
       })
   
       if (response && response.data) {
-        console.log('Repo Response data save production plan:', response.data.data)
+        //console.log('Repo Response data save production plan:', response.data.data)
         
         return { data: response.data.data, success: true }
       } else {
@@ -391,7 +391,7 @@ export const productionPlanRepository = {
       )
   
       if (response && response.data) {
-        console.log('Service Response export Excel form:', response.data)
+        //console.log('Service Response export Excel form:', response.data)
   
         // สร้าง Blob จาก response
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
@@ -422,7 +422,7 @@ export const productionPlanRepository = {
   },
 
   async getStatusText(urlApi, form, whereHouse, accessToken) {
-    console.log('get repo getStatusText...')
+    //console.log('get repo getStatusText...')
     try {
       const response = await axios.get(`${urlApi}/api/v1/${form}/status`, {
         headers: {
@@ -433,16 +433,16 @@ export const productionPlanRepository = {
       })
 
       if (response && response.data) {
-        console.log('success get repo getStatusText...')
-        console.log('Service Response data getStatusText:', response.data)
+        //console.log('success get repo getStatusText...')
+        //console.log('Service Response data getStatusText:', response.data)
         
         return { data: response.data, success: true }
       } else {
-        console.log('Error repo Error If getStatusText...')
+        //console.log('Error repo Error If getStatusText...')
         throw new Error('No data received from the server')
       }
     } catch (error) {
-      console.log('Error repo Error Try getStatusText...')
+      //console.log('Error repo Error Try getStatusText...')
       console.error('Error in getProductionPlan:', error)
       throw new Error(`Failed to fetch getStatusText ${error.response?.data?.message || error.message}`)
     }
