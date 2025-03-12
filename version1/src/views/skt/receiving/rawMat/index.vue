@@ -1519,7 +1519,11 @@ const submitButtonVisibleNew = async word => {
   if(trickerSubmit.value !== true){
     textAlertDialogFunction(word, true)
 
-    location.reload()
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+
+    // location.reload()
   }
   
   // isDialogSubmitSuccessVisible.value = true

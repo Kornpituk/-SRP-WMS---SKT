@@ -2052,16 +2052,12 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       </table>
     </VCol>
 
-    <VCol
-      v-if="department === 'Warehouse' || 
-        showBtnCheckSheet()"
-      cols="12"
-    >
+    <VCol cols="12">
       <div class="d-flex justify-end">
         <VBtn
-          v-if="statusModel === 1102 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
-            statusModel === 1103 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
-            statusModel === 0 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible"
+          v-if="statusModel === 1102 && canVisibleUserPermission(statusPermission,'BTN_LF_SAVE_DRAFT').canVisible || 
+            statusModel === 1103 && canVisibleUserPermission(statusPermission,'BTN_LF_SAVE_DRAFT').canVisible || 
+            statusModel === 0 && canVisibleUserPermission(statusPermission,'BTN_LF_SAVE_DRAFT').canVisible"
           class="mx-2"
           color="warning"
           @click="handleSaveDraft"
@@ -2069,16 +2065,16 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
           Save Draft
         </VBtn>
         <VBtn
-          v-if="statusModel === 1102 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
-            statusModel === 1103 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible || 
-            statusModel === 0 && canVisibleUserPermission(statusPermission,'BTN_CS_WH1_SUBMIT').canVisible"
+          v-if="statusModel === 1102 && canVisibleUserPermission(statusPermission,'BTN_LF_WH_APPROVE').canVisible || 
+            statusModel === 1103 && canVisibleUserPermission(statusPermission,'BTN_LF_WH_APPROVE').canVisible || 
+            statusModel === 0 && canVisibleUserPermission(statusPermission,'BTN_LF_WH_APPROVE').canVisible"
           class="mx-2"
           @click="handleSubmit('submit')"
         >
           WH1 ACCEPT
         </VBtn>
         <VBtn
-          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_CS_WH2_SUBMIT').canVisible"
+          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_LF_LEADER_APPROVE').canVisible"
           class="mx-2"
           color="purple-accent-4"
           @click="openConfirmDialog('back')"
@@ -2086,7 +2082,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
           Send Back
         </VBtn>
         <VBtn
-          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_CS_SENDBACK').canVisible"
+          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"
           class="mx-2"
           @click="handleSubmit('leaderapprove')"
         >

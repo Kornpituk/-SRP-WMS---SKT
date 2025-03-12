@@ -1836,7 +1836,10 @@ const statusText = statusId => {
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
-                  v-if="item.raw.statusId === 102 || item.raw.statusId === 107"
+                  v-if="item.raw.statusId === 102 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible || 
+                    item.raw.statusId === 107 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible || 
+                    item.raw.statusId === 102 && canVisibleUserPermission(statusPermission,'BTN_PROD_APPROVE').canVisible || 
+                    item.raw.statusId === 107 && canVisibleUserPermission(statusPermission,'BTN_PROD_APPROVE').canVisible"
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"
@@ -2326,9 +2329,6 @@ const statusText = statusId => {
               >
                 {{ useFormatDateUtilities(item.raw.updatedDate) }}
               </td>
-              
-              
-              
               <td
                 style="font-size: 12px;"
                 :style="{ 

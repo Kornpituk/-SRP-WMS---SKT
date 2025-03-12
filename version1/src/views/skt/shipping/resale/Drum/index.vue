@@ -86,7 +86,7 @@ const paramsForGetPermission = ref({
 })
 
 // เรียก fetchUserPermissions ครั้งเดียวใน lifecycle hook
-onMounted(async () => {
+watch(async () => {
   await fetchUserPermissions(
     urlApi.value,
     whereHouse,
@@ -2728,10 +2728,7 @@ const dessertsMockAmountView = [
             </tr>
           </tbody>
         </table>
-        <div
-          v-if="department === 'Warehouse' || showBtnCheckSheet()"
-          class="d-flex justify-end mt-4"
-        >
+        <div class="d-flex justify-end mt-4">
           <VBtn
             v-if="statusModel === 1002 && !loadingCycleBtn && canVisibleUserPermission(statusPermission,'BTN_CS_SAVE_DRAFT').canVisible || 
               statusModel === 1003 && !loadingCycleBtn && canVisibleUserPermission(statusPermission,'BTN_CS_SAVE_DRAFT').canVisible || 
@@ -2742,6 +2739,7 @@ const dessertsMockAmountView = [
           >
             SAVE DRAFT
           </VBtn>
+        
           <VBtn
             v-if="loadingCycleBtn"
             style="width: 134px;"
@@ -2771,7 +2769,7 @@ const dessertsMockAmountView = [
             Send Back
           </VBtn>
           <VBtn
-            v-if="statusModel === 1004 && canVisibleUserPermission(statusPermission,'BTN_CS_SENDBACK').canVisible"
+            v-if="statusModel === 1004 && canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"
             class="mx-2"
             color="green"
             @click="handleSubmit('leaderapprove')"

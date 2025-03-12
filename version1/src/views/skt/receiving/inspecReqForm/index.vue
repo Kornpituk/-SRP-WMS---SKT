@@ -296,68 +296,71 @@ watch( async () => {
 
 
 //------------- Header
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const getHearderInsp = async () => {
+  if (!poEtlLogDetailJournalIDQueryParameters.value) {
+    console.warn('poEtlLogDetailJournalIDQueryParameters ยังไม่มีค่า')
+    
+    return
+  }
+
   loadingGenerated1.value = true
 
-  if (poEtlLogDetailJournalIDQueryParameters.value) {
-    try {
-      const response = await axiosIns.get(
-        `${urlApi.value}/api/v1/Inspection/View/${poEtlLogDetailJournalIDQueryParameters.value}`,
-        {
-          headers: {
-            'accept': '*/*',
-            'x-location': `${whereHouse.value}`,
-            Authorization: `Bearer ${accessTokenAtStore}`,
-          },
+  try {
+    const response = await axiosIns.get(
+      `${urlApi.value}/api/v1/Inspection/View/${poEtlLogDetailJournalIDQueryParameters.value}`,
+      {
+        headers: {
+          accept: '*/*',
+          'x-location': whereHouse.value || '',
+          Authorization: `Bearer ${accessTokenAtStore || ''}`,
         },
-      )
+      },
+    )
 
-      const data = response.data.data
-
-      //------- Headers --------------------------------
-      headerInsp.value.sktName = data[0].productName
-      headerInsp.value.sktId = data[0].sktLot
-      headerInsp.value.itemCode = data[0].productId
-      headerInsp.value.supplierName = data[0].supplierName
-      headerInsp.value.tradeNames = data[0].tradeName
-      headerInsp.value.ManufacturerName = data[0].makerName
-      headerInsp.value.receivedDate = data[0].receivedDate
-
-      //--------- Footers --------------------------------
-      headerInsp.value.remark = data[0].remark
-      headerInsp.value.note = data[0].note
-      headerInsp.value.details = data[0].limConditionDetail
-      headerInsp.value.remark = data[0].remark
-
-      // WH/IP
-      headerInsp.value.updateByStaffWH = data[0].whStaff
-      headerInsp.value.updateBySuperWH = data[0].whSupervisor
-      headerInsp.value.updateByStaffInsp = data[0].inspStaff
-      headerInsp.value.updateBySuperInsp = data[0].inspSupervisor
-
-      // lastUpdated
-      headerInsp.value.lastUpdatedStaffWH = data[0].whStaffUpdatedDate
-      headerInsp.value.lastUpdatedSuperWH = data[0].whSupervisorDate
-      headerInsp.value.lastUpdatedStaffInsp = data[0].inspStaffUpdatedDate
-      headerInsp.value.lastUpdatedSuperInsp = data[0].inspSupervisorDate
-
-      isReject.value = data[0].isReject // เก็บค่า statusId
-      isAccept.value = data[0].isAccept // เก็บค่า statusId
-
-      // reject
-      headerInsp.value.remarkReject = data[0].statusComments
-
-      //console.log('[*****Headers]]!!: ', data[0])
-    } catch (error) {
-      // Handle errors
-      console.error('Error:', error)
-    } finally {
-      loadingGenerated1.value = false
+    const data = response.data.data
+    if (!Array.isArray(data) || data.length === 0) {
+      console.warn('Data ไม่ถูกต้อง:', data)
+      
+      return
     }
-  } else {
-    loadingGenerated1.value = true
 
-    //console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    const inspData = data[0]
+
+    headerInsp.value = {
+      sktName: inspData?.productName || '',
+      sktId: inspData?.sktLot || '',
+      itemCode: inspData?.productId || '',
+      supplierName: inspData?.supplierName || '',
+      tradeNames: inspData?.tradeName || '',
+      ManufacturerName: inspData?.makerName || '',
+      receivedDate: inspData?.receivedDate || '',
+
+      remark: inspData?.remark || '',
+      note: inspData?.note || '',
+      details: inspData?.limConditionDetail || '',
+
+      updateByStaffWH: inspData?.whStaff || '',
+      updateBySuperWH: inspData?.whSupervisor || '',
+      updateByStaffInsp: inspData?.inspStaff || '',
+      updateBySuperInsp: inspData?.inspSupervisor || '',
+
+      lastUpdatedStaffWH: inspData?.whStaffUpdatedDate || '',
+      lastUpdatedSuperWH: inspData?.whSupervisorDate || '',
+      lastUpdatedStaffInsp: inspData?.inspStaffUpdatedDate || '',
+      lastUpdatedSuperInsp: inspData?.inspSupervisorDate || '',
+
+      remarkReject: inspData?.statusComments || '',
+    }
+
+    isReject.value = inspData?.isReject || false
+    isAccept.value = inspData?.isAccept || false
+
+    console.log('Headers Data:', headerInsp.value)
+  } catch (error) {
+    console.error('Error fetching inspection header:', error)
+  } finally {
+    loadingGenerated1.value = false
   }
 }
 
@@ -446,83 +449,95 @@ const formData = ref({
 const getAnalysistInsp = async () => {
   loadingGenerated1.value = true
 
-  if (poEtlLogDetailJournalIDQueryParameters.value) {
-    try {
-      const response = await axiosIns.get(
-        `${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`,
-        {
-          headers: {
-            'accept': '*/*',
-            'x-location': `${whereHouse.value}`,
-            Authorization: `Bearer ${accessTokenAtStore}`,
-          },
+  if (!poEtlLogDetailJournalIDQueryParameters.value) {
+    loadingGenerated1.value = false
+    
+    return
+  }
+
+  try {
+    const response = await axiosIns.get(
+      `${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`,
+      {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse.value,
+          Authorization: `Bearer ${accessTokenAtStore}`,
         },
-      )
+      },
+    )
 
-      analysisItems.value = response.data.items
-
-      for (let i = 0; i < 5; i++) {
-        analysisItemsCode.value[`actualAmountUnits_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualAmountUnits`]
-        analysisItemsCode.value[`actualMakerLotNo_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualMakerLotNo`]
-        analysisItemsCode.value[`actualNetCountKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualNetCountKgs`]
-        analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analysisItems.value[0].itemAnalyticals[i][`actualTotalQuantityKgs`]
-      }
-
-      // วนลูปผ่าน analysisItems.value
-      for (let i = 0; i < analysisItems.value.length; i++) {
-        const item = analysisItems.value[i]
-
-        // เก็บค่าจาก analysisItems
-        analysisResults.value.push({
-          rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
-          typeID: item.typeID,
-          typeName: item.typeName,
-          analyticalItem: item.analyticalItem,
-          unit: item.unit,
-        })
-
-        // ตรวจสอบว่า itemAnalyticals เป็นอาร์เรย์
-        if (Array.isArray(item.itemAnalyticals)) {
-          for (let j = 0; j < item.itemAnalyticals.length; j++) {
-            const analyticalItem = item.itemAnalyticals[j]
-
-            // เก็บค่าจาก itemAnalyticals
-            analyticalItemsResults.value.push({
-              rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
-              actualAmountUnits: analyticalItem.actualAmountUnits,
-              actualAnalysis: analyticalItem.actualAnalysis,
-              actualMakerLotNo: analyticalItem.actualMakerLotNo,
-              actualNetCountKgs: analyticalItem.actualNetCountKgs,
-              actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
-              inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
-              lotID: analyticalItem.lotID,
-              okState: analyticalItem.okState,
-
-              // เพิ่มฟิลด์ที่ต้องการเก็บข้อมูลได้ที่นี่
-            })
-          }
-        }
-      }
-
-      //console.log("***************55555555", analysisItems.value)
-    } catch (error) {
-      console.error('Error:', error)
-    } finally {
-      loadingGenerated1.value = false
+    if (!response.data || !response.data.items) {
+      console.warn("No data received from API")
+      
+      return
     }
-  } else {
-    //console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
-    loadingGenerated1.value = true
+
+    analysisItems.value = response.data.items
+
+    // ตรวจสอบว่า analysisItems มีข้อมูลและมี itemAnalyticals
+    if (analysisItems.value.length > 0 && Array.isArray(analysisItems.value[0].itemAnalyticals)) {
+      for (let i = 0; i < Math.min(5, analysisItems.value[0].itemAnalyticals.length); i++) {
+        const analyticalItem = analysisItems.value[0].itemAnalyticals[i]
+
+        analysisItemsCode.value[`actualAmountUnits_${i}`] = analyticalItem.actualAmountUnits || null
+        analysisItemsCode.value[`actualMakerLotNo_${i}`] = analyticalItem.actualMakerLotNo || null
+        analysisItemsCode.value[`actualNetCountKgs_${i}`] = analyticalItem.actualNetCountKgs || null
+        analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analyticalItem.actualTotalQuantityKgs || null
+      }
+    }
+
+    // ใช้ map() เพื่อสร้าง `analysisResults`
+    analysisResults.value = analysisItems.value.map(item => ({
+      rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
+      typeID: item.typeID,
+      typeName: item.typeName,
+      analyticalItem: item.analyticalItem,
+      unit: item.unit,
+    }))
+
+    // ใช้ reduce() เพื่อลดซ้อน loop
+    analyticalItemsResults.value = analysisItems.value.reduce((acc, item) => {
+      if (Array.isArray(item.itemAnalyticals)) {
+        acc.push(
+          ...item.itemAnalyticals.map(analyticalItem => ({
+            rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
+            actualAmountUnits: analyticalItem.actualAmountUnits,
+            actualAnalysis: analyticalItem.actualAnalysis,
+            actualMakerLotNo: analyticalItem.actualMakerLotNo,
+            actualNetCountKgs: analyticalItem.actualNetCountKgs,
+            actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
+            inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+            lotID: analyticalItem.lotID,
+            okState: analyticalItem.okState,
+          })),
+        )
+      }
+      
+      return acc
+    }, [])
+
+  } catch (error) {
+    console.error("Error fetching analysis items:", error)
+  } finally {
+    loadingGenerated1.value = false
   }
 }
+
 
 const loadingGenerated1 = ref(true)
 const loadingGenerated2 = ref(true)
 
-watch( async () => {
-  await getHearderInsp()
-  await getAnalysistInsp()
-})
+watch(
+  () => poEtlLogDetailJournalIDQueryParameters.value,
+  async newVal => {
+    if (newVal) {
+      await getHearderInsp()
+      await getAnalysistInsp()
+    }
+  },
+  { immediate: true }, // ให้ทำงานทันทีตอนโหลดหน้า
+)
 
 //--------------- save header --------------------------------
 const saveHeaderInspect = async () => {
@@ -725,7 +740,7 @@ const submitInspForm = async () => {
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
         window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
       return true
     } else {
@@ -788,7 +803,7 @@ const rejectInsp = () => {
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
         window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
@@ -820,7 +835,7 @@ const approveInsp = () => {
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
         window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
@@ -874,7 +889,7 @@ const handelSendBack = async () => {
       // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
       setTimeout(() => {
         window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
@@ -911,7 +926,7 @@ const handelBackToEdit = async () => {
         //location.reload()
 
         window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
     
     })
     .catch(error => {
@@ -1210,7 +1225,7 @@ const submitButtonVisibleNew = async word => {
     // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
     setTimeout(() => {
       location.reload()
-    }, 300) // 10000 มิลลิวินาที = 10 วินาที
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
   }
 
   // isDialogSubmitSuccessVisible.value = true
@@ -2667,7 +2682,6 @@ const getDisabledFollowStatusNRole = () => {
         >
           Details of Limitation Condition
         </VCol>
-      --> {{ statusId}} || {{frozeCheck}}
         <VCol
           cols="12"
           class="py-0"
