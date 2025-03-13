@@ -2227,7 +2227,7 @@ const dessertsMockAmountView = [
                   <div>
                     <VTextarea
                       v-model="getShippingCheckSheetResult.reportCheckSheet.other"
-                      :readonly="!frozeCheck"
+                      :readonly="disableInpit()"
                       counter
                       label="Other"
                       placeholder="Enter Other"

@@ -234,7 +234,8 @@ const disShowTableShipmentPLand = () => !['00011',
   '00033',
   '00032', 
   '00034',
-  '00044'].includes(userDataInfo.value.id)
+  '00044',
+  '00045'].includes(userDataInfo.value.id)
 
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
