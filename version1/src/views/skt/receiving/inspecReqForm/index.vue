@@ -195,6 +195,15 @@ const covertFloatFixedTwo = convert => {
   return formatNumber(convert)
 }
 
+//-------------------------- Dialog ---------------------------
+const isDialogVisibleInput = ref({}) // ใช้ Object แทน Boolean
+const JournalIdAreaInput = ref(null)
+
+const toggleDialog = journalId => {
+  // ตรวจสอบว่าค่ามีอยู่ใน object หรือไม่
+  isDialogVisibleInput.value[journalId] = !isDialogVisibleInput.value[journalId]
+}
+
 //--------------------------- API --------------------------------
 
 //-------------- Generate---------------------------------------
@@ -732,17 +741,26 @@ const submitInspForm = async () => {
         },
       })
 
-      //console.log('[products.value]!!: ', response.data)
+      if(response){
+        //console.log('[products.value]!!: ', response.data)
 
-      // รีโหลดหน้าเมื่อส่งข้อมูลสำเร็จ
-      textAlertDialogFunction('SUBMIT', true)
+        // รีโหลดหน้าเมื่อส่งข้อมูลสำเร็จ
+        textAlertDialogFunction('SUBMIT', true)
 
-      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
-      setTimeout(() => {
-        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
-      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+        // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+        setTimeout(() => {
+          window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+        }, 500) // 10000 มิลลิวินาที = 10 วินาที
 
-      return true
+        return true
+      }else{
+        // ถ้าการตรวจสอบ submitButtonVisibleNew ไม่สำเร็จ แสดง error
+        console.error('submitButtonVisibleNew failed, cannot submit')
+        textAlertDialogFunction('SUBMIT', false)
+      
+        return false
+      }
+     
     } else {
       // ถ้าการตรวจสอบ submitButtonVisibleNew ไม่สำเร็จ แสดง error
       console.error('submitButtonVisibleNew failed, cannot submit')
@@ -753,6 +771,8 @@ const submitInspForm = async () => {
   } catch (error) {
     // จัดการ error
     console.error('Error:', error)
+    console.error('submitButtonVisibleNew failed, cannot submit')
+    textAlertDialogFunction('SUBMIT', false)
 
     // isDialogSubmitFailedVisible.value = true
     return false
@@ -1881,6 +1901,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="item.typeID === 1"
                 class="text-center"
                 colspan="1"
+                style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
                   v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
@@ -1918,9 +1939,62 @@ const getDisabledFollowStatusNRole = () => {
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
-                <VTextField
-                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
+                    v-model="item.itemAnalyticals[0].actualAnalysis"
+                    :readonly="frozeCheck"
+                    :rules="[
+                      value => value !== '' || !value || 'Actual value is required!',
+                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => {
+                        if (value && value[0] === ' ') {
+                          item.itemAnalyticals[0].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    density="compact"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[0]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[0].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[0].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[0]?.inspReqLotJournalId]"
                   v-model="item.itemAnalyticals[0].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
@@ -1933,8 +2007,6 @@ const getDisabledFollowStatusNRole = () => {
                       return true
                     }
                   ]"
-                  density="compact"
-                  :maxlength="45" 
                 >
                   <template
                     v-if="!frozeCheck"
@@ -1942,7 +2014,7 @@ const getDisabledFollowStatusNRole = () => {
                   >
                     <VIcon icon="ri-edit-line" />
                   </template>
-                </VTextField>
+                </VTextarea>
 
                 <span
                   v-if="checkAnalysitItem(item, item.typeID, 0)"
@@ -1954,6 +2026,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="item.typeID === 1"
                 class="text-center"
                 colspan="1"
+                style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
                   v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
@@ -1989,23 +2062,74 @@ const getDisabledFollowStatusNRole = () => {
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
+                    v-model="item.itemAnalyticals[1].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => {
+                        if (value && value[0] === ' ') {
+                          item.itemAnalyticals[1].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    :maxlength="45"
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
 
-                <VTextField
-                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[1]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[1].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[1].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[1]?.inspReqLotJournalId]"
                   v-model="item.itemAnalyticals[1].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
                   :readonly="frozeCheck"
-                  density="compact"
                   :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
                     value => value.length <= 44 || 'Must be 45 characters or less',
                     value => {
-                      if (value && value[0] === ' ') {
+                      if (value && value[1] === ' ') {
                         item.itemAnalyticals[1].actualAnalysis = null
                         return `first can't be a space.`
                       }
                       return true
                     }
                   ]"
-                  :maxlength="45"
                 >
                   <template
                     v-if="!frozeCheck"
@@ -2013,7 +2137,9 @@ const getDisabledFollowStatusNRole = () => {
                   >
                     <VIcon icon="ri-edit-line" />
                   </template>
-                </VTextField>
+                </VTextarea>
+
+
                 <span
                   v-if="checkAnalysitItem(item, item.typeID, 1)"
                   class="text-red"
@@ -2024,6 +2150,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="item.typeID === 1"
                 class="text-center"
                 colspan="1"
+                style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
                   v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
@@ -2058,23 +2185,73 @@ const getDisabledFollowStatusNRole = () => {
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
-
-                <VTextField
-                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
+                    v-model="item.itemAnalyticals[2].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => {
+                        if (value && value[0] === ' ') {
+                          item.itemAnalyticals[2].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[2]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[2].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[2].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[2]?.inspReqLotJournalId]"
                   v-model="item.itemAnalyticals[2].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
                   :readonly="frozeCheck"
-                  density="compact"
                   :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
                     value => value.length <= 44 || 'Must be 45 characters or less',
                     value => {
-                      if (value && value[0] === ' ') {
+                      if (value && value[2] === ' ') {
                         item.itemAnalyticals[2].actualAnalysis = null
                         return `first can't be a space.`
                       }
                       return true
                     }
                   ]"
-                  :maxlength="45" 
                 >
                   <template
                     v-if="!frozeCheck"
@@ -2082,7 +2259,7 @@ const getDisabledFollowStatusNRole = () => {
                   >
                     <VIcon icon="ri-edit-line" />
                   </template>
-                </VTextField>
+                </VTextarea>
 
                 <span
                   v-if="checkAnalysitItem(item, item.typeID, 2)"
@@ -2094,6 +2271,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="item.typeID === 1"
                 class="text-center"
                 colspan="1"
+                style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
                   v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
@@ -2128,22 +2306,73 @@ const getDisabledFollowStatusNRole = () => {
                   class="text-red"
                 >Analysis result Ok/Not is required!</span>
 
-                <VTextField
-                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
+                    v-model="item.itemAnalyticals[3].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => {
+                        if (value && value[0] === ' ') {
+                          item.itemAnalyticals[3].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[3]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[3].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[3].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[3]?.inspReqLotJournalId]"
                   v-model="item.itemAnalyticals[3].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
                   :readonly="frozeCheck"
-                  density="compact"
                   :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
                     value => value.length <= 44 || 'Must be 45 characters or less',
                     value => {
-                      if (value && value[0] === ' ') {
+                      if (value && value[3] === ' ') {
                         item.itemAnalyticals[3].actualAnalysis = null
                         return `first can't be a space.`
                       }
                       return true
                     }
                   ]"
-                  :maxlength="45" 
                 >
                   <template
                     v-if="!frozeCheck"
@@ -2151,7 +2380,7 @@ const getDisabledFollowStatusNRole = () => {
                   >
                     <VIcon icon="ri-edit-line" />
                   </template>
-                </VTextField>
+                </VTextarea>
 
                 <span
                   v-if="checkAnalysitItem(item, item.typeID, 3)"
@@ -2163,6 +2392,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="item.typeID === 1"
                 class="text-center"
                 colspan="1"
+                style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
                   v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
@@ -2197,22 +2427,73 @@ const getDisabledFollowStatusNRole = () => {
                   class="text-red"
                 >Analysis result Ok/Not is required!</span>
 
-                <VTextField
-                  v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
+                    v-model="item.itemAnalyticals[4].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => {
+                        if (value && value[0] === ' ') {
+                          item.itemAnalyticals[4].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[4]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[4].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[4].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[4]?.inspReqLotJournalId]"
                   v-model="item.itemAnalyticals[4].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
                   :readonly="frozeCheck"
-                  density="compact"
                   :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
                     value => value.length <= 44 || 'Must be 45 characters or less',
                     value => {
-                      if (value && value[0] === ' ') {
+                      if (value && value[4] === ' ') {
                         item.itemAnalyticals[4].actualAnalysis = null
                         return `first can't be a space.`
                       }
                       return true
                     }
                   ]"
-                  :maxlength="45" 
                 >
                   <template
                     v-if="!frozeCheck"
@@ -2220,7 +2501,7 @@ const getDisabledFollowStatusNRole = () => {
                   >
                     <VIcon icon="ri-edit-line" />
                   </template>
-                </VTextField>
+                </VTextarea>
 
                 <span
                   v-if="checkAnalysitItem(item, item.typeID, 4)"
