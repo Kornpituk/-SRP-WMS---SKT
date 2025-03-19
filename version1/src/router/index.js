@@ -18,7 +18,7 @@ const router = createRouter({
       redirect: to => {
         // const userData = JSON.parse(localStorage.getItem('userData') || '{}')
         // const userRole = (userData && userData.role) ? userData.role : null
-        const accessToken = localStorage.getItem('accessToken')
+        const accessToken = sessionStorage.getItem('accessToken')
         if (accessToken)
           return { name: 'skt-stockUpdate' }
         else if(!accessToken) {
