@@ -238,6 +238,27 @@ const disShowTableShipmentPLand = () => !['00011',
   '00045'].includes(userDataInfo.value.id)
 
 
+const userData = ref(null)
+
+watch(() => {
+  const storedData = sessionStorage.getItem('userData')
+  if (storedData) {
+    userData.value = JSON.parse(storedData)
+  }
+})
+
+const disableShowDataByDepartment = () => {
+  
+
+  if(userData?.value){
+    return !(userData.value.departmentId === '007'|| 
+  userData.value.departmentId === '008' ||  
+  userData.value.departmentId === '010' ||
+  userData.value.departmentId === '009')
+  }
+}
+
+
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
@@ -3673,7 +3694,7 @@ const handleSavetruckOrder = async type => {
   </div>
 
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
-  <section v-if="disShowTableShipmentPLand()">
+  <section v-if="disableShowDataByDepartment()">
     <VCard class="mt-6">
       <div>
         <div
@@ -4998,7 +5019,6 @@ const handleSavetruckOrder = async type => {
               >
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute"
                   variant="outlined"
                   :color="product.saL_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID, 
@@ -5035,7 +5055,6 @@ const handleSavetruckOrder = async type => {
               >
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute"
                   variant="outlined"
                   :color="product.wH_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID, 
@@ -5073,7 +5092,6 @@ const handleSavetruckOrder = async type => {
                 <VBtn
                   style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute"
                   :color="product.loG_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID, 
                                                      disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId),

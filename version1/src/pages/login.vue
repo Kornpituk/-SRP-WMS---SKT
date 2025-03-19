@@ -200,6 +200,7 @@ const getInfoUserData = async () => {
     itemStore.setItemDetails(userData.value, 'UserDataCookies')
 
     //console.log('getInfoUserData: name', userData.username)
+    sessionStorage.setItem('userData', JSON.stringify(userData.value))
     localStorage.setItem('userName', userData.username)
 
     //console.log("localStorage.setItem('userData', userData)", localStorage.getItem('userDate'))

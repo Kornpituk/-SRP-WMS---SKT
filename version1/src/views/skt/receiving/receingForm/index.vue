@@ -37,11 +37,35 @@ onMounted(async () => {
   )
 })
 
+const userData = ref(null)
+
+watch(() => {
+  const storedData = sessionStorage.getItem('userData')
+  if (storedData) {
+    userData.value = JSON.parse(storedData)
+  }
+})
+
+const disableShowDataByDepartmentAndPosition = () => {
+  console.log("userData", userData.value)
+  if(userData?.value){
+    return (userData.value.departmentId === '001' && 
+    userData.value.positionId === '004'
+    )
+  }else{
+    return false
+  }
+  
+}
+
+
 const statusPermission = ref(-1)
 
 const canVisibleUserPermissionAll = (statusId, uiControlContextId) => {
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
+
+
 
 
 const isDialogVisibleConfirmDialog = ref(false)
@@ -975,7 +999,7 @@ function handleCancel() {
 
   <!-- Approval Btn --> 
   <div
-    v-if="statusId === 7 || statusId === 15"
+    v-if="statusId === 7 && disableShowDataByDepartmentAndPosition() || statusId === 15 && disableShowDataByDepartmentAndPosition()"
     style="position: fixed;
           display: flex;
           box-sizing: border-box;
@@ -987,7 +1011,6 @@ function handleCancel() {
     class="d-flex justify-start"
   >
     <VBtn
-      v-if="canVisibleUserPermissionAll(statusPermission,'BTN_WH_APVL_APPROVE').canVisible"
       style="min-width: 320px;"
       class="mb-2"
       @click="btnApprove('APPROVE')"
