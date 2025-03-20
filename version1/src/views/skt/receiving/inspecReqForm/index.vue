@@ -1392,11 +1392,11 @@ const getDisabledFollowStatusNRole = () => {
     </VProgressLinear>
   </div>
 
-  <div v-if="!loadingGenerated1 && !loadingGenerated2">
-    <div v-if="false">
-      {{ analysisItemsCode }}
-    </div>
+  <div v-if="false">
+  -->{{ analysisItemsCode }}
+  </div>
 
+  <div v-if="!loadingGenerated1 && !loadingGenerated2">
     <VRow>
       <VCol cols="2">
         <div
