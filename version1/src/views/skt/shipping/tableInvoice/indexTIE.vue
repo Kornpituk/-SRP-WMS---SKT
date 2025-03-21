@@ -748,7 +748,7 @@ const testValue = () => {
 }
 
 // คำนวณว่าทุกแถวถูกเลือกหรือไม่
-const isAllSelected = computed(() => {
+const isAllSelected = watch(() => {
   return paginatedData.value.length > 0 && selectedDataTables.value.length === paginatedData.value.length
 })
 
@@ -1244,30 +1244,32 @@ const submitLoadingSOERow = ref('')
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData) => {
-
+  console.log('submitShipmentPlanBySoEId start!!', type, soEtlLogDetailJournalID)
   trikerSaveDrft.value = true
-  submitLoadingSOERow.value = soEtlLogDetailJournalID
+  submitLoadingSOERow.value = soEtlLogDetailJournalID || '0'
 
   //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
-  const saveDraftRes = await saveShipmentPlan(productRowModel.value)
+  if(type ==! 'approve' || type ==! 'reject' || type ==! 'back'){
+    const saveDraftRes = await saveShipmentPlan(productRowModel.value)
 
-  //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
+    //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
-  if(!saveDraftRes){
-    textAlertDialogFunction(alertWordConst.saveDraft, false)
-    throw 'saveDraftRes faliad', saveDraftRes
+    if(!saveDraftRes){
+      textAlertDialogFunction(alertWordConst.saveDraft, false)
+      throw 'saveDraftRes faliad', saveDraftRes
+    }
   }
 
   try{
-    //console.log('submitShipmentPlanBySoEId start!!')
+    console.log('submitShipmentPlanBySoEId start!!3.1')
     if(type === 'submit'){
 
     }else if(type === 'approve' || type === 'reject'){
-      //console.log('submitShipmentPlanBySoEId start!! 3')
+      console.log('submitShipmentPlanBySoEId start!! 3')
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
-      //console.log('submitShipmentPlanBySoEId start!! 2')
+      console.log('submitShipmentPlanBySoEId start!! 2', selectedDataTables.value)
     }else if(type === 'back'){
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
@@ -4837,7 +4839,7 @@ const handleSavetruckOrder = async type => {
                   >
                     <FileInputDialogCarousels
                       title-dialog="Truck Order"
-                      :disabled-prop="canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                      :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
                       :files-from-a-p-i="product.getTruckOrderFileData"
