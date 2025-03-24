@@ -4680,7 +4680,7 @@ const handleSavetruckOrder = async type => {
                   location="end"
                   open-on-click
                 >
-                  {{ product.vesselName }}
+                  {{ product.voy }}
                 </VTooltip>
               </td>
 
