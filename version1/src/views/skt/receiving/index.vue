@@ -1663,19 +1663,24 @@ const checkTypeLorryToPrintPDF = () => {
 
 const printFormAll = async () => {
   // ตั้งค่าสถานะการประมวลผลให้เป็น true
+  console.log('Printing Receiving Form...')
   processingPrint.value = true
 
   const typeReceiving = ref('ReceivingForm')
 
+  console.log('Printing Receiving Form...')
+
   const printPromises = selectedPrintLabel.value.map(async label => {
     if (label === 'Receiving Form') {
       processingPrintForm1.value = true // เริ่มพิมพ์
-      //console.log('Printing Receiving Form...')
+      console.log('Printing Receiving Form...')
 
       if(receivingTypeAction.value === 2){
         typeReceiving.value = 'ReceivingForm'
       }else if(receivingTypeAction.value === 3){
         typeReceiving.value = 'ReceivingFormByLorry'
+      }else if(receivingTypeAction.value === 4){
+        typeReceiving.value = 'ResaleForm'
       }
 
       try {
@@ -3243,7 +3248,7 @@ const insetSwitch1 = ref('')
             <VCol cols="6">
               <!-- Align VCheckbox items to the right -->
               <VCheckbox
-                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
+                v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListRawM()"
                 label="Receiving Form"
@@ -3260,11 +3265,28 @@ const insetSwitch1 = ref('')
                 </template>
               </VCheckbox>
               <VCheckbox
-                v-if="receivingTypeAction === 2 || receivingTypeAction === 3"
+                v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListInsp()"
                 label="Inspection Request Form"
                 value="Inspection Request Form"
+                class="ms-auto"
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm2"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
+              <VCheckbox
+                v-if="receivingTypeAction === 4"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListRawM()"
+                label="Resale Form"
+                value="Receiving Form"
                 class="ms-auto"
               >
                 <template #append>

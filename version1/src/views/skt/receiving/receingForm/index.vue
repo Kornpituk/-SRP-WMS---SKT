@@ -65,9 +65,6 @@ const canVisibleUserPermissionAll = (statusId, uiControlContextId) => {
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
 
-
-
-
 const isDialogVisibleConfirmDialog = ref(false)
 const isDialogVisibleConfirmDialog2 = ref(false)
 const confirmValueCheck = ref(false)
@@ -93,6 +90,7 @@ const currentTableWatchSesstion = ref(0)
 import RawMatInspec from '../inspecReqForm/index.vue'
 import PackagingInspec from '../packagingForm/index.vue'
 import RawMatForm from '../rawMat/index.vue'
+import RawMatResale from '../rawMatResale/index.vue'
 
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 
@@ -345,33 +343,39 @@ watch(() => {
 const checkCurrentTabBeforIn = status => {
   let tabIndex
 
-  switch (status) {
-  case 1:
-  case 3:
-  case 8:
-  case 10:
-  case 7:
-    tabIndex = 0 // สำหรับ status 1, 3, 8, 10 ให้แสดง tab index 0
-    break
+  if(receivedTypeId.value === 4){
+    tabIndex = 0
+  }else{
+    switch (status) {
+    case 1:
+    case 3:
+    case 8:
+    case 10:
+    case 7:
+      tabIndex = 0 // สำหรับ status 1, 3, 8, 10 ให้แสดง tab index 0
+      break
     
-  case 4:
-  case 5:
-  case 6:
-    tabIndex = 1 // สำหรับ status 4, 5, 6, 7 ให้แสดง tab index 1
-    break
+    case 4:
+    case 5:
+    case 6:
+      tabIndex = 1 // สำหรับ status 4, 5, 6, 7 ให้แสดง tab index 1
+      break
     
-  case 12:
-  case 13:
-  case 14:
-  case 18:
-    tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
-    break
+    case 12:
+    case 13:
+    case 14:
+    case 18:
+      tabIndex = 2 // สำหรับ status 12, 13 ให้แสดง tab index 2
+      break
     
-  default:
-    tabIndex = 0 // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
+    default:
+      tabIndex = 0 // ค่าเริ่มต้นถ้าไม่มี status ที่ตรงกับเงื่อนไข
+    }
+
+    return tabIndex
   }
 
-  return tabIndex
+  
 }
 
 const itemsLorrySelect = [
@@ -528,6 +532,14 @@ const tabs2 = [
   },
 ]
 
+const tabs4 = [
+  {
+    title: 'Resale Product Receiving Form',
+    component: RawMatResale,
+    icon: 'ri-instance-fill',
+  },
+]
+
 const tabDisablingConfig = {
   1: {
     manager: ['R/M Inspection Request Form', 'Lorry Loading Check List'],
@@ -561,27 +573,32 @@ const tabDisablingConfig = {
     manager: ['R/M Inspection Request Form', 'Lorry Loading Check List', 'R/M Receiving Form'],
     issues: ['R/M Inspection Request Form', 'Lorry Loading Check List', 'R/M Receiving Form'],
   },
+  11: {
+    manager: ['Resale Product Receiving Form'],
+    issues: ['Resale Product Receiving Form'],
+  },
 
   // Add more statuses and role combinations as needed
 }
 
-// Configuration to specify which tab index to show based on status
-const tabIndexConfig = {
-  1: 0,  // Show tab index 1 for this status
-  3: 0,   // Show tab index 0 for this status
-  4: 1, // Show tab index 2 for this status
-  5: 1,
-  6: 1,
-  7: 1,
-  8: 0,
-  10: 0,
-  12: 2,
-  13: 2,
-  14: 2,
-  18: 2,
 
-  // Add more statuses and indices as needed
-}
+// Configuration to specify which tab index to show based on status
+// const tabIndexConfig = {
+//   1: 0,  // Show tab index 1 for this status
+//   3: 0,   // Show tab index 0 for this status
+//   4: 1, // Show tab index 2 for this status
+//   5: 1,
+//   6: 1,
+//   7: 1,
+//   8: 0,
+//   10: 0,
+//   12: 2,
+//   13: 2,
+//   14: 2,
+//   18: 2,
+
+//   // Add more statuses and indices as needed
+// }
 
 const getDisabledTabs = () => {
 
@@ -596,11 +613,11 @@ const getDisabledTabs = () => {
   return tabDisablingConfig[status.value]?.[role] || []
 }
 
-const getCurrentTabIndex = () => {
-  const status = ref(statusId.value)
+// const getCurrentTabIndex = () => {
+//   const status = ref(statusId.value)
 
-  return tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0
-}
+//   return tabIndexConfig[status.value] !== undefined ? tabIndexConfig[status.value] : 0
+// }
 
 // เรียกใช้ฟังก์ชันนี้เพื่อให้เกิดการเปลี่ยนค่า currentTab หลังจากทุกอย่างเสร็จสิ้น
 
@@ -664,10 +681,6 @@ const handleSelectLorryLoading = word => {
       2
     }
   }, 1000) // 10000 มิลลิวินาที = 10 วินาที
-
-
-
-
 }
 
 const handleAcceptPackaging = word => {
@@ -798,6 +811,28 @@ function handleCancel() {
       </VTab>
     </VTabs>
   </div>
+
+  <div v-if="receivedTypeId === 4">
+    <VTabs
+      v-model="currentTabNew"
+      grow
+    >
+      <VTab
+        v-for="(tab, index) in tabs4"
+        :key="index"
+        :disabled="getDisabledTabs().includes(tab.title)"
+        style="font-size: 12px; font-weight: bolder;"
+      >
+        <VIcon
+          v-if="false"
+          :icon="tab.icon"
+          size="40"
+        />
+        <span style="font-size: 18px; font-weight: bolder;">{{ tab.title }}</span>
+      </VTab>
+    </VTabs>
+  </div>
+
 
   <div v-if="false">
     <section>
@@ -987,6 +1022,18 @@ function handleCancel() {
   <div v-if="receivedTypeId === 1">
     <div
       v-for="(tab, index) in tabs2"
+      :key="index"
+      class="mt-20"
+    >
+      <Component
+        :is="tab.component"
+        v-if="currentTabNew === index"
+      />
+    </div>
+  </div>
+  <div v-if="receivedTypeId === 4">
+    <div
+      v-for="(tab, index) in tabs4"
       :key="index"
       class="mt-20"
     >

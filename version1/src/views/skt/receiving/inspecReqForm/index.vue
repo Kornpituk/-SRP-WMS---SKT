@@ -243,6 +243,7 @@ const statusId = ref(null) // ตัวแปรสำหรับเก็บ�
 const isReject = ref(null)
 const isAccept = ref(null)
 const frozeCheck = ref(true)
+const frozeCheckNotDetialCheck  = ref(true)
 const receiveTypeIdData = ref(null)
 const poEiLog = ref()
 
@@ -277,6 +278,7 @@ const generatedJournalId = async () => {
     })
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 watchEffect(() => {
   if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     frozeCheck.value = false
@@ -285,9 +287,31 @@ watchEffect(() => {
   if(statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     frozeCheck.value = false
   }
-  
+
+  if(sessionStorage.getItem('typeLorryInfoId') === '01' || sessionStorage.getItem('typeLorryInfoId') === '02'){
+    
+    if(statusId.value === 12 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+      frozeCheck.value = false
+    }
+
+    if(statusId.value === 14 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+      frozeCheck.value = false
+    }
+
+  }
+
+
+  if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+    frozeCheckNotDetialCheck.value = false
+  }
+
+  if(statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+    frozeCheckNotDetialCheck.value = false
+  }
+
 })
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 watch( async () => {
   await generatedInsp()
   await generatedJournalId()
@@ -298,6 +322,25 @@ watch( async () => {
 
   if(statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     frozeCheck.value = false
+  }
+  if(sessionStorage.getItem('typeLorryInfoId') === '01' || sessionStorage.getItem('typeLorryInfoId') === '02'){
+    
+    if(statusId.value === 12 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+      frozeCheck.value = false
+    }
+
+    if(statusId.value === 14 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+      frozeCheck.value = false
+    }
+
+  }
+
+  if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+    frozeCheckNotDetialCheck.value = false
+  }
+
+  if(statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+    frozeCheckNotDetialCheck.value = false
   }
 })
 
@@ -3236,7 +3279,7 @@ const getDisabledFollowStatusNRole = () => {
                 <td colspan="6">
                   <VTextarea
                     v-model="headerInsp.note"
-                    :readonly="frozeCheck"
+                    :readonly="frozeCheckNotDetialCheck"
                     counter
                     auto-grow
                     :rules="[
@@ -3245,7 +3288,7 @@ const getDisabledFollowStatusNRole = () => {
                     @input="limitTextInputLine4Note" 
                   >
                     <template
-                      v-if="!frozeCheck"
+                      v-if="!frozeCheckNotDetialCheck"
                       #label
                     >
                       <VIcon icon="ri-edit-line" />
@@ -3255,7 +3298,7 @@ const getDisabledFollowStatusNRole = () => {
                 <td colspan="6">
                   <VTextarea
                     v-model="headerInsp.details"
-                    :readonly="frozeCheck"
+                    :readonly="frozeCheckNotDetialCheck"
                     counter
                     auto-grow
                     :rules="[
@@ -3264,7 +3307,7 @@ const getDisabledFollowStatusNRole = () => {
                     @input="limitTextInputLine4Details"
                   >
                     <template
-                      v-if="!frozeCheck"
+                      v-if="!frozeCheckNotDetialCheck"
                       #label
                     >
                       <VIcon icon="ri-edit-line" />
@@ -3447,7 +3490,7 @@ const getDisabledFollowStatusNRole = () => {
           Send Back
         </VBtn>
         <VBtn
-          v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
+          v-if="!frozeCheck"
           class="mx-4"
           color="warning"
           style="font-size: 12px;"
@@ -3462,6 +3505,24 @@ const getDisabledFollowStatusNRole = () => {
           @click="submitButtonVisible('SUBMIT')"
         >
           SUBMIT
+        </VBtn>
+      </div>
+    </section>
+
+    <section
+      v-if="statusId === 12 || statusId === 14"
+      cols="12"
+      class="my-4"
+    >
+      <div class="d-flex justify-end">
+        <VBtn
+          v-if="!frozeCheck"
+          class="mx-4"
+          color="warning"
+          style="font-size: 12px;"
+          @click="saveDraftButton('SAVE DRAFT')"
+        >
+          SAVE DRAFT
         </VBtn>
       </div>
     </section>
