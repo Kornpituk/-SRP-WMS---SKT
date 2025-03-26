@@ -185,14 +185,14 @@ const purchaseOrder = ref({
   storagePlaceNo: '',
 
   actualMakerLotNo_1: null,
-  actualNetCountKgs_1: NetCountPackage.value,
+  actualNetCountKgs_1: null,
   actualAmountUnits_1: null,
   actualTotalQuantityKgs_1: null,
   customManufacturerName_1: '',
   customLable_1: '',
 
   actualMakerLotNo_2: null,
-  actualNetCountKgs_2: NetCountPackage.value,
+  actualNetCountKgs_2: null,
   actualAmountUnits_2: null,
   actualTotalQuantityKgs_2: null,
   customManufacturerName_2: '',
@@ -313,10 +313,6 @@ const readonlyAllInput = () => {
 const hidedAllIconInput = () => {
   return statusId.value === 3 || statusId.value === 1
 }
-
-watchEffect(() => {
-
-})
 
 const frozeCheck = ref(true)
 
@@ -562,7 +558,9 @@ const getLotReceivingForm = async () => {
       NetCountPackage.value = lotData[0].actualNetCountKgs
       purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
 
-      // console.log('[*****Headers Lot]]!!:', lotData[0])
+      console.log('[*****Headers Lot]]!!:', lotData[0])
+      console.log('[*****Headers Lot2]]!!:', lotData[0].actualNetCountKgs)
+      console.log('[*****Headers Lot3]]!!:', purchaseOrder.value.actualNetCountKgs_1)
     } catch (error) {
       console.error('Error:', error)
     } finally {
@@ -615,13 +613,6 @@ const rules = [
   },
 ]
 
-watchEffect(() => {
-  // console.log('fileMuti++', fileMuti.value)
-  // console.log('files+++', files.value)
-
-  
-})
-
 const getCOAReceivingForm = async () => {
   if (poEtlLogDetailJournalIDQueryParameters.value) {
     loading.value = true
@@ -665,16 +656,12 @@ onBeforeUnmount(() => {
   clearInterval(interval.value)
 })
 
-watch(() => {
+watchEffect(() => {
   // console.log('Gene 2')
   getManufacturer()
   getLotReceivingForm()
   getHearderReceivingForm()
   getCOAReceivingForm()
-})
-
-watchEffect(() => {
-  console.log('selectedMakerName', purchaseOrder.value.selectedMakerName.makerName, "+", dataHeaderReceving.value.customManufacturerName)
 })
 
 const saveReceivingForm = () => {
@@ -1612,12 +1599,6 @@ const submitButtonVisible = word => {
   isDialogConfirmVisible.value = false
 }
 
-watchEffect(() => {
-  // console.log("formData", formData)
-  // console.log("coaFiles.value", coaFiles.value)
-  // console.log("files.value", files.value)
-})
-
 
 //----------------------------------- Submit Partial -----------------------
 
@@ -1728,7 +1709,7 @@ const dataRaeMatRequest = ref([
 watchEffect(() => {
   const updateNetCountKgs = (index, lotNo, netCountField) => {
     if (lotNo) {
-      if (data.value.receiveTypeId === 2) {
+      if (data.value.receiveTypeId === 2 || data.value.receiveTypeId === 4) {
         purchaseOrder.value[netCountField] = dataHeaderReceving.value.packagingQtyKg
       } else if (data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0) {
         if(data.value.statusId === 15 || data.value.statusId === 17 ){
@@ -1822,6 +1803,8 @@ const calculationPONew = () => {
     purchaseOrder.value.actualMeanNetCountKgs = covertFloatFixedTwo(purchaseOrder.value.actualNetCountKgs_1) || 0
     purchaseOrder.value.actualGrandAmountUnits = covertToInteger(totalAmount) || 0.00
     purchaseOrder.value.actualGrandTotalQuantityKgs = covertFloatFixedTwo(totlaQty_1 + totlaQty_2 + totlaQty_3 + totlaQty_4 + totlaQty_5) || 0.00
+
+    console.log('data 3 actualAmountUnits_1', purchaseOrder.value.actualNetCountKgs_1)
   }
 }
 
@@ -1898,8 +1881,9 @@ watchEffect(() => {
   if(data?.value.receiveTypeId === 3){
     genAmounUnitLorry()
   }
-  
+  console.log('data actualAmountUnits_1', purchaseOrder.value.actualNetCountKgs_1)
   calculationPONew()
+  console.log('data 2 actualAmountUnits_1', purchaseOrder.value.actualNetCountKgs_1)
 })
 
 const showDialogImageMuti = (img, name) => {
@@ -3128,6 +3112,7 @@ const getDisabledFollowStatusNRole = () => {
               >
                 Net Count.(Kg)
               </th>
+            
               <td
                 class="text-center"
                 colspan="1"
@@ -3136,7 +3121,7 @@ const getDisabledFollowStatusNRole = () => {
                 <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
                   formatNumber(data.purchasingAmountKgs) }}</span>
                 
-                <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
+                <span v-if="data.receiveTypeId === 2 || data.receiveTypeId === 4">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
               </td>
               <th
                 :disabled="!purchaseOrder.actualMakerLotNo_1"

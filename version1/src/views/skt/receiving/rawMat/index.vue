@@ -1777,6 +1777,8 @@ watchEffect(() => {
 const genAmounUnitLorry = () => {
   if(purchaseOrder?.value.actualMakerLotNo_1){
     purchaseOrder.value.actualAmountUnits_1 = 1
+  }else{
+    purchaseOrder.value.actualAmountUnits_1 = 199
   }
 }
 
@@ -2628,6 +2630,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextField>
 
                 {{ formatNumber(purchaseOrder.actualNetCountKgs_1) }}
+              
               </td>
 
               <td

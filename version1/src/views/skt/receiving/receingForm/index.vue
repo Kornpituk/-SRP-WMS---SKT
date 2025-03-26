@@ -58,7 +58,6 @@ const disableShowDataByDepartmentAndPosition = () => {
   
 }
 
-
 const statusPermission = ref(-1)
 
 const canVisibleUserPermissionAll = (statusId, uiControlContextId) => {
@@ -345,6 +344,8 @@ const checkCurrentTabBeforIn = status => {
 
   if(receivedTypeId.value === 4){
     tabIndex = 0
+    
+    return tabIndex
   }else{
     switch (status) {
     case 1:
@@ -375,7 +376,6 @@ const checkCurrentTabBeforIn = status => {
     return tabIndex
   }
 
-  
 }
 
 const itemsLorrySelect = [
@@ -573,7 +573,7 @@ const tabDisablingConfig = {
     manager: ['R/M Inspection Request Form', 'Lorry Loading Check List', 'R/M Receiving Form'],
     issues: ['R/M Inspection Request Form', 'Lorry Loading Check List', 'R/M Receiving Form'],
   },
-  11: {
+  12: {
     manager: ['Resale Product Receiving Form'],
     issues: ['Resale Product Receiving Form'],
   },
