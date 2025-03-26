@@ -288,17 +288,17 @@ watchEffect(() => {
     frozeCheck.value = false
   }
 
-  if(sessionStorage.getItem('typeLorryInfoId') === '01' || sessionStorage.getItem('typeLorryInfoId') === '02'){
+  // if(sessionStorage.getItem('typeLorryInfoId') === '01' || sessionStorage.getItem('typeLorryInfoId') === '02'){
     
-    if(statusId.value === 12 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
-      frozeCheck.value = false
-    }
+  //   if(statusId.value === 12 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  //     frozeCheck.value = false
+  //   }
 
-    if(statusId.value === 14 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
-      frozeCheck.value = false
-    }
+  //   if(statusId.value === 14 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  //     frozeCheck.value = false
+  //   }
 
-  }
+  // }
 
 
   if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
@@ -323,17 +323,18 @@ watch( async () => {
   if(statusId.value === 5 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     frozeCheck.value = false
   }
-  if(sessionStorage.getItem('typeLorryInfoId') === '01' || sessionStorage.getItem('typeLorryInfoId') === '02'){
+
+  // if(sessionStorage.getItem('typeLorryInfoId') === '01' || sessionStorage.getItem('typeLorryInfoId') === '02'){
     
-    if(statusId.value === 12 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
-      frozeCheck.value = false
-    }
+  //   if(statusId.value === 12 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  //     frozeCheck.value = false
+  //   }
 
-    if(statusId.value === 14 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
-      frozeCheck.value = false
-    }
+  //   if(statusId.value === 14 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  //     frozeCheck.value = false
+  //   }
 
-  }
+  // }
 
   if(statusId.value === 4 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     frozeCheckNotDetialCheck.value = false
