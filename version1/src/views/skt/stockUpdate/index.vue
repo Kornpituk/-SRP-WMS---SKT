@@ -1569,7 +1569,7 @@ const refeshPage = () => {
                             }"
                             @dblclick="dataTableCliclHighlightIsToggle2(batch.no)"
                           >
-                            {{ batch.qty }}
+                            {{ Number(batch.qty).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                           </td>
                           <td
                             
