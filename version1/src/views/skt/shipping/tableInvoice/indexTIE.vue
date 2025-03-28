@@ -1189,6 +1189,8 @@ const saveShipmentPlan = async row => {
 
           return true
         }
+
+        saveDraftLoading.value = false
         
       }else{
         
@@ -1250,14 +1252,14 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
 
   //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
-  if(type ==! 'approve' || type ==! 'reject' || type ==! 'back'){
+  if(type !== 'approve' || type !== 'reject' || type !== 'back'){
     const saveDraftRes = await saveShipmentPlan(productRowModel.value)
 
     //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
     if(!saveDraftRes){
       textAlertDialogFunction(alertWordConst.saveDraft, false)
-      throw 'saveDraftRes faliad', saveDraftRes
+      throw new Error('saveDraftRes failed: ' + saveDraftRes)
     }
   }
 
@@ -1342,6 +1344,9 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
     }
   } catch (e) {
     console.error(`Error saving search plan:`, error)
+  }finally {
+    // เคลียร์สถานะต่างๆ ถ้าจำเป็น
+    trikerSaveDrft.value = false
   }
 }
 
@@ -2619,6 +2624,7 @@ const bodyFirstTruckOrder = ref(
 )
 
 const loadingSaveTruckOrderForm = ref(false)
+const trickerSaveTruckOrder= ref(0)
 
 const handleSavetruckOrder = async type => {
 
@@ -2640,6 +2646,17 @@ const handleSavetruckOrder = async type => {
 
   const body = bodySaveTruckOrder(paramsTruckOrder.value)
 
+  trikerSaveDrft.value  = true
+
+  const saveDraftRes = await saveShipmentPlan(dataRowModel.value)
+
+  //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
+
+  if(!saveDraftRes){
+    textAlertDialogFunction(alertWordConst.saveDraft, false)
+    throw new Error('saveDraftRes failed: ' + saveDraftRes)
+  }
+
 
   try{
     const result = await saveTruckOrder(
@@ -2652,25 +2669,31 @@ const handleSavetruckOrder = async type => {
 
     if(result){
       //console.log('saveTruckOrderResult', saveTruckOrderResult?.value)
-      textAlertDialogFunction("SAVE TRUCK ORDER", true)
+      
 
       sessionStorage.removeItem('sOHistoryTruckOrderSST')
       sessionStorage.removeItem('sOeIdHistoryTruckOrderSST')
       sessionStorage.removeItem('rowDataHistoryTruckOrderSST')
 
-      setTimeout(() => {
-        location.reload()
-      }, 500)
-      
+      if(trickerSaveTruckOrder.value ==! 1){
+        console.log("asdasdasd", trickerSaveTruckOrder.value)
+        textAlertDialogFunction("SAVE TRUCK ORDER", true)
+        setTimeout(() => {
+          location.reload()
+        }, 500)
+      }
     }else{
       //console.log('errorSaveTruckOrder', errorSaveTruckOrder.value)
       textAlertDialogFunction("SAVE TRUCK ORDER", false)
+
+      trikerSaveDrft.value  = false
     }
   }catch(error){
-
+    trikerSaveDrft.value  = false
   }
 
   loadingSaveTruckOrderForm.value = false
+  trikerSaveDrft.value  = false
 }
 </script>
 
@@ -3190,7 +3213,7 @@ const handleSavetruckOrder = async type => {
         <DialogCloseBtn
           variant="text"
           size="default"
-          @click="isDialogVisiblePrintTruck = false, clearParamsTruckOrder(), clearHistoryTruckOrder()"
+          @click="trikerSaveDrft = false, trickerSaveTruckOrder = 1, handleSavetruckOrder(), isDialogVisiblePrintTruck = false, clearParamsTruckOrder(), clearHistoryTruckOrder()"
         />
 
         <VCardTitle class="text-center">
@@ -3512,7 +3535,7 @@ const handleSavetruckOrder = async type => {
           <VBtn
             color="warning"
             class="d-flex justify-space-between mx-2"
-            @click="handleSavetruckOrder(), loadingSaveTruckOrderForm = true"
+            @click="trickerSaveTruckOrder = 0, trikerSaveDrft = true, handleSavetruckOrder(), loadingSaveTruckOrderForm = true"
           >
             <span v-if="!loadingSaveTruckOrderForm">
 

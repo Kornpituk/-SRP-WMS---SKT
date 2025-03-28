@@ -3285,7 +3285,7 @@ const insetSwitch1 = ref('')
                 v-if="receivingTypeAction === 4"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListRawM()"
-                label="Resale Form"
+                label="Reasale Receiving form"
                 value="Receiving Form"
                 class="ms-auto"
               >
