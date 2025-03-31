@@ -1961,7 +1961,7 @@ const cancelReceivingPlant = () => {
 
           // Reload หลังแจ้งเตือนสำเร็จ
           setTimeout(() => {
-            location.reload()
+            // location.reload()
           }, 500) // 0.5 วินาที
           isDialogVisibleCommentDialog.value = false
 
