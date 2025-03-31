@@ -652,6 +652,13 @@ const headersDataTableNew = [
   },
 
   {
+    title: 'Lot',
+    key: 'lotNumber',
+    sortable: false,
+    align: "start",
+  },
+
+  {
     title: 'Item Code1',
     key: 'product1SelectedCode',
     class: 'my-header-style',
@@ -715,12 +722,7 @@ const headersDataTableNew = [
     sortable: false,
   },
 
-  {
-    title: 'Lot',
-    key: 'lotNumber',
-    sortable: false,
-    align: "start",
-  },
+  
   {
     title: 'Producing Date',
     key: 'producingDate',
@@ -1565,6 +1567,18 @@ const statusText = statusId => {
             </tr>
           </template>
 
+          <template #column.lotNumber="{ column }">
+            <tr class="d-flex justify-start">
+              <th>
+                <span>{{ column.title }}<VIcon
+                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                  class="clickable-icon"
+                  @click="toggleDirection(column.key)"
+                /></span>
+              </th>
+            </tr>
+          </template>
+
           <template #column.product1SelectedCode="{ column }">
             <tr class="d-flex justify-center">
               <th />
@@ -1741,17 +1755,7 @@ const statusText = statusId => {
             </tr>
           </template>
 
-          <template #column.lotNumber="{ column }">
-            <tr class="d-flex justify-start">
-              <th>
-                <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection(column.key)"
-                /></span>
-              </th>
-            </tr>
-          </template>
+          
           <template #column.producingDate="{ column }">
             <tr class="d-flex justify-center">
               <th>
@@ -1996,6 +2000,24 @@ const statusText = statusId => {
                 {{ formatNumber(item.raw.quantityKgs) }}
               </td>
               <td
+                class="px-1 cursor-pointer text-start"
+                style="min-width: 150px; font-size: 12px;"
+                :style="{ 
+                  backgroundColor: 
+                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
+                    isSelected(item.raw) ? '#E0F7FA' : 
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
+                    
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
+              >
+                <span class="text-start">{{ item.raw.lotNumber }}</span>
+              </td>
+              <td
                 style="font-size: 12px;"
                 class="bg-light-blue-lighten-5 cursor-pointer" 
                 :style="{ 
@@ -2217,25 +2239,6 @@ const statusText = statusId => {
               >
                 <span v-if="item.raw.product2UomCountActual">{{ item.raw.product2UomCountActual }}</span>
                 <span v-else />
-              </td>
-
-              <td
-                class="px-1 cursor-pointer text-start"
-                style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === item.raw.no ? dataTableColor : 
-                    isSelected(item.raw) ? '#E0F7FA' : 
-                    '',
-                  borderTop:
-                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : '',
-                  borderBottom:
-                    dataTableNummberedToggle === item.raw.no ? '1px solid #BBDEFB' : ''
-                    
-                }"
-                @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
-              >
-                <span class="text-start">{{ item.raw.lotNumber }}</span>
               </td>
               <td
                 class="px-1 text-center cursor-pointer"
