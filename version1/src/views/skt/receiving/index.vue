@@ -2370,6 +2370,15 @@ const insetSwitch1 = ref('')
           </VBtn>
 
           <VBtn
+            v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
+            style="font-size: 12px;"
+            :disabled="selectedDataTables.length < 1"
+            @click="submitButton('Approve')"
+          >
+            Cancel
+          </VBtn>
+
+          <VBtn
             v-if="false"
             :disabled="insetSwitch1 === 'issues'"
             style="font-size: 12px;"
