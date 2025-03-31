@@ -26,6 +26,23 @@ const accountRole = ref('issues')
 const dataRowModel = ref()
 const roleAccount = ref('issues')
 
+//------------------------------- alert --------------------------------------------
+
+import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
+import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
+import alertWordConst from '@/utilities/constant'
+
+const isDialogVisibleAlertDialog = ref(false)
+const subWordForSubmit = ref('')
+const successDialAlert = ref(false)
+
+const textAlertDialogFunction = (word, success) => {
+  subWordForSubmit.value = ''
+  wordForSubmit.value = word
+  successDialAlert.value = success
+  isDialogVisibleAlertDialog.value = true
+}
+
 watchEffect(() => {
   if(localStorage.getItem('userCheck') === 'supwh'){
     accountRole.value = 'manager'
@@ -1863,11 +1880,93 @@ const approveReceivingPlant = () => {
         .then(response => {
           //console.log(`Response for poEtlLogDetailJournalID ${item.poEtlLogDetailJournalID}:`, response.data)
 
-          // isDialogSubmitSuccessVisible.value = true
+          
           isDialogConfirmVisible.value = false
 
+          textAlertDialogFunction(alertWordConst.approve, true)
+
+          // Reload หลังแจ้งเตือนสำเร็จ
+          setTimeout(() => {
+            location.reload()
+          }, 500) // 0.5 วินาที
+        })
+        .catch(error => {
+          // Handle errors
+          console.error(`Error for poEtlLogDetailJournalID ${item.poEtlLogDetailJournalID}:`, error)
+          isDialogSubmitFailedVisible.value = true
+        })
+    } else {
+      
+      statusCheckApprove.value = item.statusId
+
+      //console.log(`Status ID not equal to 17 for poEtlLogDetailJournalID ${item.poEtlLogDetailJournalID}:`, item.statusId, statusCheckApprove.value)
+    }
+    
+  })
+}
+
+const conmentCancel = ref('')
+const isDialogVisibleCommentDialog = ref(false)
+
+const btnApprove = ref('0') // เริ่มต้นเป็น disabled
+const btnCancel = ref('0')  // เริ่มต้นเป็น disabled
+
+watchEffect(() => {
+  let canApprove = false
+  let canCancel = false
+
+  if (selectedDataTables.value.length > 0) {
+    canApprove = selectedDataTables.value.some(item => 
+      item.statusId !== 15 && item.statusId !== 7,
+    )
+    canCancel = selectedDataTables.value.some(item => 
+      item.statusId !== 1,
+    )
+  }
+
+  btnApprove.value = canApprove ? '1' : '0'
+  btnCancel.value = canCancel ? '1' : '0'
+  
+  console.log('Approve/Cancel status:', {
+    approve: btnApprove.value,
+    cancel: btnCancel.value,
+    selectedItems: selectedDataTables.value,
+  })
+})
+
+const cancelReceivingPlant = () => {
+  selectedDataTables.value.forEach(item => {
+    // นำ poEtlLogDetailJournalID จากแต่ละ item ไปใส่ใน URL
+
+    selectedItemIdForColotRow.value = item.itemCode
+
+    const body = {
+      journalID: item.journalID,
+      statusComments: conmentCancel.value,
+    }
+
+    if(item.statusId === 1){
+      statusCheckApprove.value = item.statusId
+      axiosIns.post(`${urlApi.value}/api/v1/ReceivingPlan/Cancel`, body, {
+        headers: {
+          'accept': '*/*',
+          'x-location': `${whereHouse}`,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      })
+        .then(response => {
+          //console.log(`Response for poEtlLogDetailJournalID ${item.poEtlLogDetailJournalID}:`, response.data)
+
+          textAlertDialogFunction(alertWordConst.cancel, true)
+
+          // Reload หลังแจ้งเตือนสำเร็จ
+          setTimeout(() => {
+            location.reload()
+          }, 500) // 0.5 วินาที
+          isDialogVisibleCommentDialog.value = false
+
           // รีเฟรชหน้าจอทั้งหมด
-          window.location.reload()
+          // window.location.reload()
         })
         .catch(error => {
           // Handle errors
@@ -2360,23 +2459,46 @@ const insetSwitch1 = ref('')
     <section class="mb-4 mt-2">
       <VCard>
         <VCardText class="pa-2 d-flex justify-space-between align-center">
-          <VBtn
-            v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
-            style="font-size: 12px;"
-            :disabled="selectedDataTables.length < 1"
-            @click="submitButton('Approve')"
-          >
-            Approve
-          </VBtn>
+          <VRow>
+            <VCol cols="11">
+              <VBtn
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
+                style="font-size: 12px;"
+                :disabled="selectedDataTables.length < 1 || btnApprove === '1'"
+                @click="submitButton('Approve')"
+              >
+                Approve
+              </VBtn>
 
-          <VBtn
-            v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
-            style="font-size: 12px;"
-            :disabled="selectedDataTables.length < 1"
-            @click="submitButton('Approve')"
-          >
-            Cancel
-          </VBtn>
+              <VBtn
+                v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
+                style="font-size: 12px;"
+                :disabled="selectedDataTables.length < 1 || btnCancel === '1'"
+                color="error"
+                class="mx-4"
+                @click="isDialogVisibleCommentDialog = true"
+              >
+                Cancel
+              </VBtn>
+            </VCol>
+            <VCol
+              cols="1"
+              class="d-flex justify-end"
+            >
+              <VBtn
+                icon
+                size="small"
+                @click="refeshPage"
+              >
+                <VIcon
+                  size="20"
+                  icon="ri-restart-line"
+                  :class="{ spinning: isSpinning }"
+                />
+              </VBtn>
+            </VCol>
+          </VRow>
+          
 
           <VBtn
             v-if="false"
@@ -2395,17 +2517,6 @@ const insetSwitch1 = ref('')
             false-value="manager"
             :label="`Role: ${insetSwitch1}`"
           />
-          <VBtn
-            icon
-            size="small"
-            @click="refeshPage"
-          >
-            <VIcon
-              size="20"
-              icon="ri-restart-line"
-              :class="{ spinning: isSpinning }"
-            />
-          </VBtn>
         </VCardText>
       </VCard>
     </section>
@@ -3469,6 +3580,51 @@ const insetSwitch1 = ref('')
     </VDialog>
   </section>
 
+  <!-- ใช้ AuthenticatorDialog Component -->
+  <div>
+    <AlertWord2
+      v-model="isDialogVisibleAlertDialog"
+      :word="wordForSubmit"
+      :subword="subWordForSubmit"
+      :success="successDialAlert"
+    />
+  </div>
+
+  <!-- dialogcomment -->
+  <div>
+    <VDialog
+      v-model="isDialogVisibleCommentDialog"
+      persistent
+      class="v-dialog-sm"
+    >
+      <!-- Dialog Content -->
+      <VCard title="Comment">
+        <DialogCloseBtn
+          variant="text"
+          size="default"
+          @click="isDialogVisibleCommentDialog = false"
+        />
+
+        <VCardText>
+          <VTextarea
+            v-model="conmentCancel"
+            counter
+            placeholder="Enter Commnet"
+          />
+        </VCardText>
+
+        <VCardText class="d-flex justify-end flex-wrap gap-4">
+          <VBtn
+            color="error"
+            @click="isDialogVisibleCommentDialog = false, cancelReceivingPlant()"
+          >
+            Cancel
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+  </div>
+
   <!-- Data Table Beta1.0 -->
   <section v-if="resultPermission?.length > 0">
     <VCard>
@@ -3528,7 +3684,9 @@ const insetSwitch1 = ref('')
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VCheckboxBtn
-                  v-if="item.raw.statusId === 7 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible || item.raw.statusId === 15 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
+                  v-if="item.raw.statusId === 7 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible || 
+                    item.raw.statusId === 15 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible || 
+                    item.raw.statusId === 1 && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible "
                   v-model="selectedDataTables"
                   :value="item.raw"
                   @update:modelValue="(selected) => handleSelection(selected, item.raw)"

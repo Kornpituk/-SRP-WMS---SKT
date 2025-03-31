@@ -5584,8 +5584,8 @@ const handleSavetruckOrder = async type => {
     </div>
   </section>
 
+   <!-- ใช้ AuthenticatorDialog Component -->
   <div>
-    <!-- ใช้ AuthenticatorDialog Component -->
     <AlertWord2
       v-model="isDialogVisibleAlertDialog"
       :word="wordForSubmit"
