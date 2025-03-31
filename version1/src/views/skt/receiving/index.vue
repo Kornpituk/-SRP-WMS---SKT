@@ -1917,10 +1917,10 @@ watchEffect(() => {
 
   if (selectedDataTables.value.length > 0) {
     canApprove = selectedDataTables.value.some(item => 
-      item.statusId !== 15 && item.statusId !== 7,
+      item.statusId === 15 || item.statusId === 7,
     )
     canCancel = selectedDataTables.value.some(item => 
-      item.statusId !== 1,
+      item.statusId === 1,
     )
   }
 
@@ -1966,7 +1966,7 @@ const cancelReceivingPlant = () => {
           isDialogVisibleCommentDialog.value = false
 
           // รีเฟรชหน้าจอทั้งหมด
-          // window.location.reload()
+          window.location.reload()
         })
         .catch(error => {
           // Handle errors
@@ -2464,7 +2464,7 @@ const insetSwitch1 = ref('')
               <VBtn
                 v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 style="font-size: 12px;"
-                :disabled="selectedDataTables.length < 1 || btnApprove === '1'"
+                :disabled="selectedDataTables.length < 1 || btnApprove === '0'"
                 @click="submitButton('Approve')"
               >
                 Approve
@@ -2473,7 +2473,7 @@ const insetSwitch1 = ref('')
               <VBtn
                 v-if="canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
                 style="font-size: 12px;"
-                :disabled="selectedDataTables.length < 1 || btnCancel === '1'"
+                :disabled="selectedDataTables.length < 1 || btnCancel === '0'"
                 color="error"
                 class="mx-4"
                 @click="isDialogVisibleCommentDialog = true"
@@ -3405,7 +3405,7 @@ const insetSwitch1 = ref('')
                 v-if="receivingTypeAction === 4"
                 v-model="selectedPrintLabel"
                 :disabled="disabledCheckboxListRawM()"
-                label="Reasale Receiving form"
+                label="Resale Receiving form"
                 value="Receiving Form"
                 class="ms-auto"
               >
