@@ -378,6 +378,7 @@ watchEffect(async () => {
                         text-start=""
                         text-end=""
                         :readonly="isReadOnly"
+                        style="width: 100%;"
                       /> {{ section.practice.endPracticeText }}
                       <span
                         class="text-red justify-center d-none"

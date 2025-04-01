@@ -373,6 +373,7 @@ watchEffect(async () => {
                         text-start=""
                         text-end=""
                         :readonly="isReadOnly"
+                        style="width: 100%;"
                       /> {{ section.practice.endPracticeText }}
                     </VLabel>
                   </VCol>
@@ -632,6 +633,7 @@ watchEffect(async () => {
                       label=""
                       text-start=""
                       text-end="C°"
+                      style="width: 100%;"
                       :readonly="isReadOnly"
                     />
                   </VCol>
@@ -960,6 +962,7 @@ watchEffect(async () => {
                       text-start=""
                       text-end="C°"
                       :readonly="isReadOnly"
+                      style="width: 100%;"
                     />
                     <span
                       class="text-red justify-center d-none"
