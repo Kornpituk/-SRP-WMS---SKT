@@ -156,6 +156,17 @@ function formatDateSave(date) {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
+function convertDateFormat(dateString) {
+  const parts = dateString.split("/") // แยกส่วนของวันที่
+  if (parts.length === 3) {
+    const [dd, mm, yyyy] = parts // จัดเรียงใหม่
+    
+    return `${yyyy}-${mm}-${dd}`
+  }
+  
+  return "Invalid Date Format" // กรณีรูปแบบไม่ถูกต้อง
+}
+
 const dateCurrent = ref()
 
 
@@ -668,22 +679,22 @@ const searchShipmentPlan = async () => {
   const etdDateForApi = ref(etdDateModel.value)
 
   filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
-  filterForSearchPlan.value.ETD = formatDateSave(etdDateForApi.value)
+  filterForSearchPlan.value.ETD = (etdDateForApi.value)
 
-  // if (filterForSearchPlan.value.includes(" to ")) {
-  //   // กรณีเป็นช่วงวันที่
-  //   const [startDate, endDate] = filterForSearchPlan.value.ETD.split(" to ")
+  if (filterForSearchPlan.value) {
+    // กรณีเป็นช่วงวันที่
+    const [startDate, endDate] = filterForSearchPlan.value.ETD.split(" to ")
 
-  //   filterForSearchPlan.value.ETDDateFrom = formatToMMDDYYYY(startDate)
-  //   filterForSearchPlan.value.ETDDateTo = formatToMMDDYYYY(endDate)
+    filterForSearchPlan.value.ETDDateFrom = convertDateFormat(startDate)
+    filterForSearchPlan.value.ETDDateTo = convertDateFormat(endDate)
 
-  // } else {
-  //   // กรณีเป็นวันเดียว
-  //   const singleDate = datePickerFilter.value
+  } else {
+    // กรณีเป็นวันเดียว
+    const singleDate = datePickerFilter.value
 
-  //   filterForSearchPlan.value.ETDDateFrom = formatToMMDDYYYY(singleDate)
-  //   filterForSearchPlan.value.ETDDateTo = formatToMMDDYYYY(singleDate)
-  // }
+    filterForSearchPlan.value.ETDDateFrom = convertDateFormat(singleDate)
+    filterForSearchPlan.value.ETDDateTo = convertDateFormat(singleDate)
+  }
 
   filterForSearchPlan.value.SortColumn = sortColumn.value
   filterForSearchPlan.value.SortDirection = sortDirection.value
@@ -2867,7 +2878,7 @@ const handleSavetruckOrder = async type => {
                     placeholder="ETD (dd/mm/yyyy To dd/mm/yyyy)"
                     density="compact"
                     style="font-size: 14px;"
-                    :config="{ dateFormat: 'd/m/Y'}"
+                    :config="{ dateFormat: 'd/m/Y', mode: 'range' }"
                   >
                     <template #label>
                       <span style="font-size: 12px;">ETD</span>

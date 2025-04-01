@@ -98,7 +98,8 @@ export const shipmentPlanRepository = {
         params: {
           StatusId: statusID || '',
           ETA: params.ETA || '',
-          ETD: params.ETD || '',
+          ETD_St: params.ETDDateFrom || '',
+          ETD_END: params.ETDDateTo || '',
           SalesOrderNoSearch: params.SalesOrderNoSearch || '',
           PayerNameSearch: params.PayerNameSearch || '',
           ItemNameSearch: params.ItemNameSearch || '',
