@@ -1898,7 +1898,7 @@ const handleInputAmount = (e, AmountUnits) => {
 
 // watchEffect จะเรียกใช้ calculateTotals ทุกครั้งที่ข้อมูลใน dataRaeMatRequest เปลี่ยนแปลง
 watchEffect(() => {
-  console.log('data', data.value)
+  // console.log('data', data.value)
   if (data?.value.receiveTypeId === 3) {
     genAmounUnitLorry()
   }
