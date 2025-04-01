@@ -304,10 +304,10 @@ const generatedJournalId = () => {
 //----------------------------------- Set configuration Status ---
 
 const readonlyAllInput = () => {
-  return statusId.value !== 3 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible && 
-  statusId.value !== 1 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible && 
-  statusId.value === 8 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible && 
-  statusId.value !== 9 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible
+  return statusId.value !== 3 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible &&
+    statusId.value !== 1 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible &&
+    statusId.value === 8 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible &&
+    statusId.value !== 9 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible
 }
 
 const hidedAllIconInput = () => {
@@ -327,9 +327,9 @@ watch(() => {
   generatedJournalId()
   generatedReceivingForm()
 
-  if(statusId.value === 3 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible || 
-  statusId.value === 1 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible || 
-  statusId.value === 8 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible ){
+  if (statusId.value === 3 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible ||
+    statusId.value === 1 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible ||
+    statusId.value === 8 && canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible) {
     frozeCheck.value = false
   }
 })
@@ -341,7 +341,7 @@ const maxCharsPerLine = 130
 const limitTextInputLine4 = event => {
   const inputText = event.target.value
   let lines = inputText.split('\n')
-  
+
   const maxLines = 4
   const maxCharsPerLine = 130
 
@@ -351,7 +351,7 @@ const limitTextInputLine4 = event => {
       // ถ้าตัวอักษรเกิน 130 ตัวในบรรทัดที่กำหนด ให้ขึ้นบรรทัดใหม่
       let extraText = lines[i].slice(maxCharsPerLine)
       lines[i] = lines[i].slice(0, maxCharsPerLine)
-      
+
       if (i + 1 < maxLines) {
         // ถ้าบรรทัดถัดไปยังไม่เกิน 4 ให้เพิ่มบรรทัดใหม่
         lines.splice(i + 1, 0, extraText)
@@ -382,7 +382,7 @@ const generated = () => {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
+      Authorization: `Bearer ${accessTokenAtStore}`,
     },
   },
   {})
@@ -394,7 +394,7 @@ const generated = () => {
 
     })
     .catch(error => {
-    // Handle errors
+      // Handle errors
       console.error('Error:', error)
     })
 }
@@ -574,10 +574,12 @@ const getLotReceivingForm = async () => {
   }
 }
 
-import { useGetCOAFormController, 
-  useDeleteCoaFormController, 
-  useDeleteAllCoaFormController, 
-  useSaveCOAFormController } from '@/services/skt/receivingFrom/rawMat/controller'
+import {
+  useGetCOAFormController,
+  useDeleteCoaFormController,
+  useDeleteAllCoaFormController,
+  useSaveCOAFormController,
+} from '@/services/skt/receivingFrom/rawMat/controller'
 
 const coaFiles = ref([])
 
@@ -619,7 +621,7 @@ watchEffect(() => {
   // console.log('fileMuti++', fileMuti.value)
   // console.log('files+++', files.value)
 
-  
+
 })
 
 const getCOAReceivingForm = async () => {
@@ -716,17 +718,17 @@ const validateHeader = () => {
 
   let value = 'NaN'
 
-  if(purchaseOrder.value.actualMeanNetCountKgs  === value ){
+  if (purchaseOrder.value.actualMeanNetCountKgs === value) {
     textAlertError.value.mgs += 'Net Count Kgs failed.'
     textAlertError.value.success = false
   }
 
-  if(purchaseOrder.value.actualGrandAmountUnits === value){
+  if (purchaseOrder.value.actualGrandAmountUnits === value) {
     textAlertError.value.mgs += 'Total Amount Units failed.'
     textAlertError.value.success = false
   }
 
-  if(purchaseOrder.value.actualGrandTotalQuantityKgs === value){
+  if (purchaseOrder.value.actualGrandTotalQuantityKgs === value) {
     textAlertError.value.mgs += 'Total Quantity Kgs failed.'
     textAlertError.value.success = false
   }
@@ -743,7 +745,7 @@ const saveHeaderReceivingForm = async () => {
     invoiceNo: purchaseOrder.value.invoiceNo,
     expectDeliveryDate: purchaseOrder.value.expectDeliveryDate,
     customManufacturerName: purchaseOrder.value.customManufacturerName,
-    
+
     actualMeanNetCountKgs: purchaseOrder.value.actualMeanNetCountKgs,
     actualGrandAmountUnits: purchaseOrder.value.actualGrandAmountUnits,
     actualGrandTotalQuantityKgs: purchaseOrder.value.actualGrandTotalQuantityKgs,
@@ -756,8 +758,8 @@ const saveHeaderReceivingForm = async () => {
 
   const validatedHeader = ref(validateHeader())
 
-  if(!validatedHeader.value){
-    throw 'Save header Failed'+textAlertError.value.msg
+  if (!validatedHeader.value) {
+    throw 'Save header Failed' + textAlertError.value.msg
   }
 
   // if(!purchaseOrder.value.noteText){
@@ -879,39 +881,39 @@ const alertErrorAmount = ref({
 })
 
 const validateLotNoInput = (actualAmountUnits, actualMakerLotNo, index) => {
-  if(!actualMakerLotNo && actualAmountUnits){
+  if (!actualMakerLotNo && actualAmountUnits) {
     return `Lot No.${index} is required.`
-  }else{
-    
+  } else {
+
     return ''
   }
 }
 
 const validateAmountInput = (actualAmountUnits, actualMakerLotNo, index) => {
-  if(actualMakerLotNo && !actualAmountUnits){
+  if (actualMakerLotNo && !actualAmountUnits) {
     return `Amount(Unit)${index} is required.`
-  }else{
+  } else {
     return ''
   }
 }
 
 const validateMissing = l => {
-  if(l === 1 && !purchaseOrder.value[`actualMakerLotNo_${l}`]){
+  if (l === 1 && !purchaseOrder.value[`actualMakerLotNo_${l}`]) {
     return 0
   }
-  if(!purchaseOrder.value[`actualMakerLotNo_${l}`]){
+  if (!purchaseOrder.value[`actualMakerLotNo_${l}`]) {
 
-    for (let i = l+1; i <= 5; i++) {
+    for (let i = l + 1; i <= 5; i++) {
 
-      if(purchaseOrder.value[`actualMakerLotNo_${i}`] || purchaseOrder.value[`actualAmountUnits_${i}`]){
+      if (purchaseOrder.value[`actualMakerLotNo_${i}`] || purchaseOrder.value[`actualAmountUnits_${i}`]) {
         return 0
       }
     }
 
-    if(purchaseOrder.value[`actualAmountUnits_${l}`]){
+    if (purchaseOrder.value[`actualAmountUnits_${l}`]) {
       return 0
     }
-    
+
     return -1
   }
 
@@ -925,7 +927,7 @@ const validateLotNo = (i, actualMakerLotNo, actualAmount) => {
 
   // console.log("validate++++3", validate.value)
 
-  if(validate.value === 0){
+  if (validate.value === 0) {
     alertErrorLot.value[`alertMakerLot${i}`].msg = `- Maker Lot - missing.`
     alertErrorLot.value[`alertMakerLot${i}`].success = false
 
@@ -961,18 +963,18 @@ const validateAmount = (i, actualMakerLotNo, actualAmount) => {
   const validate = ref(validateMissing(i))
   let errorMessage = ''
 
-  if(validate.value === 0 || validate.value === 1){
-    
+  if (validate.value === 0 || validate.value === 1) {
+
     // ตรวจสอบเงื่อนไขแรก
     if (!actualAmount) {
       errorMessage +=
-      `- Amount(Unit) - field blank`
+        `- Amount(Unit) - field blank`
     }
 
     // ตรวจสอบเงื่อนไขที่สอง
     else if (actualAmount < 1 && actualAmount !== null) {
       errorMessage +=
-      `- Amount(Unit) - more than 1. `
+        `- Amount(Unit) - more than 1. `
     }
   }
 
@@ -982,12 +984,12 @@ const validateAmount = (i, actualMakerLotNo, actualAmount) => {
   if (errorMessage) {
     alertErrorLot.value[`alertAmountLot${i}`].msg = errorMessage.trim() // ลบช่องว่างที่ไม่จำเป็น
     alertErrorLot.value[`alertAmountLot${i}`].success = false
-    
+
     return true  // มีข้อผิดพลาด
   } else {
-    alertErrorLot.value[`alertAmountLot${i}`].msg  = `- Amount(Unit) - Completed.` // ไม่มีข้อผิดพลาด
+    alertErrorLot.value[`alertAmountLot${i}`].msg = `- Amount(Unit) - Completed.` // ไม่มีข้อผิดพลาด
     alertErrorLot.value[`alertAmountLot${i}`].success = true
-    
+
     return false // ไม่มีข้อผิดพลาด
   }
 }
@@ -1060,7 +1062,7 @@ const getFileUrl = file => {
   if (!fileUrls.value[file.name]) {
     fileUrls.value[file.name] = URL.createObjectURL(file)
   }
-  
+
   return fileUrls.value[file.name]
 }
 
@@ -1081,15 +1083,15 @@ const removeFileN = index => {
   }
   fileCoaNew.value.splice(index, 1) // ลบไฟล์จาก array
 
-  if(file){
-    if(file.length < 1){
+  if (file) {
+    if (file.length < 1) {
       fileCoaNew.value = []
 
       // console.log('clear fileCoaNew complet!')
-    }else{
+    } else {
       // console.log('Test length < 1')
     }
-    
+
   }
 }
 
@@ -1104,7 +1106,7 @@ const removeFileO = (index, id) => {
   coaIdForDelete.value.push(id)
 
   getCoaForm.value.splice(index, 1) // ลบไฟล์จาก array
-  
+
 
 }
 
@@ -1142,7 +1144,7 @@ const handleSaveDraftCoa = async () => {
   // console.log("Start COA!!!!!")
   // console.log("Start COA!!!!!", fileCoaNew.value)
 
-  if(trickerSubmit.value){
+  if (trickerSubmit.value) {
     // if (fileCoaNew.value < 1 || getCoaForm.value < 1) {
     // // alert('Please upload at least one file')
     //   result.value -=1
@@ -1154,80 +1156,80 @@ const handleSaveDraftCoa = async () => {
     //   console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
     // }
 
-    if(fileCoaNew.value < 1){
-      if( getCoaForm.value < 1){
-        result.value -=1
+    if (fileCoaNew.value < 1) {
+      if (getCoaForm.value < 1) {
+        result.value -= 1
         textAlertError.value.success = false
         textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
 
         // console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
         throw 'Failed To Save COA. Plase Upload COA Ones.'
-      }else{
+      } else {
         // console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
       }
     }
-    
-  }else{
+
+  } else {
     // console.log("No tricker")
   }
 
-  if(getCoaForm.value){
+  if (getCoaForm.value) {
     // console.log("getCoaForm Start++++")
     result.value += 1
   }
 
-  if(deleteAllStart.value === true){
+  if (deleteAllStart.value === true) {
     // console.log("Delete All Start++++")
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success) {
       // console.log('Delete all coa  successful', resultDeleteAllCoa.value.success)
       result.value += 1
-      
-      
+
+
     } else {
-      result.value -=1
+      result.value -= 1
       console.error('Failed to delete all coa')
       throw 'Failed to save coa'
     }
   }
 
-  if(fileCoaNew.value){
+  if (fileCoaNew.value) {
     // console.log("Upload Start++++")
     await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (saveCoaForm) {
       // console.log('Save coa  successful', saveCoaForm.value.success)
       result.value += 1
-      
+
       // return saveCoaForm
     } else {
-      result.value -=1
+      result.value -= 1
       console.error('Failed to save coa')
       throw 'Failed to save coa'
     }
   }
 
-  if(coaIdForDelete.value.length > 0){
+  if (coaIdForDelete.value.length > 0) {
     // console.log("delete by id Start++++")
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteByIdCoa.value.success === true) {
       // console.log('Delete coa by id successful', resultDeleteByIdCoa.value.success)
       result.value += 1
-      
+
       // return resultDeleteByIdCoa
     } else {
-      result.value -=1
+      result.value -= 1
       console.error('Failed to save coa')
       throw 'Failed to delete coa by id'
     }
-    
+
   }
 
-  if(result.value <= 0) {
+  if (result.value <= 0) {
     throw 'Failed to handleSaveDraftCoa'
   }
 
   // console.log("Result COA", result.value)
-  
+
   return result
 
   // throw 'success!'
@@ -1403,7 +1405,7 @@ const loadindingSaveDatftSeccess3 = ref(false)
 
 
 //--------------------- alertDialog--------------------------------------------------------
-import AuthenticatorDialog  from '@/components/dialogs/alert/alertDialog.vue'
+import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
 
 const isDialogVisibleAlertDialog = ref(false)
 const showOnlyErrors = ref(false)
@@ -1414,7 +1416,7 @@ const testWord = word => {
 }
 
 const submitButtonVisibleNew = async word => {
-  
+
   wordForSubmit.value = word
 
   // console.log("submit submitButtonVisibleNew1111", wordForSubmit.value, word)
@@ -1516,7 +1518,7 @@ const submitButtonVisibleNew = async word => {
   // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
   // isDialogVisibleStepSaveDraft.value = false
 
-  if(trickerSubmit.value !== true){
+  if (trickerSubmit.value !== true) {
     textAlertDialogFunction(word, true)
 
     setTimeout(() => {
@@ -1525,7 +1527,7 @@ const submitButtonVisibleNew = async word => {
 
     // location.reload()
   }
-  
+
   // isDialogSubmitSuccessVisible.value = true
   // console.log("%ctrickerSubmit Step", "color: yellow; font-weight: bold",  trickerSubmit.value)
   isDialogConfirmVisible.value = false
@@ -1540,7 +1542,7 @@ const submitReceivingForm = async () => {
     trickerSubmit.value = true
 
     // console.log("%ctrickerSubmit Submit", "color: yellow; font-weight: bold", trickerSubmit.value)
-    
+
     const isSuccess = await submitButtonVisibleNew()
 
     // ถ้า submitButtonVisibleNew() ไม่สำเร็จ (สมมติว่ามันคืนค่า false เมื่อไม่สำเร็จ)
@@ -1573,7 +1575,7 @@ const submitReceivingForm = async () => {
         // if(isSuccess){
         //   textAlertDialogFunction('SUBMIT', true)
         // }
-        
+
 
         // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
 
@@ -1582,7 +1584,7 @@ const submitReceivingForm = async () => {
         setTimeout(() => {
           window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
         }, 200) // 10000 มิลลิวินาที = 10 วินาที
-        
+
       })
       .catch(error => {
         // Handle errors
@@ -1637,10 +1639,10 @@ const handelBackToEdit = async () => {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`, 
+      Authorization: `Bearer ${accessTokenAtStore}`,
     },
     params: {
-      purchasingQuantityPcs: purchasingQuantityPcsModel.value ||  data?.value.purchasingQuantityPcs,
+      purchasingQuantityPcs: purchasingQuantityPcsModel.value || data?.value.purchasingQuantityPcs,
       purchasingAmountKgs: dataHeaderReceving?.value.packagingQtyKg * purchasingQuantityPcsModel.value || backUpPurchasingAmount.value,
     },
   },
@@ -1657,10 +1659,10 @@ const handelBackToEdit = async () => {
 
         window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 200) // 10000 มิลลิวินาที = 10 วินาที
-    
+
     })
     .catch(error => {
-    // Handle errors
+      // Handle errors
       textAlertDialogFunction('Partial RCVD', false)
       console.error('Error:', error)
 
@@ -1731,12 +1733,12 @@ watchEffect(() => {
       if (data.value.receiveTypeId === 2) {
         purchaseOrder.value[netCountField] = dataHeaderReceving.value.packagingQtyKg
       } else if (data.value.receiveTypeId === 3 && dataHeaderReceving.value.packagingQtyKg === 0) {
-        if(data.value.statusId === 15 || data.value.statusId === 17 ){
+        if (data.value.statusId === 15 || data.value.statusId === 17) {
           purchaseOrder.value[netCountField] = purchaseOrder.value[netCountField]
-        }else{
+        } else {
           purchaseOrder.value[netCountField] = dataHeaderReceving.value.purchasingAmountKgs
         }
-        
+
       }
     } else {
       purchaseOrder.value[netCountField] = null
@@ -1750,7 +1752,7 @@ watchEffect(() => {
 
     updateNetCountKgs(i, lotNo, netCountField)
   }
-  
+
 
   // ---------------------- Amount ---------------------  
   for (let i = 1; i <= 5; i++) {
@@ -1767,7 +1769,7 @@ watchEffect(() => {
   }
 
   // ---------------------- reset grand net count  ---------------------
-  if(purchaseOrder.value.actualMeanNetCountKgs === 'NaN'){
+  if (purchaseOrder.value.actualMeanNetCountKgs === 'NaN') {
     purchaseOrder.value.actualMeanNetCountKgs = 0
   }
 })
@@ -1775,9 +1777,9 @@ watchEffect(() => {
 // ฟังก์ชันสำหรับคำนวณค่า total
 
 const genAmounUnitLorry = () => {
-  if(purchaseOrder?.value.actualMakerLotNo_1){
+  if (purchaseOrder?.value.actualMakerLotNo_1) {
     purchaseOrder.value.actualAmountUnits_1 = 1
-  }else{
+  } else {
     purchaseOrder.value.actualAmountUnits_1 = 199
   }
 }
@@ -1838,7 +1840,7 @@ function formatNumberWithCommas(value) {
 const formatNumber = value => {
   if (value !== null && value !== undefined) {
     return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }else{
+  } else {
     return '0.00'
   }
 
@@ -1897,10 +1899,10 @@ const handleInputAmount = (e, AmountUnits) => {
 // watchEffect จะเรียกใช้ calculateTotals ทุกครั้งที่ข้อมูลใน dataRaeMatRequest เปลี่ยนแปลง
 watchEffect(() => {
   console.log('data', data.value)
-  if(data?.value.receiveTypeId === 3){
+  if (data?.value.receiveTypeId === 3) {
     genAmounUnitLorry()
   }
-  
+
   calculationPONew()
 })
 
@@ -2113,7 +2115,7 @@ const getDisabledFollowStatusNRole = () => {
     <VProgressLinear
       height="20"
       color="success"
-      indeterminate 
+      indeterminate
     >
       <span>Loading</span>
     </VProgressLinear>
@@ -2343,7 +2345,6 @@ const getDisabledFollowStatusNRole = () => {
                     #label
                   >
                     <VIcon
-                    
                       color="green"
                       icon="ri-edit-line"
                     />
@@ -2630,7 +2631,6 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextField>
 
                 {{ formatNumber(purchaseOrder.actualNetCountKgs_1) }}
-              
               </td>
 
               <td
@@ -2865,7 +2865,7 @@ const getDisabledFollowStatusNRole = () => {
                   v-model="purchaseOrder.actualAmountUnits_1"
                   :readonly="readonlyAllInput()"
                   :rules="[
-                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                     v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                   ]"
                   density="compact"
@@ -2882,7 +2882,8 @@ const getDisabledFollowStatusNRole = () => {
                     <span style="font-size: 12px; padding-block-start: 2px;">Unit</span>
                   </template>
                 </VTextField>
-                <span v-if="data?.receiveTypeId === 3 && purchaseOrder.actualAmountUnits_1">{{ purchaseOrder.actualAmountUnits_1 }}</span>
+                <span v-if="data?.receiveTypeId === 3 && purchaseOrder.actualAmountUnits_1">{{
+                  purchaseOrder.actualAmountUnits_1 }}</span>
                 <span v-if="data?.receiveTypeId === 3 && !purchaseOrder.actualAmountUnits_1">0</span>
                 <span
                   v-if="validateAmountInput(purchaseOrder.actualAmountUnits_1, purchaseOrder.actualMakerLotNo_1, 1) !== ''"
@@ -2902,7 +2903,7 @@ const getDisabledFollowStatusNRole = () => {
                   v-model="purchaseOrder.actualAmountUnits_2"
                   :readonly="readonlyAllInput()"
                   :rules="[
-                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                     v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                   ]"
                   density="compact"
@@ -2937,7 +2938,7 @@ const getDisabledFollowStatusNRole = () => {
                   v-model="purchaseOrder.actualAmountUnits_3"
                   :readonly="readonlyAllInput()"
                   :rules="[
-                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                     v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                   ]"
                   density="compact"
@@ -2971,7 +2972,7 @@ const getDisabledFollowStatusNRole = () => {
                   v-model="purchaseOrder.actualAmountUnits_4"
                   :readonly="readonlyAllInput()"
                   :rules="[
-                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                     v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                   ]"
                   density="compact"
@@ -3005,7 +3006,7 @@ const getDisabledFollowStatusNRole = () => {
                   v-model="purchaseOrder.actualAmountUnits_5"
                   :readonly="readonlyAllInput()"
                   :rules="[
-                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น', 
+                    v => v === '' || (!!v && /^\d+$/.test(v)) || 'กรุณากรอกตัวเลขเท่านั้น',
                     v => v === '' || v >= 1 || 'ค่าที่กรอกต้องไม่น้อยกว่า 1'
                   ]"
                   density="compact"
@@ -3131,7 +3132,7 @@ const getDisabledFollowStatusNRole = () => {
               >
                 <span v-if="data.receiveTypeId === 3 && dataHeaderReceving.packagingQtyKg === 0">{{
                   formatNumber(data.purchasingAmountKgs) }}</span>
-                
+
                 <span v-if="data.receiveTypeId === 2">{{ formatNumber(dataHeaderReceving.packagingQtyKg) }}</span>
               </td>
               <th
@@ -3236,7 +3237,8 @@ const getDisabledFollowStatusNRole = () => {
                 style="min-width: 150px; max-width: 150px;"
               >
                 <span v-if="statusId !== 8">{{ formatNumber(data.purchasingAmountKgs) }}</span>
-                <span v-if="statusId === 8">{{ isNaN(totalPurchasingAmount) || !totalPurchasingAmount ? '0.00' : formatNumber(totalPurchasingAmount) }}</span>
+                <span v-if="statusId === 8">{{ isNaN(totalPurchasingAmount) || !totalPurchasingAmount ? '0.00' :
+                  formatNumber(totalPurchasingAmount) }}</span>
               </td>
               <th
                 class="text-center"
@@ -3570,7 +3572,7 @@ const getDisabledFollowStatusNRole = () => {
                 counter
                 :rules="[
                   v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
-                ]" 
+                ]"
                 @input="limitTextInputLine4"
               >
                 <template
@@ -3586,7 +3588,8 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="textAlertError.note && !purchaseOrder.noteText"
                 class="text-red"
-              >{{ textAlertError.note }}</span>
+              >{{ textAlertError.note
+              }}</span>
             </th>
           </tr>
         </Table>
@@ -3834,7 +3837,8 @@ const getDisabledFollowStatusNRole = () => {
               <span
                 v-if="textAlertError.coa && !getCoaForm && trickerSubmit"
                 class="text-red"
-              >{{ textAlertError.coa }}</span>
+              >{{ textAlertError.coa
+              }}</span>
             </th>
           </tr>
         </Table>
@@ -3923,7 +3927,7 @@ const getDisabledFollowStatusNRole = () => {
       >
         <div class="py-0 d-flex justify-end">
           <VBtn
-            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
+            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
             class="mx-4"
             color="warning"
             style="font-size: 12px;"
@@ -3932,7 +3936,7 @@ const getDisabledFollowStatusNRole = () => {
             SAVE DRAFT
           </VBtn>
           <VBtn
-            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
+            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
             color="green"
             style="font-size: 12px;"
             @click="submitButton('SUBMIT')"
@@ -3957,7 +3961,7 @@ const getDisabledFollowStatusNRole = () => {
       >
         <div class="py-0 d-flex justify-end">
           <VBtn
-            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
+            v-if="getDisabledFollowStatusNRole() && canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
             class=""
             color="green"
             style="font-size: 12px;"
@@ -4107,7 +4111,7 @@ const getDisabledFollowStatusNRole = () => {
             <VCardText />
             <!-- Header -->
             <VCardText v-if="!textAlertError.success && textAlertError.note">
-              <VAlert 
+              <VAlert
                 title="Verify The Accuracy Of The Header"
                 variant="outlined"
                 closable
@@ -4116,7 +4120,9 @@ const getDisabledFollowStatusNRole = () => {
                 <span
                   v-if="false"
                   class="text-start"
-                >Header Validated :</span> <span class="text-red">{{ textAlertError.mgs }} </span>
+                >Header Validated :</span> <span class="text-red">{{
+                  textAlertError.mgs
+                }} </span>
                 <span class="text-start">Alert Note :</span> <span class="text-red">{{ textAlertError.note }} </span>
               </VAlert>
             </VCardText>
@@ -4156,7 +4162,7 @@ const getDisabledFollowStatusNRole = () => {
                       <VIcon
                         color="error"
                         icon="ri-error-warning-fill"
-                      />Lot No.{{ value.index }} 
+                      />Lot No.{{ value.index }}
                       {{ value.msg }}
                     </span>
                     <span
@@ -4175,7 +4181,7 @@ const getDisabledFollowStatusNRole = () => {
             </VCardText>
             <!-- Coa -->
             <VCardText v-if="!textAlertError.success && textAlertError.coa && !textAlertError.note">
-              <VAlert 
+              <VAlert
                 title="Verify The Accuracy Of The COA"
                 variant="outlined"
                 closable

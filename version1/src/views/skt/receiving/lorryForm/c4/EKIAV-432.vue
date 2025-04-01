@@ -357,6 +357,7 @@ watchEffect(async () => {
                         variant="solo"
                         text-start=""
                         text-end=""
+                        style="width: 100%;"
                         :readonly="isReadOnly"
                       /> 
                       <span v-html="section.practice.endPracticeText" />

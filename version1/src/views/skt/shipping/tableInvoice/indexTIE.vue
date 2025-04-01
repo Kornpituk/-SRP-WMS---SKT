@@ -599,6 +599,8 @@ const filterForSearchPlan = ref({
   StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
   ETA: etaDateModel.value || '',
   ETD: etdDateModel.value || '',
+  ETDDateFrom: '',
+  ETDDateTo: '',
   SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
   PayerNameSearch: sessionStorage.getItem("PayerNameSearchProductionFilter") || '',
   ItemNameSearch: sessionStorage.getItem("ItemNameSearchProductionFilter") || '',
@@ -654,6 +656,8 @@ watchEffect( () => {
   //console.log('checkValueFilter', filterForSearchPlan.valu)
 })
 
+
+
 const searchShipmentPlan = async () => {
   isLoading.value = true
 
@@ -665,6 +669,21 @@ const searchShipmentPlan = async () => {
 
   filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
   filterForSearchPlan.value.ETD = formatDateSave(etdDateForApi.value)
+
+  // if (filterForSearchPlan.value.includes(" to ")) {
+  //   // กรณีเป็นช่วงวันที่
+  //   const [startDate, endDate] = filterForSearchPlan.value.ETD.split(" to ")
+
+  //   filterForSearchPlan.value.ETDDateFrom = formatToMMDDYYYY(startDate)
+  //   filterForSearchPlan.value.ETDDateTo = formatToMMDDYYYY(endDate)
+
+  // } else {
+  //   // กรณีเป็นวันเดียว
+  //   const singleDate = datePickerFilter.value
+
+  //   filterForSearchPlan.value.ETDDateFrom = formatToMMDDYYYY(singleDate)
+  //   filterForSearchPlan.value.ETDDateTo = formatToMMDDYYYY(singleDate)
+  // }
 
   filterForSearchPlan.value.SortColumn = sortColumn.value
   filterForSearchPlan.value.SortDirection = sortDirection.value
@@ -2848,7 +2867,7 @@ const handleSavetruckOrder = async type => {
                     placeholder="ETD (dd/mm/yyyy To dd/mm/yyyy)"
                     density="compact"
                     style="font-size: 14px;"
-                    :config="{ dateFormat: 'd/m/Y' }"
+                    :config="{ dateFormat: 'd/m/Y'}"
                   >
                     <template #label>
                       <span style="font-size: 12px;">ETD</span>
@@ -5584,8 +5603,8 @@ const handleSavetruckOrder = async type => {
     </div>
   </section>
 
+  <!-- ใช้ AuthenticatorDialog Component -->
   <div>
-    <!-- ใช้ AuthenticatorDialog Component -->
     <AlertWord2
       v-model="isDialogVisibleAlertDialog"
       :word="wordForSubmit"

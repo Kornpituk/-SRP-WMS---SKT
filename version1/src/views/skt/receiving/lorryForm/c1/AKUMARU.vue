@@ -391,6 +391,7 @@ function formatDate(dateString) {
                         text-start=""
                         text-end=""
                         :readonly="isReadOnly"
+                        style="width: 100%;"
                       /> {{ section.practice.endPracticeText }}
                     </VLabel>
                   </VCol>

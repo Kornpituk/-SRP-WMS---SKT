@@ -372,7 +372,7 @@ const getVariantType = (filesLength, filesModelLength) => {
                 <iframe 
                   :src="'https://docs.google.com/viewer?url=' +file.fileUri + '&embedded=true'" 
                   type="application/pdf" 
-                  style="width: 80%; height: 500px; border: none;"
+                  style="width: 50%; height: 50%; border: none;"
                 />
               </div>
 
@@ -384,7 +384,7 @@ const getVariantType = (filesLength, filesModelLength) => {
                 <iframe 
                   :src="file.objectUrl"
                   type="application/pdf"
-                  style="width: 80%; height: 500px;"
+                  style="width: 50%; height: 50%;"
                 />
               </div>
             </VCarouselItem>
@@ -486,7 +486,9 @@ const getVariantType = (filesLength, filesModelLength) => {
                     max-height="125"
                     :src="file.objectUrl"
                   />
-                  <VChip color="success"><span class="text-green">New</span></VChip>
+                  <VChip color="success">
+                    <span class="text-green">New</span>
+                  </VChip>
                 </div>
 
                 <div v-else-if="file.contentType === 'application/octet-stream'">
@@ -503,9 +505,9 @@ const getVariantType = (filesLength, filesModelLength) => {
                   class="d-flex justify-center align-center"
                 >
                   <iframe 
-                    :src="'https://docs.google.com/viewer?url=' +file.fileUri + '&embedded=true'" 
+                    :src="`https://docs.google.com/gview?url=${urlApi}${file.fileUri}&embedded=true`"  
                     type="application/pdf" 
-                    style="width: 80%; height: 500px; border: none;"
+                    style="width: 80%; height: 50%; border: none;"
                   />
                 </div>
   
@@ -530,7 +532,6 @@ const getVariantType = (filesLength, filesModelLength) => {
                     type="application/pdf"
                     style="width: 80%;"
                   />
-                  4
                 </div>
 
                 <VCardText class="pa-2">
