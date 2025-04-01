@@ -4625,7 +4625,7 @@ const handleSavetruckOrder = async type => {
                     isSelected(product) ? '#E0F7FA' : 
                     '',
                   borderTop:
-                    dataTableNummberedToggle  === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
                   borderBottom:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
                 }"
@@ -5409,17 +5409,6 @@ const handleSavetruckOrder = async type => {
       </section>
     </VCard>
   </section>
-
-  <section v-else>
-    <VProgressLinear
-          height="20"
-          color="secondary"
-          class="elevation-1"
-        >
-          <span>No Data....</span>
-        </VProgressLinear>
-  </section>
-
 
   <!-- Footer -->
   <section
