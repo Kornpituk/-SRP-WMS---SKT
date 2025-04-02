@@ -1991,13 +1991,7 @@ const getDisabledFollowStatusNRole = () => {
                     :rules="[
                       value => value !== '' || !value || 'Actual value is required!',
                       value => value.length <= 44 || 'Must be 45 characters or less',
-                      value => {
-                        if (value && value[0] === ' ') {
-                          item.itemAnalyticals[0].actualAnalysis = null
-                          return `first can't be a space.`
-                        }
-                        return true
-                      }
+                      
                     ]"
                     density="compact"
                     :maxlength="45" 
@@ -2017,7 +2011,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[0]?.inspReqLotJournalId)"
                   >
                     <span
@@ -2037,19 +2031,13 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
-                    value => {
-                      if (value && value[0] === ' ') {
-                        item.itemAnalyticals[0].actualAnalysis = null
-                        return `first can't be a space.`
-                      }
-                      return true
-                    }
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                    
                   ]"
                 >
                   <template
@@ -2113,14 +2101,7 @@ const getDisabledFollowStatusNRole = () => {
                     :readonly="frozeCheck"
                     density="compact"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
-                      value => {
-                        if (value && value[0] === ' ') {
-                          item.itemAnalyticals[1].actualAnalysis = null
-                          return `first can't be a space.`
-                        }
-                        return true
-                      }
+                      value => value.length <= 99 || 'Must be 100 characters or less',9
                     ]"
                     :maxlength="45"
                   >
@@ -2140,7 +2121,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[1]?.inspReqLotJournalId)"
                   >
                     <span
@@ -2160,19 +2141,13 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
-                    value => {
-                      if (value && value[1] === ' ') {
-                        item.itemAnalyticals[1].actualAnalysis = null
-                        return `first can't be a space.`
-                      }
-                      return true
-                    }
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                    
                   ]"
                 >
                   <template
@@ -2236,14 +2211,7 @@ const getDisabledFollowStatusNRole = () => {
                     :readonly="frozeCheck"
                     density="compact"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
-                      value => {
-                        if (value && value[0] === ' ') {
-                          item.itemAnalyticals[2].actualAnalysis = null
-                          return `first can't be a space.`
-                        }
-                        return true
-                      }
+                      value => value.length <= 99 || 'Must be 100 characters or less',9
                     ]"
                     :maxlength="45" 
                   >
@@ -2262,7 +2230,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[2]?.inspReqLotJournalId)"
                   >
                     <span
@@ -2282,19 +2250,13 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
-                    value => {
-                      if (value && value[2] === ' ') {
-                        item.itemAnalyticals[2].actualAnalysis = null
-                        return `first can't be a space.`
-                      }
-                      return true
-                    }
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                    
                   ]"
                 >
                   <template
@@ -2357,14 +2319,8 @@ const getDisabledFollowStatusNRole = () => {
                     :readonly="frozeCheck"
                     density="compact"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
-                      value => {
-                        if (value && value[0] === ' ') {
-                          item.itemAnalyticals[3].actualAnalysis = null
-                          return `first can't be a space.`
-                        }
-                        return true
-                      }
+                      value => value.length <= 99 || 'Must be 100 characters or less',
+                      
                     ]"
                     :maxlength="45" 
                   >
@@ -2383,7 +2339,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[3]?.inspReqLotJournalId)"
                   >
                     <span
@@ -2403,19 +2359,12 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
-                    value => {
-                      if (value && value[3] === ' ') {
-                        item.itemAnalyticals[3].actualAnalysis = null
-                        return `first can't be a space.`
-                      }
-                      return true
-                    }
+                    value => value.length <= 99 || 'Must be 100 characters or less',
                   ]"
                 >
                   <template
@@ -2478,14 +2427,7 @@ const getDisabledFollowStatusNRole = () => {
                     :readonly="frozeCheck"
                     density="compact"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
-                      value => {
-                        if (value && value[0] === ' ') {
-                          item.itemAnalyticals[4].actualAnalysis = null
-                          return `first can't be a space.`
-                        }
-                        return true
-                      }
+                      value => value.length <= 99 || 'Must be 100 characters or less',
                     ]"
                     :maxlength="45" 
                   >
@@ -2504,7 +2446,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[4]?.inspReqLotJournalId)"
                   >
                     <span
@@ -2524,19 +2466,13 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
-                    value => {
-                      if (value && value[4] === ' ') {
-                        item.itemAnalyticals[4].actualAnalysis = null
-                        return `first can't be a space.`
-                      }
-                      return true
-                    }
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                    
                   ]"
                 >
                   <template
@@ -2666,14 +2602,8 @@ const getDisabledFollowStatusNRole = () => {
                     density="compact"
                     :readonly="frozeCheck"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
-                      value => {
-                        if (value && value[0] === ' ') {
-                          item.itemAnalyticals[0].actualAnalysis = null
-                          return `first can't be a space.`
-                        }
-                        return true
-                      }
+                      value => value.length <= 101 || 'Must be 100 characters or less',
+                      
                     ]"
                     :maxlength="45" 
                   >
@@ -2693,7 +2623,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 101) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[0]?.inspReqLotJournalId)"
                   >
                     <span
@@ -2713,19 +2643,12 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
-                    value => {
-                      if (value && value[0] === ' ') {
-                        item.itemAnalyticals[0].actualAnalysis = null
-                        return `first can't be a space.`
-                      }
-                      return true
-                    }
+                    value => value.length <= 101 || 'Must be 100 characters or less',
                   ]"
                 >
                   <template
@@ -2735,7 +2658,6 @@ const getDisabledFollowStatusNRole = () => {
                     <VIcon icon="ri-edit-line" />
                   </template>
                 </VTextarea>
-                
 
                 <span
                   v-if="checkAnalysitItem(item, item.typeID, 0)"
@@ -2789,7 +2711,7 @@ const getDisabledFollowStatusNRole = () => {
                     :readonly="frozeCheck"
                     density="compact"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => value.length <= 101 || 'Must be 100 characters or less',
                       value => {
                         if (value && value[0] === ' ') {
                           item.itemAnalyticals[1].actualAnalysis = null
@@ -2815,7 +2737,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[1]?.inspReqLotJournalId)"
                   >
                     <span
@@ -2835,12 +2757,12 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 101) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
                     value => {
                       if (value && value[1] === ' ') {
                         item.itemAnalyticals[1].actualAnalysis = null
@@ -2909,9 +2831,9 @@ const getDisabledFollowStatusNRole = () => {
                     :readonly="frozeCheck"
                     density="compact"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => value.length <= 101 || 'Must be 100 characters or less',
                       value => {
-                        if (value && value[0] === ' ') {
+                        if (value && value[2] === ' ') {
                           item.itemAnalyticals[2].actualAnalysis = null
                           return `first can't be a space.`
                         }
@@ -2935,7 +2857,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[2]?.inspReqLotJournalId)"
                   >
                     <span
@@ -2955,12 +2877,12 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
                     value => {
                       if (value && value[2] === ' ') {
                         item.itemAnalyticals[2].actualAnalysis = null
@@ -3029,7 +2951,7 @@ const getDisabledFollowStatusNRole = () => {
                     :readonly="frozeCheck"
                     density="compact"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => value.length <= 101 || 'Must be 100 characters or less',
                       value => {
                         if (value && value[0] === ' ') {
                           item.itemAnalyticals[3].actualAnalysis = null
@@ -3055,7 +2977,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[3]?.inspReqLotJournalId)"
                   >
                     <span
@@ -3075,12 +2997,12 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
                     value => {
                       if (value && value[3] === ' ') {
                         item.itemAnalyticals[3].actualAnalysis = null
@@ -3148,7 +3070,7 @@ const getDisabledFollowStatusNRole = () => {
                     :readonly="frozeCheck"
                     density="compact"
                     :rules="[
-                      value => value.length <= 44 || 'Must be 45 characters or less',
+                      value => value.length <= 101 || 'Must be 100 characters or less',
                       value => {
                         if (value && value[0] === ' ') {
                           item.itemAnalyticals[4].actualAnalysis = null
@@ -3175,7 +3097,7 @@ const getDisabledFollowStatusNRole = () => {
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
                     variant="outlined"
                     dencity="compact"
-                    :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                    :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                     @click="toggleDialog(item.itemAnalyticals[4]?.inspReqLotJournalId)"
                   >
                     <span
@@ -3195,12 +3117,12 @@ const getDisabledFollowStatusNRole = () => {
                   class="my-2"
                   rows="2"
                   auto-grow
-                  :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 44) ? 'primary' : 'red'"
+                  :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 99) ? 'primary' : 'red'"
                   placeholder="Placeholder Text"
                   :readonly="frozeCheck"
                   :rules="[
                     value => value !== '' || !value || 'Actual value is required!',
-                    value => value.length <= 44 || 'Must be 45 characters or less',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
                     value => {
                       if (value && value[4] === ' ') {
                         item.itemAnalyticals[4].actualAnalysis = null
@@ -3497,7 +3419,7 @@ const getDisabledFollowStatusNRole = () => {
           style="font-size: 12px;"
           @click="saveDraftButton('SAVE DRAFT')"
         >
-          SAVE DRAFT || 5555
+          SAVE DRAFT
         </VBtn>
         <VBtn
           v-if="canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
