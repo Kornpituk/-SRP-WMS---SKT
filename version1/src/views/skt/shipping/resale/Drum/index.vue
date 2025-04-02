@@ -1348,7 +1348,7 @@ const dessertsMockAmountView = [
     <span
       class="text-center d-flex justify-center"
       style="font-weight: bolder;"
-    >Resale / Product Shipping Check Sheet ({{ getShippingCheckSheetResult?.checkSheetItems[0].packging }}) on {{ getCurrentDate() }}</span>
+    >Resale / Product Shipping Check Sheet (<span v-if="getShippingCheckSheetResult.checkSheetItems[0]">{{ getShippingCheckSheetResult?.checkSheetItems[0].packging }}</span>) on {{ getCurrentDate() }}</span>
     <div class="my-6">
       <VRow>
         <VCol cols="12">

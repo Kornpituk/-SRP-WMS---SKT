@@ -3491,13 +3491,13 @@ const getDisabledFollowStatusNRole = () => {
           Send Back
         </VBtn>
         <VBtn
-          v-if="!frozeCheck"
+          v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
           class="mx-4"
           color="warning"
           style="font-size: 12px;"
           @click="saveDraftButton('SAVE DRAFT')"
         >
-          SAVE DRAFT
+          SAVE DRAFT || 5555
         </VBtn>
         <VBtn
           v-if="canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
