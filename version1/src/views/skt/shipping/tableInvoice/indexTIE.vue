@@ -9,29 +9,29 @@ import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 const department = ref(userDataInfo.value.departmentName)
-const dataRowModel  =ref()
+const dataRowModel = ref()
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
 
 
-  if( dataRow?.statusId === 205 ){
+  if (dataRow?.statusId === 205) {
     return true
-  }else if (
+  } else if (
     department.value === 'Warehouse' &&
-  (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
+    (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
   ) {
     return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
   }
-  else if(department.value === 'Warehouse' && whStatusId === 404){
+  else if (department.value === 'Warehouse' && whStatusId === 404) {
     return true
-  }else if(department.value === 'Logistic' && logStatusId === 504){
+  } else if (department.value === 'Logistic' && logStatusId === 504) {
     return true
-  }else if(department.value === 'Inspection' && inspStatusId === 604){
+  } else if (department.value === 'Inspection' && inspStatusId === 604) {
     return true
-  }else if(department.value === 'Sale and Marketing' && salStatusId === 304){
+  } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
     return true
-  }else{ 
+  } else {
     return false
   }
 }
@@ -40,15 +40,15 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
 
 const disabledStatusWithOutAdminUser = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
 
-  if(department.value === 'Warehouse' && whStatusId === 404){
+  if (department.value === 'Warehouse' && whStatusId === 404) {
     return true
-  }else if(department.value === 'Logistic' && logStatusId === 504){
+  } else if (department.value === 'Logistic' && logStatusId === 504) {
     return true
-  }else if(department.value === 'Inspection' && inspStatusId === 604){
+  } else if (department.value === 'Inspection' && inspStatusId === 604) {
     return true
-  }else if(department.value === 'Sale and Marketing' && salStatusId === 304){
+  } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
     return true
-  }else{
+  } else {
     return false
   }
 }
@@ -75,7 +75,7 @@ const textAlertDialogFunction = (word, success) => {
 const isDialogLoadingVisible = ref(false)
 const wordLoading = ref('')
 
-const handleDialogLoading = type=> {
+const handleDialogLoading = type => {
   wordLoading.value = type
   isDialogLoadingVisible.value = true
 }
@@ -91,14 +91,14 @@ function openConfirmDialog(type, SoEId, productRow) {
   productRowModel.value = productRow
 
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
-  if(type === 'submit'){
+  if (type === 'submit') {
     wordForSubmit.value = type
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
 
     //console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
-    
-  }else if(type === 'back'){
+
+  } else if (type === 'back') {
     wordForSubmit.value = "SEND BACK"
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
@@ -130,15 +130,15 @@ function openConfirmDialog(type, SoEId, productRow) {
 }
 
 function handleConfirmAction() {
-  if( wordForSubmit.value === 'submit'){
+  if (wordForSubmit.value === 'submit') {
     submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
-  }else if(wordForSubmit.value === 'SEND BACK'){
+  } else if (wordForSubmit.value === 'SEND BACK') {
     submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
 
     //console.log('back')
   }
-  
-  
+
+
 }
 
 function handleCancel() {
@@ -160,10 +160,10 @@ function convertDateFormat(dateString) {
   const parts = dateString.split("/") // แยกส่วนของวันที่
   if (parts.length === 3) {
     const [dd, mm, yyyy] = parts // จัดเรียงใหม่
-    
+
     return `${yyyy}-${mm}-${dd}`
   }
-  
+
   return "Invalid Date Format" // กรณีรูปแบบไม่ถูกต้อง
 }
 
@@ -235,7 +235,7 @@ const canVisibleUserPermission = (statusId, uiControlContextId) => {
 }
 
 const disShowTableShipmentPLand = () => !['00011',
-  '00012', 
+  '00012',
   '00013',
   '00014',
   '00015',
@@ -243,7 +243,7 @@ const disShowTableShipmentPLand = () => !['00011',
   '00030',
   '00031',
   '00033',
-  '00032', 
+  '00032',
   '00034',
   '00044',
   '00045'].includes(userDataInfo.value.id)
@@ -259,13 +259,13 @@ watch(() => {
 })
 
 const disableShowDataByDepartment = () => {
-  
 
-  if(userData?.value){
-    return !(userData.value.departmentId === '007'|| 
-  userData.value.departmentId === '008' ||  
-  userData.value.departmentId === '010' ||
-  userData.value.departmentId === '009')
+
+  if (userData?.value) {
+    return !(userData.value.departmentId === '007' ||
+      userData.value.departmentId === '008' ||
+      userData.value.departmentId === '010' ||
+      userData.value.departmentId === '009')
   }
 }
 
@@ -342,7 +342,7 @@ const dialogConfig = {
 const textAreaDialogActive = (type, data, index) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
-  
+
   // โหลดค่าจากคอนฟิก
   const config = dialogConfig[type]
   if (config) {
@@ -368,10 +368,10 @@ const btnCloseShipCon = async () => {
 
   //console.log('btnCloseShipCon...', paginatedData.value)
 
-  if(!disabledModel.value){
+  if (!disabledModel.value) {
     await saveShipmentPlan(dataRowForUse.value)
   }
-  
+
   dialogVisible.value = false
 }
 
@@ -379,23 +379,23 @@ const btnTextarea = () => {
   //console.log('textAreaRemarkDialogActive', typeDialogTextArea.value)
   paginatedData.value.forEach(item => {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
-      if(typeDialogTextArea.value === 'Remark WH'){
+      if (typeDialogTextArea.value === 'Remark WH') {
         item.wH_Remarks = dialogRemark.value
 
         // //console.log('btnCloseRemark... Remark WH', dialogRemark.value)
-      }else if(typeDialogTextArea.value === 'Remark SAL'){
+      } else if (typeDialogTextArea.value === 'Remark SAL') {
         item.saL_Remarks = dialogRemark.value
 
         // //console.log('btnCloseRemark... Remark SAL', dialogRemark.value, item.saL_Remarks)
-      }else if(typeDialogTextArea.value === 'Remark LOG'){
+      } else if (typeDialogTextArea.value === 'Remark LOG') {
         item.loG_Remarks = dialogRemark.value
 
         // //console.log('btnCloseRemark... Remark LOG', dialogRemark.value)
-      }else if(typeDialogTextArea.value === 'Lot'){
+      } else if (typeDialogTextArea.value === 'Lot') {
         item.lot = dialogRemark.value
       }
-      
-    }else{
+
+    } else {
       //console.log('btnCloseRemark... ELSe', typeDialogTextArea.value, soEIdModel.value, item.soEtlLogDetailJournalID)
     }
   })
@@ -405,7 +405,7 @@ const btnTextarea = () => {
 }
 
 const textAreaRemarkDialogActive = (type, data, soEId, disabledRow, disPermiss) => {
- 
+
   typeDialogTextArea.value = type
   soEIdModel.value = soEId
   titleDialogView.value = 'Shipping Mark Con'
@@ -413,19 +413,19 @@ const textAreaRemarkDialogActive = (type, data, soEId, disabledRow, disPermiss) 
   dialogVisibleTextarea.value = true
 
   //console.log('Type dialog', typeDialogTextArea.value, '=', type)
-  
+
 
   const disabledCanExecute = ref(false)
 
-  if(disPermiss){
+  if (disPermiss) {
     // eslint-disable-next-line sonarjs/no-all-duplicated-branches
 
-    if(disabledRow){
+    if (disabledRow) {
       disabledCanExecute.value = true
-    }else{
+    } else {
       disabledCanExecute.value = false
     }
-  }else{
+  } else {
     disabledCanExecute.value = true
   }
 
@@ -434,8 +434,8 @@ const textAreaRemarkDialogActive = (type, data, soEId, disabledRow, disPermiss) 
 
 const dataRowForUse = ref()
 
-const textAreaShipDialogActive2 = (type, data, data2, 
-  index, soEId, activeShipMark, dataProduct, disabledRow, 
+const textAreaShipDialogActive2 = (type, data, data2,
+  index, soEId, activeShipMark, dataProduct, disabledRow,
   disabledPermission) => {
   typeDialogTextArea.value = type
   indexDataDialogTextArea.value = index
@@ -450,15 +450,15 @@ const textAreaShipDialogActive2 = (type, data, data2,
 
   const disabledCanExecute = ref(false)
 
-  if(disabledPermission){
+  if (disabledPermission) {
     // eslint-disable-next-line sonarjs/no-all-duplicated-branches
 
-    if(disabledRow){
+    if (disabledRow) {
       disabledCanExecute.value = true
-    }else{
+    } else {
       disabledCanExecute.value = false
     }
-  }else{
+  } else {
     disabledCanExecute.value = true
   }
 
@@ -479,15 +479,15 @@ const handleDialogSubmit = data => {
     item.value = data
 
     // ใช้งานข้อมูลตาม type
-    if (typeDialogTextArea.value  === 'ShipCon') {
+    if (typeDialogTextArea.value === 'ShipCon') {
       item.shippingCondition = data
     } else if (typeDialogTextArea.value === 'ShipMark') {
       item.shippingMark = data
     } else if (typeDialogTextArea.value === 'RemarkSAL') {
       item.remarkSal = data
-    }else if (typeDialogTextArea.value === 'RemarkWH') {
+    } else if (typeDialogTextArea.value === 'RemarkWH') {
       item.remarkWh = data
-    }else if (typeDialogTextArea.value === 'RemarkLOG') {
+    } else if (typeDialogTextArea.value === 'RemarkLOG') {
       item.remarkLog = data
     }
   } else {
@@ -534,7 +534,7 @@ const formatToDate = dateString => {
   const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = date.getFullYear()
-  
+
   return `${day}/${month}/${year}`
 }
 
@@ -546,7 +546,7 @@ const goToLastPage = () => (currentPage.value = totalPages.value)
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = currentPage.value * itemsPerPage.value
-  
+
   // ตัดข้อมูลเฉพาะที่ต้องแสดงในหน้านั้น
   // จัดรูปแบบวันที่สำหรับ `eta` และ `etd`
   // return pageData.map(item => ({
@@ -644,13 +644,13 @@ const toggleDirection = async key => {
 //- เปรียบเทียบ status text = id
 function getStatusIdByName(statusName) {
   const matchedItem = itemsStatus.find(item => item.name === statusName)
-  
+
   return matchedItem ? matchedItem.id : '' // คืนค่า id หรือ null หากไม่พบ
 }
 
 const disabledBtnExport = ref(false)
 
-watchEffect( () => {
+watchEffect(() => {
   const etaDateForApi = ref(etaDateModel.value)
   const etdDateForApi = ref(etdDateModel.value)
 
@@ -660,7 +660,7 @@ watchEffect( () => {
   filterForSearchPlan.value.SortColumn = sortColumn.value
   filterForSearchPlan.value.SortDirection = sortDirection.value
 
-  const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
+  const statusID = getStatusIdByName(filterForSearchPlan.value.StatusId)
 
   disabledBtnExport.value = Object.values(filterForSearchPlan.value).some(value => value !== null && value !== "")
 
@@ -681,16 +681,16 @@ const searchShipmentPlan = async () => {
   filterForSearchPlan.value.ETA = formatDateSave(etaDateForApi.value)
   filterForSearchPlan.value.ETD = (etdDateForApi.value)
 
-  if(filterForSearchPlan.value.ETD){
+  if (filterForSearchPlan.value.ETD) {
     if (filterForSearchPlan.value.ETD.includes(" to ")) {
-    // กรณีเป็นช่วงวันที่
+      // กรณีเป็นช่วงวันที่
       const [startDate, endDate] = filterForSearchPlan.value.ETD.split(" to ")
 
       filterForSearchPlan.value.ETDDateFrom = convertDateFormat(startDate)
       filterForSearchPlan.value.ETDDateTo = convertDateFormat(endDate)
 
     } else {
-    // กรณีเป็นวันเดียว
+      // กรณีเป็นวันเดียว
       const singleDate = filterForSearchPlan.value.ETD
 
       filterForSearchPlan.value.ETDDateFrom = convertDateFormat(singleDate)
@@ -703,7 +703,7 @@ const searchShipmentPlan = async () => {
 
   saveHistoryFilter()
 
-  const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
+  const statusID = getStatusIdByName(filterForSearchPlan.value.StatusId)
 
   try {
     const result = await fetchSearchPlan(
@@ -717,7 +717,7 @@ const searchShipmentPlan = async () => {
 
     if (result && getSearchPlanResult.value.datas) {
       searchPlanData.value = getSearchPlanResult.value.datas // เก็บข้อมูลใน reactive stat
-      
+
       searchPlanData.value = await Promise.all(
         getSearchPlanResult.value.datas.map(async item => ({
           ...item,
@@ -819,7 +819,7 @@ const typeNameFileInput = ref('')
 //------------------------------- Delete File --------------------------------
 const { deleteFileFormResult, errorMessageDeleteFileForm, deleteFileFormFunction } = useDeleteFileFormService()
 
-const handleDeleteFileForm =  async( file,
+const handleDeleteFileForm = async (file,
   typeFile,
   soEtlLogDetailJournalID) => {
 
@@ -845,14 +845,14 @@ const handleDeleteFileForm =  async( file,
       setTimeout(() => {
         // location.reload()
       }, 500) // 0.5 วินาที
-      
+
       return true
     } else {
       // กรณีบันทึกไม่สำเร็จ
       console.error(`Error saving File plan:`, errorMessageDeleteFileForm.value)
 
       // textAlertDialogFunction(errorMessageDeleteFileForm.value, false)
-      
+
       return false
     }
   } catch (error) {
@@ -860,7 +860,7 @@ const handleDeleteFileForm =  async( file,
     console.error(`Error saving File plan:`, error)
 
     // textAlertDialogFunction("An error occurred while saving the file.", false)
-    
+
     return false
   }
 }
@@ -874,7 +874,7 @@ const saveFileFormShipment = async (
   soEtlLogDetailJournalID,
 ) => {
   //console.log("save file start...", soEtlLogDetailJournalID)
-  
+
   try {
     // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
     const requestData = file
@@ -891,41 +891,41 @@ const saveFileFormShipment = async (
     //console.log("Response from functionSaveFileForm:", response)
 
     if (resultSaveFielForm.value?.success) {
-      if(disabledModel.value){
+      if (disabledModel.value) {
         // textAlertDialogFunction('Print', true)
 
         // // Reload หลังแจ้งเตือนสำเร็จ
         // setTimeout(() => {
         // location.reload()
         // }, 500) // 0.5 วินาที
-      }else{
-        if(trikerSaveDrft.value === false){
+      } else {
+        if (trikerSaveDrft.value === false) {
           textAlertDialogFunction(alertWordConst.saveDraft, true)
 
           //console.log(`Saved File Plan:`, resultSaveFielForm.value)
 
           // Reload หลังแจ้งเตือนสำเร็จ
           setTimeout(() => {
-          // location.reload()
+            // location.reload()
           }, 500) // 0.5 วินาที
         }
-        
+
       }
-      
-      
+
+
       return true
     } else {
       // กรณีบันทึกไม่สำเร็จ
       console.error(`Error saving File plan:`, errorMessageSaveFileForm.value)
       textAlertDialogFunction(errorMessageSaveFileForm.value, false)
-      
+
       return false
     }
   } catch (error) {
     // กรณีเกิดข้อผิดพลาดในกระบวนการ
     console.error(`Error saving File plan:`, error)
     textAlertDialogFunction("An error occurred while saving the file.", false)
-    
+
     return false
   }
 }
@@ -954,20 +954,20 @@ const getFileForm = async (
     )
 
     if (getFileFormResult.value?.success) {
-      
+
       return response.data.data
     } else {
 
       return ''
     }
   } catch (error) {
-    
+
     return ''
   }
 }
 
 const showFileFormByTypeAndSoId = async (type, soId) => {
-  if(type === 'GetSo'){
+  if (type === 'GetSo') {
     //console.log('showFileFormByTypeAndSoId', await getFileForm(type, soId))
 
     getSoFileModel.value = await getFileForm(type, soId)
@@ -982,7 +982,7 @@ const showFileFormByTypeAndSoId = async (type, soId) => {
 
 const handleFileUpdatesSO = updatedFiles => {
   filesFromUploaderSO.value = updatedFiles
-  
+
 }
 
 const handleFileUpdatesCOA = updatedFiles => {
@@ -1029,22 +1029,22 @@ const getOrDefault = (value, defaultValue) => value ?? defaultValue
 const showText = () => {
   //console.log("filesFromUploaderSO.value show")
   //console.log("filesFromUploaderSO.value", filesFromUploaderSO.value)
-  if(filesFromUploaderSO.value){
+  if (filesFromUploaderSO.value) {
     //console.log("filesFromUploaderSO.value", filesFromUploaderSO.value.length)
   }
 
   //console.log("filesFromUploaderSO.value", filesFromUploaderCOA.value)
-  if(filesFromUploaderCOA.value){
+  if (filesFromUploaderCOA.value) {
     //console.log("filesFromUploaderCOA.value", filesFromUploaderCOA.value.length)
   }
 
   //console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value)
-  if(filesFromUploaderTruckOrder.value){
+  if (filesFromUploaderTruckOrder.value) {
     //console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value.length)
   }
 
   //console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value)
-  if(filesFromUploaderDeliNote.value){
+  if (filesFromUploaderDeliNote.value) {
     //console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value.length)
   }
 }
@@ -1060,10 +1060,10 @@ const saveShipmentPlan = async row => {
   saveDraftLoadingSOERow.value = row.soEtlLogDetailJournalID
 
   if (
-    filesFromUploaderSO.value||
-      filesFromUploaderCOA.value||
-      filesFromUploaderTruckOrder.value||
-      filesFromUploaderDeliNote.value
+    filesFromUploaderSO.value ||
+    filesFromUploaderCOA.value ||
+    filesFromUploaderTruckOrder.value ||
+    filesFromUploaderDeliNote.value
   ) {
     //console.log("Uploading files...",  filesFromUploaderSO.value)
 
@@ -1077,17 +1077,17 @@ const saveShipmentPlan = async row => {
     const saveFile3 = ref()
     const saveFile4 = ref()
 
-    if(filesFromUploaderSO.value){
-      if(filesFromUploaderSO.value.length === 0){
+    if (filesFromUploaderSO.value) {
+      if (filesFromUploaderSO.value.length === 0) {
         //console.log("SaveSo")
-      }else{
+      } else {
         deleteFie1.value = await handleDeleteFileForm(
           filesFromUploaderSO.value,
           "DeleteSo",
           row.soEtlLogDetailJournalID,
         )
 
-        saveFile1.value =  await saveFileFormShipment(
+        saveFile1.value = await saveFileFormShipment(
           filesFromUploaderSO.value,
           "SaveSo",
           row.soEtlLogDetailJournalID,
@@ -1095,17 +1095,17 @@ const saveShipmentPlan = async row => {
       }
     }
 
-    if(filesFromUploaderCOA.value){
-      if(filesFromUploaderCOA.value.length === 0){
+    if (filesFromUploaderCOA.value) {
+      if (filesFromUploaderCOA.value.length === 0) {
         //console.log("SaveCOA")
-      }else{
+      } else {
         deleteFie2.value = await handleDeleteFileForm(
           filesFromUploaderCOA.value,
           "DeleteCOA",
           row.soEtlLogDetailJournalID,
         )
 
-        saveFile2.value =  await saveFileFormShipment(
+        saveFile2.value = await saveFileFormShipment(
           filesFromUploaderCOA.value,
           "SaveCOA",
           row.soEtlLogDetailJournalID,
@@ -1113,17 +1113,17 @@ const saveShipmentPlan = async row => {
       }
     }
 
-    if(filesFromUploaderTruckOrder.value){
-      if(filesFromUploaderTruckOrder.value.length === 0){
+    if (filesFromUploaderTruckOrder.value) {
+      if (filesFromUploaderTruckOrder.value.length === 0) {
         //console.log("SaveTruckOrder")
-      }else{
+      } else {
         deleteFie3.value = await handleDeleteFileForm(
           filesFromUploaderTruckOrder.value,
           "DeleteTruckOrder",
           row.soEtlLogDetailJournalID,
         )
 
-        saveFile3.value =  await saveFileFormShipment(
+        saveFile3.value = await saveFileFormShipment(
           filesFromUploaderTruckOrder.value,
           "SaveTruckOrder",
           row.soEtlLogDetailJournalID,
@@ -1131,17 +1131,17 @@ const saveShipmentPlan = async row => {
       }
     }
 
-    if(filesFromUploaderDeliNote.value){
-      if(filesFromUploaderDeliNote.value.length === 0){
+    if (filesFromUploaderDeliNote.value) {
+      if (filesFromUploaderDeliNote.value.length === 0) {
         //console.log("SaveDeliveryNote")
-      }else{
+      } else {
         deleteFie4.value = await handleDeleteFileForm(
           filesFromUploaderDeliNote.value,
           "DeleteDeliveryNote",
           row.soEtlLogDetailJournalID,
         )
 
-        saveFile4.value =  await saveFileFormShipment(
+        saveFile4.value = await saveFileFormShipment(
           filesFromUploaderDeliNote.value,
           "SaveDeliveryNote",
           row.soEtlLogDetailJournalID,
@@ -1158,17 +1158,17 @@ const saveShipmentPlan = async row => {
     // }
 
     //console.log("File upload completed.", row.soEtlLogDetailJournalID)
-  }else{
+  } else {
     //console.log("File not foand", filesFromUploaderSO.value)
   }
 
 
   //console.log("submitShipmentPlanBySoEId start. save draft", trikerSaveDrft.value)
-  if(row.statusId === 207){
+  if (row.statusId === 207) {
     //console.log('Saved Shipment plan if', row.csLfStatusId)
     saveDraftLoading.value = false
-    if(disabledModel.value !== true){
-      if(trikerSaveDrft.value === false){
+    if (disabledModel.value !== true) {
+      if (trikerSaveDrft.value === false) {
         textAlertDialogFunction('Print', true)
         setTimeout(() => {
           location.reload()
@@ -1177,24 +1177,24 @@ const saveShipmentPlan = async row => {
 
         return true
       }
-        
-    }else{
-        
-      if(trikerSaveDrft.value !== true){
+
+    } else {
+
+      if (trikerSaveDrft.value !== true) {
         textAlertDialogFunction(alertWordConst.saveDraft, true)
         setTimeout(() => {
           location.reload()
           saveDraftLoading.value = false
         }, 500) // 500 มิลลิวินาที = 0.5 วินาที
-       
+
       }
 
       return true
     }
 
-    
 
-  }else{
+
+  } else {
     //console.log('saveShipmentPlan complated', row)
 
     // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
@@ -1211,8 +1211,8 @@ const saveShipmentPlan = async row => {
 
     if (saveSearchPlanResult.value) {
 
-      if(disabledModel.value){
-        if(trikerSaveDrft.value === false){
+      if (disabledModel.value) {
+        if (trikerSaveDrft.value === false) {
           textAlertDialogFunction('Print', true)
           setTimeout(() => {
             location.reload()
@@ -1223,10 +1223,10 @@ const saveShipmentPlan = async row => {
         }
 
         saveDraftLoading.value = false
-        
-      }else{
-        
-        if(trikerSaveDrft.value === false){
+
+      } else {
+
+        if (trikerSaveDrft.value === false) {
           textAlertDialogFunction(alertWordConst.saveDraft, true)
           setTimeout(() => {
             location.reload()
@@ -1236,7 +1236,7 @@ const saveShipmentPlan = async row => {
 
         return true
       }
-      
+
     } else {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
       setTimeout(() => {
@@ -1246,9 +1246,9 @@ const saveShipmentPlan = async row => {
 
       return false
     }
-    
+
     saveDraftLoading.value = false
-    
+
 
     //console.log(`Saved search plan:`, response)
   }
@@ -1262,11 +1262,11 @@ const isDialogVisibleCommentDialog = ref(false)
 const statusCommnetValue = ref('')
 
 const checkStatusBeforeAvtion = sataus => {
-  if(sataus === 205){
+  if (sataus === 205) {
     return true
-  }else if(sataus === 206){
+  } else if (sataus === 206) {
     return false
-  }else{
+  } else {
     return false
   }
 }
@@ -1284,38 +1284,38 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
 
   //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
-  if(type !== 'approve' || type !== 'reject' || type !== 'back'){
+  if (type !== 'approve' || type !== 'reject' || type !== 'back') {
     const saveDraftRes = await saveShipmentPlan(productRowModel.value)
 
     //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
-    if(!saveDraftRes){
+    if (!saveDraftRes) {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
       throw new Error('saveDraftRes failed: ' + saveDraftRes)
     }
   }
 
-  try{
+  try {
     console.log('submitShipmentPlanBySoEId start!!3.1')
-    if(type === 'submit'){
+    if (type === 'submit') {
 
-    }else if(type === 'approve' || type === 'reject'){
+    } else if (type === 'approve' || type === 'reject') {
       console.log('submitShipmentPlanBySoEId start!! 3')
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
       console.log('submitShipmentPlanBySoEId start!! 2', selectedDataTables.value)
-    }else if(type === 'back'){
+    } else if (type === 'back') {
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
       //console.log('submitShipmentPlanBySoEId back !! 3')
     }
 
-    if(!statusCommnetValue.value && type === 'reject'){
+    if (!statusCommnetValue.value && type === 'reject') {
       textAlertDialogFunction('Please enter Reject Comment.', false)
-      
+
       return
     }
-    
+
     const result = submitShipmentPlan(urlApi.value,
       type,
       whereHouse,
@@ -1325,24 +1325,24 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
     )
 
     //console.log('submitShipmentPlanBySoEId start!! 3')
-    
-    if(submitShipmentPlanResult.value || result){
-      if(type === 'submit'){
+
+    if (submitShipmentPlanResult.value || result) {
+      if (type === 'submit') {
         textAlertDialogFunction(alertWordConst.submit, true)
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      }else if(type === 'approve'){
+      } else if (type === 'approve') {
         textAlertDialogFunction(alertWordConst.approve, true)
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      }else if(type === 'reject'){
+      } else if (type === 'reject') {
         textAlertDialogFunction(alertWordConst.reject, true)
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      }else if(type === 'back'){
+      } else if (type === 'back') {
         textAlertDialogFunction(alertWordConst.sendBack, true)
         setTimeout(() => {
           location.reload()
@@ -1350,24 +1350,24 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
       }
 
       //console.log('submitShipmentPlanBySoEId start!! 4')
-      
-    }else{
-      if(type === 'submit'){
+
+    } else {
+      if (type === 'submit') {
         textAlertDialogFunction(alertWordConst.submit, false)
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      }else if(type === 'approve'){
+      } else if (type === 'approve') {
         textAlertDialogFunction(alertWordConst.approve, false)
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      }else if(type === 'reject'){
+      } else if (type === 'reject') {
         textAlertDialogFunction(alertWordConst.reject, false)
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      }else if(type === 'back'){
+      } else if (type === 'back') {
         textAlertDialogFunction(alertWordConst.sendBack, false)
         setTimeout(() => {
           location.reload()
@@ -1376,7 +1376,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData)
     }
   } catch (e) {
     console.error(`Error saving search plan:`, error)
-  }finally {
+  } finally {
     // เคลียร์สถานะต่างๆ ถ้าจำเป็น
     trikerSaveDrft.value = false
   }
@@ -1405,14 +1405,14 @@ const dataTableCliclHighlightIsToggle = no => {
 
     //console.log("dataTableNum else", dataTableNummberedToggle.value, no)
   }
-  
+
 
   //console.log("dataTableNum", dataTableNummberedToggle.value, no)
 }
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
-onMounted( async () => {
+onMounted(async () => {
   searchShipmentPlan()
 })
 
@@ -1485,11 +1485,11 @@ const isDialogImageVisible = ref(false)
 const urlImage = ref('')
 const nameImage = ref('')
 
-const checkRFID = ref ('')
+const checkRFID = ref('')
 
-watchEffect(() =>{
-  const checkRFIDUpdate = ref (localStorage.getItem('configsShowRfdi'))
-  if(checkRFIDUpdate.value === 'true'){
+watchEffect(() => {
+  const checkRFIDUpdate = ref(localStorage.getItem('configsShowRfdi'))
+  if (checkRFIDUpdate.value === 'true') {
     // //console.log('RFID Check True:'+ checkRFIDUpdate.value)
     checkRFID.value = true
   } else if (checkRFIDUpdate.value === 'false') {
@@ -1586,12 +1586,12 @@ const colorStatusWithId = id => {
   }
 }
 
-const statuses = [ 'Approve', 'Reject', 'Back to Edit']
+const statuses = ['Approve', 'Reject', 'Back to Edit']
 
 // ฟังก์ชันสำหรับสุ่มสถานะ
 function getRandomStatus() {
   const randomIndex = Math.floor(Math.random() * statuses.length)
-  
+
   return statuses[randomIndex]
 }
 
@@ -1600,20 +1600,20 @@ function getRandomDate(start, end) {
   const endDate = new Date(end)
   const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime())
   const randomDate = new Date(randomTime)
-  
+
   const year = randomDate.getFullYear()
   const month = String(randomDate.getMonth() + 1).padStart(2, '0') // Months are zero-based
   const day = String(randomDate.getDate()).padStart(2, '0')
-  
+
   return `${day}/${month}/${year}`
 }
 
 const checkBgTruck = truck => {
-  if(truck === 'BTS'){
+  if (truck === 'BTS') {
     return 'bg-red-lighten-4'
-  }else if(truck === 'LCL'){
+  } else if (truck === 'LCL') {
     return 'bg-warning'
-  } 
+  }
 }
 
 //----------------------------------------- fetch data ----------------------------------
@@ -1648,17 +1648,17 @@ const getSelectData = async (format, type) => {
 
     if (result) {
       // //console.log(`Fetched ${type}:`, getSelectDataResult.value)
-      
+
       return getSelectDataResult.value
     } else {
       console.error('No result from API')
-      
+
       return [] // Return empty array if no result
     }
   } catch (error) {
     console.error(`Error fetching ${type}:`, error)
     console.error(`Error(service) fetching ${type}:`, errorGetSelectData)
-    
+
     return [] // Return empty array on error
   }
 }
@@ -1705,7 +1705,7 @@ const selectedTruckCompany2 = () => {
   if (foundItem) {
     personInchargeTruckCompanyModel.value = foundItem.personIncharge || ''
     contactTruckCompanyModel.value = foundItem.contact || ''
-  }else{
+  } else {
     //console.log('selectedTruckCompany2', TruckCompanyPrint.value, '==')
   }
 }
@@ -1722,15 +1722,15 @@ const TruckTypePrint = ref([])
 import mockData from './dataMock'
 
 //------------------------ Set Permissions (Hiden and Show Column) ------------------------
-const accountAmin = ref (false)
-const accountViewerKK = ref (false)
-const accountINSP = ref (false)
-const accountSALLOG = ref (false)
-const accountSAL = ref (false)
-const accountLOG = ref (false)
-const accountWH = ref (false)
-const accountWHSub = ref (false)
-const accountAll = ref (true)
+const accountAmin = ref(false)
+const accountViewerKK = ref(false)
+const accountINSP = ref(false)
+const accountSALLOG = ref(false)
+const accountSAL = ref(false)
+const accountLOG = ref(false)
+const accountWH = ref(false)
+const accountWHSub = ref(false)
+const accountAll = ref(true)
 
 const setAccount = role => {
   accountAmin.value = false
@@ -1778,7 +1778,7 @@ const setAccount = role => {
     accountWH.value = false
     accountWHSub.value = false
     accountAll.value = false
-  } 
+  }
 
   else if (role === 'SAL') {
     accountAmin.value = false
@@ -1789,7 +1789,7 @@ const setAccount = role => {
     accountWH.value = false
     accountWHSub.value = false
     accountAll.value = false
-  } 
+  }
 
   else if (role === 'LOG') {
     accountAmin.value = false
@@ -1800,8 +1800,8 @@ const setAccount = role => {
     accountWH.value = false
     accountWHSub.value = false
     accountAll.value = false
-  } 
-  
+  }
+
   else if (role === 'WH') {
     accountAmin.value = false
     accountViewerKK.value = false
@@ -1810,7 +1810,7 @@ const setAccount = role => {
     accountWH.value = true
     accountWHSub.value = false
     accountAll.value = false
-    
+
   } else if (role === 'WHSub') {
     accountAmin.value = false
     accountViewerKK.value = false
@@ -1819,8 +1819,8 @@ const setAccount = role => {
     accountWH.value = false
     accountWHSub.value = true
     accountAll.value = false
-    
-  }  
+
+  }
   else if (role === 'All') {
     accountAmin.value = false
     accountViewerKK.value = false
@@ -1888,7 +1888,7 @@ onMounted(() => {
   const savedData = sessionStorage.getItem("savedTruckOrder")
   if (savedData) {
     const { SoId, SoeId, rowData } = JSON.parse(savedData)
-    
+
     // if (isDialogVisiblePrintTruck.value) {
     //   showDialogTruckOrder(SoId, SoeId, rowData)
     // }
@@ -1912,9 +1912,9 @@ const imgDialogPDF = ref('')
 const imgDialogPng = ref('')
 
 //------------------------------------------ Check Sheet To Page Resale -----------------------
-async function  redirectBasedOnStatus (product)  {
+async function redirectBasedOnStatus(product) {
   // ดึงเฉพาะตัวเลขหลักแรกของ status
-  const mainStatus = Math.floor(product.statusId/ 100)
+  const mainStatus = Math.floor(product.statusId / 100)
 
   // กำหนดประเภทตามเลขหลักแรกของ status
   const statusMapping = {
@@ -1948,7 +1948,7 @@ async function  redirectBasedOnStatus (product)  {
   //   9: 'Drum',
   //   10: 'Drum',
   //   11: 'Flexi',
-    
+
   // }
 
   const checkSheetTypeNameMapping = {
@@ -1957,7 +1957,7 @@ async function  redirectBasedOnStatus (product)  {
     2: 'Drum',
     3: 'Flexi',
     4: 'Flexi',
-    
+
   }
 
   // ตรวจสอบว่า status มีใน mapping หรือไม่
@@ -2008,7 +2008,7 @@ const refeshPage = () => {
 //----------------------------------------- Print Section -------------------------------
 
 
-const { printShipmentPDFResult, errorPrintShipmentPDF, printShipmentPDF  } = usePrintShipmentPDFService()
+const { printShipmentPDFResult, errorPrintShipmentPDF, printShipmentPDF } = usePrintShipmentPDFService()
 const loadingPrint = ref(false)
 
 const printShipmentPDFBySoEId = async type => {
@@ -2025,11 +2025,11 @@ const printShipmentPDFBySoEId = async type => {
       item.shippingMarkActive = activeShipMarkModel.value
     }
   }
-  if(!disabledModel.value){
+  if (!disabledModel.value) {
     // ✅ บันทึกข้อมูลก่อนพิมพ์
     await saveShipmentPlan(dataRowForUse.value)
   }
-  
+
   try {
     // ✅ เรียก printShipmentPDF
     const result = await printShipmentPDF(
@@ -2039,7 +2039,7 @@ const printShipmentPDFBySoEId = async type => {
       accessTokenAtStore,
       soEIdModel.value,
     )
-    
+
     if (result) {
       //console.log('result print', result)
 
@@ -2069,16 +2069,16 @@ const { getShippingCheckSheetResult, errorGetShippingCheckSheet, fetchShippingCh
 const getShippingCheckSheet = async soEId => {
   try {
     const result = await fetchShippingCheckSheet(
-      urlApi.value, 'ShippingCheckSheet', whereHouse, 
+      urlApi.value, 'ShippingCheckSheet', whereHouse,
       accessTokenAtStore, soEId)
 
-    if(result){
+    if (result) {
       getShippingCheckSheetResult.value = result
 
       errorGetShippingCheckSheet.value = null
 
       // //console.log('getShippingCheckSheetResult', result)
-    }else{
+    } else {
 
       // //console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
     }
@@ -2094,16 +2094,16 @@ const { getShippingCheckSheetResult2,
 const getShippingCheckSheetLorryFlexi = async soEId => {
   try {
     const result = await fetchShippingCheckSheet2(
-      urlApi.value, 'ShippingLorryFlexi', whereHouse, 
+      urlApi.value, 'ShippingLorryFlexi', whereHouse,
       accessTokenAtStore, soEId)
 
-    if(result){
+    if (result) {
       getShippingCheckSheetResult2.value = result.data.reportLorryFlexi
 
       errorGetShippingCheckSheet.value = null
 
       //console.log('getShippingCheckSheetResult2', result)
-    }else{
+    } else {
 
       // //console.log('errorGetShippingCheckSheet !result ', errorGetShippingCheckSheet.value)
     }
@@ -2155,31 +2155,31 @@ const didabledPrintPDFCheckSheet = statusId => {
 const hanbleBtnPrintPDFCheckSheet = type => {
   //console.log('Check BtnPrintPDF start...', prouctRowAction.value.checkSheetTypeID)
 
-  if(prouctRowAction.value){
+  if (prouctRowAction.value) {
     //console.log('Check BtnPrintPDF start if', prouctRowAction.value.checkSheetTypeID)
-    if(prouctRowAction.value.checkSheetTypeID !== 3 && prouctRowAction.value.checkSheetTypeID !== 4){
+    if (prouctRowAction.value.checkSheetTypeID !== 3 && prouctRowAction.value.checkSheetTypeID !== 4) {
       //console.log('Check BtnPrintPDF start ===', prouctRowAction.value.checkSheetTypeID)
-      if(prouctRowAction.value.checkSheetTypeID === 2){
+      if (prouctRowAction.value.checkSheetTypeID === 2) {
         handlePrintDPFCheckSheet('ShippingCheckSheetIBC2')
-      }else if(prouctRowAction.value.checkSheetTypeID === 1){
+      } else if (prouctRowAction.value.checkSheetTypeID === 1) {
         handlePrintDPFCheckSheet('ShippingCheckSheet')
       }
-    }else if(prouctRowAction.value.checkSheetTypeID === 3 || prouctRowAction.value.checkSheetTypeID === 4){
+    } else if (prouctRowAction.value.checkSheetTypeID === 3 || prouctRowAction.value.checkSheetTypeID === 4) {
       handlePrintDPFCheckSheet('ShippingLorry')
 
       //console.log('Check BtnPrintPDF start ===', prouctRowAction.value.checkSheetTypeID)
-      if(getShippingCheckSheetResult2?.value.isLorry){
+      if (getShippingCheckSheetResult2?.value.isLorry) {
         //console.log('Check getShippingCheckSheetResult2 start ===', getShippingCheckSheetResult2.value.isLorry)
         handlePrintDPFCheckSheet('ShippingLorry')
-      }else if(!getShippingCheckSheetResult2?.value.isLorry){
+      } else if (!getShippingCheckSheetResult2?.value.isLorry) {
         handlePrintDPFCheckSheet('ShippingFlexi')
-      }else{
+      } else {
         //console.log('Please prouctRowAction3', prouctRowAction.value)
       }
-    }else{
+    } else {
       //console.log('Please prouctRowAction2', prouctRowAction.value)
     }
-  }else{
+  } else {
     //console.log('Please prouctRowAction1', prouctRowAction.value)
   }
 }
@@ -2187,25 +2187,25 @@ const hanbleBtnPrintPDFCheckSheet = type => {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const handlePrintDPFCheckSheet = async type => {
 
-  if(prouctRowAction.value){
-    if(type === 'ShippingCheckSheetIBC2' || type === 'ShippingCheckSheet'){
+  if (prouctRowAction.value) {
+    if (type === 'ShippingCheckSheetIBC2' || type === 'ShippingCheckSheet') {
       //console.log('getShippingCheckSheet start')
       await getShippingCheckSheet(prouctRowAction.value.soEtlLogDetailJournalID)
 
-      if(getShippingCheckSheetResult.value){
+      if (getShippingCheckSheetResult.value) {
         //console.log('getShippingCheckSheet start',  getShippingCheckSheetResult.value.containerNo_LicPlNo)
         licensePlate.value = getShippingCheckSheetResult.value.checkSheetItems
 
         //console.log('getShippingCheckSheet start',  licensePlate.value)
       }
-      
-      
-    }else{
+
+
+    } else {
       await getShippingCheckSheetLorryFlexi(prouctRowAction.value.soEtlLogDetailJournalID)
 
       //console.log('getShippingCheckSheetResult.value Lorry', getShippingCheckSheetResult2.value)
     }
-    
+
   }
 
   await mapProductRowToPramsPrint(prouctRowAction.value)
@@ -2214,14 +2214,14 @@ const handlePrintDPFCheckSheet = async type => {
 
   const countPage = ref(1)
 
-  if (type === 'ShippingCheckSheetIBC2' ) {
+  if (type === 'ShippingCheckSheetIBC2') {
     //console.log('type.value', type)
     handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet('ShippingCheckSheet', '', countPage.value++)
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
-    const licensePlates = Array.isArray(licensePlate.value) 
-      ? licensePlate.value 
+    const licensePlates = Array.isArray(licensePlate.value)
+      ? licensePlate.value
       : [licensePlate.value]
 
     for (const item of licensePlates) {
@@ -2231,14 +2231,14 @@ const handlePrintDPFCheckSheet = async type => {
     setTimeout(() => {
       isDialogLoadingVisible.value = false
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
-   
-  }else if(type === 'ShippingCheckSheet'){
+
+  } else if (type === 'ShippingCheckSheet') {
     //console.log('type.value', type)
     handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
 
-    const licensePlates = Array.isArray(licensePlate.value) 
-      ? licensePlate.value 
+    const licensePlates = Array.isArray(licensePlate.value)
+      ? licensePlate.value
       : [licensePlate.value]
 
     for (const item of licensePlates) {
@@ -2249,7 +2249,7 @@ const handlePrintDPFCheckSheet = async type => {
       isDialogLoadingVisible.value = false
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
     //console.log('Completed')
-  }else if(getShippingCheckSheetResult2?.value.isLorry){
+  } else if (getShippingCheckSheetResult2?.value.isLorry) {
     handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet('ShippingLorry')
 
@@ -2258,7 +2258,7 @@ const handlePrintDPFCheckSheet = async type => {
     setTimeout(() => {
       isDialogLoadingVisible.value = false
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
-  }else if(!getShippingCheckSheetResult2?.value.isLorry){
+  } else if (!getShippingCheckSheetResult2?.value.isLorry) {
     handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet('ShippingFlexi')
 
@@ -2268,7 +2268,7 @@ const handlePrintDPFCheckSheet = async type => {
       isDialogLoadingVisible.value = false
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   }
-  else{
+  else {
     // handleDialogLoading("PRINT CHECK SHEETS")
     // callAPIPrintPDFChecksheet(type)
 
@@ -2282,8 +2282,8 @@ const handlePrintDPFCheckSheet = async type => {
 }
 
 const callAPIPrintPDFChecksheet = async (type, LicensePlate, page) => {
-  
-  
+
+
   try {
     const result = printPDFService(
       urlApi.value,
@@ -2293,14 +2293,14 @@ const callAPIPrintPDFChecksheet = async (type, LicensePlate, page) => {
       accessTokenAtStore,
       paramsPrintPDFCheckSheet.value,
       LicensePlate,
-      page, 
+      page,
     )
 
-    if(printPDFResult.value){
+    if (printPDFResult.value) {
       //console.log(result)
-      
+
     }
-  }catch(error){
+  } catch (error) {
     console.error(`Error printing PDF:`, error)
     setTimeout(() => {
       wordForSubmit.value = "PRINT CHECKSHEET"
@@ -2340,21 +2340,21 @@ const printShipmentPDFBySoEIdPlan = async () => {
   saveHistoryFilter()
 
 
-  const statusID  = getStatusIdByName(filterForSearchPlan.value.StatusId)
+  const statusID = getStatusIdByName(filterForSearchPlan.value.StatusId)
 
   const typeDepartment = () => {
-    
-    if(department.value === 'Warehouse'){
+
+    if (department.value === 'Warehouse') {
       return 'ShipmentPlanWH'
-    }else if(department.value === 'Logistic'){
+    } else if (department.value === 'Logistic') {
       return 'ShipmentPlanLOG'
-    }else if(department.value === 'Sale and marketing'){
+    } else if (department.value === 'Sale and marketing') {
       return 'ShipmentPlanSALE'
-    }else if(department.value === 'Inspection'){
+    } else if (department.value === 'Inspection') {
       return 'ShipmentPlanInspection'
     }
   }
-  
+
   try {
     // ✅ เรียก printShipmentPDF
     const result = await printExportExcelService(
@@ -2365,9 +2365,9 @@ const printShipmentPDFBySoEIdPlan = async () => {
       accessTokenAtStore,
       filterForSearchPlan.value,
       statusID,
-      
+
     )
-    
+
     if (result) {
       //console.log('result print', result)
 
@@ -2413,7 +2413,7 @@ function convertToISO8601(dateStr) {
   // แยกค่าจากรูปแบบ "DD/MM/YYYY"
   const [day, month, year] = dateStr.split('/')
   const date = new Date(`${year}-${month}-${day}T00:00:00.000Z`)
-  
+
   return date.toISOString() || ''
 }
 
@@ -2422,7 +2422,7 @@ function convertToDDMMYYYY(isoDateStr) {
   const day = String(date.getUTCDate()).padStart(2, '0')
   const month = String(date.getUTCMonth() + 1).padStart(2, '0')
   const year = date.getUTCFullYear()
-  
+
   return `${day}/${month}/${year}` || ''
 }
 
@@ -2437,7 +2437,7 @@ const getDataTruckOrder = async () => {
   paramsTruckOrder.value.dateDriverDate = dateCurrent.value
   paramsTruckOrder.value.dateAuthorizedDate = dateCurrent.value
 
-  try{
+  try {
     const result = await fetchTruckOrderData(
       urlApi.value,
       soEIdModel.value,
@@ -2447,10 +2447,10 @@ const getDataTruckOrder = async () => {
       accessTokenAtStore,
     )
 
-    if(result){
-      
+    if (result) {
 
-      if(getTruckOrderDataResult?.value){
+
+      if (getTruckOrderDataResult?.value) {
         if (paramsTruckOrder.value) {
 
           paramsTruckOrder.value.address = getTruckOrderDataResult?.value.address
@@ -2469,20 +2469,20 @@ const getDataTruckOrder = async () => {
           paramsTruckOrder.value.authorizedBy = getTruckOrderDataResult?.value.authorizedBy
           paramsTruckOrder.value.authorizedDate = getTruckOrderDataResult?.value.authorizedDate
 
-          TruckTypePrint.value =  getTruckOrderDataResult?.value.truckType
+          TruckTypePrint.value = getTruckOrderDataResult?.value.truckType
           contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
           personInchargeTruckCompanyModel.value = getTruckOrderDataResult?.value.driverName
 
           //console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
         }
-      }else{
+      } else {
         // conslolr
       }
-      
+
       return getTruckOrderDataResult.value
-      
+
     }
-  }catch(error){
+  } catch (error) {
     //console.log(error)
   }
 }
@@ -2509,8 +2509,8 @@ const clearParamsTruckOrder = () => {
   saleOrderNo.value = null
   soEIdModel.value = null
 
-  CompanyPrint.value  = []
-  AddressPrint.value  = []
+  CompanyPrint.value = []
+  AddressPrint.value = []
   TruckCompanyPrint.value = []
   TruckTypePrint.value = []
   paramsTruckOrder.value = {
@@ -2539,7 +2539,7 @@ const clearParamsTruckOrder = () => {
   // sessionStorage.setItem('sOeIdHistoryTruckOrderSST', 'null')
   // sessionStorage.setItem('rowDataHistoryTruckOrderSST', null)
 
-  
+
 }
 
 const handlePrintTruckOrderPDF = () => {
@@ -2562,29 +2562,29 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value || ''
 
   //console.log('loading.......')
-  
 
-  try{
+
+  try {
     const result = printTruckOrderFormPDF(
       urlApi.value,
       paramsTruckOrder.value,
       whereHouse,
       accessTokenAtStore,
       soEIdModel.value)
-    
-    if(result){
+
+    if (result) {
       // textAlertDialogFunction(alertWordConst.print, true)
       // setTimeout(() => {
       //   location.reload()
       // }, 500) // 10000 มิลลิวินาที = 10 วินาที
       // loadingPrintTruckOrderForm.value = false
-      
-      
+
+
       setTimeout(() => {
         loadingPrintTruckOrderForm.value = false
       }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
-    
-    }else{
+
+    } else {
       setTimeout(() => {
         loadingPrintTruckOrderForm.value = false
       }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
@@ -2592,22 +2592,22 @@ const handlePrintTruckOrderPDF = () => {
       setTimeout(() => {
       }, 500) // 10000 มิลลิวินาที = 10 วินาที
       loadingPrintTruckOrderForm.value = false
-      
+
     }
   } catch (e) {
     setTimeout(() => {
-      
+
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
     console.error(`Error saving search plan:`, error)
     loadingPrintTruckOrderForm.value = false
-    
+
   }
   setTimeout(() => {
-    
+
   }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
   loadingPrintTruckOrderForm.value = false
-  
-  
+
+
 }
 
 const { saveTruckOrderResult,
@@ -2622,17 +2622,17 @@ const bodySaveTruckOrder = data => ({
   truckType: TruckTypePrint.value,
   truckLicense: data.truckLicense,
   remark: data.remark,
-  
+
   driverName: personInchargeTruckCompanyModel.value,
 
   orderBy: userDataInfo?.value.firstName,
   contactAndTel: contactTruckCompanyModel.value,
   authorizedBy: data.authorizedBy,
 
-  contactDate: convertToISO8601(data.dateDriverBy)  || convertToISO8601(dateCurrent.value) || '',
-  orderDate: data.orderDate  || convertToISO8601(dateCurrent.value),
-  authorizedDate: data.authorizedDate  || convertToISO8601(dateCurrent.value),
-  lastPrintDateTime: data.orderDate  || convertToISO8601(dateCurrent.value),
+  contactDate: convertToISO8601(data.dateDriverBy) || convertToISO8601(dateCurrent.value) || '',
+  orderDate: data.orderDate || convertToISO8601(dateCurrent.value),
+  authorizedDate: data.authorizedDate || convertToISO8601(dateCurrent.value),
+  lastPrintDateTime: data.orderDate || convertToISO8601(dateCurrent.value),
 })
 
 const bodyFirstTruckOrder = ref(
@@ -2656,7 +2656,7 @@ const bodyFirstTruckOrder = ref(
 )
 
 const loadingSaveTruckOrderForm = ref(false)
-const trickerSaveTruckOrder= ref(0)
+const trickerSaveTruckOrder = ref(0)
 
 const handleSavetruckOrder = async type => {
 
@@ -2678,19 +2678,19 @@ const handleSavetruckOrder = async type => {
 
   const body = bodySaveTruckOrder(paramsTruckOrder.value)
 
-  trikerSaveDrft.value  = true
+  trikerSaveDrft.value = true
 
   const saveDraftRes = await saveShipmentPlan(dataRowModel.value)
 
   //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
-  if(!saveDraftRes){
+  if (!saveDraftRes) {
     textAlertDialogFunction(alertWordConst.saveDraft, false)
     throw new Error('saveDraftRes failed: ' + saveDraftRes)
   }
 
 
-  try{
+  try {
     const result = await saveTruckOrder(
       urlApi.value,
       'save',
@@ -2699,33 +2699,33 @@ const handleSavetruckOrder = async type => {
       body,
     )
 
-    if(result){
+    if (result) {
       //console.log('saveTruckOrderResult', saveTruckOrderResult?.value)
-      
+
 
       sessionStorage.removeItem('sOHistoryTruckOrderSST')
       sessionStorage.removeItem('sOeIdHistoryTruckOrderSST')
       sessionStorage.removeItem('rowDataHistoryTruckOrderSST')
 
-      if(trickerSaveTruckOrder.value ==! 1){
+      if (trickerSaveTruckOrder.value == !1) {
         console.log("asdasdasd", trickerSaveTruckOrder.value)
         textAlertDialogFunction("SAVE TRUCK ORDER", true)
         setTimeout(() => {
           location.reload()
         }, 500)
       }
-    }else{
+    } else {
       //console.log('errorSaveTruckOrder', errorSaveTruckOrder.value)
       textAlertDialogFunction("SAVE TRUCK ORDER", false)
 
-      trikerSaveDrft.value  = false
+      trikerSaveDrft.value = false
     }
-  }catch(error){
-    trikerSaveDrft.value  = false
+  } catch (error) {
+    trikerSaveDrft.value = false
   }
 
   loadingSaveTruckOrderForm.value = false
-  trikerSaveDrft.value  = false
+  trikerSaveDrft.value = false
 }
 </script>
 
@@ -2740,7 +2740,8 @@ const handleSavetruckOrder = async type => {
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
-                :to="{ name: 'skt-receiving',
+                :to="{
+                  name: 'skt-receiving',
                 }"
               >
                 <VIcon
@@ -2819,7 +2820,7 @@ const handleSavetruckOrder = async type => {
                         variant="elevated"
                         size="x-small"
                         style="min-height: 20px;"
-                        :color="item.raw.color? item.raw.color : 'grey'"
+                        :color="item.raw.color ? item.raw.color : 'grey'"
                       >
                         <span
                           v-if="item.raw.name"
@@ -2864,7 +2865,7 @@ const handleSavetruckOrder = async type => {
                     </template>
                   </VTextField>
                 </VCol>
-                
+
 
                 <!-- 👉 Select Product code -->
                 <VCol
@@ -2937,7 +2938,6 @@ const handleSavetruckOrder = async type => {
                         color="green"
                         density="compact"
                         class="mx-0"
-                        
                         @click="searchFilterPlanFunctionBtn"
                       >
                         <span style="font-size: 12px;">{{ $t('Search') }}</span>
@@ -3067,7 +3067,8 @@ const handleSavetruckOrder = async type => {
                     }}:&nbsp;</span>&nbsp;{{ groupSupProduct }}<br>
                     <span style="font-size: large; font-weight: 900;">{{
                       $t("Total")
-                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{ (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
+                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{
+                      (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
                   </VCol>
                 </VRow>
                 <span style="font-size: large; font-weight: 900;">{{
@@ -3127,7 +3128,6 @@ const handleSavetruckOrder = async type => {
           <VRow>
             <VCol
               cols="6"
-
               class="d-flex justify-end align-center"
             >
               <span>Print Coppy:</span>
@@ -3138,7 +3138,6 @@ const handleSavetruckOrder = async type => {
             >
               <VTextField
                 density="compact"
-                  
                 type="number"
                 min="0"
               >
@@ -3574,7 +3573,7 @@ const handleSavetruckOrder = async type => {
               Save
 
             </span>
-            
+
             <div>
               <VProgressCircular
                 v-if="loadingSaveTruckOrderForm"
@@ -3602,7 +3601,7 @@ const handleSavetruckOrder = async type => {
               Print
 
             </span>
-            
+
             <div>
               <VProgressCircular
                 v-if="loadingPrintTruckOrderForm"
@@ -3685,7 +3684,7 @@ const handleSavetruckOrder = async type => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
+              v-if="userDataInfo.id === '00023' || userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="primary"
@@ -3695,7 +3694,7 @@ const handleSavetruckOrder = async type => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_REJECT').canVisible"
+              v-if="userDataInfo.id === '00023' || userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission, 'BTN_REJECT').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="error"
@@ -3705,7 +3704,7 @@ const handleSavetruckOrder = async type => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_SENDBACK').canVisible"
+              v-if="userDataInfo.id === '00023' || userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="purple-accent-4"
@@ -3760,7 +3759,7 @@ const handleSavetruckOrder = async type => {
         >
           {{ errorMessage }}
         </div>
-        
+
         <VProgressLinear
           v-if="isLoading"
           height="20"
@@ -3784,7 +3783,7 @@ const handleSavetruckOrder = async type => {
                 class="sticky-column"
               >
                 <VCheckbox
-                  v-if="userDataInfo.id === '00023'|| userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
+                  v-if="userDataInfo.id === '00023' || userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
                   v-model="isSelectAll"
                   :indeterminate="isIndeterminate"
                   @click="toggleSelectAll"
@@ -3800,69 +3799,79 @@ const handleSavetruckOrder = async type => {
                 <span style="font-weight: bold;">{{ $t('Status') }}</span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Sale Order No.') }}<VIcon
-                  :icon="sortColumn === 'salesOrderNo' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('salesOrderNo')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Sale Order No.') }}
+                  <VIcon
+                    :icon="sortColumn === 'salesOrderNo' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('salesOrderNo')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-center"
               >
                 <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SAP_INVOICE_NO').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}<VIcon
-                  :icon="sortColumn === 'sapInvoiceNo' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('sapInvoiceNo')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('SAP Invoice no') }}
+                  <VIcon
+                    :icon="sortColumn === 'sapInvoiceNo' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('sapInvoiceNo')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_PAYER_NAME').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Payer Name') }}<VIcon
-                  :icon="sortColumn === 'payerName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('payerName')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Payer Name') }}
+                  <VIcon
+                    :icon="sortColumn === 'payerName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('payerName')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_USER').canVisible"
                 class="px-2"
               >
                 <span style="font-weight: bold;">{{ $t('User') }}</span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SHIPPER').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Shipper') }}<VIcon
-                  :icon="sortColumn === 'shipper' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('shipper')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Shipper') }}
+                  <VIcon
+                    :icon="sortColumn === 'shipper' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('shipper')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Shipper location') }}<VIcon
-                  :icon="sortColumn === 'shipperLocation' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('shipperLocation')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Shipper location') }}
+                  <VIcon
+                    :icon="sortColumn === 'shipperLocation' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('shipperLocation')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SHIPPING_MARK').canVisible"
                 class="text-start px-2"
               >
                 <div>
@@ -3871,131 +3880,153 @@ const handleSavetruckOrder = async type => {
                   </span>
                 </div>
               </th>
-              <th v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible">
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_END_USER').canVisible">
                 <span style="font-weight: bold;">{{ $t('End User') }}</span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_CONSIGNEE').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Consignee') }}<VIcon
-                  :icon="sortColumn === 'consignee' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('consignee')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Consignee') }}
+                  <VIcon
+                    :icon="sortColumn === 'consignee' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('consignee')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_PRODUCT').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Item Name') }}<VIcon
-                  :icon="sortColumn === 'itemName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('itemName')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Item Name') }}
+                  <VIcon
+                    :icon="sortColumn === 'itemName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('itemName')"
+                  />
+                </span>
               </th>
-              <th v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible">
-                <span style="font-weight: bold;">{{ $t('Lot') }}<VIcon
-                  :icon="sortColumn === 'lot' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('lot')"
-                /></span>
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_LOT_NUMBER').canVisible">
+                <span style="font-weight: bold;">{{ $t('Lot') }}
+                  <VIcon
+                    :icon="sortColumn === 'lot' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('lot')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_QTY_KG').canVisible"
                 class="text-end px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}<VIcon
-                  :icon="sortColumn === 'quantity' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('quantity')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}
+                  <VIcon
+                    :icon="sortColumn === 'quantity' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('quantity')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_COA').canVisible"
                 class="text-center"
               >
                 <span style="font-weight: bold;">{{ $t('COA') }}</span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_FREIGHT_FORWARDER').canVisible"
                 class="bg-green-lighten-3"
               >
                 <span
                   style="font-weight: bold;"
                   class="text-black"
-                >{{ $t('Freight forwarder') }}<VIcon
-                  :icon="sortColumn === 'freightForwarder' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('freightForwarder')"
-                /></span>
+                >{{ $t('Freight forwarder') }}
+                  <VIcon
+                    :icon="sortColumn === 'freightForwarder' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('freightForwarder')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_CARRIER').canVisible"
                 class="bg-green-lighten-3 text-start"
                 style="min-width: 150px;"
               >
                 <span
                   style="min-width: 250px; font-weight: bold;"
                   class="text-start"
-                >{{ $t('Carrier') }}<VIcon
-                  :icon="sortColumn === 'carrier' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('carrier')"
-                /></span>
+                >{{ $t('Carrier') }}
+                  <VIcon
+                    :icon="sortColumn === 'carrier' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('carrier')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_VESSEL_NAME').canVisible"
                 class="bg-green-lighten-3"
               >
                 <span
                   style="font-weight: bold;"
                   class="text-black"
-                >{{ $t('Vessel name') }}<VIcon
-                  :icon="sortColumn === 'vesselName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('vesselName')"
-                /></span>
+                >{{ $t('Vessel name') }}
+                  <VIcon
+                    :icon="sortColumn === 'vesselName' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('vesselName')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_VOY').canVisible"
                 class="bg-yellow-lighten-3"
               >
                 <span
                   style="font-weight: bold;"
                   class="text-black"
-                >{{ $t('Voy') }}<VIcon
-                  :icon="sortColumn === 'voy' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('voy')"
-                /></span>
+                >{{ $t('Voy') }}
+                  <VIcon
+                    :icon="sortColumn === 'voy' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('voy')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK').canVisible"
                 class="bg-green-lighten-3"
               >
-                <span style="font-weight: bold;">{{ $t('Truck') }}<VIcon
-                  :icon="sortColumn === 'truck' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('truck')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Truck') }}
+                  <VIcon
+                    :icon="sortColumn === 'truck' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('truck')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canVisible"
                 class="bg-yellow-lighten-3 texct-end"
               >
-                <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}<VIcon
-                  :icon="sortColumn === 'truckReservingNumber' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('truckReservingNumber')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}
+                  <VIcon
+                    :icon="sortColumn === 'truckReservingNumber' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('truckReservingNumber')"
+                  />
+                </span>
               </th>
-              <th v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible">
-                <span style="font-weight: bold;">{{ $t('Truck fee') }}<VIcon
-                  :icon="sortColumn === 'truckFee' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('truckFee')"
-                /></span>
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_FEE').canVisible">
+                <span style="font-weight: bold;">{{ $t('Truck fee') }}
+                  <VIcon
+                    :icon="sortColumn === 'truckFee' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('truckFee')"
+                  />
+                </span>
               </th>
               <th
                 v-if="department === 'Warehouse'"
@@ -4004,36 +4035,42 @@ const handleSavetruckOrder = async type => {
                 <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_DO_EX').canVisible"
                 class="px-4"
               >
-                <span style="font-weight: bold;">{{ $t('DO/EX') }}<VIcon
-                  :icon="sortColumn === 'doEx' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('doEx')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('DO/EX') }}
+                  <VIcon
+                    :icon="sortColumn === 'doEx' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('doEx')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_COUNTRY').canVisible"
                 class="px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Country') }}<VIcon
-                  :icon="sortColumn === 'country' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('country')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Country') }}
+                  <VIcon
+                    :icon="sortColumn === 'country' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('country')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_LOADING_DATE').canVisible"
                 class="text-start px-2"
               >
-                <span style="font-weight: bold;">{{ $t('Loading date') }}<VIcon
-                  :icon="sortColumn === 'logUpdatedDate' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('logUpdatedDate')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Loading date') }}
+                  <VIcon
+                    :icon="sortColumn === 'logUpdatedDate' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('logUpdatedDate')"
+                  />
+                </span>
               </th>
-              <th v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible">
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_ETD').canVisible">
                 <VRow>
                   <VCol cols="6">
                     <span style="font-weight: bold;">{{ $t('ETD') }}</span>
@@ -4054,7 +4091,7 @@ const handleSavetruckOrder = async type => {
                   </VCol>
                 </VRow>
               </th>
-              <th v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible">
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_ETA').canVisible">
                 <VRow>
                   <VCol cols="6">
                     <span style="font-weight: bold;">{{ $t('ETA') }}</span>
@@ -4076,48 +4113,58 @@ const handleSavetruckOrder = async type => {
                 </VRow>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_DELIVERY_NOTE').canVisible"
                 class="text-center"
               >
                 <span style="font-weight: bold;">{{ $t('Delivery note') }}</span>
               </th>
-              <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible">
-                <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}<VIcon
-                  :icon="sortColumn === 'saL_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('saL_Remarks')"
-                /></span>
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_SAL').canVisible">
+                <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}
+                  <VIcon
+                    :icon="sortColumn === 'saL_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('saL_Remarks')"
+                  />
+                </span>
               </th>
-              <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible">
-                <span style="font-weight: bold;">{{ $t('Remark (WH)') }}<VIcon
-                  :icon="sortColumn === 'wH_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('wH_Remarks')"
-                /></span>
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_WH').canVisible">
+                <span style="font-weight: bold;">{{ $t('Remark (WH)') }}
+                  <VIcon
+                    :icon="sortColumn === 'wH_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('wH_Remarks')"
+                  />
+                </span>
               </th>
-              <th v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible">
-                <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}<VIcon
-                  :icon="sortColumn === 'loG_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('loG_Remarks')"
-                /></span>
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_LOG').canVisible">
+                <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}
+                  <VIcon
+                    :icon="sortColumn === 'loG_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('loG_Remarks')"
+                  />
+                </span>
               </th>
               <th class="px-1">
-                <span style="font-weight: bold;">{{ $t('Updated By') }}<VIcon
-                  :icon="sortColumn === 'updatedBy' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('updatedBy')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Updated By') }}
+                  <VIcon
+                    :icon="sortColumn === 'updatedBy' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('updatedBy')"
+                  />
+                </span>
               </th>
               <th class="px-1">
-                <span style="font-weight: bold;">{{ $t('Updated Date') }}<VIcon
-                  :icon="sortColumn === 'updatedDate' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('updatedDate')"
-                /></span>
+                <span style="font-weight: bold;">{{ $t('Updated Date') }}
+                  <VIcon
+                    :icon="sortColumn === 'updatedDate' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                    class="clickable-icon"
+                    @click="toggleDirection('updatedDate')"
+                  />
+                </span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
                 class="text-center"
               >
                 <span style="font-weight: bold;" />
@@ -4126,7 +4173,7 @@ const handleSavetruckOrder = async type => {
                 <span style="font-weight: bold;">{{ $t('Action') }}</span>
               </th>
               <th
-                v-if="canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
                 class="text-center"
               >
                 <span style="font-weight: bold;" />
@@ -4136,16 +4183,16 @@ const handleSavetruckOrder = async type => {
           <!-- 👉 table body -->
           <tbody>
             <tr
-              v-for="(product, index) in paginatedData "
+              v-for="(product, index) in paginatedData"
               :key="index"
             >
               <td
                 style="min-width: 60px;"
                 class="sticky-columnBody cursor-pointer"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4155,17 +4202,17 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VCheckboxBtn
-                  v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023'|| checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00025' || checkStatusBeforeAvtion(product.statusId) && canVisibleUserPermission(statusPermission,'BTN_APPROVE').canVisible"
+                  v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023' || checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00025' || checkStatusBeforeAvtion(product.statusId) && canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
                   v-model="selectedDataTables"
                   :value="product"
                 />
               </td>
               <td
                 class="sticky-columnBody cursor-pointer"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4178,10 +4225,10 @@ const handleSavetruckOrder = async type => {
               </td>
               <td
                 class="sticky-columnBody cursor-pointer"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4195,7 +4242,8 @@ const handleSavetruckOrder = async type => {
                     :color="colorStatusWithId(product.statusId).color"
                     :style="{ color: colorStatusWithId(product.statusId).color }"
                     style="font-size: 12px;"
-                  >{{ product.statusText }} 
+                  >{{
+                     product.statusText }}
                     <VTooltip
                       activator="parent"
                       location="right"
@@ -4209,18 +4257,18 @@ const handleSavetruckOrder = async type => {
                     </VTooltip>
                   </VChip>
                   <span v-if="false">{{ product.checkSheetTypeName }}</span>
-                  
+
                 </span>
               </td>
               <!-- 👉 saleOrderNo -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SALE_ORDER_NO').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4232,15 +4280,15 @@ const handleSavetruckOrder = async type => {
                 {{ product.salesOrderNo }}
               </td>
               <!-- 👉 soAttachment -->
-             
+
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4251,31 +4299,31 @@ const handleSavetruckOrder = async type => {
               >
                 <VForm
                   ref="product"
-                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                  :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   @submit.prevent="submitShipmentPlanBySoEId('submit', product.soEtlLogDetailJournalID)"
                 >
                   <div>
                     <FileInputDialogCarousels
                       :files-from-a-p-i="product.getSOFileData"
                       title-dialog="SO Attachment"
-                      :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_SO_ATTACHMENT').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                      :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                       :type-file-input="typeFileInput"
-                      file-name="So Attachment" 
+                      file-name="So Attachment"
                       @updateFiles="handleFileUpdatesSO"
                     />
                   </div>
                 </VForm>
               </td>
-              
+
               <!-- 👉 sapInvoiceNo -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SAP_INVOICE_NO').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SAP_INVOICE_NO').canVisible"
                 class="text-start px-2 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4288,13 +4336,13 @@ const handleSavetruckOrder = async type => {
               </td>
               <!-- 👉 payerName -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PAYER_NAME').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_PAYER_NAME').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 220px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4307,13 +4355,13 @@ const handleSavetruckOrder = async type => {
               </td>
               <!-- 👉 user -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_USER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_USER').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 220px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4326,13 +4374,13 @@ const handleSavetruckOrder = async type => {
               </td>
               <!-- 👉 shipper -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SHIPPER').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4345,13 +4393,13 @@ const handleSavetruckOrder = async type => {
               </td>
               <!-- 👉 shipperLocation -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPER_LOCATION').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 300px; max-width: 300px;  font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4365,13 +4413,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 Shipping Condition -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SHIPPING_MARK').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 180px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4385,18 +4433,19 @@ const handleSavetruckOrder = async type => {
                     style="min-width: 160px; max-width: 160px;"
                     variant="outlined"
                     :color="product.shipperConditions ? 'primary' : 'grey'"
-                    @click="textAreaShipDialogActive2('ShipMC',product.shipperMark, 
-                                                      product.shipperConditions, index, product.soEtlLogDetailJournalID, 
-                                                      product.shippingMarkActive, product, 
+                    @click="textAreaShipDialogActive2('ShipMC', product.shipperMark,
+                                                      product.shipperConditions, index, product.soEtlLogDetailJournalID,
+                                                      product.shippingMarkActive, product,
                                                       disabledStatus(product.inspStatusId,
-                                                                     product.logStatusId,product.salStatusId,
-                                                                     product.whStatusId,product), 
-                                                      canVisibleUserPermission(statusPermission,'COL_SHIPPING_MARK').canExecute)"
+                                                                     product.logStatusId, product.salStatusId,
+                                                                     product.whStatusId, product),
+                                                      canVisibleUserPermission(statusPermission, 'COL_SHIPPING_MARK').canExecute)"
                   >
                     <span
                       v-if="product.shipperConditions"
                       style="overflow: hidden; min-width: 100px; max-width: 150px; font-size: 12px; text-overflow: ellipsis;"
-                    >{{ product.shipperConditions }}</span>
+                    >{{
+                      product.shipperConditions }}</span>
                     <span
                       v-else
                       style="font-size: 12px;"
@@ -4407,13 +4456,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 endUser -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_END_USER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_END_USER').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4426,7 +4475,7 @@ const handleSavetruckOrder = async type => {
                   v-model="product.shippingEndUser"
                   density="compact"
                   class="text-field"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_END_USER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_END_USER').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   style=" min-width: 150px; font-size: 12px !important;"
                 >
                   <template #label>
@@ -4445,13 +4494,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 consignee -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_CONSIGNEE').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_CONSIGNEE').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4465,13 +4514,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 product -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_PRODUCT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_PRODUCT').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 250px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4485,13 +4534,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 Lot Number -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_LOT_NUMBER').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4504,14 +4553,15 @@ const handleSavetruckOrder = async type => {
                   style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
                   :color="product.lot ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Lot', product.lot, product.soEtlLogDetailJournalID, 
-                                                     disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product),
-                                                     canVisibleUserPermission(statusPermission,'COL_LOT_NUMBER').canExecute)"
+                  @click="textAreaRemarkDialogActive('Lot', product.lot, product.soEtlLogDetailJournalID,
+                                                     disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product),
+                                                     canVisibleUserPermission(statusPermission, 'COL_LOT_NUMBER').canExecute)"
                 >
                   <span
                     v-if="product.lot"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
-                  >{{ product.lot }}</span>
+                  >{{ product.lot
+                  }}</span>
                   <span
                     v-else
                     style="font-size: 12px;"
@@ -4521,11 +4571,11 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 qty -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_QTY_KG').canVisible"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                v-if="canVisibleUserPermission(statusPermission, 'COL_QTY_KG').canVisible"
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4541,13 +4591,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 coa -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_COA').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_COA').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 100px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4559,10 +4609,10 @@ const handleSavetruckOrder = async type => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="COA"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_COA').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_COA').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.getCOAFileData"
-                    file-name="COA" 
+                    file-name="COA"
                     @updateFiles="handleFileUpdatesCOA"
                   />
                 </div>
@@ -4570,13 +4620,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 Freight Forwarder -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_FREIGHT_FORWARDER').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4587,7 +4637,7 @@ const handleSavetruckOrder = async type => {
               >
                 <VSelect
                   v-model="product.freightForwarder"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_FREIGHT_FORWARDER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_FREIGHT_FORWARDER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   :items="freightForwarderModel"
                   class="truncate-select"
                   item-title="freightForwarder"
@@ -4616,16 +4666,16 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 carrier -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_CARRIER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_CARRIER').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
-                    dataTableNummberedToggle  === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
                   borderBottom:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
                 }"
@@ -4633,7 +4683,7 @@ const handleSavetruckOrder = async type => {
               >
                 <VSelect
                   v-model="product.carrier"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_CARRIER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_CARRIER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   :items="carrierModel"
                   class="truncate-select"
                   item-title="carrier"
@@ -4662,13 +4712,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 vesselName -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_VESSEL_NAME').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4683,7 +4733,7 @@ const handleSavetruckOrder = async type => {
                   :items="vesselsModel"
                   item-title="carrier"
                   item-value="carrier"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VESSEL_NAME').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_VESSEL_NAME').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
                   eager
                 >
@@ -4708,13 +4758,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 voy -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_VOY').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_VOY').canVisible"
                 style="font-size: 12px;"
                 class="text-start px-1 cursor-pointer"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4725,7 +4775,7 @@ const handleSavetruckOrder = async type => {
               >
                 <VTextField
                   v-model="product.voy"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_VOY').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_VOY').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
                   style=" min-width: 150px;"
                 />
@@ -4741,14 +4791,14 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 COL_TRUCK -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK').canVisible"
                 class="text-start px-1 cursor-pointer"
                 :class="checkBgTruck(product.truck)"
                 style="font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4766,7 +4816,7 @@ const handleSavetruckOrder = async type => {
                       item-title="truck"
                       class="truncate-select"
                       item-value="truck"
-                      :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                      :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                       density="compact"
                       dense
                     >
@@ -4793,13 +4843,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 truckReserving -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canVisible"
                 class="text-center px-1 cursor-pointer"
                 style="min-width: 250px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4812,7 +4862,7 @@ const handleSavetruckOrder = async type => {
                   v-if="true"
                   v-model="product.truckReservingNumber"
                   density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_RESERVING_NUMBER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   style=" min-width: 150px;"
                 />
                 <VTooltip
@@ -4827,13 +4877,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 truckFee -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_FEE').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4844,7 +4894,7 @@ const handleSavetruckOrder = async type => {
               >
                 <VTextField
                   v-model="product.truckFee"
-                  :disabled="!canVisibleUserPermission(statusPermission,'COL_TRUCK_FEE').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId) || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_FEE').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
                   style=" min-width: 150px;"
                 />
@@ -4863,10 +4913,10 @@ const handleSavetruckOrder = async type => {
                 v-if="department === 'Warehouse'"
                 class="text-start px-2 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4894,7 +4944,7 @@ const handleSavetruckOrder = async type => {
                   >
                     <FileInputDialogCarousels
                       title-dialog="Truck Order"
-                      :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_TRUCK_ORDER').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                      :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
                       :files-from-a-p-i="product.getTruckOrderFileData"
@@ -4906,13 +4956,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 doEx -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_DO_EX').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_DO_EX').canVisible"
                 class="text-start px-4 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4926,13 +4976,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 country -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_COUNTRY').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_COUNTRY').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4946,13 +4996,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 loadingDate -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_LOADING_DATE').canVisible"
                 class="text-start px-1"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4962,9 +5012,9 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
-                  v-if="canVisibleUserPermission(statusPermission,'COL_LOADING_DATE').canExecute && 
-                    !disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product) &&
-                    !disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  v-if="canVisibleUserPermission(statusPermission, 'COL_LOADING_DATE').canExecute &&
+                    !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) &&
+                    !disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
                   v-model="product.logUpdatedDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -4975,13 +5025,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 etd -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_ETD').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -4991,7 +5041,7 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
-                  v-if="canVisibleUserPermission(statusPermission,'COL_ETD').canExecute && !disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product) && !disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  v-if="canVisibleUserPermission(statusPermission, 'COL_ETD').canExecute && !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) && !disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
                   v-model="product.etd"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -5002,13 +5052,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 eta -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_ETA').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5018,7 +5068,7 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
-                  v-if="canVisibleUserPermission(statusPermission,'COL_ETA').canExecute && !disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product) && !disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  v-if="canVisibleUserPermission(statusPermission, 'COL_ETA').canExecute && !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) && !disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
                   v-model="product.eta"
                   disabeld
                   density="compact"
@@ -5030,13 +5080,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 deliveryNote -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_DELIVERY_NOTE').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5048,10 +5098,10 @@ const handleSavetruckOrder = async type => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="Delivery Note"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission,'COL_DELIVERY_NOTE').canExecute || disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product)"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_DELIVERY_NOTE').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.getDeliveryNoteFileData"
-                    file-name="Delivery Note" 
+                    file-name="Delivery Note"
                     @updateFiles="handleFileUpdatesDeliNote"
                   />
                 </div>
@@ -5059,13 +5109,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 remarkSAL -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_SAL').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5078,14 +5128,15 @@ const handleSavetruckOrder = async type => {
                   style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
                   :color="product.saL_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID, 
-                                                     disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId),
-                                                     canVisibleUserPermission(statusPermission,'COL_REMARK_SAL').canExecute)"
+                  @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID,
+                                                     disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId),
+                                                     canVisibleUserPermission(statusPermission, 'COL_REMARK_SAL').canExecute)"
                 >
                   <span
                     v-if="product.saL_Remarks"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
-                  >{{ product.saL_Remarks }}</span>
+                  >{{
+                    product.saL_Remarks }}</span>
                   <span
                     v-else
                     style="font-size: 12px;"
@@ -5095,13 +5146,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 remarkWH -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_WH').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style=" overflow: hidden; max-width: 185px; font-size: 12px; text-overflow: ellipsis;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5114,14 +5165,15 @@ const handleSavetruckOrder = async type => {
                   style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
                   :color="product.wH_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID, 
-                                                     disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId),
-                                                     canVisibleUserPermission(statusPermission,'COL_REMARK_WH').canExecute)"
+                  @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID,
+                                                     disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId),
+                                                     canVisibleUserPermission(statusPermission, 'COL_REMARK_WH').canExecute)"
                 >
                   <span
                     v-if="product.wH_Remarks"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
-                  >{{ product.wH_Remarks }}</span>
+                  >{{
+                    product.wH_Remarks }}</span>
                   <span
                     v-else
                     style="font-size: 12px;"
@@ -5131,13 +5183,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 remarkLOG -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_LOG').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5150,14 +5202,15 @@ const handleSavetruckOrder = async type => {
                   style="min-width: 150px; max-width: 150px;"
                   variant="outlined"
                   :color="product.loG_Remarks ? 'primary' : 'grey'"
-                  @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID, 
-                                                     disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId),
-                                                     canVisibleUserPermission(statusPermission,'COL_REMARK_LOG').canExecute)"
+                  @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID,
+                                                     disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId),
+                                                     canVisibleUserPermission(statusPermission, 'COL_REMARK_LOG').canExecute)"
                 >
                   <span
                     v-if="product.loG_Remarks"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
-                  >{{ product.loG_Remarks }}</span>
+                  >{{
+                    product.loG_Remarks }}</span>
                   <span
                     v-else
                     style="font-size: 12px;"
@@ -5169,10 +5222,10 @@ const handleSavetruckOrder = async type => {
               <td
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 110px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5188,10 +5241,10 @@ const handleSavetruckOrder = async type => {
               <td
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 120px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5205,13 +5258,13 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 Actions -->
               <td
-                v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
                 style="width: 150px; font-size: 12px;"
                 class="text-center px-1 cursor-pointer"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5221,19 +5274,21 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product) || 
-                    !canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
+                  :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
+                    !canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
                   :color="accountINSP ? 'grey' : 'warning'"
                   @click="saveShipmentPlan(product), saveDraftLoading = true"
                 >
                   <span
                     v-if="saveDraftLoading && product.soEtlLogDetailJournalID === saveDraftLoadingSOERow"
                     style="font-size: 12px;"
-                  ><VProgressCircular
-                    :size="30"
-                    color="primary"
-                    indeterminate
-                  /></span>
+                  >
+                    <VProgressCircular
+                      :size="30"
+                      color="primary"
+                      indeterminate
+                    />
+                  </span>
                   <span
                     v-else
                     style="font-size: 12px;"
@@ -5241,12 +5296,12 @@ const handleSavetruckOrder = async type => {
                 </VBtn>
               </td>
               <td
-                v-if="canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
                 style="width: 150px; font-size: 12px;"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5257,8 +5312,8 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="disabledStatus(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId,product) 
-                    || !canVisibleUserPermission(statusPermission,'BTN_SUBMIT').canVisible || disabledStatusWithOutAdminUser(product.inspStatusId,product.logStatusId,product.salStatusId,product.whStatusId)"
+                  :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
+                    || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
                   @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
@@ -5266,11 +5321,13 @@ const handleSavetruckOrder = async type => {
                   <span
                     v-if="submitLoading && product.soEtlLogDetailJournalID === submitLoadingSOERow"
                     style="font-size: 12px;"
-                  ><VProgressCircular
-                    :size="30"
-                    color="primary"
-                    indeterminate
-                  /></span>
+                  >
+                    <VProgressCircular
+                      :size="30"
+                      color="primary"
+                      indeterminate
+                    />
+                  </span>
                   <span
                     v-else
                     style="font-size: 12px;"
@@ -5281,10 +5338,10 @@ const handleSavetruckOrder = async type => {
                 v-if="accountWHSub"
                 style="max-width: 130px; font-size: 12px;"
                 class="text-center px-1"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5303,10 +5360,10 @@ const handleSavetruckOrder = async type => {
               <td
                 style="max-width: 150px; font-size: 12px;"
                 class="text-center px-1"
-                :style="{ 
-                  backgroundColor: 
-                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor : 
-                    isSelected(product) ? '#E0F7FA' : 
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
                     '',
                   borderTop:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
@@ -5352,7 +5409,7 @@ const handleSavetruckOrder = async type => {
           </tbody>
           <VDivider />
         </VTable>
-        
+
         <VDivider />
         <VCardText>
           <div class="d-flex align-center flex-no-wrap justify-end pa-2">
@@ -5412,12 +5469,12 @@ const handleSavetruckOrder = async type => {
 
   <section v-else>
     <VProgressLinear
-          height="20"
-          color="secondary"
-          class="elevation-1"
-        >
-          <span>No Data....</span>
-        </VProgressLinear>
+      height="20"
+      color="secondary"
+      class="elevation-1"
+    >
+      <span>No Data....</span>
+    </VProgressLinear>
   </section>
 
 
@@ -5433,7 +5490,7 @@ const handleSavetruckOrder = async type => {
           color="red-lighten-3"
           style="font-size: 20px;"
         >
-          (Demo) Shipment  - Version : 2.1  - Data 24 Row
+          (Demo) Shipment - Version : 2.1 - Data 24 Row
         </VAlert>
       </VCardText>
     </VCard>
@@ -5617,7 +5674,7 @@ const handleSavetruckOrder = async type => {
           <VCardText class="d-flex justify-end flex-wrap gap-4">
             <VBtn
               color="error"
-              @click="isDialogVisibleCommentDialog = false, submitShipmentPlanBySoEId('reject','101')"
+              @click="isDialogVisibleCommentDialog = false, submitShipmentPlanBySoEId('reject', '101')"
             >
               Reject
             </VBtn>
@@ -5766,4 +5823,3 @@ const handleSavetruckOrder = async type => {
 </template>
 
 <style scoped lang="scss" src="./indexTIE.scss"></style>
-
