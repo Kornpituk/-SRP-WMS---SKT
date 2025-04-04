@@ -4635,7 +4635,7 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <VSelect
+                <VCombobox
                   v-model="product.freightForwarder"
                   :disabled="!canVisibleUserPermission(statusPermission, 'COL_FREIGHT_FORWARDER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   :items="freightForwarderModel"
@@ -4653,7 +4653,7 @@ const handleSavetruckOrder = async type => {
                       {{ item.title }}
                     </div>
                   </template>
-                </VSelect>
+                </VCombobox>
                 <VTooltip
                   v-if="product.freightForwarder"
                   activator="parent"
@@ -4681,7 +4681,7 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <VSelect
+                <VCombobox
                   v-model="product.carrier"
                   :disabled="!canVisibleUserPermission(statusPermission, 'COL_CARRIER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   :items="carrierModel"
@@ -4699,7 +4699,7 @@ const handleSavetruckOrder = async type => {
                       {{ item.title }}
                     </div>
                   </template>
-                </VSelect>
+                </VCombobox>
                 <VTooltip
                   v-if="product.carrier"
                   activator="parent"
@@ -4727,7 +4727,7 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <VSelect
+                <VCombobox
                   v-model="product.vesselName"
                   class="truncate-select"
                   :items="vesselsModel"
@@ -4745,7 +4745,7 @@ const handleSavetruckOrder = async type => {
                       {{ item.title }}
                     </div>
                   </template>
-                </VSelect>
+                </VCombobox>
                 <VTooltip
                   v-if="product.vesselName"
                   activator="parent"
@@ -4809,7 +4809,7 @@ const handleSavetruckOrder = async type => {
               >
                 <VRow>
                   <VCol cols="12">
-                    <VSelect
+                    <VCombobox
                       v-model="product.truck"
                       :items="truckModel"
                       :menu-props="{ top: true, offsetY: true }"
@@ -4828,7 +4828,7 @@ const handleSavetruckOrder = async type => {
                           {{ item.title }}
                         </div>
                       </template>
-                    </VSelect>
+                    </VCombobox>
                   </VCol>
                 </VRow>
                 <VTooltip
