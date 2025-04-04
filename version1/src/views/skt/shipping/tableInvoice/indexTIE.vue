@@ -4635,15 +4635,15 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <VCombobox
+                <VAutocomplete
                   v-model="product.freightForwarder"
                   :disabled="!canVisibleUserPermission(statusPermission, 'COL_FREIGHT_FORWARDER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   :items="freightForwarderModel"
-                  class="truncate-select"
                   item-title="freightForwarder"
                   item-value="freightForwarder"
+                  class="truncate-select my-1"
                   density="compact"
-                  eager
+                  dense
                 >
                   <template #selection="{ item }">
                     <div
@@ -4653,7 +4653,7 @@ const handleSavetruckOrder = async type => {
                       {{ item.title }}
                     </div>
                   </template>
-                </VCombobox>
+                </VAutocomplete>
                 <VTooltip
                   v-if="product.freightForwarder"
                   activator="parent"
@@ -4681,7 +4681,7 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <VCombobox
+                <VAutocomplete
                   v-model="product.carrier"
                   :disabled="!canVisibleUserPermission(statusPermission, 'COL_CARRIER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   :items="carrierModel"
@@ -4689,7 +4689,7 @@ const handleSavetruckOrder = async type => {
                   item-title="carrier"
                   item-value="carrier"
                   density="compact"
-                  eager
+                  dense
                 >
                   <template #selection="{ item }">
                     <div
@@ -4699,7 +4699,7 @@ const handleSavetruckOrder = async type => {
                       {{ item.title }}
                     </div>
                   </template>
-                </VCombobox>
+                </VAutocomplete>
                 <VTooltip
                   v-if="product.carrier"
                   activator="parent"
@@ -4727,7 +4727,7 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <VCombobox
+                <VAutocomplete
                   v-model="product.vesselName"
                   class="truncate-select"
                   :items="vesselsModel"
@@ -4735,7 +4735,7 @@ const handleSavetruckOrder = async type => {
                   item-value="carrier"
                   :disabled="!canVisibleUserPermission(statusPermission, 'COL_VESSEL_NAME').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
-                  eager
+                  dense
                 >
                   <template #selection="{ item }">
                     <div
@@ -4745,7 +4745,7 @@ const handleSavetruckOrder = async type => {
                       {{ item.title }}
                     </div>
                   </template>
-                </VCombobox>
+                </VAutocomplete>
                 <VTooltip
                   v-if="product.vesselName"
                   activator="parent"
@@ -4809,7 +4809,7 @@ const handleSavetruckOrder = async type => {
               >
                 <VRow>
                   <VCol cols="12">
-                    <VCombobox
+                    <VAutocomplete
                       v-model="product.truck"
                       :items="truckModel"
                       :menu-props="{ top: true, offsetY: true }"
@@ -4828,7 +4828,7 @@ const handleSavetruckOrder = async type => {
                           {{ item.title }}
                         </div>
                       </template>
-                    </VCombobox>
+                    </VAutocomplete>
                   </VCol>
                 </VRow>
                 <VTooltip
