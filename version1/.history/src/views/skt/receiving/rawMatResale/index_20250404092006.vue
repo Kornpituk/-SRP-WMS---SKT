@@ -3935,9 +3935,9 @@ const getDisabledFollowStatusNRole = () => {
         class="text-end pb-4 pt-1"
         cols="12"
       >
-      <!--  v-if="getDisabledFollowStatusNRole()" -->
+      <!--        Alert Dialog Success/Fiald new -->
         <span
-          v-if="false"
+          v-if="getDisabledFollowStatusNRole()"
           class="px-1"
           style="font-size: 12px;"
         >For Inspection </span>

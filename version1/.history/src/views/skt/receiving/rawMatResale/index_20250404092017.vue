@@ -3937,7 +3937,7 @@ const getDisabledFollowStatusNRole = () => {
       >
       <!--  v-if="getDisabledFollowStatusNRole()" -->
         <span
-          v-if="false"
+          v-if="getDisabledFollowStatusNRole()"
           class="px-1"
           style="font-size: 12px;"
         >For Inspection </span>

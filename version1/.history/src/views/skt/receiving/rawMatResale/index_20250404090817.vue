@@ -3935,9 +3935,8 @@ const getDisabledFollowStatusNRole = () => {
         class="text-end pb-4 pt-1"
         cols="12"
       >
-      <!--  v-if="getDisabledFollowStatusNRole()" -->
         <span
-          v-if="false"
+          v-if="getDisabledFollowStatusNRole()"
           class="px-1"
           style="font-size: 12px;"
         >For Inspection </span>
@@ -4198,7 +4197,6 @@ const getDisabledFollowStatusNRole = () => {
           </VCard>
         </VDialog>
       </section>
-
       <!-- Dialog Submit Success -->
       <section>
         <VDialog
@@ -4234,7 +4232,7 @@ const getDisabledFollowStatusNRole = () => {
           </VCard>
         </VDialog>
       </section>
-
+      
       <!-- Dialog Submit Failed -->
       <section>
         <VDialog
