@@ -1411,6 +1411,8 @@ const disabledBtnLebal = () => {
     return false
   }else if(dataRowModel.value.receiveTypeId === 2 && [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(idStatusDialogAction.value)){
     return false
+  }else if(dataRowModel.value.receiveTypeId === 4 && [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(idStatusDialogAction.value)){
+    return false
   }
   else{
     return true
@@ -1509,10 +1511,6 @@ const savePrintLabel = async () => {
 
     successSavePrintLabel.value = false
   }
-}
-
-const btnPrintLabelTest = () => {
-  savePrintLabel()
 }
 
 const printLabelSmallPdf = async () => {
