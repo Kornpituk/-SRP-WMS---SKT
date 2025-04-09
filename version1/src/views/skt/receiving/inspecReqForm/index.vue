@@ -1979,7 +1979,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 0)"
+                  v-if="checkOkState(item, item.typeID, 0) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
@@ -2049,7 +2049,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 0)"
+                  v-if="checkAnalysitItem(item, item.typeID, 0) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -2090,7 +2090,7 @@ const getDisabledFollowStatusNRole = () => {
 
               
                 <span
-                  v-if="checkOkState(item, item.typeID, 1)"
+                  v-if="checkOkState(item, item.typeID, 1) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
@@ -2160,7 +2160,7 @@ const getDisabledFollowStatusNRole = () => {
 
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 1)"
+                  v-if="checkAnalysitItem(item, item.typeID, 1) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -2200,7 +2200,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 2)"
+                  v-if="checkOkState(item, item.typeID, 2) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
@@ -2268,7 +2268,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 2)"
+                  v-if="checkAnalysitItem(item, item.typeID, 2) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -2308,7 +2308,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 3)"
+                  v-if="checkOkState(item, item.typeID, 3) && item.unit !== ''"
                   class="text-red"
                 >Analysis result Ok/Not is required!</span>
 
@@ -2376,7 +2376,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 3)"
+                  v-if="checkAnalysitItem(item, item.typeID, 3) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -2416,7 +2416,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 4)"
+                  v-if="checkOkState(item, item.typeID, 4) && item.unit !== ''"
                   class="text-red"
                 >Analysis result Ok/Not is required!</span>
 
@@ -2484,7 +2484,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 4)"
+                  v-if="checkAnalysitItem(item, item.typeID, 4) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -2591,7 +2591,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 0)"
+                  v-if="checkOkState(item, item.typeID, 0) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
@@ -2660,7 +2660,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 0)"
+                  v-if="checkAnalysitItem(item, item.typeID, 0) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -2700,7 +2700,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 1)"
+                  v-if="checkOkState(item, item.typeID, 1) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
@@ -2781,7 +2781,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 1)"
+                  v-if="checkAnalysitItem(item, item.typeID, 1) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -2820,7 +2820,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 2)"
+                  v-if="checkOkState(item, item.typeID, 2) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
@@ -2902,7 +2902,7 @@ const getDisabledFollowStatusNRole = () => {
 
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 2)"
+                  v-if="checkAnalysitItem(item, item.typeID, 2) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -2940,7 +2940,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 3)"
+                  v-if="checkOkState(item, item.typeID, 3) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
@@ -3021,7 +3021,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 3)"
+                  v-if="checkAnalysitItem(item, item.typeID, 3) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
@@ -3059,7 +3059,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VRadioGroup>
 
                 <span
-                  v-if="checkOkState(item, item.typeID, 4)"
+                  v-if="checkOkState(item, item.typeID, 4) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorOkState }}</span>
 
@@ -3142,7 +3142,7 @@ const getDisabledFollowStatusNRole = () => {
 
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 4)"
+                  v-if="checkAnalysitItem(item, item.typeID, 4) && item.unit !== ''"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
               </td>
