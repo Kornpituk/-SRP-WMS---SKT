@@ -528,6 +528,23 @@ const getAnalysistInsp = async () => {
 
     analysisItems.value = response.data.items
 
+    // const checkAnalyticalsUnit = item => {
+    //   const res = ref(0)
+    //   if(item[0].unit === ''){
+    //     res.value = 1
+    //   }else if(item[1].unit === ''){
+    //     res.value = 1
+    //   }else if(item[2].unit === ''){
+    //     res.value = 1
+    //   }else if(item[3].unit === ''){
+    //     res.value = 1
+    //   }else if(item[4].unit === ''){
+    //     res.value = 1
+    //   }
+
+    //   return res
+    // }
+
     // ตรวจสอบว่า analysisItems มีข้อมูลและมี itemAnalyticals
     if (analysisItems.value.length > 0 && Array.isArray(analysisItems.value[0].itemAnalyticals)) {
       for (let i = 0; i < Math.min(5, analysisItems.value[0].itemAnalyticals.length); i++) {
@@ -628,7 +645,7 @@ const textAlertErrorOkState = ref('')
 
 const checkOkState = (item, typeId, indexAnalysis) => {
   // ตรวจสอบว่ามีค่าใน itemAnalyticals ก่อนที่จะเข้าถึง
-  if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis) {
+  if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis && item.unit !== ''  ) {
     const analyticalItem = item.itemAnalyticals[indexAnalysis]
     if (analyticalItem.okState != null) {
       textAlertErrorOkState.value = 'Analysis result OK/Not is required!'
@@ -649,7 +666,7 @@ const textAlertErrorAnalysitItem = ref('')
 
 const checkAnalysitItem = (item, typeId, indexAnalysis) => {
   // ตรวจสอบว่ามีค่าใน itemAnalyticals ก่อนที่จะเข้าถึง
-  if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis) {
+  if (item.itemAnalyticals && item.itemAnalyticals.length > indexAnalysis && item.unit !== '') {
     const analyticalItem = item.itemAnalyticals[indexAnalysis]
 
     textAlertErrorAnalysitItem.value = 'Analysis result Text is required!'
@@ -667,6 +684,7 @@ const checkAnalysitItem = (item, typeId, indexAnalysis) => {
 const checkEmptyFields = () => {
   const emptyFieldsList = []
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   analysisItems.value.forEach((item, itemIndex) => {
     item.itemAnalyticals.forEach((analyticalItem, analyticalIndex) => {
       const body = {
@@ -681,21 +699,24 @@ const checkEmptyFields = () => {
       const needActualCheck = item.needActualValue
 
       // ตรวจสอบว่าต้องเช็ค actualAnalysis หรือ okState ตามค่า needActualValue
-      if (item.needActualValue) {
+      if(item.unit !== ''){
+        if (item.needActualValue) {
         // เช็คเฉพาะ actualAnalysis
-        if (!body.actualAnalysis) {
-          emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
+          if (!body.actualAnalysis) {
+            emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
+          } else {
+            emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false, needActualCheck })
+          }
         } else {
-          emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false, needActualCheck })
-        }
-      } else {
         // เช็คเฉพาะ okState
-        if (body.okState === -1) {
-          emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
-        } else {
-          emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false, needActualCheck })
+          if (body.okState === -1) {
+            emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
+          } else {
+            emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false, needActualCheck })
+          }
         }
       }
+      
     })
   })
 
