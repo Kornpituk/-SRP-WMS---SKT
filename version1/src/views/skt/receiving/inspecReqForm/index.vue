@@ -1948,7 +1948,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0] && item.unit !== ''"
                   v-model="item.itemAnalyticals[0].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -1985,7 +1985,7 @@ const getDisabledFollowStatusNRole = () => {
 
                 <div v-if="false">
                   <VTextField
-                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]"
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0] && item.unit !== ''"
                     v-model="item.itemAnalyticals[0].actualAnalysis"
                     :readonly="frozeCheck"
                     :rules="[
@@ -2005,7 +2005,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VTextField>
                 </div>
                 
-                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0]">
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2026,7 +2026,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[0]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[0]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[0].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -2061,7 +2061,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1] && item.unit !== ''"
                   v-model="item.itemAnalyticals[1].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -2115,7 +2115,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
 
-                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]">
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2136,7 +2136,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[1]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[1]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[1].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -2172,7 +2172,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2] && item.unit !== ''"
                   v-model="item.itemAnalyticals[2].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -2224,7 +2224,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VTextField>
                 </div>
                 
-                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]">
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2245,7 +2245,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[2]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[2]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[2].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -2280,7 +2280,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3] && item.unit !== ''"
                   v-model="item.itemAnalyticals[3].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -2333,7 +2333,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VTextField>
                 </div>
                 
-                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]">
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2354,7 +2354,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[3]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[3]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[3].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -2388,7 +2388,7 @@ const getDisabledFollowStatusNRole = () => {
                 style="min-width: 200px; max-width: 200px;"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4] && item.unit !== ''"
                   v-model="item.itemAnalyticals[4].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -2440,7 +2440,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VTextField>
                 </div>
                 
-                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]">
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2461,7 +2461,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[4]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[4]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[4].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -2563,7 +2563,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0] && item.unit !== ''"
                   v-model="item.itemAnalyticals[0].okState"
                   :mandatory="false"
                   :readonly="frozeCheck"
@@ -2617,7 +2617,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
 
-                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]">
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2638,7 +2638,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[0]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[0]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[0].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -2672,7 +2672,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1] && item.unit !== ''"
                   v-model="item.itemAnalyticals[1].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -2731,7 +2731,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VTextField>
                 </div>
                 
-                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]">
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2752,7 +2752,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[1]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[1]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[1].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -2792,7 +2792,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2] && item.unit !== ''"
                   v-model="item.itemAnalyticals[2].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -2851,7 +2851,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VTextField>
                 </div>
                 
-                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]">
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2872,7 +2872,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[2]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[2]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[2].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -2912,7 +2912,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3] && item.unit !== ''"
                   v-model="item.itemAnalyticals[3].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -2971,7 +2971,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VTextField>
                 </div>
                 
-                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]">
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -2992,7 +2992,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[3]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[3]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[3].actualAnalysis"
                   class="my-2"
                   rows="2"
@@ -3031,7 +3031,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="1"
               >
                 <VRadioGroup
-                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4] && item.unit !== ''"
                   v-model="item.itemAnalyticals[4].okState"
                   :readonly="frozeCheck"
                   :mandatory="false"
@@ -3065,7 +3065,7 @@ const getDisabledFollowStatusNRole = () => {
 
                 <div v-if="false">
                   <VTextField
-                    v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]"
+                    v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4] && item.unit !== ''"
                     v-model="item.itemAnalyticals[4].actualAnalysis"
                     :readonly="frozeCheck"
                     density="compact"
@@ -3091,7 +3091,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
 
-                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4]">
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4] && item.unit !== ''">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -3112,7 +3112,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
                 
                 <VTextarea
-                  v-if="isDialogVisibleInput[item.itemAnalyticals[4]?.inspReqLotJournalId]"
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[4]?.inspReqLotJournalId] && item.unit !== ''"
                   v-model="item.itemAnalyticals[4].actualAnalysis"
                   class="my-2"
                   rows="2"

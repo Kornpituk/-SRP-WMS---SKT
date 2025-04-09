@@ -343,11 +343,12 @@ const headersNewEx = [
     key: 'receivedDate',
     sortable: false,
   },
-  {
-    title: PoNoColumn,
-    key: 'purchaseOrderNo',
-    sortable: false,
-  },
+
+  // {
+  //   title: PoNoColumn,
+  //   key: 'purchaseOrderNo',
+  //   sortable: false,
+  // },
   {
     title: 'Item Code',
     key: 'productId',
@@ -1202,17 +1203,6 @@ const dataTableCliclHighlightIsToggle2 = no => {
             </tr>
           </template>
           <template #column.receivedDate="{ column }">
-            <tr class="d-flex justify-center">
-              <th>
-                <span>{{ column.title }}<VIcon
-                  :icon="sortColumn === column.key && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection(column.key)"
-                /></span>
-              </th>
-            </tr>
-          </template>
-          <template #column.purchaseOrderNo="{ column }">
             <tr class="d-flex justify-center">
               <th>
                 <span>{{ column.title }}<VIcon
