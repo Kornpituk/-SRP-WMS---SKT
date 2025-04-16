@@ -344,11 +344,12 @@ const headersNewEx = [
     sortable: false,
   },
 
-  // {
-  //   title: PoNoColumn,
-  //   key: 'purchaseOrderNo',
-  //   sortable: false,
-  // },
+  {
+    title: PoNoColumn,
+    key: 'purchaseOrderNo',
+    sortable: false,
+
+  },
   {
     title: 'Item Code',
     key: 'productId',
@@ -381,6 +382,16 @@ const headersNewEx = [
     sortable: false,
   },
 ]
+
+const filteredHeaders = computed(() => {
+  return headersNewEx.filter(header => {
+    if (paramsFetchDataPrintLabel.value.category === 'Product') {
+      return header.key !== 'purchaseOrderNo'
+    }
+    
+    return true
+  })
+})
 
 const headerSubtitle = [
   { title: '' },
@@ -1036,7 +1047,7 @@ const dataTableCliclHighlightIsToggle2 = no => {
           v-if="dataPrintLabel.length > 0 && progressLinearNoData === true"
           v-model:expanded="expanded"
           v-model="selectedDataTables"
-          :headers="headersNewEx"
+          :headers="filteredHeaders"
           :items="dataPrintLabel"
           :items-per-page="10"
           class="text-no-wrap"
