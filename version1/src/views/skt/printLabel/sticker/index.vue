@@ -109,6 +109,7 @@ const paramsFetchDataPrintLabel = ref({
 const searchFilters = ref({ ...paramsFetchDataPrintLabel.value }) // ฟิลเตอร์จริงที่จะส่งไป API
 
 const handleSearch = async () => {
+  
   searchFilters.value = { ...paramsFetchDataPrintLabel.value } // คัดลอกค่าฟิลเตอร์ที่กรอกเสร็จแล้ว
   await fetchData() // เรียก API ด้วยฟิลเตอร์ที่ผู้ใช้กรอก
 }
@@ -138,9 +139,11 @@ const validatedFilterEmpty = () => {
 const fetchData = async () => {
   try {
 
+    // eslint-disable-next-line sonarjs/no-all-duplicated-branches
     if(paramsFetchDataPrintLabel.value.category === 'Product'){
-      PoNoColumn.value = 'Sale order No.'
+      PoNoColumn.value = 'P/O No.'
     }else{
+      // console
       PoNoColumn.value = 'P/O No.'
     }
 
@@ -383,9 +386,9 @@ const headersNewEx = [
   },
 ]
 
-const filteredHeaders = computed(() => {
+const filteredHeaders = computed( () => {
   return headersNewEx.filter(header => {
-    if (paramsFetchDataPrintLabel.value.category === 'Product') {
+    if (paramsFetchDataPrintLabel.value.category === 'Product' || paramsFetchDataPrintLabel.value.category === 'Semi') {
       return header.key !== 'purchaseOrderNo'
     }
     

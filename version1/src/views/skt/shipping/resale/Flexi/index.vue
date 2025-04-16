@@ -675,7 +675,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
               colspan="4"
               class="text-center"
             >
-              <span>Delivery Place: </span><span class="font-weight-body">{{ dataProductRow?.shipperLocation }}</span>
+              <span>Delivery Place: </span><span class="font-weight-body">{{ dataProductRow?.shipperLocationProvince }}</span>
             </th>
             <th
               colspan="4"

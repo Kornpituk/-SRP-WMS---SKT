@@ -193,7 +193,7 @@ import {
   useGetSearchPlanService,
   useGetSelectDataService,
   usePrintExportExcelService,
-  usePrintPDFService,
+  usePrintPDFService, 
   usePrintShipmentPDFService,
   usePrintTruckOrderFormPDFService,
   useSaveFileFormService,
@@ -2142,7 +2142,7 @@ const mapProductRowToPramsPrint = async item => {
     UserCode: item.shippingUserCode,
     Customer: item.shippingUserName,
     SaleOrder: item.salesOrderNo,
-    location: item.shipperLocation,
+    location: item.ShipperLocationProvince,
     LicensePlate: item.containerNo_LicPlNo, // ✅ ใช้ค่าที่ถูกต้อง
   }))
 }
@@ -4582,8 +4582,8 @@ const handleSavetruckOrder = async type => {
                   borderBottom:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
                 }"
-                class="text-end px-1 cursor-pointer"
-                style="min-width: 100px; font-size: 12px;"
+                class="text-end px-2 cursor-pointer"
+                style="min-width: 120px; font-size: 12px;"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ formatNumber(product.quantity) }}
@@ -5240,7 +5240,7 @@ const handleSavetruckOrder = async type => {
               <!-- 👉 update date -->
               <td
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 120px; font-size: 12px;"
+                style="min-width: 130px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
