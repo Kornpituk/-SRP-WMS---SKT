@@ -689,7 +689,7 @@ watchEffect(async () => {
         </tr>
         <tr>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="ipaRequestData.whStaffUpdatedDate">
@@ -697,7 +697,7 @@ watchEffect(async () => {
             </div>
           </td>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="ipaRequestData.whLeaderDate">
@@ -705,7 +705,7 @@ watchEffect(async () => {
             </div>
           </td>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="ipaRequestData.whSupervisorDate">

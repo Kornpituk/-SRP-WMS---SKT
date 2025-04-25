@@ -1144,7 +1144,7 @@ function formatDate(dateString) {
         </tr>
         <tr>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="lorryRequestData.whStaffUpdatedDate">
@@ -1153,7 +1153,7 @@ function formatDate(dateString) {
             </div>
           </td>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="lorryRequestData.whLeaderDate">
@@ -1161,7 +1161,7 @@ function formatDate(dateString) {
             </div>
           </td>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="lorryRequestData.whSupervisorDate">

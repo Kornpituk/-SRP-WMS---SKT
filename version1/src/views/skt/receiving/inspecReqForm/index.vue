@@ -3380,7 +3380,7 @@ const getDisabledFollowStatusNRole = () => {
             </tr>
             <tr>
               <td
-                style="min-width: 150px;"
+                style="min-width: 150px;  height: 35px;"
                 colspan="3"
               >
                 <div v-if="headerInsp.lastUpdatedStaffWH">
@@ -3388,7 +3388,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
               </td>
               <td
-                style="min-width: 150px;"
+                style="min-width: 150px;  height: 35px;"
                 colspan="3"
               >
                 <div v-if="headerInsp.lastUpdatedSuperWH">
@@ -3396,7 +3396,7 @@ const getDisabledFollowStatusNRole = () => {
                 </div>
               </td>
               <td
-                style="min-width: 150px;"
+                style="min-width: 150px;  height: 35px;"
                 colspan="3"
               >
                 <div v-if="headerInsp.lastUpdatedStaffInsp">

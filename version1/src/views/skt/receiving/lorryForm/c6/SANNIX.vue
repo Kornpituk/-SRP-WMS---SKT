@@ -1066,7 +1066,7 @@ watchEffect(async () => {
         </tr>
         <tr>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="lorryRequestData.whStaffUpdatedDate">
@@ -1075,7 +1075,7 @@ watchEffect(async () => {
             </div>
           </td>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="lorryRequestData.whLeaderDate">
@@ -1083,7 +1083,7 @@ watchEffect(async () => {
             </div>
           </td>
           <td
-            style="min-width: 150px;"
+            style="min-width: 150px; height: 35px;"
             colspan="4"
           >
             <div v-if="lorryRequestData.whSupervisorDate">

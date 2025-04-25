@@ -1951,6 +1951,7 @@ const saveDraftData = word => {
               <VRow>
                 <VCol cols="12">
                   <VFileInput
+                    v-if="canVisibleUserPermission(statusPermission,'BTN_SAVE_DRAFT').canVisible"
                     v-model="fileCoaNew"
                     :disabled="frozeCheck"
                     label="File Upload COA"
@@ -2169,7 +2170,7 @@ const saveDraftData = word => {
             </tr>
             <tr>
               <td
-                style="min-width: 150px;"
+                style="min-width: 150px;  height: 35px;"
                 colspan="6"
               >
                 <div v-if="dataHeader.inspStaffUpdateDate">
@@ -2177,7 +2178,7 @@ const saveDraftData = word => {
                 </div>
               </td>
               <td
-                style="min-width: 150px;"
+                style="min-width: 150px;  height: 35px;"
                 colspan="6"
               >
                 <div v-if="dataHeader.whUpdateDate">

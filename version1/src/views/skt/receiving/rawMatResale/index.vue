@@ -3853,9 +3853,9 @@ const getDisabledFollowStatusNRole = () => {
               <span>Supervisor: {{ supplier }}</span>
             </td>
           </tr>
-          <tr>
+          <tr style="min-height: 35px;">
             <td
-              style="min-width: 150px;"
+              style="min-width: 150px; height: 35px;"
               colspan="6"
             >
               <div v-if="dataHeaderReceving.updatedDate">
@@ -3865,7 +3865,7 @@ const getDisabledFollowStatusNRole = () => {
               </div>
             </td>
             <td
-              style="min-width: 150px;"
+              style="min-width: 150px; height: 35px;"
               colspan="6"
             >
               <div v-if="dataHeaderReceving.approveRejectDate">
