@@ -89,6 +89,13 @@ function openConfirmDialog() {
       isDialogVisibleAlertDialog.value = false
 
       //console.log("selectedDataTables 102")
+    }else if (typeConfirm.value === 'cancel' ) {
+      typeConfirm.value = 'cancel plan'
+      wordForSubmit.value = alertWordConst.cancel
+      confirmDialog2.value.openDialog()
+      isDialogVisibleAlertDialog.value = false
+
+      //console.log("selectedDataTables 102")
     }else if(item.statusId === 101){
       textAlertSubDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
 
@@ -108,6 +115,17 @@ function btnSubmitConfirm() {
     // กำหนดค่าเริ่มต้น
     typeConfirm.value = 'submit'
     wordForSubmit.value = alertWordConst.submit
+    confirmDialog2.value.openDialog()
+    isDialogVisibleAlertDialog.value = false
+
+  })
+}
+
+function btnCancelConfirm() {
+  selectedDataTables.value.forEach(item => {
+    // กำหนดค่าเริ่มต้น
+    typeConfirm.value = 'cancel'
+    wordForSubmit.value = alertWordConst.cancel
     confirmDialog2.value.openDialog()
     isDialogVisibleAlertDialog.value = false
 
@@ -136,11 +154,12 @@ function btnConfirmAll(type) {
   })
 }
 
-
 const btnConfirmLotValidate = async () => {
   isDialogVisibleConfirmLotValidateDialog.value = false
   await submitPlan()
 }
+
+const titleAlertCommentConfirm = ref('')
 
 async function handleConfirmAction () {
   //console.log('Confirmed! Executing action...')
@@ -154,16 +173,30 @@ async function handleConfirmAction () {
 
     // await submitPlan()
   }else if(typeConfirm.value === "reject"){
+    titleAlertCommentConfirm.value = "Reject"
     isDialogVisibleCommentDialog.value = true
     trickerSubmit.value = false
 
     // await rejectPlan()
   }else if(typeConfirm.value === "sendBack"){
     sendBackPlan()
+  }else if(typeConfirm.value === "cancel"){
+    titleAlertCommentConfirm.value = "Cancel"
+    isDialogVisibleCommentDialog.value = true
+    trickerSubmit.value = false
   }
   
 }
 
+async function handleCommentAlertAction () {
+  if(titleAlertCommentConfirm.value === "Reject"){
+    isDialogVisibleCommentDialog.value = false
+    rejectPlan()
+  }else if(titleAlertCommentConfirm.value === "Cancel"){
+    isDialogVisibleCommentDialog.value = false
+    deletePlan()
+  }
+}
 
 //--------------------------------------- dialog -------------------------------------
 
@@ -2722,7 +2755,7 @@ const statusText = statusId => {
           color="error"
           :disabled="!activeBtnCancelPlan || !canVisibleUserPermission(statusPermission,'DELETE_PLAN').canExecute"
           class="mx-1"
-          @click="deletePlan"
+          @click="btnCancelConfirm"
         >
           <span style="font-size: 12px;">Delete Plan</span>
         </VBtn>
@@ -3922,7 +3955,7 @@ const statusText = statusId => {
         class="v-dialog-sm"
       >
         <!-- Dialog Content -->
-        <VCard title="Comment">
+        <VCard :title="titleAlertCommentConfirm">
           <DialogCloseBtn
             variant="text"
             size="default"
@@ -3940,9 +3973,9 @@ const statusText = statusId => {
           <VCardText class="d-flex justify-end flex-wrap gap-4">
             <VBtn
               color="error"
-              @click="isDialogVisibleCommentDialog = false, rejectPlan()"
+              @click="handleCommentAlertAction"
             >
-              Reject
+              {{ titleAlertCommentConfirm }}
             </VBtn>
           </VCardText>
         </VCard>

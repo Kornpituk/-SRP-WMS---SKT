@@ -1959,7 +1959,7 @@ const cancelReceivingPlant = () => {
 
           // Reload หลังแจ้งเตือนสำเร็จ
           setTimeout(() => {
-            // location.reload()
+            location.reload()
           }, 500) // 0.5 วินาที
           isDialogVisibleCommentDialog.value = false
 
@@ -2961,6 +2961,10 @@ const insetSwitch1 = ref('')
               <tr>
                 <td>Updated By</td>
                 <td>{{ resultDetailsAvtion.updatedBy }}</td>
+              </tr>
+              <tr v-if="resultDetailsAvtion.statusId	=== 0">
+                <td>Comment</td>
+                <td>{{ resultDetailsAvtion.statusComments }}</td>
               </tr>
               <!-- เพิ่มข้อมูลเพิ่มเติมตามต้องการ -->
               <div v-if="false">
