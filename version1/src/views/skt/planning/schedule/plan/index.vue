@@ -124,8 +124,8 @@ function btnSubmitConfirm() {
 function btnCancelConfirm() {
   selectedDataTables.value.forEach(item => {
     // กำหนดค่าเริ่มต้น
-    typeConfirm.value = 'cancel'
-    wordForSubmit.value = alertWordConst.cancel
+    typeConfirm.value = 'Delete'
+    wordForSubmit.value = 'Delete'
     confirmDialog2.value.openDialog()
     isDialogVisibleAlertDialog.value = false
 
@@ -180,8 +180,8 @@ async function handleConfirmAction () {
     // await rejectPlan()
   }else if(typeConfirm.value === "sendBack"){
     sendBackPlan()
-  }else if(typeConfirm.value === "cancel"){
-    titleAlertCommentConfirm.value = "Cancel"
+  }else if(typeConfirm.value === "Delete"){
+    titleAlertCommentConfirm.value = "Delete"
     deletePlan()
     trickerSubmit.value = false
   }
@@ -192,7 +192,7 @@ async function handleCommentAlertAction () {
   if(titleAlertCommentConfirm.value === "Reject"){
     isDialogVisibleCommentDialog.value = false
     rejectPlan()
-  }else if(titleAlertCommentConfirm.value === "Cancel"){
+  }else if(titleAlertCommentConfirm.value === "Delete"){
     isDialogVisibleCommentDialog.value = false
     deletePlan()
   }
@@ -1323,7 +1323,7 @@ const deletePlan = async () => {
   try {
     // เรียก fetchGetProductionplan และรอให้ทำงานเสร็จ
     await deleteProdutcionPlanFunc(body, urlApi.value, 'ProductionPlan', whereHouse, accessTokenAtStore)
-    textAlertDialogFunction(alertWordConst.cancel, true)
+    textAlertDialogFunction('Delete', true)
     setTimeout(() => {
       location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
