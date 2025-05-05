@@ -182,7 +182,7 @@ async function handleConfirmAction () {
     sendBackPlan()
   }else if(typeConfirm.value === "cancel"){
     titleAlertCommentConfirm.value = "Cancel"
-    isDialogVisibleCommentDialog.value = true
+    deletePlan()
     trickerSubmit.value = false
   }
   
@@ -3171,7 +3171,6 @@ const statusText = statusId => {
               </th>
             </tr>
           </template>
-          
           <template #column.updatedBy="{ column }">
             <tr class="d-flex justify-center">
               <th>

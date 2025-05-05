@@ -3159,7 +3159,7 @@ const insetSwitch1 = ref('')
       v-model="isDialogVisibleActionPrintLabel"
       style="width: 800px;"
     >
-      <VCard title="Dialog 2">
+      <VCard class="text-center" title="Print">
         <DialogCloseBtn
           variant="text"
           size="default"
@@ -3306,7 +3306,7 @@ const insetSwitch1 = ref('')
                     <VCheckbox
                       v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
                       v-model="typeSpecial"
-                      :disabled="disabledCheckboxListInsp()"
+                      :disabled="selectedPrintLabel[0] !== 'Inspection Request Form'"
                       label="Special Case"
                       value="Special Case"
                       class="ms-auto text-start"
