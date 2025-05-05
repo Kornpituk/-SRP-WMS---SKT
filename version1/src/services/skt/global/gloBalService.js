@@ -82,13 +82,13 @@ export const usePrintInspectionFormService = () => {
   const printInspectionFormResult = ref(null)
   const errorMessageInspection = ref(null)
   
-  const printInspectionFormService = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) => {
+  const printInspectionFormService = async (poEtlLogDetailJournalID, urlApi, whereHouse, accessToken, typeSpecial) => {
     try {
       errorMessageInspection.value = null
 
       //console.log('Print Inspection Form Service Starting...')
   
-      const result = await globalService.printInspectionFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken)
+      const result = await globalService.printInspectionFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken, typeSpecial)
         
       if (result) {
         //console.log('Print Inspection Form Service Complate:', result)

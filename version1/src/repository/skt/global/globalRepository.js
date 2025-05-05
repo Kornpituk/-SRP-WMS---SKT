@@ -63,36 +63,36 @@ export const  globalService = {
     }
   },
 
-  async printInspectionFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken) {
+  async printInspectionFormPDF(poEtlLogDetailJournalID, urlApi, whereHouse, accessToken, typeSpecial) {
     try {
-      const response = await axios.post(
-        `${urlApi}/api/v1/PrintForm/Inspection/Pdf/${poEtlLogDetailJournalID}`,
+      const response = ref()
+  
+      const endpoint = typeSpecial === 'Special Case'
+        ? `${urlApi}/api/v1/PrintForm/InspectionSpecialCase/Pdf/${poEtlLogDetailJournalID}`
+        : `${urlApi}/api/v1/PrintForm/Inspection/Pdf/${poEtlLogDetailJournalID}`
+  
+      response.value = await axios.post(
+        endpoint,
         {},
         {
           headers: {
-            'accept': 'application/pdf', // รับไฟล์ PDF
+            'accept': 'application/pdf',
             'x-location': whereHouse,
             Authorization: `Bearer ${accessToken}`,
           },
-          responseType: 'blob', // รับ response เป็น Blob
+          responseType: 'blob',
         },
       )
   
-      if (response && response.data) {
-        //console.log('Service Response print Inspection form:', response.data)
-  
-        // สร้าง Blob จาก response
-        const blob = new Blob([response.data], { type: 'application/pdf' })
-  
-        // สร้าง URL สำหรับ Blob
+      if (response.value && response.value.data) {
+        const blob = new Blob([response.value.data], { type: 'application/pdf' })
         const blobUrl = URL.createObjectURL(blob)
-  
-        // เปิดหน้าต่างใหม่เพื่อแสดง PDF หรือเปลี่ยนเป็นการดาวน์โหลดก็ได้
+
         window.open(blobUrl)
   
         return { success: true, data: blob }
       } else {
-        throw new Error('No data Genterate print Inspection form')
+        throw new Error('No data generated for inspection form PDF')
       }
     } catch (error) {
       console.error('Error in printInspectionFormPDF:', error)

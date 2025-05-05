@@ -1679,8 +1679,6 @@ const checkTypeLorryToPrintPDF = () => {
   }
 }
 
-const typeSpecial = ref('')
-
 const printFormAll = async () => {
   // ตั้งค่าสถานะการประมวลผลให้เป็น true
   console.log('Printing Receiving Form...')
@@ -1714,9 +1712,7 @@ const printFormAll = async () => {
       //console.log('Printing Inspection Request Form...')
 
       try {
-        console.log('typeSpecial.value:', typeSpecial.value)
-        
-        return await printInspectionFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore, typeSpecial.value) 
+        return await printInspectionFormService(poEtILogAction.value, urlApi.value, whereHouse, accessTokenAtStore) 
       } finally {
         processingPrintForm2.value = false // เสร็จสิ้นการพิมพ์
       }
@@ -2843,6 +2839,687 @@ const insetSwitch1 = ref('')
     </VDialog>
   </section>
 
+  <!-- Dialog Action -->
+  <section v-if="accountRole === 'issues' ">
+    <VDialog
+      v-model="isDialogVisibleAction"
+      width="800"
+      class="d-flex justify-center align-center"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardTitle
+          style="font-size: 18px;"
+          class="text-center"
+        >
+          RECEIVING PLAN DETAILS
+        </VCardTitle>
+        <DialogCloseBtn
+          variant="text"
+          size="default"
+          @click="isDialogVisibleAction = false"
+        />
+
+        <VCardText class="">
+          <VTable
+            height="600"
+            fixed-header
+          >
+            <thead>
+              <tr class="bg-table-header-background">
+                <th class="bg-table-header-background">
+                  <span style="font-size: 12px; text-transform: capitalize;">Field</span>
+                </th>
+                <th class="bg-table-header-background">
+                  <span style="font-size: 12px; text-transform: capitalize;">Value</span>
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <th><span style="font-size: 12px; text-transform: capitalize;">{{ getDisplayName('statusText') }}</span></th>
+                <td class="px-2">
+                  <VChip :color="colorStatusWithId2(idStatusDialogAction).color">
+                    <span
+                      :style="{ color: colorStatusWithId(idStatusDialogAction).message }"
+                      style="font-size: 12px; text-transform: capitalize;"
+                    >{{ filteredDetails.statusText }}</span>
+                  </VChip>
+                </td>
+              </tr>
+            </tbody>
+            <tbody style="font-size: 12px;">
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Code
+                </td>
+                <td>{{ resultDetailsAvtion.itemCode }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Name
+                </td>
+                <td>{{ resultDetailsAvtion.itemName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Code
+                </td>
+                <td>{{ resultDetailsAvtion.supplierId }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Name
+                </td>
+                <td>{{ resultDetailsAvtion.supplierName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchase Order No
+                </td>
+                <td>{{ resultDetailsAvtion.purchaseOrderNo }}</td>
+              </tr>
+              <tr v-if="!resultDetailsAvtion.expectDeliveryDate">
+                <td style="font-weight: 500;">
+                  Delivery Date
+                </td>
+                <td>{{ convertDate(resultDetailsAvtion.deliveryDate) }}</td>
+              </tr>
+              <tr v-if="resultDetailsAvtion.expectDeliveryDate">
+                <td style="font-weight: 500;">
+                  Delivery Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.expectDeliveryDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.expectDeliveryDate) }}</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchasing Qty
+                </td>
+                <td>
+                  <span style="text-transform: capitalize;">{{ resultDetailsAvtion.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Purchasing Amount</td>
+                <td><span style="text-transform: capitalize;">{{ formatNumber(resultDetailsAvtion.purchasingAmountKgs).toLocaleString() }}  Kgs</span></td>
+              </tr>
+              <tr>
+                <td>Receiving Qty</td>
+                <td>{{ (resultDetailsAvtion.purchasingQuantityRcvdPcs).toLocaleString() }} PCS</td>
+              </tr>
+              <tr>
+                <td>Receiving Amount</td>
+                <td>{{ formatNumber(resultDetailsAvtion.purchasingAmountRcvdKgs).toLocaleString() }} Kgs</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
+              </tr>
+              <tr>
+                <td>Updated Date</td>
+                <td>{{ convertDateTime(resultDetailsAvtion.updatedDate) }}</td>
+              </tr>
+              <tr>
+                <td>Updated By</td>
+                <td>{{ resultDetailsAvtion.updatedBy }}</td>
+              </tr>
+              <tr v-if="resultDetailsAvtion.statusId	=== 0">
+                <td>Comment</td>
+                <td>{{ resultDetailsAvtion.statusComments }}</td>
+              </tr>
+              <!-- เพิ่มข้อมูลเพิ่มเติมตามต้องการ -->
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
+                  style="text-transform: capitalize;"
+                >{{ formatNumber(detailsReceiv.purchasingAmountKgs) }} Kgs</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingAmountKgs"
+                  label="Purchesing Amount"
+                  suffix="Kgs"
+                  type="number"
+                  density="compact"
+                  placeholder="2000"
+                  :step="0.01"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+              </div>
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && key !== 'statusText'"
+                  style="text-transform: capitalize;"
+                >{{ detailsReceiv.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingQuantityPcs"
+                  label="Purchesing Qty"
+                  suffix="PCS"
+                  type="number"
+                  density="compact"
+                />
+              </div>
+            </tbody>
+          </VTable>
+        </VCardText>
+
+        <VCardText class="d-flex justify-center flex-wrap gap-4">
+          <VBtn
+            v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+            color="green"
+            style="font-size: 12px;"
+            @click="submitButton('Edit')"
+          >
+            Confirm
+          </VBtn>
+          <VBtn
+            v-if="detailsReceiv.statusText === 'ETL Failed!' && detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && detailsReceiv.statusText !== 'Cancel'"
+            color="red"
+            style="font-size: 12px;"
+            @click="isDialogVisibleCanncel = true"
+          >
+            Cancel
+          </VBtn>
+          <VBtn
+            v-if="detailsReceiv.statusText !== 'ETL Failed!' && detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && detailsReceiv.statusText !== 'Cancel'"
+            color="warning"
+            style="font-size: 12px;"
+            @click="isDialogVisibleActionPrintLabel = true"
+          >
+            Print Label &  Form
+          </VBtn>
+          <VBtn
+            v-if="detailsReceiv.statusText !== 'ETL Failed!' && detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && detailsReceiv.statusText !== 'Cancel'"
+            :color="colorStatusWithId2(idStatusDialogAction).color"
+            style="font-size: 12px;"
+            :disabled="!checkReceivedStatus(detailsReceiv.statusText)"
+            :to="{ 
+              name: 'skt-receiving-receivingForm'
+            }"
+          >
+            <span class="text-white">{{ detailsReceiv.statusText }}</span>
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+  </section>
+
+  <section v-if="accountRole === 'manager'">
+    <VDialog
+      v-model="isDialogVisibleAction"
+      width="600"
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardTitle class="text-center py-0 mt-4">
+          RECEIVING PLAN DETAILS
+        </VCardTitle>
+        <DialogCloseBtn
+          variant="text"
+          size="default"
+          @click="isDialogVisibleAction = false"
+        />
+
+        <VCardText class="pt-0">
+          <VTable
+            height="700"
+            fixed-header
+          >
+            <thead>
+              <tr class="bg-table-header-background">
+                <th class="bg-table-header-background">
+                  <span style="font-size: 12px; text-transform: capitalize;">Field</span>
+                </th>
+                <th class="bg-table-header-background">
+                  <span style="font-size: 12px; text-transform: capitalize;">Value</span>
+                </th>
+              </tr>
+            </thead>
+
+            <tbody style="font-size: 12px;">
+              <tr>
+                <th><span style="font-size: 12px; text-transform: capitalize;">{{ getDisplayName('statusText') }}</span></th>
+                <td>
+                  <VChip :color="colorStatusWithId2(idStatusDialogAction).color">
+                    <span
+                      :style="{ color: colorStatusWithId(idStatusDialogAction).message }"
+                      style="font-size: 12px; text-transform: capitalize;"
+                    >{{ filteredDetails.statusText }}</span>
+                  </VChip>
+                  <VChip
+                    :color="colorStatusWithId2(filteredDetails).color"
+                    class="font-weight-medium"
+                    style="min-height: 50px;"
+                    :style="{ color: colorStatusWithId(filteredDetails).message }"
+                  >
+                    <span
+                      style="font-size: 12px;"
+                      class="text-wrap"
+                    >{{ item.raw.statusText }}</span>
+                  </VChip>
+                </td>
+              </tr>
+            </tbody>
+            <tbody style="font-size: 12px;">
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Code
+                </td>
+                <td>{{ resultDetailsAvtion.itemCode }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Item Name
+                </td>
+                <td>{{ resultDetailsAvtion.itemName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Code
+                </td>
+                <td>{{ resultDetailsAvtion.supplierId }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Supplier Name
+                </td>
+                <td>{{ resultDetailsAvtion.supplierName }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchase Order No
+                </td>
+                <td>{{ resultDetailsAvtion.purchaseOrderNo }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Delivery Date
+                </td>
+                <td>{{ convertDate(resultDetailsAvtion.deliveryDate) }}</td>
+              </tr>
+              <tr v-if="false">
+                <td style="font-weight: 500;">
+                  Expect Delivery Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.expectDeliveryDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.expectDeliveryDate) }}</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Purchasing Qty
+                </td>
+                <td>
+                  <span style="text-transform: capitalize;">{{ resultDetailsAvtion.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Purchasing Amount</td>
+                <td><span style="text-transform: capitalize;">{{ formatNumber(resultDetailsAvtion.purchasingAmountKgs).toLocaleString() }}  Kgs</span></td>
+              </tr>
+              <tr>
+                <td>Receiving Qty</td>
+                <td>{{ (resultDetailsAvtion.purchasingQuantityRcvdPcs).toLocaleString() }} PCS</td>
+              </tr>
+              <tr>
+                <td>Receiving Amount</td>
+                <td>{{ formatNumber(resultDetailsAvtion.purchasingAmountRcvdKgs).toLocaleString() }} Kgs</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
+              </tr>
+              <tr>
+                <td>Updated Date</td>
+                <td>{{ convertDateTime(resultDetailsAvtion.updatedDate) }}</td>
+              </tr>
+              <tr>
+                <td>Updated By</td>
+                <td>{{ resultDetailsAvtion.updatedBy }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 500;">
+                  Received Date
+                </td>
+                <td><span v-if="convertDate(resultDetailsAvtion.receivedDate) !== '01/01/1970'">{{ convertDate(resultDetailsAvtion.receivedDate) }}</span></td>
+              </tr>
+              <!-- เพิ่มข้อมูลเพิ่มเติมตามต้องการ -->
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
+                  style="text-transform: capitalize;"
+                >{{ formatNumber(detailsReceiv.purchasingAmountKgs) }} Kgs</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingAmountKgs"
+                  label="Purchesing Amount"
+                  suffix="Kgs"
+                  type="number"
+                  density="compact"
+                  placeholder="2000"
+                  :step="0.01"
+                  pattern="^\d+(\.\d{1,2})?$"
+                />
+              </div>
+              <div v-if="false">
+                <span
+                  v-if="detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && key !== 'statusText'"
+                  style="text-transform: capitalize;"
+                >{{ detailsReceiv.purchasingQuantityPcs.toLocaleString() }}  PCS</span>
+                <VTextField
+                  v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+                  v-model="detailsReceiv.purchasingQuantityPcs"
+                  label="Purchesing Qty"
+                  suffix="PCS"
+                  type="number"
+                  density="compact"
+                />
+              </div>
+            </tbody>
+          </VTable>
+        </VCardText>
+
+        <VCardText class="d-flex justify-center flex-wrap gap-4">
+          <VBtn
+            v-if="detailsReceiv.statusText === 'Waiting for Editing for Partial Receiving'"
+            style="font-size: 12px;"
+            color="green"
+            @click="submitButton('Edit')"
+          >
+            Confirm
+          </VBtn>
+          
+          <VBtn
+            v-if="detailsReceiv.statusText === 'ETL Failed!' && detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving'"
+            style="font-size: 12px;"
+            color="red"
+            @click="isDialogVisibleReject = true"
+          >
+            Reject
+          </VBtn>
+          
+          <VBtn
+            v-if="detailsReceiv.statusText !== 'ETL Failed!' && detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && detailsReceiv.statusText !== 'Cancel'"
+            style="font-size: 12px;"
+            color="warning"
+            @click="isDialogVisibleActionPrintLabel = true"
+          >
+            Print Label & Form
+          </VBtn>
+          <VBtn
+            v-if="detailsReceiv.statusText !== 'ETL Failed!' && detailsReceiv.statusText !== 'Waiting for Editing for Partial Receiving' && detailsReceiv.statusText !== 'Cancel'"
+            style="font-size: 12px;"
+            :disabled="!checkReceivedStatus(detailsReceiv.statusText)"
+            :to="{ 
+              name: 'skt-receiving-receingForm',
+            }"
+          >
+            Receiving Form
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+  </section>
+
+  <!-- Dialog 2 Print Label -->
+  <section>
+    <VDialog
+      v-model="isDialogVisibleActionPrintLabel"
+      class=""
+      style="width: 100%; max-width: 800px;"
+      :persistent="checkPersistent"
+    >
+      <VCard
+        class="text-center"
+        title="Print"
+        style="width: 100%; width: 800px;"
+      >
+        <DialogCloseBtn
+          :disabled="checkPersistent"
+          variant="text"
+          size="default"
+          @click="isDialogVisibleActionPrintLabel = false"
+        />
+        <VCardText class="text-end">
+          <VRow>
+            <VCol
+              cols="6"
+              @click="printLabel = true, printForm = false, getPrintLabelView(lotAction)"
+            >
+              <VHover>
+                <template #default="{ isHovering, props }">
+                  <VCard
+                    class="cursor-pointer"
+                    v-bind="props"
+                    ripple
+                    :color="isHovering || printLabel ? 'yellow-lighten-4' : undefined"
+                  >
+                    <VCardText class="d-flex justify-center">
+                      <VProgressCircular
+                        v-if="processingPrintLabel"
+                        :size="105"
+                        :width="15"
+                        color="primary"
+                        indeterminate
+                      >
+                        <VIcon
+                          icon="ri-price-tag-3-line"
+                          size="60"
+                        />
+                      </VProgressCircular>
+                      <VIcon
+                        v-if="!processingPrintLabel"
+                        icon="ri-price-tag-3-line"
+                        size="80"
+                      />
+                    </VCardText>
+                    <VCardText class="text-center">
+                      <span>Label</span>
+                    </VCardText>
+                  </VCard>
+                </template>
+              </VHover>
+            </VCol>
+            <VCol
+              cols="6"
+              @click="printForm = true, printLabel = false"
+            >
+              <VHover>
+                <template #default="{ isHovering, props }">
+                  <VCard
+                    class="cursor-pointer"
+                    v-bind="props"
+                    ripple
+                    :color="isHovering || printForm ? 'light-blue-lighten-4' : undefined"
+                  >
+                    <VCardText class="d-flex justify-center pa-2">
+                      <VProgressCircular
+                        v-if="processingPrint"
+                        :size="105"
+                        :width="15"
+                        color="primary"
+                        indeterminate
+                      >
+                        <VIcon
+                          icon="ri-survey-line"
+                          size="60"
+                        />
+                      </VProgressCircular>
+
+                      <VIcon
+                        v-if="!processingPrint"
+                        icon="ri-survey-line"
+                        size="105"
+                      />
+                    </VCardText>
+                    <VCardText class="text-center">
+                      <span>Form</span>
+                    </VCardText>
+                  </VCard>
+                </template>
+              </VHover>
+            </VCol>
+          </VRow>
+        </VCardText>
+
+        <VCardText>
+          <VContainer
+            fluid
+            class="py-0"
+          />
+
+          <VRow v-if="printForm">
+            <VCol cols="6" />
+            <VCol cols="6">
+              <!-- Align VCheckbox items to the right -->
+              <VCheckbox
+                v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListRawM()"
+                label="Receiving Form"
+                value="Receiving Form"
+                class="ms-auto"
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm1"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
+              <div>
+                <VRow>
+                  <VCol cols="6">
+                    <VCheckbox
+                      v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
+                      v-model="selectedPrintLabel"
+                      :disabled="disabledCheckboxListInsp()"
+                      label="Inspection Request Form"
+                      value="Inspection Request Form"
+                      class="ms-auto text-start"
+                    >
+                      <template #append>
+                        <VProgressCircular
+                          v-if="processingPrintForm2"
+                          :size="10"
+                          color="primary"
+                          indeterminate
+                        />
+                      </template>
+                    </VCheckbox>
+                  </VCol>
+                  <VCol cols="6">
+                    <VCheckbox
+                      v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
+                      v-model="selectedPrintLabel"
+                      :disabled="disabledCheckboxListInsp()"
+                      label="Special Case"
+                      value="Special Case"
+                      class="ms-auto text-start"
+                    >
+                      <template #append>
+                        <VProgressCircular
+                          v-if="processingPrintForm2"
+                          :size="10"
+                          color="primary"
+                          indeterminate
+                        />
+                      </template>
+                    </VCheckbox>
+                  </VCol>
+                </VRow>
+              </div>
+              
+              <VCheckbox
+                v-if="receivingTypeAction === 4"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListRawM()"
+                label="Resale Receiving form"
+                value="Receiving Form"
+                class="ms-auto"
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm2"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
+              <VCheckbox
+                v-if="receivingTypeAction === 3"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListLorry()"
+                label="Lorry Loading Checklist"
+                value="Lorry Loading Checklist"
+                class="ms-auto"
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm4"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
+              <VCheckbox
+                v-if="receivingTypeAction === 1"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListPk()"
+                label="Inspection Request Form"
+                value="Packaging Inspection Request Form"
+                class="ms-auto"
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm3"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox> 
+              <div class="mt-4">
+                <VBtn
+                  :disabled="checkPersistent"
+                  style="width: 100%;"
+                  @click="printFormAll"
+                >
+                  Print
+                </VBtn>
+              </div>
+            </VCol>
+          </VRow>
+
+          <VRow v-if="printLabel">
+            <VCol cols="6">
+              <div
+                v-if="!disabledBtnLebal()"
+                class="mt-4"
+              >
+                <VBtn
+                  style="width: 100%;"
+                  :disabled="checkPersistent"
+                  @click="btnPrintLabel"
+                >
+                  Print
+                </VBtn>
+              </div>
+            </VCol>
+            <VCol cols="6" />
+          </VRow>
+        </VCardText>
+      </VCard>
+    </VDialog>
+  </section>
+
   <!-- Dialog Details Item -->
   <section>
     <VDialog
@@ -2947,7 +3624,6 @@ const insetSwitch1 = ref('')
     />
   </div>
 
-  <!-- Detail action and Print -->
   <section>
     <!-- Dialog -->
     <VDialog
@@ -3305,7 +3981,7 @@ const insetSwitch1 = ref('')
                   <VCol cols="6">
                     <VCheckbox
                       v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
-                      v-model="typeSpecial"
+                      v-model="selectedPrintLabel"
                       :disabled="disabledCheckboxListInsp()"
                       label="Special Case"
                       value="Special Case"
