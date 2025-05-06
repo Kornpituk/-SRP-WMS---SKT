@@ -581,25 +581,6 @@ const tabDisablingConfig = {
   // Add more statuses and role combinations as needed
 }
 
-
-// Configuration to specify which tab index to show based on status
-// const tabIndexConfig = {
-//   1: 0,  // Show tab index 1 for this status
-//   3: 0,   // Show tab index 0 for this status
-//   4: 1, // Show tab index 2 for this status
-//   5: 1,
-//   6: 1,
-//   7: 1,
-//   8: 0,
-//   10: 0,
-//   12: 2,
-//   13: 2,
-//   14: 2,
-//   18: 2,
-
-//   // Add more statuses and indices as needed
-// }
-
 const getDisabledTabs = () => {
 
   const role = userRole.value

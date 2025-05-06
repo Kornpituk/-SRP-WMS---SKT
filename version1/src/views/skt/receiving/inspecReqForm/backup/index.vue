@@ -18,11 +18,11 @@ import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
-import { fetchAndMapInspectionHeader,
-  useGenerateInspection,
-  useGenerateJournalIdInspection,
-  useAnalysisItems,
-} from './composables/useInspection'
+import { generateInspectionService,
+  getReceivingPlanByJournalIdService,
+} from "../inspecReqForm/services"
+
+import { fetchAndMapInspectionHeader } from '../inspecReqForm/composables/useReceivingForm'
 
 //-------------------------------------------- Permission -----------------------------------------
 
@@ -204,23 +204,18 @@ const poEtlLogDetailJournalIDQueryParameters = ref(itemStore.getItemDetails('poE
 
 const loadingGenerated1 = ref(true)
 
-const { generate, loading, error } = useGenerateInspection()
-
 const generatedInsp = async () => {
   loadingGenerated1.value = true
 
-  const success = await generate(poEtlLogDetailJournalIDQueryParameters.value)
+  const result = await generateInspectionService(poEtlLogDetailJournalIDQueryParameters.value)
 
-  // if (success) {
-  //   loadingGenerated1.value = false
-
-  //   // console.log('สร้างสำเร็จ:', data.value)
-
-  // } else {
-  //   // console.error('ล้มเหลว:', error.value)
-    
-  //   loadingGenerated1.value = false
-  // }
+  if (result.success) {
+    // itemsManufacturer.value = result.data.data
+    loadingGenerated1.value = false
+  } else {
+    console.error('Generate inspection failed:', result.message)
+    loadingGenerated1.value = false
+  }
 }
 
 //------------- journalId
@@ -234,42 +229,20 @@ const frozeCheckNotDetialCheck  = ref(true)
 const receiveTypeIdData = ref(null)
 const poEiLog = ref()
 
-// const generatedJournalId = async () => {
-//   const result = await getReceivingPlanByJournalIdService(poEtlLogDetailJournalIDQueryParameters.value)
-
-//   if (result.success) {
-//     responseGener.value = result.data
-
-//     const item = result.data[0]
-
-//     console.log("item", item)
-
-//     poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
-//     receiveTypeIdData.value = item.receiveTypeId
-//     statusId.value = item.statusId
-//     loadingGenerated2.value = false
-//   } else {
-//     console.error('[generatedJournalId] failed:', result.message)
-//   }
-// }
-
-const journalInspection = useGenerateJournalIdInspection()
-
 const generatedJournalId = async () => {
-  loadingGenerated1.value = true
+  const result = await getReceivingPlanByJournalIdService(poEtlLogDetailJournalIDQueryParameters.value)
 
-  const success = await journalInspection.generate(poEtlLogDetailJournalIDQueryParameters.value)
-  if (success) {
-    loadingGenerated1.value = false
+  if (result.success) {
+    responseGener.value = result.data
 
-    const item = journalInspection.result.value.data[0]
+    const item = result.data[0]
 
     poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
     receiveTypeIdData.value = item.receiveTypeId
     statusId.value = item.statusId
     loadingGenerated2.value = false
   } else {
-    loadingGenerated1.value = false
+    console.error('[generatedJournalId] failed:', result.message)
   }
 }
 
@@ -316,6 +289,73 @@ watch( async () => {
 })
 
 //------------- Header
+// eslint-disable-next-line sonarjs/cognitive-complexity
+// const getHearderInsp = async () => {
+//   if (!poEtlLogDetailJournalIDQueryParameters.value) {
+//     console.warn('poEtlLogDetailJournalIDQueryParameters ยังไม่มีค่า')
+    
+//     return
+//   }
+
+//   loadingGenerated1.value = true
+
+//   try {
+//     const response = await axiosIns.get(
+//       `${urlApi.value}/api/v1/Inspection/View/${poEtlLogDetailJournalIDQueryParameters.value}`,
+//       {
+//         headers: {
+//           accept: '*/*',
+//           'x-location': whereHouse.value || '',
+//           Authorization: `Bearer ${accessTokenAtStore || ''}`,
+//         },
+//       },
+//     )
+
+//     const data = response.data.data
+//     if (!Array.isArray(data) || data.length === 0) {
+//       console.warn('Data ไม่ถูกต้อง:', data)
+      
+//       return
+//     }
+
+//     const inspData = data[0]
+
+//     headerInsp.value = {
+//       sktName: inspData?.productName || '',
+//       sktId: inspData?.sktLot || '',
+//       itemCode: inspData?.productId || '',
+//       supplierName: inspData?.supplierName || '',
+//       tradeNames: inspData?.tradeName || '',
+//       ManufacturerName: inspData?.makerName || '',
+//       receivedDate: inspData?.receivedDate || '',
+
+//       remark: inspData?.remark || '',
+//       note: inspData?.note || '',
+//       details: inspData?.limConditionDetail || '',
+
+//       updateByStaffWH: inspData?.whStaff || '',
+//       updateBySuperWH: inspData?.whSupervisor || '',
+//       updateByStaffInsp: inspData?.inspStaff || '',
+//       updateBySuperInsp: inspData?.inspSupervisor || '',
+
+//       lastUpdatedStaffWH: inspData?.whStaffUpdatedDate || '',
+//       lastUpdatedSuperWH: inspData?.whSupervisorDate || '',
+//       lastUpdatedStaffInsp: inspData?.inspStaffUpdatedDate || '',
+//       lastUpdatedSuperInsp: inspData?.inspSupervisorDate || '',
+
+//       remarkReject: inspData?.statusComments || '',
+//     }
+
+//     isReject.value = inspData?.isReject || false
+//     isAccept.value = inspData?.isAccept || false
+
+//     console.log('Headers Data:', headerInsp.value)
+//   } catch (error) {
+//     console.error('Error fetching inspection header:', error)
+//   } finally {
+//     loadingGenerated1.value = false
+//   }
+// }
 
 const getHearderInsp = async () => {
   const id = poEtlLogDetailJournalIDQueryParameters.value
@@ -323,6 +363,7 @@ const getHearderInsp = async () => {
   
   if (result) {
     headerInsp.value = result.headerInsp.value
+    console.log('headerInsp.value ', result.headerInsp.value)
     isReject.value = result?.isReject || false
     isAccept.value = result?.isAccept || false
   }
@@ -334,44 +375,44 @@ const state = reactive({
 
 //------------- Analysist
 //---------------- Model
-// const analysisItems = ref([])
+const analysisItems = ref([])
 
-// const analysisItemsCode = ref({
-//   actualAmountUnits_1: null,
-//   actualAmountUnits_2: null,
-//   actualAmountUnits_3: null,
-//   actualAmountUnits_4: null,
-//   actualAmountUnits_5: null,
+const analysisItemsCode = ref({
+  actualAmountUnits_1: null,
+  actualAmountUnits_2: null,
+  actualAmountUnits_3: null,
+  actualAmountUnits_4: null,
+  actualAmountUnits_5: null,
 
-//   actualAnalysis_1: null,
-//   actualAnalysis_2: null,
-//   actualAnalysis_3: null,
-//   actualAnalysis_4: null,
-//   actualAnalysis_5: null,
+  actualAnalysis_1: null,
+  actualAnalysis_2: null,
+  actualAnalysis_3: null,
+  actualAnalysis_4: null,
+  actualAnalysis_5: null,
 
-//   actualMakerLotNo_1: null,
-//   actualMakerLotNo_2: null,
-//   actualMakerLotNo_3: null,
-//   actualMakerLotNo_4: null,
-//   actualMakerLotNo_5: null,
+  actualMakerLotNo_1: null,
+  actualMakerLotNo_2: null,
+  actualMakerLotNo_3: null,
+  actualMakerLotNo_4: null,
+  actualMakerLotNo_5: null,
 
-//   actualNetCountKgs_1: null,
-//   actualNetCountKgs_2: null,
-//   actualNetCountKgs_3: null,
-//   actualNetCountKgs_4: null,
-//   actualNetCountKgs_5: null,
+  actualNetCountKgs_1: null,
+  actualNetCountKgs_2: null,
+  actualNetCountKgs_3: null,
+  actualNetCountKgs_4: null,
+  actualNetCountKgs_5: null,
 
-//   actualTotalQuantityKgs_1: 0,
-//   actualTotalQuantityKgs_2: 0,
-//   actualTotalQuantityKgs_3: 0,
-//   actualTotalQuantityKgs_4: 0,
-//   actualTotalQuantityKgs_5: 0,
-// })
+  actualTotalQuantityKgs_1: 0,
+  actualTotalQuantityKgs_2: 0,
+  actualTotalQuantityKgs_3: 0,
+  actualTotalQuantityKgs_4: 0,
+  actualTotalQuantityKgs_5: 0,
+})
 
-// //-------------- API
+//-------------- API
 
-// const analysisResults = ref([])
-// const analyticalItemsResults = ref([])
+const analysisResults = ref([])
+const analyticalItemsResults = ref([])
 
 // ข้อมูลต้นแบบที่เราจะเก็บเพื่อส่งไปยัง API
 const formData = ref({
@@ -381,106 +422,103 @@ const formData = ref({
   okState: 0,                // ค่าจาก VRadioGroup
 })
 
-const {
-  fetch,
-  loading: analysisLoading,
-  error: analysisError,
-  analysisItems,
-  analysisItemsCode,
-  analysisResults,
-  analyticalItemsResults,
-} = useAnalysisItems()
-
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const getAnalysistInsp = async () => {
-  if (!poEtlLogDetailJournalIDQueryParameters.value) return
+  loadingGenerated1.value = true
 
-  await fetch(poEtlLogDetailJournalIDQueryParameters.value)
+  if (!poEtlLogDetailJournalIDQueryParameters.value) {
+    loadingGenerated1.value = false
+    
+    return
+  }
 
-  if (error.value) {
-    console.error('ล้มเหลว:', error.value)
-  } else {
-    console.log('สำเร็จ:', analysisItems.value)
+  try {
+    const response = await axiosIns.get(
+      `${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`,
+      {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse.value,
+          Authorization: `Bearer ${accessTokenAtStore}`,
+        },
+      },
+    )
+
+    if (!response.data || !response.data.items) {
+      console.warn("No data received from API")
+      
+      return
+    }
+
+    analysisItems.value = response.data.items
+
+    // const checkAnalyticalsUnit = item => {
+    //   const res = ref(0)
+    //   if(item[0].unit === ''){
+    //     res.value = 1
+    //   }else if(item[1].unit === ''){
+    //     res.value = 1
+    //   }else if(item[2].unit === ''){
+    //     res.value = 1
+    //   }else if(item[3].unit === ''){
+    //     res.value = 1
+    //   }else if(item[4].unit === ''){
+    //     res.value = 1
+    //   }
+
+    //   return res
+    // }
+
+    // ตรวจสอบว่า analysisItems มีข้อมูลและมี itemAnalyticals
+    if (analysisItems.value.length > 0 && Array.isArray(analysisItems.value[0].itemAnalyticals)) {
+      for (let i = 0; i < Math.min(5, analysisItems.value[0].itemAnalyticals.length); i++) {
+        const analyticalItem = analysisItems.value[0].itemAnalyticals[i]
+
+        analysisItemsCode.value[`actualAmountUnits_${i}`] = analyticalItem.actualAmountUnits || null
+        analysisItemsCode.value[`actualMakerLotNo_${i}`] = analyticalItem.actualMakerLotNo || null
+        analysisItemsCode.value[`actualNetCountKgs_${i}`] = analyticalItem.actualNetCountKgs || null
+        analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analyticalItem.actualTotalQuantityKgs || null
+      }
+    }
+
+    // ใช้ map() เพื่อสร้าง `analysisResults`
+    analysisResults.value = analysisItems.value.map(item => ({
+      rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
+      typeID: item.typeID,
+      typeName: item.typeName,
+      analyticalItem: item.analyticalItem,
+      unit: item.unit,
+    }))
+
+    // ใช้ reduce() เพื่อลดซ้อน loop
+    analyticalItemsResults.value = analysisItems.value.reduce((acc, item) => {
+      if (Array.isArray(item.itemAnalyticals)) {
+        acc.push(
+          ...item.itemAnalyticals.map(analyticalItem => ({
+            rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
+            actualAmountUnits: analyticalItem.actualAmountUnits,
+            actualAnalysis: analyticalItem.actualAnalysis,
+            actualMakerLotNo: analyticalItem.actualMakerLotNo,
+            actualNetCountKgs: analyticalItem.actualNetCountKgs,
+            actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
+            inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+            lotID: analyticalItem.lotID,
+            okState: analyticalItem.okState,
+          })),
+        )
+      }
+      
+      return acc
+    }, [])
+
+  } catch (error) {
+    console.error("Error fetching analysis items:", error)
+  } finally {
+    loadingGenerated1.value = false
   }
 }
 
-// // eslint-disable-next-line sonarjs/cognitive-complexity
-// const getAnalysistInsp = async () => {
-//   loadingGenerated1.value = true
 
-//   if (!poEtlLogDetailJournalIDQueryParameters.value) {
-//     loadingGenerated1.value = false
-    
-//     return
-//   }
-
-//   try {
-//     const response = await axiosIns.get(
-//       `${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`,
-//       {
-//         headers: {
-//           'accept': '*/*',
-//           'x-location': whereHouse.value,
-//           Authorization: `Bearer ${accessTokenAtStore}`,
-//         },
-//       },
-//     )
-
-//     if (!response.data || !response.data.items) {
-//       console.warn("No data received from API")
-      
-//       return
-//     }
-
-//     analysisItems.value = response.data.items
-
-//     // ตรวจสอบว่า analysisItems มีข้อมูลและมี itemAnalyticals
-//     if (analysisItems.value.length > 0 && Array.isArray(analysisItems.value[0].itemAnalyticals)) {
-//       for (let i = 0; i < Math.min(5, analysisItems.value[0].itemAnalyticals.length); i++) {
-//         const analyticalItem = analysisItems.value[0].itemAnalyticals[i]
-
-//         analysisItemsCode.value[`actualAmountUnits_${i}`] = analyticalItem.actualAmountUnits || null
-//         analysisItemsCode.value[`actualMakerLotNo_${i}`] = analyticalItem.actualMakerLotNo || null
-//         analysisItemsCode.value[`actualNetCountKgs_${i}`] = analyticalItem.actualNetCountKgs || null
-//         analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analyticalItem.actualTotalQuantityKgs || null
-//       }
-//     }
-
-//     // ใช้ map() เพื่อสร้าง `analysisResults`
-//     analysisResults.value = analysisItems.value.map(item => ({
-//       rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
-//       typeID: item.typeID,
-//       typeName: item.typeName,
-//       analyticalItem: item.analyticalItem,
-//       unit: item.unit,
-//     }))
-
-//     // ใช้ reduce() เพื่อลดซ้อน loop
-//     analyticalItemsResults.value = analysisItems.value.reduce((acc, item) => {
-//       if (Array.isArray(item.itemAnalyticals)) {
-//         acc.push(
-//           ...item.itemAnalyticals.map(analyticalItem => ({
-//             rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
-//             actualAmountUnits: analyticalItem.actualAmountUnits,
-//             actualAnalysis: analyticalItem.actualAnalysis,
-//             actualMakerLotNo: analyticalItem.actualMakerLotNo,
-//             actualNetCountKgs: analyticalItem.actualNetCountKgs,
-//             actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
-//             inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
-//             lotID: analyticalItem.lotID,
-//             okState: analyticalItem.okState,
-//           })),
-//         )
-//       }
-      
-//       return acc
-//     }, [])
-
-//   } catch (error) {
-//     console.error("Error fetching analysis items:", error)
-//   } finally {
-//     loadingGenerated1.value = false
-//   }
-// }
 
 const loadingGenerated2 = ref(true)
 

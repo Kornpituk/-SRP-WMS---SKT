@@ -3810,12 +3810,26 @@ const handleSavetruckOrder = async type => {
                   />
                 </span>
               </th>
+              
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-center"
               >
                 <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
               </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
+                class="text-start"
+              >
+                <span style="font-weight: bold;">{{ $t('PO No.') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
+                class="text-center"
+              >
+                <span style="font-weight: bold;">{{ $t('PO attachment') }}</span>
+              </th>
+              
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SAP_INVOICE_NO').canVisible"
                 class="px-2"
@@ -4280,6 +4294,61 @@ const handleSavetruckOrder = async type => {
                 {{ product.salesOrderNo }}
               </td>
               <!-- 👉 soAttachment -->
+
+              <td
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
+                class="text-start px-1 cursor-pointer"
+                style="min-width: 150px; font-size: 12px;"
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
+                <VForm
+                  ref="product"
+                  :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  @submit.prevent="submitShipmentPlanBySoEId('submit', product.soEtlLogDetailJournalID)"
+                >
+                  <div>
+                    <FileInputDialogCarousels
+                      :files-from-a-p-i="product.getSOFileData"
+                      title-dialog="SO Attachment"
+                      :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                      :type-file-input="typeFileInput"
+                      file-name="So Attachment"
+                      @updateFiles="handleFileUpdatesSO"
+                    />
+                  </div>
+                </VForm>
+              </td>
+
+              <!-- 👉 PO No -->
+              <td
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
+                class="text-start px-3 cursor-pointer"
+                style="min-width: 150px; font-size: 12px;"
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
+                {{ product.salesOrderNo }}
+              </td>
+              <!-- 👉 PO Attachment -->
 
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"

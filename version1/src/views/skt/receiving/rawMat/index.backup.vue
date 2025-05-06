@@ -22,9 +22,7 @@ const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, 
-  canVisibleUserPermissionPermission,
-} from '@/utilities/permission'
+import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
 
 
 const paramsForGetPermission = ref({
@@ -265,16 +263,6 @@ const generatedReceivingForm = () => {
 }
 
 //------------- journalId
-import { fetchGeneratedJournalService, 
-  fetchHeaderReceivingFormService,
-  fetchLotReceivingFormService,
-  fetchCOAReceivingFormService,
-  saveHeaderReceivingFormService,
-  saveLotReceivingFormService,
-  submitReceivingFormService,
-  savePoQtyKgsPcsService,
-} from '../rawMat/services'
-
 const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
@@ -282,62 +270,38 @@ const typeReceivedId = ref(null)
 
 const poEtlLogDetailJournalIDQueryParameters = ref(data.value.poEtlLogDetailJournalID)
 
-// const generatedJournalId = () => {
-//   axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${data.value.poEtlLogDetailJournalID}`, {
-//     headers: {
-//       'accept': '*/*',
-//       'x-location': `${whereHouse.value}`,
-//       Authorization: `Bearer ${accessTokenAtStore}`,
-//     },
-//   },
-//   {})
-//     .then(response => {
-//       // console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
+const generatedJournalId = () => {
+  axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${data.value.poEtlLogDetailJournalID}`, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  },
+  {})
+    .then(response => {
+      // console.log('%c[generatedJournalId] raw mat!!: ', "color: green; font-weight: bold", response.data)
 
-//       // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
-//       if (response.data && response.data.data && response.data.data.length > 0) {
-//         responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
+      // ตรวจสอบว่ามีข้อมูลใน response.data.data ก่อน
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        responseGener.value = response.data.data // เก็บค่า response.data.data ลงใน responseGener
 
-//         const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
+        const item = responseGener.value[0] // เข้าถึงข้อมูลตัวแรกใน array
 
-//         poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
-//         statusId.value = item.statusId // เก็บค่า statusId
-//         typeReceivedId.value = item.receiveTypeId
-//         loadingGenerated2.value = false
-//       } else {
-//         console.error("ไม่มีข้อมูลใน responseGener")
-//       }
-//     })
-//     .catch(error => {
-//       console.error('Error:', error)
-//     })
-// }
-
-
-
-//----------------------------------- Set configuration Status ---
-
-const generatedJournalId = async () => {
-  loadingGenerated2.value = true
-
-  const result = await fetchGeneratedJournalService({
-    poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
-  })
-
-  if (result.success) {
-    const res = result.data
-
-    responseGener.value = res.fullResponse
-    poEtlLogDetailJournalIDQueryParameters.value = res.poEtlLogDetailJournalID
-    statusId.value = res.statusId
-    typeReceivedId.value = res.receiveTypeId
-  } else {
-    console.error(result.message)
-  }
-
-  loadingGenerated2.value = false
+        poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
+        statusId.value = item.statusId // เก็บค่า statusId
+        typeReceivedId.value = item.receiveTypeId
+        loadingGenerated2.value = false
+      } else {
+        console.error("ไม่มีข้อมูลใน responseGener")
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })
 }
 
+//----------------------------------- Set configuration Status ---
 
 const readonlyAllInput = () => {
   return statusId.value !== 3 || !canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible &&
@@ -349,6 +313,10 @@ const readonlyAllInput = () => {
 const hidedAllIconInput = () => {
   return statusId.value === 3 || statusId.value === 1
 }
+
+watchEffect(() => {
+
+})
 
 const frozeCheck = ref(true)
 
@@ -500,71 +468,89 @@ const detailsReceivingForm = () => {
 }
 
 //------------- Header
-
-const getHeaderReceivingForm = async () => {
+const getHearderReceivingForm = async () => {
   loadingGenerated1.value = true
 
   if (poEtlLogDetailJournalIDQueryParameters.value) {
-    const result = await fetchHeaderReceivingFormService({
-      poEtlLogDetailJournalID: poEtlLogDetailJournalIDQueryParameters.value,
-    })
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-    if (result.success) {
-      const data = result.data
+      const data = response.data.data
 
-      dataHeaderReceving.value = data
+      dataHeaderReceving.value = data[0]
 
-      purchaseOrder.value.journalID = data.journalID
-      UserNameAccoutWork.value = data.updatedBy
-      supplier.value = data.approveBy
+      purchaseOrder.value.journalID = data[0].journalID
+      UserNameAccoutWork.value = data[0].updatedBy
+      supplier.value = data[0].approveBy
 
-      purchaseOrder.value.receivedDate = formatDate(data.receivedDate)
-      purchaseOrder.value.expectDeliveryDate = formatDate(data.expectDeliveryDate)
-      purchaseOrder.value.invoiceNo = data.invoiceNo
+      purchaseOrder.value.receivedDate = formatDate(data[0].receivedDate)
+      purchaseOrder.value.expectDeliveryDate = formatDate(data[0].expectDeliveryDate)
+      purchaseOrder.value.invoiceNo = data[0].invoiceNo
 
-      purchaseOrder.value.isForHalalProduct = data.isForHalalProduct
-      purchaseOrder.value.isForRspoProduct = data.isForRspoProduct
-      purchaseOrder.value.viewHalal = data.viewHalal
-      purchaseOrder.value.viewRSPO = data.viewRSPO
-      purchaseOrder.value.noteText = data.noteText
+      purchaseOrder.value.isForHalalProduct = data[0].isForHalalProduct
+      purchaseOrder.value.isForRspoProduct = data[0].isForRspoProduct
+      purchaseOrder.value.viewHalal = data[0].viewHalal
+      purchaseOrder.value.viewRSPO = data[0].viewRSPO
+      purchaseOrder.value.noteText = data[0].noteText
 
-      purchaseOrder.value.selectedMakerName = data.selectedMakerName
-      Manufacturer.value = data.selectedMakerName
-      purchaseOrder.value.packagingTypeName = data.packagingTypeName
+      purchaseOrder.value.selectedMakerName = data[0].selectedMakerName
+      Manufacturer.value = data[0].selectedMakerName
+      purchaseOrder.value.packagingTypeName = data[0].packagingTypeName
 
-      poEtlLogDetailJournalID.value = data.poEtlLogDetailJournalID
-      purchaseOrder.value.storagePlaceNo = data.storagePlaceNo
-      purchaseOrder.value.receivedDate = data.receivedDate
+      poEtlLogDetailJournalID.value = data[0].poEtlLogDetailJournalID
+      purchaseOrder.value.storagePlaceNo = data[0].storagePlaceNo
+      purchaseOrder.value.receivedDate = data[0].receivedDate
 
-      deliveryQuantity.value.netCount = data.actualMeanNetCountKgs
-      deliveryQuantity.value.packagingQtyKg = data.packagingQtyKg
-    } else {
-      console.error(result.message)
+      //------------------------- DeliveryQueue ------------------------
+      deliveryQuantity.value.netCount = data[0].actualMeanNetCountKgs
+      deliveryQuantity.value.packagingQtyKg = data[0].packagingQtyKg
+
+      // console.log('[*****Headers]]!!: ', data[0])
+      // console.log("dataHeaderReceving.packagingQtyKg!!***", dataHeaderReceving.value.packagingQtyKg)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
     }
+  } else {
+    // console.log('**poEtlLogDetailJournalIDQueryParameters = ', poEtlLogDetailJournalIDQueryParameters.value)
+    loadingGenerated1.value = true
   }
-
-  loadingGenerated1.value = false
 }
 
 //--------------- Lot
-
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const getLotReceivingForm = async () => {
   loadingGenerated1.value = true
-
   if (poEtlLogDetailJournalIDQueryParameters.value) {
-    const result = await fetchLotReceivingFormService({
-      urlApi: urlApi.value,
-      poEtlLogDetailJournalID: poEtlLogDetailJournalIDQueryParameters.value,
-      warehouse: whereHouse.value,
-      accessToken: accessTokenAtStore,
-    })
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get-lot/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        },
+      )
 
-    if (result.success) {
-      const lotData = result.data
+      const lotData = response.data.data
 
+      // แมพข้อมูลจาก API ลงใน purchaseOrder
       lotData.forEach((lot, index) => {
-        const lotNumber = index + 1
+        const lotNumber = index + 1 // เริ่มจาก 1, 2, 3, ...
 
+        // เก็บข้อมูลแต่ละ lot ใน purchaseOrder
         purchaseOrder.value[`actualMakerLotNo_${lotNumber}`] = lot.actualMakerLotNo
         purchaseOrder.value[`actualNetCountKgs_${lotNumber}`] = lot.actualNetCountKgs
         purchaseOrder.value[`actualAmountUnits_${lotNumber}`] = lot.actualAmountUnits
@@ -573,14 +559,19 @@ const getLotReceivingForm = async () => {
         purchaseOrder.value[`customLable_${lotNumber}`] = lot.customLable
       })
 
-      NetCountPackage.value = lotData[0]?.actualNetCountKgs || 0
+      NetCountPackage.value = lotData[0].actualNetCountKgs
       purchaseOrder.value.actualNetCountKgs_1 = NetCountPackage.value
-    } else {
-      console.error(result.message)
-    }
-  }
 
-  loadingGenerated1.value = false
+      // console.log('[*****Headers Lot]]!!:', lotData[0])
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingGenerated1.value = false
+    }
+  } else {
+    // console.log('**poEtlLogDetailJournalIDQueryParameters is missing')
+    loadingGenerated1.value = true
+  }
 }
 
 import {
@@ -598,10 +589,13 @@ const { getCoaForm, errorMessageGetCoa, fetchCoaForm } = useGetCOAFormController
 
 fetchCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
 
+let startTime
+
 //----------------- Progression
 const loading = ref(false)
 const modelValue = ref(0) // Progress value
 const bufferValue = ref(100) // Buffer value for the progress
+const progressPercentage = ref('0%') // Percentage text
 const interval = ref()
 
 const maxFileSizeMB = 2 // Set max file size to 1 MB
@@ -623,35 +617,49 @@ const rules = [
   },
 ]
 
+watchEffect(() => {
+  // console.log('fileMuti++', fileMuti.value)
+  // console.log('files+++', files.value)
+
+
+})
+
 const getCOAReceivingForm = async () => {
   if (poEtlLogDetailJournalIDQueryParameters.value) {
     loading.value = true
+    try {
+      const response = await axiosIns.get(
+        `${urlApi.value}/api/v1/ReceivingForm/get-coA/${poEtlLogDetailJournalIDQueryParameters.value}`,
+        {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+          onDownloadProgress: progressEvent => {
+            const { loaded, total } = progressEvent
+            if (total > 0) {
+              const percentCompleted = Math.round((loaded * 100) / total)
 
-    const result = await fetchCOAReceivingFormService({
-      urlApi: urlApi.value,
-      poEtlLogDetailJournalID: poEtlLogDetailJournalIDQueryParameters.value,
-      warehouse: whereHouse.value,
-      accessToken: accessTokenAtStore,
-      onProgress: progressEvent => {
-        const { loaded, total } = progressEvent
-        if (total > 0) {
-          const percentCompleted = Math.round((loaded * 100) / total)
+              modelValue.value = percentCompleted
+              bufferValue.value = percentCompleted + 10 // Optional: Adjust buffer value if needed
+            } else {
+              console.warn('Total size of file is not available')
+            }
+          },
+        },
+      )
 
-          modelValue.value = percentCompleted
-          bufferValue.value = percentCompleted + 10
-        } else {
-          console.warn('Total size of file is not available')
-        }
-      },
-    })
+      const lotData = response.data.data
 
-    if (result.success) {
-      coaFiles.value = result.data
-    } else {
-      console.error(result.message)
+      coaFiles.value = lotData
+
+      // console.log('[*****Headers COA]]!!: ', lotData)
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loading.value = false
     }
-
-    loading.value = false
   }
 }
 
@@ -660,11 +668,39 @@ onBeforeUnmount(() => {
 })
 
 watch(() => {
+  // console.log('Gene 2')
   getManufacturer()
   getLotReceivingForm()
-  getHeaderReceivingForm()
+  getHearderReceivingForm()
   getCOAReceivingForm()
 })
+
+watchEffect(() => {
+  console.log('selectedMakerName', purchaseOrder.value.selectedMakerName.makerName, "+", dataHeaderReceving.value.customManufacturerName)
+})
+
+const saveReceivingForm = () => {
+  // console.log('Submit buttonVisible Start In')
+  axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save`, purchaseOrder.value, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+  },
+  {})
+    .then(response => {
+      console.log('[products.value]!!: ', response.data)
+      isDialogSubmitSuccessVisible.value = true
+      isDialogConfirmVisible.value = false
+
+    })
+    .catch(error => {
+      // Handle errors
+      isDialogSubmitFailedVisible.value = true
+      console.error('Error:', error)
+    })
+}
 
 //--------------- save header --------------------------------
 const textAlertError = ref({
@@ -700,15 +736,7 @@ const validateHeader = () => {
   return textAlertError.value.success
 }
 
-//--------------- save Lot --------------------------------
-
 const saveHeaderReceivingForm = async () => {
-  const validated = validateHeader()
-
-  if (!validated) {
-    throw 'Save header Failed: ' + textAlertError.value.msg
-  }
-
   const body = {
     poEtlLogDetailJournalID: purchaseOrder.value.poEtlLogDetailJournalID,
     linkedJournalID: purchaseOrder.value.linkedJournalID,
@@ -728,19 +756,37 @@ const saveHeaderReceivingForm = async () => {
     updatedBy: purchaseOrder.value.updatedBy,
   }
 
-  const result = await saveHeaderReceivingFormService({
-    poEtlLogDetailJournalID: purchaseOrder.value.poEtlLogDetailJournalID,
-    body,
-  })
+  const validatedHeader = ref(validateHeader())
 
-  if (!result.success) {
-    throw 'Save header failed: ' + result.message
+  if (!validatedHeader.value) {
+    throw 'Save header Failed' + textAlertError.value.msg
   }
 
-  return result.data 
+  // if(!purchaseOrder.value.noteText){
+  //   textAlertError.value.success = false
+  //   textAlertError.value.note = "Request Note"
+  //   throw 'Save header Failed. request note.'
+  // }
 
-  // สำเร็จแล้วอาจจะทำอะไรต่อ เช่นแจ้งเตือน user
+  try {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save/${data.value.poEtlLogDetailJournalID}`, body, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    // console.log('[saveHeaderReceivingForm] success:', response.data)
+
+    return response.data  // คืนค่า response กลับไป
+  } catch (error) {
+    console.error('Error [saveHeaderReceivingForm]:', error)
+    throw error  // โยนข้อผิดพลาดให้ฟังก์ชันที่เรียกใช้จัดการ
+  }
 }
+
+//--------------- save Lot --------------------------------
 
 const alertErrorLot = ref({
 
@@ -794,6 +840,39 @@ const alertErrorLot = ref({
     msg: '',
     success: false,
   },
+  alertAmountLot5: {
+    index: 5,
+    msg: '',
+    success: false,
+  },
+})
+
+const alertErrorAmount = ref({
+
+  alertAmountLot1: {
+    index: 1,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot2: {
+    index: 2,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot3: {
+    index: 3,
+    msg: '',
+    success: false,
+  },
+
+  alertAmountLot4: {
+    index: 4,
+    msg: '',
+    success: false,
+  },
+
   alertAmountLot5: {
     index: 5,
     msg: '',
@@ -916,19 +995,61 @@ const validateAmount = (i, actualMakerLotNo, actualAmount) => {
 }
 
 const saveLotReceivingForm = async () => {
-  const result = await saveLotReceivingFormService({
-    poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
-    purchaseOrder: purchaseOrder.value,
-    validateLotNo,
-    validateAmount,
-  })
+  const body = []
+  let hasError = false
 
-  if (!result.success) {
-    throw 'Save lot failed: ' + result.message
+  // ตรวจสอบว่า actualMakerLotNo มีค่า (ไม่เป็นค่าว่างหรือ undefined)
+  for (let i = 1; i <= 5; i++) {
+    const actualMakerLotNo = purchaseOrder.value[`actualMakerLotNo_${i}`]
+    const actualAmount = purchaseOrder.value[`actualAmountUnits_${i}`]
+
+    // ตรวจสอบข้อผิดพลาด
+    const lotNoError = validateLotNo(i, actualMakerLotNo, actualAmount)
+    const amountError = validateAmount(i, actualMakerLotNo, actualAmount)
+
+    // ถ้ามีข้อผิดพลาดจะตั้งค่า hasError = true
+    if (lotNoError || amountError) {
+      hasError = true
+    }
+
+    // ถ้าไม่มีข้อผิดพลาด และ actualMakerLotNo มีค่า
+    if (actualMakerLotNo && actualMakerLotNo.trim()) {
+      const lot = {
+        actualMakerLotNo: actualMakerLotNo,
+        actualNetCountKgs: purchaseOrder.value[`actualNetCountKgs_${i}`] || '',
+        actualAmountUnits: purchaseOrder.value[`actualAmountUnits_${i}`] || '',
+        actualTotalQuantityKgs: purchaseOrder.value[`actualTotalQuantityKgs_${i}`] || '',
+        customManufacturerName: purchaseOrder.value[`customManufacturerName_${i}`] || '',
+        customLable: purchaseOrder.value[`customLable_${i}`] || '',
+      }
+
+      // เพิ่ม lot ลงใน body เฉพาะเมื่อ actualMakerLotNo มีค่า
+      body.push(lot)
+    }
   }
 
-  return result.data
+  // ถ้ามีข้อผิดพลาด ให้หยุดการทำงาน
+  if (hasError) {
+    throw "Error: Some actualMakerLotNo fields are empty while their respective amounts are not."
+  }
 
+  // ถ้าไม่มีข้อผิดพลาด ส่งข้อมูลไปยัง API
+  try {
+    const response = await axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/save-lot-details/${data.value.poEtlLogDetailJournalID}`, body, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+
+    // console.log('[saveLotReceivingForm] success:', body)
+
+    return response.data
+  } catch (error) {
+    console.error('Error [saveLotReceivingForm]:', error)
+    throw error
+  }
 }
 
 // -------------------------- Save COA ---------------------------
@@ -945,6 +1066,13 @@ const getFileUrl = file => {
   return fileUrls.value[file.name]
 }
 
+const testCoaNew = () => {
+  console.log('Test Coa', fileCoaNew.value)
+}
+
+const testCoaODelete = () => {
+  console.log('Test Coa', coaIdForDelete.value)
+}
 
 // ฟังก์ชันสำหรับลบไฟล์และปล่อย URL
 const removeFileN = index => {
@@ -1013,7 +1141,20 @@ const trickerSubmit = ref(false)
 const handleSaveDraftCoa = async () => {
   const result = ref(1)
 
+  // console.log("Start COA!!!!!")
+  // console.log("Start COA!!!!!", fileCoaNew.value)
+
   if (trickerSubmit.value) {
+    // if (fileCoaNew.value < 1 || getCoaForm.value < 1) {
+    // // alert('Please upload at least one file')
+    //   result.value -=1
+    //   textAlertError.value.success = false
+    //   textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
+    //   console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
+    //   throw 'Failed To Save COA. Plase Upload COA Ones.'
+    // }else{
+    //   console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
+    // }
 
     if (fileCoaNew.value < 1) {
       if (getCoaForm.value < 1) {
@@ -1021,21 +1162,27 @@ const handleSaveDraftCoa = async () => {
         textAlertError.value.success = false
         textAlertError.value.coa = 'Failed to save coa. Plase Upload COA ones.'
 
+        // console.log("if", fileCoaNew.value.length, getCoaForm.value.length)
         throw 'Failed To Save COA. Plase Upload COA Ones.'
       } else {
+        // console.log("Test", fileCoaNew.value.length, getCoaForm.value.length)
       }
     }
 
   } else {
+    // console.log("No tricker")
   }
 
   if (getCoaForm.value) {
+    // console.log("getCoaForm Start++++")
     result.value += 1
   }
 
   if (deleteAllStart.value === true) {
+    // console.log("Delete All Start++++")
     await deleteAllCoaForm(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteAllCoa.value.success) {
+      // console.log('Delete all coa  successful', resultDeleteAllCoa.value.success)
       result.value += 1
 
 
@@ -1047,10 +1194,13 @@ const handleSaveDraftCoa = async () => {
   }
 
   if (fileCoaNew.value) {
+    // console.log("Upload Start++++")
     await handleSaveDraftCoaForm(fileCoaNew.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (saveCoaForm) {
+      // console.log('Save coa  successful', saveCoaForm.value.success)
       result.value += 1
 
+      // return saveCoaForm
     } else {
       result.value -= 1
       console.error('Failed to save coa')
@@ -1059,10 +1209,13 @@ const handleSaveDraftCoa = async () => {
   }
 
   if (coaIdForDelete.value.length > 0) {
+    // console.log("delete by id Start++++")
     await deleteCoaForm(coaIdForDelete.value, poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, 'ReceivingForm', whereHouse.value, accessTokenAtStore)
     if (resultDeleteByIdCoa.value.success === true) {
+      // console.log('Delete coa by id successful', resultDeleteByIdCoa.value.success)
       result.value += 1
 
+      // return resultDeleteByIdCoa
     } else {
       result.value -= 1
       console.error('Failed to save coa')
@@ -1075,8 +1228,11 @@ const handleSaveDraftCoa = async () => {
     throw 'Failed to handleSaveDraftCoa'
   }
 
+  // console.log("Result COA", result.value)
+
   return result
 
+  // throw 'success!'
 }
 
 // ฟังก์ชันเพื่อแปลง Base64 กลับเป็นไฟล์
@@ -1203,6 +1359,20 @@ const deleteAllCIA = () => {
 }
 
 //------------- Dialog Step SaveDraf ----------------------------------------------------------------
+const iconsSteps = [
+  {
+    title: 'Save Darft Header',
+    icon: 'ri-mac-line',
+  },
+  {
+    title: 'Save Darft Lot',
+    icon: 'ri-mac-line',
+  },
+  {
+    title: 'Save Darft COA',
+    icon: 'ri-mac-line',
+  },
+]
 
 const isDialogVisibleStepSaveDraft = ref(false)
 
@@ -1241,10 +1411,15 @@ const isDialogVisibleAlertDialog = ref(false)
 const showOnlyErrors = ref(false)
 const countErr = ref(0)
 
+const testWord = word => {
+  // console.log('test word', word)
+}
+
 const submitButtonVisibleNew = async word => {
 
   wordForSubmit.value = word
 
+  // console.log("submit submitButtonVisibleNew1111", wordForSubmit.value, word)
   isDialogVisibleStepSaveDraft.value = true
 
   try { // Start Step 1
@@ -1254,6 +1429,8 @@ const submitButtonVisibleNew = async word => {
     // Step 1: saveLotReceivingForm
 
     await saveHeaderReceivingForm()
+
+    // console.log('saveHeaderReceivingForm success')
 
     iconStep1.value = 'ri-check-line'
     colorStep1.value = 'success'
@@ -1351,6 +1528,8 @@ const submitButtonVisibleNew = async word => {
     // location.reload()
   }
 
+  // isDialogSubmitSuccessVisible.value = true
+  // console.log("%ctrickerSubmit Step", "color: yellow; font-weight: bold",  trickerSubmit.value)
   isDialogConfirmVisible.value = false
 
   return true
@@ -1358,35 +1537,89 @@ const submitButtonVisibleNew = async word => {
 
 const submitReceivingForm = async () => {
   try {
+    // เรียก submitButtonVisibleNew() และรอให้ทำงานเสร็จ
+
     trickerSubmit.value = true
 
+    // console.log("%ctrickerSubmit Submit", "color: yellow; font-weight: bold", trickerSubmit.value)
+
     const isSuccess = await submitButtonVisibleNew()
-    if (!isSuccess) return
+
+    // ถ้า submitButtonVisibleNew() ไม่สำเร็จ (สมมติว่ามันคืนค่า false เมื่อไม่สำเร็จ)
+    if (!isSuccess) {
+      // console.log('submitButtonVisibleNew failed, stopping submission.')
+
+      return // หยุดการทำงาน
+    }
 
     isDialogConfirmVisible.value = false
 
-    const result = await submitReceivingFormService({
-      urlApi: urlApi.value,
-      poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
-      whereHouse: whereHouse.value,
-      accessToken: accessTokenAtStore,
-    })
+    // console.log('Submit buttonVisible Start In')
 
-    if (result.success) {
-      textAlertDialogFunction('SUBMIT', true)
-      setTimeout(() => {
-        window.location.href = '/skt/receiving'
-      }, 200)
-    } else {
-      textAlertDialogFunction('SUBMIT', false)
-      isDialogSubmitFailedVisible.value = true
-    }
+    // throw "Success"
+
+    axiosIns.post(`${urlApi.value}/api/v1/ReceivingForm/Submit/${data.value.poEtlLogDetailJournalID}`, {}, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${whereHouse.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+    })
+      .then(response => {
+        // console.log('[products.value]!!: ', response.data)
+
+        // isDialogSubmitSuccessVisible.value = true
+        // isDialogConfirmVisible.value = false
+
+
+        // if(isSuccess){
+        //   textAlertDialogFunction('SUBMIT', true)
+        // }
+
+
+        // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+
+
+        textAlertDialogFunction('SUBMIT', true)
+        setTimeout(() => {
+          window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+        }, 200) // 10000 มิลลิวินาที = 10 วินาที
+
+      })
+      .catch(error => {
+        // Handle errors
+        textAlertDialogFunction('SUBMIT', false)
+        console.error('Error:', error)
+        isDialogSubmitFailedVisible.value = true
+      })
   } catch (error) {
-    console.error('handleSubmit error:', error)
+    // จับ error จากการทำงานของ submitButtonVisibleNew() หรือโค้ดอื่นๆ
+    console.error('Error in submitButtonVisibleNew:', error)
+
     textAlertDialogFunction('SUBMIT', false)
     isDialogSubmitFailedVisible.value = true
   }
 }
+
+const submitButtonVisible = word => {
+  wordForSubmit.value = word
+
+  saveLotReceivingForm()
+  saveHeaderReceivingForm()
+  saveCOARecevingFrom()
+
+  // ปิด dialog เมื่อสำเร็จทุกขั้นตอน
+  isDialogVisibleStepSaveDraft.value = false
+  isDialogSubmitSuccessVisible.value = true
+  isDialogConfirmVisible.value = false
+}
+
+watchEffect(() => {
+  // console.log("formData", formData)
+  // console.log("coaFiles.value", coaFiles.value)
+  // console.log("files.value", files.value)
+})
+
 
 //----------------------------------- Submit Partial -----------------------
 
@@ -1400,30 +1633,54 @@ watchEffect(() => {
 })
 
 const handelBackToEdit = async () => {
-  const purchasingQuantityPcs = purchasingQuantityPcsModel.value || data?.value.purchasingQuantityPcs
-  const purchasingAmountKgs = (dataHeaderReceving?.value.packagingQtyKg || 0) * purchasingQuantityPcs || backUpPurchasingAmount.value
 
-  const result = await savePoQtyKgsPcsService({
-    urlApi: urlApi.value,
-    poEtlLogDetailJournalID: data.value.poEtlLogDetailJournalID,
-    whereHouse: whereHouse.value,
-    accessToken: accessTokenAtStore,
-    purchasingQuantityPcs,
-    purchasingAmountKgs,
-  })
+  // console.log('Send start')
+  await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SavePoQtyKgsPcs/${data.value.poEtlLogDetailJournalID}`, {}, {
+    headers: {
+      'accept': '*/*',
+      'x-location': `${whereHouse.value}`,
+      Authorization: `Bearer ${accessTokenAtStore}`,
+    },
+    params: {
+      purchasingQuantityPcs: purchasingQuantityPcsModel.value || data?.value.purchasingQuantityPcs,
+      purchasingAmountKgs: dataHeaderReceving?.value.packagingQtyKg * purchasingQuantityPcsModel.value || backUpPurchasingAmount.value,
+    },
+  },
 
-  if (result.success) {
-    isDialogConfirmVisible.value = false
-    textAlertDialogFunction('Partial RCVD', true)
-    setTimeout(() => {
-      window.location.href = '/skt/receiving'
-    }, 200)
-  } else {
-    textAlertDialogFunction('Partial RCVD', false)
-  }
+  {})
+    .then(response => {
+      isDialogConfirmVisible.value = false
+
+      textAlertDialogFunction('Partial RCVD', true)
+
+      // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+      setTimeout(() => {
+        // location.reload()
+
+        window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
+      }, 200) // 10000 มิลลิวินาที = 10 วินาที
+
+    })
+    .catch(error => {
+      // Handle errors
+      textAlertDialogFunction('Partial RCVD', false)
+      console.error('Error:', error)
+
+      // isDialogSubmitFailedVisible.value = true
+      // console.log('backUpPurchasingAmount', backUpPurchasingAmount.value)
+    })
+
+
+
+  // console.log('backUpPurchasingAmount', backUpPurchasingAmount.value)
 }
 
 //---------------------------------- MOck Data Table --------------------------------
+const makerLotNo1 = ref('')
+const makerLotNo2 = ref('')
+const makerLotNo3 = ref('')
+const makerLotNo4 = ref('')
+const makerLotNo5 = ref('')
 
 function formatDate(dateString) {
   if (dateString === null || dateString === '' || dateString === undefined) {
@@ -1445,6 +1702,10 @@ const UserNameAccoutWork = ref('')
 const dateStaff = ref(formatDate(new Date()))
 const supplier = ref('')
 const dateSupplier = ref(formatDate(new Date()))
+
+const convertToInt = value => {
+  return Number(value) // หรือ parseInt(value) ถ้าต้องการแปลงจากสตริงเป็นจำนวนเต็ม
+}
 
 const dataRaeMatRequest = ref([
   {
@@ -1566,6 +1827,14 @@ const calculationPONew = () => {
   }
 }
 
+function formatNumberWithCommas(value) {
+  const parts = value.split('.')
+
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
+  return parts.join('.')
+}
+
 const formatNumber = value => {
   if (value !== null && value !== undefined) {
     return parseFloat(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -1646,6 +1915,74 @@ const showDialogImageMuti = (img, name) => {
   isDialogVisibleImgFileMuti.value = true
   imgDialog.value = img
   imgNameDialog.value = name
+}
+
+const formatFileSize = size => {
+  if (size < 1024) {
+    return size + ' Bytes'
+  } else if (size < 1024 * 1024) {
+    return (size / 1024).toFixed(2) + ' KB'
+  } else {
+    return (size / (1024 * 1024)).toFixed(2) + ' MB'
+  }
+}
+
+const handleFilesO = event => {
+  files.value = [] // รีเซ็ตไฟล์
+
+  const selectedFiles = event.target.files
+  const maxFileSizeMB = 2 // กำหนดขนาดไฟล์สูงสุดที่อนุญาต (2 MB)
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i]
+
+    // ตรวจสอบขนาดไฟล์
+    // if (file.size > maxFileSizeMB * 1024 * 1024) {
+    //   alert(`File ${file.name} exceeds the 2 MB size limit and will not be uploaded.`)
+    //   continue // ข้ามไฟล์ที่มีขนาดเกิน
+    // }
+
+    const reader = new FileReader()
+
+    reader.onload = e => {
+      files.value.push({
+        name: file.name,
+        src: e.target.result,
+        size: formatFileSize(file.size), // Format ขนาดไฟล์
+      })
+    }
+    reader.readAsDataURL(file) // อ่านไฟล์และแปลงเป็น base64
+  }
+
+  fileMuti.value = selectedFiles // อัปเดต fileMuti
+}
+
+const removeFile = index => {
+  files.value.splice(index, 1)
+  if (!files.value.length) {
+    fileMuti.value = []
+    console.log('removeFile', fileMuti.value)
+  }
+}
+
+const removeFileDraft = index => {
+  coaFiles.value.splice(index, 1)
+  if (!coaFiles.value.length) {
+    coaFiles.value = []
+    console.log('coaFiles', coaFiles.value)
+  }
+}
+
+const seeTruck = () => {
+  console.log('data truck', resaleProductShipping.value)
+}
+
+const seeTruckO = () => {
+  console.log('data truck', files.value)
+}
+
+const removeFilesInTruck = index => {
+  resaleProductShipping.value[index].files = []
 }
 
 //------------------------ Dialog --------------------------------
@@ -3334,6 +3671,13 @@ const getDisabledFollowStatusNRole = () => {
                   </VFileInput>
                 </VCol>
               </VRow>
+
+              <VBtn
+                v-if="false"
+                @click="testCoaNew"
+              >
+                TestNew
+              </VBtn>
 
               <div class="demo-space-y">
                 <VProgressLinear

@@ -1,0 +1,184 @@
+import { fetchInspectionHeaderService,
+  generateInspectionService,
+  getReceivingPlanByJournalIdService,
+  getAnalysisInspService,
+} from '../api/receivingService'
+import { mapInspectionHeader, success, failure } from '../utils/inspectionUtils'
+import { createAnalysisItemsCode } from '../types/analysisItems'
+
+// *** generate Insp
+export function useGenerateInspection() {
+  const loading = ref(false)
+  const error = ref(null)
+  const result = ref(null)
+
+  const generate = async id => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await generateInspectionService(id)
+
+      result.value = response.data
+      
+      return true
+    } catch (err) {
+      error.value = err?.response?.data?.message || err.message
+      console.error('[useGenerateInspection] error:', error.value)
+      
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    generate,
+    loading,
+    error,
+    result,
+  }
+}
+
+// *** generate JournalId Insp
+export function useGenerateJournalIdInspection() {
+  const loading = ref(false)
+  const error = ref(null)
+  const result = ref(null)
+
+  const generate = async id => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await getReceivingPlanByJournalIdService(id)
+
+      result.value = response.data
+      
+      return true
+    } catch (err) {
+      error.value = err?.response?.data?.message || err.message
+      console.error('[useGenerateJournalIdInspection] error:', error.value)
+      
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    generate,
+    loading,
+    error,
+    result,
+  }
+}
+
+// *** fetch Head Insp
+export async function fetchAndMapInspectionHeader(id) {
+  const headerInsp = ref({})
+  const isReject = ref(false)
+  const isAccept = ref(false)
+  
+  try {
+    const res = await fetchInspectionHeaderService(id)
+    const data = res.data.data
+  
+    if (!Array.isArray(data) || data.length === 0) {
+      console.warn('ไม่พบข้อมูล')
+      
+      return { headerInsp, isReject, isAccept }
+    }
+  
+    const insp = data[0]
+
+    headerInsp.value = mapInspectionHeader(insp)
+    isReject.value = insp?.isReject ?? false
+    isAccept.value = insp?.isAccept ?? false
+  } catch (e) {
+    console.error('โหลดข้อมูลผิดพลาด', e)
+  }
+  
+  return { headerInsp, isReject, isAccept }
+}
+
+// *** fetch Analysis Insp
+export function useAnalysisItems() {
+  const loading = ref(false)
+  const error = ref(null)
+  const analysisItems = ref([])
+  const analysisItemsCode = ref(createAnalysisItemsCode()) // ✅ ใช้ model ที่แยกไว้
+  const analysisResults = ref([])
+  const analyticalItemsResults = ref([])
+
+  const fetch = async id => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await getAnalysisInspService(id)
+      const data = response.data
+
+      if (!data || !data.items) {
+        console.warn('No data received from API')
+        
+        return
+      }
+
+      analysisItems.value = data.items
+
+      const firstItemAnalyticals = data.items[0]?.itemAnalyticals || []
+      for (let i = 0; i < Math.min(5, firstItemAnalyticals.length); i++) {
+        const ai = firstItemAnalyticals[i]
+
+        analysisItemsCode.value[`actualAmountUnits_${i}`] = ai.actualAmountUnits ?? null
+        analysisItemsCode.value[`actualAnalysis_${i}`] = ai.actualAnalysis ?? null
+        analysisItemsCode.value[`actualMakerLotNo_${i}`] = ai.actualMakerLotNo ?? null
+        analysisItemsCode.value[`actualNetCountKgs_${i}`] = ai.actualNetCountKgs ?? null
+        analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = ai.actualTotalQuantityKgs ?? 0
+      }
+
+      analysisResults.value = data.items.map(item => ({
+        rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
+        typeID: item.typeID,
+        typeName: item.typeName,
+        analyticalItem: item.analyticalItem,
+        unit: item.unit,
+      }))
+
+      analyticalItemsResults.value = data.items.reduce((acc, item) => {
+        if (Array.isArray(item.itemAnalyticals)) {
+          acc.push(...item.itemAnalyticals.map(ai => ({
+            rmInspReqFormAnalyticalItemsJournalId: ai.rmInspReqFormAnalyticalItemsJournalId,
+            actualAmountUnits: ai.actualAmountUnits,
+            actualAnalysis: ai.actualAnalysis,
+            actualMakerLotNo: ai.actualMakerLotNo,
+            actualNetCountKgs: ai.actualNetCountKgs,
+            actualTotalQuantityKgs: ai.actualTotalQuantityKgs,
+            inspReqLotJournalId: ai.inspReqLotJournalId,
+            lotID: ai.lotID,
+            okState: ai.okState,
+          })))
+        }
+        
+        return acc
+      }, [])
+
+    } catch (err) {
+      console.error('[useAnalysisItems] error:', err)
+      error.value = err?.response?.data?.message || err.message
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    fetch,
+    loading,
+    error,
+    analysisItems,
+    analysisItemsCode,
+    analysisResults,
+    analyticalItemsResults,
+  }
+}

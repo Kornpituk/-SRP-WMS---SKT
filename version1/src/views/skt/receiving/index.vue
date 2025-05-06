@@ -213,8 +213,6 @@ watch(() => {
   }
 })
 
-
-
 // ฟังก์ชันสำหรับเพิ่มค่าจาก sessionStorage เข้าไปใน statusFilter
 const addStoredStatus = () => {
   //console.log("statusFilter addStoredStatus", statusFilter.value)
@@ -3159,7 +3157,10 @@ const insetSwitch1 = ref('')
       v-model="isDialogVisibleActionPrintLabel"
       style="width: 800px;"
     >
-      <VCard class="text-center" title="Print">
+      <VCard
+        class="text-center"
+        title="Print"
+      >
         <DialogCloseBtn
           variant="text"
           size="default"
@@ -3281,49 +3282,69 @@ const insetSwitch1 = ref('')
                   />
                 </template>
               </VCheckbox>
-              <div>
-                <VRow>
-                  <VCol cols="6">
-                    <VCheckbox
-                      v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
-                      v-model="selectedPrintLabel"
-                      :disabled="disabledCheckboxListInsp()"
-                      label="Inspection Request Form"
-                      value="Inspection Request Form"
-                      class="ms-auto text-start"
-                    >
-                      <template #append>
-                        <VProgressCircular
-                          v-if="processingPrintForm2"
-                          :size="10"
-                          color="primary"
-                          indeterminate
-                        />
-                      </template>
-                    </VCheckbox>
-                  </VCol>
-                  <VCol cols="6">
-                    <VCheckbox
-                      v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
-                      v-model="typeSpecial"
-                      :disabled="selectedPrintLabel[0] !== 'Inspection Request Form'"
-                      label="Special Case"
-                      value="Special Case"
-                      class="ms-auto text-start"
-                    >
-                      <template #append>
-                        <VProgressCircular
-                          v-if="processingPrintForm2"
-                          :size="10"
-                          color="primary"
-                          indeterminate
-                        />
-                      </template>
-                    </VCheckbox>
-                  </VCol>
-                </VRow>
-              </div>
               
+              <!--
+                <div>
+                <VRow>
+                <VCol cols="6">
+                <VCheckbox
+                v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListInsp()"
+                label="Inspection Request Form"
+                value="Inspection Request Form"
+                class="ms-auto text-start"
+                >
+                <template #append>
+                <VProgressCircular
+                v-if="processingPrintForm2"
+                :size="10"
+                color="primary"
+                indeterminate
+                />
+                </template>
+                </VCheckbox>
+                </VCol>
+                <VCol cols="6">
+                <VCheckbox
+                v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
+                v-model="typeSpecial"
+                :disabled="selectedPrintLabel[0] !== 'Inspection Request Form'"
+                label="Special Case"
+                value="Special Case"
+                class="ms-auto text-start"
+                >
+                <template #append>
+                <VProgressCircular
+                v-if="processingPrintForm2"
+                :size="10"
+                color="primary"
+                indeterminate
+                />
+                </template>
+                </VCheckbox>
+                </VCol>
+                </VRow>
+                </div> 
+              -->
+              
+              <VCheckbox
+                v-if="receivingTypeAction === 2 && receivingTypeAction !== 4 || receivingTypeAction === 3 && receivingTypeAction !== 4"
+                v-model="selectedPrintLabel"
+                :disabled="disabledCheckboxListInsp()"
+                label="Inspection Request Form"
+                value="Inspection Request Form"
+                class="ms-auto text-start"
+              >
+                <template #append>
+                  <VProgressCircular
+                    v-if="processingPrintForm2"
+                    :size="10"
+                    color="primary"
+                    indeterminate
+                  />
+                </template>
+              </VCheckbox>
               <VCheckbox
                 v-if="receivingTypeAction === 4"
                 v-model="selectedPrintLabel"

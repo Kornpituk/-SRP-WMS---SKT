@@ -21,75 +21,14 @@ const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 const currentTab = ref(0)
 
 import IndexTIE from '../shipping/tableInvoice/indexTIE.vue' 
-import IndexTIP from '../shipping/tableInvoice/indexTIP.vue' 
-import IndexTIX from '../shipping/tableInvoice/indexTIX.vue'
- 
-const tabs = [
-  {
-    title: 'TIE',
-    component: IndexTIE,
-  },
-  {
-    title: 'TIP',
-    component: IndexTIP,
-  },
-  {
-    title: 'TIX',
-    component: IndexTIX,
-  },
-]
 </script>
 
 <template>
   <!-- Tabs -->
   <section>
     <div>
-      <VTabs
-        v-if="false"
-        v-model="currentTab"
-        :touch="touchless"
-        mandatory
-        grow
-      >
-        <VTab
-          v-for="(tab, index) in tabs"
-          :key="index"
-          mandatory
-
-          :touch="touchless"
-        >
-          {{ tab.title }}
-        </VTab>
-      </VTabs>
-
-      <div
-        v-for="(tab, index) in tabs"
-        :key="index"
-      >
-        <Component
-          :is="tab.component"
-          v-if="currentTab === index"
-        />
-      </div>
+      <IndexTIE />
     </div>
-  </section>
-
-  <!-- Footer -->
-  <section
-    v-if="false"
-    section
-    class="fixed-bottom"
-  >
-    <VCard>
-      <VCardText>
-        <VAlert
-          color="red-lighten-3"
-          style="font-size: 20px;"
-        >
-          (Demo) Shipment  - Version : 2.1  - Data 24 Row
-        </VAlert>
-      </VCardText>
-    </VCard>
   </section>
 </template>
 
