@@ -2,8 +2,9 @@ import { fetchInspectionHeaderService,
   generateInspectionService,
   getReceivingPlanByJournalIdService,
   getAnalysisInspService,
+  saveAnalyticalItemDetailsService,
 } from '../api/receivingService'
-import { mapInspectionHeader, success, failure } from '../utils/inspectionUtils'
+import { mapInspectionHeader, success, failure, checkHasEmptyFields } from '../utils/inspectionUtils'
 import { createAnalysisItemsCode } from '../types/analysisItems'
 
 // *** generate Insp
@@ -180,5 +181,67 @@ export function useAnalysisItems() {
     analysisItemsCode,
     analysisResults,
     analyticalItemsResults,
+  }
+}
+
+//*** Save Lot Insp *
+export function useSaveLotInsp(analysisItems) {
+  const emptyFields = ref([])
+  const trickerSubmit = ref(false)
+
+  const checkEmptyFields = () => {
+    const emptyFieldsList = []
+
+    analysisItems.value.forEach((item, itemIndex) => {
+      const needActualCheck = item.needActualValue
+      const shouldCheck = item.unit !== ''
+
+      if (!shouldCheck) return
+
+      item.itemAnalyticals.forEach((analyticalItem, analyticalIndex) => {
+        const body = {
+          inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+          actualAnalysis: analyticalItem.actualAnalysis,
+          okState: analyticalItem.okState,
+        }
+
+        const isMissingActual = needActualCheck && !body.actualAnalysis
+        const isMissingOkState = !needActualCheck && body.okState === -1
+        const isEmpty = isMissingActual || isMissingOkState
+
+        emptyFieldsList.push({
+          indexLabel: `No.${itemIndex + 1} - Lot ${analyticalIndex + 1}`,
+          body,
+          isEmpty,
+          needActualCheck,
+        })
+      })
+    })
+
+    return emptyFieldsList
+  }
+
+  const checkHasEmptyFields = fields => fields.some(f => f.isEmpty)
+
+  const saveLotInspect = async () => {
+    emptyFields.value = checkEmptyFields()
+
+    if (trickerSubmit.value && checkHasEmptyFields(emptyFields.value)) {
+      throw 'Cannot proceed: There are errors in the fields.'
+    }
+
+    for (const item of analysisItems.value) {
+      for (const analyticalItem of item.itemAnalyticals) {
+        await saveAnalyticalItemDetailsService(analyticalItem)
+      }
+    }
+
+    return true
+  }
+
+  return {
+    emptyFields,
+    trickerSubmit,
+    saveLotInspect,
   }
 }

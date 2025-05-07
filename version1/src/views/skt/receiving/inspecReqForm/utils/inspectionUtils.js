@@ -33,3 +33,8 @@ export function success(data, isReject = false, isAccept = false) {
 export function failure(message) {
   return { success: false, message }
 }
+
+// composables/useValidation.js
+export const checkHasEmptyFields = fields => {
+  return fields.some(field => field.isEmpty)
+}
