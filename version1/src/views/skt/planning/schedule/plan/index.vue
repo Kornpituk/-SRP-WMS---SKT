@@ -817,7 +817,7 @@ watch(()=> {
         activeBtnSubmit.value = true
       }else if(item.statusId === 105){
         activeBtnRejectPlan.value = true
-        activeBtnSendBackPlan.value = true
+        activeBtnSendBackPlan.value = false //// 07 -05 - 2024 workd in process not send back
       }else if(item.statusId === 103){
         activeBtnSendBackPlan.value = true
         activeBtnRejectPlan.value = true
