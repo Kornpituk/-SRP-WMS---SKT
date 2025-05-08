@@ -2137,7 +2137,7 @@ const getDisabledFollowStatusNRole = () => {
               class=""
             >
               <div class="text-center">
-                <span style="font-size: 12px;">Raw Mat. Code</span>
+                <span style="font-size: 12px;">Resale Code</span>
               </div>
             </th>
             <th
@@ -2173,7 +2173,7 @@ const getDisabledFollowStatusNRole = () => {
               {{ dataHeaderReceving.productId }}
             </td>
             <th colspan="2">
-              Appearance of package
+              Manufacturer Name
             </th>
             <td
               class="text-start text-wrap"
@@ -2267,7 +2267,7 @@ const getDisabledFollowStatusNRole = () => {
                 colspan="11"
               >
                 <div>
-                  Raw Material Receiving
+                  Resale Product Receiving
                 </div>
               </th>
             </tr>
