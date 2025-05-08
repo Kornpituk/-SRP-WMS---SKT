@@ -4,6 +4,7 @@ import { fetchInspectionHeaderService,
   getAnalysisInspService,
   saveAnalyticalItemDetailsService,
   saveInspectionFormService,
+  saveLorryAfterMixingService,
 } from '../api/receivingService'
 import { mapInspectionHeader, success, failure, checkHasEmptyFields } from '../utils/inspectionUtils'
 import { createAnalysisItemsCode } from '../types/analysisItems'
@@ -279,5 +280,31 @@ export function useSaveLotInsp(analysisItems) {
     emptyFields,
     trickerSubmit,
     saveLotInspect,
+  }
+}
+
+//*** Save Lorry After Mixing Insp */
+export function useSaveLorryAfterMixing(analysisItems) {
+  const trickerSubmit = ref(false)
+
+
+  const saveLorryAfterMixing = async () => {
+
+    if (trickerSubmit.value) {
+      throw 'Cannot proceed: There are errors in the fields.'
+    }
+
+    for (const item of analysisItems.value) {
+      for (const analyticalItem of item.itemAnalyticals) {
+        await saveLorryAfterMixingService(analyticalItem)
+      }
+    }
+
+    return true
+  }
+
+  return {
+    trickerSubmit,
+    saveLorryAfterMixing,
   }
 }

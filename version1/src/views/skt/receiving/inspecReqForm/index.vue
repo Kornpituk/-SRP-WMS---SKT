@@ -24,6 +24,7 @@ import { fetchAndMapInspectionHeader,
   useAnalysisItems,
   useSaveLotInsp,
   useSaveHeaderInspect,
+  useSaveLorryAfterMixing,
 } from './composables/useInspection'
 
 //-------------------------------------------- Permission -----------------------------------------
@@ -639,6 +640,45 @@ const saveLotInspect = async () => {
     console.error('Error:', error)
     
     return
+  }
+}
+
+// ------------------------ Save After Mixing  --------------------------------------------------
+
+const validateDisableInoutAferMixing = type => {
+  if(type === 'Actual In Lorry'){
+    return !(statusId.value === 5)
+  }else if(type === 'After Mixing'){
+    if(statusId.value === 5){
+      return false
+    }else if(statusId.value === 13 || statusId.value === 14){
+      return false
+    }
+    else{
+      return true
+    }
+  }else{
+    return true
+  }
+}
+
+const {
+  saveLorryAfterMixing: saveLorryAfterMixingUseCase,
+
+  // isDialogSubmitFailedVisible,
+} = useSaveLorryAfterMixing(analysisItems)
+
+const saveLorryAfterMixing = async () => {
+  const success = await saveLorryAfterMixingUseCase()
+  if (success) {
+    // ทำอะไรต่อ เช่น แสดง Dialog สำเร็จ
+    // isDialogSubmitFailedVisible.value = true
+    console.log('บันทึกสำเร็จ saveLorryAfterMixing')
+    
+    return true
+  } else {
+    isDialogSubmitFailedVisible.value = true
+    console.log('บันทึกล้มเหลว saveLorryAfterMixing')
   }
 }
 
@@ -1936,6 +1976,8 @@ const getDisabledFollowStatusNRole = () => {
                     density="compact"
                     placeholder="Actual In Lorry"
                     class="py-2"
+                    type="number"
+                    :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
                   >
                     <!-- Prepend -->
                     <template #prepend>
@@ -1944,11 +1986,19 @@ const getDisabledFollowStatusNRole = () => {
                         style="font-size: 12px;"
                       >Actual In Lorry =</span>
                     </template>
+                    <template
+                      v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
                   </VTextField>
                   <VTextField
                     v-model="item.itemAnalyticals[0].afterMixing"
                     density="compact"
-                    placeholder="Actual In Lorry"
+                    placeholder="After Mixing"
+                    type="number"
+                    :readonly="validateDisableInoutAferMixing('After Mixing')"
                   >
                     <!-- Prepend -->
                     <template #prepend>
@@ -1956,6 +2006,12 @@ const getDisabledFollowStatusNRole = () => {
                         class="text-red"
                         style="font-size: 12px;"
                       >After Mixing =</span>
+                    </template>
+                    <template
+                      v-if="!validateDisableInoutAferMixing('After Mixing')"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
                     </template>
                   </VTextField>
                 </div>
@@ -3360,7 +3416,24 @@ const getDisabledFollowStatusNRole = () => {
     </section>
 
     <section
-      v-if="statusId === 12 || statusId === 14"
+      v-if="statusId === 13 || statusId === 14"
+      cols="12"
+      class="my-4"
+    >
+      <div class="d-flex justify-end">
+        <VBtn
+          class="mx-4"
+          color="warning"
+          style="font-size: 12px;"
+          @click="saveLorryAfterMixing"
+        >
+          SAVE Lorry After Mixing
+        </VBtn>
+      </div>
+    </section>
+
+    <section
+      v-if="statusId === 13 || statusId === 14"
       cols="12"
       class="my-4"
     >

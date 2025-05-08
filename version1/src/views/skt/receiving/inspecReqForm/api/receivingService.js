@@ -73,3 +73,23 @@ export const saveAnalyticalItemDetailsService = async analyticalItem => {
 
   return response.data
 }
+
+//*** Save Lorry After Mixing Insp */
+export const saveLorryAfterMixingService = async analyticalItem => {
+  const body = {
+    updatedBy: '', // ใส่ผู้ใช้ที่แก้ไขจริง
+    inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+    afterMixing: analyticalItem.afterMixing || 0,
+  }
+
+  const response = await axiosIns.post(
+    `${urlApi.value}/api/v1//Inspection/save-after-mixing`,
+    body,
+    { 
+      headers: getHeaders(), 
+    },
+  )
+
+  return response.data
+}
+
