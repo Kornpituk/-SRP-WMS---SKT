@@ -23,6 +23,7 @@ import { fetchAndMapInspectionHeader,
   useGenerateJournalIdInspection,
   useAnalysisItems,
   useSaveLotInsp,
+  useSaveHeaderInspect,
 } from './composables/useInspection'
 
 //-------------------------------------------- Permission -----------------------------------------
@@ -418,28 +419,51 @@ watch(
 )
 
 //--------------- save header --------------------------------
+// const saveHeaderInspect = async () => {
+//   try {
+//     const body = {
+//       limConditionDetail: headerInsp.value.details,
+//       note: headerInsp.value.note,
+//     }
+
+//     const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
+//       headers: {
+//         'accept': '*/*',
+//         'x-location': `${whereHouse.value}`,
+//         Authorization: `Bearer ${accessTokenAtStore}`,
+//       },
+//     })
+
+//     // //console.log('[products.value]!!: ', response.data)
+//     // isDialogSubmitSuccessVisible.value = true
+//     return true
+//   } catch (error) {
+//     // Handle errors
+//     isDialogSubmitFailedVisible.value = true
+//     console.error('Error:', error)
+//   }
+// }
+
+const {
+  saveHeaderInspect: saveHeaderInspectUseCase,
+
+  // isDialogSubmitFailedVisible,
+} = useSaveHeaderInspect({
+  headerInsp,
+  poEtlLogDetailJournalIDQueryParameters,
+})
+
 const saveHeaderInspect = async () => {
-  try {
-    const body = {
-      limConditionDetail: headerInsp.value.details,
-      note: headerInsp.value.note,
-    }
-
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    })
-
-    // //console.log('[products.value]!!: ', response.data)
-    // isDialogSubmitSuccessVisible.value = true
+  const success = await saveHeaderInspectUseCase()
+  if (success) {
+    // ทำอะไรต่อ เช่น แสดง Dialog สำเร็จ
+    // isDialogSubmitFailedVisible.value = true
+    console.log('บันทึกสำเร็จ saveHeaderInspect')
+    
     return true
-  } catch (error) {
-    // Handle errors
+  } else {
     isDialogSubmitFailedVisible.value = true
-    console.error('Error:', error)
+    console.log('บันทึกล้มเหลว saveHeaderInspect')
   }
 }
 
@@ -530,7 +554,6 @@ const checkEmptyFields = () => {
 
   return emptyFieldsList
 }
-
 
 
 //---------------- api
@@ -1903,7 +1926,7 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 0) && item.unit !== ''"
+                  v-if="checkAnalysitItem(item, item.typeID, 0) && item.unit !== ''&& !item.lorryInput"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
 
@@ -1916,7 +1939,10 @@ const getDisabledFollowStatusNRole = () => {
                   >
                     <!-- Prepend -->
                     <template #prepend>
-                      <span class='text-red' style="font-size: 12px;">Actual In Lorry =</span>
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >Actual In Lorry =</span>
                     </template>
                   </VTextField>
                   <VTextField
@@ -1926,7 +1952,10 @@ const getDisabledFollowStatusNRole = () => {
                   >
                     <!-- Prepend -->
                     <template #prepend>
-                      <span class='text-red' style="font-size: 12px;">After Mixing =</span>
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >After Mixing =</span>
                     </template>
                   </VTextField>
                 </div>

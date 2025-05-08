@@ -33,6 +33,27 @@ export const getAnalysisInspService = id => {
   })
 }
 
+//*** Save Head Insp */
+export async function saveInspectionFormService(
+  poEtlLogDetailJournalID,
+  body,
+) {
+  try {
+    const response = await axiosIns.post(
+      `${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalID}`,
+      body,
+      {
+        headers: getHeaders(),
+      },
+    )
+    
+    return response.data
+  } catch (error) {
+    console.error('saveInspectionForm error:', error)
+    throw error
+  }
+}
+
 //*** Save Lot Insp */
 export const saveAnalyticalItemDetailsService = async analyticalItem => {
   const body = {

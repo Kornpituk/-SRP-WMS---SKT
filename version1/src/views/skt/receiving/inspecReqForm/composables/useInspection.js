@@ -3,6 +3,7 @@ import { fetchInspectionHeaderService,
   getReceivingPlanByJournalIdService,
   getAnalysisInspService,
   saveAnalyticalItemDetailsService,
+  saveInspectionFormService,
 } from '../api/receivingService'
 import { mapInspectionHeader, success, failure, checkHasEmptyFields } from '../utils/inspectionUtils'
 import { createAnalysisItemsCode } from '../types/analysisItems'
@@ -181,6 +182,41 @@ export function useAnalysisItems() {
     analysisItemsCode,
     analysisResults,
     analyticalItemsResults,
+  }
+}
+
+//*** Save Head Insp */
+export function useSaveHeaderInspect(options) {
+  const {
+    headerInsp,
+    poEtlLogDetailJournalIDQueryParameters,
+  } = options
+
+  const isDialogSubmitFailedVisible = ref(false)
+
+  const saveHeaderInspect = async () => {
+    try {
+      const body = {
+        limConditionDetail: headerInsp.value.details,
+        note: headerInsp.value.note,
+      }
+
+      await saveInspectionFormService(
+        poEtlLogDetailJournalIDQueryParameters.value,
+        body,
+      )
+
+      return true
+    } catch (error) {
+      isDialogSubmitFailedVisible.value = true
+      
+      return false
+    }
+  }
+
+  return {
+    saveHeaderInspect,
+    isDialogSubmitFailedVisible,
   }
 }
 
