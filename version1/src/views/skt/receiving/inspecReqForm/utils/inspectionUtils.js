@@ -10,6 +10,7 @@ export function mapInspectionHeader(inspData) {
     remark: 'remark',
     note: 'note',
     details: 'limConditionDetail',
+    spacialCase: 'spacialCase',
     updateByStaffWH: 'whStaff',
     updateBySuperWH: 'whSupervisor',
     updateByStaffInsp: 'inspStaff',

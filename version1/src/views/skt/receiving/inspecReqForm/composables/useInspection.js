@@ -200,6 +200,7 @@ export function useSaveHeaderInspect(options) {
       const body = {
         limConditionDetail: headerInsp.value.details,
         note: headerInsp.value.note,
+        spacialCase: headerInsp.value.spacialCase,
       }
 
       await saveInspectionFormService(

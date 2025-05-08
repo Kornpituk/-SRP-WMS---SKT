@@ -164,6 +164,7 @@ const headerInsp =ref({
   remark: null,
   note: null,
   details: null,
+  spacialCase: false,
 
   updateByStaffWH: null,
   updateBySuperWH: null,
@@ -668,15 +669,34 @@ const {
   // isDialogSubmitFailedVisible,
 } = useSaveLorryAfterMixing(analysisItems)
 
+const loadingSaveLorryAftherMixing = ref(false)
+
 const saveLorryAfterMixing = async () => {
+  loadingSaveLorryAftherMixing.value = true
+
   const success = await saveLorryAfterMixingUseCase()
   if (success) {
     // ทำอะไรต่อ เช่น แสดง Dialog สำเร็จ
     // isDialogSubmitFailedVisible.value = true
     console.log('บันทึกสำเร็จ saveLorryAfterMixing')
+    textAlertDialogFunction('SAVE LORRY AFTER MIXXING', true)
+
+    // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    loadingSaveLorryAftherMixing.value = false
     
     return true
   } else {
+    textAlertDialogFunction('SAVE LORRY AFTER MIXXING', false)
+
+    loadingSaveLorryAftherMixing.value = false
+
+    // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+    setTimeout(() => {
+      location.reload()
+    }, 3 * 1000) // 10000 มิลลิวินาที = 10 วินาที
     isDialogSubmitFailedVisible.value = true
     console.log('บันทึกล้มเหลว saveLorryAfterMixing')
   }
@@ -1205,7 +1225,7 @@ const submitButtonVisibleNew = async word => {
 
     // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 10000 มิลลิวินาที = 10 วินาที
   }
 
@@ -3165,7 +3185,7 @@ const getDisabledFollowStatusNRole = () => {
             </VCol>
             <VCol cols="6">
               <VCheckbox
-                v-model="checkboxOne"
+                v-model="headerInsp.spacialCase"
                 style="font-size: 12px;"
               >
                 <template #label>
@@ -3428,6 +3448,13 @@ const getDisabledFollowStatusNRole = () => {
           @click="saveLorryAfterMixing"
         >
           SAVE Lorry After Mixing
+          <VProgressCircular
+            v-if="loadingSaveLorryAftherMixing"
+            :size="30"
+            width="3"
+            color="primary"
+            indeterminate
+          />
         </VBtn>
       </div>
     </section>
