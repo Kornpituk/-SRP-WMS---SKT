@@ -10,6 +10,7 @@ export function mapInspectionHeader(inspData) {
     remark: 'remark',
     note: 'note',
     details: 'limConditionDetail',
+    spacialCase: 'spacialCase',
     updateByStaffWH: 'whStaff',
     updateBySuperWH: 'whSupervisor',
     updateByStaffInsp: 'inspStaff',
@@ -19,6 +20,8 @@ export function mapInspectionHeader(inspData) {
     lastUpdatedStaffInsp: 'inspStaffUpdatedDate',
     lastUpdatedSuperInsp: 'inspSupervisorDate',
     remarkReject: 'statusComments',
+    isAccept: 'isAccept',
+    isReject: 'isReject',
   }
   
   return Object.fromEntries(
@@ -32,4 +35,9 @@ export function success(data, isReject = false, isAccept = false) {
     
 export function failure(message) {
   return { success: false, message }
+}
+
+// composables/useValidation.js
+export const checkHasEmptyFields = fields => {
+  return fields.some(field => field.isEmpty)
 }

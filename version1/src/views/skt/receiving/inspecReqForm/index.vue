@@ -3196,7 +3196,7 @@ const getDisabledFollowStatusNRole = () => {
           style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
         >
           <VIcon
-            v-if="isAccept"
+            v-if="headerInsp.isAccept"
             color="success"
             size="60"
             icon="ri-checkbox-circle-fill"
@@ -3218,7 +3218,7 @@ const getDisabledFollowStatusNRole = () => {
           style="border: 1px solid black;"
         >
           <VIcon
-            v-if="isReject"
+            v-if="headerInsp.isReject"
             color="red"
             size="60"
             icon="ri-close-circle-fill"
