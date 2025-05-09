@@ -165,6 +165,8 @@ const headerInsp =ref({
   note: null,
   details: null,
   spacialCase: false,
+  isAccept: false,
+  isReject: false,
 
   updateByStaffWH: null,
   updateBySuperWH: null,
@@ -3272,7 +3274,7 @@ const getDisabledFollowStatusNRole = () => {
           style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
         >
           <VIcon
-            v-if="isAccept"
+            v-if="headerInsp.isAccept"
             color="success"
             size="60"
             icon="ri-checkbox-circle-fill"
@@ -3286,15 +3288,17 @@ const getDisabledFollowStatusNRole = () => {
           style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
         >
           <span style="font-size: 12px; font-weight: bolder;">Reject</span>
+        
         </VCol>
 
+      
         <VCol
           cols="3"
           class="d-flex align-center justify-center py-0"
           style="border: 1px solid black;"
         >
           <VIcon
-            v-if="isReject"
+            v-if="headerInsp.isReject"
             color="red"
             size="60"
             icon="ri-close-circle-fill"

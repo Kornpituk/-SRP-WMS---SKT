@@ -1578,11 +1578,6 @@ const btnPrintLabel = async () => {
       throw 'save PrintLabel:'+successSavePrintLabel.value
     }
 
-    //console.log('savePrintLabel end!')
-
-
-    //console.log('printLabelSmallPdf start!')
-
     const printResponse = await printLabelSmallPdf()
 
     //console.log('printLabelSmallPdf end!')

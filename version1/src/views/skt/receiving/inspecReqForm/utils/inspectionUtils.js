@@ -20,6 +20,8 @@ export function mapInspectionHeader(inspData) {
     lastUpdatedStaffInsp: 'inspStaffUpdatedDate',
     lastUpdatedSuperInsp: 'inspSupervisorDate',
     remarkReject: 'statusComments',
+    isAccept: 'isAccept',
+    isReject: 'isReject',
   }
   
   return Object.fromEntries(
