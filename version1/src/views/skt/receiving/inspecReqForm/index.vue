@@ -22,6 +22,9 @@ import { fetchAndMapInspectionHeader,
   useGenerateInspection,
   useGenerateJournalIdInspection,
   useAnalysisItems,
+  useSaveLotInsp,
+  useSaveHeaderInspect,
+  useSaveLorryAfterMixing,
 } from './composables/useInspection'
 
 //-------------------------------------------- Permission -----------------------------------------
@@ -161,6 +164,9 @@ const headerInsp =ref({
   remark: null,
   note: null,
   details: null,
+  spacialCase: false,
+  isAccept: false,
+  isReject: false,
 
   updateByStaffWH: null,
   updateBySuperWH: null,
@@ -403,85 +409,6 @@ const getAnalysistInsp = async () => {
   }
 }
 
-// // eslint-disable-next-line sonarjs/cognitive-complexity
-// const getAnalysistInsp = async () => {
-//   loadingGenerated1.value = true
-
-//   if (!poEtlLogDetailJournalIDQueryParameters.value) {
-//     loadingGenerated1.value = false
-    
-//     return
-//   }
-
-//   try {
-//     const response = await axiosIns.get(
-//       `${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${poEtlLogDetailJournalIDQueryParameters.value}`,
-//       {
-//         headers: {
-//           'accept': '*/*',
-//           'x-location': whereHouse.value,
-//           Authorization: `Bearer ${accessTokenAtStore}`,
-//         },
-//       },
-//     )
-
-//     if (!response.data || !response.data.items) {
-//       console.warn("No data received from API")
-      
-//       return
-//     }
-
-//     analysisItems.value = response.data.items
-
-//     // ตรวจสอบว่า analysisItems มีข้อมูลและมี itemAnalyticals
-//     if (analysisItems.value.length > 0 && Array.isArray(analysisItems.value[0].itemAnalyticals)) {
-//       for (let i = 0; i < Math.min(5, analysisItems.value[0].itemAnalyticals.length); i++) {
-//         const analyticalItem = analysisItems.value[0].itemAnalyticals[i]
-
-//         analysisItemsCode.value[`actualAmountUnits_${i}`] = analyticalItem.actualAmountUnits || null
-//         analysisItemsCode.value[`actualMakerLotNo_${i}`] = analyticalItem.actualMakerLotNo || null
-//         analysisItemsCode.value[`actualNetCountKgs_${i}`] = analyticalItem.actualNetCountKgs || null
-//         analysisItemsCode.value[`actualTotalQuantityKgs_${i}`] = analyticalItem.actualTotalQuantityKgs || null
-//       }
-//     }
-
-//     // ใช้ map() เพื่อสร้าง `analysisResults`
-//     analysisResults.value = analysisItems.value.map(item => ({
-//       rmInspReqFormAnalyticalItemsJournalId: item.rmInspReqFormAnalyticalItemsJournalId,
-//       typeID: item.typeID,
-//       typeName: item.typeName,
-//       analyticalItem: item.analyticalItem,
-//       unit: item.unit,
-//     }))
-
-//     // ใช้ reduce() เพื่อลดซ้อน loop
-//     analyticalItemsResults.value = analysisItems.value.reduce((acc, item) => {
-//       if (Array.isArray(item.itemAnalyticals)) {
-//         acc.push(
-//           ...item.itemAnalyticals.map(analyticalItem => ({
-//             rmInspReqFormAnalyticalItemsJournalId: analyticalItem.rmInspReqFormAnalyticalItemsJournalId,
-//             actualAmountUnits: analyticalItem.actualAmountUnits,
-//             actualAnalysis: analyticalItem.actualAnalysis,
-//             actualMakerLotNo: analyticalItem.actualMakerLotNo,
-//             actualNetCountKgs: analyticalItem.actualNetCountKgs,
-//             actualTotalQuantityKgs: analyticalItem.actualTotalQuantityKgs,
-//             inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
-//             lotID: analyticalItem.lotID,
-//             okState: analyticalItem.okState,
-//           })),
-//         )
-//       }
-      
-//       return acc
-//     }, [])
-
-//   } catch (error) {
-//     console.error("Error fetching analysis items:", error)
-//   } finally {
-//     loadingGenerated1.value = false
-//   }
-// }
-
 const loadingGenerated2 = ref(true)
 
 watch(
@@ -496,34 +423,57 @@ watch(
 )
 
 //--------------- save header --------------------------------
+// const saveHeaderInspect = async () => {
+//   try {
+//     const body = {
+//       limConditionDetail: headerInsp.value.details,
+//       note: headerInsp.value.note,
+//     }
+
+//     const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
+//       headers: {
+//         'accept': '*/*',
+//         'x-location': `${whereHouse.value}`,
+//         Authorization: `Bearer ${accessTokenAtStore}`,
+//       },
+//     })
+
+//     // //console.log('[products.value]!!: ', response.data)
+//     // isDialogSubmitSuccessVisible.value = true
+//     return true
+//   } catch (error) {
+//     // Handle errors
+//     isDialogSubmitFailedVisible.value = true
+//     console.error('Error:', error)
+//   }
+// }
+
+const {
+  saveHeaderInspect: saveHeaderInspectUseCase,
+
+  // isDialogSubmitFailedVisible,
+} = useSaveHeaderInspect({
+  headerInsp,
+  poEtlLogDetailJournalIDQueryParameters,
+})
+
 const saveHeaderInspect = async () => {
-  try {
-    const body = {
-      limConditionDetail: headerInsp.value.details,
-      note: headerInsp.value.note,
-    }
-
-    const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
-      headers: {
-        'accept': '*/*',
-        'x-location': `${whereHouse.value}`,
-        Authorization: `Bearer ${accessTokenAtStore}`,
-      },
-    })
-
-    // //console.log('[products.value]!!: ', response.data)
-    // isDialogSubmitSuccessVisible.value = true
+  const success = await saveHeaderInspectUseCase()
+  if (success) {
+    // ทำอะไรต่อ เช่น แสดง Dialog สำเร็จ
+    // isDialogSubmitFailedVisible.value = true
+    console.log('บันทึกสำเร็จ saveHeaderInspect')
+    
     return true
-  } catch (error) {
-    // Handle errors
+  } else {
     isDialogSubmitFailedVisible.value = true
-    console.error('Error:', error)
+    console.log('บันทึกล้มเหลว saveHeaderInspect')
   }
 }
 
 //--------------- save Lot --------------------------------
 //---------------- Validate
-const emptyFields = ref([])
+// const emptyFields = ref([])
 
 const showOnlyErrors = ref(false) // ตั้งเป็น true เพื่อแสดงเฉพาะค่า error
 
@@ -609,6 +559,68 @@ const checkEmptyFields = () => {
   return emptyFieldsList
 }
 
+
+//---------------- api
+// const saveLotInspect = async () => {
+//   emptyFields.value = checkEmptyFields()
+
+//   // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
+  
+//   const hasErrors = ref(null)
+//   if(trickerSubmit.value === true){
+//     hasErrors.value = emptyFields.value.some(field => field.isEmpty)
+//   }
+  
+//   // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
+//   if (hasErrors.value) {
+//     //console.log('Cannot proceed: There are errors in the fields.')
+
+//     // แสดง dialog แจ้งเตือนถ้าจำเป็น
+//     // isDialogSubmitFailedVisible.value = true
+    
+//     throw "Cannot proceed: There are errors in the fields."
+//   }
+
+//   try {
+//     for (const item of analysisItems.value) {
+//       for (const analyticalItem of item.itemAnalyticals) {
+//         // สร้าง body สำหรับแต่ละ analyticalItem
+//         const body = {
+//           updatedBy: '', // ข้อมูลที่ต้องการส่ง
+//           inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+//           actualAnalysis: analyticalItem.actualAnalysis,
+//           okState: analyticalItem.okState,
+//         }
+
+//         // ส่ง body ไปยัง API ทีละตัว
+//         const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails`, body, {
+//           headers: {
+//             'accept': '*/*',
+//             'x-location': `${whereHouse.value}`,
+//             Authorization: `Bearer ${accessTokenAtStore}`,
+//           },
+//         })
+
+//         //console.log('[response]: ', response.data)
+//       }
+//     }
+
+//     // แสดง dialog เมื่อสำเร็จ
+//     // isDialogSubmitSuccessVisible.value = true
+//     return true
+//   } catch (error) {
+//     // แสดง dialog เมื่อมีข้อผิดพลาด
+//     // isDialogSubmitFailedVisible.value = true
+//     console.error('Error:', error)
+//   }
+// }
+
+const {
+  emptyFields,
+  trickerSubmit,
+  saveLotInspect: saveLotInspectUserCase,
+} = useSaveLotInsp(analysisItems)
+
 const filteredFields = computed(() => {
   if (!showOnlyErrors.value) {
     return emptyFields.value.filter(field => field.isEmpty) // กรองเฉพาะค่า error
@@ -617,64 +629,84 @@ const filteredFields = computed(() => {
   return emptyFields.value // แสดงทั้งหมด
 })
 
-//---------------- api
 const saveLotInspect = async () => {
-  emptyFields.value = checkEmptyFields()
-
-  // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
-  
-  const hasErrors = ref(null)
-  if(trickerSubmit.value === true){
-    hasErrors.value = emptyFields.value.some(field => field.isEmpty)
-  }
-  
-  // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
-  if (hasErrors.value) {
-    //console.log('Cannot proceed: There are errors in the fields.')
-
-    // แสดง dialog แจ้งเตือนถ้าจำเป็น
-    // isDialogSubmitFailedVisible.value = true
-    
-    throw "Cannot proceed: There are errors in the fields."
-  }
-
   try {
-    for (const item of analysisItems.value) {
-      for (const analyticalItem of item.itemAnalyticals) {
-        // สร้าง body สำหรับแต่ละ analyticalItem
-        const body = {
-          updatedBy: '', // ข้อมูลที่ต้องการส่ง
-          inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
-          actualAnalysis: analyticalItem.actualAnalysis,
-          okState: analyticalItem.okState,
-        }
+    const result = await saveLotInspectUserCase(analysisItems)
 
-        // ส่ง body ไปยัง API ทีละตัว
-        const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails`, body, {
-          headers: {
-            'accept': '*/*',
-            'x-location': `${whereHouse.value}`,
-            Authorization: `Bearer ${accessTokenAtStore}`,
-          },
-        })
-
-        //console.log('[response]: ', response.data)
-      }
+    if (result) {
+      // แสดง dialog สำเร็จ
+      console.log('Save successful', result)
     }
-
-    // แสดง dialog เมื่อสำเร็จ
-    // isDialogSubmitSuccessVisible.value = true
-    return true
   } catch (error) {
-    // แสดง dialog เมื่อมีข้อผิดพลาด
-    // isDialogSubmitFailedVisible.value = true
+    // แสดง dialog ผิดพลาด
+    console.log('Save not successful', error)
     console.error('Error:', error)
+    
+    return
+  }
+}
+
+// ------------------------ Save After Mixing  --------------------------------------------------
+
+const validateDisableInoutAferMixing = type => {
+  if(type === 'Actual In Lorry'){
+    return !(statusId.value === 5)
+  }else if(type === 'After Mixing'){
+    if(statusId.value === 5){
+      return false
+    }else if(statusId.value === 13 || statusId.value === 14){
+      return false
+    }
+    else{
+      return true
+    }
+  }else{
+    return true
+  }
+}
+
+const {
+  saveLorryAfterMixing: saveLorryAfterMixingUseCase,
+
+  // isDialogSubmitFailedVisible,
+} = useSaveLorryAfterMixing(analysisItems)
+
+const loadingSaveLorryAftherMixing = ref(false)
+
+const saveLorryAfterMixing = async () => {
+  loadingSaveLorryAftherMixing.value = true
+
+  const success = await saveLorryAfterMixingUseCase()
+  if (success) {
+    // ทำอะไรต่อ เช่น แสดง Dialog สำเร็จ
+    // isDialogSubmitFailedVisible.value = true
+    console.log('บันทึกสำเร็จ saveLorryAfterMixing')
+    textAlertDialogFunction('SAVE LORRY AFTER MIXXING', true)
+
+    // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+    setTimeout(() => {
+      location.reload()
+    }, 500) // 10000 มิลลิวินาที = 10 วินาที
+    loadingSaveLorryAftherMixing.value = false
+    
+    return true
+  } else {
+    textAlertDialogFunction('SAVE LORRY AFTER MIXXING', false)
+
+    loadingSaveLorryAftherMixing.value = false
+
+    // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
+    setTimeout(() => {
+      location.reload()
+    }, 3 * 1000) // 10000 มิลลิวินาที = 10 วินาที
+    isDialogSubmitFailedVisible.value = true
+    console.log('บันทึกล้มเหลว saveLorryAfterMixing')
   }
 }
 
 //--------------- Submit --------------------------------
 
-const trickerSubmit = ref(false)
+// const trickerSubmit = ref(false)
 
 const submitInspForm = async () => {
   try {
@@ -1852,7 +1884,7 @@ const getDisabledFollowStatusNRole = () => {
                 v-if="item.typeID === 1"
                 class="text-center"
                 colspan="1"
-                style="min-width: 200px; max-width: 200px;"
+                style="min-width: 300px; max-width: 200px;"
               >
                 <VRadioGroup
                   v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0] && item.unit !== ''"
@@ -1912,7 +1944,7 @@ const getDisabledFollowStatusNRole = () => {
                   </VTextField>
                 </div>
                 
-                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0] && item.unit !== ''">
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0] && item.unit !== '' && !item.lorryInput">
                   <VBtn
                     width="190"
                     :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
@@ -1956,9 +1988,55 @@ const getDisabledFollowStatusNRole = () => {
                 </VTextarea>
 
                 <span
-                  v-if="checkAnalysitItem(item, item.typeID, 0) && item.unit !== ''"
+                  v-if="checkAnalysitItem(item, item.typeID, 0) && item.unit !== ''&& !item.lorryInput"
                   class="text-red"
                 >{{ textAlertErrorAnalysitItem }}</span>
+
+                <div v-if="item.lorryInput">
+                  <VTextField
+                    v-model="item.itemAnalyticals[0].acture"
+                    density="compact"
+                    placeholder="Actual In Lorry"
+                    class="py-2"
+                    type="number"
+                    :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                  >
+                    <!-- Prepend -->
+                    <template #prepend>
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >Actual In Lorry =</span>
+                    </template>
+                    <template
+                      v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                  <VTextField
+                    v-model="item.itemAnalyticals[0].afterMixing"
+                    density="compact"
+                    placeholder="After Mixing"
+                    type="number"
+                    :readonly="validateDisableInoutAferMixing('After Mixing')"
+                  >
+                    <!-- Prepend -->
+                    <template #prepend>
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >After Mixing =</span>
+                    </template>
+                    <template
+                      v-if="!validateDisableInoutAferMixing('After Mixing')"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
               </td>
 
               <td
@@ -3109,7 +3187,7 @@ const getDisabledFollowStatusNRole = () => {
             </VCol>
             <VCol cols="6">
               <VCheckbox
-                v-model="checkboxOne"
+                v-model="headerInsp.spacialCase"
                 style="font-size: 12px;"
               >
                 <template #label>
@@ -3210,8 +3288,10 @@ const getDisabledFollowStatusNRole = () => {
           style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
         >
           <span style="font-size: 12px; font-weight: bolder;">Reject</span>
+        
         </VCol>
 
+      
         <VCol
           cols="3"
           class="d-flex align-center justify-center py-0"
@@ -3360,7 +3440,31 @@ const getDisabledFollowStatusNRole = () => {
     </section>
 
     <section
-      v-if="statusId === 12 || statusId === 14"
+      v-if="statusId === 13 || statusId === 14"
+      cols="12"
+      class="my-4"
+    >
+      <div class="d-flex justify-end">
+        <VBtn
+          class="mx-4"
+          color="warning"
+          style="font-size: 12px;"
+          @click="saveLorryAfterMixing"
+        >
+          SAVE Lorry After Mixing
+          <VProgressCircular
+            v-if="loadingSaveLorryAftherMixing"
+            :size="30"
+            width="3"
+            color="primary"
+            indeterminate
+          />
+        </VBtn>
+      </div>
+    </section>
+
+    <section
+      v-if="statusId === 13 || statusId === 14"
       cols="12"
       class="my-4"
     >

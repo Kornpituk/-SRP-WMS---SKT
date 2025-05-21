@@ -14,6 +14,7 @@ const dataRowModel = ref()
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
 
+
   if (dataRow?.statusId === 205) {
     return true
   } else if (
@@ -34,6 +35,8 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
     return false
   }
 }
+
+
 
 const disabledStatusWithOutAdminUser = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
 
@@ -135,6 +138,7 @@ function handleConfirmAction() {
     //console.log('back')
   }
 
+
 }
 
 function handleCancel() {
@@ -164,6 +168,7 @@ function convertDateFormat(dateString) {
 }
 
 const dateCurrent = ref()
+
 
 function getCurrentDateFormatted() {
   const today = new Date()
@@ -206,6 +211,7 @@ import {
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
 import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
+
 const paramsForGetPermission = ref({
   empId: String(userDataInfo.value.id) || '',
   statusId: '',
@@ -242,6 +248,7 @@ const disShowTableShipmentPLand = () => !['00011',
   '00044',
   '00045'].includes(userDataInfo.value.id)
 
+
 const userData = ref(null)
 
 watch(() => {
@@ -262,6 +269,7 @@ const disableShowDataByDepartment = () => {
   }
 }
 
+
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 
 const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
@@ -277,6 +285,8 @@ const router = useRouter()
 
 const serialProductCode = ref(null)
 
+
+
 /// ------------------------------ Import Component --------------------------------
 // --- Dialog Text Area --------------------------------
 
@@ -287,6 +297,7 @@ const dialogData2TextArea = ref('')
 const dialogVisible = ref(false)
 const dialogVisibleTextarea = ref(false)
 const dialogRemark = ref('')
+
 
 // --- define Model
 
@@ -796,7 +807,6 @@ const viewAllData = () => {
 const typeFileInput = ref('hideInput')
 
 const filesFromUploaderSO = ref([])
-const filesFromUploaderPO = ref([])
 const filesFromUploaderCOA = ref([])
 const filesFromUploaderTruckOrder = ref([])
 const filesFromUploaderDeliNote = ref([])
@@ -924,7 +934,6 @@ const saveFileFormShipment = async (
 const { getFileFormResult, errorMessageGetFileForm, getFileFormFunction } = useGetFileFormService()
 
 const getSoFileModel = ref([])
-const getPoFileModel = ref([])
 const getCoAFileModel = ref([])
 const getTruckOrderFileModel = ref([])
 const getDeliveryNoteFileModel = ref([])
@@ -976,11 +985,6 @@ const handleFileUpdatesSO = updatedFiles => {
 
 }
 
-const handleFileUpdatesPO = updatedFiles => {
-  filesFromUploaderPO.value = updatedFiles
-
-}
-
 const handleFileUpdatesCOA = updatedFiles => {
   filesFromUploaderCOA.value = updatedFiles
 }
@@ -1022,6 +1026,29 @@ const mapRequestData = data => ({
 
 const getOrDefault = (value, defaultValue) => value ?? defaultValue
 
+const showText = () => {
+  //console.log("filesFromUploaderSO.value show")
+  //console.log("filesFromUploaderSO.value", filesFromUploaderSO.value)
+  if (filesFromUploaderSO.value) {
+    //console.log("filesFromUploaderSO.value", filesFromUploaderSO.value.length)
+  }
+
+  //console.log("filesFromUploaderSO.value", filesFromUploaderCOA.value)
+  if (filesFromUploaderCOA.value) {
+    //console.log("filesFromUploaderCOA.value", filesFromUploaderCOA.value.length)
+  }
+
+  //console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value)
+  if (filesFromUploaderTruckOrder.value) {
+    //console.log("filesFromUploaderTruckOrder.value", filesFromUploaderTruckOrder.value.length)
+  }
+
+  //console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value)
+  if (filesFromUploaderDeliNote.value) {
+    //console.log("filesFromUploaderDeliNote.value", filesFromUploaderDeliNote.value.length)
+  }
+}
+
 const saveDraftLoading = ref(false)
 const saveDraftLoadingSOERow = ref('')
 
@@ -1034,7 +1061,6 @@ const saveShipmentPlan = async row => {
 
   if (
     filesFromUploaderSO.value ||
-    filesFromUploaderPO.value ||
     filesFromUploaderCOA.value ||
     filesFromUploaderTruckOrder.value ||
     filesFromUploaderDeliNote.value
@@ -1057,31 +1083,13 @@ const saveShipmentPlan = async row => {
       } else {
         deleteFie1.value = await handleDeleteFileForm(
           filesFromUploaderSO.value,
-          "DeleteSO",
+          "DeleteSo",
           row.soEtlLogDetailJournalID,
         )
 
         saveFile1.value = await saveFileFormShipment(
           filesFromUploaderSO.value,
           "SaveSo",
-          row.soEtlLogDetailJournalID,
-        )
-      }
-    }
-
-    if (filesFromUploaderPO.value) {
-      if (filesFromUploaderPO.value.length === 0) {
-        //console.log("SaveSo")
-      } else {
-        deleteFie1.value = await handleDeleteFileForm(
-          filesFromUploaderPO.value,
-          "DeletePO",
-          row.soEtlLogDetailJournalID,
-        )
-
-        saveFile1.value = await saveFileFormShipment(
-          filesFromUploaderPO.value,
-          "SavePo",
           row.soEtlLogDetailJournalID,
         )
       }
@@ -1232,8 +1240,8 @@ const saveShipmentPlan = async row => {
     } else {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
       setTimeout(() => {
-        location.reload()
-      }, 1000) // 500 มิลลิวินาที = 0.5 วินาที
+        // location.reload()
+      }, 500) // 500 มิลลิวินาที = 0.5 วินาที
       saveDraftLoading.value = false
 
       return false
@@ -1711,7 +1719,7 @@ watchEffect(() => {
 const TruckTypePrint = ref([])
 
 //------------------------------------------ Mock Data --------------------------------
-import mockData from './dataMock'
+import mockData from '../dataMock'
 
 //------------------------ Set Permissions (Hiden and Show Column) ------------------------
 const accountAmin = ref(false)
@@ -3809,20 +3817,18 @@ const handleSavetruckOrder = async type => {
               >
                 <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
               </th>
-              <!--
-                <th
+              <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-start"
-                >
+              >
                 <span style="font-weight: bold;">{{ $t('PO No.') }}</span>
-                </th>
-                <th
+              </th>
+              <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-center"
-                >
+              >
                 <span style="font-weight: bold;">{{ $t('PO attachment') }}</span>
-                </th> 
-              -->
+              </th>
               
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SAP_INVOICE_NO').canVisible"
@@ -4272,7 +4278,7 @@ const handleSavetruckOrder = async type => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 140px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -4324,85 +4330,59 @@ const handleSavetruckOrder = async type => {
               </td>
 
               <!-- 👉 PO No -->
-              <!--
-                <td
+              <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
                 class="text-start px-3 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
                 :style="{
-                backgroundColor:
-                dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
-                isSelected(product) ? '#E0F7FA' :
-                '',
-                borderTop:
-                dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
-                borderBottom:
-                dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
-<<<<<<< HEAD
               >
-                {{ product.poNo }}
-              </td>
-
-              <!-- 👉 PO Attachment -->
-              <td
-=======
-                >
                 {{ product.salesOrderNo }}
-                </td> 
-              -->
+              </td>
               <!-- 👉 PO Attachment -->
 
-              <!--
-                <td
->>>>>>> origin/develop
+              <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-start px-1 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
                 :style="{
-                backgroundColor:
-                dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
-                isSelected(product) ? '#E0F7FA' :
-                '',
-                borderTop:
-                dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
-                borderBottom:
-                dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
+                <VForm
+                  ref="product"
+                  :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  @submit.prevent="submitShipmentPlanBySoEId('submit', product.soEtlLogDetailJournalID)"
                 >
-<<<<<<< HEAD
                   <div>
                     <FileInputDialogCarousels
-                      :files-from-a-p-i="product.getPOFileData"
-                      title-dialog="PO Attachment"
+                      :files-from-a-p-i="product.getSOFileData"
+                      title-dialog="SO Attachment"
                       :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                       :type-file-input="typeFileInput"
-                      file-name="Po Attachment"
-                      @updateFiles="handleFileUpdatesPO"
+                      file-name="So Attachment"
+                      @updateFiles="handleFileUpdatesSO"
                     />
                   </div>
-=======
-                <VForm
-                ref="product"
-                :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
-                @submit.prevent="submitShipmentPlanBySoEId('submit', product.soEtlLogDetailJournalID)"
-                >
-                <div>
-                <FileInputDialogCarousels
-                :files-from-a-p-i="product.getSOFileData"
-                title-dialog="SO Attachment"
-                :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
-                :type-file-input="typeFileInput"
-                file-name="So Attachment"
-                @updateFiles="handleFileUpdatesSO"
-                />
-                </div>
->>>>>>> origin/develop
                 </VForm>
-                </td> 
-              -->
+              </td>
 
               <!-- 👉 sapInvoiceNo -->
               <td

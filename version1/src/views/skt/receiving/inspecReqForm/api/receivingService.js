@@ -1,45 +1,94 @@
 import axiosIns from '@axios'
 import { urlApi } from '@/api'
 
-//---------------------- Import Api for Url *****
-const whereHouse = ref(localStorage.getItem('whereHouseName'))
-
-const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
-
-//--------------------------- Header ------------------------------------
-
-const headers = () => ({
-  accept: '*/*',
-  'x-location': whereHouse.value,
-  Authorization: `Bearer ${accessTokenAtStore}`,
-})
+import { getHeaders } from '../utils/headers'
 
 //-------------------------- Services ------------------------------------
 
 // *** generate Insp
 export const generateInspectionService = id => {
   return axiosIns.post(`${urlApi.value}/api/v1/Inspection/Generate/${id}`, {}, {
-    headers: headers(),
+    headers: getHeaders(),
   })
 }
 
 // *** generate JournalId Insp
 export const getReceivingPlanByJournalIdService = id => {
   return axiosIns.get(`${urlApi.value}/api/v1/ReceivingPlan/GetByPoEtlLogDetailJournalID/${id}`, {
-    headers: headers(),
+    headers: getHeaders(),
   })
 }
 
 // *** fetch Head Insp
 export const fetchInspectionHeaderService = id => {
   return axiosIns.get(`${urlApi.value}/api/v1/Inspection/View/${id}`, {
-    headers: headers(),
+    headers: getHeaders(),
   })
 }
 
 // *** fetch Analysis Insp
 export const getAnalysisInspService = id => {
   return axiosIns.get(`${urlApi.value}/api/v1/Inspection/GetAnalyticalItems/${id}`, {
-    headers: headers(),
+    headers: getHeaders(),
   })
 }
+
+//*** Save Head Insp */
+export async function saveInspectionFormService(
+  poEtlLogDetailJournalID,
+  body,
+) {
+  try {
+    const response = await axiosIns.post(
+      `${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalID}`,
+      body,
+      {
+        headers: getHeaders(),
+      },
+    )
+    
+    return response.data
+  } catch (error) {
+    console.error('saveInspectionForm error:', error)
+    throw error
+  }
+}
+
+//*** Save Lot Insp */
+export const saveAnalyticalItemDetailsService = async analyticalItem => {
+  const body = {
+    updatedBy: '', // ใส่ผู้ใช้ที่แก้ไขจริง
+    inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+    actualAnalysis: analyticalItem.actualAnalysis,
+    okState: analyticalItem.okState,
+    acture: analyticalItem.acture || 0,
+    afterMixing: analyticalItem.afterMixing || 0,
+  }
+
+  const response = await axiosIns.post(
+    `${urlApi.value}/api/v1/Inspection/SaveLotDetails`,
+    body,
+    { headers: getHeaders() },
+  )
+
+  return response.data
+}
+
+//*** Save Lorry After Mixing Insp */
+export const saveLorryAfterMixingService = async analyticalItem => {
+  const body = {
+    inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+    afterMixing: analyticalItem.afterMixing || 0,
+  }
+
+  const response = await axiosIns.post(
+    `${urlApi.value}/api/v1/Inspection/save-after-mixing`,
+    body,
+    { 
+      headers: getHeaders(), 
+    },
+  )
+
+  return response.data
+}
+
