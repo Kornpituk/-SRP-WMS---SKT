@@ -1993,49 +1993,76 @@ const getDisabledFollowStatusNRole = () => {
                 >{{ textAlertErrorAnalysitItem }}</span>
 
                 <div v-if="item.lorryInput">
-                  <VTextField
-                    v-model="item.itemAnalyticals[0].acture"
-                    density="compact"
-                    placeholder="Actual In Lorry"
-                    class="py-2"
-                    type="number"
-                    :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                  >
-                    <!-- Prepend -->
-                    <template #prepend>
+                  <VRow>
+                    <VCol
+                      cols="5"
+                      class="d-flex justify-space-between align-center py-1"
+                    >
                       <span
                         class="text-red"
                         style="font-size: 12px;"
-                      >Actual In Lorry =</span>
-                    </template>
-                    <template
-                      v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                      #label
-                    >
-                      <VIcon icon="ri-edit-line" />
-                    </template>
-                  </VTextField>
-                  <VTextField
-                    v-model="item.itemAnalyticals[0].afterMixing"
-                    density="compact"
-                    placeholder="After Mixing"
-                    type="number"
-                    :readonly="validateDisableInoutAferMixing('After Mixing')"
-                  >
-                    <!-- Prepend -->
-                    <template #prepend>
+                      >Actual In Lorry </span>
                       <span
                         class="text-red"
                         style="font-size: 12px;"
-                      >After Mixing =</span>
-                    </template>
-                    <template
-                      v-if="!validateDisableInoutAferMixing('After Mixing')"
-                      #label
+                      >=</span>
+                    </VCol>
+                    <VCol
+                      cols="7"
+                      class="py-0"
                     >
-                      <VIcon icon="ri-edit-line" />
-                    </template>
-                  </VTextField>
+                      <VTextField
+                        v-model="item.itemAnalyticals[0].acture"
+                        density="compact"
+                        placeholder="Actual In Lorry"
+                        class="py-2"
+                        type="number"
+                        :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                      >
+                        <template
+                          v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                          #label
+                        >
+                          <VIcon icon="ri-edit-line" />
+                        </template>
+                      </VTextField>
+                    </VCol>
+                  </VRow>
+
+                  <VRow>
+                    <VCol
+                      cols="5"
+                      class="d-flex justify-space-between align-center py-1"
+                    >
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >After Mixing </span>
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >=</span>
+                    </VCol>
+                    <VCol
+                      cols="7"
+                      class="py-2"
+                    >
+                      <VTextField
+                        v-model="item.itemAnalyticals[0].afterMixing"
+                        density="compact"
+                        placeholder="After Mixing"
+                        type="number"
+                        :readonly="validateDisableInoutAferMixing('After Mixing')"
+                      >
+                        <template
+                          v-if="!validateDisableInoutAferMixing('After Mixing')"
+                          #label
+                        >
+                          <VIcon icon="ri-edit-line" />
+                        </template>
+                      </VTextField>
+                    </VCol>
+                  </VRow>
                 </div>
               </td>
 
@@ -3288,7 +3315,6 @@ const getDisabledFollowStatusNRole = () => {
           style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"
         >
           <span style="font-size: 12px; font-weight: bolder;">Reject</span>
-        
         </VCol>
 
       
@@ -3446,6 +3472,7 @@ const getDisabledFollowStatusNRole = () => {
     >
       <div class="d-flex justify-end">
         <VBtn
+          v-if="canVisibleUserPermission(statusPermission,'BTN_INSP_APVL_ACCEPT\r\n').canVisible"
           class="mx-4"
           color="warning"
           style="font-size: 12px;"
