@@ -92,3 +92,12 @@
 .custom-date-time-picker >>> input icon--prepend {
   font-size: 12px; /* ปรับขนาดของไอคอนที่อยู่ด้านหน้า */
 }
+
+.text-truncate {
+  display: inline-block;
+  font-size: 12px;
+  max-inline-size: 130px;
+  max-inline-size: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
