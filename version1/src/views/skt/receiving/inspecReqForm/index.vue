@@ -445,6 +445,8 @@ const checkEmptyFields = () => {
         inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
         actualAnalysis: analyticalItem.actualAnalysis,
         okState: analyticalItem.okState,
+        acture: analyticalItem.acture,
+        afterMixing: analyticalItem.afterMixing,
       }
 
       const indexLabelFiled = `No.${itemIndex + 1} - Lot ${analyticalIndex + 1}`
@@ -454,7 +456,14 @@ const checkEmptyFields = () => {
 
       // ตรวจสอบว่าต้องเช็ค actualAnalysis หรือ okState ตามค่า needActualValue
       if(item.unit !== ''){
-        if (item.needActualValue) {
+        if (item.lorryInput) {
+        // เช็คเฉพาะ okState
+          if (!body.acture && !body.afterMixing) {
+            emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
+          } else {
+            emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false, needActualCheck })
+          }
+        } else if (item.needActualValue) {
         // เช็คเฉพาะ actualAnalysis
           if (!body.actualAnalysis) {
             emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
@@ -477,6 +486,62 @@ const checkEmptyFields = () => {
   return emptyFieldsList
 }
 
+const saveLotInspect = async () => {
+  emptyFields.value = checkEmptyFields()
+
+  // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
+  
+  const hasErrors = ref(null)
+  if(trickerSubmit.value === true){
+    hasErrors.value = emptyFields.value.some(field => field.isEmpty)
+  }
+  
+  // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
+  if (hasErrors.value) {
+    //console.log('Cannot proceed: There are errors in the fields.')
+
+    // แสดง dialog แจ้งเตือนถ้าจำเป็น
+    // isDialogSubmitFailedVisible.value = true
+    
+    throw "Cannot proceed: There are errors in the fields."
+  }
+
+  try {
+    for (const item of analysisItems.value) {
+      for (const analyticalItem of item.itemAnalyticals) {
+        // สร้าง body สำหรับแต่ละ analyticalItem
+        const body = {
+          updatedBy: '', // ข้อมูลที่ต้องการส่ง
+          inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+          actualAnalysis: analyticalItem.actualAnalysis,
+          okState: analyticalItem.okState,
+          "acture": analyticalItem.acture,
+          "afterMixing": analyticalItem.afterMixing,
+        }
+
+        // ส่ง body ไปยัง API ทีละตัว
+        const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails`, body, {
+          headers: {
+            'accept': '*/*',
+            'x-location': `${whereHouse.value}`,
+            Authorization: `Bearer ${accessTokenAtStore}`,
+          },
+        })
+
+        //console.log('[response]: ', response.data)
+      }
+    }
+
+    // แสดง dialog เมื่อสำเร็จ
+    // isDialogSubmitSuccessVisible.value = true
+    return true
+  } catch (error) {
+    // แสดง dialog เมื่อมีข้อผิดพลาด
+    // isDialogSubmitFailedVisible.value = true
+    console.error('Error:', error)
+  }
+}
+
 const {
   emptyFields,
   trickerSubmit,
@@ -484,9 +549,12 @@ const {
 } = useSaveLotInsp(analysisItems)
 
 const filteredFields = computed(() => {
+  console.log('All filteredFields start:', emptyFields.value)
   if (!showOnlyErrors.value) {
     return emptyFields.value.filter(field => field.isEmpty) // กรองเฉพาะค่า error
   }
+
+  console.log('All fields:', emptyFields.value)
   
   return emptyFields.value // แสดงทั้งหมด
 })
@@ -503,25 +571,27 @@ const generateActualAnalysis = analysisItems => {
   console.log('Result:', analysisItems.value)
 }
 
-const saveLotInspect = async () => {
-  try {
+// const saveLotInspect = async () => {
+//   try {
 
-    generateActualAnalysis(analysisItems)
+//     filteredFields
 
-    const result = await saveLotInspectUserCase(analysisItems.value)
+//     generateActualAnalysis(analysisItems)
 
-    if (result) {
-      // แสดง dialog สำเร็จ
-      console.log('Save successful', result)
-    }
-  } catch (error) {
-    // แสดง dialog ผิดพลาด
-    console.log('Save not successful', error)
-    console.error('Error:', error)
+//     const result = await saveLotInspectUserCase(analysisItems.value)
+
+//     if (result) {
+//       // แสดง dialog สำเร็จ
+//       console.log('Save successful', result)
+//     }
+//   } catch (error) {
+//     // แสดง dialog ผิดพลาด
+//     console.log('Save not successful', error)
+//     console.error('Error:', error)
     
-    return
-  }
-}
+//     return
+//   }
+// }
 
 // ------------------------ Save After Mixing  --------------------------------------------------
 
@@ -611,6 +681,8 @@ const submitInspForm = async () => {
         setTimeout(() => {
           window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
+
+        console.log('Submit successful:', submitVisibleResult)
 
         return true
       }else{
@@ -1722,6 +1794,7 @@ const inputRules = [
               <td
                 v-if="item.typeID === 1"
                 class="text-center"
+                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
                 colspan="1"
               >
                 <span>{{ item.sqnText }}</span>
@@ -1773,7 +1846,7 @@ const inputRules = [
                     <div
                       v-if="shouldShowInput(item, i-1)"
                       class="pa-2"
-                      style="min-width: 200px; max-width: 200px;"
+                      style="min-width: 220px; max-width: 200px;"
                     >
                       <!-- Radio Group -->
                       <VRadioGroup
@@ -1804,6 +1877,185 @@ const inputRules = [
                           </VCol>
                         </VRow>
                       </VRadioGroup>
+                      <!-- Input AfterMixxin -->
+                      <div v-if="item.lorryInput">
+                        <VRow>
+                          <VCol
+                            cols="5"
+                            class="d-flex justify-space-between align-center py-1"
+                          >
+                            <span
+                              class="text-red"
+                              style="font-size: 12px;"
+                            >Actual In Lorry </span>
+                            <span
+                              class="text-red"
+                              style="font-size: 12px;"
+                            >=</span>
+                          </VCol>
+                          <VCol
+                            cols="7"
+                            class="py-0"
+                          >
+                            <VTextField
+                              v-model="item.itemAnalyticals[i-1].acture"
+                              density="compact"
+                              placeholder="Actual In Lorry"
+                              class="py-2"
+                              type="number"
+                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                            >
+                              <template
+                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                                #label
+                              >
+                                <VIcon icon="ri-edit-line" />
+                              </template>
+                            </VTextField>
+                          </VCol>
+                        </VRow>
+
+                        <VRow>
+                          <VCol
+                            cols="5"
+                            class="d-flex justify-space-between align-center py-1"
+                          >
+                            <span
+                              class="text-red"
+                              style="font-size: 12px;"
+                            >After Mixing </span>
+                            <span
+                              class="text-red"
+                              style="font-size: 12px;"
+                            >=</span>
+                          </VCol>
+                          <VCol
+                            cols="7"
+                            class="py-2"
+                          >
+                            <VTextField
+                              v-model="item.itemAnalyticals[i-1].afterMixing"
+                              density="compact"
+                              placeholder="After Mixing"
+                              type="number"
+                              :readonly="validateDisableInoutAferMixing('After Mixing')"
+                            >
+                              <template
+                                v-if="!validateDisableInoutAferMixing('After Mixing')"
+                                #label
+                              >
+                                <VIcon icon="ri-edit-line" />
+                              </template>
+                            </VTextField>
+                          </VCol>
+                        </VRow>
+                      </div>
+
+                      <!-- Error Messages -->
+                      <span
+                        v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
+                        class="text-red"
+                      >
+                        {{ textAlertErrorOkState }}
+                      </span>
+                      <span
+                        v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
+                        class="text-red"
+                      >
+                        {{ textAlertErrorAnalysitItem }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+              </template>
+
+              <template v-else-if="item.typeID === 1 && item.needActualValue && item.lorryInput">
+                <td
+                  v-for="i in item.itemAnalyticals.length"
+                  :key="i"
+                  :colspan="getColspanCount(item)"
+                  class="text-center"
+                >
+                  <div class="d-flex flex-wrap">
+                    <div
+                      v-if="shouldShowInput(item, i-1)"
+                      class="pa-2"
+                      style="min-width: 220px; max-width: 200px;"
+                    >
+                      <!-- Input AfterMixxin -->
+                      <div v-if="item.lorryInput">
+                        <VRow>
+                          <VCol
+                            cols="5"
+                            class="d-flex justify-space-between align-center py-1 px-1"
+                          >
+                            <span
+                              class="text-red"
+                              style="font-size: 12px;"
+                            >Actual In Lorry </span>
+                            <span
+                              class="text-red"
+                              style="font-size: 12px;"
+                            >=</span>
+                          </VCol>
+                          <VCol
+                            cols="7"
+                            class="py-1 px-1"
+                          >
+                            <VTextField
+                              v-model="item.itemAnalyticals[i-1].acture"
+                              density="compact"
+                              placeholder="Actual In Lorry"
+                              class="py-2"
+                              type="number"
+                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                            >
+                              <template
+                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                                #label
+                              >
+                                <VIcon icon="ri-edit-line" />
+                              </template>
+                            </VTextField>
+                          </VCol>
+                        </VRow>
+
+                        <VRow>
+                          <VCol
+                            cols="5"
+                            class="d-flex justify-space-between align-center py-1 px-1"
+                          >
+                            <span
+                              class="text-red"
+                              style="font-size: 12px;"
+                            >After Mixing </span>
+                            <span
+                              class="text-red"
+                              style="font-size: 12px;"
+                            >=</span>
+                          </VCol>
+                          <VCol
+                            cols="7"
+                            class="py-1 px-1"
+                          >
+                            <VTextField
+                              v-model="item.itemAnalyticals[i-1].afterMixing"
+                              density="compact"
+                              placeholder="After Mixing"
+                              type="number"
+                              :readonly="validateDisableInoutAferMixing('After Mixing')"
+                            >
+                              <template
+                                v-if="!validateDisableInoutAferMixing('After Mixing')"
+                                #label
+                              >
+                                <VIcon icon="ri-edit-line" />
+                              </template>
+                            </VTextField>
+                          </VCol>
+                        </VRow>
+                      </div>
+
                       <!-- Error Messages -->
                       <span
                         v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
@@ -1822,7 +2074,7 @@ const inputRules = [
                 </td>
               </template>
               <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
-              <template v-if="item.typeID === 1 && item.needActualValue">
+              <template v-if="item.typeID === 1 && item.needActualValue && !item.lorryInput">
                 <td
                   v-for="i in 1"
                   :key="i"
