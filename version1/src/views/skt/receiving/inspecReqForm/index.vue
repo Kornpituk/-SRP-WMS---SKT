@@ -486,6 +486,18 @@ const checkEmptyFields = () => {
   return emptyFieldsList
 }
 
+const generateActualAnalysis = analysisItems => {
+  for (const item of analysisItems) {
+    const firstValue = item.itemAnalyticals?.[0]?.actualAnalysis ?? ''
+
+    for (const analyticalItem of item.itemAnalyticals || []) {
+      analyticalItem.actualAnalysis = firstValue
+    }
+  }
+
+  // console.log('Result:', analysisItems.value)
+}
+
 const saveLotInspect = async () => {
   emptyFields.value = checkEmptyFields()
 
@@ -505,6 +517,8 @@ const saveLotInspect = async () => {
     
     throw "Cannot proceed: There are errors in the fields."
   }
+
+  generateActualAnalysis(analysisItems.value)
 
   try {
     for (const item of analysisItems.value) {
@@ -559,17 +573,7 @@ const filteredFields = computed(() => {
   return emptyFields.value // แสดงทั้งหมด
 })
 
-const generateActualAnalysis = analysisItems => {
-  for (const item of analysisItems.value) {
-    const firstValue = item.itemAnalyticals?.[0]?.actualAnalysis ?? ''
 
-    for (const analyticalItem of item.itemAnalyticals || []) {
-      analyticalItem.actualAnalysis = firstValue
-    }
-  }
-
-  console.log('Result:', analysisItems.value)
-}
 
 // const saveLotInspect = async () => {
 //   try {
