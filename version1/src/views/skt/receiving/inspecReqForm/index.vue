@@ -2005,7 +2005,6 @@ const inputRules = [
                             <VTextField
                               v-model="item.itemAnalyticals[i-1].acture"
                               density="compact"
-                              placeholder="Actual In Lorry"
                               class="py-2"
                               type="number"
                               :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
@@ -2041,7 +2040,6 @@ const inputRules = [
                             <VTextField
                               v-model="item.itemAnalyticals[i-1].afterMixing"
                               density="compact"
-                              placeholder="After Mixing"
                               type="number"
                               :readonly="validateDisableInoutAferMixing('After Mixing')"
                             >
