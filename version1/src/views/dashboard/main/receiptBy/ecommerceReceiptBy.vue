@@ -535,8 +535,12 @@ watchEffect(() => {
   
 })
 
-const selectTypeDatepicker = value => {
+const titleTyleSelectDatepicker = ref('')
+
+const selectTypeDatepicker = (value, title) => {
   typeSelectDatepicker.value = value
+  titleTyleSelectDatepicker.value = title
+
 }
 
 const formatForShowDatepicker = date => {
@@ -650,19 +654,25 @@ watchEffect(() => {
   }
 })
 
+
+
 const formatDateMaster = date => {
   if (!date) return ''
   
-  return date.toLocaleString('en-GB', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+  // return date.toLocaleString('en-GB', {
+  //   year: 'numeric',
+  //   month: '2-digit',
+  //   day: '2-digit',
 
-    // hour: '2-digit',
-    // minute: '2-digit',
-    // second: '2-digit',
-    // hour12: false,
-  })
+  //   // hour: '2-digit',
+  //   // minute: '2-digit',
+  //   // second: '2-digit',
+  //   // hour12: false,
+  // })
+
+
+
+  return formatDateYMD(date).replace(/\//g, '-') // แปลงเป็นรูปแบบ YYYY-MM-D
 }
 
 const formatDateYMD = date => {
@@ -717,8 +727,8 @@ watchEffect(() => {
   // console.log('datePickerMaster value format Date', formatDateMaster(startDate.value), formatDateMaster(endDate.value), formatDateYMD(startDate.value),  formatDateYMD(endDate.value))
   // console.log('datePicker Query***', startDateQuery.value, endDateQuery.value)
   if(startDateQuery.value && endDateQuery.value){
-    datePropMasterStart.value = startDateQuery.value
-    datePropMasterEnd.value = endDateQuery.value
+    datePropMasterStart.value = formatDateMaster(startDateQuery.value)
+    datePropMasterEnd.value = formatDateMaster(endDateQuery.value)
   }else if(showDatepickerCustom.value){
     datePropMasterStart.value = formatDateMaster(startDate.value)
     datePropMasterEnd.value = formatDateMaster(endDate.value)
@@ -910,8 +920,22 @@ watchEffect(() => {
                 <div>
                   <VMenu>
                     <template #activator="{ props }">
+                      <VIcon
+                        v-if="!titleTyleSelectDatepicker"
+                        size="30"
+                        icon="ri-error-warning-fill"
+                        color="red"
+                      />
+                      <VIcon
+                        v-if="titleTyleSelectDatepicker"
+                        size="30"
+                        icon="ri-checkbox-circle-fill"
+                        color="green"
+                      />
                       <VBtn v-bind="props">
-                        {{ $t('Select Type Date') }}
+                        <!-- {{ $t('Select Type Date') }}  -->
+
+                        Select Type [ {{ titleTyleSelectDatepicker }}  ]
                       </VBtn>
                     </template>
 
@@ -919,7 +943,7 @@ watchEffect(() => {
                       <VListItem
                         v-for="item in itemsMenuTypeDate"
                         :key="item.value"
-                        @click="selectTypeDatepicker(item.value)"
+                        @click="selectTypeDatepicker(item.value, item.title)"
                       >
                         {{ item.title }}
                       </VListItem>
