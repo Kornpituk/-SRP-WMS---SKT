@@ -3126,25 +3126,25 @@ const switcherDrS = ref(false)
               {{ product.uomScale }}
             </td>
             <td
-              class="text-start px-1 bg-green-lighten-4"
+              class="text-start px-1"
               style="width: 5rem;"
             >
               {{ product.warehouse }}
             </td>
             <td
-              class="text-start px-1 bg-green-lighten-4"
+              class="text-start px-1"
               style="width: 5rem;"
             >
               {{ product.zoneName }}
             </td>
             <td
-              class="text-start px-1 bg-green-lighten-4"
+              class="text-start px-1"
               style="width: 5rem;"
             >
               {{ product.areaName }}
             </td>
             <td
-              class="text-start px-1 bg-green-lighten-4"
+              class="text-start px-1"
               style="width: 5rem;"
             >
               {{ product.subAreaName }}
