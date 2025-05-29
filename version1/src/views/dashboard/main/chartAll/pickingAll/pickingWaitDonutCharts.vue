@@ -37,6 +37,7 @@ watchEffect(() => {
     series.value = [
       props.dataset.tranferOut || 0,
       props.dataset.pickingDelivery || 0,
+      props.dataset.pickingWriteOff || 0,
     ]
     checkSeries.value = true
   }
@@ -61,7 +62,7 @@ watchEffect(() => {
         <VueApexCharts
           type="donut"
           height="250"
-          :options="expenseRationChexpenseRationChartConfigNoDataartConfigNoData"
+          :options="expenseRationChartConfigNoData"
           :series="seriesNoData"
         />
       </div>

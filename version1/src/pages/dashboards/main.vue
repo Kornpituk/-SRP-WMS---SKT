@@ -685,7 +685,6 @@ onMounted(() => {
               </VCardTitle>
               <VCardText>
                 <ReceiptSuccess :dataset="dateSetReceivedSuccess" />
-                {{ dateSetReceivedSuccess }}
               </VCardText>
             </VCard>
           </VCol>
@@ -706,7 +705,6 @@ onMounted(() => {
               </VCardTitle>
               <VCardText>
                 <ReceiptWaiting :dataset="dateSetReceivedPending" />
-                {{ dateSetReceivedPending }}
               </VCardText>
             </VCard>
           </VCol>
@@ -727,7 +725,6 @@ onMounted(() => {
               </VCardTitle>
               <VCardText>
                 <PickingSuccess :dataset="dateSetPickingSuccess" />
-                {{ dateSetPickingSuccess }}
               </VCardText>
             </VCard>
           </VCol>
@@ -748,7 +745,6 @@ onMounted(() => {
               </VCardTitle>
               <VCardText>
                 <PickingWaiting :dataset="dateSetPickingPending" />
-                {{ dateSetPickingPending }}
               </VCardText>
             </VCard>
           </VCol>

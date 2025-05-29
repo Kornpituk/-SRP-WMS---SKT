@@ -29,5 +29,5 @@ const urlEnv = ref(process.env.VITE_API_URL)
 
 // const urlEnv = ref(urlSktTrue)
 
-export const urlApi = urlApiWebOriginal
+export const urlApi = urlAsaki
 

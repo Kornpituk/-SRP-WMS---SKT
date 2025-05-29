@@ -114,8 +114,9 @@ const formatNameCompany = title => {
 const router = useRouter()
 
 const pushBtnTable = () => {
-  // router.push('/dashboards/main')
-  router.push('/skt/receiving')
+  router.push('/dashboards/main')
+
+  // router.push('/skt/receiving')
 }
 
 const logoCompany = ref('')
