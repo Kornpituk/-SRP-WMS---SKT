@@ -588,7 +588,10 @@ onMounted(() => {
                       cols="12"
                     >
                       <div class="d-flex justify-center align-center py-0">
-                        <span class="d-flex justify-center align-center" style="font-size: 18px; font-weight: bolder;">{{ formattedDateTime }}</span>
+                        <span
+                          class="d-flex justify-center align-center"
+                          style="font-size: 18px; font-weight: bolder;"
+                        >{{ formattedDateTime }}</span>
                       </div>
                     </VCol>
                     <VCol
@@ -596,7 +599,10 @@ onMounted(() => {
                       cols="12"
                     >
                       <div class="d-flex justify-center align-center py-0">
-                        <span class="d-flex justify-center align-center" style="font-size: 18px; font-weight: bolder;">{{ time }}</span>
+                        <span
+                          class="d-flex justify-center align-center"
+                          style="font-size: 18px; font-weight: bolder;"
+                        >{{ time }}</span>
                       </div>
                     </VCol>
                   </VRow>
@@ -679,6 +685,7 @@ onMounted(() => {
               </VCardTitle>
               <VCardText>
                 <ReceiptSuccess :dataset="dateSetReceivedSuccess" />
+                {{ dateSetReceivedSuccess  }}
               </VCardText>
             </VCard>
           </VCol>
@@ -699,6 +706,7 @@ onMounted(() => {
               </VCardTitle>
               <VCardText>
                 <ReceiptWaiting :dataset="dateSetReceivedPending" />
+                {{ dateSetReceivedPending  }}
               </VCardText>
             </VCard>
           </VCol>
@@ -719,6 +727,7 @@ onMounted(() => {
               </VCardTitle>
               <VCardText>
                 <PickingSuccess :dataset="dateSetPickingSuccess" />
+                {{ dateSetPickingSuccess  }}
               </VCardText>
             </VCard>
           </VCol>
@@ -739,6 +748,7 @@ onMounted(() => {
               </VCardTitle>
               <VCardText>
                 <PickingWaiting :dataset="dateSetPickingPending" />
+                {{ dateSetPickingPending }}
               </VCardText>
             </VCard>
           </VCol>
@@ -898,52 +908,70 @@ onMounted(() => {
       <div v-if="!logicLuxOn && !operationOn">
         <VRow>
           <VCol cols="6">
-            <VWindow
+            <!--
+              <VWindow
               v-model="onboardingMove"
               show-arrows="hover"
-            >
-              <VWindowItem
-                v-for="n in lengthMove"
-                :key="`card-${n}`"
               >
-                <VCardText
-                  v-if="onboardingMove === 0"
-                  class="pa-1"
-                >
-                  <ChartJsBarChartMove v-if="onboardingMove === 0" />
-                </VCardText>
-                <VCardText
-                  v-else
-                  class="pa-1"
-                >
-                  <TopProductMove v-if="onboardingMove === 1" />
-                </VCardText>
+              <VWindowItem
+              v-for="n in lengthMove"
+              :key="`card-${n}`"
+              >
+              <VCardText
+              v-if="onboardingMove === 0"
+              class="pa-1"
+              >
+              <ChartJsBarChartMove v-if="onboardingMove === 0" />
+              </VCardText>
+              <VCardText
+              v-else
+              class="pa-1"
+              >
+              <TopProductMove v-if="onboardingMove === 1" />
+              </VCardText>
               </VWindowItem>
-            </VWindow>
+              </VWindow> 
+            -->
+
+            <VCardText
+              v-if="onboardingMove === 0"
+              class="pa-1"
+            >
+              <ChartJsBarChartMove v-if="onboardingMove === 0" />
+            </VCardText>
           </VCol>
           <VCol cols="6">
-            <VWindow
+            <!--
+              <VWindow
               v-model="onboardingNonMove"
               show-arrows="hover"
-            >
-              <VWindowItem
-                v-for="n in lengthNonMove"
-                :key="`card-${n}`"
               >
-                <VCardText
-                  v-if="onboardingNonMove === 0"
-                  class="pa-1"
-                >
-                  <ChartJsBarChartNonMove v-if="onboardingNonMove === 0" />
-                </VCardText>
-                <VCardText
-                  v-else
-                  class="pa-1"
-                >
-                  <TopProductNonMove v-if="onboardingNonMove === 1" />
-                </VCardText>
+              <VWindowItem
+              v-for="n in lengthNonMove"
+              :key="`card-${n}`"
+              >
+              <VCardText
+              v-if="onboardingNonMove === 0"
+              class="pa-1"
+              >
+              <ChartJsBarChartNonMove v-if="onboardingNonMove === 0" />
+              </VCardText>
+              <VCardText
+              v-else
+              class="pa-1"
+              >
+              <TopProductNonMove v-if="onboardingNonMove === 1" />
+              </VCardText>
               </VWindowItem>
-            </VWindow>
+              </VWindow> 
+            -->
+
+            <VCardText
+              v-if="onboardingNonMove === 0"
+              class="pa-1"
+            >
+              <ChartJsBarChartNonMove v-if="onboardingNonMove === 0" />
+            </VCardText>
           </VCol>
         </VRow>
       </div>

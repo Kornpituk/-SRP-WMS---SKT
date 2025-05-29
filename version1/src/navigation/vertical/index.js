@@ -16,6 +16,6 @@ import minMax from './minMax'
 import performance from './performance'
 import skt from './skt'
 
-// export default [...dashboard, ...inventory, ...configuration, ...countStock  ]
+export default [...dashboard, ...inventory, ...configuration, ...countStock  ]
 
-export default [ ...skt]
+// export default [ ...skt]

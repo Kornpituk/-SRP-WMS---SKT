@@ -7,6 +7,7 @@ import { ref, watchEffect } from 'vue'
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
+import { tryOnUnmounted } from '@vueuse/core'
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
@@ -213,7 +214,7 @@ const generateRandomString = (prefix, length = 6) => {
 const GetStockUpdate = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate/byLot?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
     params: {
       categoryId: searchByCategoryId.value,
       typeId: searchByTypeId.value,
@@ -277,15 +278,15 @@ const GetStockUpdate = () => {
         HeightMock: getRandomNumberInRange(5, 50), // Random height between 5 and 50 cm
       }))
 
-      products.value = productsWithMockData
+      // products.value = productsWithMockData
 
-      // products.value = response.data.items
+      products.value = response.data.items
       totalCount.value = response.data.totalCount
       currentPage.value = response.data.page
       totalPage.value = response.data.totalPages
       rowPerPage.value = response.data.perPage
 
-      console.log('[products.value Mock]!!: ', products)
+      console.log('[products.value Mock]!!: ', products.value)
       console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
     })
     .catch(error => {
@@ -1582,740 +1583,9 @@ const switcherDrS = ref(false)
   </section>
 
   <!-- ----------             Product  Easetrack                                  ------------------------------------ -->
-  <section v-if="false">
+  <section v-if="true">
     <VCard class="mt-6">
       <VDivider />
-
-      <VTable
-        v-if="false"
-        class="text-no-wrap table-header-bg rounded-0"
-      >
-        <!-- 👉 table head -->
-        <thead>
-          <tr>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              {{ $t('No.') }}
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              {{ $t('Image') }}
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Categories') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuCategory"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByCategoryName"
-                            class="mt-4"
-                            :label="$t('Product Categories')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuCategory = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Secondary product categories') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuGroup"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByTypeName"
-                            class="mt-4"
-                            :label="$t('Secondary product categories')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuGroup = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Sub product categories') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuSubGroup"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchBySubTypeName"
-                            class="mt-4"
-                            :label="$t('Sub product categories')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuSubGroup = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Barcode') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuBarcode"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByBarcodeName"
-                            class="mt-4"
-                            :label="$t('Barcode')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuBarcode = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Product Code') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuProductCode"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByProductCodeName"
-                            class="mt-4"
-                            :label="$t('Product Code')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductCode = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Product Name') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuProductName"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByProductNameFilter"
-                            class="mt-4"
-                            :label="$t('Product Name')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              v-if="false"
-              scope="row"
-              class="text-start"
-            >
-              {{ $t('Serial') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByTags')"
-              />
-            </th>
-            <th
-              v-if="checkRFID"
-              scope="row"
-              class="text-end px-1"
-            >
-              Tag
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByTags')"
-              />
-            </th>
-            <th
-              v-if="checkRFID"
-              scope="row"
-              class="text-end px-1"
-            >
-              Non-Tag
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByNonTags')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-end px-1"
-            >
-              {{ $t('QTY') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Counting Unit') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('Counting Unit')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-center px-1"
-            >
-              Action
-            </th>
-          </tr>
-        </thead>
-        
-        <!-- 👉 table body -->
-        <tbody>
-          <tr
-            v-for="(product, index) in products"
-            :key="index"
-          >
-            <!-- 👉 Ordinal Number -->
-            <td class="text-center px-1">
-              {{ (currentPage - 1) * rowPerPage + index + 1 }}
-            </td>
-
-            <!-- 👉 Image -->
-            <td class="text-center px-1">
-              <div v-if="false">
-                <VBtn
-                  width="70px"
-                  height="70px"
-                  variant="text"
-                >
-                  <VImg
-                    v-if="product.image"
-                    :width="70"
-                    :height="70"
-                    aspect-ratio="16/9"
-                    cover
-                    :src="product.image"
-                    @click="showDialogImage(
-                      product.productId,
-                      product.productName,
-                      product.image,
-                      product.barcode,
-                      product.categoryName,
-                      product.typeName,
-                      product.subTypeName,
-                      product.qty,
-                      product.unitName,
-                      product.details,
-                      
-                    )"
-                  />
-                </VBtn>
-              </div>
-              <div v-if="true">
-                <VHover v-slot="{ isHovering, props }">
-                  <VBtn
-                    class="mx-auto"
-                    color="grey-lighten-4"
-                    max-width="70px"
-                    height="70px"
-                    v-bind="props"
-                    variant="text"
-                  >
-                    <VImg
-                      :src="product.image"
-                      :width="70"
-                      :height="70"
-                      cover
-                      class="image-transition"
-                      @click="showDialogImage(
-                        product.productId,
-                        product.productName,
-                        product.image,
-                        product.barcode,
-                        product.categoryName,
-                        product.typeName,
-                        product.subTypeName,
-                        product.qty,
-                        product.unitName,
-                        product.details,
-                      )"
-                    >
-                      <VExpandTransition>
-                        <div
-                          v-if="isHovering"
-                          style="height: 100%;"
-                        >
-                          <VAvatar
-                            size="20"
-                            color="primary"
-                            class="d-flex"
-                          >
-                            <VIcon icon="mdi-magnify-plus-outline" />
-                          </VAvatar>
-                        </div>
-                      </VExpandTransition>
-                    </VImg>
-                  </VBtn>
-                </VHover>
-              </div>
-            </td>
-
-            <!-- 👉 Product categories -->
-            <td class="text-start px-1">
-              {{ product.categoryName }}
-            </td>
-
-            <!-- 👉 Secondary product categories -->
-            <td class="text-start px-1">
-              {{ product.typeName }}
-            </td>
-
-            <!-- 👉 Sub product categories -->
-            <td class="text-start px-1">
-              {{ product.subTypeName }}
-            </td>
-
-            <!-- 👉 Barcode -->
-            <td class="text-start px-1">
-              {{ product.barcode }}
-            </td>
-
-            <!-- 👉 Product code -->
-            <td class="text-start px-1">
-              {{ product.productId }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td class="text-start px-1">
-              {{ (product.productName) }}
-            </td>
-
-            <!-- 👉 Tag -->
-            <td
-              v-if="false"
-              class="text-start"
-            >
-              {{ (product.serial) }}
-            </td>
-
-            <!-- 👉 Number(Tag) -->
-            <td
-              v-if="checkRFID"
-              class="text-end px-6"
-            >
-              {{ (formatDecimal(product.tags)).toLocaleString('en-US') }}
-            </td>
-
-            <!-- 👉 Number(Non-Tag) -->
-            <td
-              v-if="checkRFID"
-              class="text-end  px-6"
-            >
-              {{ (formatDecimal(product.nonTags)).toLocaleString('en-US') }}
-            </td>
-            <!-- 👉 Total quantity of products -->
-            <td class="text-end px-6">
-              {{ (formatDecimal(product.qty)).toLocaleString('en-US') }}
-            </td>
-
-            <!-- 👉 Counting unit -->
-            <td
-              class="text-start "
-              style="width: 5rem;"
-            >
-              {{ product.unitName }}
-            </td>
-
-            <!-- 👉 Actions -->
-            <td
-              style="width: 8rem;"
-              class="text-center px-1"
-            >
-              <RouterLink
-                :to="{ 
-                  name: 'inventory-stockUpdateByProduct-view-id', 
-                  params: { id: index }, 
-                  query: { productId: product.productId ,
-                           UnitId: product.unitId,
-                           warehouseStock: searchByWareHouseId ,
-                           serialCode: serialProductCode,
-                  }, 
-                }"
-              >
-                <VIcon icon="mdi-eye-outline" />
-              </RouterLink>
-              
-              <!-- MoreBtn component with menu list and item props -->
-              <!--   <MoreBtn :menu-list="computedMoreListP(item.No)" item-props /> -->
-            </td>
-          </tr>
-        </tbody>
-      </VTable>
 
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
@@ -2337,6 +1607,140 @@ const switcherDrS = ref(false)
               scope="row"
               class="text-start px-1"
             >
+              {{ $t('Product Code') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuProductCode"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByProductCodeName"
+                            class="mt-4"
+                            :label="$t('Product Code')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="resetSearchKey"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuProductCode = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Product Name') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuProductName"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByProductNameFilter"
+                            class="mt-4"
+                            :label="$t('Product Name')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="resetSearchKey"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuProductName = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
               {{ $t('Categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
@@ -2534,140 +1938,7 @@ const switcherDrS = ref(false)
                 </VCard>
               </VMenu>
             </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Product Code') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuProductCode"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByProductCodeName"
-                            class="mt-4"
-                            :label="$t('Product Code')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductCode = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Product Name') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuProductName"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByProductNameFilter"
-                            class="mt-4"
-                            :label="$t('Product Name')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="resetSearchKey"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuProductName = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
+           
             <th
               scope="row"
               class="text-start px-1"
@@ -2915,6 +2186,414 @@ const switcherDrS = ref(false)
               </VMenu>
             </th>
             
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Color') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuColor"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByColor"
+                            class="mt-4"
+                            :label="$t('Color')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchByColor = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuColor = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Size') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuSize"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchBySize"
+                            class="mt-4"
+                            :label="$t('Size')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchBySize = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuSize = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Style No.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuStyle"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByStyle"
+                            class="mt-4"
+                            :label="$t('Style No.')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchByStyle = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuStyle = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Model') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuVersion"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByVersion"
+                            class="mt-4"
+                            :label="$t('Version')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchByVersion = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuVersion = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Brand') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuBrand"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByBrand"
+                            class="mt-4"
+                            :label="$t('Product Brand')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchByBrand = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuBrand = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Weight') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VIcon
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="toggleSortType('sortByQty')"
+              />
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('UoM Weight') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VIcon
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="toggleSortType('sortByQty')"
+              />
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('width') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VIcon
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="toggleSortType('sortByQty')"
+              />
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('length') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VIcon
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="toggleSortType('sortByQty')"
+              />
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('height') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VIcon
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="toggleSortType('sortByQty')"
+              />
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('UoM Scale') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VIcon
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="toggleSortType('sortByQty')"
+              />
+            </th>
             <th
               scope="row"
               class="text-start px-1"
@@ -3184,7 +2863,7 @@ const switcherDrS = ref(false)
               </VMenu>
             </th>
             <th
-              v-if="switcherDrS"
+              v-if="false"
               scope="row"
               class="text-start"
             >
@@ -3197,537 +2876,6 @@ const switcherDrS = ref(false)
               />
             </th>
             <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Color') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuColor"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByColor"
-                            class="mt-4"
-                            :label="$t('Color')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchByColor = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuColor = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Size') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuSize"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchBySize"
-                            class="mt-4"
-                            :label="$t('Size')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchBySize = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuSize = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Style No.') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuStyle"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByStyle"
-                            class="mt-4"
-                            :label="$t('Style No.')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchByStyle = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuStyle = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Version') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuVersion"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByVersion"
-                            class="mt-4"
-                            :label="$t('Version')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchByVersion = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuVersion = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              v-if="switcherDrS"
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Serial No.') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuSerial"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchBySerial"
-                            class="mt-4"
-                            :label="$t('Serial No.')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchBySerial = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuSerial = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Brand') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuBrand"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByBrand"
-                            class="mt-4"
-                            :label="$t('Product Brand')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchByBrand = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuBrand = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Weight') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1 bg-green-lighten-4"
-            >
-              {{ $t('width') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1 bg-green-lighten-4"
-            >
-              {{ $t('length') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1 bg-green-lighten-4"
-            >
-              {{ $t('height') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1 bg-green-lighten-4"
-            >
-              {{ $t('UoMScale') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByQty')"
-              />
-            </th>
-            <th
-              v-if="switcherDrS"
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Remark') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuRemark"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByRemark"
-                            class="mt-4"
-                            :label="$t('Remark')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchByRemark = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuRemark = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
               v-if="false"
               scope="row"
               class="text-center px-1"
@@ -3736,6 +2884,7 @@ const switcherDrS = ref(false)
             </th>
           </tr>
         </thead>
+        
         
         <!-- 👉 table body -->
         <tbody>
@@ -3863,7 +3012,7 @@ const switcherDrS = ref(false)
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.Lot }}
+              {{ product.lotMaster }}
             </td>
             
 
@@ -3907,99 +3056,98 @@ const switcherDrS = ref(false)
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.Warehouse }}
+              {{ product.color }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.Zone }}
+              {{ product.size }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.Area }}
+              {{ product.styleNo }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.SubArea }}
+              {{ product.Model }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.Color }}
+              {{ product.color }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.SizeMock }}
+              {{ product.productBrand }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.StyleNoMock }}
+              {{ product.weight }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.VersionMock }}
+              {{ product.uomWeight }}
+            </td>
+            <td
+              class="text-start px-1"
+              style="width: 5rem;"
+            >
+              {{ product.width }}
             </td>
             <td
               v-if="switcherDrS"
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.SerialNo }}
+              {{ product.length }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.BrandMock }}
+              {{ product.height }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.WeightMock }}
+              {{ product.uomScale }}
             </td>
             <td
               class="text-start px-1 bg-green-lighten-4"
               style="width: 5rem;"
             >
-              {{ product.WidthMock }}
+              {{ product.warehouse }}
             </td>
             <td
               class="text-start px-1 bg-green-lighten-4"
               style="width: 5rem;"
             >
-              {{ product.LengthMock }}
+              {{ product.zoneName }}
             </td>
             <td
               class="text-start px-1 bg-green-lighten-4"
               style="width: 5rem;"
             >
-              {{ product.HeightMock }}
+              {{ product.areaName }}
             </td>
             <td
               class="text-start px-1 bg-green-lighten-4"
               style="width: 5rem;"
             >
-              {{ product.unitName }}
-            </td>
-            <td
-              v-if="switcherDrS"
-              class="text-start px-1"
-              style="width: 5rem;"
-            >
-              {{ product.Remark }}
+              {{ product.subAreaName }}
             </td>
 
             <!-- 👉 Actions -->
@@ -4064,7 +3212,7 @@ const switcherDrS = ref(false)
     </VCard>
   </section>
 
-  <section>
+  <section v-if="false">
     <VCard class="mt-6">
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
