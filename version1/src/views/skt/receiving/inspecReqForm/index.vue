@@ -2161,14 +2161,13 @@ const inputRules = [
                   </div>
                 </td>
 
-                <!--
-                  <td
+                
+                <td
                   v-for="i in 5 - item.itemAnalyticals.length"
                   :key="i"
-                  :colspan="getColspanCount(item)"
+                  :colspan="1"
                   class="text-center"
-                  /> 
-                -->
+                />
               </template>
             </tr>
 
