@@ -121,6 +121,14 @@ const pushBtnTable = () => {
 const logoCompany = ref('')
 const nameCompany = ref('')
 
+const computedFontSize = computed(() => {
+  if (!nameCompany.value) return 16
+  if (nameCompany.value.length > 30) return 12
+  if (nameCompany.value.length > 20) return 14
+  
+  return 16
+})
+
 watchEffect(() => {
   logoCompany.value = localStorage.getItem('companyLogo')
   nameCompany.value = localStorage.getItem('companyName')
@@ -159,22 +167,20 @@ watchEffect(() => {
             <VImg
               v-if="true"
               :src="logoCompanyApi"
-              style="width: 30px;"
+              class="company-logo"
             />
           </VCol>
           <VCol
             cols="12"
-            class="d-flex align-center justify-center gap-x-2 app-title-wrapper pt-0"
+            class="d-flex align-center justify-center gap-x-2 pt-0 "
           >
             <Transition name="vertical-nav-app-title">
               <h1
                 v-show="!hideTitleAndIcon"
-                class="leading-normal text-xl font-weight-bold text-capitalize"
+                class="company-name-auto"
+                :style="{ fontSize: computedFontSize + 'px' }"
               >
-                <span
-                  class="d-flex align-center justify-center text-center"
-                  style="font-size: 16px;"
-                >{{ nameCompany }}</span>
+                {{ nameCompany }}
               </h1>
             </Transition>
           </VCol>
@@ -254,6 +260,23 @@ watchEffect(() => {
     line-height: 1.75rem;
     text-transform: capitalize;
   }
+}
+
+// ใน style scoped
+.company-logo {
+  margin: auto;
+  max-block-size: 60px;
+  max-inline-size: 120px;
+  object-fit: contain;
+}
+
+.company-name {
+  display: block;
+  overflow: hidden;
+  font-size: clamp(12px, 2.5vw, 18px);
+  max-inline-size: 200px;
+  text-align: center;
+  white-space: nowrap;
 }
 </style>
 
