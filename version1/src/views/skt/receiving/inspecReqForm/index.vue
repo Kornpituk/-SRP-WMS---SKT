@@ -351,6 +351,10 @@ const getAnalysistInsp = async () => {
   }
 }
 
+const checkMakerLot = () => {
+
+}
+
 const loadingGenerated2 = ref(true)
 
 watch(
@@ -486,7 +490,7 @@ const checkEmptyFields = () => {
   return emptyFieldsList
 }
 
-const generateActualAnalysis = analysisItems => {
+const generateActualAnalysis = async analysisItems => {
   for (const item of analysisItems) {
     const firstValue = item.itemAnalyticals?.[0]?.actualAnalysis ?? ''
 
@@ -499,10 +503,13 @@ const generateActualAnalysis = analysisItems => {
 }
 
 const saveLotInspect = async () => {
+
+  await generateActualAnalysis(analysisItems.value)
+
   emptyFields.value = checkEmptyFields()
 
   // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
-  
+
   const hasErrors = ref(null)
   if(trickerSubmit.value === true){
     hasErrors.value = emptyFields.value.some(field => field.isEmpty)
@@ -518,7 +525,6 @@ const saveLotInspect = async () => {
     throw "Cannot proceed: There are errors in the fields."
   }
 
-  generateActualAnalysis(analysisItems.value)
 
   try {
     for (const item of analysisItems.value) {
@@ -1971,6 +1977,14 @@ const inputRules = [
                     </div>
                   </div>
                 </td>
+
+                
+                <td
+                  v-for="i in 5 - item.itemAnalyticals.length"
+                  :key="i"
+                  :colspan="getColspanCount(item)"
+                  class="text-center"
+                />
               </template>
 
               <template v-else-if="item.typeID === 1 && item.needActualValue && item.lorryInput">
@@ -2074,7 +2088,17 @@ const inputRules = [
                     </div>
                   </div>
                 </td>
+
+                
+                <td
+                  v-for="i in 5 - item.itemAnalyticals.length"
+                  :key="i"
+                  :colspan="getColspanCount(item)"
+                  class="text-center"
+                />
               </template>
+
+              
               <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
               <template v-if="item.typeID === 1 && item.needActualValue && !item.lorryInput">
                 <td
@@ -2136,6 +2160,15 @@ const inputRules = [
                     </span>
                   </div>
                 </td>
+
+                <!--
+                  <td
+                  v-for="i in 5 - item.itemAnalyticals.length"
+                  :key="i"
+                  :colspan="getColspanCount(item)"
+                  class="text-center"
+                  /> 
+                -->
               </template>
             </tr>
 
@@ -2335,6 +2368,13 @@ const inputRules = [
                     </div>
                   </div>
                 </td>
+                
+                <td
+                  v-for="i in 5 - item.itemAnalyticals.length"
+                  :key="i"
+                  :colspan="getColspanCount(item)"
+                  class="text-center"
+                />
               </template>
 
               <template v-else-if="item.typeID === 2 && item.needActualValue && item.lorryInput">
@@ -2440,6 +2480,12 @@ const inputRules = [
                     </div>
                   </div>
                 </td>
+                <td
+                  v-for="i in 5 - item.itemAnalyticals.length"
+                  :key="i"
+                  :colspan="getColspanCount(item)"
+                  class="text-center"
+                />
               </template>
               <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
               <template v-if="item.typeID === 2 && item.needActualValue && !item.lorryInput">
@@ -2502,6 +2548,14 @@ const inputRules = [
                     </span>
                   </div>
                 </td>
+                <!--
+                  <td
+                  v-for="i in 5 - item.itemAnalyticals.length"
+                  :key="i"
+                  :colspan="getColspanCount(item)"
+                  class="text-center"
+                  /> 
+                -->
               </template>
             </tr>
 
