@@ -10,6 +10,8 @@ const accessToken = localStorage.getItem('accessTokenAtStore')
 import { urlApi } from '@/api'
 import axios from '@axios'
 
+import { useDataMoveStore } from '@/pages/dashboards/data/move/data'
+
 const whereRoomNameSet = ref('')
 
 const itemsWarehouse = []
@@ -199,6 +201,8 @@ const clickDialogProductStore = () => {
 //------------------------------------------------------ Top Product -----------
 const isDialogTopProductVisible = ref(false)
 
+
+
 //- -------------------------------------- Data ----------------------------------------------------------
 const dataset1 = [
   {
@@ -213,6 +217,66 @@ const dataset2 = [
     item: 350,
   },
 ]
+
+const dataMoveStore = useDataMoveStore()
+
+const dataNonMoveStore = useDataMoveStore()
+
+watchEffect(() => {
+  const accessToken = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+  const day = 1 // หรือรับจาก props/refs ก็ได้
+
+  dataMoveStore.fetchDataMove(day, accessToken, whereHouse, 'MovingDayBack')
+  dataNonMoveStore.fetchDataMove(day, accessToken, whereHouse, 'NonMovingDayBack')
+})
+
+
+// แปลงข้อมูลเป็น chartData
+const chartDataMove = computed(() => {
+  const rawData = dataMoveStore.dataMove?.map(cat => {
+    const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
+    
+    return {
+      category: cat.categoryName,
+      qty: totalQty,
+    }
+  }) || []
+
+  // เรียงจากมากไปน้อย
+  const sorted = rawData.sort((a, b) => b.qty - a.qty)
+
+  const categories = sorted.map(item => item.category)
+  const series = sorted.map(item => item.qty)
+
+  return {
+    categories,
+    series,
+  }
+})
+
+const chartDataNonMove = computed(() => {
+  const rawData = dataNonMoveStore.dataMove?.map(cat => {
+    const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
+    
+    return {
+      category: cat.categoryName,
+      qty: totalQty,
+    }
+  }) || []
+
+  // เรียงจากมากไปน้อย
+  const sorted = rawData.sort((a, b) => b.qty - a.qty)
+
+  const categories = sorted.map(item => item.category)
+  const series = sorted.map(item => item.qty)
+
+  return {
+    categories,
+    series,
+  }
+})
+
 
 //-------------------------------------------------- Date Data ---------------------------------------------------
 import AppDataTimePickerAllWay from '@/views/dashboard/main/dateData/appTImePicker/appDatatimePicker.vue'
@@ -933,7 +997,13 @@ onMounted(() => {
               v-if="onboardingMove === 0"
               class="pa-1"
             >
-              <ChartJsBarChartMove v-if="onboardingMove === 0" />
+              <ChartJsBarChartMove
+                v-if="onboardingMove === 0"
+                :categories="chartDataMove.categories"
+                :series="chartDataMove.series"
+              />
+
+              --> {{ chartDataMove.series }}
             </VCardText>
           </VCol>
           <VCol cols="6">
@@ -966,7 +1036,11 @@ onMounted(() => {
               v-if="onboardingNonMove === 0"
               class="pa-1"
             >
-              <ChartJsBarChartNonMove v-if="onboardingNonMove === 0" />
+              <ChartJsBarChartNonMove
+                v-if="onboardingNonMove === 0"
+                :categories="chartDataNonMove.categories"
+                :series="chartDataNonMove.series"
+              />
             </VCardText>
           </VCol>
         </VRow>

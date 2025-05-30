@@ -6,6 +6,11 @@ import {
 } from 'vuetify'
 import { hexToRgb } from '@layouts/utils'
 
+const props = defineProps({
+  categories: Array,
+  series: Array,
+})
+
 const moreList = [
   {
     title: 'Refresh',
@@ -78,13 +83,15 @@ const chartConfig = computed(() => {
     xaxis: {
       axisTicks: { show: false },
       axisBorder: { show: false },
-      categories: [
-        'Shoes',
-        'Female',
-        'Male',
-        'Shirt',
-        'Beverage',
-      ],
+      categories: props.categories,
+
+      // categories: [
+      //   'Shoes',
+      //   'Female',
+      //   'Male',
+      //   'Shirt',
+      //   'Beverage',
+      // ],
     },
     yaxis: {
       labels: {
@@ -101,13 +108,15 @@ const chartConfig = computed(() => {
 
 const series = [{
   name: 'Sales',
-  data: [
-    20,
-    50,
-    75,
-    60,
-    8,
-  ],
+  data: props.series,
+
+  // data: [
+  //   20,
+  //   50,
+  //   75,
+  //   60,
+  //   8,
+  // ],
 }]
 
 const total = computed(() => {
@@ -120,7 +129,9 @@ const total = computed(() => {
     <VCardTitle class="d-flex justify-center">
       <span style="font-size: 16px; font-weight: bolder;">{{ $t('Moving Stock') }}</span>
     </VCardTitle>
-    <VCardSubtitle v-if="false">{{$t(`Total ${total} Products`)}}</VCardSubtitle>
+    <VCardSubtitle v-if="false">
+      {{ $t(`Total ${total} Products`) }}
+    </VCardSubtitle>
 
     <VueApexCharts
       type="bar"
@@ -128,5 +139,6 @@ const total = computed(() => {
       :options="chartConfig"
       :series="series"
     />
+    {{ props.series }}
   </VCard>
 </template>
