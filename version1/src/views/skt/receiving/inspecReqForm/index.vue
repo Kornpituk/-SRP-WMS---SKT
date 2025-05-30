@@ -233,6 +233,7 @@ const generatedInsp = async () => {
 const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
+const typeIdLorry = ref(null) // ตัวแปรสำหรับเก็บค่า typeIdLorry
 const isReject = ref(null)
 const isAccept = ref(null)
 const frozeCheck = ref(true)
@@ -255,9 +256,27 @@ const generatedJournalId = async () => {
     receiveTypeIdData.value = item.receiveTypeId
     statusId.value = item.statusId
     loadingGenerated2.value = false
+    typeIdLorry.value  = item.lorryInfos
   } else {
     loadingGenerated1.value = false
   }
+}
+
+const checkTypeIdLorry = () => {
+  if (typeIdLorry.value && typeIdLorry.value.length > 0) {
+    // return !!(typeIdLorry.value[0].lorryInfoKey === 1 || typeIdLorry.value[0].lorryInfoKey === 2)
+    if(typeIdLorry.value[0].lorryInfoKey === '01' || typeIdLorry.value[0].lorryInfoKey === '02'){
+      console.log('TypeIdLorry is true', typeIdLorry.value[0].lorryInfoKey)
+      
+      return true
+    } else {
+      console.log('TypeIdLorry is false', typeIdLorry.value[0].lorryInfoKey)
+
+      return false
+    }
+  }
+  
+  return false
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -2615,6 +2634,7 @@ const inputRules = [
             <VCol cols="6">
               <VCheckbox
                 v-model="headerInsp.spacialCase"
+                :readonly="frozeCheckNotDetialCheck"
                 style="font-size: 12px;"
               >
                 <template #label>
@@ -2866,7 +2886,7 @@ const inputRules = [
     </section>
 
     <section
-      v-if="statusId === 13 || statusId === 14"
+      v-if="statusId === 13 && checkTypeIdLorry() || statusId === 14 && checkTypeIdLorry()"
       cols="12"
       class="my-4"
     >
