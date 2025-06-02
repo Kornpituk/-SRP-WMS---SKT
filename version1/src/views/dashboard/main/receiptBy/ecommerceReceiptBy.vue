@@ -754,11 +754,11 @@ watchEffect(() => {
 })
 </script>
 
+ <!-- @click="isDialogDetailVisible = true" -->
 <template>
   <VCard
     v-if="!logicLuxOn"
     :color="getSwitchThemeColor"
-    @click="isDialogDetailVisible = true"
   >
     <VCardText>
       <div class="d-flex align-center justify-center">
@@ -790,7 +790,7 @@ watchEffect(() => {
               style="font-size: 16px; font-weight: bolder;"
               class="text-white"
               :class="`text-${getSwitchThemeColorText}`"
-            >{{ $t('Complete') }}</span>
+            >{{ $t('Completed') }}</span>
           </div>
 
           <VRow class="d-flex justify-center ">

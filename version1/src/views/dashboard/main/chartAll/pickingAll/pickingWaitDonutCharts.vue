@@ -37,7 +37,6 @@ watchEffect(() => {
     series.value = [
       props.dataset.tranferOut || 0,
       props.dataset.pickingDelivery || 0,
-      props.dataset.pickingWriteOff || 0,
     ]
     checkSeries.value = true
   }

@@ -87,6 +87,9 @@ import axios from '@axios'
 const productDataSummaryCat = ref(0)
 const productDataSummaryProduct = ref(0)
 
+const categoriesStockUpdate = ref(0)
+const listStockUpdate = ref(0)
+
 const getSummaryProduct = () => {
   axios.get(`${urlApi.value}/api/v1/Dashboard/Summary/Product`, {
     headers: {
@@ -99,9 +102,11 @@ const getSummaryProduct = () => {
 
       productDataSummaryCat.value = responseData.categorys
       productDataSummaryProduct.value = responseData.products
+      categoriesStockUpdate.value = responseData.categorys
+      listStockUpdate.value = responseData.products
 
       // console.log('Response Length product:', responseLength)
-      // console.log("Data Product", response.data)
+      console.log("Data Product", response.data)
     })
     .catch(error => {
       // Handle errors
@@ -188,42 +193,41 @@ watchEffect(() => {
 
 
 //---------------------------------------- Length Stock Update-------------------------------- 
-const categoriesStockUpdate = ref(0)
-const listStockUpdate = ref(0)
 
-const lengthStockUpdate = () => {
-  axios.get(`${urlApi.value}/api/v1/StockUpdate?page=1&perPage=9999`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
-    .then(response => {
-      // สมมติว่า response.data เป็น array ของวัตถุ
-      const data = response.data.items
 
-      // สร้าง Set เพื่อเก็บ categoryId ที่ไม่ซ้ำกัน
-      const uniqueCategoryIds = new Set()
+// const lengthStockUpdate = () => {
+//   axios.get(`${urlApi.value}/api/v1/StockUpdate?page=1&perPage=9999`, {
+//     headers: {
+//       'accept': '*/*',
+//       'x-location': `${whereHouse}`,
+//       Authorization: `Bearer ${accessToken}`,
+//     },
+//   })
+//     .then(response => {
+//       // สมมติว่า response.data เป็น array ของวัตถุ
+//       const data = response.data.items
 
-      // วนลูปผ่านข้อมูลและเพิ่ม categoryId ที่ไม่ซ้ำกันลงใน Set
-      data.forEach(item => {
-        uniqueCategoryIds.add(item.categoryId)
-      })
+//       // สร้าง Set เพื่อเก็บ categoryId ที่ไม่ซ้ำกัน
+//       const uniqueCategoryIds = new Set()
 
-      // นับจำนวน categoryId ที่ไม่ซ้ำกัน
-      const uniqueCategoryCount = uniqueCategoryIds.size
+//       // วนลูปผ่านข้อมูลและเพิ่ม categoryId ที่ไม่ซ้ำกันลงใน Set
+//       data.forEach(item => {
+//         uniqueCategoryIds.add(item.categoryId)
+//       })
 
-      categoriesStockUpdate.value = uniqueCategoryCount
-      listStockUpdate.value = data.length
-    })
-    .catch(error => {
-      // จัดการข้อผิดพลาด
-      console.error('Error:', error)
-    })
-}
+//       // นับจำนวน categoryId ที่ไม่ซ้ำกัน
+//       const uniqueCategoryCount = uniqueCategoryIds.size
 
-watchEffect(lengthStockUpdate)
+//       categoriesStockUpdate.value = uniqueCategoryCount
+//       listStockUpdate.value = data.length
+//     })
+//     .catch(error => {
+//       // จัดการข้อผิดพลาด
+//       console.error('Error:', error)
+//     })
+// }
+
+// watchEffect(lengthStockUpdate)
 </script>
 
 <template>

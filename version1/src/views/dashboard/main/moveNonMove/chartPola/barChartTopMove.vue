@@ -58,6 +58,10 @@ const chartConfig = computed(() => {
         fontWeight: 500,
         fontSize: '0.875rem',
       },
+      formatter: val => {
+        // return val / 1000 + 'K'
+        return new Intl.NumberFormat().format(val)
+      },
     },
     grid: {
       strokeDashArray: 8,
@@ -101,6 +105,11 @@ const chartConfig = computed(() => {
           fontSize: '0.875rem',
           colors: primaryText,
         },
+
+        // formatter: val => {
+        //   // return val / 1000 + 'K'
+        //   return new Intl.NumberFormat().format(val)
+        // },
       },
     },
   }
