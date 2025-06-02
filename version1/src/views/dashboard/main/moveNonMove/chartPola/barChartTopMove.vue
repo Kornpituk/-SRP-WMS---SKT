@@ -119,6 +119,23 @@ const series = [{
   // ],
 }]
 
+// แก้ไขการสร้าง series ให้เป็น computed
+const chartSeries = computed(() => {
+  if (!props.series || props.series.length === 0) {
+    return [{
+      name: 'จำนวน',
+      data: [],
+    }]
+  }
+  
+  return [{
+    name: 'จำนวน',
+    data: props.series,
+  }]
+})
+
+
+
 const total = computed(() => {
   return series[0].data.reduce((acc, val) => acc + val, 0)
 })
@@ -137,8 +154,8 @@ const total = computed(() => {
       type="bar"
       height="250"
       :options="chartConfig"
-      :series="series"
+      :series="chartSeries"
     />
-    {{ props.series }}
+    {{ props.chartSeries }}
   </VCard>
 </template>

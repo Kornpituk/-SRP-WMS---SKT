@@ -271,6 +271,7 @@ const chartDataNonMove = computed(() => {
   const categories = sorted.map(item => item.category)
   const series = sorted.map(item => item.qty)
 
+
   return {
     categories,
     series,
@@ -1002,8 +1003,6 @@ onMounted(() => {
                 :categories="chartDataMove.categories"
                 :series="chartDataMove.series"
               />
-
-              --> {{ chartDataMove.series }}
             </VCardText>
           </VCol>
           <VCol cols="6">
