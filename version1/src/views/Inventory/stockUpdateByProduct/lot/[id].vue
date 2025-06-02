@@ -1126,13 +1126,13 @@ const showExpansionDialog = ref(false)
                     <strong>{{ $t('TolTalQTY') }}:</strong>
                   </p>
                   <p
-                    v-if="checkRFID"
+                    v-if="checkRFID && productsLocation.tags"
                     style="margin: -0.5px; font-size: 15px;"
                   >
                     <strong>Tag:</strong> {{ (formatDecimal(productsLocation.tags)).toLocaleString('en-US') }}
                   </p>
                   <p
-                    v-if="checkRFID"
+                    v-if="checkRFID && productsLocation.nonTags"
                     style="margin-top: -0.5px; margin-bottom: -0.5px; font-size: 15px;"
                   >
                     <strong>Non-Tag:</strong> {{ (formatDecimal(productsLocation.nonTags)).toLocaleString('en-US') }}
