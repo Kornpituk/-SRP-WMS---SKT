@@ -129,12 +129,10 @@ export const getDonutChartConfigPOSuccess = themeColors => {
               formatter(w) {
                 const totalValue = w.globals.seriesTotals.reduce((a, b) => {
                   return a + b
-                }, 0) / w.globals.series.length
-  
-                if (totalValue % 1 === 0)
-                  return `${totalValue}%`
-                else
-                  return `${totalValue.toFixed(2)}%`
+                }, 0)
+ 
+                
+                return `${totalValue}`
               },
               color: themePrimaryTextColor,
             },
@@ -237,12 +235,10 @@ export const getDonutChartConfigPOWaiting = themeColors => {
               formatter(w) {
                 const totalValue = w.globals.seriesTotals.reduce((a, b) => {
                   return a + b
-                }, 0) / w.globals.series.length
-  
-                if (totalValue % 1 === 0)
-                  return `${totalValue}%`
-                else
-                  return `${totalValue.toFixed(2)}%`
+                }, 0)
+ 
+                
+                return `${totalValue}`
               },
               color: themePrimaryTextColor,
             },

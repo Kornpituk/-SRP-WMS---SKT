@@ -9,6 +9,7 @@ import { hexToRgb } from '@layouts/utils'
 const props = defineProps({
   categories: Array,
   series: Array,
+  date: String,
 })
 
 const moreList = [
@@ -25,6 +26,22 @@ const moreList = [
     value: 'share',
   },
 ]
+
+const calScaleBarHight = series => {
+  if (!series || series.length === 0) {
+    return '10%'
+  }
+  const maxValue = series.length
+  if (maxValue > 4) {
+    return '60%'
+  } else if (maxValue > 2) {
+    return '40%'
+  } else if (maxValue > 1) {
+    return '30%'
+  } else {
+    return '15%'
+  }
+}
 
 const vuetifyTheme = useTheme()
 
@@ -45,7 +62,7 @@ const chartConfig = computed(() => {
     plotOptions: {
       bar: {
         borderRadius: 8,
-        barHeight: '60%',
+        barHeight: calScaleBarHight(props.series),
         horizontal: true,
         distributed: true,
         startingShape: 'rounded',
@@ -125,6 +142,16 @@ const chartSeries = computed(() => {
   }]
 })
 
+const calDateReverse30Days = computed(() => {
+  const date = new Date(props.date)
+  const reverseDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 30)
+
+  const day = String(reverseDate.getDate()).padStart(2, '0')
+  const month = String(reverseDate.getMonth() + 1).padStart(2, '0')
+  const year = reverseDate.getFullYear()
+
+  return `${day}/${month}/${year}`
+})
 
 const total = computed(() => {
   return series[0].data.reduce((acc, val) => acc + val, 0)
@@ -134,7 +161,7 @@ const total = computed(() => {
 <template>
   <VCard>
     <VCardTitle class="d-flex justify-center">
-      <span style="font-size: 16px; font-weight: bolder;">{{ $t('Non Moving Stock') }}</span>
+      {{ $t('Non Moving Stock (last 30 days)') }}: {{ calDateReverse30Days }} - {{ props.date }}
     </VCardTitle>
     <VCardSubtitle v-if="false">
       {{ $t(`Total ${total} Products`) }}

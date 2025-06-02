@@ -10,7 +10,7 @@ const accessToken = localStorage.getItem('accessTokenAtStore')
 import { urlApi } from '@/api'
 import axios from '@axios'
 
-import { useDataMoveStore } from '@/pages/dashboards/data/move/data'
+import { useDataMoveStore, useDataNonMoveStore } from '@/pages/dashboards/data/move/data'
 
 const whereRoomNameSet = ref('')
 
@@ -220,15 +220,15 @@ const dataset2 = [
 
 const dataMoveStore = useDataMoveStore()
 
-const dataNonMoveStore = useDataMoveStore()
+const dataNonMoveStore = useDataNonMoveStore()
 
 watchEffect(() => {
   const accessToken = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
-  const day = 1 // หรือรับจาก props/refs ก็ได้
+  const day = 30 // หรือรับจาก props/refs ก็ได้
 
   dataMoveStore.fetchDataMove(day, accessToken, whereHouse, 'MovingDayBack')
-  dataNonMoveStore.fetchDataMove(day, accessToken, whereHouse, 'NonMovingDayBack')
+  dataNonMoveStore.fetchDataNonMove(day, accessToken, whereHouse, 'NonMovingDayBack')
 })
 
 
@@ -255,8 +255,10 @@ const chartDataMove = computed(() => {
   }
 })
 
+console.log('chartDataMove', chartDataMove)
+
 const chartDataNonMove = computed(() => {
-  const rawData = dataNonMoveStore.dataMove?.map(cat => {
+  const rawData = dataNonMoveStore.dataNonMove?.map(cat => {
     const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
     
     return {
@@ -277,6 +279,8 @@ const chartDataNonMove = computed(() => {
     series,
   }
 })
+
+console.log('chartDataNonMove', chartDataNonMove)
 
 
 //-------------------------------------------------- Date Data ---------------------------------------------------
@@ -471,7 +475,7 @@ const summaryAll = (switchAll, obj1, obj2) => {
   if(switchAll === 1){
     complateAll.value = mergedObj.receivedPo + mergedObj.tranferIn + mergedObj.receivedOther + mergedObj.tranferOut + mergedObj.pickingDelivery + mergedObj.pickingWriteOff
   } else if(switchAll === 2){
-    awaitAll.value = mergedObj.receivedPo + mergedObj.tranferIn + mergedObj.receivedOther + mergedObj.tranferOut + mergedObj.pickingDelivery + mergedObj.pickingWriteOff
+    awaitAll.value = mergedObj.receivedPo + mergedObj.tranferIn + mergedObj.tranferOut + mergedObj.pickingDelivery 
   }
   
 }
@@ -593,85 +597,62 @@ onMounted(() => {
     <VCol cols="12">
       <!-- Row 1 WareHouse & Date -->
       <div>
-        <VRow class="match-height">
-          <!-- Select Week -->
+        <VRow class="align-center justify-space-between">
+          <!-- ซ้าย: Dashboard Today + วันที่และเวลา -->
           <VCol
             cols="12"
-            lg="8"
-            sm="6"
+            lg="10"
+            sm="9"
           >
-            <span style="font-size: 25px; font-weight: bolder;">{{ $t('Dashboard Overview') }}</span>
+            <VRow class="align-center">
+              <!-- หัวข้อ -->
+              <VCol cols="auto" class="pa-2">
+                <span class="text-h5 font-weight-bold">{{ $t('Dashboard Today') }}</span>
+              </VCol>
+
+              <!-- วันที่และเวลาในการ์ด -->
+              <VCol cols="auto" class="pa-2">
+                <VCard
+                  class="pa-2 d-flex align-center"
+                  style="min-width: 260px;"
+                  elevation="2"
+                >
+                  <VIcon
+                    icon="ri-calendar-2-fill"
+                    class="me-2"
+                    size="20"
+                  />
+                  <span class="me-4">{{ formattedDateTime }}</span>
+
+                  <VIcon
+                    icon="ri-time-line"
+                    class="me-2"
+                    size="20"
+                  />
+                  <span>{{ time }}</span>
+                </VCard>
+              </VCol>
+            </VRow>
           </VCol>
+
+          <!-- ขวาสุด: เลือกคลัง -->
           <VCol
             cols="12"
             lg="2"
             sm="3"
-            class="px-2"
+            class="pa-1"
           >
-            <VCard>
+            <VCard class="pa-0">
               <VCardText class="pa-2">
-                <VRow>
-                  <VCol cols="12">
-                    <VAutocomplete
-                      v-model="wareHouseSection"
-                      :label="$t('Warehouse')"
-                      density="compact"
-                      placeholder="Select State"
-                      :items="itemsWarehouseGetForAPI"
-                      item-title="name"
-                      item-value="id"
-                    />
-                  </VCol>
-                </VRow>
-              </VCardText>
-            </VCard>
-          </VCol>
-          <VCol
-            cols="12"
-            lg="2"
-            sm="3"
-            class="px-2"
-          >
-            <VCard class="d-flex justify-center align-center">
-              <VCardText class="pa-2 ">
-                <div>
-                  <VRow>
-                    <VCol
-                      v-if="false"
-                      class="d-flex"
-                      cols="3"
-                    >
-                      <div class="">
-                        <VIcon
-                          size="30"
-                          icon="ri-calendar-2-fill"
-                        />
-                      </div>
-                    </VCol>
-                    <VCol
-                      class="d-flex align-center justify-center py-1"
-                      cols="12"
-                    >
-                      <div class="d-flex justify-center align-center py-0">
-                        <span
-                          class="d-flex justify-center align-center"
-                          style="font-size: 18px; font-weight: bolder;"
-                        >{{ formattedDateTime }}</span>
-                      </div>
-                    </VCol>
-                    <VCol
-                      class="d-flex align-center justify-center py-1"
-                      cols="12"
-                    >
-                      <div class="d-flex justify-center align-center py-0">
-                        <span
-                          class="d-flex justify-center align-center"
-                          style="font-size: 18px; font-weight: bolder;"
-                        >{{ time }}</span>
-                      </div>
-                    </VCol>
-                  </VRow>
-                </div>
+                <VAutocomplete
+                  v-model="wareHouseSection"
+                  :label="$t('Warehouse')"
+                  density="compact"
+                  placeholder="Select Warehouse"
+                  :items="itemsWarehouseGetForAPI"
+                  item-title="name"
+                  item-value="id"
+                />
               </VCardText>
             </VCard>
           </VCol>
@@ -786,7 +767,7 @@ onMounted(() => {
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
-                >{{ $t('Inventory Delivery') }}</span>
+                >{{ $t('Picking Request') }}</span>
               </VCardTitle>
               <VCardText>
                 <PickingSuccess :dataset="dateSetPickingSuccess" />
@@ -1002,6 +983,7 @@ onMounted(() => {
                 v-if="onboardingMove === 0"
                 :categories="chartDataMove.categories"
                 :series="chartDataMove.series"
+                :date="formattedDateTime"
               />
             </VCardText>
           </VCol>
@@ -1039,6 +1021,7 @@ onMounted(() => {
                 v-if="onboardingNonMove === 0"
                 :categories="chartDataNonMove.categories"
                 :series="chartDataNonMove.series"
+                :date="formattedDateTime"
               />
             </VCardText>
           </VCol>

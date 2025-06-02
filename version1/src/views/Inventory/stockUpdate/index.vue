@@ -1524,6 +1524,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1591,6 +1592,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Secondary product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1658,6 +1660,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Sub product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1725,6 +1728,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Barcode') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -1792,6 +1796,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Product Code') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1859,6 +1864,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Product Name') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1977,6 +1983,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Counting Unit') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"

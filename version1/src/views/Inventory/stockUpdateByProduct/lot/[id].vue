@@ -1204,6 +1204,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Lot/Batch') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+              v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"

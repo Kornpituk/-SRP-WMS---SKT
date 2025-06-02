@@ -914,10 +914,16 @@ const showExpansionDialog = ref('')
                   <p style="margin: -0.5px; font-size: 15px;">
                     <strong>{{ $t('TolTalQTY') }}:</strong>
                   </p>
-                  <p v-if="checkRFID" style="margin: -0.5px; font-size: 15px;">
+                  <p
+                    v-if="checkRFID"
+                    style="margin: -0.5px; font-size: 15px;"
+                  >
                     <strong>Tag:</strong><span v-if="productsLocation.tags">{{ (formatDecimal(productsLocation.tags)).toLocaleString('en-US') }}</span> 
                   </p>
-                  <p v-if="checkRFID" style="margin-top: -0.5px; margin-bottom: -0.5px; font-size: 15px;">
+                  <p
+                    v-if="checkRFID"
+                    style="margin-top: -0.5px; margin-bottom: -0.5px; font-size: 15px;"
+                  >
                     <strong>Non-Tag:</strong><span v-if="productsLocation.nonTags">{{ (formatDecimal(productsLocation.nonTags)).toLocaleString('en-US') }}</span> 
                   </p>
                 </VCol>
@@ -987,6 +993,7 @@ const showExpansionDialog = ref('')
               {{ $t('Lot/Batch') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"
@@ -1063,6 +1070,7 @@ const showExpansionDialog = ref('')
               {{ $t('Warehouse') }} 
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuStock"
                 :close-on-content-click="false"
                 location="end"
@@ -1125,6 +1133,7 @@ const showExpansionDialog = ref('')
               {{ $t('Zone') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+              v-if="false"
                 v-model="menuZone"
                 :close-on-content-click="false"
                 location="end"
@@ -1188,6 +1197,7 @@ const showExpansionDialog = ref('')
               {{ $t('Area') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+              v-if="false"
                 v-model="menuArea"
                 :close-on-content-click="false"
                 location="end"
@@ -1252,6 +1262,7 @@ const showExpansionDialog = ref('')
               {{ $t('Sub Area') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+              v-if="false"
                 v-model="menuSubArea"
                 :close-on-content-click="false"
                 location="end"
@@ -1363,11 +1374,17 @@ const showExpansionDialog = ref('')
             :key="index"
           >
             <!-- 👉 Ordinal Number -->
-            <td v-if="false" class="px-1">
+            <td
+              v-if="false"
+              class="px-1"
+            >
               {{ (currentPage - 1) * rowPerPage + index + 1 }}
             </td>
 
-            <td v-if="true" class="px-1">
+            <td
+              v-if="true"
+              class="px-1"
+            >
               {{ index + 1 }}
             </td>
 

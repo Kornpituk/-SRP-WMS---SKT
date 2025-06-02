@@ -29,3 +29,30 @@ export const useDataMoveStore = defineStore('dataMove', () => {
 
   return { dataMove, fetchDataMove, isLoading }
 })
+
+export const useDataNonMoveStore = defineStore('dataNonMove', () => {
+  const dataNonMove = ref(null)
+  const isLoading = ref(false)
+
+  const fetchDataNonMove = async (day, accessToken, whereHouse, type) => {
+    isLoading.value = true
+    try {
+      const response = await axios.get(`${urlApi.value}/api/v1/Dashboard/${type}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'x-location': whereHouse,
+        },
+        params: { day },
+      })
+
+      dataNonMove.value = response.data
+      console.log('DataNonMove fetched successfully:', dataNonMove.value)
+    } catch (err) {
+      console.error('Error fetching dataNonMove:', err)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  return { dataNonMove, fetchDataNonMove, isLoading }
+})

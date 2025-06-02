@@ -1611,6 +1611,7 @@ const switcherDrS = ref(true)
               {{ $t('Product Code') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1678,6 +1679,7 @@ const switcherDrS = ref(true)
               {{ $t('Product Name') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1745,6 +1747,7 @@ const switcherDrS = ref(true)
               {{ $t('Categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1812,6 +1815,7 @@ const switcherDrS = ref(true)
               {{ $t('Secondary product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1879,6 +1883,7 @@ const switcherDrS = ref(true)
               {{ $t('Sub product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1947,6 +1952,7 @@ const switcherDrS = ref(true)
               {{ $t('Barcode') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -2020,6 +2026,7 @@ const switcherDrS = ref(true)
                 @click="toggleSortType('sortByQty')"
               />
               <VMenu
+                v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"
@@ -2094,6 +2101,7 @@ const switcherDrS = ref(true)
                 @click="toggleSortType('sortByQty')"
               />
               <VMenu
+                v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"
@@ -2200,6 +2208,7 @@ const switcherDrS = ref(true)
               {{ $t('Counting Unit') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
@@ -2268,6 +2277,7 @@ const switcherDrS = ref(true)
               {{ $t('Color') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuColor"
                 :close-on-content-click="false"
                 location="end"
@@ -2335,6 +2345,7 @@ const switcherDrS = ref(true)
               {{ $t('Size') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSize"
                 :close-on-content-click="false"
                 location="end"
@@ -2402,6 +2413,7 @@ const switcherDrS = ref(true)
               {{ $t('Style No.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuStyle"
                 :close-on-content-click="false"
                 location="end"
@@ -2469,6 +2481,7 @@ const switcherDrS = ref(true)
               {{ $t('Model') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuVersion"
                 :close-on-content-click="false"
                 location="end"
@@ -2537,6 +2550,7 @@ const switcherDrS = ref(true)
               {{ $t('Brand') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuBrand"
                 :close-on-content-click="false"
                 location="end"
@@ -2676,6 +2690,7 @@ const switcherDrS = ref(true)
               {{ $t('Warehouse') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuWarehouse"
                 :close-on-content-click="false"
                 location="end"
@@ -2743,6 +2758,7 @@ const switcherDrS = ref(true)
               {{ $t('Zone') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuZone"
                 :close-on-content-click="false"
                 location="end"
@@ -2810,6 +2826,7 @@ const switcherDrS = ref(true)
               {{ $t('Area') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuArea"
                 :close-on-content-click="false"
                 location="end"
@@ -2877,6 +2894,7 @@ const switcherDrS = ref(true)
               {{ $t('Sub Area') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSubArea"
                 :close-on-content-click="false"
                 location="end"
@@ -2958,6 +2976,7 @@ const switcherDrS = ref(true)
               {{ $t('Serial No.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSerial"
                 :close-on-content-click="false"
                 location="end"
@@ -3026,6 +3045,7 @@ const switcherDrS = ref(true)
               {{ $t('Remark') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuRemark"
                 :close-on-content-click="false"
                 location="end"
