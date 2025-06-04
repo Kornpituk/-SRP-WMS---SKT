@@ -194,7 +194,7 @@ const GetStockUpdate = () => {
       'sortByType': sortByType.value,
       'sortBySubType': sortBySubType.value,
       'sortByBarcode': sortByBarcode.value,
-      'sortByProductId': sortByProductId.value,
+      'sortByProductId': sortByProductId.value || 'asc',
       'sortByProductName': sortByProductName.value,
       'sortByUnit': sortByUnit.value,
       'sortByQty': sortByQty.value,
@@ -2171,15 +2171,18 @@ const showExpansionDialog = ref(false)
 
             <!-- 👉 Barcode -->
             <td class="text-start px-1">
-              <VueBarcode
-                v-if="product.barcode"
-                :options="{
-                  width: '1%',
-                  height: '30%',
-                  fontSize: '16px', 
-                }"
-                :value="product.barcode"
-              />
+              <div class="d-flex justify-center align-items-center">
+                <VueBarcode
+                  v-if="product.barcode"
+                  class="text-start"
+                  :options="{
+                    width: '1%',
+                    height: '20%',
+                    fontSize: '16px', 
+                  }"
+                  :value="product.barcode"
+                />
+              </div>
             </td>
 
             <!-- 👉 Product code -->

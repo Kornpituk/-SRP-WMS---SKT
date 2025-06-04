@@ -1133,7 +1133,7 @@ const showExpansionDialog = ref('')
               {{ $t('Zone') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
-              v-if="false"
+                v-if="false"
                 v-model="menuZone"
                 :close-on-content-click="false"
                 location="end"
@@ -1197,7 +1197,7 @@ const showExpansionDialog = ref('')
               {{ $t('Area') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
-              v-if="false"
+                v-if="false"
                 v-model="menuArea"
                 :close-on-content-click="false"
                 location="end"
@@ -1262,7 +1262,7 @@ const showExpansionDialog = ref('')
               {{ $t('Sub Area') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
-              v-if="false"
+                v-if="false"
                 v-model="menuSubArea"
                 :close-on-content-click="false"
                 location="end"
@@ -1435,6 +1435,7 @@ const showExpansionDialog = ref('')
               class="text-end px-6"
             >
               <span v-if="product.tags">{{ (formatDecimal(product.tags)).toLocaleString('en-US') }}</span>
+              <span v-else>0</span>
             </td>
 
             <!--  Number(Non-Tag) -->
@@ -1443,10 +1444,12 @@ const showExpansionDialog = ref('')
               class="text-end px-6"
             >
               <span v-if="product.nonTags">{{ (formatDecimal(product.nonTags)).toLocaleString('en-US') }}</span>
+              <span v-else>0</span>
             </td>
             <!--  Total quantity of products -->
             <td class="text-end px-6">
               <span v-if="product.qty">{{ (formatDecimal(product.qty)).toLocaleString('en-US') }}</span>
+              <span v-else>0</span>
             </td>
             <!-- 👉 Actions -->
             <td
