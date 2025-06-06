@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -23,7 +23,10 @@ const totalCount = ref(0)
 
 const rowPerPage = ref(10)
 const currentPage = ref(1)
-const totalPage = ref(1)
+
+const totalPage = computed(() => {
+  return Math.ceil(totalCount.value / rowPerPage.value)
+})
 
 //------------------- Model ID For search ------------------------------------
 const searchByCategoryId = ref(null)
@@ -210,7 +213,7 @@ const generateRandomString = (prefix, length = 6) => {
   return result
 }
 
-const GetStockUpdate = () => {
+const GetStockUpdate = async () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/StockUpdate/byLotBatch?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
@@ -283,7 +286,8 @@ const GetStockUpdate = () => {
       products.value = response.data.items
       totalCount.value = response.data.totalCount
       currentPage.value = response.data.page
-      totalPage.value = response.data.totalPages
+
+      // totalPage.value = response.data.totalCount
       rowPerPage.value = response.data.perPage
 
       console.log('[products.value Mock]!!: ', products.value)
@@ -379,25 +383,28 @@ const GetStockUpdateForPagination = () => {
     })
 }
 
-watch(GetStockUpdate)
+watch( async () => {
+  await GetStockUpdate()
+})
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
-watch(() => {
+watchEffect(() => {
   if (currentPage.value > totalPage.value)
     currentPage.value = totalPage.value
+
+  if (currentPage.value < 1)
+    currentPage.value = 1
 })
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
+  if (!products.value.length) return '0'
 
-  // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
-  // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
-  // console.log('products.value.length: ',products.value.length)
-  
-  return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
+  const firstIndex = (currentPage.value - 1) * rowPerPage.value + 1
+  const lastIndex = firstIndex + products.value.length - 1
+
+  return `${firstIndex}-${lastIndex} of ${totalCount.value}`
 })
 
 // SECTION Checkbox toggle
@@ -2969,7 +2976,7 @@ const switcherDrS = ref(true)
               />
             </th>
             <th
-              v-if="switcherDrS"
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
@@ -3038,7 +3045,7 @@ const switcherDrS = ref(true)
               </VMenu>
             </th>
             <th
-              v-if="switcherDrS"
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
@@ -3305,63 +3312,63 @@ const switcherDrS = ref(true)
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.styleNo }}
+              {{ product.style }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.Model }}
+              {{ product.modelNo }}
             </td>
             
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.productBrand }}
+              {{ product.brand }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.weight }}
+              {{ product.pdWeight }}
             </td>
             <td
-              class="text-start px-1"
+              class="text-end px-1"
               style="width: 5rem;"
             >
-              {{ product.uomWeight }}
+              {{ product.unitWeight }}
             </td>
             <td
-              class="text-start px-1"
+              class="text-end px-1"
               style="width: 5rem;"
             >
-              {{ product.width }}
+              {{ product.dimensionWidth }}
             </td>
             <td
               v-if="switcherDrS"
-              class="text-start px-1"
+              class="text-end px-1"
               style="width: 5rem;"
             >
-              {{ product.length }}
+              {{ product.dimensionLength }}
+            </td>
+            <td
+              class="text-end px-1"
+              style="width: 5rem;"
+            >
+              {{ product.dimensionHeight }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.height }}
+              {{ product.unitDimension }}
             </td>
             <td
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.uomScale }}
-            </td>
-            <td
-              class="text-start px-1"
-              style="width: 5rem;"
-            >
-              {{ product.warehouse }}
+              {{ product.stockName }}
             </td>
             <td
               class="text-start px-1"
@@ -3381,18 +3388,20 @@ const switcherDrS = ref(true)
             >
               {{ product.subAreaName }}
             </td>
-            <td
+            <!--
+              <td
               class="text-start px-1"
               style="width: 5rem;"
-            >
+              >
               {{ product.serailNo }}
-            </td>
-            <td
+              </td>
+              <td
               class="text-start px-1"
               style="width: 5rem;"
-            >
+              >
               {{ product.remark }}
-            </td>
+              </td> 
+            -->
 
             <!-- 👉 Actions -->
             <td

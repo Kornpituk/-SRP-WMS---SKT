@@ -23,7 +23,10 @@ const totalCount = ref(0)
 
 const rowPerPage = ref(10)
 const currentPage = ref(1)
-const totalPage = ref(1)
+
+const totalPage = computed(() => {
+  return Math.ceil(totalCount.value / rowPerPage.value)
+})
 
 //------------------- Model ID For search ------------------------------------
 const searchByCategoryId = ref(null)
@@ -165,7 +168,7 @@ const clearValuesNeo = () => {
   }
 }
 
-const GetStockUpdate = () => {
+const GetStockUpdate = async () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
@@ -220,7 +223,8 @@ const GetStockUpdate = () => {
 
       totalCount.value = response.data.totalCount
       currentPage.value = response.data.page
-      totalPage.value = response.data.totalPages
+
+      // totalPage.value = response.data.totalCount
       rowPerPage.value = response.data.perPage
 
       console.log('[products.value]!!: ', products)
@@ -299,25 +303,28 @@ const GetStockUpdateForPagination = () => {
     })
 }
 
-watch(GetStockUpdate)
+watch( async () => {
+  await GetStockUpdate()
+})
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
-watch(() => {
+watchEffect(() => {
   if (currentPage.value > totalPage.value)
     currentPage.value = totalPage.value
+
+  if (currentPage.value < 1)
+    currentPage.value = 1
 })
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
+  if (!products.value.length) return '0'
 
-  // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
-  // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
-  // console.log('products.value.length: ',products.value.length)
-  
-  return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
+  const firstIndex = (currentPage.value - 1) * rowPerPage.value + 1
+  const lastIndex = firstIndex + products.value.length - 1
+
+  return `${firstIndex}-${lastIndex} of ${totalCount.value}`
 })
 
 // SECTION Checkbox toggle

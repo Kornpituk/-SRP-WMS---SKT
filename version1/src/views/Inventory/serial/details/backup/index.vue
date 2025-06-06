@@ -1,6 +1,5 @@
 <script setup>
 import axiosIns from '@axios'
-import { debounce } from 'lodash'
 
 //// --------------------------------------------------------------------------------------
 import { ref, watchEffect } from 'vue'
@@ -8,7 +7,6 @@ import { ref, watchEffect } from 'vue'
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
-import { tryOnUnmounted } from '@vueuse/core'
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
@@ -25,10 +23,7 @@ const totalCount = ref(0)
 
 const rowPerPage = ref(10)
 const currentPage = ref(1)
-
-const totalPage = computed(() => {
-  return Math.ceil(totalCount.value / rowPerPage.value)
-})
+const totalPage = ref(1)
 
 //------------------- Model ID For search ------------------------------------
 const searchByCategoryId = ref(null)
@@ -215,10 +210,10 @@ const generateRandomString = (prefix, length = 6) => {
   return result
 }
 
-const GetStockUpdate = async () => {
+const GetStockUpdate = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate/byLot?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate/byLotBatch?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
     params: {
       categoryId: searchByCategoryId.value,
       typeId: searchByTypeId.value,
@@ -276,7 +271,8 @@ const GetStockUpdate = async () => {
         StyleNoMock: generateRandomString('StyleNo-'),
         VersionMock: generateRandomString('V-', 3),
         BrandMock: generateRandomString('Brand-'),
-        WeightMock: getRandomNumberInRange(0.5, 5)+`Kg`, // Random weight between 0.5 and 5 kg
+        WeightUOMMock: `Kg`, // Random weight between 0.5 and 5 kg
+        WeightMock: getRandomNumberInRange(0.5, 5), // Random weight between 0.5 and 5 kg
         WidthMock: getRandomNumberInRange(10, 100), // Random width between 10 and 100 cm
         LengthMock: getRandomNumberInRange(10, 200), // Random length between 10 and 200 cm
         HeightMock: getRandomNumberInRange(5, 50), // Random height between 5 and 50 cm
@@ -287,8 +283,7 @@ const GetStockUpdate = async () => {
       products.value = response.data.items
       totalCount.value = response.data.totalCount
       currentPage.value = response.data.page
-
-      // totalPage.value = response.data.totalCount
+      totalPage.value = response.data.totalPages
       rowPerPage.value = response.data.perPage
 
       console.log('[products.value Mock]!!: ', products.value)
@@ -360,6 +355,7 @@ const GetStockUpdateForPagination = () => {
         StyleNo: generateRandomString('StyleNo-'),
         Version: generateRandomString('V-', 3),
         Brand: generateRandomString('Brand-'),
+        WeightUOM: `UOM`, // Random weight between 0.5 and 5 kg
         Weight: getRandomNumberInRange(0.5, 5), // Random weight between 0.5 and 5 kg
         Width: getRandomNumberInRange(10, 100), // Random width between 10 and 100 cm
         Length: getRandomNumberInRange(10, 200), // Random length between 10 and 200 cm
@@ -383,36 +379,25 @@ const GetStockUpdateForPagination = () => {
     })
 }
 
-watch( async () => {
-  await GetStockUpdate()
-})
-
-watch(currentPage, async (newPage, oldPage) => {
-  selectedRows.value = []
-
-  if (newPage !== oldPage) {
-    await GetStockUpdate() // หรือชื่อ function ดึงข้อมูลของคุณ
-  }
-})
+watch(GetStockUpdate)
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
-watchEffect(() => {
+watch(() => {
   if (currentPage.value > totalPage.value)
     currentPage.value = totalPage.value
-
-  if (currentPage.value < 1)
-    currentPage.value = 1
 })
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  if (!products.value.length) return '0'
+  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  const firstIndex = (currentPage.value - 1) * rowPerPage.value + 1
-  const lastIndex = firstIndex + products.value.length - 1
-
-  return `${firstIndex}-${lastIndex} of ${totalCount.value}`
+  // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
+  // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
+  // console.log('products.value.length: ',products.value.length)
+  
+  return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
 })
 
 // SECTION Checkbox toggle
@@ -796,7 +781,7 @@ const showDialogImage = (code, name, img, barcode, categories, group, groupSup, 
 const showExpansionDialog = ref(false)
 
 //----------------------- Switches Details / Summaey -------------------
-const switcherDrS = ref(false)
+const switcherDrS = ref(true)
 </script>
 
 <template>
@@ -845,7 +830,7 @@ const switcherDrS = ref(false)
             />
           </IconBtn>
           <h4 class="text-white">
-            {{ $t('Stock Update - Total Summary') }}
+            {{ $t('Stock Update - Total Details') }}
           </h4>
         </div>
       </VCardTitle>
@@ -2102,6 +2087,81 @@ const switcherDrS = ref(false)
                 </VCard>
               </VMenu>
             </th>
+
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Lot Batch') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VIcon
+                v-if="false"
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="toggleSortType('sortByQty')"
+              />
+              <VMenu
+                v-if="false"
+                v-model="menuLot"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByLot"
+                            class="mt-4"
+                            :label="$t('Lot')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchByLot = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuLot = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
             
             <th
               v-if="checkRFID"
@@ -2909,6 +2969,144 @@ const switcherDrS = ref(false)
               />
             </th>
             <th
+              v-if="switcherDrS"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Serial No.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-if="false"
+                v-model="menuSerial"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchBySerial"
+                            class="mt-4"
+                            :label="$t('Serial No.')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchBySerial = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuSerial = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
+              v-if="switcherDrS"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Remark') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-if="false"
+                v-model="menuRemark"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByRemark"
+                            class="mt-4"
+                            :label="$t('Remark')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchByRemark = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuRemark = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
               v-if="false"
               scope="row"
               class="text-center px-1"
@@ -2917,7 +3115,6 @@ const switcherDrS = ref(false)
             </th>
           </tr>
         </thead>
-        
         
         <!-- 👉 table body -->
         <tbody>
@@ -3047,6 +3244,13 @@ const switcherDrS = ref(false)
             >
               {{ product.lotMaster }}
             </td>
+
+            <td
+              class="text-start px-1"
+              style="width: 5rem;"
+            >
+              {{ product.lotBatch }}
+            </td>
             
 
             <!-- 👉 Tag -->
@@ -3135,6 +3339,7 @@ const switcherDrS = ref(false)
               {{ product.dimensionWidth }}
             </td>
             <td
+              v-if="switcherDrS"
               class="text-end px-1"
               style="width: 5rem;"
             >
@@ -3176,6 +3381,20 @@ const switcherDrS = ref(false)
             >
               {{ product.subAreaName }}
             </td>
+            <!--
+              <td
+              class="text-start px-1"
+              style="width: 5rem;"
+              >
+              {{ product.serailNo }}
+              </td>
+              <td
+              class="text-start px-1"
+              style="width: 5rem;"
+              >
+              {{ product.remark }}
+              </td> 
+            -->
 
             <!-- 👉 Actions -->
             <td
@@ -3231,6 +3450,8 @@ const switcherDrS = ref(false)
             v-model="currentPage"
             :length="totalPage"
             :total-visible="$vuetify.display.mdAndUp ? 7 : 3"
+            @next="selectedRows = []"
+            @prev="selectedRows = []"
           />
         </div>
       </VCardText>
@@ -3239,6 +3460,8 @@ const switcherDrS = ref(false)
 
   <section v-if="false">
     <VCard class="mt-6">
+      <VDivider />
+
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
         <thead>
@@ -4528,6 +4751,142 @@ const switcherDrS = ref(false)
               />
             </th>
             <th
+              v-if="switcherDrS"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Serial No.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuSerial"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchBySerial"
+                            class="mt-4"
+                            :label="$t('Serial No.')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchBySerial = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuSerial = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
+              v-if="switcherDrS"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Remark') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VMenu
+                v-model="menuRemark"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByRemark"
+                            class="mt-4"
+                            :label="$t('Remark')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchByRemark = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuRemark = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+            <th
               v-if="false"
               scope="row"
               class="text-center px-1"
@@ -4790,6 +5149,20 @@ const switcherDrS = ref(false)
               style="width: 5rem;"
             >
               กลุ่มเสื้อผ้า
+            </td>
+            <td
+              v-if="switcherDrS"
+              class="text-start px-1"
+              style="width: 5rem;"
+            >
+              SN-0101010010001-1
+            </td>
+            <td
+              v-if="switcherDrS"
+              class="text-start px-1"
+              style="width: 5rem;"
+            >
+              รับเข้ามาแล้ว เสื้อแขนยาว
             </td>
 
             <!-- 👉 Actions -->
