@@ -235,7 +235,8 @@ watchEffect(() => {
 // แปลงข้อมูลเป็น chartData
 const chartDataMove = computed(() => {
   const rawData = dataMoveStore.dataMove?.map(cat => {
-    const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
+    // const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
+    const totalQty = cat.products
     
     return {
       category: cat.categoryName,
@@ -259,7 +260,8 @@ console.log('chartDataMove', chartDataMove)
 
 const chartDataNonMove = computed(() => {
   const rawData = dataNonMoveStore.dataNonMove?.map(cat => {
-    const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
+    // const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
+    const totalQty = cat.products
     
     return {
       category: cat.categoryName,
@@ -606,12 +608,18 @@ onMounted(() => {
           >
             <VRow class="align-center">
               <!-- หัวข้อ -->
-              <VCol cols="auto" class="pa-2">
+              <VCol
+                cols="auto"
+                class="pa-2"
+              >
                 <span class="text-h5 font-weight-bold">{{ $t('Dashboard Today') }}</span>
               </VCol>
 
               <!-- วันที่และเวลาในการ์ด -->
-              <VCol cols="auto" class="pa-2">
+              <VCol
+                cols="auto"
+                class="pa-2"
+              >
                 <VCard
                   class="pa-2 d-flex align-center"
                   style="min-width: 260px;"
