@@ -240,6 +240,14 @@ const GetStockUpdate = async () => {
       searchByProductName: searchByProductNameFilter.value,
       searchByUnit: searchByUnitName.value,
 
+      // searchByCategory: searchByCategoryId.value,
+      // searchByType: searchByTypeId.value,
+      // searchBySubType: searchBySubTypeId.value,
+      // searchByBarcode: searchByBarcode.value,
+      // searchByProductId: searchByProductId.value,
+      // searchByProductName: searchByProductName.value,
+      
+
       'sortByCategory': sortByCategory.value,
       'sortByType': sortByType.value,
       'sortBySubType': sortBySubType.value,
@@ -605,7 +613,7 @@ watch(getItemLocalZone)
 //--------------------------------------- FetchItems for Search  Area ----------------------------------------
 
 const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}api/v1/Locations/area/all`, {
+  axiosIns.get(`${urlApi.value}/api/v1/Locations/area/all`, {
     params: {
       'zoneCode': searchByZoneId.value,
     },
@@ -3010,6 +3018,16 @@ const switcherDrS = ref(false)
               </div>
             </td>
 
+            <!-- 👉 Product code -->
+            <td class="text-start px-1">
+              {{ product.productId }}
+            </td>
+
+            <!-- 👉 Product Name -->
+            <td class="text-start px-1">
+              {{ (product.productName) }}
+            </td>
+
             <!-- 👉 Product categories -->
             <td class="text-start px-1">
               {{ product.categoryName }}
@@ -3023,17 +3041,6 @@ const switcherDrS = ref(false)
             <!-- 👉 Sub product categories -->
             <td class="text-start px-1">
               {{ product.subTypeName }}
-            </td>
-
-            
-            <!-- 👉 Product code -->
-            <td class="text-start px-1">
-              {{ product.productId }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td class="text-start px-1">
-              {{ (product.productName) }}
             </td>
 
             <!-- 👉 Barcode -->

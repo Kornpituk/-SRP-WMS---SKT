@@ -219,8 +219,10 @@ const dataset2 = [
 ]
 
 const dataMoveStore = useDataMoveStore()
+const dataMoveTopStore = useDataMoveStore()
 
 const dataNonMoveStore = useDataNonMoveStore()
+const dataNonNonMoveStore = useDataNonMoveStore()
 
 watchEffect(() => {
   const accessToken = localStorage.getItem('accessTokenAtStore')
@@ -228,9 +230,13 @@ watchEffect(() => {
   const day = 30 // หรือรับจาก props/refs ก็ได้
 
   dataMoveStore.fetchDataMove(day, accessToken, whereHouse, 'MovingDayBack')
+  dataMoveTopStore.fetchDataMove(day, accessToken, whereHouse, 'MovingDayBack')
   dataNonMoveStore.fetchDataNonMove(day, accessToken, whereHouse, 'NonMovingDayBack')
+  dataNonNonMoveStore.fetchDataNonMove(day, accessToken, whereHouse, 'NonMovingDayBack')
 })
 
+const charDataItemMove = ref()
+const charDataItemNonMove = ref()
 
 // แปลงข้อมูลเป็น chartData
 const chartDataMove = computed(() => {
@@ -256,7 +262,30 @@ const chartDataMove = computed(() => {
   }
 })
 
+
 console.log('chartDataMove', chartDataMove)
+
+const chartDataTopMove = computed(() => {
+  if (!dataMoveTopStore.dataMove) return { groupedItems: [] }
+
+  const groupedItems = dataMoveTopStore.dataMove.map(cat => ({
+    categoryName: cat.categoryName,
+    catId: cat.catId,
+    items: [...(cat.items || [])].sort((a, b) => (b.qty || 0) - (a.qty || 0)),
+  }))
+
+  // เรียง category ตามจำนวน products ทั้งหมด
+  groupedItems.sort((a, b) => 
+    (b.items.reduce((sum, item) => sum + (item.qty || 0), 0)) - 
+    (a.items.reduce((sum, item) => sum + (item.qty || 0), 0)),
+  )
+
+  return {
+    groupedItems,
+  }
+})
+
+console.log('chartDataTopMove', chartDataTopMove.value.groupedItems)
 
 const chartDataNonMove = computed(() => {
   const rawData = dataNonMoveStore.dataNonMove?.map(cat => {
@@ -284,6 +313,27 @@ const chartDataNonMove = computed(() => {
 
 console.log('chartDataNonMove', chartDataNonMove)
 
+const chartDataTopNonMove = computed(() => {
+  if (!dataNonNonMoveStore.dataNonMove) return { groupedItems: [] }
+
+  const groupedItems = dataNonNonMoveStore.dataNonMove.map(cat => ({
+    categoryName: cat.categoryName,
+    catId: cat.catId,
+    items: [...(cat.items || [])].sort((a, b) => (b.qty || 0) - (a.qty || 0)),
+  }))
+
+  // เรียง category ตามจำนวน products ทั้งหมด
+  groupedItems.sort((a, b) => 
+    (b.items.reduce((sum, item) => sum + (item.qty || 0), 0)) - 
+    (a.items.reduce((sum, item) => sum + (item.qty || 0), 0)),
+  )
+
+  return {
+    groupedItems,
+  }
+})
+
+console.log('chartDataTopNonMove', chartDataTopNonMove.value.groupedItems)
 
 //-------------------------------------------------- Date Data ---------------------------------------------------
 import AppDataTimePickerAllWay from '@/views/dashboard/main/dateData/appTImePicker/appDatatimePicker.vue'
@@ -755,7 +805,7 @@ onMounted(() => {
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
-                >{{ $t('Await Received') }}</span>
+                >{{ $t('Await Receiving') }}</span>
               </VCardTitle>
               <VCardText>
                 <ReceiptWaiting :dataset="dateSetReceivedPending" />
@@ -958,80 +1008,98 @@ onMounted(() => {
       <div v-if="!logicLuxOn && !operationOn">
         <VRow>
           <VCol cols="6">
-            <!--
-              <VWindow
+            <VWindow
               v-model="onboardingMove"
               show-arrows="hover"
-              >
-              <VWindowItem
-              v-for="n in lengthMove"
-              :key="`card-${n}`"
-              >
-              <VCardText
-              v-if="onboardingMove === 0"
-              class="pa-1"
-              >
-              <ChartJsBarChartMove v-if="onboardingMove === 0" />
-              </VCardText>
-              <VCardText
-              v-else
-              class="pa-1"
-              >
-              <TopProductMove v-if="onboardingMove === 1" />
-              </VCardText>
-              </VWindowItem>
-              </VWindow> 
-            -->
-
-            <VCardText
-              v-if="onboardingMove === 0"
-              class="pa-1"
             >
+              <VWindowItem
+                v-for="n in lengthMove"
+                :key="`card-${n}`"
+              >
+                <VCardText
+                  v-if="onboardingMove === 0"
+                  class="pa-1"
+                >
+                  <ChartJsBarChartMove
+                    v-if="onboardingMove === 0"
+                    :categories="chartDataMove.categories"
+                    :series="chartDataMove.series"
+                    :date="formattedDateTime"
+                  />
+                </VCardText>
+                <VCardText
+                  v-else
+                  class="pa-1"
+                >
+                  <TopProductMove
+                    v-if="onboardingMove === 1 && chartDataTopMove.groupedItems.length > 0"
+                    :grouped-items="chartDataTopMove.groupedItems"
+                  />
+                </VCardText>
+              </VWindowItem>
+            </VWindow> 
+           
+
+            <!--
+              <VCardText
+              v-if="onboardingMove === 0"
+              class="pa-1"
+              >
               <ChartJsBarChartMove
-                v-if="onboardingMove === 0"
-                :categories="chartDataMove.categories"
-                :series="chartDataMove.series"
-                :date="formattedDateTime"
+              v-if="onboardingMove === 0"
+              :categories="chartDataMove.categories"
+              :series="chartDataMove.series"
+              :date="formattedDateTime"
               />
-            </VCardText>
+              </VCardText> 
+            -->
           </VCol>
           <VCol cols="6">
-            <!--
-              <VWindow
+            <VWindow
               v-model="onboardingNonMove"
               show-arrows="hover"
-              >
-              <VWindowItem
-              v-for="n in lengthNonMove"
-              :key="`card-${n}`"
-              >
-              <VCardText
-              v-if="onboardingNonMove === 0"
-              class="pa-1"
-              >
-              <ChartJsBarChartNonMove v-if="onboardingNonMove === 0" />
-              </VCardText>
-              <VCardText
-              v-else
-              class="pa-1"
-              >
-              <TopProductNonMove v-if="onboardingNonMove === 1" />
-              </VCardText>
-              </VWindowItem>
-              </VWindow> 
-            -->
-
-            <VCardText
-              v-if="onboardingNonMove === 0"
-              class="pa-1"
             >
+              <VWindowItem
+                v-for="n in lengthNonMove"
+                :key="`card-${n}`"
+              >
+                <VCardText
+                  v-if="onboardingNonMove === 0"
+                  class="pa-1"
+                >
+                  <ChartJsBarChartNonMove
+                    v-if="onboardingNonMove === 0"
+                    :categories="chartDataNonMove.categories"
+                    :series="chartDataNonMove.series"
+                    :date="formattedDateTime"
+                  />
+                </VCardText>
+                <VCardText
+                  v-else
+                  class="pa-1"
+                >
+                  <TopProductNonMove
+                    v-if="onboardingNonMove === 1"
+                    :grouped-items="chartDataTopNonMove.groupedItems"
+                  />
+                </VCardText>
+              </VWindowItem>
+            </VWindow> 
+           
+
+            <!--
+              <VCardText
+              v-if="onboardingNonMove === 0"
+              class="pa-1"
+              >
               <ChartJsBarChartNonMove
-                v-if="onboardingNonMove === 0"
-                :categories="chartDataNonMove.categories"
-                :series="chartDataNonMove.series"
-                :date="formattedDateTime"
+              v-if="onboardingNonMove === 0"
+              :categories="chartDataNonMove.categories"
+              :series="chartDataNonMove.series"
+              :date="formattedDateTime"
               />
-            </VCardText>
+              </VCardText> 
+            -->
           </VCol>
         </VRow>
       </div>

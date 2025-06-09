@@ -28,7 +28,7 @@ const seriesNoData = [100]
 
 const checkSeries = ref(true)
 
-watchEffect(() => {
+watch(() => {
   // console.log('date Set', props.dataset)
 
   if(props.dataset.tranferOut === 0 && props.dataset.pickingDelivery === 0 ){

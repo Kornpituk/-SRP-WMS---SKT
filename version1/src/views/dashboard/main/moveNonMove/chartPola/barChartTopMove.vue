@@ -175,12 +175,14 @@ const chartSeries = computed(() => {
 })
 
 const calDateReverse30Days = computed(() => {
-  const date = new Date(props.date)
-  const reverseDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 30)
+  const [dayStr, monthStr, yearStr] = props.date.split('/')
+  const date = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)) // ✅ เดือน -1 เพราะ JavaScript นับเดือนจาก 0
 
-  const day = String(reverseDate.getDate()).padStart(2, '0')
-  const month = String(reverseDate.getMonth() + 1).padStart(2, '0')
-  const year = reverseDate.getFullYear()
+  date.setDate(date.getDate() - 30) // ลบ 30 วัน
+
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
 
   return `${day}/${month}/${year}`
 })

@@ -204,7 +204,7 @@ export const getDonutChartConfigPOWaiting = themeColors => {
       },
     },
     stroke: { width: 0 },
-    labels: ['RECEIVED PO', 'TRANSFER IN'],
+    labels: ['PO', 'TRANSFER IN'],
     colors: [donutColors.series2, donutColors.series3, donutColors.series4],
     dataLabels: {
       enabled: true,

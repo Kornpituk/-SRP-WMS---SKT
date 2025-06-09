@@ -517,7 +517,7 @@ watch(getItemLocalZone)
 //--------------------------------------- FetchItems for Search  Area ----------------------------------------
 
 const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}api/v1/Locations/area/all`, {
+  axiosIns.get(`${urlApi.value}/api/v1/Locations/area/all`, {
     params: {
       'zoneCode': searchByZoneId.value,
     },

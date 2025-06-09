@@ -27,7 +27,7 @@ const seriesNoData = [100]
 
 const checkSeries = ref(true)
 
-watchEffect(() => {
+watch(() => {
   // console.log('date Set', props.dataset)
   
   if(props.dataset.receivedPo === 0 && props.dataset.tranferIn === 0 && props.dataset.receivedOther === 0 ){

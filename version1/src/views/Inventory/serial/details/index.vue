@@ -597,7 +597,7 @@ watch(getItemLocalZone)
 //--------------------------------------- FetchItems for Search  Area ----------------------------------------
 
 const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}api/v1/Locations/area/all`, {
+  axiosIns.get(`${urlApi.value}/api/v1/Locations/area/all`, {
     params: {
       'zoneCode': searchByZoneId.value,
     },
@@ -3214,6 +3214,16 @@ const switcherDrS = ref(true)
               </div>
             </td>
 
+            <!-- 👉 Product code -->
+            <td class="text-start px-1">
+              {{ product.productId }}
+            </td>
+
+            <!-- 👉 Product Name -->
+            <td class="text-start px-1">
+              {{ (product.productName) }}
+            </td>
+
             <!-- 👉 Product categories -->
             <td class="text-start px-1">
               {{ product.categoryName }}
@@ -3227,17 +3237,6 @@ const switcherDrS = ref(true)
             <!-- 👉 Sub product categories -->
             <td class="text-start px-1">
               {{ product.subTypeName }}
-            </td>
-
-            
-            <!-- 👉 Product code -->
-            <td class="text-start px-1">
-              {{ product.productId }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td class="text-start px-1">
-              {{ (product.productName) }}
             </td>
 
             <!-- 👉 Barcode -->
