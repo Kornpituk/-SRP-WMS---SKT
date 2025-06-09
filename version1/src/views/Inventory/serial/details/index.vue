@@ -2169,6 +2169,14 @@ const switcherDrS = ref(true)
                 </VCard>
               </VMenu>
             </th>
+
+            <th
+              scope="row"
+              class="text-end px-1"
+            >
+              Serial
+              <!-- ----------------------------- Icon Search By --------------------- -->
+            </th>
             
             <th
               v-if="checkRFID"
@@ -3045,7 +3053,7 @@ const switcherDrS = ref(true)
               </VMenu>
             </th>
             <th
-              v-if="false"
+              v-if="true"
               scope="row"
               class="text-start px-1"
             >
@@ -3248,6 +3256,13 @@ const switcherDrS = ref(true)
               class="text-start px-1"
               style="width: 5rem;"
             >
+              {{ product.lotM }}
+            </td>
+
+            <td
+              class="text-start px-1"
+              style="width: 5rem;"
+            >
               {{ product.lotMaster }}
             </td>
 
@@ -3255,7 +3270,7 @@ const switcherDrS = ref(true)
               class="text-start px-1"
               style="width: 5rem;"
             >
-              {{ product.lotBatch }}
+              {{ product.serial }}
             </td>
             
 
@@ -3394,13 +3409,15 @@ const switcherDrS = ref(true)
               >
               {{ product.serailNo }}
               </td>
-              <td
+              
+            -->
+
+            <td
               class="text-start px-1"
               style="width: 5rem;"
-              >
+            >
               {{ product.remark }}
-              </td> 
-            -->
+            </td> 
 
             <!-- 👉 Actions -->
             <td
