@@ -1143,6 +1143,7 @@ const formatDate = dateString => {
               {{ $t('Categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1210,6 +1211,7 @@ const formatDate = dateString => {
               {{ $t('Secondary product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1277,6 +1279,7 @@ const formatDate = dateString => {
               {{ $t('Sub product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1344,6 +1347,7 @@ const formatDate = dateString => {
               {{ $t('Barcode') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -1411,6 +1415,7 @@ const formatDate = dateString => {
               {{ $t('Product Code') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1478,6 +1483,7 @@ const formatDate = dateString => {
               {{ $t('Product Name') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1570,6 +1576,7 @@ const formatDate = dateString => {
               {{ $t('Counting Unit') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
@@ -1843,327 +1850,6 @@ const formatDate = dateString => {
             @prev="selectedRows = []"
           />
         </div>
-      </VCardText>
-    </VCard>
-  </section>
-
-  <section v-if="false">
-    <VCard>
-      <template #text>
-        <VTextField
-          v-model="searchFilter"
-          label="Search"
-          prepend-inner-icon="mdi-magnify"
-          variant="outlined"
-          hide-details
-          single-line
-        />
-      </template>
-      <VCardText>
-        <VDataTable
-          :headers="headersMock"
-          :items="dataProductNew"
-          :items-per-page="5"
-          :search="searchFilter"
-          density="comfortable"
-          item-value="index"
-          multi-sort
-        >
-          <template #headers="{ columns }">
-            <tr>
-              <template
-                v-for="column in columns"
-                :key="column.key"
-              >
-                <th class="text-no-wrap">
-                  <span
-                    class="cursor-pointer"
-                    @click="() => toggleSearch(column)"
-                  >{{ column.title }}</span>
-                </th>
-              </template>
-            </tr>
-          </template>
-
-          <template #item="{ item }">
-            <tr>
-              <td
-                :class="resolveChipColorTable(item.raw.status)"
-                class="pa-0"
-              >
-                {{ item.raw.index }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                <div v-if="false">
-                  <VBtn
-                    width="70px"
-                    height="70px"
-                    variant="text"
-                  >
-                    <VImg
-                      v-if="item.raw.image"
-                      :width="70"
-                      :height="70"
-                      aspect-ratio="16/9"
-                      cover
-                      :src="item.raw.image"
-                      @click="showDialogImage(
-                        item.raw.productCode,
-                        item.raw.productName,
-                        item.raw.color,
-                        item.raw.size,
-                        item.raw.status,
-                        item.raw.image,
-                        item.raw.barcode,
-                        item.raw.categories,
-                        item.raw.group,
-                        item.raw.groupSup,
-                        item.raw.total,
-                        item.raw.unitName,
-                        item.raw.details,
-                      )"
-                    />
-                  </VBtn>
-                </div>
-                <div v-if="true">
-                  <VHover v-slot="{ isHovering, props }">
-                    <VBtn
-                      class="mx-auto card-image-hover"
-                      color="grey-lighten-4"
-                      max-width="70px"
-                      height="70px"
-                      v-bind="props"
-                      variant="text"
-                    >
-                      <VImg
-                        :src="item.raw.image"
-                        :width="70"
-                        :height="70"
-                        cover
-                        class="image-transition"
-                        @click="showDialogImage(
-                          item.raw.productCode,
-                          item.raw.productName,
-                          item.raw.color,
-                          item.raw.size,
-                          item.raw.status,
-                          item.raw.image,
-                          item.raw.barcode,
-                          item.raw.categories,
-                          item.raw.group,
-                          item.raw.groupSup,
-                          item.raw.total,
-                          item.raw.unitName,
-                          item.raw.details,
-                        )"
-                      >
-                        <VExpandTransition>
-                          <div
-                            v-if="isHovering"
-                            style="height: 100%;"
-                          >
-                            <VAvatar
-                              size="20"
-                              color="primary"
-                              class="d-flex"
-                            >
-                              <VIcon icon="mdi-magnify-plus-outline" />
-                            </VAvatar>
-                          </div>
-                        </VExpandTransition>
-                      </VImg>
-                    </VBtn>
-                  </VHover>
-                </div>
-              </td>
-              <td>
-                <span><strong>{{ item.raw.categoryName }}</strong></span>
-              </td>
-              <td>
-                {{ item.raw.typeName }}
-              </td>
-              <td>
-                {{ item.raw.subTypeName }}
-              </td>
-              <td>
-                {{ item.raw.barcode }}
-              </td>
-              <td>
-                {{ item.raw.productId }}
-              </td>
-              <td class="text-no-wrap">
-                {{ item.raw.productName }}
-              </td>
-              <td>
-                {{ item.raw.qty }}
-              </td>
-              <td>
-                {{ item.raw.qty }}
-              </td>
-              <td>
-                {{ item.raw.qty }}
-              </td>
-              <td>
-                {{ item.raw.qty }}
-              </td>
-              <td>
-                {{ item.raw.qty }}
-              </td>
-              
-              <td @click="pushBtnTable(item.raw.productId, item.raw.remark)">
-                {{ item.raw.remark }}
-              </td>
-            </tr>
-          </template>
-        </VDataTable>  
-      </VCardText>
-    </VCard>
-  </section>
-
-  <section v-if="false">
-    <VCard>
-      <VCardText>
-        <VDataTable
-          :headers="headers"
-          :items="mockData"
-          :items-per-page="5"
-          item-value="index"
-        >
-          <template #item="{ item }">
-            <tr>
-              <td
-                :class="resolveChipColorTable(item.raw.status)"
-                class="pa-0"
-              >
-                {{ item.raw.index }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                <div v-if="false">
-                  <VBtn
-                    width="70px"
-                    height="70px"
-                    variant="text"
-                  >
-                    <VImg
-                      v-if="item.raw.image"
-                      :width="70"
-                      :height="70"
-                      aspect-ratio="16/9"
-                      cover
-                      :src="item.raw.image"
-                      @click="showDialogImage(
-                        item.raw.productCode,
-                        item.raw.productName,
-                        item.raw.color,
-                        item.raw.size,
-                        item.raw.status,
-                        item.raw.image,
-                        item.raw.barcode,
-                        item.raw.categories,
-                        item.raw.group,
-                        item.raw.groupSup,
-                        item.raw.stockQty,
-                        item.raw.unitName,
-                        item.raw.details,
-                      )"
-                    />
-                  </VBtn>
-                </div>
-                <div v-if="true">
-                  <VHover v-slot="{ isHovering, props }">
-                    <VBtn
-                      class="mx-auto card-image-hover"
-                      color="grey-lighten-4"
-                      max-width="70px"
-                      height="70px"
-                      v-bind="props"
-                      variant="text"
-                    >
-                      <VImg
-                        :src="item.raw.image"
-                        :width="70"
-                        :height="70"
-                        cover
-                        class="image-transition"
-                        @click="showDialogImage(
-                          item.raw.productCode,
-                          item.raw.productName,
-                          item.raw.color,
-                          item.raw.size,
-                          item.raw.status,
-                          item.raw.image,
-                          item.raw.barcode,
-                          item.raw.categories,
-                          item.raw.group,
-                          item.raw.groupSup,
-                          item.raw.stockQty,
-                          item.raw.unitName,
-                          item.raw.details,
-                        )"
-                      >
-                        <VExpandTransition>
-                          <div
-                            v-if="isHovering"
-                            style="height: 100%;"
-                          >
-                            <VAvatar
-                              size="20"
-                              color="primary"
-                              class="d-flex"
-                            >
-                              <VIcon icon="mdi-magnify-plus-outline" />
-                            </VAvatar>
-                          </div>
-                        </VExpandTransition>
-                      </VImg>
-                    </VBtn>
-                  </VHover>
-                </div>
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                <span :class="resolveTextColorTable(item.raw.status)"><strong>{{ item.raw.status }}</strong></span>
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.poNo }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.poDate }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.location }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.refDoc }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.poNo }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.poDate }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.total }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.supplierId }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.supplierName }}
-              </td>
-              <td :class="resolveChipColorTable(item.raw.status)">
-                {{ item.raw.deliveredDate }}
-              </td>
-              
-              <td
-                :class="resolveChipColorTable(item.raw.status)"
-                
-                @click="pushBtnTable(item.raw.productId, item.raw.remark)"
-              >
-                {{ item.raw.remark }}
-              </td>
-            </tr>
-          </template>
-        </VDataTable>
       </VCardText>
     </VCard>
   </section>
