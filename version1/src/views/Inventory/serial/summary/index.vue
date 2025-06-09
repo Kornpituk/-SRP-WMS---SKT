@@ -3060,7 +3060,7 @@ const switcherDrS = ref(false)
             <!-- 👉 Number(Tag) -->
             <td
               v-if="checkRFID"
-              class="text-end px-6"
+              class="text-end px-1"
             >
               {{ (formatDecimal(product.tags)).toLocaleString('en-US') }}
             </td>
@@ -3068,12 +3068,12 @@ const switcherDrS = ref(false)
             <!-- 👉 Number(Non-Tag) -->
             <td
               v-if="checkRFID"
-              class="text-end  px-6"
+              class="text-end  px-1"
             >
               {{ (formatDecimal(product.nonTags)).toLocaleString('en-US') }}
             </td>
             <!-- 👉 Total quantity of products -->
-            <td class="text-end px-6">
+            <td class="text-end px-1">
               {{ (formatDecimal(product.qty)).toLocaleString('en-US') }}
             </td>
 
@@ -3117,13 +3117,13 @@ const switcherDrS = ref(false)
               {{ product.brand }}
             </td>
             <td
-              class="text-start px-1"
+              class="text-end px-1"
               style="width: 5rem;"
             >
-              {{ product.pdWeight }}
+              {{ (product.pdWeight).toLocaleString('en-US') }}
             </td>
             <td
-              class="text-end px-1"
+              class="text-start px-1"
               style="width: 5rem;"
             >
               {{ product.unitWeight }}
@@ -3132,19 +3132,19 @@ const switcherDrS = ref(false)
               class="text-end px-1"
               style="width: 5rem;"
             >
-              {{ product.dimensionWidth }}
+              {{ (product.dimensionWidth).toLocaleString('en-US') }}
             </td>
             <td
               class="text-end px-1"
               style="width: 5rem;"
             >
-              {{ product.dimensionLength }}
+              {{ (product.dimensionLength).toLocaleString('en-US') }}
             </td>
             <td
               class="text-end px-1"
               style="width: 5rem;"
             >
-              {{ product.dimensionHeight }}
+              {{ (product.dimensionHeight).toLocaleString('en-US') }}
             </td>
             <td
               class="text-start px-1"

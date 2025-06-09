@@ -761,303 +761,6 @@ const showExpansionDialog = ref(false)
     </VCard>
   </div>
   <!-- ----------           Search bar                                   ------------------------------------ -->
-  <section v-if="false">
-    <VCard class="ma-2">
-      <VContainer
-        fluid
-        ma-6
-        pa-6
-        fill-height
-      >
-        <VForm @submit.prevent="submitSearchButton">
-          <!-- Warehouse  | Storehouse barcode | Store area | Sub Storage area -->
-
-          <VRow>
-            <!-- 👉 Select WareHouse -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VAutocomplete
-                v-model="searchByWareHouseId"
-                :label="$t('Warehouse')"
-                :items="wareHouseItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                item-text="name"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select Storehouse Zone -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VAutocomplete
-                v-model="searchByZoneId"
-                :label="$t('Store Zone')"
-                :items="zoneItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select Store area -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VAutocomplete
-                v-model="searchByAreaId"
-                :label="$t('Store Area')"
-                :items="areaItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select Sub Storage area -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VAutocomplete
-                v-model="searchBySubAreaId"
-                :label="$t('Sub Area')"
-                :items="subAreaItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-          </VRow>
-
-          <!-- product categories | Group | Sub Group | Counting unit -->
-          <VRow>
-            <!-- 👉 Select  product categories  -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <!-- 👉 Search categories -->
-
-              <section>
-                <VAutocomplete
-                  v-model="searchByCategoryId"
-                  :label="$t('Categories')"
-                  :items="itemsSearchByCategoryId"
-                  :custom-filter="customFilter"
-                  item-title="name"
-                  item-value="id"
-                  density="compact"
-                  clearable
-                  clear-icon="mdi-close"
-                />
-              </section>
-            </VCol>
-
-            <!-- 👉 Select Group -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-              md="6"
-            >
-              <!-- 👉 Search ProductID -->
-              <VAutocomplete
-                v-model="searchByTypeId"
-                :label="$t('Product Group')"
-                :items="typeItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select  Sub Group -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <!-- 👉 Search Description -->
-              <VAutocomplete
-                v-model="searchBySubTypeId"
-                :label="$t('Product Sub Group')"
-                :items="subTypeItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="name"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select Counting unit -->
-            <VCol
-              v-if="false"
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <section>
-                <VAutocomplete
-                  v-model="searchByUOMId"
-                  :label="$t('Counting Unit')"
-                  :items="itemsSearchByUOMId"
-                  :custom-filter="customFilter"
-                  item-title="name"
-                  item-value="id"
-                  density="compact"
-                  clearable
-                  clear-icon="mdi-close"
-                />
-              </section>
-            </VCol>
-            <!-- 👉 Select Counting Serial -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <section>
-                <VTextField
-                  v-model="searchByUOMId"
-                  :label="$t('Serial')"
-                  density="compact"
-                  clearable
-                />
-              </section>
-            </VCol>
-          </VRow>
-    
-          <!-- Barcode | Product code | Product Name | Button Export -->
-          <VRow>
-            <!-- 👉 Select Barcode -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <!-- 👉 Search Product code -->
-              <VTextField
-                v-model="searchByBarcode"
-                :label="$t('Barcode')"
-                type="Barcode"
-                density="compact"
-                append-inner-icon="mdi-barcode-scan"
-              />
-            </VCol>
-
-            <!-- 👉 Select Product code -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VTextField
-                v-model="searchByProductId"
-                :label="$t('Product Code')"
-                type="Product Code"
-                density="compact"
-              />
-            </VCol>
-
-            <!-- 👉 Select Product Name -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VTextField
-                v-model="searchByProductName"
-                :label="$t('Product Name')"
-                type="Product Name"
-                density="compact"
-              />
-            </VCol>
-
-            <!-- 👉 Button Search and Export -->
-            <VCol
-              cols="12"
-              xs="4"
-              sm="4"
-              md="3"
-            >
-              <VRow>
-                <!-- 👉 Button Search  -->
-                <VCol
-                  xs="4"
-                  sm="6"
-                  cols="6"
-                >
-                  <VBtn
-                    type="submit"
-                    density="compact"
-                    size="x-large"
-                    class="px-16 px-sm-12 custom-small-btn-search"
-                    style="width: 100%; height: 100%;"
-                    @click="GetStockUpdate"
-                  >
-                    <VIcon
-                      icon="mdi-magnify"
-                      size="20px"
-                    />
-                    {{ $t('Search') }}
-                  </VBtn>
-                </VCol>
-                <!--  Export -->
-                <VCol
-                  sm="6"
-                  cols="6"
-                >
-                  <VBtn
-                    density="compact"
-                    class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
-                    color="warning"
-                    style="width: 100%; height: 100%;"
-                    @click="stockUpdateExcel"
-                  >
-                    <img
-                      src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
-                      style="width: 27px;"
-                      class="custom-small-img"
-                    >
-                    {{ $t('Export file') }}
-                  </VBtn>
-                </VCol>
-              </VRow>
-            </VCol>
-          </VRow>
-        </VForm>
-      </VContainer>
-    </VCard>
-  </section>
-
   <section
     v-if="true"
     class="my-2"
@@ -1730,7 +1433,7 @@ const showExpansionDialog = ref(false)
             </th>
             <th
               scope="row"
-              class="text-center"
+              class="text-center px-1"
             >
               {{ $t('Barcode') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
@@ -2053,7 +1756,7 @@ const showExpansionDialog = ref(false)
             </th>
             <th
               scope="row"
-              class="text-center px-4"
+              class="text-center px-1"
             >
               Action
             </th>
@@ -2213,7 +1916,7 @@ const showExpansionDialog = ref(false)
             <!-- 👉 Number(Tag) -->
             <td
               v-if="checkRFID"
-              class="text-end px-6"
+              class="text-end px-1"
             >
               {{ (formatDecimal(product.tags)).toLocaleString('en-US') }}
             </td>
@@ -2221,18 +1924,18 @@ const showExpansionDialog = ref(false)
             <!-- 👉 Number(Non-Tag) -->
             <td
               v-if="checkRFID"
-              class="text-end  px-6"
+              class="text-end  px-1"
             >
               {{ (formatDecimal(product.nonTags)).toLocaleString('en-US') }}
             </td>
             <!-- 👉 Total quantity of products -->
-            <td class="text-end px-6">
+            <td class="text-end px-1">
               {{ (formatDecimal(product.qty)).toLocaleString('en-US') }}
             </td>
 
             <!-- 👉 Counting unit -->
             <td
-              class="text-start "
+              class="text-start px-1"
               style="width: 5rem;"
             >
               {{ product.unitName }}
