@@ -9,14 +9,16 @@ export default [
       },
 
       {
+        title: 'Total Summary',
+        to: 'inventory-serial-summary',
+      },
+
+      {
         title: 'Total Details',
         to: 'inventory-serial-details',
       },
 
-      {
-        title: 'Total Summary',
-        to: 'inventory-serial-summary',
-      },
+      
       
     ],
   },
