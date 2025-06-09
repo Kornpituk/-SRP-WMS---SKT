@@ -1970,7 +1970,7 @@ const switcherDrS = ref(false)
            
             <th
               scope="row"
-              class="text-start px-1"
+              class="text-center px-1"
             >
               {{ $t('Barcode') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
@@ -3045,7 +3045,16 @@ const switcherDrS = ref(false)
 
             <!-- 👉 Barcode -->
             <td class="text-start px-1">
-              {{ product.barcode }}
+              <VueBarcode
+                v-if="product.barcode"
+                class="text-start"
+                :options="{
+                  width: '1%',
+                  height: '20%',
+                  fontSize: '16px', 
+                }"
+                :value="product.barcode"
+              />
             </td>
 
             <td
