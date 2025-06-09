@@ -781,7 +781,7 @@ onMounted(() => {
             lg="3"
           >
             <VCard style="height: 100%;">
-              <VCardTitle>
+              <VCardTitle v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
@@ -801,7 +801,7 @@ onMounted(() => {
             lg="3"
           >
             <VCard style="height: 100%;">
-              <VCardTitle>
+              <VCardTitle v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
@@ -821,7 +821,7 @@ onMounted(() => {
             sm="6"
           >
             <VCard style="height: 100%;">
-              <VCardTitle>
+              <VCardTitle v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
@@ -841,7 +841,7 @@ onMounted(() => {
             lg="3"
           >
             <VCard style="height: 100%;">
-              <VCardTitle>
+              <VCardTitle v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"

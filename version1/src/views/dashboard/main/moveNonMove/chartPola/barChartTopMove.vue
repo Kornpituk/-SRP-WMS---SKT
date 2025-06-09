@@ -1,11 +1,11 @@
 <script setup>
+import { hexToRgb } from '@layouts/utils'
+import { computed } from 'vue'
 import VueApexCharts from 'vue3-apexcharts'
 import {
   useRtl,
   useTheme,
 } from 'vuetify'
-import { hexToRgb } from '@layouts/utils'
-import { computed } from 'vue'
 
 const props = defineProps({
   categories: Array,
@@ -67,9 +67,73 @@ const chartConfig = computed(() => {
   return {
     chart: {
       parentHeightOffset: 0,
-      toolbar: { show: true },
+      toolbar: { 
+        show: true,
+        export: {
+          csv: {
+            filename: function() {
+              const now = new Date()
+              const dateStr = now.toISOString().slice(0, 10)
+              const timeStr = now.toTimeString().slice(0, 5).replace(':', '')
+              
+              return `Moving_Stock_(last 30 days)_${calDateReverse30Days.value}_${props.date}`
+            }(),
+  
+            columnDelimiter: ',',
+            headerCategory: 'Category',
+            headerValue: 'Value',
+          },
+          svg: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Moving_Stock_(last 30 days)_${calDateReverse30Days.value}_${props.date}`
+            })(),
+          },
+          png: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Moving_Stock_(last 30 days)_${calDateReverse30Days.value}_${props.date}`
+            })(),
+          },
+        },
+        
+      },
     },
-    tooltip: { enabled: false },
+    title: {
+      text: `Moving Stock (last 30 days) ${calDateReverse30Days.value} - ${props.date}`,
+      align: 'center',
+      style: {
+        fontSize: '16px',
+
+        // color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+
+        // color: themeSecondaryTextColor,
+      },
+    },
+    tooltip: { enabled: false, 
+      
+    },
     plotOptions: {
       bar: {
         borderRadius: 8,
@@ -196,7 +260,7 @@ const total = computed(() => {
 
 <template>
   <VCard>
-    <VCardTitle class="d-flex justify-center">
+    <VCardTitle  v-if="false" class="d-flex justify-center">
       {{ $t('Moving Stock (last 30 days)') }}: {{ calDateReverse30Days }} - {{ props.date }}
     </VCardTitle>
     <VCardSubtitle v-if="false">
