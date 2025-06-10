@@ -197,7 +197,7 @@ const addPoCat = (title, icon) => {
                     scope="col"
                     class="text-end"
                   >
-                    {{ $t('QTY.') }}
+                    {{ $t('Stock QTY.') }}
                   </th>
                   <th
                     scope="col"
