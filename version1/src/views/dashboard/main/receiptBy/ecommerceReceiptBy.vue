@@ -759,6 +759,7 @@ watchEffect(() => {
   <VCard
     v-if="!logicLuxOn"
     :color="getSwitchThemeColor"
+     @click="isDialogDetailVisible = true"
   >
     <VCardText>
       <div class="d-flex align-center justify-center">

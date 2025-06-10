@@ -90,7 +90,7 @@ export const getDonutChartConfigPOSuccess = themeColors => {
       stacked: true,
       parentHeightOffset: 0,
       toolbar: { 
-        show: true, 
+        show: false, 
         offsetX: 0,
         offsetY: 5,
         export: {
@@ -269,7 +269,7 @@ export const getDonutChartConfigPOWaiting = themeColors => {
       stacked: true,
       parentHeightOffset: 0,
       toolbar: { 
-        show: true, 
+        show: false, 
         offsetX: 0,
         offsetY: 5,
         export: {

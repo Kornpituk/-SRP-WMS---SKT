@@ -68,7 +68,7 @@ const chartConfig = computed(() => {
     chart: {
       parentHeightOffset: 0,
       toolbar: { 
-        show: true,
+        show: false,
         export: {
           csv: {
             filename: function() {

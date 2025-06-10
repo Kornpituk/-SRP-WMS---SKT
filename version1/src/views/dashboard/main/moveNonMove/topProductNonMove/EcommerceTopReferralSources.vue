@@ -124,7 +124,7 @@ const addPoCat = (title, icon) => {
               </VCol>
               <VCol
                 cols="12"
-                lg="10"
+                lg="8"
                 class="px-0"
               >
                 <div>
@@ -146,11 +146,14 @@ const addPoCat = (title, icon) => {
                   </VMenu>
                 </div>
               </VCol>
+              <VCol  class="d-flex align-center justify-end" cols="2">
+                <span>(Top 5)</span>
+              </VCol>
             </VRow>
           </VCardText>
 
           <!-- Table -->
-          <VCardText class="py-0">
+          <VCardText class="pa-0">
             <VTable
               density="compact"
               class="text-no-wrap mb-5 text-sm"
@@ -244,7 +247,7 @@ const addPoCat = (title, icon) => {
                   </td>
 
                   <td class="text-end font-weight-medium">
-                    {{ currentProduct.qty }}
+                    {{ (currentProduct.qty).toLocaleString('en-US') }}
                   </td>
 
                   <td class="text-end font-weight-medium">
