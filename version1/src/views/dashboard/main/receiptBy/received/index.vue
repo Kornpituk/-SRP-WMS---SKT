@@ -1,10 +1,14 @@
 <script setup>
 import { urlApi } from '@/api'
 import ChartPerformanceReceived from '@/views/dashboard/main/receiptBy/received/Chart/chartPerformance.vue'
-import { defineProps, watchEffect } from 'vue'
 import axios from '@axios'
+import { defineProps, watchEffect } from 'vue'
 
 import { useRoute } from 'vue-router'
+
+import DetailsPoReceiving from "@/views/dashboard/main/shortCutMenu/received/po/datails.vue"
+import DetailsTranferInReceiving from "@/views/dashboard/main/shortCutMenu/received/transferIn/datails.vue"
+import DetailsOtherReceiving from "@/views/dashboard/main/shortCutMenu/received/other/datails.vue"
 
 const props = defineProps({
   data: {
@@ -133,9 +137,16 @@ watch(() => {
 //------------------------------------------------- Get Data from API ---------------------------------------------
 const dataDatepicker = ref()
 
+const formateDateNew = inputDate => {
+  const [day, month, year] = inputDate.split('/')
+
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+
 const getHeaderGroupTimeNew = () => {
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
+  console.log('getHeaderGroupTimeNew: ', formateDateNew(props.datepickerDataStart))
   axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Receive/GroupTime`, {
     headers: {
       'accept': '*/*',
@@ -148,8 +159,8 @@ const getHeaderGroupTimeNew = () => {
     // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: dateEndProp.value,
-      dateSp: dateStartProp.value,
+      dateSt: '2025-06-11',
+      dateSp: '2025-06-11',
 
       // ... and so on with other parameters
     },
@@ -171,7 +182,8 @@ const getHeaderGroupTimeNew = () => {
 
 const getHeaderGroupDayNew = () => {
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
+  
+  console.log('getHeaderGroupDayNew: ', formateDateNew(props.datepickerDataStart))
   axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Receive/GroupDay`, {
     headers: {
       'accept': '*/*',
@@ -184,8 +196,8 @@ const getHeaderGroupDayNew = () => {
       // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: dateEndProp.value,
-      dateSp: dateStartProp.value,
+      dateSt: '2025-06-11',
+      dateSp: '2025-06-11',
 
     // ... and so on with other parameters
     },
@@ -205,24 +217,20 @@ const getHeaderGroupDayNew = () => {
     })
 }
 
-watch([dateStartProp, dateEndProp, typeDateProps], ([newDateStart, newDateEnd, newTypeDate]) => {
-  if (newTypeDate === 8) {
-    getHeaderGroupTimeNew()
-  } else if(newTypeDate === 7){
-    getHeaderGroupDayNew()
-  }
-})
+const typeTableReceiving = ref('PO')
 
-watchEffect(() => {
-  if(!props.datepickerDataEnd && !props.datepickerDataStart){
-    // console.log('Props datepickerDataEnd Empty', props.datepickerDataEnd, props.datepickerDataStart, props.selectTypeDate)
-    dateEndProp.value = route.query.startDate
-    dateStartProp.value = route.query.endDate
-  }
+watch(() => {
+  // if(!props.datepickerDataEnd && !props.datepickerDataStart){
+  //   // console.log('Props datepickerDataEnd Empty', props.datepickerDataEnd, props.datepickerDataStart, props.selectTypeDate)
+  //   dateEndProp.value = route.query.startDate
+  //   dateStartProp.value = route.query.endDate
+  // }
 
-  if (typeDateProps === 8) {
+  console.log('compareType', typeDateProps)
+
+  if (typeDateProps.value === 8) {
     getHeaderGroupTimeNew()
-  } else if(typeDateProps === 7){
+  } else if(typeDateProps.value === 7){
     getHeaderGroupDayNew()
   }
 
@@ -241,12 +249,8 @@ watchEffect(() => {
       >
         <VCard
           v-ripple
-          :to="{ name: 'dashboards-shortCutMenu-received-po',
-                 query: { dateStart: dateEndProp,
-                          dateEnd: dateStartProp,
-                          typeDate: typeDatepicker
-                 }, }"
           class="cursor-pointer"
+          @click="typeTableReceiving = 'PO'"
           @mouseenter="isHoveredReceived = true"
           @mouseleave="isHoveredReceived = false"
         >
@@ -300,12 +304,8 @@ watchEffect(() => {
       >
         <VCard
           v-ripple
-          :to="{ name: 'dashboards-shortCutMenu-received-transferIn',
-                 query: { dateStart: dateEndProp,
-                          dateEnd: dateStartProp,
-                          typeDate: typeDatepicker
-                 }, }"
           class="cursor-pointer"
+          @click="typeTableReceiving = 'Transfer In'"
           @mouseenter="isHoveredTransferIn = true"
           @mouseleave="isHoveredTransferIn = false"
         >
@@ -359,12 +359,8 @@ watchEffect(() => {
       >
         <VCard
           v-ripple
-          :to="{ name: 'dashboards-shortCutMenu-received-other',
-                 query: { dateStart: dateEndProp,
-                          dateEnd: dateStartProp,
-                          typeDate: typeDatepicker
-                 }, }"
           class="cursor-pointer"
+          @click="typeTableReceiving = 'Other'"
           @mouseenter="isHoveredOther = true"
           @mouseleave="isHoveredOther = false"
         >
@@ -421,9 +417,22 @@ watchEffect(() => {
         lg="8"
       >
         <ChartPerformanceReceived
+          v-if="false"
           :data="dataBar"
           :pure-data="dataDatepicker"
           :type-date="typeDatepicker"
+        />
+        <DetailsPoReceiving
+          v-if="typeTableReceiving === 'PO'"
+          :date="props.datepickerDataStart"
+        />
+        <DetailsTranferInReceiving
+          v-if="typeTableReceiving === 'Transfer In'"
+          :date="props.datepickerDataStart"
+        />
+        <DetailsOtherReceiving
+          v-if="typeTableReceiving === 'Other'"
+          :date="props.datepickerDataStart"
         />
       </VCol>
       <VCol

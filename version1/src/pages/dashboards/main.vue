@@ -823,6 +823,7 @@ onMounted(() => {
               :history="dialogHistory"
               :complate-all-props="complateAll"
               :await-all-props="awaitAll"
+              :date-current="formattedDateTime"
             />
           </VCol>
         </VRow>

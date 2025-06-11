@@ -26,7 +26,7 @@ const dataTotalTransferIn = ref([])
 const dataTotalOther = ref([])
 const series = ref([dataTotalRecieved, dataTotalTransferIn, dataTotalOther])
 
-watchEffect(() => {
+watch(() => {
   console.log("pureData ## in Pie", props.pureData)
 
   if(props.pureData){

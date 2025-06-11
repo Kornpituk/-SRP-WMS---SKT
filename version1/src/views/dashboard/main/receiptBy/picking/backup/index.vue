@@ -7,9 +7,9 @@ import axios from '@axios'
 
 import { useRoute } from 'vue-router'
 
-import DetailsTransferPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/transferOut/datails.vue"
-import DetailsDeliveryPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/delivery/datails.vue"
-import DetailsWriteOfPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/writeOff/datails.vue"
+import DetailsTransferReceiving from "@/views/dashboard/main/shortCutMenu/pickingUp/transferOut/datails.vue"
+import DetailsDeliveryReceiving from "@/views/dashboard/main/shortCutMenu/pickingUp/delivery/datails.vue"
+import DetailsWriteOfReceiving from "@/views/dashboard/main/shortCutMenu/pickingUp/writeOff/datails.vue"
  
 const props = defineProps({
   data: {
@@ -29,14 +29,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const formateDateNew = inputDate => {
-
-  const [day, month, year] = inputDate.split('/')
-  
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-}
-
 
 const route = useRoute()
 const MAX= 100
@@ -163,8 +155,8 @@ const getHeaderGroupTimeNew = () => {
     // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: formateDateNew(props.datepickerDataStart),
-      dateSp: formateDateNew(props.datepickerDataStart),
+      dateSt: dateEndProp.value,
+      dateSp: dateStartProp.value,
 
       // ... and so on with other parameters
     },
@@ -199,8 +191,8 @@ const getHeaderGroupDayNew = () => {
       // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: formateDateNew(props.datepickerDataStart),
-      dateSp: formateDateNew(props.datepickerDataStart),
+      dateSt: dateEndProp.value,
+      dateSp: dateStartProp.value,
 
     // ... and so on with other parameters
     },
@@ -241,14 +233,11 @@ watchEffect(() => {
 
   console.log('Props datepickerDataEnd picking', props.datepickerDataEnd, props.datepickerDataStart)
 
-  // if (typeDateProps === 8) {
-  //   getHeaderGroupTimeNew()
-  // } else if(typeDateProps === 7){
-  //   getHeaderGroupDayNew()
-  // }
-
-  getHeaderGroupTimeNew()
-
+  if (typeDateProps === 8) {
+    getHeaderGroupTimeNew()
+  } else if(typeDateProps === 7){
+    getHeaderGroupDayNew()
+  }
 
 
 })
@@ -266,8 +255,12 @@ watchEffect(() => {
       >
         <VCard
           v-ripple
+          :to="{ name: 'dashboards-shortCutMenu-pickingUp-transferOut',
+                 query: { dateStart: dateEndProp,
+                          dateEnd: dateStartProp,
+                          typeDate: typeDatepicker
+                 }, }"
           class="cursor-pointer"
-          @click="typeTableReceiving = 'Transfer Out'"
           @mouseenter="isHoveredReceived = true"
           @mouseleave="isHoveredReceived = false"
         >
@@ -322,8 +315,12 @@ watchEffect(() => {
       >
         <VCard
           v-ripple
+          :to="{ name: 'dashboards-shortCutMenu-pickingUp-delivery',
+                 query: { dateStart: dateEndProp,
+                          dateEnd: dateStartProp,
+                          typeDate: typeDatepicker
+                 }, }"
           class="cursor-pointer"
-          @click="typeTableReceiving = 'Deliveryt'"
           @mouseenter="isHoveredTransferIn = true"
           @mouseleave="isHoveredTransferIn = false"
         >
@@ -378,8 +375,12 @@ watchEffect(() => {
       >
         <VCard
           v-ripple
+          :to="{ name: 'dashboards-shortCutMenu-pickingUp-writeOff',
+                 query: { dateStart: dateEndProp,
+                          dateEnd: dateStartProp,
+                          typeDate: typeDatepicker
+                 }, }"
           class="cursor-pointer"
-          @click="typeTableReceiving = 'Write Off'"
           @mouseenter="isHoveredOther = true"
           @mouseleave="isHoveredOther = false"
         >
@@ -436,23 +437,9 @@ watchEffect(() => {
         lg="8"
       >
         <ChartPerformanceReceived
-          v-if="false"
           :data="dataBar"
           :pure-data="dataDatepicker"
           :type-date="typeDatepicker"
-        />
-
-        <DetailsTransferPicking
-          v-if="typeTableReceiving === 'Transfer Out'"
-          :date="formateDateNew(props.datepickerDataStart)"
-        />
-        <DetailsDeliveryPicking
-          v-if="typeTableReceiving === 'Deliveryt'"
-          :date="formateDateNew(props.datepickerDataStart)"
-        />
-        <DetailsWriteOfPicking
-          v-if="typeTableReceiving === 'Write Off'"
-          :date="formateDateNew(props.datepickerDataStart)"
         />
       </VCol>
       <VCol

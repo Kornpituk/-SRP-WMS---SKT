@@ -1,16 +1,15 @@
 <script setup>
 import { urlApi } from '@/api'
-import ChartPerformanceReceived from '@/views/dashboard/main/receiptBy/picking/Chart/chartPerformance.vue'
-import ChartPerformancePickingPie from '@/views/dashboard/main/receiptBy/picking/Chart/chartPerformancePie.vue'
-import { defineProps, watchEffect } from 'vue'
+import ChartPerformanceReceived from '@/views/dashboard/main/receiptBy/received/Chart/chartPerformance.vue'
 import axios from '@axios'
+import { defineProps, watchEffect } from 'vue'
 
 import { useRoute } from 'vue-router'
 
-import DetailsTransferPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/transferOut/datails.vue"
-import DetailsDeliveryPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/delivery/datails.vue"
-import DetailsWriteOfPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/writeOff/datails.vue"
- 
+import DetailsPoReceiving from "@/views/dashboard/main/shortCutMenu/received/po/datails.vue"
+import DetailsTranferInReceiving from "@/views/dashboard/main/shortCutMenu/received/transferIn/datails.vue"
+import DetailsOtherReceiving from "@/views/dashboard/main/shortCutMenu/received/other/datails.vue"
+
 const props = defineProps({
   data: {
     type: Array,
@@ -29,22 +28,15 @@ const props = defineProps({
     required: true,
   },
 })
-
-const formateDateNew = inputDate => {
-
-  const [day, month, year] = inputDate.split('/')
-  
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-}
-
-
+ 
 const route = useRoute()
+ 
 const MAX= 100
 
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
-
+import ChartPerformancePickingPie from '@/views/dashboard/main/receiptBy/received/Chart/chartPerformancePie.vue'
 
 const isHoveredReceived = ref(false)
 const isHoveredTransferIn = ref(false)
@@ -58,16 +50,13 @@ const colorIconReceived = ref('green-lighten-3') //
 const colorIconTransferIn = ref('deep-orange-lighten-3') //
 const colorIconOther = ref('teal-lighten-3') //
 
-const typeDatepicker = ref('')
-const dateStartProp = ref(new Date())
-const dateEndProp = ref(new Date())
+const typeDatepicker = ref(localStorage.getItem('startDateFromPerformance'))
+const dateStartProp = ref('')
+const dateEndProp = ref(localStorage.getItem('endDateFromPerformance'))
 
 watchEffect(() => {
 
-
   typeDatepicker.value = props.selectTypeDate
-
-  // console.log('Props datepickerDataEnd', props.datepickerDataEnd, props.datepickerDataStart)
 
   //---------------- Set Date With Prop Data -----------------------------
   if(props.datepickerDataEnd && props.datepickerDataStart){
@@ -148,10 +137,17 @@ watch(() => {
 //------------------------------------------------- Get Data from API ---------------------------------------------
 const dataDatepicker = ref()
 
+const formateDateNew = inputDate => {
+  const [day, month, year] = inputDate.split('/')
+
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+
 const getHeaderGroupTimeNew = () => {
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)Receive Picking
-  axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Picking/GroupTime`, {
+  console.log('getHeaderGroupTimeNew: ', formateDateNew(props.datepickerDataStart))
+  axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Receive/GroupTime`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -163,8 +159,8 @@ const getHeaderGroupTimeNew = () => {
     // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: formateDateNew(props.datepickerDataStart),
-      dateSp: formateDateNew(props.datepickerDataStart),
+      dateSt: '2025-06-11',
+      dateSp: '2025-06-11',
 
       // ... and so on with other parameters
     },
@@ -173,7 +169,7 @@ const getHeaderGroupTimeNew = () => {
 
       dataDatepicker.value = response.data
 
-      console.log('Chart Data New Time PK:', dataDatepicker.value)
+      console.log('Chart Data New Time:', dataDatepicker.value)
 
       // currentPage.value = response.data.page
       // totalPage.value = response.data.totalPages
@@ -186,8 +182,9 @@ const getHeaderGroupTimeNew = () => {
 
 const getHeaderGroupDayNew = () => {
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Picking/GroupDay`, {
+  
+  console.log('getHeaderGroupDayNew: ', formateDateNew(props.datepickerDataStart))
+  axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Receive/GroupDay`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -199,8 +196,8 @@ const getHeaderGroupDayNew = () => {
       // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: formateDateNew(props.datepickerDataStart),
-      dateSp: formateDateNew(props.datepickerDataStart),
+      dateSt: '2025-06-11',
+      dateSp: '2025-06-11',
 
     // ... and so on with other parameters
     },
@@ -209,7 +206,7 @@ const getHeaderGroupDayNew = () => {
 
       dataDatepicker.value = response.data
 
-      console.log('Chart Data New Day PK:', response.data)
+      console.log('Chart Data New Day:', response.data)
 
       // currentPage.value = response.data.page
       // totalPage.value = response.data.totalPages
@@ -220,35 +217,24 @@ const getHeaderGroupDayNew = () => {
     })
 }
 
-getHeaderGroupTimeNew()
+const typeTableReceiving = ref('')
 
-const typeTableReceiving = ref('Transfer Out')
 
-watch([dateStartProp, dateEndProp, typeDateProps], ([newDateStart, newDateEnd, newTypeDate]) => {
-  if (newTypeDate === 8) {
-    getHeaderGroupTimeNew()
-  } else if(newTypeDate === 7){
-    getHeaderGroupDayNew()
-  }
-})
 
-watchEffect(() => {
-  if(!props.datepickerDataEnd && !props.datepickerDataStart){
-    console.log('Props datepickerDataEnd Empty picking', props.datepickerDataEnd, props.datepickerDataStart, props.selectTypeDate)
-    dateEndProp.value = route.query.startDate
-    dateStartProp.value = route.query.endDate
-  }
-
-  console.log('Props datepickerDataEnd picking', props.datepickerDataEnd, props.datepickerDataStart)
-
-  // if (typeDateProps === 8) {
-  //   getHeaderGroupTimeNew()
-  // } else if(typeDateProps === 7){
-  //   getHeaderGroupDayNew()
+watch(() => {
+  // if(!props.datepickerDataEnd && !props.datepickerDataStart){
+  //   // console.log('Props datepickerDataEnd Empty', props.datepickerDataEnd, props.datepickerDataStart, props.selectTypeDate)
+  //   dateEndProp.value = route.query.startDate
+  //   dateStartProp.value = route.query.endDate
   // }
 
-  getHeaderGroupTimeNew()
+  console.log('compareType', typeDateProps)
 
+  if (typeDateProps.value === 8) {
+    getHeaderGroupTimeNew()
+  } else if(typeDateProps.value === 7){
+    getHeaderGroupDayNew()
+  }
 
 
 })
@@ -259,15 +245,18 @@ watchEffect(() => {
   <!-- Card To Received / Transfer In / Other -->
   <div>
     <VRow>
-      <!-- Transfer Out  -->
       <VCol
         cols="12"
         lg="4"
       >
         <VCard
           v-ripple
+          :to="{ name: 'dashboards-shortCutMenu-received-po',
+                 query: { dateStart: dateEndProp,
+                          dateEnd: dateStartProp,
+                          typeDate: typeDatepicker
+                 }, }"
           class="cursor-pointer"
-          @click="typeTableReceiving = 'Transfer Out'"
           @mouseenter="isHoveredReceived = true"
           @mouseleave="isHoveredReceived = false"
         >
@@ -281,17 +270,17 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="light-blue-lighten-4"
+                    :color="colorAvatarReceived"
                   >
                     <VIcon
-                      color="light-blue"
-                      icon="ri-logout-box-line"
+                      :color="colorIconReceived"
+                      icon="ri-store-3-line"
                     />
                   </VAvatar><span
                     style="font-size: 16px; font-weight: bolder;"
                     class="px-4"
-                    :class="{ 'text-light-blue': isHoveredReceived, 'text-light-blue-lighten-2': !isHoveredReceived }"
-                  >{{ $t('Transfer Out') }}</span>
+                    :class="{ 'text-green': isHoveredReceived, 'text-green-lighten-2': !isHoveredReceived }"
+                  >{{ $t('PO') }}</span>
                 </div>
               </VCol>
               <VCol
@@ -309,21 +298,24 @@ watchEffect(() => {
             </VRow>
           </VCardText>
           <VCardActions
-            :class="{ 'bg-light-blue': isHoveredReceived, 'bg-light-blue-lighten-3': !isHoveredReceived }"
+            :class="{ 'bg-green': isHoveredReceived, 'bg-green-lighten-3': !isHoveredReceived }"
             @mouseenter="isHoveredReceived = true"
             @mouseleave="isHoveredReceived = false"
           />
         </VCard>
       </VCol>
-      <!-- Delivery  -->
       <VCol
         cols="12"
         lg="4"
       >
         <VCard
           v-ripple
+          :to="{ name: 'dashboards-shortCutMenu-received-transferIn',
+                 query: { dateStart: dateEndProp,
+                          dateEnd: dateStartProp,
+                          typeDate: typeDatepicker
+                 }, }"
           class="cursor-pointer"
-          @click="typeTableReceiving = 'Deliveryt'"
           @mouseenter="isHoveredTransferIn = true"
           @mouseleave="isHoveredTransferIn = false"
         >
@@ -337,17 +329,17 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="amber-lighten-4"
+                    :color="colorAvatarTransferIn"
                   >
                     <VIcon
-                      color="amber"
-                      icon="ri-truck-line"
+                      :color="colorIconTransferIn"
+                      icon="ri-folder-transfer-line"
                     />
                   </VAvatar><span
                     style="font-size: 16px; font-weight: bolder;"
                     class="px-4"
-                    :class="{ 'text-amber': isHoveredTransferIn, 'text-amber-lighten-2': !isHoveredTransferIn }"
-                  >{{ $t('Delivery') }}</span>
+                    :class="{ 'text-deep-orange': isHoveredReceived, 'text-deep-orange-lighten-2': !isHoveredReceived }"
+                  >{{ $t('Transfer In') }}</span>
                 </div>
               </VCol>
               <VCol
@@ -365,21 +357,24 @@ watchEffect(() => {
             </VRow>
           </VCardText>
           <VCardActions
-            :class="{ 'bg-amber': isHoveredTransferIn, 'bg-amber-lighten-3': !isHoveredTransferIn }"
+            :class="{ 'bg-deep-orange': isHoveredTransferIn, 'bg-deep-orange-lighten-3': !isHoveredTransferIn }"
             @mouseenter="isHoveredTransferIn = true"
             @mouseleave="isHoveredTransferIn = false"
           />
         </VCard>
       </VCol>
-      <!--  White Off -->
       <VCol
         cols="12"
         lg="4"
       >
         <VCard
           v-ripple
+          :to="{ name: 'dashboards-shortCutMenu-received-other',
+                 query: { dateStart: dateEndProp,
+                          dateEnd: dateStartProp,
+                          typeDate: typeDatepicker
+                 }, }"
           class="cursor-pointer"
-          @click="typeTableReceiving = 'Write Off'"
           @mouseenter="isHoveredOther = true"
           @mouseleave="isHoveredOther = false"
         >
@@ -393,17 +388,17 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="purple-lighten-3"
+                    :color="colorAvatarOther"
                   >
                     <VIcon
-                      color="purple"
+                      :color="colorIconOther"
                       icon="ri-sparkling-2-line"
                     />
                   </VAvatar><span
                     style="font-size: 16px; font-weight: bolder;"
                     class="px-4"
-                    :class="{ 'text-purple': isHoveredOther, 'text-purple-lighten-2': !isHoveredOther}"
-                  >{{ $t('Write Off') }}</span>
+                    :class="{ 'text-teal': isHoveredOther, 'text-teal-lighten-2': !isHoveredOther}"
+                  >{{ $t('Other') }}</span>
                 </div>
               </VCol>
               <VCol
@@ -421,7 +416,7 @@ watchEffect(() => {
             </VRow>
           </VCardText>
           <VCardActions
-            :class="{ 'bg-purple': isHoveredOther, 'bg-purple-lighten-3': !isHoveredOther }"
+            :class="{ 'bg-teal': isHoveredOther, 'bg-teal-lighten-3': !isHoveredOther }"
             @mouseenter="isHoveredOther = true"
             @mouseleave="isHoveredOther = false"
           />
@@ -441,19 +436,7 @@ watchEffect(() => {
           :pure-data="dataDatepicker"
           :type-date="typeDatepicker"
         />
-
-        <DetailsTransferPicking
-          v-if="typeTableReceiving === 'Transfer Out'"
-          :date="formateDateNew(props.datepickerDataStart)"
-        />
-        <DetailsDeliveryPicking
-          v-if="typeTableReceiving === 'Deliveryt'"
-          :date="formateDateNew(props.datepickerDataStart)"
-        />
-        <DetailsWriteOfPicking
-          v-if="typeTableReceiving === 'Write Off'"
-          :date="formateDateNew(props.datepickerDataStart)"
-        />
+        <DetailsPoReceiving :date="props.datepickerDataStart" />
       </VCol>
       <VCol
         cols="12"

@@ -1,16 +1,23 @@
+/* stylelint-disable no-eol-whitespace */
 <script setup>
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
 import { ref, watchEffect } from 'vue'
-import { VDataTable } from 'vuetify/labs/VDataTable'
 import { useRoute } from 'vue-router'
+
+const props = defineProps({
+  date: {
+    type: String,
+    required: true,
+  },
+})
 
 const route = useRoute()
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
+import { urlApi } from '@/api'; //---------------------- Import Api for Url *****
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
@@ -76,16 +83,16 @@ const searchByProductNameFilter = ref(null)
 const searchByUnitName = ref(null)
 
 //----- Search Filter Icon Header Table[Product Category, Group, Sub Group, Barcode, Product Category Code, Product Name]
-const menuCategory= ref( false)
-const menuGroup = ref( false)
-const menuSubGroup = ref( false)
-const menuBarcode = ref( false)
-const menuProductCode = ref( false)
-const menuProductReceivedNo = ref( false)
-const menuProductName = ref( false)
+const menuCategory = ref(false)
+const menuGroup = ref(false)
+const menuSubGroup = ref(false)
+const menuBarcode = ref(false)
+const menuProductCode = ref(false)
+const menuProductReceivedNo = ref(false)
+const menuProductName = ref(false)
 
 
-const menuUoM = ref( false)
+const menuUoM = ref(false)
 
 //------------------------ item ID for search ------------------------------
 const itemsSearchByCategoryId = ref([])
@@ -139,7 +146,7 @@ const toggleSortType = sortBy => {
 // ฟังก์ชันสำหรับการดึงข้อมูลจาก localStorage
 const loadFromLocalStorage = key => {
   const data = localStorage.getItem(key)
-  
+
   return data ? JSON.parse(data) : []
 }
 
@@ -193,10 +200,19 @@ const checkReceiveNos = receivedPO => {
   return false
 }
 
+const formateDateNew = inputDate => {
+
+  const [day, month, year] = inputDate.split('/')
+  
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+
+
 const GetReceivedPoDetails = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/ReceivePo/Detail?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+  axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/ReceivePo/Detail?page=` + currentPage.value + `&perPage=` + rowPerPage.value, {
     headers: {
       'accept': '*/*',
       'x-location': `${searchByWareHouseId.value}`,
@@ -207,8 +223,12 @@ const GetReceivedPoDetails = () => {
       // dateSt: dateStData.value,
       // dateSp: dateSpData.value,
       stockId: stockIdData.value,
-      dateSt: startDate.value,
-      dateSp: endDate.value,
+
+      // dateSt: startDate.value,
+      // dateSp: endDate.value,
+
+      dateSt: formateDateNew(props.date),
+      dateSp: formateDateNew(props.date),
 
       barcode: barcodeData.value,
       productId: productIdData.value,
@@ -229,7 +249,7 @@ const GetReceivedPoDetails = () => {
       sortByColQtyReceive: sortByReceive.value,
       sortByColQtyOrder: sortByQtyOrder.value,
 
-    // ... and so on with other parameters
+      // ... and so on with other parameters
     },
   }, {})
     .then(response => {
@@ -259,7 +279,7 @@ const GetReceivedPoDetails = () => {
 
       console.log('Matched Partial ReceiveNos:', matchedReceiveNos.matchedPartial)
       console.log('Matched Complete ReceiveNos:', matchedReceiveNos.matchedComplete)
-  
+
     })
     .catch(error => {
       // Handle errors
@@ -284,8 +304,8 @@ const paginationData = computed(() => {
   // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
   // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
   // console.log('products.value.length: ',products.value.length)
-  
-  return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
+
+  return `${firstIndex}-${lastIndex} of ${totalCount.value}`
 })
 
 // SECTION Checkbox toggle
@@ -306,7 +326,7 @@ const fetchItemsSearchBy = nameSearch => {
     return response.data
   }).catch(error => {
     console.error('Error:', error)
-    
+
     return null
   })
 }
@@ -319,7 +339,7 @@ function customFilter(item, queryText, itemText) {
   const textOne = itemText.title.toLowerCase()
   const textTwo = itemText.value.toLowerCase()
   const searchText = queryText.toLocaleLowerCase()
-  
+
   return textOne.includes(searchText) || textTwo.includes(searchText)
 }
 
@@ -342,7 +362,7 @@ const fetchItemsWareHouse = () => {
       // Now `items` contains an array of objects with id and name properties
       // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
 
-      
+
     })
     .catch(error => {
       // Handle errors
@@ -350,7 +370,7 @@ const fetchItemsWareHouse = () => {
       console.error('Error:', error)
     })
 
-    
+
 }
 
 watch(fetchItemsWareHouse)
@@ -358,7 +378,7 @@ watch(fetchItemsWareHouse)
 //--------------------------------------- FetchItems for Search  Unit  ----------------------------------------
 
 const getItemsProductUnit = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/`+searchByCategoryId.value+'/Unit', {
+  axiosIns.get(`${urlApi.value}/api/v1/Product/` + searchByCategoryId.value + '/Unit', {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -372,7 +392,7 @@ const getItemsProductUnit = () => {
       // Now `items` contains an array of objects with id and name properties
       // console.log('itemsSearchByUOMId.value At index',itemsSearchByUOMId.value)
 
-      
+
     })
     .catch(error => {
       // Handle errors
@@ -380,7 +400,7 @@ const getItemsProductUnit = () => {
       console.error('Error:', error)
     })
 
-    
+
 }
 
 watchEffect(getItemsProductUnit)
@@ -405,7 +425,7 @@ const getItemsProductType = () => {
       // Now `items` contains an array of objects with id and name properties
       // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
 
-      
+
     })
     .catch(error => {
       // Handle errors
@@ -413,7 +433,7 @@ const getItemsProductType = () => {
       console.error('Error:', error)
     })
 
-    
+
 }
 
 watchEffect(getItemsProductType)
@@ -438,7 +458,7 @@ const getItemsProductSubType = () => {
       // Now `items` contains an array of objects with id and name properties
       // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
 
-      
+
     })
     .catch(error => {
       // Handle errors
@@ -446,7 +466,7 @@ const getItemsProductSubType = () => {
       console.error('Error:', error)
     })
 
-    
+
 }
 
 watchEffect(getItemsProductSubType)
@@ -468,7 +488,7 @@ const getItemLocalZone = () => {
       // Now `items` contains an array of objects with id and name properties
       // console.log('zoneItemsSearchById At index',zoneItemsSearchById.value)
 
-      
+
     })
     .catch(error => {
       // Handle errors
@@ -476,7 +496,7 @@ const getItemLocalZone = () => {
       console.error('Error:', error)
     })
 
-    
+
 }
 
 watch(getItemLocalZone)
@@ -501,7 +521,7 @@ const getItemLocalArea = () => {
       // Now `items` contains an array of objects with id and name properties
       // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
 
-      
+
     })
     .catch(error => {
       // Handle errors
@@ -509,7 +529,7 @@ const getItemLocalArea = () => {
       console.error('Error:', error)
     })
 
-    
+
 }
 
 watchEffect(getItemLocalArea)
@@ -535,7 +555,7 @@ const getItemLocalSubArea = () => {
       // Now `items` contains an array of objects with id and name properties
       // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
 
-      
+
     })
     .catch(error => {
       // Handle errors
@@ -543,7 +563,7 @@ const getItemLocalSubArea = () => {
       console.error('Error:', error)
     })
 
-    
+
 }
 
 watchEffect(getItemLocalSubArea)
@@ -616,7 +636,7 @@ const formatDate = dateString => {
   const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = String(date.getFullYear())
-  
+
   return `${day}/${month}/${year}`
 }
 
@@ -626,7 +646,7 @@ const nameUser = localStorage.getItem('userCheck')
 const checkConfigUser = nameUser => {
   if (nameUser == 'Chutimon') {
     return false
-  } else if (nameUser == 'Tamma'){
+  } else if (nameUser == 'Tamma') {
     return true
   } else {
     return true
@@ -744,7 +764,7 @@ function getRandomDate() {
   const start = new Date(2020, 0, 1) // 1st Jan 2020
   const end = new Date() // Current date
   const randomDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
-  
+
   return randomDate.toISOString().split('T')[0] // Format: YYYY-MM-DD
 }
 
@@ -784,7 +804,6 @@ import p8 from "@images/topProductMove/ladies/L08.jpg"
 import p9 from "@images/topProductMove/ladies/L09.webp"
 
 import p10 from "@images/topProductMove/genter/genter01.webp"
-import p11 from "@images/topProductMove/genter/genter02.webp"
 import p12 from "@images/topProductMove/genter/genter03.webp"
 import p13 from "@images/topProductMove/genter/genter04.jpg"
 import p14 from "@images/topProductMove/genter/genter05.jpg"
@@ -794,7 +813,7 @@ import p17 from "@images/topProductMove/genter/genter08.jpg"
 import p18 from "@images/topProductMove/genter/genter09.jpg"
 import p19 from "@images/topProductMove/genter/genter10.jpg"
 
-const imageLs = [p1, p2, p3, p4, p5, p6, p7, p8, p8, p9, p10,  p12, p12, p13, p14, p15, p16, p17, p18, p19]
+const imageLs = [p1, p2, p3, p4, p5, p6, p7, p8, p8, p9, p10, p12, p12, p13, p14, p15, p16, p17, p18, p19]
 
 const detailsMockData = [
   'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo dolore reprehenderit, doloribus nesciunt, ullam quisquam, nam ipsum itaque delectus inventore et natus odit alias ipsam magnam consequatur sed! Sequi, provident?',
@@ -822,7 +841,7 @@ const mockData = Array.from({ length: 20 }, (_, index) => ({
   groupSup: `Group Sup ${index + 1}`,
   group: `Group ${index + 1}`,
   total: Math.floor(Math.random() * 100) + 1,
-  details: `Details ${index + 1}`+detailsMockData,
+  details: `Details ${index + 1}` + detailsMockData,
   receivedNo: `RN-${index}`,
   receivedDate: getRandomDate(),
   location: `Location ${index + 1}`,
@@ -852,7 +871,7 @@ const dataProductNew = ref([])
 const getDataProductNewData = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=1`+`&perPage=999`, {
+  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=1` + `&perPage=999`, {
     params: {
       categoryId: searchByCategoryId.value,
       typeId: searchByTypeId.value,
@@ -882,7 +901,7 @@ const getDataProductNewData = () => {
       'sortByTags': sortByTags.value,
       'sortByNonTags': sortByNonTags.value,
 
-    // ... and so on with other parameters
+      // ... and so on with other parameters
     },
     headers: {
       'accept': '*/*',
@@ -902,7 +921,7 @@ const getDataProductNewData = () => {
       console.log('[dataProductNew.value]!!: ', dataProductNew.value)
     })
     .catch(error => {
-    // Handle errors
+      // Handle errors
       console.error('Error:', error)
     })
 }
@@ -912,7 +931,7 @@ const getDataProductNewData = () => {
 const router = useRouter()
 
 const pushBtnTable = (productId, productUnitId) => {
-  console.log('pushBtnTable', productId, productUnitId), 
+  console.log('pushBtnTable', productId, productUnitId),
 
   // router.push('/dashboards/shortCutMenu/received/po/details')3
   router.push({
@@ -925,7 +944,6 @@ const pushBtnTable = (productId, productUnitId) => {
 }
 
 //--------------------------------------- Menu Filter -------------------------------------------
-import avatar1 from '@images/avatars/avatar-1.png'
 
 const dialogHistory = (true)
 const cardBtnHistory = ('received')
@@ -960,10 +978,12 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               <span
                 v-if="!expanded"
                 class="text-h6"
-              ><VIcon
-                :color="!expanded ? '' : ''"
-                :icon="expanded ? filter : 'ri-equalizer-line'"
-              /></span>
+              >
+                <VIcon
+                  :color="!expanded ? '' : ''"
+                  :icon="expanded ? filter : 'ri-equalizer-line'"
+                />
+              </span>
             </VRow>
           </template>
           <template #actions="" />
@@ -974,7 +994,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="3"
               sm="6"
             >
@@ -989,7 +1008,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="3"
               sm="6"
             >
@@ -1004,7 +1022,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="3"
               sm="6"
             >
@@ -1019,7 +1036,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="3"
               sm="6"
             >
@@ -1034,7 +1050,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="3"
               sm="6"
             >
@@ -1049,7 +1064,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="3"
               sm="6"
             >
@@ -1064,7 +1078,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="2"
               sm="6"
             >
@@ -1083,7 +1096,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="2"
               sm="6"
             >
@@ -1102,7 +1114,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <VCol
               class="py-1"
               cols="12"
-
               lg="2"
               sm="6"
             >
@@ -1157,7 +1168,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
           :src="imgProduct"
         />
 
-      
+
         <VCardActions
           class="bg-green-lighten-1"
           style="width: 100%; padding: 0;"
@@ -1230,8 +1241,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
       v-if="true"
       class="mt-6"
     >
-      <VDivider />
-
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
         <thead>
@@ -1261,6 +1270,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Categories') }}
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1327,7 +1337,9 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Group') }}
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
+                s
                 :close-on-content-click="false"
                 location="end"
               >
@@ -1364,7 +1376,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="searchByTypeName = ' ' "
+                            @click="searchByTypeName = ' '"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -1393,6 +1405,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Sub Group') }}
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1459,6 +1472,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Barcode') }}
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -1525,6 +1539,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Product Code') }}
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1591,6 +1606,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Product Name') }}
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1702,6 +1718,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('QTY. PO.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
+                v-if="false"
                 color="primary"
                 icon="mdi-pan-vertical"
                 @click="sortByQtyOrder = sortByQtyOrder === 'asc' ? 'desc' : 'asc'"
@@ -1715,6 +1732,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('QTY. Received') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
+                v-if="false"
                 color="primary"
                 icon="mdi-pan-vertical"
                 @click="sortByReceive = sortByReceive === 'asc' ? 'desc' : 'asc'"
@@ -1728,6 +1746,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('UoM') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
@@ -1811,7 +1830,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             </th>
           </tr>
         </thead>
-        
+
         <!-- 👉 table body -->
         <tbody>
           <tr
@@ -1823,7 +1842,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               :class="resolveChipColorTable(product.status)"
               class="text-center px-1"
             >
-              {{ index+1 }}
+              {{ index + 1 }}
             </td>
 
             <td
@@ -1836,7 +1855,8 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 :color="resolveChipColor(checkReceiveNos(product.receiveNo))"
                 label
               >
-                <span :class="resolveTextColorTable(checkReceiveNos(product.receiveNo))">{{ checkReceiveNos(product.receiveNo) }}</span>
+                <span :class="resolveTextColorTable(checkReceiveNos(product.receiveNo))">{{
+                  checkReceiveNos(product.receiveNo) }}</span>
               </VChip>
             </td>
 
@@ -1962,7 +1982,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 :options="{
                   width: '1%',
                   height: '30%',
-                  fontSize: '16px', 
+                  fontSize: '16px',
                 }"
                 :value="product.barcode"
               />
@@ -2115,6 +2135,8 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 </template>
 
 <style lang="scss">
+/* stylelint-disable-next-line no-eol-whitespace */
+/* stylelint-disable-next-line no-eol-whitespace */
 .text-capitalize {
   text-transform: capitalize;
 }
@@ -2129,11 +2151,14 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 }
 
 .cell-hover-effect:hover {
-  background-color: #e9fae9 !important; /* สีเขียวอ่อน */
+  background-color: #e9fae9 !important;
+  /* stylelint-disable-next-line comment-empty-line-before */
+  /* สีเขียวอ่อน */
 }
 
 .card-image-hover:hover {
-  transform: scale(1.1); /* ทำให้ขยายใหญ่ขึ้นเมื่อ hover */
+  transform: scale(1.1);
+  
+  /* ทำให้ขยายใหญ่ขึ้นเมื่อ hover */
 }
 </style>
-

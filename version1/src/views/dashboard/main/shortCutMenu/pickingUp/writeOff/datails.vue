@@ -3,14 +3,20 @@ import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
 import { ref, watchEffect } from 'vue'
-import { VDataTable } from 'vuetify/labs/VDataTable'
 import { useRoute } from 'vue-router'
+
+const props = defineProps({
+  date: {
+    type: String,
+    required: true,
+  },
+})
 
 const route = useRoute()
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
+import { urlApi } from '@/api'; //---------------------- Import Api for Url *****
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
@@ -231,8 +237,8 @@ const GetReceivedPoDetails = () => {
       // dateSt: dateStData.value,
       // dateSp: dateSpData.value,
       stockId: stockIdData.value,
-      dateSt: startDate.value,
-      dateSp: endDate.value,
+      dateSt: props.date,
+      dateSp: props.date,
 
       barcode: barcodeData.value,
       productId: productIdData.value,
@@ -742,7 +748,6 @@ const resolveCardDialogTitleColorTable = status => {
 
 
 //--------------------------------------- Menu Filter -------------------------------------------
-import avatar1 from '@images/avatars/avatar-1.png'
 
 const dialogHistory = (true)
 const cardBtnHistory = ('received')
@@ -1015,6 +1020,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Category') }}
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1081,6 +1087,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Group') }}
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1147,6 +1154,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Sub Group') }}
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1213,6 +1221,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Barcode') }}
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -1279,6 +1288,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Product Code') }}
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1345,6 +1355,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Product Name') }}
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1412,6 +1423,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Lot') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"
@@ -1479,6 +1491,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Issue No.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuIsuueNo"
                 :close-on-content-click="false"
                 location="end"
@@ -1553,6 +1566,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Issue By') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuIsuueBy"
                 :close-on-content-click="false"
                 location="end"
@@ -1635,6 +1649,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('UoM') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
@@ -1702,6 +1717,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Reason') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuReason"
                 :close-on-content-click="false"
                 location="end"
@@ -1769,6 +1785,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Ref No.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuRefDoc"
                 :close-on-content-click="false"
                 location="end"
@@ -1836,6 +1853,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Remark') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuRemark"
                 :close-on-content-click="false"
                 location="end"
