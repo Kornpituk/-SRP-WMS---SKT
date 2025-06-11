@@ -218,21 +218,79 @@ const dataset2 = [
   },
 ]
 
+const dayMove = ref(30) // หรือรับจาก props/refs ก็ได้
+const dayNonMove = ref(30) // หรือรับจาก props/refs ก็ได้
+
 const dataMoveStore = useDataMoveStore()
 const dataMoveTopStore = useDataMoveStore()
 
 const dataNonMoveStore = useDataNonMoveStore()
 const dataNonNonMoveStore = useDataNonMoveStore()
 
+const reveresDaysMove = ref('last 30 days')
+const reverseDaysNonMove = ref('last 30 days')
+
+
+const calDateReverse30Days = computed(() => {
+  const [dayStr, monthStr, yearStr] = formattedDateTime.value.split('/')
+  const date = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)) // ✅ เดือน -1 เพราะ JavaScript นับเดือนจาก 0
+
+  date.setDate(date.getDate() - dayMove.value) // ลบ 30 วัน
+
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+
+  return `${day}/${month}/${year}`
+})
+
+const calDateReverse30DaysNonMove = computed(() => {
+  const [dayStr, monthStr, yearStr] = formattedDateTime.value.split('/')
+  const date = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)) // ✅ เดือน -1 เพราะ JavaScript นับเดือนจาก 0
+
+  date.setDate(date.getDate() - dayNonMove.value) // ลบ 30 วัน
+
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+
+  return `${day}/${month}/${year}`
+})
+
+const typeDataMove = [
+  { title: 'last 30 days', value: 30 }, 
+  { title: 'last 15 days', value: 15 }, 
+  { title: 'last 7 day', value: 7 },
+  { title: 'lastday', value: 1 },
+]
+
+function handleSelectDay(value, type, title) {
+  if(type === 'move'){
+    dayMove.value = value
+    reveresDaysMove.value = title
+  }else{
+    dayNonMove.value = value
+    reverseDaysNonMove.value = title
+  }
+  
+}
+
+const typeDataNonMove = [
+  { title: 'last 30 days', value: 30 }, 
+  { title: 'last 15 days', value: 15 }, 
+  { title: 'last 7 day', value: 7 },
+  { title: 'lastday', value: 1 },
+]
+
 watchEffect(() => {
   const accessToken = localStorage.getItem('accessTokenAtStore')
   const whereHouse = localStorage.getItem('whereHouseName')
-  const day = 30 // หรือรับจาก props/refs ก็ได้
+  
 
-  dataMoveStore.fetchDataMove(day, accessToken, whereHouse, 'MovingDayBack')
-  dataMoveTopStore.fetchDataMove(day, accessToken, whereHouse, 'MovingDayBack')
-  dataNonMoveStore.fetchDataNonMove(day, accessToken, whereHouse, 'NonMovingDayBack')
-  dataNonNonMoveStore.fetchDataNonMove(day, accessToken, whereHouse, 'NonMovingDayBack')
+  dataMoveStore.fetchDataMove(dayMove.value, accessToken, whereHouse, 'MovingDayBack')
+  dataMoveTopStore.fetchDataMove(dayMove.value, accessToken, whereHouse, 'MovingDayBack')
+  dataNonMoveStore.fetchDataNonMove(dayNonMove.value, accessToken, whereHouse, 'NonMovingDayBack')
+  dataNonNonMoveStore.fetchDataNonMove(dayNonMove.value, accessToken, whereHouse, 'NonMovingDayBack')
 })
 
 const charDataItemMove = ref()
@@ -1008,36 +1066,68 @@ onMounted(() => {
       <div v-if="!logicLuxOn && !operationOn">
         <VRow>
           <VCol cols="6">
-            <VWindow
-              v-model="onboardingMove"
-              show-arrows="hover"
-            >
-              <VWindowItem
-                v-for="n in lengthMove"
-                :key="`card-${n}`"
-              >
-                <VCardText
-                  v-if="onboardingMove === 0"
-                  class="pa-1"
-                >
-                  <ChartJsBarChartMove
-                    v-if="onboardingMove === 0"
-                    :categories="chartDataMove.categories"
-                    :series="chartDataMove.series"
-                    :date="formattedDateTime"
-                  />
-                </VCardText>
-                <VCardText
-                  v-else
-                  class="pa-1"
-                >
-                  <TopProductMove
-                    v-if="onboardingMove === 1 && chartDataTopMove.groupedItems.length > 0"
-                    :grouped-items="chartDataTopMove.groupedItems"
-                  />
-                </VCardText>
-              </VWindowItem>
-            </VWindow> 
+            <VCard class="">
+              <VCardTitle> 
+                <div class="d-flex justify-space-between">
+                  <span>{{ $t('Moving Stock') }} ( {{ reveresDaysMove }} ): {{ calDateReverse30Days }} - {{ formattedDateTime }} </span>
+                  <VMenu location="end">
+                    <template #activator="{ props }">
+                      <VBtn
+                        icon="ri-more-2-fill"
+                        size="20"
+                        variant="text"
+                        v-bind="props"
+                      />
+                    </template>
+
+                    <VList>
+                      <VListItem
+                        v-for="item in typeDataMove"
+                        :key="item.value"
+                        :title="item.title"
+                        :active="dayMove === item.value"
+                        color="primary"
+                        @click="handleSelectDay(item.value,'move')"
+                      />
+                    </VList>
+                  </VMenu>
+                </div>
+              </VCardTitle>
+              <VCardText class="pa-1">
+                <div>
+                  <VWindow
+                    v-model="onboardingMove"
+                    show-arrows="hover"
+                  >
+                    <VWindowItem
+                      v-for="n in lengthMove"
+                      :key="`card-${n}`"
+                    >
+                      <VCardText
+                        v-if="onboardingMove === 0"
+                        class="pa-1"
+                      >
+                        <ChartJsBarChartMove
+                          v-if="onboardingMove === 0"
+                          :categories="chartDataMove.categories"
+                          :series="chartDataMove.series"
+                          :date="formattedDateTime"
+                        />
+                      </VCardText>
+                      <VCardText
+                        v-else
+                        class="pa-1"
+                      >
+                        <TopProductMove
+                          v-if="onboardingMove === 1 && chartDataTopMove.groupedItems.length > 0"
+                          :grouped-items="chartDataTopMove.groupedItems"
+                        />
+                      </VCardText>
+                    </VWindowItem>
+                  </VWindow> 
+                </div>
+              </VCardText>
+            </VCard>
            
 
             <!--
@@ -1055,36 +1145,70 @@ onMounted(() => {
             -->
           </VCol>
           <VCol cols="6">
-            <VWindow
-              v-model="onboardingNonMove"
-              show-arrows="hover"
-            >
-              <VWindowItem
-                v-for="n in lengthNonMove"
-                :key="`card-${n}`"
-              >
-                <VCardText
-                  v-if="onboardingNonMove === 0"
-                  class="pa-1"
-                >
-                  <ChartJsBarChartNonMove
-                    v-if="onboardingNonMove === 0"
-                    :categories="chartDataNonMove.categories"
-                    :series="chartDataNonMove.series"
-                    :date="formattedDateTime"
-                  />
-                </VCardText>
-                <VCardText
-                  v-else
-                  class="pa-1"
-                >
-                  <TopProductNonMove
-                    v-if="onboardingNonMove === 1"
-                    :grouped-items="chartDataTopNonMove.groupedItems"
-                  />
-                </VCardText>
-              </VWindowItem>
-            </VWindow> 
+            <VCard class="">
+              <VCardTitle> 
+                <div class="d-flex justify-space-between">
+                  <span>{{ $t('Non Moving Stock') }} ( {{ reverseDaysNonMove }} ) : {{ calDateReverse30DaysNonMove }} - {{ formattedDateTime }}</span>
+                  <VMenu location="end">
+                    <template #activator="{ props }">
+                      <VBtn
+                        icon="ri-more-2-fill"
+                        variant="text"
+                        v-bind="props"
+                        size="20"
+                      />
+                    </template>
+
+                    <VList>
+                      <VListItem
+                        v-for="item in typeDataNonMove"
+                        :key="item.value"
+                        :title="item.title"
+                        :active="dayNonMove === item.value"
+                        color="primary"
+                        @click="handleSelectDay(item.value,'nonMove', item.title)"
+                      />
+                    </VList>
+                  </VMenu>
+                </div>
+              </VCardTitle>
+              <VCardText class="pa-1">
+                <div>
+                  <VWindow
+                    v-model="onboardingNonMove"
+                    show-arrows="hover"
+                  >
+                    <VWindowItem
+                      v-for="n in lengthNonMove"
+                      :key="`card-${n}`"
+                    >
+                      <VCardText
+                        v-if="onboardingNonMove === 0"
+                        class="pa-1"
+                      >
+                        <ChartJsBarChartNonMove
+                          v-if="onboardingNonMove === 0"
+                          :categories="chartDataNonMove.categories"
+                          :series="chartDataNonMove.series"
+                          :date="formattedDateTime"
+                        />
+                      </VCardText>
+                      <VCardText
+                        v-else
+                        class="pa-1"
+                      >
+                        <TopProductNonMove
+                          v-if="onboardingNonMove === 1"
+                          :grouped-items="chartDataTopNonMove.groupedItems"
+                        />
+                      </VCardText>
+                    </VWindowItem>
+                  </VWindow> 
+                </div>
+              </VCardText>
+            </VCard>
+           
+            
            
 
             <!--

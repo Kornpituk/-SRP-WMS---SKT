@@ -113,24 +113,25 @@ const chartConfig = computed(() => {
         
       },
     },
-    title: {
-      text: `Moving Stock (last 30 days) ${calDateReverse30Days.value} - ${props.date}`,
-      align: 'center',
-      style: {
-        fontSize: '16px',
 
-        // color: themePrimaryTextColor,
-      },
-    },
-    subtitle: {
-      text: '',
-      align: 'center',
-      style: {
-        fontSize: '14px',
+    // title: {
+    //   text: `Moving Stock (last 30 days) ${calDateReverse30Days.value} - ${props.date}`,
+    //   align: 'center',
+    //   style: {
+    //     fontSize: '16px',
 
-        // color: themeSecondaryTextColor,
-      },
-    },
+    //     // color: themePrimaryTextColor,
+    //   },
+    // },
+    // subtitle: {
+    //   text: '',
+    //   align: 'center',
+    //   style: {
+    //     fontSize: '14px',
+
+    //     // color: themeSecondaryTextColor,
+    //   },
+    // },
     tooltip: { enabled: false, 
       
     },
@@ -259,8 +260,11 @@ const total = computed(() => {
 </script>
 
 <template>
-  <VCard>
-    <VCardTitle  v-if="false" class="d-flex justify-center">
+  <div>
+    <VCardTitle
+      v-if="false"
+      class="d-flex justify-center"
+    >
       {{ $t('Moving Stock (last 30 days)') }}: {{ calDateReverse30Days }} - {{ props.date }}
     </VCardTitle>
     <VCardSubtitle v-if="false">
@@ -274,5 +278,5 @@ const total = computed(() => {
       :series="chartSeries"
     />
     {{ props.chartSeries }}
-  </VCard>
+  </div>
 </template>
