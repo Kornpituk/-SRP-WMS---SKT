@@ -811,7 +811,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
 <template>
   <!-- Expansion Filter -->
-  <section>
+  <section v-if="false">
     <VExpansionPanels>
       <VExpansionPanel>
         <VExpansionPanelTitle

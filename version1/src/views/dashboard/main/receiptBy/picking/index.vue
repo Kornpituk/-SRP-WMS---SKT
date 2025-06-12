@@ -262,7 +262,7 @@ watchEffect(() => {
       <!-- Transfer Out  -->
       <VCol
         cols="12"
-        lg="4"
+        lg="6"
       >
         <VCard
           v-ripple
@@ -318,7 +318,7 @@ watchEffect(() => {
       <!-- Delivery  -->
       <VCol
         cols="12"
-        lg="4"
+        lg="6"
       >
         <VCard
           v-ripple
@@ -375,6 +375,7 @@ watchEffect(() => {
       <VCol
         cols="12"
         lg="4"
+        v-if="false"
       >
         <VCard
           v-ripple

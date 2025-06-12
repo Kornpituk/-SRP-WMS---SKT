@@ -10,6 +10,8 @@ import { ref, watchEffect } from 'vue'
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 import { tryOnUnmounted } from '@vueuse/core'
 
+import { useToast } from "vue-toastification" //---------------- Import Toast alert
+
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
@@ -678,51 +680,81 @@ const getItemLocalSubArea = () => {
 watchEffect(getItemLocalSubArea)
 
 // -------------------------------------- Export Bar Excel - --------------------------------
+const toast = useToast()
 
 const stockUpdateExcel = () => {
+  const toast = useToast()
+
+  toast.info("Exporting Excel...", { timeout: 1000 })
+
   axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/ByLot/Excel`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
-    responseType: 'blob', // ให้เซิร์ฟเวอร์รีเทิร์น blob สำหรับไฟล์ Excel
+    params: {
+      categoryId: searchByCategoryId.value,
+      typeId: searchByTypeId.value,
+      subTypeId: searchBySubTypeId.value,
+      barcode: searchByBarcode.value,
+      productId: searchByProductId.value,
+      productName: searchByProductName.value,
+      unitId: searchByUOMId.value,
+      zoneId: searchByZoneId.value,
+      areaId: searchByAreaId.value,
+      subAreaId: searchBySubAreaId.value,
+      serialNo: serialProductCode.value,
+
+      searchByCategory: searchByCategoryName.value,
+      searchByType: searchByTypeName.value,
+      searchBySubType: searchBySubTypeName.value,
+      searchByBarcode: searchByBarcodeName.value,
+      searchByProductId: searchByProductCodeName.value,
+      searchByProductName: searchByProductNameFilter.value,
+      searchByUnit: searchByUnitName.value,
+
+      'sortByCategory': sortByCategory.value,
+      'sortByType': sortByType.value,
+      'sortBySubType': sortBySubType.value,
+      'sortByBarcode': sortByBarcode.value,
+      'sortByProductId': sortByProductId.value || 'asc',
+      'sortByProductName': sortByProductName.value,
+      'sortByUnit': sortByUnit.value,
+      'sortByQty': sortByQty.value,
+      'sortByTags': sortByTags.value,
+      'sortByNonTags': sortByNonTags.value,
+
+      // ... and so on with other parameters
+    },
+    responseType: 'blob',
   })
     .then(response => {
-      // สร้าง URL ของไฟล์ Excel จาก binary data
       const url = window.URL.createObjectURL(new Blob([response.data]))
 
-      const currentDate = new Date() // สร้างวัตถุ Date ปัจจุบัน
-      const year = currentDate.getFullYear() // ดึงปีปัจจุบัน
-      let fileYear
-      const threshold = 2500 // กำหนดจุดแบ่ง พ.ศ. กับ ค.ศ.
-
-      if (year > threshold) {
-        // พ.ศ. เปลี่ยนเป็น ค.ศ.
-        fileYear = year - 543
-      } else {
-        // ค.ศ.
-        fileYear = year
-      }
+      const currentDate = new Date()
+      const year = currentDate.getFullYear()
+      const threshold = 2500
+      const fileYear = year > threshold ? year - 543 : year
 
       const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
+      const fileName = `stock_update_Tag_${dateString}.xlsx`
 
-      const fileName = `stock_update_Total(Summary)_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
-
-      // สร้างลิงก์สำหรับดาวน์โหลดไฟล์ Excel
       const link = document.createElement('a')
 
       link.href = url
-      link.setAttribute('download', fileName) // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
+      link.setAttribute('download', fileName)
       document.body.appendChild(link)
       link.click()
 
-      // ลบ URL หลังจากดาวน์โหลดเสร็จเรียบร้อยแล้ว
       window.URL.revokeObjectURL(url)
+
+      // ✅ แจ้งผู้ใช้ว่าโหลดสำเร็จ
+      toast.success("Export successful!")
     })
     .catch(error => {
-      // จัดการข้อผิดพลาด
       console.error('Error:', error)
+      toast.error("Export failed. Please try again.")
     })
 }
 
@@ -784,7 +816,7 @@ const groupProduct = ref('')
 const groupSupProduct = ref('')
 const totalProduct = ref('')
 const unitNameProduct = ref('')
-const detailsProduct = ref('')
+const detailsProduct = ref()
 
 const showDialogImage = (code, name, img, barcode, categories, group, groupSup, total, unitName, details) => {
   codeProduct.value = code
@@ -1597,7 +1629,7 @@ const switcherDrS = ref(false)
                 </VRow>
                 <span style="font-size: large; font-weight: 900;">{{
                   $t("Details ")
-                }} :</span>{{ detailsProduct }}
+                }} :</span>{{ detailsProduct.note }}
               </div>
             </VCardText>
           </div>
@@ -2995,7 +3027,7 @@ const switcherDrS = ref(false)
                         product.subTypeName,
                         product.qty,
                         product.unitName,
-                        product.details,
+                        product,
                       )"
                     >
                       <VExpandTransition>

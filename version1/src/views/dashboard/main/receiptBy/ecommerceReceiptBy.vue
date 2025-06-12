@@ -902,7 +902,7 @@ const datePropMasterEnd =  ref((formattedDateTime))
                     color="light-green"
                     variant="flat"
                   >
-                    {{ $t('Received') }}
+                    {{ $t('Receiving') }}
                   </VTab>
                   <VTab
                     color="light-green"

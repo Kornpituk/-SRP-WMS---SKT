@@ -827,7 +827,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
   <!-- ----------          New Search bar  Expansion  pannels               ------------------------------------ -->
 
   <!-- Expansion Filter -->
-  <section>
+  <section v-if="false">
     <VExpansionPanels>
       <VExpansionPanel>
         <VExpansionPanelTitle
