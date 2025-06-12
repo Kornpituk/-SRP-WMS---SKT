@@ -1088,7 +1088,7 @@ onMounted(() => {
                         :title="item.title"
                         :active="dayMove === item.value"
                         color="primary"
-                        @click="handleSelectDay(item.value,'move')"
+                        @click="handleSelectDay(item.value,'move', item.title)"
                       />
                     </VList>
                   </VMenu>

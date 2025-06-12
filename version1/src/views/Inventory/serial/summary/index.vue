@@ -680,7 +680,7 @@ watchEffect(getItemLocalSubArea)
 // -------------------------------------- Export Bar Excel - --------------------------------
 
 const stockUpdateExcel = () => {
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/ByLot/Excel`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -707,7 +707,7 @@ const stockUpdateExcel = () => {
 
       const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
 
-      const fileName = `stock_update_Tag_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
+      const fileName = `stock_update_Total(Summary)_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
 
       // สร้างลิงก์สำหรับดาวน์โหลดไฟล์ Excel
       const link = document.createElement('a')

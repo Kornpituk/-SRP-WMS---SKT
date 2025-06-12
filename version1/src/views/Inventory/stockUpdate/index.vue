@@ -584,7 +584,7 @@ watchEffect(getItemLocalSubArea)
 // -------------------------------------- Export Bar Excel - --------------------------------
 
 const stockUpdateExcel = () => {
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/ByLotBatch/Exce`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
