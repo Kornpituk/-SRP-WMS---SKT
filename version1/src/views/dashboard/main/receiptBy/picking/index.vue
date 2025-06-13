@@ -61,6 +61,7 @@ const colorIconOther = ref('teal-lighten-3') //
 const typeDatepicker = ref('')
 const dateStartProp = ref(new Date())
 const dateEndProp = ref(new Date())
+const typeTableReceiving = ref('Transfer Out')
 
 watchEffect(() => {
 
@@ -76,12 +77,41 @@ watchEffect(() => {
   }
 
   if(isHoveredOther === true){
-    colorAvatarReceived.value = 'green'
-    colorAvatarTransferIn.value = 'deep-orange'
-    colorAvatarOther.value = 'teal'
-    colorIconReceived.value = 'green'
-    colorIconTransferIn.value = 'deep-orange'
-    colorIconOther.value = 'teal'
+    colorAvatarReceived.value = 'light-blue'
+    colorAvatarTransferIn.value = 'amber'
+    colorAvatarOther.value = 'purple'
+    colorIconReceived.value = 'light-blue'
+    colorIconTransferIn.value = 'amber'
+    colorIconOther.value = 'purple'
+  }
+
+  if(typeTableReceiving.value === 'Transfer Out'){
+    colorAvatarReceived.value = 'light-blue'
+    colorIconReceived.value = 'white'
+    colorIconTransferIn.value = 'amber'
+    colorAvatarTransferIn.value = ''
+    colorAvatarOther.value = ''
+    colorIconOther.value = 'purple'
+  }else if(typeTableReceiving.value === 'Delivery'){
+    colorIconTransferIn.value = 'white'
+    colorAvatarTransferIn.value = 'amber'
+    colorAvatarReceived.value = ''
+    colorIconReceived.value = 'light-blue'
+    colorAvatarOther.value = ''
+    colorIconOther.value = 'purple'
+  }else if(typeTableReceiving.value === 'Other'){
+    colorIconTransferIn.value = 'amber'
+    colorAvatarTransferIn.value = ''
+    colorAvatarReceived.value = ''
+    colorIconReceived.value = 'light-blue'
+    colorAvatarOther.value = 'purple'
+    colorIconOther.value = 'white'
+  }else{
+    colorAvatarReceived.value = 'light-blue'
+    
+    colorAvatarTransferIn.value = 'amber'
+    
+    colorAvatarTransferIn.value = 'amber'
   }
   
 })
@@ -220,17 +250,16 @@ const getHeaderGroupDayNew = () => {
     })
 }
 
-getHeaderGroupTimeNew()
 
-const typeTableReceiving = ref('Transfer Out')
 
-watch([dateStartProp, dateEndProp, typeDateProps], ([newDateStart, newDateEnd, newTypeDate]) => {
-  if (newTypeDate === 8) {
-    getHeaderGroupTimeNew()
-  } else if(newTypeDate === 7){
-    getHeaderGroupDayNew()
-  }
-})
+
+// watch([dateStartProp, dateEndProp, typeDateProps], ([newDateStart, newDateEnd, newTypeDate]) => {
+//   if (newTypeDate === 8) {
+//     getHeaderGroupTimeNew()
+//   } else if(newTypeDate === 7){
+//     getHeaderGroupDayNew()
+//   }
+// })
 
 watchEffect(() => {
   if(!props.datepickerDataEnd && !props.datepickerDataStart){
@@ -247,7 +276,7 @@ watchEffect(() => {
   //   getHeaderGroupDayNew()
   // }
 
-  getHeaderGroupTimeNew()
+  getHeaderGroupDayNew()
 
 
 
@@ -281,10 +310,10 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="light-blue-lighten-4"
+                    :color="colorAvatarReceived"
                   >
                     <VIcon
-                      color="light-blue"
+                      :color="colorIconReceived"
                       icon="ri-logout-box-line"
                     />
                   </VAvatar><span
@@ -323,7 +352,7 @@ watchEffect(() => {
         <VCard
           v-ripple
           class="cursor-pointer"
-          @click="typeTableReceiving = 'Deliveryt'"
+          @click="typeTableReceiving = 'Delivery'"
           @mouseenter="isHoveredTransferIn = true"
           @mouseleave="isHoveredTransferIn = false"
         >
@@ -337,10 +366,10 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="amber-lighten-4"
+                    :color="colorAvatarTransferIn"
                   >
                     <VIcon
-                      color="amber"
+                      :color="colorIconTransferIn"
                       icon="ri-truck-line"
                     />
                   </VAvatar><span
@@ -373,9 +402,9 @@ watchEffect(() => {
       </VCol>
       <!--  White Off -->
       <VCol
+        v-if="false"
         cols="12"
         lg="4"
-        v-if="false"
       >
         <VCard
           v-ripple
@@ -394,10 +423,10 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="purple-lighten-3"
+                    :color="colorAvatarOther"
                   >
                     <VIcon
-                      color="purple"
+                      :color="colorIconOther"
                       icon="ri-sparkling-2-line"
                     />
                   </VAvatar><span
@@ -448,7 +477,7 @@ watchEffect(() => {
           :date="formateDateNew(props.datepickerDataStart)"
         />
         <DetailsDeliveryPicking
-          v-if="typeTableReceiving === 'Deliveryt'"
+          v-if="typeTableReceiving === 'Delivery'"
           :date="formateDateNew(props.datepickerDataStart)"
         />
         <DetailsWriteOfPicking
@@ -464,6 +493,7 @@ watchEffect(() => {
           :pure-data="dataDatepicker"
           :data="dataPie"
         />
+        {{ dataDatepicker  }}
       </VCol>
     </VRow>
   </div>

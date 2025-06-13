@@ -1123,9 +1123,11 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
   <section>
     <VCard
       v-if="true"
-      class="mt-6"
+      class=""
     >
-      <VDivider />
+      <VCardTitle class="text-center bg-light-blue">
+        <span class="text-white">Picking Transfer Out Table</span>
+      </VCardTitle>
 
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->

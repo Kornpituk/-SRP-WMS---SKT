@@ -1342,7 +1342,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
       v-if="true"
       class="mt-6"
     >
-      <VDivider />
+      
 
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->

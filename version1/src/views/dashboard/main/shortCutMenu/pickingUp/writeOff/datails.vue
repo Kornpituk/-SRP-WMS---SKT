@@ -994,7 +994,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
   <section>
     <VCard
       v-if="true"
-      class="mt-6"
+      class=""
     >
       <VDivider />
 

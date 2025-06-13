@@ -6,6 +6,13 @@ import { ref, watch, watchEffect } from 'vue'
 import { VDataTable } from 'vuetify/labs/VDataTable'
 import { useRoute } from 'vue-router'
 
+const props = defineProps({
+  date: {
+    type: String,
+    required: true,
+  },
+})
+
 const route = useRoute()
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
@@ -261,6 +268,13 @@ const checkReceiveNos = receivedPO => {
   return false
 }
 
+const formateDateNew = inputDate => {
+
+  const [day, month, year] = inputDate.split('/')
+  
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
 const GetReceivedPoDetails = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
@@ -275,8 +289,9 @@ const GetReceivedPoDetails = () => {
       // dateSt: dateStData.value,
       // dateSp: dateSpData.value,
       stockId: stockIdData.value,
-      dateSt: startDate.value,
-      dateSp: endDate.value,
+      
+      dateSt: formateDateNew(props.date),
+      dateSp: formateDateNew(props.date),
 
       receiveDate: receiveDateData.value,
       requestDate: requestDateData.value,
@@ -1102,10 +1117,9 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
   <section>
     <VCard
       v-if="true"
-      class="mt-6"
+      class=""
     >
-      <VDivider />
-
+      <VCardTitle class="text-center bg-teal">Receiving Other Table</VCardTitle>
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
         <thead>

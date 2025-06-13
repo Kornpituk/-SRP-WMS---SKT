@@ -53,6 +53,7 @@ const colorIconOther = ref('teal-lighten-3') //
 const typeDatepicker = ref(localStorage.getItem('startDateFromPerformance'))
 const dateStartProp = ref('')
 const dateEndProp = ref(localStorage.getItem('endDateFromPerformance'))
+const typeTableReceiving = ref('PO')
 
 watchEffect(() => {
 
@@ -65,13 +66,47 @@ watchEffect(() => {
   }
 
   if(isHoveredOther === true){
+    
+
     colorAvatarReceived.value = 'green'
+    colorIconReceived.value = 'green'
+    
     colorAvatarTransferIn.value = 'deep-orange'
     colorAvatarOther.value = 'teal'
-    colorIconReceived.value = 'green'
+    
     colorIconTransferIn.value = 'deep-orange'
     colorIconOther.value = 'teal'
   }
+
+  if(typeTableReceiving.value === 'PO'){
+    colorAvatarReceived.value = 'green'
+    colorIconReceived.value = 'white'
+    colorIconTransferIn.value = 'deep-orange'
+    colorAvatarTransferIn.value = ''
+    colorAvatarOther.value = ''
+    colorIconOther.value = 'teal'
+  }else if(typeTableReceiving.value === 'Transfer In'){
+    colorIconTransferIn.value = 'white'
+    colorAvatarTransferIn.value = 'deep-orange'
+    colorAvatarReceived.value = ''
+    colorIconReceived.value = 'green'
+    colorAvatarOther.value = ''
+    colorIconOther.value = 'teal'
+  }else if(typeTableReceiving.value === 'Other'){
+    colorIconTransferIn.value = 'deep-orange'
+    colorAvatarTransferIn.value = ''
+    colorAvatarReceived.value = ''
+    colorIconReceived.value = 'green'
+    colorAvatarOther.value = 'teal'
+    colorIconOther.value = 'white'
+  }else{
+    colorAvatarReceived.value = 'green'
+    
+    colorAvatarTransferIn.value = 'deep-orange'
+    
+    colorIconTransferIn.value = 'deep-orange'
+  }
+  
   
 })
 
@@ -196,8 +231,8 @@ const getHeaderGroupDayNew = () => {
       // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: '2025-06-11',
-      dateSp: '2025-06-11',
+      dateSt: formateDateNew(props.datepickerDataStart),
+      dateSp: formateDateNew(props.datepickerDataStart),
 
     // ... and so on with other parameters
     },
@@ -217,7 +252,7 @@ const getHeaderGroupDayNew = () => {
     })
 }
 
-const typeTableReceiving = ref('PO')
+
 
 watch(() => {
   // if(!props.datepickerDataEnd && !props.datepickerDataStart){
@@ -228,11 +263,13 @@ watch(() => {
 
   console.log('compareType', typeDateProps)
 
-  if (typeDateProps.value === 8) {
-    getHeaderGroupTimeNew()
-  } else if(typeDateProps.value === 7){
-    getHeaderGroupDayNew()
-  }
+  // if (typeDateProps.value === 8) {
+  //   getHeaderGroupTimeNew()
+  // } else if(typeDateProps.value === 7){
+  //   getHeaderGroupDayNew()
+  // }
+
+  getHeaderGroupDayNew()
 
 
 })
@@ -248,6 +285,7 @@ watch(() => {
         lg="4"
       >
         <VCard
+          
           v-ripple
           class="cursor-pointer"
           @click="typeTableReceiving = 'PO'"
