@@ -98,24 +98,14 @@ watchEffect(getDataProductNewData)
 //-------------------------- Import Chart Receipt By ----------------------------------------------
 
 //-------------------------- Import Table ----------------------------------------------------------------
-import TableDetailsPerformancePickingDelivery from '@/views/dashboard/main/receiptBy/details/tablePerformancePickingDelivery.vue'
-import TableDetailsPerformanceReceivedPO from '@/views/dashboard/main/receiptBy/details/tablePerformanceReceivedPO.vue'
-import TableDetailsPerformanceTransferIn from '@/views/dashboard/main/receiptBy/details/tablePerformanceTransferIn.vue'
-import TableDetailsPerformanceTransferOut from '@/views/dashboard/main/receiptBy/details/tablePerformanceTransferOut.vue'
+import TableDetailsPerformancePickingDelivery from '@/views/dashboard/main/receiptByAwait/details/tablePerformancePickingDelivery.vue'
+import TableDetailsPerformanceReceivedPO from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceReceivedPO.vue'
+import TableDetailsPerformanceTransferIn from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceTransferIn.vue'
+import TableDetailsPerformanceTransferOut from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceTransferOut.vue'
 
 
-import PerformancePicking from '@/views/dashboard/main/receiptBy/picking/index.vue'
-import PerformanceReceived from '@/views/dashboard/main/receiptBy/received/index.vue'
-
-
-import TableDetailsPerformancePickingDeliveryAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformancePickingDelivery.vue'
-import TableDetailsPerformanceReceivedPOAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceReceivedPO.vue'
-import TableDetailsPerformanceTransferInAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceTransferIn.vue'
-import TableDetailsPerformanceTransferOutAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceTransferOut.vue'
-
-
-import PerformancePickingAwait from '@/views/dashboard/main/receiptByAwait/picking/index.vue'
-import PerformanceReceivedAwait from '@/views/dashboard/main/receiptByAwait/received/index.vue'
+import PerformancePicking from '@/views/dashboard/main/receiptByAwait/picking/index.vue'
+import PerformanceReceived from '@/views/dashboard/main/receiptByAwait/received/index.vue'
 
 import PerformanceRecevingNew from '@/views/dashboard/main/receiptBy/performance/receiving/index.vue'
 
@@ -184,7 +174,6 @@ const show = ref(false)
 
 //-------------------------------------- Dialog Details ------------------------------------
 const isDialogDetailVisible = ref(false)
-const isDialogDetailVisibleAwait = ref(false)
 
 const complateAll = ref ('')
 const awaitAll = ref('')
@@ -192,51 +181,25 @@ const awaitAll = ref('')
 const historyProp = ref(false)
 const historyPropCancel = ref(null)
 
-const historyPropAwait = ref(false)
-const historyPropCancelAwait = ref(null)
-
-const blockHistoryProp = type => {
+const blockHistoryProp = () => {
   
-  if( type === 'receiving'){
-    historyPropCancel.value = true
-    isDialogDetailVisible.value = false
-    sessionStorage.setItem('historyPropBlock', true)
-    isDialogDetailVisible.value = false
-  }else if('await'){
-    historyPropAwait.value = true
-    historyPropCancelAwait.value = false
-    sessionStorage.setItem('historyPropBlockAwait', true)
-    isDialogDetailVisibleAwait.value = false
-  }
-  
+  historyPropCancel.value = true
+  isDialogDetailVisible.value = false
+  sessionStorage.setItem('historyPropBlock', true)
   
 }
 
 watchEffect(() => {
   
-  // const historyBlock = sessionStorage.getItem('historyPropBlock')
+  const historyBlock = sessionStorage.getItem('historyPropBlock')
 
-  // if(historyBlock === "false"){
-  //   isDialogDetailVisible.value = true
-  //   historyProp.value = props.history
-  // }else if(historyBlock === "true"){
-  //   historyProp.value = false
-  //   isDialogDetailVisible.value = false
-  // }
-   
-  // complateAll.value = props.complateAllProps
-  // awaitAll.value = props.awaitAllProps
-
-
-  // const historyBlockAwait = sessionStorage.getItem('historyPropBlockAwait')
-
-  // if(historyBlockAwait === "false"){
-  //   isDialogDetailVisibleAwait.value = true
-  //   historyPropAwait.value = props.history
-  // }else if(historyBlockAwait === "true"){
-  //   historyPropAwait.value = false
-  //   isDialogDetailVisibleAwait.value = false
-  // }
+  if(historyBlock === "false"){
+    isDialogDetailVisible.value = true
+    historyProp.value = props.history
+  }else if(historyBlock === "true"){
+    historyProp.value = false
+    isDialogDetailVisible.value = false
+  }
    
   complateAll.value = props.complateAllProps
   awaitAll.value = props.awaitAllProps
@@ -786,13 +749,6 @@ const datePropMasterEnd =  ref((formattedDateTime))
 //   }
  
 // })
-
-const router = useRouter()
-
-const pushBtnDetails = MaxOrMin => {
-  sessionStorage.setItem('indicationMaxMin', MaxOrMin)
-  router.push('/dashboards/shortCutMenu/MinMax')
-}
 </script>
 
  <!-- @click="isDialogDetailVisible = true" -->
@@ -800,6 +756,7 @@ const pushBtnDetails = MaxOrMin => {
   <VCard
     v-if="!logicLuxOn"
     :color="getSwitchThemeColor"
+    @click="isDialogDetailVisible = true"
   >
     <VCardText>
       <div class="d-flex align-center justify-center">
@@ -825,37 +782,28 @@ const pushBtnDetails = MaxOrMin => {
     <!-- MAX - MIN -->
     <VCardText class="">
       <VRow no-gutters>
-        <VCol>
-          <VCard
-            class="cursor-pointer pa-0"
-            ripple
-            variant="text"
-            @click="isDialogDetailVisible = true"
-          >
-            <VCardText class="pa-0">
-              <div class="d-flex align-center justify-center mb-3">
-                <span
-                  style="font-size: 16px; font-weight: bolder;"
-                  class="me-2 text-white"
-                  :class="`text-${getSwitchThemeColorText}`"
-                >{{ $t('Completed') }}</span>
-              </div>
+        <VCol cols="5">
+          <div class="d-flex align-center justify-center mb-3">
+            <span
+              style="font-size: 16px; font-weight: bolder;"
+              class="text-white"
+              :class="`text-${getSwitchThemeColorText}`"
+            >{{ $t('Completed') }}</span>
+          </div>
 
-              <VRow class="d-flex justify-center ">
-                <VCol
-                  class="d-flex justify-center align-center"
-                  cols="12"
-                >
-                  <div>
-                    <span
-                      :class="`text-${getSwitchThemeColorText}`"
-                      class="text-h5 text-disabled clamp-text text-white"
-                    >{{ complateAll }}</span>
-                  </div>
-                </VCol>
-              </VRow>
-            </VCardText>
-          </VCard>
+          <VRow class="d-flex justify-center ">
+            <VCol
+              class="d-flex justify-center align-center "
+              cols="4"
+            >
+              <div>
+                <span
+                  :class="`text-${getSwitchThemeColorText}`"
+                  class="text-h5 text-disabled clamp-text text-white"
+                >{{ complateAll }}</span>
+              </div>
+            </VCol>
+          </VRow>
         </VCol>
 
         <VCol cols="2">
@@ -868,43 +816,36 @@ const pushBtnDetails = MaxOrMin => {
           </div>
         </VCol>
 
-        <VCol>
-          <VCard
-            class="cursor-pointer pa-0"
-            ripple
-            variant="text"
-            @click="isDialogDetailVisibleAwait = true"
-          >
-            <VCardText class="pa-0">
-              <div class="d-flex align-center justify-center mb-3">
+        <VCol
+          cols="5"
+          class="text-end"
+        >
+          <div class="d-flex align-center justify-center mb-3">
+            <span
+              style="font-size: 16px; font-weight: bolder;"
+              class="text-white"
+              :class="`text-${getSwitchThemeColorText}`"
+            >{{ $t('Await') }}</span>
+          </div>
+          <VRow class="d-flex justify-center ">
+            <VCol
+              class="d-flex justify-center align-center "
+              cols="4"
+            >
+              <div>
                 <span
-                  style="font-size: 16px; font-weight: bolder;"
-                  class="me-2 text-white"
                   :class="`text-${getSwitchThemeColorText}`"
-                >{{ $t('Await') }}</span>
+                  class="text-h5 text-disabled clamp-text text-white"
+                >{{ awaitAll }}</span>
               </div>
-
-              <VRow class="d-flex justify-center ">
-                <VCol
-                  class="d-flex justify-center align-center"
-                  cols="12"
-                >
-                  <div>
-                    <span
-                      :class="`text-${getSwitchThemeColorText}`"
-                      class="text-h5 text-disabled clamp-text text-white"
-                    >{{ awaitAll }}</span>
-                  </div>
-                </VCol>
-              </VRow>
-            </VCardText>
-          </VCard>
+            </VCol>
+          </VRow>
         </VCol>
       </VRow>
     </VCardText>
   </VCard>
 
-  <!-- Dialog Complate -->
+  <!-- Dialog -->
   <section>
     <VDialog
       v-model="isDialogDetailVisible"
@@ -922,7 +863,7 @@ const pushBtnDetails = MaxOrMin => {
             <span
               style="margin-left: 10px;"
               class="text-h5 text-white d-flex align-center justify-start"
-            >{{ $t('Performance - Receiving') }}</span>
+            >{{ $t('Performance') }}</span>
           </div>
           <br>
         </VCardTitle>
@@ -942,7 +883,7 @@ const pushBtnDetails = MaxOrMin => {
           style="background-color: white;"
           variant="text"
           size="small"
-          @click="blockHistoryProp('receiving')"
+          @click="blockHistoryProp"
         />
 
         <VCardText>
@@ -992,109 +933,6 @@ const pushBtnDetails = MaxOrMin => {
                 <VCard>
                   <VCardText class="py-0">
                     <PerformancePicking
-                      v-if="currentTabChartMix === 1"
-                      :select-type-date="typeDate"
-                      :datepicker-data-start="datePropMasterStart"
-                      :datepicker-data-end="datePropMasterEnd"
-                    />
-                  </VCardText>
-                </VCard>
-              </VWindowItem>
-            </VWindow>
-          </div>
-        </VCardText>
-      </VCard>
-    </VDialog>
-  </section>
-
-  <!-- Dialog Await -->
-  <section>
-    <VDialog
-      v-model="isDialogDetailVisibleAwait"
-      width="100%"
-      persistent
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardTitle
-          style="height: 65px;"
-          class="d-flex align-center"
-          :class="`bg-${getSwitchThemeColor}`"
-        >
-          <div>
-            <span
-              style="margin-left: 10px;"
-              class="text-h5 text-white d-flex align-center justify-start"
-            >{{ $t('Performance - Awaiting') }}</span>
-          </div>
-          <br>
-        </VCardTitle>
-        <VCardSubtitle
-          class="pb-2"
-          :class="`bg-${getSwitchThemeColor}`"
-        >
-          <div>
-            <span
-              class="px-3"
-              style="color: white; font-size: 18px;"
-            >{{ warehouseShowHeaderPerformance }} - {{ formattedDateTime }} </span>
-          </div>
-        </VCardSubtitle>
-
-        <DialogCloseBtn
-          style="background-color: white;"
-          variant="text"
-          size="small"
-          @click="blockHistoryProp('await')"
-        />
-
-        <VCardText>
-          <VRow class="">
-            <VCol cols="12" />
-          </VRow>
-
-          <div class="pb-1">
-            <div class="d-flex justify-space-between"> 
-              <div>
-                <VTabs
-                  v-model="currentTabChartMix"
-                  class="v-tabs-pill"
-                >
-                  <VTab
-                    color="light-green"
-                    variant="flat"
-                  >
-                    {{ $t('Receiving') }}
-                  </VTab>
-                  <VTab
-                    color="light-green"
-                    variant="flat"
-                  >
-                    {{ $t('Picking') }}
-                  </VTab>
-                </VTabs>
-              </div>
-            </div>
-            <VWindow
-              v-model="currentTabChartMix"
-              class="py-0"
-            >
-              <VWindowItem class="py-0">
-                <VCard>
-                  <VCardText class="py-0">
-                    <PerformanceReceivedAwait
-                      v-if="currentTabChartMix === 0"
-                      :select-type-date="typeDate"
-                      :datepicker-data-start="props.dateCurrent"
-                      :datepicker-data-end="props.dateCurrent"
-                    />
-                  </VCardText>
-                </VCard>
-              </VWindowItem>
-              <VWindowItem class="py-0">
-                <VCard>
-                  <VCardText class="py-0">
-                    <PerformancePickingAwait
                       v-if="currentTabChartMix === 1"
                       :select-type-date="typeDate"
                       :datepicker-data-start="datePropMasterStart"

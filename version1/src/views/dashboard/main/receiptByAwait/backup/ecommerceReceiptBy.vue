@@ -1,17 +1,15 @@
 <script setup>
-import { hexToRgb } from '@layouts/utils'
+import VueApexCharts from 'vue3-apexcharts'
 import {
+  useRtl,
   useTheme,
 } from 'vuetify'
+import { hexToRgb } from '@layouts/utils'
+import { height } from '@/views/demos/forms/tables/simple-table/demoCodeSimpleTable'
 
-import axiosIns from '@axios'
 import { defineProps, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-
-import DetailsPoReceiving from "@/views/dashboard/main/shortCutMenu/received/po/datails.vue"
-import DetailsTranferInReceiving from "@/views/dashboard/main/shortCutMenu/received/transferIn/datails.vue"
-import DetailsOtherReceiving from "@/views/dashboard/main/shortCutMenu/received/other/datails.vue"
-
+import axiosIns from '@axios'
 
 //------------------------------------- Define Props -------------------------------
 const props = defineProps({
@@ -37,10 +35,6 @@ const props = defineProps({
   },
   awaitAllProps: {
     type: Array,
-    required: true,
-  },
-  dateCurrent: {
-    type: String,
     required: true,
   },
 })
@@ -94,30 +88,21 @@ const getDataProductNewData = () => {
 
 watchEffect(getDataProductNewData)
 
+import AnalyticsReceiptBy from '@/views/dashboard/main/receiptBy/details/AnalyticsReceiptBy.vue'
 
 //-------------------------- Import Chart Receipt By ----------------------------------------------
+import POGrowthDonutCharts from '@/views/dashboard/main/totalPO/POGrowthDonutCharts.vue'
 
 //-------------------------- Import Table ----------------------------------------------------------------
-import TableDetailsPerformancePickingDelivery from '@/views/dashboard/main/receiptBy/details/tablePerformancePickingDelivery.vue'
 import TableDetailsPerformanceReceivedPO from '@/views/dashboard/main/receiptBy/details/tablePerformanceReceivedPO.vue'
 import TableDetailsPerformanceTransferIn from '@/views/dashboard/main/receiptBy/details/tablePerformanceTransferIn.vue'
 import TableDetailsPerformanceTransferOut from '@/views/dashboard/main/receiptBy/details/tablePerformanceTransferOut.vue'
+import TableDetailsPerformancePickingDelivery from '@/views/dashboard/main/receiptBy/details/tablePerformancePickingDelivery.vue'
 
+import ChartMixPerformance from '@/views/dashboard/main/receiptBy/Chart/chartPerformance.vue'
 
-import PerformancePicking from '@/views/dashboard/main/receiptBy/picking/index.vue'
 import PerformanceReceived from '@/views/dashboard/main/receiptBy/received/index.vue'
-
-
-import TableDetailsPerformancePickingDeliveryAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformancePickingDelivery.vue'
-import TableDetailsPerformanceReceivedPOAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceReceivedPO.vue'
-import TableDetailsPerformanceTransferInAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceTransferIn.vue'
-import TableDetailsPerformanceTransferOutAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceTransferOut.vue'
-
-
-import PerformancePickingAwait from '@/views/dashboard/main/receiptByAwait/picking/index.vue'
-import PerformanceReceivedAwait from '@/views/dashboard/main/receiptByAwait/received/index.vue'
-
-import PerformanceRecevingNew from '@/views/dashboard/main/receiptBy/performance/receiving/index.vue'
+import PerformancePicking from '@/views/dashboard/main/receiptBy/picking/index.vue'
 
 const vuetifyTheme = useTheme()
 
@@ -184,7 +169,6 @@ const show = ref(false)
 
 //-------------------------------------- Dialog Details ------------------------------------
 const isDialogDetailVisible = ref(false)
-const isDialogDetailVisibleAwait = ref(false)
 
 const complateAll = ref ('')
 const awaitAll = ref('')
@@ -192,51 +176,25 @@ const awaitAll = ref('')
 const historyProp = ref(false)
 const historyPropCancel = ref(null)
 
-const historyPropAwait = ref(false)
-const historyPropCancelAwait = ref(null)
-
-const blockHistoryProp = type => {
+const blockHistoryProp = () => {
   
-  if( type === 'receiving'){
-    historyPropCancel.value = true
-    isDialogDetailVisible.value = false
-    sessionStorage.setItem('historyPropBlock', true)
-    isDialogDetailVisible.value = false
-  }else if('await'){
-    historyPropAwait.value = true
-    historyPropCancelAwait.value = false
-    sessionStorage.setItem('historyPropBlockAwait', true)
-    isDialogDetailVisibleAwait.value = false
-  }
-  
+  historyPropCancel.value = true
+  isDialogDetailVisible.value = false
+  sessionStorage.setItem('historyPropBlock', true)
   
 }
 
 watchEffect(() => {
   
-  // const historyBlock = sessionStorage.getItem('historyPropBlock')
+  const historyBlock = sessionStorage.getItem('historyPropBlock')
 
-  // if(historyBlock === "false"){
-  //   isDialogDetailVisible.value = true
-  //   historyProp.value = props.history
-  // }else if(historyBlock === "true"){
-  //   historyProp.value = false
-  //   isDialogDetailVisible.value = false
-  // }
-   
-  // complateAll.value = props.complateAllProps
-  // awaitAll.value = props.awaitAllProps
-
-
-  // const historyBlockAwait = sessionStorage.getItem('historyPropBlockAwait')
-
-  // if(historyBlockAwait === "false"){
-  //   isDialogDetailVisibleAwait.value = true
-  //   historyPropAwait.value = props.history
-  // }else if(historyBlockAwait === "true"){
-  //   historyPropAwait.value = false
-  //   isDialogDetailVisibleAwait.value = false
-  // }
+  if(historyBlock === "false"){
+    isDialogDetailVisible.value = true
+    historyProp.value = props.history
+  }else if(historyBlock === "true"){
+    historyProp.value = false
+    isDialogDetailVisible.value = false
+  }
    
   complateAll.value = props.complateAllProps
   awaitAll.value = props.awaitAllProps
@@ -281,11 +239,18 @@ watchEffect(() => {
 })
 
 //----------------------------------- Data Table ------------------------------------------
+import { VDataTable } from 'vuetify/labs/VDataTable'
+import data from '@/views/demos/forms/tables/data-table/datatable'
 
 //--------------------------------- Chart Receipt & Picking ------------------------------------
 //** Receipt */
+import ReceiptSuccess from '@/views/dashboard/main/chartAll/receiptAll/receiptSuccessDonutCharts.vue'
+import ReceiptWaiting from '@/views/dashboard/main/chartAll/receiptAll/receiptWaitDonutCharts.vue'
 
 //** Picking */
+import PickingSuccess from '@/views/dashboard/main/chartAll/pickingAll/pickingSuccessDonutCharts.vue'
+import PickingWaiting from '@/views/dashboard/main/chartAll/pickingAll/pickingWaitDonutCharts.vue'
+import { trueAndFalseValue } from '@/views/demos/forms/form-elements/switch/demoCodeSwitch'
 
 const headers = [
   { title: 'Employee Total', sortable: true, value: 'id' },
@@ -468,7 +433,10 @@ const itemsDate = [
 
 ]
 
+import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import { endOfWeek, endOfMonth, endOfYear, startOfWeek, startOfMonth, startOfYear, subMonths, subWeeks, format  } from 'date-fns'
+import DemoSwitchTrueAndFalseValue from '@/views/demos/forms/form-elements/switch/DemoSwitchTrueAndFalseValue.vue'
 
 const menusVariant = ['primary' ]
 
@@ -496,12 +464,10 @@ const formattedDateOneWeekAgo = `${oneWeekAgo.getDate().toString().padStart(2, '
 const oneMonthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate())
 const formattedDateOneMonthAgo = `${oneMonthAgo.getDate().toString().padStart(2, '0')}/${(oneMonthAgo.getMonth() + 1).toString().padStart(2, '0')}/${oneMonthAgo.getFullYear()}`+` to `+formattedDate
 
-watch(() => {
+watchEffect(() => {
   const currentDate = new Date()
 
-  // formattedDateTime.value = currentDate.toLocaleString('en-GB', options)
-  formattedDateTime.value = props.dateCurrent
-
+  formattedDateTime.value = currentDate.toLocaleString('en-GB', options)
 })
 
 const formatDateNew = date => {
@@ -747,8 +713,8 @@ watch(datePickerMaster, newValue => {
 // const datePropMasterStart =  ref(localStorage.getItem('startDateFromPerformance'))
 // const datePropMasterEnd =  ref(localStorage.getItem('EndDateFromPerformance'))
 
-const datePropMasterStart =  ref((formattedDateTime))
-const datePropMasterEnd =  ref((formattedDateTime))
+const datePropMasterStart =  ref('')
+const datePropMasterEnd =  ref('')
 
 // watchEffect(() => {
 //   if(localStorage.getItem('startDateFromPerformance') && localStorage.getItem('endDateFromPerformance')){
@@ -757,42 +723,35 @@ const datePropMasterEnd =  ref((formattedDateTime))
 //   }
 // })
 
-// watchEffect(() => {
-//   // console.log('datePickerMaster value format Date', formatDateMaster(startDate.value), formatDateMaster(endDate.value), formatDateYMD(startDate.value),  formatDateYMD(endDate.value))
-//   // console.log('datePicker Query***', startDateQuery.value, endDateQuery.value)
-//   if(startDateQuery.value && endDateQuery.value){
-//     datePropMasterStart.value = formatDateMaster(startDateQuery.value)
-//     datePropMasterEnd.value = formatDateMaster(endDateQuery.value)
-//   }else if(showDatepickerCustom.value){
-//     datePropMasterStart.value = formatDateMaster(startDate.value)
-//     datePropMasterEnd.value = formatDateMaster(endDate.value)
-//   }else if(showDatepickerMonth.value){
-//     datePropMasterStart.value = formatDateYMD(startDate.value)
-//     datePropMasterEnd.value = formatDateYMD(endDate.value)
-//   }else if(showDatepickerWeek.value){
-//     datePropMasterStart.value = formatDateMaster(startDate.value)
-//     datePropMasterEnd.value = formatDateMaster(endDate.value)
-//     "Week"
-//   }else if(showDatepickerDateMax.value){
-//     datePropMasterStart.value = formatDateMaster(startDate.value)
-//     datePropMasterEnd.value = formatDateMaster(endDate.value)
-//     "Date"
-//   }
+watchEffect(() => {
+  // console.log('datePickerMaster value format Date', formatDateMaster(startDate.value), formatDateMaster(endDate.value), formatDateYMD(startDate.value),  formatDateYMD(endDate.value))
+  // console.log('datePicker Query***', startDateQuery.value, endDateQuery.value)
+  if(startDateQuery.value && endDateQuery.value){
+    datePropMasterStart.value = formatDateMaster(startDateQuery.value)
+    datePropMasterEnd.value = formatDateMaster(endDateQuery.value)
+  }else if(showDatepickerCustom.value){
+    datePropMasterStart.value = formatDateMaster(startDate.value)
+    datePropMasterEnd.value = formatDateMaster(endDate.value)
+  }else if(showDatepickerMonth.value){
+    datePropMasterStart.value = formatDateYMD(startDate.value)
+    datePropMasterEnd.value = formatDateYMD(endDate.value)
+  }else if(showDatepickerWeek.value){
+    datePropMasterStart.value = formatDateMaster(startDate.value)
+    datePropMasterEnd.value = formatDateMaster(endDate.value)
+    "Week"
+  }else if(showDatepickerDateMax.value){
+    datePropMasterStart.value = formatDateMaster(startDate.value)
+    datePropMasterEnd.value = formatDateMaster(endDate.value)
+    "Date"
+  }
 
-//   console.log('Prop Date Master', datePropMasterStart.value, datePropMasterEnd.value, typeDate.value)
-//   if(datePropMasterStart.value && datePropMasterEnd.value) {
-//     localStorage.setItem('startDateFromPerformance', datePropMasterStart.value)
-//     localStorage.setItem('endDateFromPerformance', datePropMasterEnd.value)
-//   }
+  console.log('Prop Date Master', datePropMasterStart.value, datePropMasterEnd.value, typeDate.value)
+  if(datePropMasterStart.value && datePropMasterEnd.value) {
+    localStorage.setItem('startDateFromPerformance', datePropMasterStart.value)
+    localStorage.setItem('endDateFromPerformance', datePropMasterEnd.value)
+  }
  
-// })
-
-const router = useRouter()
-
-const pushBtnDetails = MaxOrMin => {
-  sessionStorage.setItem('indicationMaxMin', MaxOrMin)
-  router.push('/dashboards/shortCutMenu/MinMax')
-}
+})
 </script>
 
  <!-- @click="isDialogDetailVisible = true" -->
@@ -800,6 +759,7 @@ const pushBtnDetails = MaxOrMin => {
   <VCard
     v-if="!logicLuxOn"
     :color="getSwitchThemeColor"
+    @click="isDialogDetailVisible = true"
   >
     <VCardText>
       <div class="d-flex align-center justify-center">
@@ -825,37 +785,28 @@ const pushBtnDetails = MaxOrMin => {
     <!-- MAX - MIN -->
     <VCardText class="">
       <VRow no-gutters>
-        <VCol>
-          <VCard
-            class="cursor-pointer pa-0"
-            ripple
-            variant="text"
-            @click="isDialogDetailVisible = true"
-          >
-            <VCardText class="pa-0">
-              <div class="d-flex align-center justify-center mb-3">
-                <span
-                  style="font-size: 16px; font-weight: bolder;"
-                  class="me-2 text-white"
-                  :class="`text-${getSwitchThemeColorText}`"
-                >{{ $t('Completed') }}</span>
-              </div>
+        <VCol cols="5">
+          <div class="d-flex align-center justify-center mb-3">
+            <span
+              style="font-size: 16px; font-weight: bolder;"
+              class="text-white"
+              :class="`text-${getSwitchThemeColorText}`"
+            >{{ $t('Completed') }}</span>
+          </div>
 
-              <VRow class="d-flex justify-center ">
-                <VCol
-                  class="d-flex justify-center align-center"
-                  cols="12"
-                >
-                  <div>
-                    <span
-                      :class="`text-${getSwitchThemeColorText}`"
-                      class="text-h5 text-disabled clamp-text text-white"
-                    >{{ complateAll }}</span>
-                  </div>
-                </VCol>
-              </VRow>
-            </VCardText>
-          </VCard>
+          <VRow class="d-flex justify-center ">
+            <VCol
+              class="d-flex justify-center align-center "
+              cols="4"
+            >
+              <div>
+                <span
+                  :class="`text-${getSwitchThemeColorText}`"
+                  class="text-h5 text-disabled clamp-text text-white"
+                >{{ complateAll }}</span>
+              </div>
+            </VCol>
+          </VRow>
         </VCol>
 
         <VCol cols="2">
@@ -868,43 +819,36 @@ const pushBtnDetails = MaxOrMin => {
           </div>
         </VCol>
 
-        <VCol>
-          <VCard
-            class="cursor-pointer pa-0"
-            ripple
-            variant="text"
-            @click="isDialogDetailVisibleAwait = true"
-          >
-            <VCardText class="pa-0">
-              <div class="d-flex align-center justify-center mb-3">
+        <VCol
+          cols="5"
+          class="text-end"
+        >
+          <div class="d-flex align-center justify-center mb-3">
+            <span
+              style="font-size: 16px; font-weight: bolder;"
+              class="text-white"
+              :class="`text-${getSwitchThemeColorText}`"
+            >{{ $t('Await') }}</span>
+          </div>
+          <VRow class="d-flex justify-center ">
+            <VCol
+              class="d-flex justify-center align-center "
+              cols="4"
+            >
+              <div>
                 <span
-                  style="font-size: 16px; font-weight: bolder;"
-                  class="me-2 text-white"
                   :class="`text-${getSwitchThemeColorText}`"
-                >{{ $t('Await') }}</span>
+                  class="text-h5 text-disabled clamp-text text-white"
+                >{{ awaitAll }}</span>
               </div>
-
-              <VRow class="d-flex justify-center ">
-                <VCol
-                  class="d-flex justify-center align-center"
-                  cols="12"
-                >
-                  <div>
-                    <span
-                      :class="`text-${getSwitchThemeColorText}`"
-                      class="text-h5 text-disabled clamp-text text-white"
-                    >{{ awaitAll }}</span>
-                  </div>
-                </VCol>
-              </VRow>
-            </VCardText>
-          </VCard>
+            </VCol>
+          </VRow>
         </VCol>
       </VRow>
     </VCardText>
   </VCard>
 
-  <!-- Dialog Complate -->
+  <!-- Dialog -->
   <section>
     <VDialog
       v-model="isDialogDetailVisible"
@@ -922,7 +866,7 @@ const pushBtnDetails = MaxOrMin => {
             <span
               style="margin-left: 10px;"
               class="text-h5 text-white d-flex align-center justify-start"
-            >{{ $t('Performance - Receiving') }}</span>
+            >{{ $t('Performance') }}</span>
           </div>
           <br>
         </VCardTitle>
@@ -942,7 +886,7 @@ const pushBtnDetails = MaxOrMin => {
           style="background-color: white;"
           variant="text"
           size="small"
-          @click="blockHistoryProp('receiving')"
+          @click="blockHistoryProp"
         />
 
         <VCardText>
@@ -961,7 +905,7 @@ const pushBtnDetails = MaxOrMin => {
                     color="light-green"
                     variant="flat"
                   >
-                    {{ $t('Receiving') }}
+                    {{ $t('Received') }}
                   </VTab>
                   <VTab
                     color="light-green"
@@ -970,6 +914,131 @@ const pushBtnDetails = MaxOrMin => {
                     {{ $t('Picking') }}
                   </VTab>
                 </VTabs>
+              </div>
+              
+              <div
+                v-if="false"
+                class="d-flex"
+              >
+                <!-- Select Datepicker -->
+                <div>
+                  <VMenu>
+                    <template #activator="{ props }">
+                      <VIcon
+                        v-if="!titleTyleSelectDatepicker"
+                        size="30"
+                        icon="ri-error-warning-fill"
+                        color="red"
+                      />
+                      <VIcon
+                        v-if="titleTyleSelectDatepicker"
+                        size="30"
+                        icon="ri-checkbox-circle-fill"
+                        color="green"
+                      />
+                      <VBtn v-bind="props">
+                        <!-- {{ $t('Select Type Date') }}  -->
+
+                        Select Type [ {{ titleTyleSelectDatepicker }}  ]
+                      </VBtn>
+                    </template>
+
+                    <VList>
+                      <VListItem
+                        v-for="item in itemsMenuTypeDate"
+                        :key="item.value"
+                        @click="selectTypeDatepicker(item.value, item.title)"
+                      >
+                        {{ item.title }}
+                      </VListItem>
+                    </VList>
+                  </VMenu>
+                </div>
+
+                <div
+                  v-if="showDatepickerDateMax || showDatepickerWeek || showDatepickerMonth || showDatepickerCustom"
+                  style="width: 200px; height: 40px; border-radius: 10px;"
+                  class="bg-green-lighten-4 d-flex justify-end aligh-center"
+                >
+                  <!-- Datepicker Type Date Max-Date -->
+                  <div
+                    v-if="showDatepickerDateMax"
+                    class="px-4"
+                  >
+                    <VueDatePicker
+                      v-model="dateMax"
+                      :max-date="new Date()"
+                      :enable-time-picker="false"
+                    />
+                  </div>
+
+                  <!-- Datepicker Type Date Week -->
+                  <div
+                    v-if="showDatepickerWeek"
+                    class="px-4"
+                  >
+                    <VueDatePicker
+                      v-model="dateWeek"
+                      week-picker
+                      :week-numbers="{ type: 'local' }"
+                      :max-date="new Date()"
+                      :enable-time-picker="false"
+                    />
+                  </div>
+
+                  <!-- Datepicker Type Date Month -->
+                  <div
+                    v-if="showDatepickerMonth"
+                    class="px-4"
+                  >
+                    <VueDatePicker
+                      v-model="dateMonth"
+                      month-picker
+                      :max-date="new Date()"
+                      :enable-time-picker="false"
+                    />
+                  </div>
+
+                  <!-- Datepicker Type Date Custom -->
+                  <div
+                    v-if="showDatepickerCustom"
+                    class="px-4"
+                  >
+                    <VueDatePicker
+                      v-model="dateCustom"
+                      :max-date="new Date()"
+                      :range="{ maxRange: 30, minMaxRawRange: true }"
+                      multi-calendars
+                      :enable-time-picker="false"
+                    />
+                  </div>
+                </div>
+
+                <div class="px-2" />
+
+                <div v-if="showDatepickerDateMax || showDatepickerWeek || showDatepickerMonth || showDatepickerCustom">
+                  <VBtn>
+                    {{ $t('View') }}
+                  </VBtn>
+                </div>
+                <div v-if="showDatepickerDateMax || showDatepickerWeek || showDatepickerMonth || showDatepickerCustom">
+                  <VBtn
+                    v-if="!btnTypeChartDayDisabled"
+                    :disabled="btnTypeChartDayDisabled"
+                    :color="colorBtnChartDay"
+                    :variant="variantBtnChartDay"
+                    @click="btnTypeChartDayCheck = true; btnTypeChartTimeCheck = false"
+                  >
+                    {{ $t('Day') }}
+                  </VBtn>
+                  <VBtn
+                    :color="colorBtnChartTime"
+                    :variant="variantBtnChartTime"
+                    @click="btnTypeChartTimeCheck = true; btnTypeChartDayCheck = false"
+                  >
+                    {{ $t('Time') }}
+                  </VBtn>
+                </div>
               </div>
             </div>
             <VWindow
@@ -982,8 +1051,8 @@ const pushBtnDetails = MaxOrMin => {
                     <PerformanceReceived
                       v-if="currentTabChartMix === 0"
                       :select-type-date="typeDate"
-                      :datepicker-data-start="props.dateCurrent"
-                      :datepicker-data-end="props.dateCurrent"
+                      :datepicker-data-start="datePropMasterStart"
+                      :datepicker-data-end="datePropMasterEnd"
                     />
                   </VCardText>
                 </VCard>
@@ -992,109 +1061,6 @@ const pushBtnDetails = MaxOrMin => {
                 <VCard>
                   <VCardText class="py-0">
                     <PerformancePicking
-                      v-if="currentTabChartMix === 1"
-                      :select-type-date="typeDate"
-                      :datepicker-data-start="datePropMasterStart"
-                      :datepicker-data-end="datePropMasterEnd"
-                    />
-                  </VCardText>
-                </VCard>
-              </VWindowItem>
-            </VWindow>
-          </div>
-        </VCardText>
-      </VCard>
-    </VDialog>
-  </section>
-
-  <!-- Dialog Await -->
-  <section>
-    <VDialog
-      v-model="isDialogDetailVisibleAwait"
-      width="100%"
-      persistent
-    >
-      <!-- Dialog Content -->
-      <VCard>
-        <VCardTitle
-          style="height: 65px;"
-          class="d-flex align-center"
-          :class="`bg-${getSwitchThemeColor}`"
-        >
-          <div>
-            <span
-              style="margin-left: 10px;"
-              class="text-h5 text-white d-flex align-center justify-start"
-            >{{ $t('Performance - Awaiting') }}</span>
-          </div>
-          <br>
-        </VCardTitle>
-        <VCardSubtitle
-          class="pb-2"
-          :class="`bg-${getSwitchThemeColor}`"
-        >
-          <div>
-            <span
-              class="px-3"
-              style="color: white; font-size: 18px;"
-            >{{ warehouseShowHeaderPerformance }} - {{ formattedDateTime }} </span>
-          </div>
-        </VCardSubtitle>
-
-        <DialogCloseBtn
-          style="background-color: white;"
-          variant="text"
-          size="small"
-          @click="blockHistoryProp('await')"
-        />
-
-        <VCardText>
-          <VRow class="">
-            <VCol cols="12" />
-          </VRow>
-
-          <div class="pb-1">
-            <div class="d-flex justify-space-between"> 
-              <div>
-                <VTabs
-                  v-model="currentTabChartMix"
-                  class="v-tabs-pill"
-                >
-                  <VTab
-                    color="light-green"
-                    variant="flat"
-                  >
-                    {{ $t('Receiving') }}
-                  </VTab>
-                  <VTab
-                    color="light-green"
-                    variant="flat"
-                  >
-                    {{ $t('Picking') }}
-                  </VTab>
-                </VTabs>
-              </div>
-            </div>
-            <VWindow
-              v-model="currentTabChartMix"
-              class="py-0"
-            >
-              <VWindowItem class="py-0">
-                <VCard>
-                  <VCardText class="py-0">
-                    <PerformanceReceivedAwait
-                      v-if="currentTabChartMix === 0"
-                      :select-type-date="typeDate"
-                      :datepicker-data-start="props.dateCurrent"
-                      :datepicker-data-end="props.dateCurrent"
-                    />
-                  </VCardText>
-                </VCard>
-              </VWindowItem>
-              <VWindowItem class="py-0">
-                <VCard>
-                  <VCardText class="py-0">
-                    <PerformancePickingAwait
                       v-if="currentTabChartMix === 1"
                       :select-type-date="typeDate"
                       :datepicker-data-start="datePropMasterStart"
