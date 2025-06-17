@@ -10,6 +10,8 @@ import { useRoute } from 'vue-router'
 import DetailsTransferPicking from "@/views/dashboard/main/shortCutMenuAwait/pickingUp/transferOut/datails.vue"
 import DetailsDeliveryPicking from "@/views/dashboard/main/shortCutMenuAwait/pickingUp/delivery/datails.vue"
 import DetailsWriteOfPicking from "@/views/dashboard/main/shortCutMenuAwait/pickingUp/writeOff/datails.vue"
+
+import { useDashboardStore } from '@/pages/dashboards/store/performance/operations'
  
 const props = defineProps({
   data: {
@@ -37,14 +39,37 @@ const formateDateNew = inputDate => {
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
 }
 
+const dashboardStore = useDashboardStore()
+
+const dateRange = ref({
+  dateSt: '2025-06-17',
+  dateSp: '2025-06-17',
+})
+
+onMounted(async () => {
+
+  console.log("props.datepickerDataStart", props.datepickerDataStart)
+
+  if(props.datepickerDataStart){
+    dateRange.value.dateSt = formateDateNew(props.datepickerDataStart)
+    dateRange.value.dateSp = formateDateNew(props.datepickerDataStart)
+  }
+
+  await fetchDataChartPerformance()
+})
+
+async function fetchDataChartPerformance() {
+  await dashboardStore.fetchPerformanceData({
+    stockId: '001',
+    ...dateRange.value,
+  })
+}
 
 const route = useRoute()
 const MAX= 100
 
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
-
-
 
 const isHoveredReceived = ref(false)
 const isHoveredTransferIn = ref(false)
@@ -249,17 +274,6 @@ const getHeaderGroupDayNew = () => {
       console.error('Error:', error)
     })
 }
-
-
-
-
-// watch([dateStartProp, dateEndProp, typeDateProps], ([newDateStart, newDateEnd, newTypeDate]) => {
-//   if (newTypeDate === 8) {
-//     getHeaderGroupTimeNew()
-//   } else if(newTypeDate === 7){
-//     getHeaderGroupDayNew()
-//   }
-// })
 
 watchEffect(() => {
   if(!props.datepickerDataEnd && !props.datepickerDataStart){
@@ -492,8 +506,11 @@ watchEffect(() => {
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"
+          :data-chart-white="dashboardStore.pickingSuccessfully.pickingWriteOff"
+          :data-chart-transfer-out="dashboardStore.pickingSuccessfully.tranferOut"
+          :data-chart-delivery="dashboardStore.pickingSuccessfully.pickingDelivery"
+          type-data="Await"
         />
-        {{ dataDatepicker  }}
       </VCol>
     </VRow>
   </div>

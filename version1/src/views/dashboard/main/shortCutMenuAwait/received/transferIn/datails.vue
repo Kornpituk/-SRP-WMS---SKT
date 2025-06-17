@@ -275,7 +275,7 @@ const formateDateNew = inputDate => {
 const GetReceivedPoDetails = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/TranferIn/Detail?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+  axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/TranferIn/Detail/Await?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
     headers: {
       'accept': '*/*',
       'x-location': `${searchByWareHouseId.value}`,

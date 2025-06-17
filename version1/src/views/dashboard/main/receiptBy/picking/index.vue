@@ -2,7 +2,7 @@
 import { urlApi } from '@/api'
 import ChartPerformanceReceived from '@/views/dashboard/main/receiptBy/picking/Chart/chartPerformance.vue'
 import ChartPerformancePickingPie from '@/views/dashboard/main/receiptBy/picking/Chart/chartPerformancePie.vue'
-import { defineProps, watchEffect } from 'vue'
+import { defineProps, watch, watchEffect } from 'vue'
 import axios from '@axios'
 
 import { useRoute } from 'vue-router'
@@ -10,6 +10,8 @@ import { useRoute } from 'vue-router'
 import DetailsTransferPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/transferOut/datails.vue"
 import DetailsDeliveryPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/delivery/datails.vue"
 import DetailsWriteOfPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/writeOff/datails.vue"
+
+import { useDashboardStore } from '@/pages/dashboards/store/performance/operations'
  
 const props = defineProps({
   data: {
@@ -31,10 +33,36 @@ const props = defineProps({
 })
 
 const formateDateNew = inputDate => {
-
   const [day, month, year] = inputDate.split('/')
-  
+
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+
+const dashboardStore = useDashboardStore()
+
+const dateRange = ref({
+  dateSt: '2025-06-17',
+  dateSp: '2025-06-17',
+})
+
+onMounted(async () => {
+
+  console.log("props.datepickerDataStart", props.datepickerDataStart)
+
+  if(props.datepickerDataStart){
+    dateRange.value.dateSt = formateDateNew(props.datepickerDataStart)
+    dateRange.value.dateSp = formateDateNew(props.datepickerDataStart)
+  }
+
+  await fetchDataChartPerformance()
+})
+
+async function fetchDataChartPerformance() {
+  await dashboardStore.fetchPerformanceData({
+    stockId: '001',
+    ...dateRange.value,
+  })
 }
 
 
@@ -276,10 +304,10 @@ watchEffect(() => {
   //   getHeaderGroupDayNew()
   // }
 
+})
+
+watch(() => {
   getHeaderGroupDayNew()
-
-
-
 })
 </script>
 
@@ -492,8 +520,11 @@ watchEffect(() => {
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"
+          :data-chart-white="dashboardStore.pickingPending.pickingWriteOff"
+          :data-chart-transfer-out="dashboardStore.pickingPending.tranferOut"
+          :data-chart-delivery="dashboardStore.pickingPending.pickingDelivery"
+          typeData="sussess"
         />
-        {{ dataDatepicker  }}
       </VCol>
     </VRow>
   </div>

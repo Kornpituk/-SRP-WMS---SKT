@@ -239,7 +239,7 @@ const checkReceiveNos = receivedPO => {
 const GetReceivedPoDetails = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/PickingTranferOut/Detail?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+  axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/PickingTranferOut/Detail/Await?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
     headers: {
       'accept': '*/*',
       'x-location': `${searchByWareHouseId.value}`,

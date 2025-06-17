@@ -10,6 +10,8 @@ import DetailsPoReceiving from "@/views/dashboard/main/shortCutMenuAwait/receive
 import DetailsTranferInReceiving from "@/views/dashboard/main/shortCutMenuAwait/received/transferIn/datails.vue"
 import DetailsOtherReceiving from "@/views/dashboard/main/shortCutMenuAwait/received/other/datails.vue"
 
+import { useDashboardStore } from '@/pages/dashboards/store/performance/operations'
+
 const props = defineProps({
   data: {
     type: Array,
@@ -176,6 +178,32 @@ const formateDateNew = inputDate => {
   const [day, month, year] = inputDate.split('/')
 
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+const dashboardStore = useDashboardStore()
+
+const dateRange = ref({
+  dateSt: formateDateNew(props.datepickerDataStart) || '',
+  dateSp: formateDateNew(props.datepickerDataStart) || '',
+})
+
+onMounted(async () => {
+
+  console.log("props.datepickerDataStart", props.datepickerDataStart)
+
+  if(props.datepickerDataStart){
+    dateRange.value.dateSt = formateDateNew(props.datepickerDataStart)
+    dateRange.value.dateSp = formateDateNew(props.datepickerDataStart)
+  }
+
+  await fetchDataChartPerformance()
+})
+
+async function fetchDataChartPerformance() {
+  await dashboardStore.fetchPerformanceData({
+    stockId: '001',
+    ...dateRange.value,
+  })
 }
 
 
@@ -392,9 +420,9 @@ watch(() => {
         </VCard>
       </VCol>
       <VCol
+        v-if="false"
         cols="12"
         lg="4"
-        v-if="false"
       >
         <VCard
           v-ripple
@@ -481,6 +509,10 @@ watch(() => {
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"
+          :data-chart-p-o="dashboardStore.receivedPending.receivedPo"
+          :data-chart-transfer-in="dashboardStore.receivedPending.tranferIn"
+          :data-chart-other="dashboardStore.receivedPending.receivedOther"
+          type-data="Await"
         />
       </VCol>
     </VRow>

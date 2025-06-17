@@ -2,13 +2,15 @@
 import { urlApi } from '@/api'
 import ChartPerformanceReceived from '@/views/dashboard/main/receiptBy/received/Chart/chartPerformance.vue'
 import axios from '@axios'
-import { defineProps, watchEffect } from 'vue'
+import { defineProps, watch, watchEffect } from 'vue'
 
 import { useRoute } from 'vue-router'
 
 import DetailsPoReceiving from "@/views/dashboard/main/shortCutMenu/received/po/datails.vue"
 import DetailsTranferInReceiving from "@/views/dashboard/main/shortCutMenu/received/transferIn/datails.vue"
 import DetailsOtherReceiving from "@/views/dashboard/main/shortCutMenu/received/other/datails.vue"
+
+import { useDashboardStore } from '@/pages/dashboards/store/performance/operations'
 
 const props = defineProps({
   data: {
@@ -28,9 +30,43 @@ const props = defineProps({
     required: true,
   },
 })
- 
+
+const formateDateNew = inputDate => {
+  const [day, month, year] = inputDate.split('/')
+
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+
+const dashboardStore = useDashboardStore()
+
+const dateRange = ref({
+  dateSt: formateDateNew(props.datepickerDataStart) || '',
+  dateSp: formateDateNew(props.datepickerDataStart) || '',
+})
+
+onMounted(async () => {
+
+  console.log("props.datepickerDataStart", props.datepickerDataStart)
+
+  if(props.datepickerDataStart){
+    dateRange.value.dateSt = formateDateNew(props.datepickerDataStart)
+    dateRange.value.dateSp = formateDateNew(props.datepickerDataStart)
+  }
+
+  await fetchDataChartPerformance()
+})
+
+async function fetchDataChartPerformance() {
+  await dashboardStore.fetchPerformanceData({
+    stockId: '001',
+    ...dateRange.value,
+  })
+}
+
 const route = useRoute()
  
+
 const MAX= 100
 
 const whereHouse = localStorage.getItem('whereHouseName')
@@ -172,11 +208,6 @@ watch(() => {
 //------------------------------------------------- Get Data from API ---------------------------------------------
 const dataDatepicker = ref()
 
-const formateDateNew = inputDate => {
-  const [day, month, year] = inputDate.split('/')
-
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-}
 
 
 const getHeaderGroupTimeNew = () => {
@@ -480,6 +511,10 @@ watch(() => {
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"
+          :data-chart-p-o="dashboardStore.receivedSuccessfully.receivedPo"
+          :data-chart-transfer-in="dashboardStore.receivedSuccessfully.tranferIn"
+          :data-chart-other="dashboardStore.receivedSuccessfully.receivedOther"
+          type-data="success"
         />
       </VCol>
     </VRow>
