@@ -73,7 +73,7 @@ onMounted(() => {
       <VCard>
         <VCardTitle class="py-5">
           <span v-if="props.typeData ==='Await'">{{ $t('Total Performance Await Picking') }}</span>
-          <span v-else>{{ $t('Total Performance Picking') }}</span>
+          <span v-else>{{ $t('Total Performance Picked') }}</span>
         </VCardTitle>
         <VDivider />
         <VCardText>

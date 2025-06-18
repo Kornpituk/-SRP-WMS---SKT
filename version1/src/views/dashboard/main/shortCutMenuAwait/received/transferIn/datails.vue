@@ -3,7 +3,6 @@ import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
 import { ref, watch, watchEffect } from 'vue'
-import { VDataTable } from 'vuetify/labs/VDataTable'
 import { useRoute } from 'vue-router'
 
 const props = defineProps({
@@ -18,7 +17,7 @@ const route = useRoute()
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
+import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
 sessionStorage.setItem('historyPropBlock2222', false)
 
@@ -824,7 +823,6 @@ const resolveCardDialogTitleColorTable = status => {
 
 
 //--------------------------------------- Menu Filter -------------------------------------------
-import avatar1 from '@images/avatars/avatar-1.png'
 
 const dialogHistory = (true)
 const cardBtnHistory = ('received')
@@ -1197,6 +1195,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Category') }}
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1263,6 +1262,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Group') }}
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1329,6 +1329,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Sub Group') }}
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1395,6 +1396,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Barcode') }}
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -1461,6 +1463,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Product Code') }}
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1527,6 +1530,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Product Name') }}
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1594,6 +1598,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Received No.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuReceiveNo"
                 :close-on-content-click="false"
                 location="end"
@@ -1675,6 +1680,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Lot') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"
@@ -1742,6 +1748,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Receive By') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuReceiveBy"
                 :close-on-content-click="false"
                 location="end"
@@ -1809,6 +1816,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Picking Goods No') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuPickingGoodsNo"
                 :close-on-content-click="false"
                 location="end"
@@ -1883,6 +1891,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Request No') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuRequestNo"
                 :close-on-content-click="false"
                 location="end"
@@ -1951,6 +1960,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Request Date') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
+                v-if="false"
                 color="primary"
                 icon="mdi-pan-vertical"
                 @click="toggleSortType('sortByColDeliveryDate')"
@@ -1971,6 +1981,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('QTY Received') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
+                v-if="false"
                 color="primary"
                 icon="mdi-pan-vertical"
                 @click="toggleSortType('sortByTags')"
@@ -1984,6 +1995,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('QTY Request') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
+                v-if="false"
                 color="primary"
                 icon="mdi-pan-vertical"
                 @click="toggleSortType('sortByTags')"
@@ -1998,6 +2010,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('QTY. Picking') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
+                v-if="false"
                 color="primary"
                 icon="mdi-pan-vertical"
                 @click="toggleSortType('sortByTags')"
@@ -2011,6 +2024,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('UoM') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
@@ -2079,6 +2093,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Remark Request') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuRemarkRequest"
                 :close-on-content-click="false"
                 location="end"
@@ -2146,6 +2161,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Remark TransferIn') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuRemarkTranferIn"
                 :close-on-content-click="false"
                 location="end"

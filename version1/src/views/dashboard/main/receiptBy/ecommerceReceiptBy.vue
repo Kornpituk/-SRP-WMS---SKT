@@ -922,7 +922,7 @@ const pushBtnDetails = MaxOrMin => {
             <span
               style="margin-left: 10px;"
               class="text-h5 text-white d-flex align-center justify-start"
-            >{{ $t('Performance - Receiving') }}</span>
+            >{{ $t('Performance - Complete') }}</span>
           </div>
           <br>
         </VCardTitle>
@@ -961,13 +961,13 @@ const pushBtnDetails = MaxOrMin => {
                     color="light-green"
                     variant="flat"
                   >
-                    {{ $t('Receiving') }}
+                    {{ $t('Received') }}
                   </VTab>
                   <VTab
                     color="light-green"
                     variant="flat"
                   >
-                    {{ $t('Picking') }}
+                    {{ $t('Picked') }}
                   </VTab>
                 </VTabs>
               </div>

@@ -55,7 +55,7 @@ onMounted(() => {
     <VCol cols="12">
       <VCard>
         <VCardTitle class="py-5">
-          <span v-if="props.typeData ==='Await'">{{ $t('Total Performance Await Received') }}</span>
+          <span v-if="props.typeData ==='Await'">{{ $t('Total Performance Await Receiving') }}</span>
           <span v-else>{{ $t('Total Performance Received') }}</span>
         </VCardTitle>
         <VDivider />

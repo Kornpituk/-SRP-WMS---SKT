@@ -1703,6 +1703,13 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
+              {{ $t('PO NO.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
               {{ $t('PO Date') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
@@ -2038,6 +2045,14 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               style="width: 5rem;"
             >
               {{ product.refDoc }}
+            </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ (product.refPoId	) }}
             </td>
 
             <td
