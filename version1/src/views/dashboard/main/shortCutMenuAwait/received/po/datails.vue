@@ -1241,8 +1241,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
       v-if="true"
       class=""
     >
-      <VCardTitle class="text-center bg-green">
-        Await To Receiving PO Table
+      <VCardTitle class="text-center bg-green">PO : Await Receiving
       </VCardTitle>
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
@@ -1263,12 +1262,14 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Status') }}
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-center px-1"
             >
               {{ $t('Image') }}
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
@@ -1336,6 +1337,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </VMenu>
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
@@ -1404,6 +1406,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </VMenu>
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
@@ -1471,6 +1474,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </VMenu>
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-center px-1"
             >
@@ -1537,6 +1541,46 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 </VCard>
               </VMenu>
             </th>
+            <th
+              v-if="false"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Received No.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              v-if="false"
+              scope="row"
+              class="text-end px-1"
+            >
+              {{ $t('Received By') }}
+              <!-- ----------------------------- Icon Search By --------------------- -->
+            </th>
+            <th
+              v-if="false"
+              scope="row"
+              class="text-start px-1"
+            >
+              Date&Time
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('PO NO.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('PO Date') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+
             <th
               scope="row"
               class="text-start px-1"
@@ -1671,76 +1715,13 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 </VCard>
               </VMenu>
             </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Received No.') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Received date') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Location') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Ref. Doc.') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('PO NO.') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('PO Date') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
+
             <th
               v-if="checkConfigUser(nameUser)"
               scope="row"
               class="text-end px-1"
             >
-              {{ $t('Received By') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-            </th>
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-end px-1"
-            >
-              {{ $t('QTY. PO.') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                v-if="false"
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="sortByQtyOrder = sortByQtyOrder === 'asc' ? 'desc' : 'asc'"
-              />
-            </th>
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-end px-1"
-            >
-              {{ $t('QTY. Received') }}
+              {{ $t("Received Q'ty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1749,6 +1730,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 @click="sortByReceive = sortByReceive === 'asc' ? 'desc' : 'asc'"
               />
             </th>
+
             <th
               v-if="checkConfigUser(nameUser)"
               scope="row"
@@ -1818,6 +1800,99 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 </VCard>
               </VMenu>
             </th>
+
+            <th
+              v-if="checkConfigUser(nameUser)"
+              scope="row"
+              class="text-end px-1"
+            >
+              {{ $t("PO Q'ty.") }}
+              <!-- ----------------------------- Icon Search By --------------------- -->
+              <VIcon
+                v-if="false"
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="sortByQtyOrder = sortByQtyOrder === 'asc' ? 'desc' : 'asc'"
+              />
+            </th>
+
+            <th
+              v-if="checkConfigUser(nameUser)"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('UoM') }}
+              <!-- ----------------------------- Icon Search By --------------------- -->
+              <VMenu
+                v-if="false"
+                v-model="menuUoM"
+                :close-on-content-click="false"
+                location="end"
+              >
+                <template #activator="{ props }">
+                  <VIcon
+                    v-bind="props"
+                    color="primary"
+                    icon="mdi-magnify"
+                  />
+                </template>
+
+                <VCard min-width="300">
+                  <VDivider />
+
+                  <VList>
+                    <VListItem>
+                      <VRow>
+                        <VCol
+                          cols="12"
+                          md="12"
+                        >
+                          <VTextField
+                            v-model="searchByUnitName"
+                            class="mt-4"
+                            :label="$t('UoM')"
+                          />
+                        </VCol>
+
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            color="warning"
+                            @click="searchByUnitName = ''"
+                          >
+                            {{ $t('Reset') }}
+                          </VBtn>
+                        </VCol>
+                        <VCol
+                          class="text-end"
+                          cols="6"
+                        >
+                          <VBtn
+                            type="submit"
+                            style="width: 100%;"
+                            @click="menuUoM = false"
+                          >
+                            {{ $t('Cancel') }}
+                          </VBtn>
+                        </VCol>
+                      </VRow>
+                    </VListItem>
+                  </VList>
+                </VCard>
+              </VMenu>
+            </th>
+
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Delivered Date') }}
+            </th>
+
             <th
               v-if="checkConfigUser(nameUser)"
               scope="row"
@@ -1834,10 +1909,20 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Delivered Date') }}
+              {{ $t('Location') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              v-if="false"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Ref. Doc.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
           </tr>
         </thead>
@@ -1873,6 +1958,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Image -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-center px-1"
             >
@@ -1961,6 +2047,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Product categories -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-start px-1"
             >
@@ -1969,6 +2056,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Secondary product categories -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-start px-1"
             >
@@ -1977,6 +2065,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Sub product categories -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-start px-1"
             >
@@ -1985,6 +2074,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Barcode -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-center px-1"
             >
@@ -1999,52 +2089,32 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               />
             </td>
 
-            <!-- 👉 Product code -->
-            <td
-              :class="resolveChipColorTable(product.status)"
-              class="text-start px-1"
-            >
-              {{ product.productId }}
-            </td>
-
-            <!-- 👉 Product Name -->
-            <td
-              :class="resolveChipColorTable(product.status)"
-              class="text-start px-1"
-            >
-              {{ (product.productName) }}
-            </td>
-
             <!-- 👉 Number(Tag) -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-start  px-1"
             >
               {{ (product.receiveNo) }}
             </td>
 
+            <!-- 👉 Actions -->
+            <td
+              v-if="false"
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ product.receiveBy }}
+            </td>
+
             <!-- 👉 Number(Non-Tag) -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-start  px-1"
             >
               {{ formatDate(product.receiveDate) }}
-            </td>
-            <!-- 👉 Total quantity of products -->
-            <td
-              :class="resolveChipColorTable(product.status)"
-              class="text-start  px-1"
-            >
-              {{ (product.locationReceive) }}
-            </td>
-
-            <!-- 👉 Counting unit -->
-            <td
-              :class="resolveChipColorTable(product.status)"
-              class="text-start  px-1"
-              style="width: 5rem;"
-            >
-              {{ product.refDoc }}
             </td>
 
             <td
@@ -2063,21 +2133,22 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ formatDate(product.poDate) }}
             </td>
 
-            <!-- 👉 Actions -->
+            <!-- 👉 Product code -->
             <td
               :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
               class="text-start px-1"
             >
-              {{ product.receiveBy }}
+              {{ product.productId }}
             </td>
+
+            <!-- 👉 Product Name -->
             <td
               :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
+              class="text-start px-1"
             >
-              {{ product.qtyPo }}
+              {{ (product.productName) }}
             </td>
+
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
@@ -2085,6 +2156,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ product.qtyReceived }}
             </td>
+
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
@@ -2092,6 +2164,31 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ product.unitName }}
             </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-end px-1"
+            >
+              {{ product.qtyPo }}
+            </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ product.unitName }}
+            </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ formatDate(product.deliveryDate) }}
+            </td>
+
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
@@ -2106,12 +2203,31 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ product.supplierName }}
             </td>
+            <!-- 👉 Total quantity of products -->
             <td
+              v-if="false"
+              :class="resolveChipColorTable(product.status)"
+              class="text-start  px-1"
+            >
+              {{ (product.locationReceive) }}
+            </td>
+
+            <!-- 👉 Counting unit -->
+            <td
+              v-if="false"
+              :class="resolveChipColorTable(product.status)"
+              class="text-start  px-1"
+              style="width: 5rem;"
+            >
+              {{ product.refDoc }}
+            </td>
+            <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
               class="text-start px-1"
             >
-              {{ formatDate(product.deliveryDate) }}
+              {{ product.unitName }}
             </td>
           </tr>
         </tbody>
@@ -2154,8 +2270,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 </template>
 
 <style lang="scss">
-/* stylelint-disable-next-line no-eol-whitespace */
-/* stylelint-disable-next-line no-eol-whitespace */
 .text-capitalize {
   text-transform: capitalize;
 }
@@ -2177,7 +2291,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
 .card-image-hover:hover {
   transform: scale(1.1);
-  
+
   /* ทำให้ขยายใหญ่ขึ้นเมื่อ hover */
 }
 </style>
