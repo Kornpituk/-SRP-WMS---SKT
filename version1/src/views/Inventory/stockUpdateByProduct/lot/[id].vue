@@ -1,9 +1,7 @@
 <script setup>
-import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
-import { themeConfig } from '@themeConfig'
 import axiosIns from '@axios'
 
-import { ref, watchEffect  } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 
@@ -1268,7 +1266,7 @@ const showExpansionDialog = ref(false)
               v-if="!serialNoIsVisible"
               class="text-start px-1"
             >
-              {{ $t('Serial') }}
+              {{ $t('SERIAL NO.') }}
             </th>
             <th
               v-if="expiryDateIsVisible"
@@ -1286,7 +1284,7 @@ const showExpansionDialog = ref(false)
               v-if="checkRFID"
               class="text-end px-1"
             >
-              {{ $t('ManyTags') }}
+              {{ $t('TAG QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1298,7 +1296,7 @@ const showExpansionDialog = ref(false)
               v-if="checkRFID"
               class="text-end px-1"
             >
-              {{ $t('ManyNonTags') }}
+              {{ $t('NON-TAG QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1307,7 +1305,7 @@ const showExpansionDialog = ref(false)
               />
             </th>
             <th class="text-end px-1">
-              {{ $t('QTY') }}
+              {{ $t('TOTAL QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"

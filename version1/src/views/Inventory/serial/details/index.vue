@@ -2205,7 +2205,7 @@ const switcherDrS = ref(true)
               scope="row"
               class="text-end px-1"
             >
-              Serial
+              SERIAL NO.
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             
@@ -2214,7 +2214,7 @@ const switcherDrS = ref(true)
               scope="row"
               class="text-end px-1"
             >
-              Tag
+              TAG QTY.
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 color="primary"
@@ -2227,7 +2227,7 @@ const switcherDrS = ref(true)
               scope="row"
               class="text-end px-1"
             >
-              Non-Tag
+              NON-TAG QTY.
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 color="primary"
@@ -2239,7 +2239,7 @@ const switcherDrS = ref(true)
               scope="row"
               class="text-end px-1"
             >
-              {{ $t('QTY') }}
+              {{ $t('TOTAL QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 color="primary"

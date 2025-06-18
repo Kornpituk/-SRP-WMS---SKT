@@ -1327,7 +1327,7 @@ const showExpansionDialog = ref('')
               v-if="checkRFID"
               class="text-end px-1"
             >
-              {{ $t('ManyTags') }}
+              {{ $t('TAG QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1339,7 +1339,7 @@ const showExpansionDialog = ref('')
               v-if="checkRFID"
               class="text-end px-1"
             >
-              {{ $t('ManyNonTags') }}
+              {{ $t('NON-TAG QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1348,7 +1348,7 @@ const showExpansionDialog = ref('')
               />
             </th>
             <th class="text-end px-1">
-              {{ $t('QTY') }}
+              {{ $t('TOTAL QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
