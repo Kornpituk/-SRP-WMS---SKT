@@ -1826,7 +1826,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Supplier Name') }}
+              {{ $t('Picking Warehouse') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             <th

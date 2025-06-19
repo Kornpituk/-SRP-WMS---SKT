@@ -1901,7 +1901,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Supplier Code.') }}
+              {{ $t('Supplier Code') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             <th

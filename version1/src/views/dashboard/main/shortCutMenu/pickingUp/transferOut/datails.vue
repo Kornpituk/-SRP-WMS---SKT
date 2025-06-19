@@ -2131,7 +2131,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
-              class="text-end px-1"
+              class="text-start px-1"
             >
               {{ (product.receiveBy) }}
             </td>
