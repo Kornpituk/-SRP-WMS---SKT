@@ -34,7 +34,6 @@ export const getDonutChartConfigPOSuccess = themeColors => {
   const donutColors = {
     series2: '#03A9F4',
     series3: '#FFC107',
-    series4: '#9C27B0',
   }
 
   const { themeSecondaryTextColor, themePrimaryTextColor } = colorVariables(themeColors)
@@ -88,7 +87,7 @@ export const getDonutChartConfigPOSuccess = themeColors => {
       },
     },
     stroke: { width: 0 },
-    labels: ['TRANSFER OUT', 'DELIVERY', 'WRITE OFF'],
+    labels: ['TRANSFER OUT', 'DELIVERY'],
     colors: [donutColors.series2, donutColors.series3, donutColors.series4],
     dataLabels: {
       enabled: true,

@@ -1241,7 +1241,8 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
       v-if="true"
       class=""
     >
-      <VCardTitle class="text-center bg-green">PO : Await Receiving
+      <VCardTitle class="text-center bg-green">
+        PO : Await Receiving
       </VCardTitle>
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
@@ -1717,7 +1718,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             </th>
 
             <th
-              v-if="checkConfigUser(nameUser)"
+              v-if="false"
               scope="row"
               class="text-end px-1"
             >
@@ -1732,7 +1733,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             </th>
 
             <th
-              v-if="checkConfigUser(nameUser)"
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
@@ -1806,7 +1807,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-end px-1"
             >
-              {{ $t("PO Q'ty.") }}
+              {{ $t("PO Qty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1898,7 +1899,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Supplier ID.') }}
+              {{ $t('Supplier Code') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             <th
@@ -2150,6 +2151,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             </td>
 
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
               class="text-end px-1"
@@ -2158,6 +2160,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             </td>
 
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
               class="text-start px-1"

@@ -1,50 +1,32 @@
 <script setup>
+import { ref, computed, watch, watchEffect, onMounted } from 'vue'
 import VueApexCharts from "vue3-apexcharts"
 import { useTheme } from "vuetify"
-import { getDonutChartConfigPOSuccess } from "@/views/dashboard/main/receiptBy/picking/Chart/apexCharConfig"
+import { getDonutChartConfigPOSuccessAwait } from "@/views/dashboard/main/receiptByAwait/received/Chart/apexCharConfig"
 
-import { defineProps, watch, watchEffect } from 'vue'
-
-//------------------------------------- Define Props -------------------------------
 const props = defineProps({
-  data: {
-    type: Array,
-    required: true,
-  },
-  pureData: {
-    type: Array,
-    required: true,
-  },
-  dataChartWhite: {
-    type: String,
-    required: true,
-  },
-  dataChartTransferOut: {
-    type: String,
-    required: true,
-  },
-  dataChartDelivery: {
-    type: String,
-    required: true,
-  },
+  data: { type: Array, required: true },
+  pureData: { type: Array, required: true },
+  dataChartPO: { type: [String, Number], required: true },
+  dataChartTransferIn: { type: [String, Number], required: true },
   typeData: {
     type: String,
     required: true,
   },
 })
 
-const vuetifyTheme = useTheme()
 const series = ref([])
+const vuetifyTheme = useTheme()
 const chartConfig = ref({})
 
 // ตรวจสอบ props และอัปเดต series
 watch(() => ({
-  tranferOut: props.dataChartTransferOut,
-  pickingDelivery: props.dataChartDelivery,
-}), ({ tranferOut, pickingDelivery }) => {
+  po: props.dataChartPO,
+  transferIn: props.dataChartTransferIn,
+}), ({ po, transferIn }) => {
   series.value = [
-    Number(tranferOut) || 0,
-    Number(pickingDelivery) || 0,
+    Number(po) || 0,
+    Number(transferIn) || 0,
   ]
 }, { immediate: true, deep: true })
 
@@ -52,7 +34,7 @@ watch(() => ({
 watchEffect(() => {
   if (vuetifyTheme.current.value) {
     chartConfig.value = {
-      ...getDonutChartConfigPOSuccess(vuetifyTheme.current.value),
+      ...getDonutChartConfigPOSuccessAwait(vuetifyTheme.current.value),
       
       chart: { animations: { enabled: true } },
     }
@@ -70,8 +52,8 @@ onMounted(() => {
     <VCol cols="12">
       <VCard>
         <VCardTitle class="py-5">
-          <span v-if="props.typeData ==='Await'">{{ $t('Total Performance Await Picking') }}</span>
-          <span v-else>{{ $t('Total Performance Picked') }}</span>
+          <span v-if="props.typeData ==='Await'">{{ $t('Total Performance Await Receiving') }}</span>
+          <span v-else>{{ $t('Total Performance Received') }}</span>
         </VCardTitle>
         <VDivider />
         <VCardText>

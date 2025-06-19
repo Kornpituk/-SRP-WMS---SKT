@@ -1499,14 +1499,14 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('PO NO.') }}
+              {{ $t('Request NO.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
             <th
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('PO Date') }}
+              {{ $t('Request Date') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
 
@@ -1645,97 +1645,13 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </VMenu>
             </th>
 
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-end px-1"
-            >
-              {{ $t("Received Q'ty.") }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                v-if="false"
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="sortByReceive = sortByReceive === 'asc' ? 'desc' : 'asc'"
-              />
-            </th>
-
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('UoM') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VMenu
-                v-if="false"
-                v-model="menuUoM"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByUnitName"
-                            class="mt-4"
-                            :label="$t('UoM')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchByUnitName = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuUoM = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
 
             <th
               v-if="checkConfigUser(nameUser)"
               scope="row"
               class="text-end px-1"
             >
-              {{ $t("PO Q'ty.") }}
+              {{ $t("Request Qty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1827,14 +1743,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Supplier ID.') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Supplier Name') }}
+              {{ $t('Picking Warehouse') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             <th
@@ -2083,7 +1992,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               style="width: 8rem;"
               class="text-end px-1"
             >
-              {{ product.qtyReceived }}
+              {{ product.qtyRequest }}
             </td>
 
             <td
@@ -2095,6 +2004,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             </td>
 
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
               class="text-end px-1"
@@ -2103,6 +2013,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             </td>
 
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
               class="text-start px-1"
@@ -2116,14 +2027,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               class="text-start px-1"
             >
               {{ formatDate(product.deliveryDate) }}
-            </td>
-
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-start px-1"
-            >
-              {{ product.pickingGoodsNo }}
             </td>
             <!-- 👉 Total quantity of products -->
             <td

@@ -38,7 +38,7 @@ const MAX= 100
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
-import ChartPerformancePickingPie from '@/views/dashboard/main/receiptBy/received/Chart/chartPerformancePie.vue'
+import ChartPerformancePickingPie from '@/views/dashboard/main/receiptByAwait/received/Chart/chartPerformancePieAwait.vue'
 
 const isHoveredReceived = ref(false)
 const isHoveredTransferIn = ref(false)
@@ -511,7 +511,6 @@ watch(() => {
           :data="dataPie"
           :data-chart-p-o="dashboardStore.receivedPending.receivedPo"
           :data-chart-transfer-in="dashboardStore.receivedPending.tranferIn"
-          :data-chart-other="dashboardStore.receivedPending.receivedOther"
           type-data="Await"
         />
       </VCol>

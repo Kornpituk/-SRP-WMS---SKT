@@ -1724,7 +1724,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-end px-1"
             >
-              {{ $t("Received Q'ty.") }}
+              {{ $t("Received Qty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1809,7 +1809,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-end px-1"
             >
-              {{ $t("PO Q'ty.") }}
+              {{ $t("PO Qty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1901,7 +1901,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Supplier ID.') }}
+              {{ $t('Supplier Code') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             <th
@@ -2270,8 +2270,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 </template>
 
 <style lang="scss">
-/* stylelint-disable-next-line no-eol-whitespace */
-/* stylelint-disable-next-line no-eol-whitespace */
 .text-capitalize {
   text-transform: capitalize;
 }
@@ -2293,7 +2291,5 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
 .card-image-hover:hover {
   transform: scale(1.1);
-  
-  /* ทำให้ขยายใหญ่ขึ้นเมื่อ hover */
 }
 </style>
