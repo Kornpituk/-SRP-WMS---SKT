@@ -1862,7 +1862,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('QTY Picking') }}
+              {{ $t('Picking QTY.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1880,28 +1880,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('UoM') }}
             </th>
 
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('QTY Request') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VIcon
-                v-if="false"
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="sortByColQtyRequest = sortByColQtyRequest === 'asc' ? 'desc' : 'asc'"
-              />
-            </th>
-
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('UoM') }}
-            </th>
-            
             <th
               v-if="false"
               scope="row"
@@ -1970,6 +1948,28 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                   </VList>
                 </VCard>
               </VMenu>
+            </th>
+
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Customer COde') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              <VIcon
+                v-if="false"
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="sortByColQtyRequest = sortByColQtyRequest === 'asc' ? 'desc' : 'asc'"
+              />
+            </th>
+
+            <th
+              v-if="checkConfigUser(nameUser)"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Customer Name') }}
             </th>
           </tr>
         </thead>
@@ -2171,7 +2171,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               style="width: 8rem;"
               class="text-start px-1"
             >
-              {{ (product.receiveBy) }}
+              {{ (product.requestWarhouse	) }}
             </td>
 
             <!-- 👉 Product code -->
@@ -2190,21 +2190,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ (product.productName) }}
             </td>
 
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
-            >
-              {{ product.qtyPicking }}
-            </td>
-
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-start px-1"
-            >
-              {{ (product.unitName) }}
-            </td>
+            
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
@@ -2219,6 +2205,22 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               class="text-start px-1"
             >
               {{ (product.unitName) }}
+            </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ product.customerId	 }}
+            </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ (product.customerName	) }}
             </td>
           </tr>
         </tbody>

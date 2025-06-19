@@ -1499,14 +1499,14 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('PO NO.') }}
+              {{ $t('Request NO.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
             <th
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('PO Date') }}
+              {{ $t('Request Date') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
 
@@ -1650,7 +1650,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-end px-1"
             >
-              {{ $t("Received Q'ty.") }}
+              {{ $t("Received Qty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1735,7 +1735,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-end px-1"
             >
-              {{ $t("PO Q'ty.") }}
+              {{ $t("Request Qty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1823,18 +1823,10 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             </th>
 
             <th
-              v-if="checkConfigUser(nameUser)"
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Supplier ID.') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Supplier Name') }}
+              {{ $t('requestWarhouse') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             <th
@@ -2118,13 +2110,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ formatDate(product.deliveryDate) }}
             </td>
 
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-start px-1"
-            >
-              {{ product.pickingGoodsNo }}
-            </td>
             <!-- 👉 Total quantity of products -->
             <td
               :class="resolveChipColorTable(product.status)"

@@ -1860,31 +1860,9 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <th
               scope="row"
-              class="text-start px-1"
+              class="text-end px-1"
             >
-              {{ $t('QTY Picking') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VIcon
-                v-if="false"
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="sortByColQtyPicking = sortByColQtyPicking === 'asc' ? 'desc' : 'asc'"
-              />
-            </th>
-
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('UoM') }}
-            </th>
-
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('QTY Request') }}
+              {{ $t('Request QTY.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -2171,7 +2149,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               style="width: 8rem;"
               class="text-start px-1"
             >
-              {{ (product.receiveBy) }}
+              {{ (product.requestWarhouse	) }}
             </td>
 
             <!-- 👉 Product code -->
@@ -2190,21 +2168,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ (product.productName) }}
             </td>
 
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
-            >
-              {{ product.qtyPicking }}
-            </td>
-
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-start px-1"
-            >
-              {{ (product.unitName) }}
-            </td>
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
