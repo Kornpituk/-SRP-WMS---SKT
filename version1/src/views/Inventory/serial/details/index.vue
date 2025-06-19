@@ -2208,7 +2208,14 @@ const switcherDrS = ref(true)
               SERIAL NO.
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
-            
+            <th
+              v-if="true"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Remark') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
             <th
               v-if="checkRFID"
               scope="row"
@@ -3083,75 +3090,7 @@ const switcherDrS = ref(true)
                 </VCard>
               </VMenu>
             </th>
-            <th
-              v-if="true"
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Remark') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-if="false"
-                v-model="menuRemark"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="searchByRemark"
-                            class="mt-4"
-                            :label="$t('Remark')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="searchByRemark = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuRemark = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
+            
             <th
               v-if="false"
               scope="row"
@@ -3312,7 +3251,12 @@ const switcherDrS = ref(true)
             >
               {{ product.serialNo }}
             </td>
-            
+            <td
+              class="text-start px-1"
+              style="width: 5rem;"
+            >
+              {{ product.remark }}
+            </td> 
 
             <!-- 👉 Tag -->
             <td
@@ -3452,12 +3396,7 @@ const switcherDrS = ref(true)
               
             -->
 
-            <td
-              class="text-start px-1"
-              style="width: 5rem;"
-            >
-              {{ product.remark }}
-            </td> 
+            
 
             <!-- 👉 Actions -->
             <td
