@@ -1859,7 +1859,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('QTY Picking') }}
+              {{ $t('Picking QTY.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1881,7 +1881,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('QTY Request') }}
+              {{ $t('Request QTY.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -2165,7 +2165,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               style="width: 8rem;"
               class="text-start px-1"
             >
-              {{ (product.receiveBy) }}
+              {{ (product.requestWarhouse	) }}
             </td>
 
             <!-- 👉 Product code -->
