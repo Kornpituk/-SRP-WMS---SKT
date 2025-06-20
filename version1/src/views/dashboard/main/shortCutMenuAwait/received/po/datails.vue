@@ -1721,7 +1721,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-end px-1"
             >
-              {{ $t("Re Qty.") }}
+              {{ $t("PO Qty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1805,7 +1805,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Delivered Date') }}
+              {{ $t('Delivery Date') }}
             </th>
 
             <th

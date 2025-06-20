@@ -1437,12 +1437,11 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('Received No.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
-            
             <th
               scope="row"
               class="text-start px-1"
             >
-              Date&Time
+              Received Date
               <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
 

@@ -1650,7 +1650,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-end px-1"
             >
-              {{ $t("Received Qty.") }}
+              {{ $t("PICKED QTY.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1734,14 +1734,14 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Delivered Date') }}
+              {{ $t('Delivery Date') }}
             </th>
 
             <th
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('picking Warhouse') }}
+              {{ $t('PICKED FROM') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
             </th>
             <th
@@ -1758,6 +1758,13 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               class="text-start px-1"
             >
               {{ $t('Ref. Doc.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('PICKED DATE ') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
           </tr>
@@ -1990,7 +1997,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               style="width: 8rem;"
               class="text-end px-1"
             >
-              {{ product.qtyRequest }}
+              {{ product.qtyPicking }}
             </td>
 
             <td
@@ -2033,6 +2040,13 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               class="text-start px-1"
             >
               {{ product.unitName }}
+            </td>
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ formatDate(product.pickingDate) }}
             </td>
           </tr>
         </tbody>

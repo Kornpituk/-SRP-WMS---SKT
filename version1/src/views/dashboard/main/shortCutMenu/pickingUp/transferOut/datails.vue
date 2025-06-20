@@ -1425,7 +1425,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Picking No.') }}
+              {{ $t('Picked No.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
                 v-if="false"
@@ -1493,7 +1493,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Picking By') }}
+              {{ $t('Picked By') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
                 v-if="false"
@@ -1561,7 +1561,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Date&Time') }}
+              {{ $t('Picked Date') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VIcon
                 v-if="false"
@@ -1862,7 +1862,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Picking QTY.') }}
+              {{ $t('Picked QTY.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VIcon
                 v-if="false"
