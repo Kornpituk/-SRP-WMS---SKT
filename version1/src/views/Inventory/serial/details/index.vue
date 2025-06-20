@@ -670,7 +670,7 @@ const stockUpdateExcel = () => {
 
   toast.info("Exporting Excel...", { timeout: 1000 })
 
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/ByLotBatch/Excel`, {}, {
+  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/ByLot/Excel`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -721,7 +721,7 @@ const stockUpdateExcel = () => {
       const fileYear = year > threshold ? year - 543 : year
 
       const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
-      const fileName = `stock_update_Tag_${dateString}.xlsx`
+      const fileName = `Stock_Update_Total_Detail_Export_${dateString}.xlsx`
 
       const link = document.createElement('a')
 
