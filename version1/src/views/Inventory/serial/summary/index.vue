@@ -738,7 +738,7 @@ const stockUpdateExcel = () => {
       const fileYear = year > threshold ? year - 543 : year
 
       const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
-      const fileName = `tock_Update_Total_Summary_Export_${dateString}.xlsx`
+      const fileName = `Stock_Update_Total_Summary_Export_${dateString}.xlsx`
 
       const link = document.createElement('a')
 

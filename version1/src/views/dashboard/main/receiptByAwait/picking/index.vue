@@ -203,46 +203,10 @@ watch(() => {
 //------------------------------------------------- Get Data from API ---------------------------------------------
 const dataDatepicker = ref()
 
-const getHeaderGroupTimeNew = () => {
-
-  // console.log('searchByCategoryName: ',searchByCategoryName)Receive Picking
-  axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Picking/GroupTime`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    params: {
-    // stockId: stockIdData.value,
-    // dateSt: dateStData.value,
-    // dateSp: dateSpData.value,
-
-      stockId: whereHouse,
-      dateSt: formateDateNew(props.datepickerDataStart),
-      dateSp: formateDateNew(props.datepickerDataStart),
-
-      // ... and so on with other parameters
-    },
-  }, {})
-    .then(response => {
-
-      dataDatepicker.value = response.data
-
-      console.log('Chart Data New Time PK:', dataDatepicker.value)
-
-      // currentPage.value = response.data.page
-      // totalPage.value = response.data.totalPages
-    })
-    .catch(error => {
-    // Handle errors
-      console.error('Error:', error)
-    })
-}
-
 const getHeaderGroupDayNew = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
-  axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Picking/GroupDay`, {
+  axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Picking/GroupDay/Await`, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
@@ -506,9 +470,9 @@ watchEffect(() => {
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"
-          :data-chart-white="dashboardStore.pickingSuccessfully.pickingWriteOff"
-          :data-chart-transfer-out="dashboardStore.pickingSuccessfully.tranferOut"
-          :data-chart-delivery="dashboardStore.pickingSuccessfully.pickingDelivery"
+          :data-chart-white="dashboardStore.pickingPending.pickingWriteOff"
+          :data-chart-transfer-out="dashboardStore.pickingPending.tranferOut"
+          :data-chart-delivery="dashboardStore.pickingPending.pickingDelivery"
           type-data="Await"
         />
       </VCol>
