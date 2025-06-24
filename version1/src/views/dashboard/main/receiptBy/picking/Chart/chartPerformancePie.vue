@@ -55,8 +55,6 @@ watchEffect(() => {
   if (vuetifyTheme.current.value) {
     chartConfig.value = {
       ...getDonutChartConfigPOSuccess(vuetifyTheme.current.value),
-      
-      chart: { animations: { enabled: true } },
     }
   }
 })

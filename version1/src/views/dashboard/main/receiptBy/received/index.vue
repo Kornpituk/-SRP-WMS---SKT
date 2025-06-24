@@ -59,7 +59,7 @@ onMounted(async () => {
 
 async function fetchDataChartPerformance() {
   await dashboardStore.fetchPerformanceData({
-    stockId: '001',
+    stockId: whereHouse,
     ...dateRange.value,
   })
 }
