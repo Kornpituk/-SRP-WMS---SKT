@@ -2119,6 +2119,7 @@ const getColorMenuStatus = title => {
               >
                 {{ $t('Alert') }}
               </VChip>
+              <h3><span class="text-amber">{{ $t('Alert') }}</span></h3>
             </td>
 
             <!-- 👉 Total quantity of products -->
@@ -2133,7 +2134,7 @@ const getColorMenuStatus = title => {
               >
                 {{ $t('Expiry') }}
               </VChip>
-              <span class="text-red">{{ $t('Expired') }}</span>
+              <h3><span class="text-red">{{ $t('Expired') }}</span></h3>
             </td>
 
             <!-- 👉 Image -->

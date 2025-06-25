@@ -596,7 +596,7 @@ const getDataForAPI = async () => {
       headers: {
         'accept': '*/*',
         'Content-Type': 'application/json',
-        'x-location': `${whereHouse}`,
+        'x-location': whereHouse,
         Authorization: `Bearer ${accessTokenAtStore}`,
       },
 
@@ -616,8 +616,6 @@ const getDataForAPI = async () => {
     summaryAll(1, dateSetReceivedSuccess.value, dateSetPickingSuccess.value)
     summaryAll(2, dateSetReceivedPending.value, dateSetPickingPending.value)
 
-    // complateAll.vale = dateSetReceivedSuccess.value + dateSetPickingSuccess.value
-    // awaitAll.value = dateSetReceivedPending.value + dateSetPickingPending.value
 
     console.log('response.data', response.data)
     console.log('complateAll', complateAll.value, 'awaitAll', awaitAll.value)

@@ -697,9 +697,10 @@ const stockUpdateExcel = () => {
       categoryId: searchByCategoryId.value,
       typeId: searchByTypeId.value,
       subTypeId: searchBySubTypeId.value,
-      barcode: searchByBarcode.value,
-      productId: searchByProductId.value,
-      productName: searchByProductName.value,
+
+      // barcode: searchByBarcode.value,
+      // productId: searchByProductId.value,
+      // productName: searchByProductName.value,
       unitId: searchByUOMId.value,
       zoneId: searchByZoneId.value,
       areaId: searchByAreaId.value,
