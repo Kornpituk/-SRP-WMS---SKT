@@ -234,6 +234,7 @@ const total = computed(() => {
       {{ $t(`Total ${total} Products`) }}
     </VCardSubtitle>
     <VueApexCharts
+      v-else
       type="bar"
       height="250"
       :options="chartConfig"

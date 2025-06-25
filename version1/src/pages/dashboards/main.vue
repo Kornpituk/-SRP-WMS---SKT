@@ -260,8 +260,8 @@ const calDateReverse30DaysNonMove = computed(() => {
 const typeDataMove = [
   { title: 'last 30 days', value: 30 }, 
   { title: 'last 15 days', value: 15 }, 
-  { title: 'last 7 day', value: 7 },
-  { title: 'lastday', value: 1 },
+  { title: 'last 7 days', value: 7 },
+  { title: 'Today', value: 1 },
 ]
 
 function handleSelectDay(value, type, title) {
@@ -278,8 +278,8 @@ function handleSelectDay(value, type, title) {
 const typeDataNonMove = [
   { title: 'last 30 days', value: 30 }, 
   { title: 'last 15 days', value: 15 }, 
-  { title: 'last 7 day', value: 7 },
-  { title: 'lastday', value: 1 },
+  { title: 'last 7 days', value: 7 },
+  { title: 'Today', value: 1 },
 ]
 
 watchEffect(() => {
@@ -1105,7 +1105,23 @@ onMounted(() => {
                       :key="`card-${n}`"
                     >
                       <VCardText
-                        v-if="onboardingMove === 0"
+                        v-if="chartDataMove.series.length === 0 "
+                        class="pa-1"
+                      >
+                        <div class="text-center">
+                          <VIcon
+                            size="220"
+                            color="grey lighten-1"
+                          >
+                            mdi-chart-bar
+                          </VIcon>
+                          <p class="mt-2">
+                            {{ $t('No data available') }}
+                          </p>
+                        </div>
+                      </VCardText>
+                      <VCardText
+                        v-else-if="onboardingMove === 0"
                         class="pa-1"
                       >
                         <ChartJsBarChartMove
@@ -1184,7 +1200,24 @@ onMounted(() => {
                       :key="`card-${n}`"
                     >
                       <VCardText
-                        v-if="onboardingNonMove === 0"
+                        v-if="chartDataNonMove.series.length === 0"
+                        class="pa-1"
+                      >
+                        <div class="text-center">
+                          <VIcon
+                            size="220"
+                            color="grey lighten-1"
+                          >
+                            mdi-chart-bar
+                          </VIcon>
+                          <p class="mt-2">
+                            {{ $t('No data available') }}
+                          </p>
+                        </div>
+                      </VCardText>
+                     
+                      <VCardText
+                        v-else-if="onboardingNonMove === 0"
                         class="pa-1"
                       >
                         <ChartJsBarChartNonMove
