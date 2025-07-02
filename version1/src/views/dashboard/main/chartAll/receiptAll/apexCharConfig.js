@@ -89,6 +89,9 @@ export const getDonutChartConfigPOSuccess = themeColors => {
     chart: {
       stacked: true,
       parentHeightOffset: 0,
+      animations: {
+        enabled: false, // ปิด animation ชั่วคราวเพื่อทดสอบ
+      },
       toolbar: { 
         show: false, 
         offsetX: 0,

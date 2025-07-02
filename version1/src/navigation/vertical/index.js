@@ -18,6 +18,6 @@ import skt from './skt'
 
 // export default [...dashboard, ...inventory, ...configuration, ...countStock  ]
 
-export default [...dashboard, ...inventory]
+export default [...dashboard, ...inventory, ...charts]
 
 // export default [ ...skt]

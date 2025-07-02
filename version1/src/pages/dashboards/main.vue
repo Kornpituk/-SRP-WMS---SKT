@@ -625,7 +625,7 @@ const getDataForAPI = async () => {
   }
 }
 
-watchEffect(() => {
+watch(() => {
   getDataForAPI()
 
 })
@@ -845,7 +845,10 @@ onMounted(() => {
                 >{{ $t('Inventory Arrived') }}</span>
               </VCardTitle>
               <VCardText>
-                <ReceiptSuccess :dataset="dateSetReceivedSuccess" />
+                <ReceiptSuccess
+                  :date-formate="formattedDateNow"
+                  :dataset="dateSetReceivedSuccess"
+                />
               </VCardText>
             </VCard>
           </VCol>
