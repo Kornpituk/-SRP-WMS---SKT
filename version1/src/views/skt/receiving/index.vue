@@ -3545,7 +3545,6 @@ const insetSwitch1 = ref('')
                 >
                   <span
                     v-if="debugMode === false"
-                    :style="{ color: colorStatusWithId2(item.raw.statusId).message }"
                     style="font-size: 12px;"
                     class="text-wrap"
                   >{{ item.raw.statusText }}</span>
