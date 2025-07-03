@@ -233,13 +233,31 @@ const generatedInsp = async () => {
 const responseGener = ref([])
 
 const statusId = ref(null) // ตัวแปรสำหรับเก็บค่า statusId
-const typeIdLorry = ref(null) // ตัวแปรสำหรับเก็บค่า typeIdLorry
 const isReject = ref(null)
 const isAccept = ref(null)
 const frozeCheck = ref(true)
 const frozeCheckNotDetialCheck  = ref(true)
 const receiveTypeIdData = ref(null)
 const poEiLog = ref()
+
+// const generatedJournalId = async () => {
+//   const result = await getReceivingPlanByJournalIdService(poEtlLogDetailJournalIDQueryParameters.value)
+
+//   if (result.success) {
+//     responseGener.value = result.data
+
+//     const item = result.data[0]
+
+//     console.log("item", item)
+
+//     poEtlLogDetailJournalIDQueryParameters.value = item.poEtlLogDetailJournalID
+//     receiveTypeIdData.value = item.receiveTypeId
+//     statusId.value = item.statusId
+//     loadingGenerated2.value = false
+//   } else {
+//     console.error('[generatedJournalId] failed:', result.message)
+//   }
+// }
 
 const journalInspection = useGenerateJournalIdInspection()
 
@@ -256,27 +274,9 @@ const generatedJournalId = async () => {
     receiveTypeIdData.value = item.receiveTypeId
     statusId.value = item.statusId
     loadingGenerated2.value = false
-    typeIdLorry.value  = item.lorryInfos
   } else {
     loadingGenerated1.value = false
   }
-}
-
-const checkTypeIdLorry = () => {
-  if (typeIdLorry.value && typeIdLorry.value.length > 0) {
-    // return !!(typeIdLorry.value[0].lorryInfoKey === 1 || typeIdLorry.value[0].lorryInfoKey === 2)
-    if(typeIdLorry.value[0].lorryInfoKey === '01' || typeIdLorry.value[0].lorryInfoKey === '02'){
-      console.log('TypeIdLorry is true', typeIdLorry.value[0].lorryInfoKey)
-      
-      return true
-    } else {
-      console.log('TypeIdLorry is false', typeIdLorry.value[0].lorryInfoKey)
-
-      return false
-    }
-  }
-  
-  return false
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -339,6 +339,45 @@ const state = reactive({
 })
 
 //------------- Analysist
+//---------------- Model
+// const analysisItems = ref([])
+
+// const analysisItemsCode = ref({
+//   actualAmountUnits_1: null,
+//   actualAmountUnits_2: null,
+//   actualAmountUnits_3: null,
+//   actualAmountUnits_4: null,
+//   actualAmountUnits_5: null,
+
+//   actualAnalysis_1: null,
+//   actualAnalysis_2: null,
+//   actualAnalysis_3: null,
+//   actualAnalysis_4: null,
+//   actualAnalysis_5: null,
+
+//   actualMakerLotNo_1: null,
+//   actualMakerLotNo_2: null,
+//   actualMakerLotNo_3: null,
+//   actualMakerLotNo_4: null,
+//   actualMakerLotNo_5: null,
+
+//   actualNetCountKgs_1: null,
+//   actualNetCountKgs_2: null,
+//   actualNetCountKgs_3: null,
+//   actualNetCountKgs_4: null,
+//   actualNetCountKgs_5: null,
+
+//   actualTotalQuantityKgs_1: 0,
+//   actualTotalQuantityKgs_2: 0,
+//   actualTotalQuantityKgs_3: 0,
+//   actualTotalQuantityKgs_4: 0,
+//   actualTotalQuantityKgs_5: 0,
+// })
+
+// //-------------- API
+
+// const analysisResults = ref([])
+// const analyticalItemsResults = ref([])
 
 // ข้อมูลต้นแบบที่เราจะเก็บเพื่อส่งไปยัง API
 const formData = ref({
@@ -370,10 +409,6 @@ const getAnalysistInsp = async () => {
   }
 }
 
-const checkMakerLot = () => {
-
-}
-
 const loadingGenerated2 = ref(true)
 
 watch(
@@ -388,6 +423,30 @@ watch(
 )
 
 //--------------- save header --------------------------------
+// const saveHeaderInspect = async () => {
+//   try {
+//     const body = {
+//       limConditionDetail: headerInsp.value.details,
+//       note: headerInsp.value.note,
+//     }
+
+//     const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveInspectionForm?PoEtlLogDetailJournalID=${poEtlLogDetailJournalIDQueryParameters.value}`, body, {
+//       headers: {
+//         'accept': '*/*',
+//         'x-location': `${whereHouse.value}`,
+//         Authorization: `Bearer ${accessTokenAtStore}`,
+//       },
+//     })
+
+//     // //console.log('[products.value]!!: ', response.data)
+//     // isDialogSubmitSuccessVisible.value = true
+//     return true
+//   } catch (error) {
+//     // Handle errors
+//     isDialogSubmitFailedVisible.value = true
+//     console.error('Error:', error)
+//   }
+// }
 
 const {
   saveHeaderInspect: saveHeaderInspectUseCase,
@@ -468,8 +527,6 @@ const checkEmptyFields = () => {
         inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
         actualAnalysis: analyticalItem.actualAnalysis,
         okState: analyticalItem.okState,
-        acture: analyticalItem.acture,
-        afterMixing: analyticalItem.afterMixing,
       }
 
       const indexLabelFiled = `No.${itemIndex + 1} - Lot ${analyticalIndex + 1}`
@@ -479,14 +536,7 @@ const checkEmptyFields = () => {
 
       // ตรวจสอบว่าต้องเช็ค actualAnalysis หรือ okState ตามค่า needActualValue
       if(item.unit !== ''){
-        if (item.lorryInput) {
-        // เช็คเฉพาะ okState
-          if (!body.acture && !body.afterMixing) {
-            emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
-          } else {
-            emptyFieldsList.push({ indexLabelSuccessed, body, isEmpty: false, needActualCheck })
-          }
-        } else if (item.needActualValue) {
+        if (item.needActualValue) {
         // เช็คเฉพาะ actualAnalysis
           if (!body.actualAnalysis) {
             emptyFieldsList.push({ indexLabelFiled, body, isEmpty: true, needActualCheck })
@@ -509,77 +559,61 @@ const checkEmptyFields = () => {
   return emptyFieldsList
 }
 
-const generateActualAnalysis = async analysisItems => {
-  for (const item of analysisItems) {
-    const firstValue = item.itemAnalyticals?.[0]?.actualAnalysis ?? ''
 
-    for (const analyticalItem of item.itemAnalyticals || []) {
-      analyticalItem.actualAnalysis = firstValue
-    }
-  }
+//---------------- api
+// const saveLotInspect = async () => {
+//   emptyFields.value = checkEmptyFields()
 
-  // console.log('Result:', analysisItems.value)
-}
-
-const saveLotInspect = async () => {
-
-  await generateActualAnalysis(analysisItems.value)
-
-  emptyFields.value = checkEmptyFields()
-
-  // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
-
-  const hasErrors = ref(null)
-  if(trickerSubmit.value === true){
-    hasErrors.value = emptyFields.value.some(field => field.isEmpty)
-  }
+//   // ตรวจสอบว่ามี error (emptyFields ที่เป็น error)
   
-  // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
-  if (hasErrors.value) {
-    //console.log('Cannot proceed: There are errors in the fields.')
+//   const hasErrors = ref(null)
+//   if(trickerSubmit.value === true){
+//     hasErrors.value = emptyFields.value.some(field => field.isEmpty)
+//   }
+  
+//   // ถ้ามี error ไม่ส่งข้อมูลไปยัง API
+//   if (hasErrors.value) {
+//     //console.log('Cannot proceed: There are errors in the fields.')
 
-    // แสดง dialog แจ้งเตือนถ้าจำเป็น
-    // isDialogSubmitFailedVisible.value = true
+//     // แสดง dialog แจ้งเตือนถ้าจำเป็น
+//     // isDialogSubmitFailedVisible.value = true
     
-    throw "Cannot proceed: There are errors in the fields."
-  }
+//     throw "Cannot proceed: There are errors in the fields."
+//   }
 
+//   try {
+//     for (const item of analysisItems.value) {
+//       for (const analyticalItem of item.itemAnalyticals) {
+//         // สร้าง body สำหรับแต่ละ analyticalItem
+//         const body = {
+//           updatedBy: '', // ข้อมูลที่ต้องการส่ง
+//           inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
+//           actualAnalysis: analyticalItem.actualAnalysis,
+//           okState: analyticalItem.okState,
+//         }
 
-  try {
-    for (const item of analysisItems.value) {
-      for (const analyticalItem of item.itemAnalyticals) {
-        // สร้าง body สำหรับแต่ละ analyticalItem
-        const body = {
-          updatedBy: '', // ข้อมูลที่ต้องการส่ง
-          inspReqLotJournalId: analyticalItem.inspReqLotJournalId,
-          actualAnalysis: analyticalItem.actualAnalysis,
-          okState: analyticalItem.okState,
-          "acture": analyticalItem.acture,
-          "afterMixing": analyticalItem.afterMixing,
-        }
+//         // ส่ง body ไปยัง API ทีละตัว
+//         const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails`, body, {
+//           headers: {
+//             'accept': '*/*',
+//             'x-location': `${whereHouse.value}`,
+//             Authorization: `Bearer ${accessTokenAtStore}`,
+//           },
+//         })
 
-        // ส่ง body ไปยัง API ทีละตัว
-        const response = await axiosIns.post(`${urlApi.value}/api/v1/Inspection/SaveLotDetails`, body, {
-          headers: {
-            'accept': '*/*',
-            'x-location': `${whereHouse.value}`,
-            Authorization: `Bearer ${accessTokenAtStore}`,
-          },
-        })
+//         //console.log('[response]: ', response.data)
+//       }
+//     }
 
-        //console.log('[response]: ', response.data)
-      }
-    }
-
-    // แสดง dialog เมื่อสำเร็จ
-    // isDialogSubmitSuccessVisible.value = true
-    return true
-  } catch (error) {
-    // แสดง dialog เมื่อมีข้อผิดพลาด
-    // isDialogSubmitFailedVisible.value = true
-    console.error('Error:', error)
-  }
-}
+//     // แสดง dialog เมื่อสำเร็จ
+//     // isDialogSubmitSuccessVisible.value = true
+//     return true
+//   } catch (error) {
+//     // แสดง dialog เมื่อมีข้อผิดพลาด
+//     // isDialogSubmitFailedVisible.value = true
+//     console.error('Error:', error)
+//   }
+// }
 
 const {
   emptyFields,
@@ -588,39 +622,44 @@ const {
 } = useSaveLotInsp(analysisItems)
 
 const filteredFields = computed(() => {
-  console.log('All filteredFields start:', emptyFields.value)
   if (!showOnlyErrors.value) {
     return emptyFields.value.filter(field => field.isEmpty) // กรองเฉพาะค่า error
   }
-
-  console.log('All fields:', emptyFields.value)
   
   return emptyFields.value // แสดงทั้งหมด
 })
 
+const generateActualAnalysis = analysisItems => {
+  for (const item of analysisItems.value) {
+    const firstValue = item.itemAnalyticals?.[0]?.actualAnalysis ?? ''
 
+    for (const analyticalItem of item.itemAnalyticals || []) {
+      analyticalItem.actualAnalysis = firstValue
+    }
+  }
 
-// const saveLotInspect = async () => {
-//   try {
+  console.log('Result:', analysisItems.value)
+}
 
-//     filteredFields
+const saveLotInspect = async () => {
+  try {
 
-//     generateActualAnalysis(analysisItems)
+    generateActualAnalysis(analysisItems)
 
-//     const result = await saveLotInspectUserCase(analysisItems.value)
+    const result = await saveLotInspectUserCase(analysisItems.value)
 
-//     if (result) {
-//       // แสดง dialog สำเร็จ
-//       console.log('Save successful', result)
-//     }
-//   } catch (error) {
-//     // แสดง dialog ผิดพลาด
-//     console.log('Save not successful', error)
-//     console.error('Error:', error)
+    if (result) {
+      // แสดง dialog สำเร็จ
+      console.log('Save successful', result)
+    }
+  } catch (error) {
+    // แสดง dialog ผิดพลาด
+    console.log('Save not successful', error)
+    console.error('Error:', error)
     
-//     return
-//   }
-// }
+    return
+  }
+}
 
 // ------------------------ Save After Mixing  --------------------------------------------------
 
@@ -657,7 +696,7 @@ const saveLorryAfterMixing = async () => {
     // ทำอะไรต่อ เช่น แสดง Dialog สำเร็จ
     // isDialogSubmitFailedVisible.value = true
     console.log('บันทึกสำเร็จ saveLorryAfterMixing')
-    textAlertDialogFunction('SAVE LORRY AFTER MIXING', true)
+    textAlertDialogFunction('SAVE LORRY AFTER MIXXING', true)
 
     // หน่วงเวลา 10 วินาที ก่อนที่จะ reload หน้าเว็บ
     setTimeout(() => {
@@ -667,7 +706,7 @@ const saveLorryAfterMixing = async () => {
     
     return true
   } else {
-    textAlertDialogFunction('SAVE LORRY AFTER MIXING', false)
+    textAlertDialogFunction('SAVE LORRY AFTER MIXXING', false)
 
     loadingSaveLorryAftherMixing.value = false
 
@@ -710,8 +749,6 @@ const submitInspForm = async () => {
         setTimeout(() => {
           window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-
-        console.log('Submit successful:', submitVisibleResult)
 
         return true
       }else{
@@ -1700,6 +1737,1498 @@ const inputRules = [
         cols="12"
       >
         <div style="overflow-x: auto; white-space: nowrap;">
+          <table
+            v-if="false"
+            class="custom-table"
+          >
+            <!-- Sanyo Lot No. -->
+            <tr>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="1"
+              >
+                No.
+              </th>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="2"
+              >
+                Analytical Items
+              </th>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="2"
+              >
+                Unit
+              </th>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="2"
+              >
+                Analytical  Method No.
+              </th>
+              <th
+                class="text-center"
+                rowspan="3"
+                colspan="2"
+              >
+                Specification Ranges
+              </th>
+              <th
+                class="text-center "
+                colspan="1"
+              >
+                Sanyo Lot No.
+              </th>
+              <td
+                colspan="5"
+                class="text-center"
+              >
+                {{ headerInsp.sktId }}
+              </td>
+            </tr>
+            <!-- Maker Lot No. -->
+            <tr>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Maker Lot No.
+              </th>
+              <td
+                class="text-center"
+                colspan="1"
+              >
+                <div class="d-flex justify-center align-center">
+                  <span>1 : {{ analysisItemsCode.actualMakerLotNo_0 }}</span>
+                </div>
+              </td>
+              <td colspan="1">
+                <div class="d-flex justify-center align-center">
+                  <span>2 : {{ analysisItemsCode.actualMakerLotNo_1 }}</span>
+                </div>
+              </td>
+              <td colspan="1">
+                <div class="d-flex justify-center align-center">
+                  <span>3 : {{ analysisItemsCode.actualMakerLotNo_2 }}</span>
+                </div>
+              </td>
+              <td colspan="1">
+                <div class="d-flex justify-center align-center">
+                  <span>4 : {{ analysisItemsCode.actualMakerLotNo_3 }}</span>
+                </div>
+              </td>
+              <td colspan="1">
+                <div class="d-flex justify-center align-center">
+                  <span>5 : {{ analysisItemsCode.actualMakerLotNo_4 }}</span>
+                </div>
+              </td>
+            </tr>
+            <!-- Net Count.x Amount -->
+            <tr>
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Net Count.x Amount
+              </th>
+              <td
+                v-for="i = 1 in 5"
+                :key="i"
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span>{{ covertFloatFixedTwo(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
+              </td>
+            </tr>
+
+            <!-- Actual Analysis -->
+            <tr>
+              <th
+                class="text-center"
+                colspan="9"
+              />
+              <th
+                class="text-center"
+                colspan="1"
+              >
+                Actual Analysis
+              </th>
+              <td
+             
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_0) }}</span>
+              </td>
+              <td
+              
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_1) }}</span>
+              </td>
+              <td
+              
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_2) }}</span>
+              </td>
+              <td
+             
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_3) }}</span>
+              </td>
+              <td 
+              
+                class="text-center"
+                colspan="1"
+                style="min-width: 160px; max-width: 160px;"
+              >
+                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode.actualTotalQuantityKgs_4) }}</span>
+              </td>
+            </tr>
+
+            <!-- AnalysisItems -->
+            <tr
+              v-for="(item , index) in analysisItems"
+              :key="index"
+              class=""
+            >
+              <td
+                v-if="item.typeID === 1"
+                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
+                class="text-center"
+                colspan="1"
+              >
+                <span>{{ item.sqnText }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                colspan="2"
+              >
+                <span>{{ item.analyticalItem }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="2"
+              >
+                <span>{{ item.unit }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="2"
+              >
+                <span>{{ item.methodCode }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="2"
+              >
+                <span>{{ item.specRange }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+              >
+                <span>{{ item.actualAnalysis }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+                style="min-width: 200px; max-width: 200px;"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[0].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                  :rules="[
+                    v => v !== -1 || 'Actual value is required!',
+                  ]"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 0) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+                
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[0] && item.unit !== '' && !item.lorryInput">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[0]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[0].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[0].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[0]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[0].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                    
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 0) && item.unit !== ''&& !item.lorryInput"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+
+                <div v-if="item.lorryInput">
+                  <VRow>
+                    <VCol
+                      cols="5"
+                      class="d-flex justify-space-between align-center py-1"
+                    >
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >Actual In Lorry </span>
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >=</span>
+                    </VCol>
+                    <VCol
+                      cols="7"
+                      class="py-0"
+                    >
+                      <VTextField
+                        v-model="item.itemAnalyticals[0].acture"
+                        density="compact"
+                        placeholder="Actual In Lorry"
+                        class="py-2"
+                        type="number"
+                        :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                      >
+                        <template
+                          v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                          #label
+                        >
+                          <VIcon icon="ri-edit-line" />
+                        </template>
+                      </VTextField>
+                    </VCol>
+                  </VRow>
+
+                  <VRow>
+                    <VCol
+                      cols="5"
+                      class="d-flex justify-space-between align-center py-1"
+                    >
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >After Mixing </span>
+                      <span
+                        class="text-red"
+                        style="font-size: 12px;"
+                      >=</span>
+                    </VCol>
+                    <VCol
+                      cols="7"
+                      class="py-2"
+                    >
+                      <VTextField
+                        v-model="item.itemAnalyticals[0].afterMixing"
+                        density="compact"
+                        placeholder="After Mixing"
+                        type="number"
+                        :readonly="validateDisableInoutAferMixing('After Mixing')"
+                      >
+                        <template
+                          v-if="!validateDisableInoutAferMixing('After Mixing')"
+                          #label
+                        >
+                          <VIcon icon="ri-edit-line" />
+                        </template>
+                      </VTextField>
+                    </VCol>
+                  </VRow>
+                </div>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+                style="min-width: 200px; max-width: 200px;"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[1].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+              
+                <span
+                  v-if="checkOkState(item, item.typeID, 1) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1]"
+                    v-model="item.itemAnalyticals[1].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 99 || 'Must be 100 characters or less',9
+                    ]"
+                    :maxlength="45"
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[1] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[1]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[1].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[1].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[1]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[1].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                    
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 1) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+                style="min-width: 200px; max-width: 200px;"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[2].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 2) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2]"
+                    v-model="item.itemAnalyticals[2].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 99 || 'Must be 100 characters or less',9
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[2] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[2]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[2].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[2].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[2]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[2].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                    
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 2) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+                style="min-width: 200px; max-width: 200px;"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[3].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 3) && item.unit !== ''"
+                  class="text-red"
+                >Analysis result Ok/Not is required!</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3]"
+                    v-model="item.itemAnalyticals[3].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 99 || 'Must be 100 characters or less',
+                      
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[3] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[3]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[3].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[3].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[3]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[3].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 3) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 1"
+                class="text-center"
+                colspan="1"
+                style="min-width: 200px; max-width: 200px;"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[4].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 4) && item.unit !== ''"
+                  class="text-red"
+                >Analysis result Ok/Not is required!</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4]"
+                    v-model="item.itemAnalyticals[4].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 99 || 'Must be 100 characters or less',
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 1 && item.itemAnalyticals[4] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[4]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[4].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[4].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[4]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[4].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 99 || 'Must be 100 characters or less',
+                    
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 4) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+            </tr>
+        
+            <!-- Reference -->
+            <tr class="">
+              <td
+                class="text-center"
+                colspan="1"
+              />
+              <th
+                class="text-start text-decoration-underline"
+                colspan="14"
+              >
+                Reference
+              </th>
+            </tr>
+
+            <tr
+              v-for="(item , index) in analysisItems"
+              :key="index"
+            >
+              <td
+                v-if="item.typeID === 2"
+                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
+                class="text-center"
+                colspan="1"
+              >
+                <span>{{ item.sqnText }}</span>
+              </td>
+            
+              <td
+                v-if="item.typeID === 2"
+                colspan="2"
+                style="text-transform: capitalize;"
+              >
+                <span>{{ item.analyticalItem }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="2"
+                style="text-transform: capitalize;"
+              >
+                <span>{{ item.unit }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="2"
+                style="text-transform: capitalize;"
+              >
+                <span>{{ item.methodCode }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="2"
+                style="text-transform: capitalize;"
+              >
+                <span>{{ item.specRange }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="1"
+                style="text-transform: capitalize;"
+              >
+                <span>{{ item.actualAnalysis }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[0].okState"
+                  :mandatory="false"
+                  :readonly="frozeCheck"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 0) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0]"
+                    v-model="item.itemAnalyticals[0].actualAnalysis"
+                    density="compact"
+                    :readonly="frozeCheck"
+                    :rules="[
+                      value => value.length <= 101 || 'Must be 100 characters or less',
+                      
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[0] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 101) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[0]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[0].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[0].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[0]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[0].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[0].actualAnalysis && item.itemAnalyticals[0].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 0) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[1].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 1) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1]"
+                    v-model="item.itemAnalyticals[1].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 101 || 'Must be 100 characters or less',
+                      value => {
+                        if (value && value[0] === ' ') {
+                          item.itemAnalyticals[1].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[1] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[1]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[1].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[1].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[1]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[1].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[1].actualAnalysis && item.itemAnalyticals[1].actualAnalysis.length <= 101) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
+                    value => {
+                      if (value && value[1] === ' ') {
+                        item.itemAnalyticals[1].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 1) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[2].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 2) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2]"
+                    v-model="item.itemAnalyticals[2].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 101 || 'Must be 100 characters or less',
+                      value => {
+                        if (value && value[2] === ' ') {
+                          item.itemAnalyticals[2].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[2] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[2]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[2].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[2].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[2]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[2].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[2].actualAnalysis && item.itemAnalyticals[2].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
+                    value => {
+                      if (value && value[2] === ' ') {
+                        item.itemAnalyticals[2].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 2) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[3].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 3) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3]"
+                    v-model="item.itemAnalyticals[3].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 101 || 'Must be 100 characters or less',
+                      value => {
+                        if (value && value[0] === ' ') {
+                          item.itemAnalyticals[3].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[3] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[3]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[3].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[3].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[3]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[3].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[3].actualAnalysis && item.itemAnalyticals[3].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
+                    value => {
+                      if (value && value[3] === ' ') {
+                        item.itemAnalyticals[3].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 3) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+              <td
+                v-if="item.typeID === 2"
+                class="text-center"
+                colspan="1"
+              >
+                <VRadioGroup
+                  v-if="!item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[4].okState"
+                  :readonly="frozeCheck"
+                  :mandatory="false"
+                >
+                  <VRow>
+                    <VCol cols="6">
+                      <VRadio :value="1">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Ok
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                    <VCol cols="6">
+                      <VRadio :value="0">
+                        <template #label>
+                          <div style="font-size: 12px;">
+                            Not
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VCol>
+                  </VRow>
+                </VRadioGroup>
+
+                <span
+                  v-if="checkOkState(item, item.typeID, 4) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorOkState }}</span>
+
+                <div v-if="false">
+                  <VTextField
+                    v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4] && item.unit !== ''"
+                    v-model="item.itemAnalyticals[4].actualAnalysis"
+                    :readonly="frozeCheck"
+                    density="compact"
+                    :rules="[
+                      value => value.length <= 101 || 'Must be 100 characters or less',
+                      value => {
+                        if (value && value[0] === ' ') {
+                          item.itemAnalyticals[4].actualAnalysis = null
+                          return `first can't be a space.`
+                        }
+                        return true
+                      }
+                    ]"
+                    :maxlength="45" 
+                  >
+                    <template
+                      v-if="!frozeCheck"
+                      #label
+                    >
+                      <VIcon icon="ri-edit-line" />
+                    </template>
+                  </VTextField>
+                </div>
+                
+
+                <div v-if="item.needActualValue && item.typeID === 2 && item.itemAnalyticals[4] && item.unit !== ''">
+                  <VBtn
+                    width="190"
+                    :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                    variant="outlined"
+                    dencity="compact"
+                    :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                    @click="toggleDialog(item.itemAnalyticals[4]?.inspReqLotJournalId)"
+                  >
+                    <span
+                      v-if="item.itemAnalyticals[4].actualAnalysis"
+                      style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
+                    >{{ item.itemAnalyticals[4].actualAnalysis }}</span>
+                    <span
+                      v-else
+                      style="font-size: 12px;"
+                    >Input</span>
+                  </VBtn>
+                </div>
+                
+                <VTextarea
+                  v-if="isDialogVisibleInput[item.itemAnalyticals[4]?.inspReqLotJournalId] && item.unit !== ''"
+                  v-model="item.itemAnalyticals[4].actualAnalysis"
+                  class="my-2"
+                  rows="2"
+                  auto-grow
+                  :color="(item.itemAnalyticals[4].actualAnalysis && item.itemAnalyticals[4].actualAnalysis.length <= 99) ? 'primary' : 'red'"
+                  placeholder="Placeholder Text"
+                  :readonly="frozeCheck"
+                  :rules="[
+                    value => value !== '' || !value || 'Actual value is required!',
+                    value => value.length <= 101 || 'Must be 100 characters or less',
+                    value => {
+                      if (value && value[4] === ' ') {
+                        item.itemAnalyticals[4].actualAnalysis = null
+                        return `first can't be a space.`
+                      }
+                      return true
+                    }
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+
+                <span
+                  v-if="checkAnalysitItem(item, item.typeID, 4) && item.unit !== ''"
+                  class="text-red"
+                >{{ textAlertErrorAnalysitItem }}</span>
+              </td>
+            </tr>
+
+            <!-- Reference Item -->
+            <tr>
+              <td
+                class="text-center"
+                colspan="1"
+              />
+              <td
+                class="text-start"
+                colspan="14"
+              >
+                <div class="d-flex align-center">
+                  <VIcon
+                    color="primary"
+                    icon="ri-circle-fill"
+                  /> = After arrival of raw material, we have to actually analyze every lot.
+                </div>
+              </td>
+            </tr>
+          </table>
+
           <table class="custom-table">
             <!-- Header Rows (unchanged) -->
             <tr>
@@ -1823,7 +3352,6 @@ const inputRules = [
               <td
                 v-if="item.typeID === 1"
                 class="text-center"
-                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
                 colspan="1"
               >
                 <span>{{ item.sqnText }}</span>
@@ -1875,7 +3403,7 @@ const inputRules = [
                     <div
                       v-if="shouldShowInput(item, i-1)"
                       class="pa-2"
-                      style="min-width: 220px; max-width: 200px;"
+                      style="min-width: 200px; max-width: 200px;"
                     >
                       <!-- Radio Group -->
                       <VRadioGroup
@@ -1906,80 +3434,6 @@ const inputRules = [
                           </VCol>
                         </VRow>
                       </VRadioGroup>
-                      <!-- Input AfterMixxin -->
-                      <div v-if="item.lorryInput">
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >Actual In Lorry </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-0"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].acture"
-                              density="compact"
-                              placeholder="Actual In Lorry"
-                              class="py-2"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >After Mixing </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-2"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].afterMixing"
-                              density="compact"
-                              placeholder="After Mixing"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('After Mixing')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('After Mixing')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-                      </div>
-
                       <!-- Error Messages -->
                       <span
                         v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
@@ -1996,130 +3450,9 @@ const inputRules = [
                     </div>
                   </div>
                 </td>
-
-                
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                />
               </template>
-
-              <template v-else-if="item.typeID === 1 && item.needActualValue && item.lorryInput">
-                <td
-                  v-for="i in item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div class="d-flex flex-wrap">
-                    <div
-                      v-if="shouldShowInput(item, i-1)"
-                      class="pa-2"
-                      style="min-width: 220px; max-width: 200px;"
-                    >
-                      <!-- Input AfterMixxin -->
-                      <div v-if="item.lorryInput">
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1 px-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >Actual In Lorry </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-1 px-1"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].acture"
-                              density="compact"
-                              class="py-2"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1 px-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >After Mixing </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-1 px-1"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].afterMixing"
-                              density="compact"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('After Mixing')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('After Mixing')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-                      </div>
-
-                      <!-- Error Messages -->
-                      <span
-                        v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorOkState }}
-                      </span>
-                      <span
-                        v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorAnalysitItem }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-
-                
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                />
-              </template>
-
-              
               <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
-              <template v-if="item.typeID === 1 && item.needActualValue && !item.lorryInput">
+              <template v-if="item.typeID === 1 && item.needActualValue">
                 <td
                   v-for="i in 1"
                   :key="i"
@@ -2179,14 +3512,6 @@ const inputRules = [
                     </span>
                   </div>
                 </td>
-
-                
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="1"
-                  class="text-center"
-                />
               </template>
             </tr>
 
@@ -2204,16 +3529,15 @@ const inputRules = [
               </th>
             </tr>
 
-            <!-- Analysis Items -->
+            <!-- Reference Items -->
             <tr
               v-for="(item, index) in analysisItems"
-              :key="index"
+              :key="'ref-'+index"
             >
-              <!-- Fixed Columns -->
+              <!-- Fixed Columns for Reference -->
               <td
                 v-if="item.typeID === 2"
                 class="text-center"
-                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
                 colspan="1"
               >
                 <span>{{ item.sqnText }}</span>
@@ -2221,6 +3545,7 @@ const inputRules = [
               <td
                 v-if="item.typeID === 2"
                 colspan="2"
+                style="text-transform: capitalize;"
               >
                 <span>{{ item.analyticalItem }}</span>
               </td>
@@ -2228,6 +3553,7 @@ const inputRules = [
                 v-if="item.typeID === 2"
                 class="text-center"
                 colspan="2"
+                style="text-transform: capitalize;"
               >
                 <span>{{ item.unit }}</span>
               </td>
@@ -2235,6 +3561,7 @@ const inputRules = [
                 v-if="item.typeID === 2"
                 class="text-center"
                 colspan="2"
+                style="text-transform: capitalize;"
               >
                 <span>{{ item.methodCode }}</span>
               </td>
@@ -2242,6 +3569,7 @@ const inputRules = [
                 v-if="item.typeID === 2"
                 class="text-center"
                 colspan="2"
+                style="text-transform: capitalize;"
               >
                 <span>{{ item.specRange }}</span>
               </td>
@@ -2249,335 +3577,107 @@ const inputRules = [
                 v-if="item.typeID === 2"
                 class="text-center"
                 colspan="1"
+                style="text-transform: capitalize;"
               >
                 <span>{{ item.actualAnalysis }}</span>
               </td>
 
-              <!-- Dynamic Input Columns - regular without Input Button & Textarea -->
-              <template v-if="item.typeID === 2 && !item.needActualValue">
+              <!-- Dynamic Input Columns for Reference -->
+              <template v-if="item.typeID === 2">
                 <td
-                  v-for="i in item.itemAnalyticals.length"
-                  :key="i"
+                  v-if="shouldShowRadioGroup(item)"
                   :colspan="getColspanCount(item)"
                   class="text-center"
                 >
                   <div class="d-flex flex-wrap">
-                    <div
-                      v-if="shouldShowInput(item, i-1)"
-                      class="pa-2"
-                      style="min-width: 220px; max-width: 200px;"
+                    <template
+                      v-for="i in 5"
+                      :key="i"
                     >
-                      <!-- Radio Group -->
-                      <VRadioGroup
-                        v-if="!item.needActualValue && item.itemAnalyticals[i-1] && item.unit !== ''"
-                        v-model="item.itemAnalyticals[i-1].okState"
-                        :readonly="frozeCheck"
-                        :mandatory="false"
-                        :rules="[v => v !== -1 || 'Actual value is required!']"
+                      <div
+                        v-if="shouldShowInput(item, i-1)"
+                        class="pa-2"
+                        style="min-width: 200px; max-width: 200px;"
                       >
-                        <VRow>
-                          <VCol cols="6">
-                            <VRadio :value="1">
-                              <template #label>
-                                <div style="font-size: 12px;">
-                                  Ok
-                                </div>
-                              </template>
-                            </VRadio>
-                          </VCol>
-                          <VCol cols="6">
-                            <VRadio :value="0">
-                              <template #label>
-                                <div style="font-size: 12px;">
-                                  Not
-                                </div>
-                              </template>
-                            </VRadio>
-                          </VCol>
-                        </VRow>
-                      </VRadioGroup>
-                      <!-- Input AfterMixxin -->
-                      <div v-if="item.lorryInput">
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >Actual In Lorry </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-0"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].acture"
-                              density="compact"
-                              placeholder="Actual In Lorry"
-                              class="py-2"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >After Mixing </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-2"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].afterMixing"
-                              density="compact"
-                              placeholder="After Mixing"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('After Mixing')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('After Mixing')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-                      </div>
-
-                      <!-- Error Messages -->
-                      <span
-                        v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorOkState }}
-                      </span>
-                      <span
-                        v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorAnalysitItem }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                />
-              </template>
-
-              <template v-else-if="item.typeID === 2 && item.needActualValue && item.lorryInput">
-                <td
-                  v-for="i in item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div class="d-flex flex-wrap">
-                    <div
-                      v-if="shouldShowInput(item, i-1)"
-                      class="pa-2"
-                      style="min-width: 220px; max-width: 200px;"
-                    >
-                      <!-- Input AfterMixxin -->
-                      <div v-if="item.lorryInput">
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1 px-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >Actual In Lorry </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-1 px-1"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].acture"
-                              density="compact"
-                              placeholder="Actual In Lorry"
-                              class="py-2"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1 px-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >After Mixing </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-1 px-1"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].afterMixing"
-                              density="compact"
-                              placeholder="After Mixing"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('After Mixing')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('After Mixing')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-                      </div>
-
-                      <!-- Error Messages -->
-                      <span
-                        v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorOkState }}
-                      </span>
-                      <span
-                        v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorAnalysitItem }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                />
-              </template>
-              <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
-              <template v-if="item.typeID === 2 && item.needActualValue && !item.lorryInput">
-                <td
-                  v-for="i in 1"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div
-                    v-if="shouldShowInput(item, i-1)"
-                    class="pa-2 "
-                    style="width: auto;"
-                  >
-                    <!-- Input Button & Textarea -->
-                    <div
-                      v-if="item.needActualValue && !item.lorryInput"
-                      style="width: auto;"
-                    >
-                      <VBtn
-                        width="190"
-                        :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
-                        variant="outlined"
-                        density="compact"
-                        :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
-                        @click="toggleDialog(item.itemAnalyticals[i-1]?.inspReqLotJournalId)"
-                      >
-                        <span
-                          v-if="item.itemAnalyticals[i-1].actualAnalysis"
-                          class="text-truncate"
+                        <!-- Radio Group -->
+                        <VRadioGroup
+                          v-if="!item.needActualValue && item.itemAnalyticals[i-1] && item.unit !== ''"
+                          v-model="item.itemAnalyticals[i-1].okState"
+                          :readonly="frozeCheck"
+                          :mandatory="false"
                         >
-                          {{ item.itemAnalyticals[i-1].actualAnalysis }}
-                        </span>
-                        <span v-else>Input</span>
-                      </VBtn>
+                          <VRow>
+                            <VCol cols="6">
+                              <VRadio :value="1">
+                                <template #label>
+                                  <div style="font-size: 12px;">
+                                    Ok
+                                  </div>
+                                </template>
+                              </VRadio>
+                            </VCol>
+                            <VCol cols="6">
+                              <VRadio :value="0">
+                                <template #label>
+                                  <div style="font-size: 12px;">
+                                    Not
+                                  </div>
+                                </template>
+                              </VRadio>
+                            </VCol>
+                          </VRow>
+                        </VRadioGroup>
+                
+                        <!-- Input Button & Textarea -->
+                        <div v-if="item.needActualValue">
+                          <VBtn
+                            width="190"
+                            :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                            variant="outlined"
+                            density="compact"
+                            :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
+                            @click="toggleDialog(item.itemAnalyticals[i-1]?.inspReqLotJournalId)"
+                          >
+                            <span
+                              v-if="item.itemAnalyticals[i-1].actualAnalysis"
+                              class="text-truncate"
+                            >
+                              {{ item.itemAnalyticals[i-1].actualAnalysis }}
+                            </span>
+                            <span v-else>Input</span>
+                          </VBtn>
                   
-                      <VTextarea
-                        v-if="isDialogVisibleInput[item.itemAnalyticals[i-1]?.inspReqLotJournalId]"
-                        v-model="item.itemAnalyticals[i-1].actualAnalysis"
-                        class="my-2"
-                        rows="2"
-                        auto-grow
-                        :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
-                        :readonly="frozeCheck"
-                        :rules="inputRules"
-                      />
-                    </div>
-                    <!-- Error Messages -->
-                    <span
-                      v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                      class="text-red"
-                    >
-                      {{ textAlertErrorOkState }}
-                    </span>
-                    <span
-                      v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                      class="text-red"
-                    >
-                      {{ textAlertErrorAnalysitItem }}
-                    </span>
+                          <VTextarea
+                            v-if="isDialogVisibleInput[item.itemAnalyticals[i-1]?.inspReqLotJournalId]"
+                            v-model="item.itemAnalyticals[i-1].actualAnalysis"
+                            class="my-2"
+                            rows="2"
+                            auto-grow
+                            :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
+                            :readonly="frozeCheck"
+                            :rules="inputRules"
+                          />
+                        </div>
+                
+                        <!-- Error Messages -->
+                        <span
+                          v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
+                          class="text-red"
+                        >
+                          {{ textAlertErrorOkState }}
+                        </span>
+                        <span
+                          v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== ''"
+                          class="text-red"
+                        >
+                          {{ textAlertErrorAnalysitItem }}
+                        </span>
+                      </div>
+                    </template>
                   </div>
                 </td>
-                <!--
-                  <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                  /> 
-                -->
               </template>
             </tr>
-
-            
 
             <!-- Footer Note -->
             <tr>
@@ -2634,7 +3734,6 @@ const inputRules = [
             <VCol cols="6">
               <VCheckbox
                 v-model="headerInsp.spacialCase"
-                :readonly="frozeCheckNotDetialCheck"
                 style="font-size: 12px;"
               >
                 <template #label>
@@ -2886,7 +3985,7 @@ const inputRules = [
     </section>
 
     <section
-      v-if="statusId === 13 && checkTypeIdLorry() || statusId === 14 && checkTypeIdLorry()"
+      v-if="statusId === 13 || statusId === 14"
       cols="12"
       class="my-4"
     >

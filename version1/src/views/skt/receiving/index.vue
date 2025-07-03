@@ -527,7 +527,7 @@ const colorStatusWithId = id => {
   case 10:
     return { color: 'green-darken-3', message: 'cycan' }
   case 11:
-    return { color: 'lime-lighten-4', message: 'black' }
+    return { color: 'lime-lighten-4', message: 'back' }
   case 12:
     return { color: 'yellow-darken-3', message: 'brown' }
   case 13:
@@ -572,7 +572,7 @@ const colorStatusWithId2 = id => {
   case 10:
     return { color: 'light-green', message: 'cycan' }
   case 11:
-    return { color: 'lime', message: 'cycan' }
+    return { color: 'lime-darken-4', message: 'cycan' }
   case 12:
     return { color: 'yellow-darken-4', message: 'brown' }
   case 13:
@@ -3539,20 +3539,18 @@ const insetSwitch1 = ref('')
                 @dblclick="dataTableCliclHighlightIsToggle(item.raw.no)"
               >
                 <VChip
-                  :color="colorStatusWithId2(item.raw.statusId).color"
                   class="font-weight-medium"
                   style="min-height: 40px;"
-                  :style="{ color: colorStatusWithId(item.raw.statusId).message }"
+                  :color="colorStatusWithId2(item.raw.statusId).color" 
                 >
                   <span
                     v-if="debugMode === false"
                     style="font-size: 12px;"
-                    :style="{ color: colorStatusWithId(item.raw.statusId).message }"
                     class="text-wrap"
                   >{{ item.raw.statusText }}</span>
+
                   <span
                     v-if="debugMode === true"
-                    :style="{ color: colorStatusWithId(item.raw.statusId).message }"
                     style="font-size: 12px;"
                     class="text-wrap"
                   >{{ debugMode }} {{ item.raw.statusText }}[{{ item.raw.poEtlLogDetailJournalID }}]({{ item.raw.receiveTypeName }})</span>

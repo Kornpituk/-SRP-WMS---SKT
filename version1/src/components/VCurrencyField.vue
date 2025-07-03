@@ -18,7 +18,7 @@ const { inputRef, formattedValue, setValue } = useCurrencyInput({
   currency: 'THB',
   hideCurrencySymbolOnFocus: true,
   hideGroupingSeparatorOnFocus: false,
-  precision: 2,
+  precision: 4,
 
   // valueRange: { min: 0 },
   currencyDisplay: CurrencyDisplay.hidden,
