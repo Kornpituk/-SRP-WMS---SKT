@@ -25,6 +25,9 @@ import '@vuepic/vue-datepicker/dist/main.css'
 // import VueColumnsResizableVuetify from 'vue-columns-resizable-vuetify'
 import resizable from './plugins/resizable/resizable' // Import resizable directive
 
+import VueEasyLightbox from 'vue-easy-lightbox'
+import VuePdfEmbed from 'vue-pdf-embed'
+
 loadFonts()
 
 
@@ -42,6 +45,8 @@ pinia.use(piniaPluginPersistedstate)
 app.use(router)
 app.use(layoutsPlugin)
 app.use(i18n)
+app.use(VueEasyLightbox)
+app.use(VuePdfEmbed)
 
 // app.use(VueColumnsResizableVuetify)
 app.directive('resizable', resizable)

@@ -926,13 +926,29 @@ const  coaFiles = ref([])
 const showAllImages = ref(false)
 const selectedImageIndex = ref(0)  // เก็บ index ของรูปที่ถูกเลือก
 
+const colsCOALayout = ref(0)
+const colsMainContent = ref(12)
+
 const openDialog = index => {
-  if(index >= 7 ){
-    selectedImageIndex.value = 0 
-  } else {
-    selectedImageIndex.value = index  // กำหนด index ของรูปที่ถูกกด
+  // if(index >= 7 ){
+  //   selectedImageIndex.value = 0 
+  // } else {
+  //   selectedImageIndex.value = index  // กำหนด index ของรูปที่ถูกกด
+  // }
+  // isDialogVisibleCOA.value = true        // เปิด dialog
+
+  if(colsMainContent.value === 8 ){
+    colsCOALayout.value = 0
+    colsMainContent.value = 12
+  }else{
+    colsCOALayout.value = 4
+    colsMainContent.value = 8
   }
-  isDialogVisibleCOA.value = true        // เปิด dialog
+
+  
+
+
+  console.log('cols', colsCOALayout.value, selectedImageIndex.value)
 }
 
 // จำกัดจำนวนรูปที่จะแสดงให้แค่ 9 รูป
@@ -973,7 +989,7 @@ const getCOAReceivingForm = () => {
 
         startTime.value = coaFiles.value.length
 
-        //console.log('[*****Headers COA]]!!: ', lotData)
+        console.log('[*****Headers COA]]!!: ',  coaFiles.value )
         loadingGenerated1.value = false
       })
       .catch(error => {
@@ -987,7 +1003,70 @@ const getCOAReceivingForm = () => {
 onMounted(() => {
   getCOAReceivingForm() // เรียกใช้ฟังก์ชันเพื่อโหลดข้อมูลจาก API
 })
+ 
+import VuePdfApp from "vue3-pdf-app"
 
+// import this to use default icons for buttons
+import "vue3-pdf-app/dist/icons/main.css"
+
+const scaleCOA = ref(1.0)
+
+const zoomInCoA = () => {
+  scaleCOA.value += 0.1
+}
+
+const zoomOutCoA = () => {
+  if (scaleCOA.value > 0.5) scaleCOA.value -= 0.1
+}
+
+const onProgress = progressData => {
+  console.log('Loading progress:', progressData)
+}
+
+//------------------------ vue-easy-lightbox
+
+console.log("coa", coaFiles.value)
+
+const lightboxImages = ref([])
+const VueEasyLightBoxShow = ref(false)
+
+const showLightbox = async item => {
+  // ถ้าเป็น PDF ต้องแปลงก่อน
+  lightboxImages.value = [item.fileUri]
+  VueEasyLightBoxShow.value = true
+}
+
+const hideLightbox = () => {
+  VueEasyLightBoxShow.value = false
+}
+
+//------------------ custom carusor
+
+
+// index ของไฟล์ที่กำลังแสดง
+const currentIndexCustomCarousel = ref(0)
+const currentItemCustomCarousel = computed(() => coaFiles.value[currentIndexCustomCarousel.value])
+
+// ไปหน้าก่อน
+const prev = () => {
+  if (currentIndexCustomCarousel.value > 0) {
+    currentIndexCustomCarousel.value--
+  }
+}
+
+// ไปหน้าถัดไป
+const next = () => {
+  if (currentIndexCustomCarousel.value < coaFiles.value.length - 1) {
+    currentIndexCustomCarousel.value++
+  }
+}
+
+
+// optional styles
+import 'vue-pdf-embed/dist/styles/annotationLayer.css'
+import 'vue-pdf-embed/dist/styles/textLayer.css'
+
+import { pdfToImages } from './utils/pdfToImages'
 
 //----------------- COA ---------------------------------------------
 const  colors = [
@@ -1384,33 +1463,30 @@ const inputRules = [
   v => v !== '' || !v || 'Actual value is required!',
   v => v.length <= 99 || 'Must be 100 characters or less',
 ]
+
+//----------------
 </script>
 
 <template>
-  <div class="text-center mt-4">
-    <span style="font-size: 22px; font-weight: bolder;">
-      Raw Material Inspection Request Form
-    </span>
-  </div>
-
-  <div
-    v-if="loadingGenerated1 && loadingGenerated2"
-    class="mt-1"
-  >
-    <VProgressLinear
-      height="20"
-      color="success"
-      indeterminate 
+  <!-- header section -->
+  <section v-if="!loadingGenerated1 && !loadingGenerated2">
+    <div class="text-center mt-4">
+      <span style="font-size: 22px; font-weight: bolder;">
+        Raw Material Inspection Request Form
+      </span>
+    </div>
+    <div
+      v-if="loadingGenerated1 && loadingGenerated2"
+      class="mt-1"
     >
-      <span>Loading</span>
-    </VProgressLinear>
-  </div>
-
-  <div v-if="false">
-    -->{{ analysisItemsCode }}
-  </div>
-
-  <div v-if="!loadingGenerated1 && !loadingGenerated2">
+      <VProgressLinear
+        height="20"
+        color="success"
+        indeterminate 
+      >
+        <span>Loading</span>
+      </VProgressLinear>
+    </div>
     <VRow>
       <VCol cols="2">
         <div
@@ -1421,7 +1497,6 @@ const inputRules = [
         </div>
       </VCol>
     </VRow>
-
     <div style="overflow-x: auto; white-space: nowrap;">
       <table class="custom-table">
         <thead>
@@ -1508,7 +1583,10 @@ const inputRules = [
               </VRow>
             </td>
             <td colspan="4">
-              <div class="card-stack-container cursor-pointer">
+              <div
+                v-if="false"
+                class="card-stack-container cursor-pointer"
+              >
                 <!-- แสดงการ์ดที่ซ้อนกัน -->
                 <VCard
                   v-for="(image, index) in limitedImages"
@@ -1608,12 +1686,24 @@ const inputRules = [
                   <span>Loading.....</span>
                 </VProgressCircular>
               </div>
+
+              <div class="d-flex justify-center">
+                <VBtn
+                  width="100px"
+                  @click="openDialog(index)"
+                >
+                  <VIcon
+                    size="35"
+                    icon="ri-gallery-line"
+                  />
+                  <span>{{ coaFiles.length }}+</span>
+                </VBtn>
+              </div>
             </td>
           </tr>
         </thead>
       </table>
     </div>
-
     <!-- Dialog COA -->
     <VDialog
       v-model="isDialogVisibleCOA"
@@ -1686,922 +1776,1093 @@ const inputRules = [
         </VCardText>
       </VCard>
     </VDialog>
-
-    <section v-if="false">
-      <VBtn @click="textValue">
-        Test
-      </VBtn>
-    </section>
-
-    <!-- Raw Material Inspection Request Form -->
-    <VRow class="mt-4">
+  </section>
+  <!-- body section -->
+  <section>
+    <VRow>
       <VCol
-        class=""
-        cols="12"
+        v-if="colsCOALayout !== 0"
+        :cols="colsCOALayout"
       >
-        <div style="overflow-x: auto; white-space: nowrap;">
-          <table class="custom-table">
-            <!-- Header Rows (unchanged) -->
-            <tr>
-              <th
-                class="text-center"
-                rowspan="3"
-                colspan="1"
-              >
-                No.
-              </th>
-              <th
-                class="text-center"
-                rowspan="3"
-                colspan="2"
-              >
-                Analytical Items
-              </th>
-              <th
-                class="text-center"
-                rowspan="3"
-                colspan="2"
-              >
-                Unit
-              </th>
-              <th
-                class="text-center"
-                rowspan="3"
-                colspan="2"
-              >
-                Analytical Method No.
-              </th>
-              <th
-                class="text-center"
-                rowspan="3"
-                colspan="2"
-              >
-                Specification Ranges
-              </th>
-              <th
-                class="text-center"
-                colspan="1"
-              >
-                Sanyo Lot No.
-              </th>
-              <td
-                colspan="5"
-                class="text-center"
-              >
-                {{ headerInsp.sktId }}
-              </td>
-            </tr>
-    
-            <!-- Maker Lot No. -->
-            <tr>
-              <th
-                class="text-center"
-                colspan="1"
-              >
-                Maker Lot No.
-              </th>
-              <td
-                v-for="i in 5"
-                :key="i"
-                class="text-center"
-                colspan="1"
-              >
-                <div class="d-flex justify-center align-center">
-                  <span>{{ i }} : {{ analysisItemsCode[`actualMakerLotNo_${i-1}`] }}</span>
-                </div>
-              </td>
-            </tr>
-    
-            <!-- Net Count.x Amount -->
-            <tr>
-              <th
-                class="text-center"
-                colspan="1"
-              >
-                Net Count.x Amount
-              </th>
-              <td
-                v-for="i in 5"
-                :key="i"
-                class="text-center"
-                colspan="1"
-                style="min-width: 160px; max-width: 160px;"
-              >
-                <span>{{ covertFloatFixedTwo(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
-              </td>
-            </tr>
-
-            <!-- Actual Analysis -->
-            <tr>
-              <th
-                class="text-center"
-                colspan="9"
-              />
-              <th
-                class="text-center"
-                colspan="1"
-              >
-                Actual Analysis
-              </th>
-              <td
-                v-for="i in 5"
-                :key="i"
-                class="text-center"
-                colspan="1"
-                style="min-width: 160px; max-width: 160px;"
-              >
-                <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode[`actualTotalQuantityKgs_${i-1}`]) }}</span>
-              </td>
-            </tr>
-
-            <!-- Analysis Items -->
-            <tr
-              v-for="(item, index) in analysisItems"
-              :key="index"
+        <div class="mt-8">
+          <VCard
+            class="mx-auto"
+            max-width="600"
+            height="530px"
+          >
+            <VCardTitle
+              v-if="false"
+              class="bg-primary d-flex justify-space-between align-center"
             >
-              <!-- Fixed Columns -->
-              <td
-                v-if="item.typeID === 1"
-                class="text-center"
-                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
-                colspan="1"
-              >
-                <span>{{ item.sqnText }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 1"
-                colspan="2"
-              >
-                <span>{{ item.analyticalItem }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 1"
-                class="text-center"
-                colspan="2"
-              >
-                <span>{{ item.unit }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 1"
-                class="text-center"
-                colspan="2"
-              >
-                <span>{{ item.methodCode }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 1"
-                class="text-center"
-                colspan="2"
-              >
-                <span>{{ item.specRange }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 1"
-                class="text-center"
-                colspan="1"
-              >
-                <span>{{ item.actualAnalysis }}</span>
-              </td>
+              <span>COA</span>
+            </VCardTitle>
 
-              <!-- Dynamic Input Columns - regular without Input Button & Textarea -->
-              <template v-if="item.typeID === 1 && !item.needActualValue">
-                <td
-                  v-for="i in item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div class="d-flex flex-wrap">
-                    <div
-                      v-if="shouldShowInput(item, i-1)"
-                      class="pa-2"
-                      style="min-width: 220px; max-width: 200px;"
+            <VCardText class="pa-0">
+              <VImg
+                v-if="false"
+                :src="srcImagCOA"
+              />
+              <div class="pa-0">
+                <div class="d-flex justify-space-around align-center py-1 bg-primary ">
+                  <VBtn
+                    v-if="false"
+                    icon="mdi-minus"
+                    variant="text"
+                    size="30px"
+                    @click="model = Math.max(model - 1, 0)"
+                  />
+                  <VRow>
+                    <VCol
+                      class="d-flex justify-center align-center"
+                      cols="10"
                     >
-                      <!-- Radio Group -->
-                      <VRadioGroup
-                        v-if="!item.needActualValue && item.itemAnalyticals[i-1] && item.unit !== ''"
-                        v-model="item.itemAnalyticals[i-1].okState"
-                        :readonly="frozeCheck"
-                        :mandatory="false"
-                        :rules="[v => v !== -1 || 'Actual value is required!']"
+                      <span>COA {{ selectedImageIndex+1 }}</span>
+                    </VCol>
+                    <VCol cols="2">
+                      <VBtn
+                        icon
+                        @click="openDialog('0')"
                       >
-                        <VRow>
-                          <VCol cols="6">
-                            <VRadio :value="1">
-                              <template #label>
-                                <div style="font-size: 12px;">
-                                  Ok
-                                </div>
-                              </template>
-                            </VRadio>
-                          </VCol>
-                          <VCol cols="6">
-                            <VRadio :value="0">
-                              <template #label>
-                                <div style="font-size: 12px;">
-                                  Not
-                                </div>
-                              </template>
-                            </VRadio>
-                          </VCol>
-                        </VRow>
-                      </VRadioGroup>
-                      <!-- Input AfterMixxin -->
-                      <div v-if="item.lorryInput">
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >Actual In Lorry </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-0"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].acture"
-                              density="compact"
-                              placeholder="Actual In Lorry"
-                              class="py-2"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
+                        <VIcon
+                          color="white"
+                          icon="ri-close-large-line"
+                        />
+                      </VBtn>
+                    </VCol>
+                  </VRow>
+                
+                  <VBtn
+                    v-if="false"
+                    icon="mdi-plus"
+                    size="30px"
+                    variant="text"
+                    @click="model = Math.min(model + 1, 4)"
+                  />
+                </div>
+                <!--
+                  <VCarousel
+                  v-model="selectedImageIndex"
+                  show-arrows="hover"
+                  height="450px"
+                  :touch="false"
+                  >
+                  <VCarouselItem
+                  v-for="(item, i) in coaFiles"
+                  :key="i"
+                  :value="i"
+                  cover
+                  >
+                  <template v-if="item.fileUri.endsWith('.pdf')">
+                  <VuePdfApp
+                  style="height: 1600px;"
+                  :pdf="item.fileUri"
+                  />
+                  </template>
+    
+                  <template v-else>
+                  <div class="zoom-wrapper">
+                  <VImg
+                  v-if="!VueEasyLightBoxShow"
+                  :src="item.fileUri"
+                  alt="Image"
+                  class="zoomable"
+                  @click="showLightbox(item)"
+                  /> 
+                     
 
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >After Mixing </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-2"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].afterMixing"
-                              density="compact"
-                              placeholder="After Mixing"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('After Mixing')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('After Mixing')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-                      </div>
-
-                      <!-- Error Messages -->
-                      <span
-                        v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorOkState }}
-                      </span>
-                      <span
-                        v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorAnalysitItem }}
-                      </span>
-                    </div>
+                  <VueEasyLightbox
+                  :visible="VueEasyLightBoxShow"
+                  :imgs="lightboxImages"
+                  @hide="hideLightbox"
+                  />
                   </div>
-                </td>
+                  </template>
+                  </VCarouselItem>
+                  </VCarousel> 
+                -->
+
+
+
+                <div class="relative w-full max-w-xl mx-auto">
+                  <!-- แสดงภาพหรือ PDF ทีละรายการ -->
+                  <div class="relative h-[450px] overflow-hidden rounded-md border">
+                    <template v-if="currentItemCustomCarousel">
+                      <!-- ถ้าเป็น PDF -->
+                      <VuePdfApp
+                        v-if="currentItemCustomCarousel.fileUri.endsWith('.pdf')"
+                        :pdf="currentItemCustomCarousel.fileUri"
+                        style="width: 100%; height: 400px;"
+                      />
+        
+                      <!-- ถ้าเป็นรูป -->
+                      <div
+                        v-else
+                        class=""
+                      >
+                        <VImg
+                          v-if="!VueEasyLightBoxShow"
+                          :src="currentItemCustomCarousel.fileUri"
+                          style="width: 100%; height: 400px;"
+                          alt="Image"
+                          class="zoomable"
+                          @click="showLightbox(currentItemCustomCarousel)"
+                        /> 
+                      </div>
+                    </template>
+                  </div>
+
+                  
+
+                  <!-- Lightbox สำหรับรูปภาพ -->
+                  <VueEasyLightbox
+                    :visible="VueEasyLightBoxShow"
+                    :imgs="lightboxImages"
+                    @hide="hideLightbox"
+                  />
+                </div>
+
+                <!-- Lightbox เดียว แสดงตามไฟล์ที่กด -->
+              </div>
+            </VCardText>
+            <VCardText class="py-2">
+              <!-- ปุ่มควบคุม -->
+              <div class="d-flex justify-space-between align-center mt-2">
+                <VBtn
+                  :disabled="currentIndexCustomCarousel === 0"
+                  icon="ri-arrow-left-fill"
+                  size="30"
+                  @click="prev"
+                />
+                <span class="text-sm text-gray-600">
+                  รูปที่ {{ currentIndexCustomCarousel + 1 }} / {{ coaFiles.length }}
+                </span>
+                <VBtn
+                  :disabled="currentIndexCustomCarousel === coaFiles.length - 1"
+                  icon="ri-arrow-right-fill"
+                  size="30"
+                  @click="next"
+                />
+              </div>
+            </VCardText>
+          </VCard>
+        </div>
+      </VCol>
+      <VCol :cols="colsMainContent">
+        <div>
+          <!-- Raw Material Inspection Request Form -->
+          <VRow class="mt-4">
+            <VCol
+              class=""
+              cols="12"
+            >
+              <div style="overflow-x: auto; white-space: nowrap;">
+                <table class="custom-table">
+                  <!-- Header Rows (unchanged) -->
+                  <tr>
+                    <th
+                      class="text-center"
+                      rowspan="3"
+                      colspan="1"
+                    >
+                      No.
+                    </th>
+                    <th
+                      class="text-center"
+                      rowspan="3"
+                      colspan="2"
+                    >
+                      Analytical Items
+                    </th>
+                    <th
+                      class="text-center"
+                      rowspan="3"
+                      colspan="2"
+                    >
+                      Unit
+                    </th>
+                    <th
+                      class="text-center"
+                      rowspan="3"
+                      colspan="2"
+                    >
+                      Analytical Method No.
+                    </th>
+                    <th
+                      class="text-center"
+                      rowspan="3"
+                      colspan="2"
+                    >
+                      Specification Ranges
+                    </th>
+                    <th
+                      class="text-center"
+                      colspan="1"
+                    >
+                      Sanyo Lot No.
+                    </th>
+                    <td
+                      colspan="5"
+                      class="text-center"
+                    >
+                      {{ headerInsp.sktId }}
+                    </td>
+                  </tr>
+    
+                  <!-- Maker Lot No. -->
+                  <tr>
+                    <th
+                      class="text-center"
+                      colspan="1"
+                    >
+                      Maker Lot No.
+                    </th>
+                    <td
+                      v-for="i in 5"
+                      :key="i"
+                      class="text-center"
+                      colspan="1"
+                    >
+                      <div class="d-flex justify-center align-center">
+                        <span>{{ i }} : {{ analysisItemsCode[`actualMakerLotNo_${i-1}`] }}</span>
+                      </div>
+                    </td>
+                  </tr>
+    
+                  <!-- Net Count.x Amount -->
+                  <tr>
+                    <th
+                      class="text-center"
+                      colspan="1"
+                    >
+                      Net Count.x Amount
+                    </th>
+                    <td
+                      v-for="i in 5"
+                      :key="i"
+                      class="text-center"
+                      colspan="1"
+                      style="min-width: 160px; max-width: 160px;"
+                    >
+                      <span>{{ covertFloatFixedTwo(analysisItemsCode[`actualNetCountKgs_${i-1}`]) }} X {{ analysisItemsCode[`actualAmountUnits_${i-1}`] }}</span>
+                    </td>
+                  </tr>
+
+                  <!-- Actual Analysis -->
+                  <tr>
+                    <th
+                      class="text-center"
+                      colspan="9"
+                    />
+                    <th
+                      class="text-center"
+                      colspan="1"
+                    >
+                      Actual Analysis
+                    </th>
+                    <td
+                      v-for="i in 5"
+                      :key="i"
+                      class="text-center"
+                      colspan="1"
+                      style="min-width: 160px; max-width: 160px;"
+                    >
+                      <span><VIcon icon="ri-functions" />: {{ covertFloatFixedTwo(analysisItemsCode[`actualTotalQuantityKgs_${i-1}`]) }}</span>
+                    </td>
+                  </tr>
+
+                  <!-- Analysis Items -->
+                  <tr
+                    v-for="(item, index) in analysisItems"
+                    :key="index"
+                  >
+                    <!-- Fixed Columns -->
+                    <td
+                      v-if="item.typeID === 1"
+                      class="text-center"
+                      :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
+                      colspan="1"
+                    >
+                      <span>{{ item.sqnText }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 1"
+                      colspan="2"
+                    >
+                      <span>{{ item.analyticalItem }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 1"
+                      class="text-center"
+                      colspan="2"
+                    >
+                      <span>{{ item.unit }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 1"
+                      class="text-center"
+                      colspan="2"
+                    >
+                      <span>{{ item.methodCode }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 1"
+                      class="text-center"
+                      colspan="2"
+                    >
+                      <span>{{ item.specRange }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 1"
+                      class="text-center"
+                      colspan="1"
+                    >
+                      <span>{{ item.actualAnalysis }}</span>
+                    </td>
+
+                    <!-- Dynamic Input Columns - regular without Input Button & Textarea -->
+                    <template v-if="item.typeID === 1 && !item.needActualValue">
+                      <td
+                        v-for="i in item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center pa-0"
+                      >
+                        <div class="d-flex flex-wrap">
+                          <div
+                            v-if="shouldShowInput(item, i-1)"
+                            class="pa-2"
+                            style="min-width: 220px; max-width: 200px;"
+                          >
+                            <!-- Radio Group -->
+                            <VRadioGroup
+                              v-if="!item.needActualValue && item.itemAnalyticals[i-1] && item.unit !== ''"
+                              v-model="item.itemAnalyticals[i-1].okState"
+                              :readonly="frozeCheck"
+                              :mandatory="false"
+                              :rules="[v => v !== -1 || 'Actual value is required!']"
+                            >
+                              <VRow>
+                                <VCol cols="6">
+                                  <VRadio :value="1">
+                                    <template #label>
+                                      <div style="font-size: 12px;">
+                                        Ok
+                                      </div>
+                                    </template>
+                                  </VRadio>
+                                </VCol>
+                                <VCol cols="6">
+                                  <VRadio :value="0">
+                                    <template #label>
+                                      <div style="font-size: 12px;">
+                                        Not
+                                      </div>
+                                    </template>
+                                  </VRadio>
+                                </VCol>
+                              </VRow>
+                            </VRadioGroup>
+                            <!-- Input AfterMixxin -->
+                            <div v-if="item.lorryInput">
+                              <VRow>
+                                <VCol
+                                  cols="5"
+                                  class="d-flex justify-space-between align-center py-1"
+                                >
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >Actual In Lorry </span>
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >=</span>
+                                </VCol>
+                                <VCol
+                                  cols="7"
+                                  class="py-0"
+                                >
+                                  <VTextField
+                                    v-model="item.itemAnalyticals[i-1].acture"
+                                    density="compact"
+                                    placeholder="Actual In Lorry"
+                                    class="py-2"
+                                    type="number"
+                                    :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                                  >
+                                    <template
+                                      v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                                      #label
+                                    >
+                                      <VIcon icon="ri-edit-line" />
+                                    </template>
+                                  </VTextField>
+                                </VCol>
+                              </VRow>
+
+                              <VRow>
+                                <VCol
+                                  cols="5"
+                                  class="d-flex justify-space-between align-center py-1"
+                                >
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >After Mixing </span>
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >=</span>
+                                </VCol>
+                                <VCol
+                                  cols="7"
+                                  class="py-2"
+                                >
+                                  <VTextField
+                                    v-model="item.itemAnalyticals[i-1].afterMixing"
+                                    density="compact"
+                                    placeholder="After Mixing"
+                                    type="number"
+                                    :readonly="validateDisableInoutAferMixing('After Mixing')"
+                                  >
+                                    <template
+                                      v-if="!validateDisableInoutAferMixing('After Mixing')"
+                                      #label
+                                    >
+                                      <VIcon icon="ri-edit-line" />
+                                    </template>
+                                  </VTextField>
+                                </VCol>
+                              </VRow>
+                            </div>
+
+                            <!-- Error Messages -->
+                            <span
+                              v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
+                              class="text-red"
+                            >
+                              {{ textAlertErrorOkState }}
+                            </span>
+                            <span
+                              v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
+                              class="text-red"
+                            >
+                              {{ textAlertErrorAnalysitItem }}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
 
                 
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                />
-              </template>
+                      <td
+                        v-for="i in 5 - item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center pa-0"
+                      />
+                    </template>
 
-              <template v-else-if="item.typeID === 1 && item.needActualValue && item.lorryInput">
-                <td
-                  v-for="i in item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div class="d-flex flex-wrap">
-                    <div
-                      v-if="shouldShowInput(item, i-1)"
-                      class="pa-2"
-                      style="min-width: 220px; max-width: 200px;"
-                    >
-                      <!-- Input AfterMixxin -->
-                      <div v-if="item.lorryInput">
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1 px-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >Actual In Lorry </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-1 px-1"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].acture"
-                              density="compact"
-                              class="py-2"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1 px-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >After Mixing </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-1 px-1"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].afterMixing"
-                              density="compact"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('After Mixing')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('After Mixing')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-                      </div>
-
-                      <!-- Error Messages -->
-                      <span
-                        v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                        class="text-red"
+                    <template v-else-if="item.typeID === 1 && item.needActualValue && item.lorryInput">
+                      <td
+                        v-for="i in item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center pa-0"
                       >
-                        {{ textAlertErrorOkState }}
-                      </span>
-                      <span
-                        v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorAnalysitItem }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
+                        <div class="d-flex flex-wrap">
+                          <div
+                            v-if="shouldShowInput(item, i-1)"
+                            class="pa-2"
+                            style="min-width: 220px; max-width: 200px;"
+                          >
+                            <!-- Input AfterMixxin -->
+                            <div v-if="item.lorryInput">
+                              <VRow>
+                                <VCol
+                                  cols="5"
+                                  class="d-flex justify-space-between align-center py-1 px-1"
+                                >
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >Actual In Lorry </span>
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >=</span>
+                                </VCol>
+                                <VCol
+                                  cols="7"
+                                  class="py-1 px-1"
+                                >
+                                  <VTextField
+                                    v-model="item.itemAnalyticals[i-1].acture"
+                                    density="compact"
+                                    class="py-2"
+                                    type="number"
+                                    :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                                  >
+                                    <template
+                                      v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                                      #label
+                                    >
+                                      <VIcon icon="ri-edit-line" />
+                                    </template>
+                                  </VTextField>
+                                </VCol>
+                              </VRow>
+
+                              <VRow>
+                                <VCol
+                                  cols="5"
+                                  class="d-flex justify-space-between align-center py-1 px-1"
+                                >
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >After Mixing </span>
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >=</span>
+                                </VCol>
+                                <VCol
+                                  cols="7"
+                                  class="py-1 px-1"
+                                >
+                                  <VTextField
+                                    v-model="item.itemAnalyticals[i-1].afterMixing"
+                                    density="compact"
+                                    type="number"
+                                    :readonly="validateDisableInoutAferMixing('After Mixing')"
+                                  >
+                                    <template
+                                      v-if="!validateDisableInoutAferMixing('After Mixing')"
+                                      #label
+                                    >
+                                      <VIcon icon="ri-edit-line" />
+                                    </template>
+                                  </VTextField>
+                                </VCol>
+                              </VRow>
+                            </div>
+
+                            <!-- Error Messages -->
+                            <span
+                              v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
+                              class="text-red"
+                            >
+                              {{ textAlertErrorOkState }}
+                            </span>
+                            <span
+                              v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
+                              class="text-red"
+                            >
+                              {{ textAlertErrorAnalysitItem }}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
 
                 
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                />
-              </template>
+                      <td
+                        v-for="i in 5 - item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center"
+                      />
+                    </template>
 
               
-              <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
-              <template v-if="item.typeID === 1 && item.needActualValue && !item.lorryInput">
-                <td
-                  v-for="i in 1"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div
-                    v-if="shouldShowInput(item, i-1)"
-                    class="pa-2 "
-                    style="width: auto;"
-                  >
-                    <!-- Input Button & Textarea -->
-                    <div
-                      v-if="item.needActualValue && !item.lorryInput"
-                      style="width: auto;"
-                    >
-                      <VBtn
-                        width="190"
-                        :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
-                        variant="outlined"
-                        density="compact"
-                        :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
-                        @click="toggleDialog(item.itemAnalyticals[i-1]?.inspReqLotJournalId)"
+                    <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
+                    <template v-if="item.typeID === 1 && item.needActualValue && !item.lorryInput">
+                      <td
+                        v-for="i in 1"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center pa-0"
                       >
-                        <span
-                          v-if="item.itemAnalyticals[i-1].actualAnalysis"
-                          class="text-truncate"
+                        <div
+                          v-if="shouldShowInput(item, i-1)"
+                          class="pa-2 "
+                          style="width: auto;"
                         >
-                          {{ item.itemAnalyticals[i-1].actualAnalysis }}
-                        </span>
-                        <span v-else>Input</span>
-                      </VBtn>
+                          <!-- Input Button & Textarea -->
+                          <div
+                            v-if="item.needActualValue && !item.lorryInput"
+                            style="width: auto;"
+                          >
+                            <VBtn
+                              width="190"
+                              :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                              variant="outlined"
+                              density="compact"
+                              :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
+                              @click="toggleDialog(item.itemAnalyticals[i-1]?.inspReqLotJournalId)"
+                            >
+                              <span
+                                v-if="item.itemAnalyticals[i-1].actualAnalysis"
+                                class="text-truncate"
+                              >
+                                {{ item.itemAnalyticals[i-1].actualAnalysis }}
+                              </span>
+                              <span v-else>Input</span>
+                            </VBtn>
                   
-                      <VTextarea
-                        v-if="isDialogVisibleInput[item.itemAnalyticals[i-1]?.inspReqLotJournalId]"
-                        v-model="item.itemAnalyticals[i-1].actualAnalysis"
-                        class="my-2"
-                        rows="2"
-                        auto-grow
-                        :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
-                        :readonly="frozeCheck"
-                        :rules="inputRules"
-                      />
-                    </div>
-                    <!-- Error Messages -->
-                    <span
-                      v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                      class="text-red"
-                    >
-                      {{ textAlertErrorOkState }}
-                    </span>
-                    <span
-                      v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                      class="text-red"
-                    >
-                      {{ textAlertErrorAnalysitItem }}
-                    </span>
-                  </div>
-                </td>
+                            <VTextarea
+                              v-if="isDialogVisibleInput[item.itemAnalyticals[i-1]?.inspReqLotJournalId]"
+                              v-model="item.itemAnalyticals[i-1].actualAnalysis"
+                              class="my-2"
+                              rows="2"
+                              auto-grow
+                              :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
+                              :readonly="frozeCheck"
+                              :rules="inputRules"
+                            />
+                          </div>
+                          <!-- Error Messages -->
+                          <span
+                            v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
+                            class="text-red"
+                          >
+                            {{ textAlertErrorOkState }}
+                          </span>
+                          <span
+                            v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
+                            class="text-red"
+                          >
+                            {{ textAlertErrorAnalysitItem }}
+                          </span>
+                        </div>
+                      </td>
 
                 
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="1"
-                  class="text-center"
-                />
-              </template>
-            </tr>
-
-            <!-- Reference Section -->
-            <tr class="">
-              <td
-                class="text-center"
-                colspan="1"
-              />
-              <th
-                class="text-start text-decoration-underline"
-                colspan="14"
-              >
-                Reference
-              </th>
-            </tr>
-
-            <!-- Analysis Items -->
-            <tr
-              v-for="(item, index) in analysisItems"
-              :key="index"
-            >
-              <!-- Fixed Columns -->
-              <td
-                v-if="item.typeID === 2"
-                class="text-center"
-                :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
-                colspan="1"
-              >
-                <span>{{ item.sqnText }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 2"
-                colspan="2"
-              >
-                <span>{{ item.analyticalItem }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 2"
-                class="text-center"
-                colspan="2"
-              >
-                <span>{{ item.unit }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 2"
-                class="text-center"
-                colspan="2"
-              >
-                <span>{{ item.methodCode }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 2"
-                class="text-center"
-                colspan="2"
-              >
-                <span>{{ item.specRange }}</span>
-              </td>
-              <td
-                v-if="item.typeID === 2"
-                class="text-center"
-                colspan="1"
-              >
-                <span>{{ item.actualAnalysis }}</span>
-              </td>
-
-              <!-- Dynamic Input Columns - regular without Input Button & Textarea -->
-              <template v-if="item.typeID === 2 && !item.needActualValue">
-                <td
-                  v-for="i in item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div class="d-flex flex-wrap">
-                    <div
-                      v-if="shouldShowInput(item, i-1)"
-                      class="pa-2"
-                      style="min-width: 220px; max-width: 200px;"
-                    >
-                      <!-- Radio Group -->
-                      <VRadioGroup
-                        v-if="!item.needActualValue && item.itemAnalyticals[i-1] && item.unit !== ''"
-                        v-model="item.itemAnalyticals[i-1].okState"
-                        :readonly="frozeCheck"
-                        :mandatory="false"
-                        :rules="[v => v !== -1 || 'Actual value is required!']"
-                      >
-                        <VRow>
-                          <VCol cols="6">
-                            <VRadio :value="1">
-                              <template #label>
-                                <div style="font-size: 12px;">
-                                  Ok
-                                </div>
-                              </template>
-                            </VRadio>
-                          </VCol>
-                          <VCol cols="6">
-                            <VRadio :value="0">
-                              <template #label>
-                                <div style="font-size: 12px;">
-                                  Not
-                                </div>
-                              </template>
-                            </VRadio>
-                          </VCol>
-                        </VRow>
-                      </VRadioGroup>
-                      <!-- Input AfterMixxin -->
-                      <div v-if="item.lorryInput">
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >Actual In Lorry </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-0"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].acture"
-                              density="compact"
-                              placeholder="Actual In Lorry"
-                              class="py-2"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >After Mixing </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-2"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].afterMixing"
-                              density="compact"
-                              placeholder="After Mixing"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('After Mixing')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('After Mixing')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-                      </div>
-
-                      <!-- Error Messages -->
-                      <span
-                        v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorOkState }}
-                      </span>
-                      <span
-                        v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorAnalysitItem }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                />
-              </template>
-
-              <template v-else-if="item.typeID === 2 && item.needActualValue && item.lorryInput">
-                <td
-                  v-for="i in item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div class="d-flex flex-wrap">
-                    <div
-                      v-if="shouldShowInput(item, i-1)"
-                      class="pa-2"
-                      style="min-width: 220px; max-width: 200px;"
-                    >
-                      <!-- Input AfterMixxin -->
-                      <div v-if="item.lorryInput">
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1 px-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >Actual In Lorry </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-1 px-1"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].acture"
-                              density="compact"
-                              placeholder="Actual In Lorry"
-                              class="py-2"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-
-                        <VRow>
-                          <VCol
-                            cols="5"
-                            class="d-flex justify-space-between align-center py-1 px-1"
-                          >
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >After Mixing </span>
-                            <span
-                              class="text-red"
-                              style="font-size: 12px;"
-                            >=</span>
-                          </VCol>
-                          <VCol
-                            cols="7"
-                            class="py-1 px-1"
-                          >
-                            <VTextField
-                              v-model="item.itemAnalyticals[i-1].afterMixing"
-                              density="compact"
-                              placeholder="After Mixing"
-                              type="number"
-                              :readonly="validateDisableInoutAferMixing('After Mixing')"
-                            >
-                              <template
-                                v-if="!validateDisableInoutAferMixing('After Mixing')"
-                                #label
-                              >
-                                <VIcon icon="ri-edit-line" />
-                              </template>
-                            </VTextField>
-                          </VCol>
-                        </VRow>
-                      </div>
-
-                      <!-- Error Messages -->
-                      <span
-                        v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorOkState }}
-                      </span>
-                      <span
-                        v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                        class="text-red"
-                      >
-                        {{ textAlertErrorAnalysitItem }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                />
-              </template>
-              <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
-              <template v-if="item.typeID === 2 && item.needActualValue && !item.lorryInput">
-                <td
-                  v-for="i in 1"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                >
-                  <div
-                    v-if="shouldShowInput(item, i-1)"
-                    class="pa-2 "
-                    style="width: auto;"
-                  >
-                    <!-- Input Button & Textarea -->
-                    <div
-                      v-if="item.needActualValue && !item.lorryInput"
-                      style="width: auto;"
-                    >
-                      <VBtn
-                        width="190"
-                        :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
-                        variant="outlined"
-                        density="compact"
-                        :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
-                        @click="toggleDialog(item.itemAnalyticals[i-1]?.inspReqLotJournalId)"
-                      >
-                        <span
-                          v-if="item.itemAnalyticals[i-1].actualAnalysis"
-                          class="text-truncate"
-                        >
-                          {{ item.itemAnalyticals[i-1].actualAnalysis }}
-                        </span>
-                        <span v-else>Input</span>
-                      </VBtn>
-                  
-                      <VTextarea
-                        v-if="isDialogVisibleInput[item.itemAnalyticals[i-1]?.inspReqLotJournalId]"
-                        v-model="item.itemAnalyticals[i-1].actualAnalysis"
-                        class="my-2"
-                        rows="2"
-                        auto-grow
-                        :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
-                        :readonly="frozeCheck"
-                        :rules="inputRules"
+                      <td
+                        v-for="i in 5 - item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="1"
+                        class="text-center"
                       />
-                    </div>
-                    <!-- Error Messages -->
-                    <span
-                      v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
-                      class="text-red"
+                    </template>
+                  </tr>
+
+                  <!-- Reference Section -->
+                  <tr class="">
+                    <td
+                      class="text-center"
+                      colspan="1"
+                    />
+                    <th
+                      class="text-start text-decoration-underline"
+                      colspan="14"
                     >
-                      {{ textAlertErrorOkState }}
-                    </span>
-                    <span
-                      v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
-                      class="text-red"
+                      Reference
+                    </th>
+                  </tr>
+
+                  <!-- Analysis Items -->
+                  <tr
+                    v-for="(item, index) in analysisItems"
+                    :key="index"
+                  >
+                    <!-- Fixed Columns -->
+                    <td
+                      v-if="item.typeID === 2"
+                      class="text-center"
+                      :class="{ 'bg-primary': !item.needActualValue, 'bg-primary': item.needActualValue }"
+                      colspan="1"
                     >
-                      {{ textAlertErrorAnalysitItem }}
-                    </span>
-                  </div>
-                </td>
-                <!--
-                  <td
-                  v-for="i in 5 - item.itemAnalyticals.length"
-                  :key="i"
-                  :colspan="getColspanCount(item)"
-                  class="text-center"
-                  /> 
-                -->
-              </template>
-            </tr>
+                      <span>{{ item.sqnText }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 2"
+                      colspan="2"
+                    >
+                      <span>{{ item.analyticalItem }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 2"
+                      class="text-center"
+                      colspan="2"
+                    >
+                      <span>{{ item.unit }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 2"
+                      class="text-center"
+                      colspan="2"
+                    >
+                      <span>{{ item.methodCode }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 2"
+                      class="text-center"
+                      colspan="2"
+                    >
+                      <span>{{ item.specRange }}</span>
+                    </td>
+                    <td
+                      v-if="item.typeID === 2"
+                      class="text-center"
+                      colspan="1"
+                    >
+                      <span>{{ item.actualAnalysis }}</span>
+                    </td>
+
+                    <!-- Dynamic Input Columns - regular without Input Button & Textarea -->
+                    <template v-if="item.typeID === 2 && !item.needActualValue">
+                      <td
+                        v-for="i in item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center pa-0"
+                      >
+                        <div class="d-flex flex-wrap">
+                          <div
+                            v-if="shouldShowInput(item, i-1)"
+                            class="pa-2"
+                            style="min-width: 220px; max-width: 200px;"
+                          >
+                            <!-- Radio Group -->
+                            <VRadioGroup
+                              v-if="!item.needActualValue && item.itemAnalyticals[i-1] && item.unit !== ''"
+                              v-model="item.itemAnalyticals[i-1].okState"
+                              :readonly="frozeCheck"
+                              :mandatory="false"
+                              :rules="[v => v !== -1 || 'Actual value is required!']"
+                            >
+                              <VRow>
+                                <VCol cols="6">
+                                  <VRadio :value="1">
+                                    <template #label>
+                                      <div style="font-size: 12px;">
+                                        Ok
+                                      </div>
+                                    </template>
+                                  </VRadio>
+                                </VCol>
+                                <VCol cols="6">
+                                  <VRadio :value="0">
+                                    <template #label>
+                                      <div style="font-size: 12px;">
+                                        Not
+                                      </div>
+                                    </template>
+                                  </VRadio>
+                                </VCol>
+                              </VRow>
+                            </VRadioGroup>
+                            <!-- Input AfterMixxin -->
+                            <div v-if="item.lorryInput">
+                              <VRow>
+                                <VCol
+                                  cols="5"
+                                  class="d-flex justify-space-between align-center py-1"
+                                >
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >Actual In Lorry </span>
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >=</span>
+                                </VCol>
+                                <VCol
+                                  cols="7"
+                                  class="py-0"
+                                >
+                                  <VTextField
+                                    v-model="item.itemAnalyticals[i-1].acture"
+                                    density="compact"
+                                    placeholder="Actual In Lorry"
+                                    class="py-2"
+                                    type="number"
+                                    :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                                  >
+                                    <template
+                                      v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                                      #label
+                                    >
+                                      <VIcon icon="ri-edit-line" />
+                                    </template>
+                                  </VTextField>
+                                </VCol>
+                              </VRow>
+
+                              <VRow>
+                                <VCol
+                                  cols="5"
+                                  class="d-flex justify-space-between align-center py-1"
+                                >
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >After Mixing </span>
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >=</span>
+                                </VCol>
+                                <VCol
+                                  cols="7"
+                                  class="py-2"
+                                >
+                                  <VTextField
+                                    v-model="item.itemAnalyticals[i-1].afterMixing"
+                                    density="compact"
+                                    placeholder="After Mixing"
+                                    type="number"
+                                    :readonly="validateDisableInoutAferMixing('After Mixing')"
+                                  >
+                                    <template
+                                      v-if="!validateDisableInoutAferMixing('After Mixing')"
+                                      #label
+                                    >
+                                      <VIcon icon="ri-edit-line" />
+                                    </template>
+                                  </VTextField>
+                                </VCol>
+                              </VRow>
+                            </div>
+
+                            <!-- Error Messages -->
+                            <span
+                              v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
+                              class="text-red"
+                            >
+                              {{ textAlertErrorOkState }}
+                            </span>
+                            <span
+                              v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
+                              class="text-red"
+                            >
+                              {{ textAlertErrorAnalysitItem }}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                
+                      <td
+                        v-for="i in 5 - item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center"
+                      />
+                    </template>
+
+                    <template v-else-if="item.typeID === 2 && item.needActualValue && item.lorryInput">
+                      <td
+                        v-for="i in item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center pa-0"
+                      >
+                        <div class="d-flex flex-wrap">
+                          <div
+                            v-if="shouldShowInput(item, i-1)"
+                            class="pa-2"
+                            style="min-width: 220px; max-width: 200px;"
+                          >
+                            <!-- Input AfterMixxin -->
+                            <div v-if="item.lorryInput">
+                              <VRow>
+                                <VCol
+                                  cols="5"
+                                  class="d-flex justify-space-between align-center py-1 px-1"
+                                >
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >Actual In Lorry </span>
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >=</span>
+                                </VCol>
+                                <VCol
+                                  cols="7"
+                                  class="py-1 px-1"
+                                >
+                                  <VTextField
+                                    v-model="item.itemAnalyticals[i-1].acture"
+                                    density="compact"
+                                    placeholder="Actual In Lorry"
+                                    class="py-2"
+                                    type="number"
+                                    :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                                  >
+                                    <template
+                                      v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
+                                      #label
+                                    >
+                                      <VIcon icon="ri-edit-line" />
+                                    </template>
+                                  </VTextField>
+                                </VCol>
+                              </VRow>
+
+                              <VRow>
+                                <VCol
+                                  cols="5"
+                                  class="d-flex justify-space-between align-center py-1 px-1"
+                                >
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >After Mixing </span>
+                                  <span
+                                    class="text-red"
+                                    style="font-size: 12px;"
+                                  >=</span>
+                                </VCol>
+                                <VCol
+                                  cols="7"
+                                  class="py-1 px-1"
+                                >
+                                  <VTextField
+                                    v-model="item.itemAnalyticals[i-1].afterMixing"
+                                    density="compact"
+                                    placeholder="After Mixing"
+                                    type="number"
+                                    :readonly="validateDisableInoutAferMixing('After Mixing')"
+                                  >
+                                    <template
+                                      v-if="!validateDisableInoutAferMixing('After Mixing')"
+                                      #label
+                                    >
+                                      <VIcon icon="ri-edit-line" />
+                                    </template>
+                                  </VTextField>
+                                </VCol>
+                              </VRow>
+                            </div>
+
+                            <!-- Error Messages -->
+                            <span
+                              v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
+                              class="text-red"
+                            >
+                              {{ textAlertErrorOkState }}
+                            </span>
+                            <span
+                              v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
+                              class="text-red"
+                            >
+                              {{ textAlertErrorAnalysitItem }}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td
+                        v-for="i in 5 - item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center"
+                      />
+                    </template>
+                    <!-- Dynamic Input Columns - iregular with Input Button & Textarea -->
+                    <template v-if="item.typeID === 2 && item.needActualValue && !item.lorryInput">
+                      <td
+                        v-for="i in 1"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center pa-0"
+                      >
+                        <div
+                          v-if="shouldShowInput(item, i-1)"
+                          class="pa-2 "
+                          style="width: auto;"
+                        >
+                          <!-- Input Button & Textarea -->
+                          <div
+                            v-if="item.needActualValue && !item.lorryInput"
+                            style="width: auto;"
+                          >
+                            <VBtn
+                              width="190"
+                              :prepend-icon="!frozeCheck ? 'ri-edit-line' : ''"
+                              variant="outlined"
+                              density="compact"
+                              :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
+                              @click="toggleDialog(item.itemAnalyticals[i-1]?.inspReqLotJournalId)"
+                            >
+                              <span
+                                v-if="item.itemAnalyticals[i-1].actualAnalysis"
+                                class="text-truncate"
+                              >
+                                {{ item.itemAnalyticals[i-1].actualAnalysis }}
+                              </span>
+                              <span v-else>Input</span>
+                            </VBtn>
+                  
+                            <VTextarea
+                              v-if="isDialogVisibleInput[item.itemAnalyticals[i-1]?.inspReqLotJournalId]"
+                              v-model="item.itemAnalyticals[i-1].actualAnalysis"
+                              class="my-2"
+                              rows="2"
+                              auto-grow
+                              :color="getInputColor(item.itemAnalyticals[i-1].actualAnalysis)"
+                              :readonly="frozeCheck"
+                              :rules="inputRules"
+                            />
+                          </div>
+                          <!-- Error Messages -->
+                          <span
+                            v-if="checkOkState(item, item.typeID, i-1) && item.unit !== ''"
+                            class="text-red"
+                          >
+                            {{ textAlertErrorOkState }}
+                          </span>
+                          <span
+                            v-if="checkAnalysitItem(item, item.typeID, i-1) && item.unit !== '' && !item.lorryInput"
+                            class="text-red"
+                          >
+                            {{ textAlertErrorAnalysitItem }}
+                          </span>
+                        </div>
+                      </td>
+                      <!--
+                        <td
+                        v-for="i in 5 - item.itemAnalyticals.length"
+                        :key="i"
+                        :colspan="getColspanCount(item)"
+                        class="text-center"
+                        /> 
+                      -->
+                    </template>
+                  </tr>
 
             
 
-            <!-- Footer Note -->
-            <tr>
-              <td
-                class="text-center"
-                colspan="1"
-              />
-              <td
-                class="text-start"
-                colspan="14"
-              >
-                <div class="d-flex align-center">
-                  <VIcon
-                    color="primary"
-                    icon="ri-circle-fill"
-                  /> = After arrival of raw material, we have to actually analyze every lot.
-                </div>
-              </td>
-            </tr>
-          </table>
+                  <!-- Footer Note -->
+                  <tr>
+                    <td
+                      class="text-center"
+                      colspan="1"
+                    />
+                    <td
+                      class="text-start"
+                      colspan="14"
+                    >
+                      <div class="d-flex align-center">
+                        <VIcon
+                          color="primary"
+                          icon="ri-circle-fill"
+                        /> = After arrival of raw material, we have to actually analyze every lot.
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </VCol>
+          </VRow>
         </div>
       </VCol>
     </VRow>
-
+  </section>
+  <!-- footer section -->
+  <section v-if="!loadingGenerated1 && !loadingGenerated2">
     <!-- Note / Details -->
     <section>
       <VRow
@@ -3365,7 +3626,7 @@ const inputRules = [
         </VCard>
       </VDialog>
     </section>
-  </div>
+  </section>
 </template>
 
 <style scoped src="./insp.scss"></style>
