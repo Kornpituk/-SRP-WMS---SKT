@@ -2856,6 +2856,12 @@ const inputRules = [
                 </table>
               </div>
             </VCol>
+            <VCol cols="12 ">
+              <span
+                class=""
+                style="font-size: 12px;"
+              >Remark: {{ headerInsp.remark }}</span>
+            </VCol>
           </VRow>
         </div>
       </VCol>
@@ -2869,12 +2875,6 @@ const inputRules = [
         style="font-size: 12px;"
         class="mb-1"
       >
-        <VCol cols="12 ">
-          <span
-            class=""
-            style="font-size: 12px;"
-          >Remark: {{ headerInsp.remark }}</span>
-        </VCol>
         <VCol
           cols="6"
           class="d-flex align-center"
