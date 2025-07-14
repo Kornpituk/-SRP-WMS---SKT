@@ -367,6 +367,11 @@ const getAnalysistInsp = async () => {
     console.error('ล้มเหลว:', error.value)
   } else {
     console.log('สำเร็จ:', analysisItems.value)
+    analysisItems.value = analysisItems.value.map(item => ({
+      ...item,
+      actureDisplay: item.acture != null ? Number(item.acture).toFixed(4) : '',
+      afterMixingDisplay: item.afterMixing != null ? Number(item.afterMixing).toFixed(4) : '',
+    }))
   }
 }
 
@@ -533,6 +538,33 @@ const generateActualAnalysis = async analysisItems => {
 
   // console.log('Result:', analysisItems.value)
 }
+
+function onDecimalInput(event, item) {
+  const input = event.target
+  const value = input.value
+
+  const isValid = /^\d*\.?\d*$/.test(value)
+
+  if (isValid) {
+    item.afterMixingDisplay = value
+    item.afterMixing = parseFloat(value)
+    console.log('✅ afterMixing:', item.afterMixing)
+  } else if(!value){
+    item.afterMixing = ''
+    console.log('invalid afterMixing:', item.afterMixing)
+  }else {
+    // Revert เป็นค่าก่อนหน้า
+    input.value = item.afterMixing != null ? item.afterMixing.toFixed(4) : ''
+    item.afterMixingDisplay = input.value
+    console.log('❌ Invalid: revert to', item.afterMixingDisplay)
+  }
+}
+
+const decimalRules = [
+  v => !!v || 'Actual value is required!',
+  v => /^\d*\.?\d*$/.test(v) || 'Only decimal numbers allowed!',
+  v => parseFloat(v) >= 0 || 'Must be zero or greater!',
+]
 
 const saveLotInspect = async () => {
 
@@ -1932,10 +1964,7 @@ const inputRules = [
             </VCard>
           </div>
         </VCol>
-        <VCol
-          class="d-flex"
-          :cols="colsMainContent"
-        >
+        <VCol :cols="colsMainContent">
           <div>
             <!-- Raw Material Inspection Request Form -->
             <VRow class="mt-4">
@@ -2284,11 +2313,13 @@ const inputRules = [
                                     class="py-1 px-1"
                                   >
                                     <VTextField
-                                      v-model="item.itemAnalyticals[i-1].acture"
+                                      v-model="item.itemAnalyticals[i-1].actureDisplay"
                                       density="compact"
                                       class="py-2"
-                                      type="number"
                                       :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
+                                      :rules="decimalRules"
+                                      inputmode="decimal"
+                                      @input="event => onDecimalInput(event, item.itemAnalyticals[i - 1])"
                                     >
                                       <template
                                         v-if="!validateDisableInoutAferMixing('Actual In Lorry')"
@@ -2319,10 +2350,12 @@ const inputRules = [
                                     class="py-1 px-1"
                                   >
                                     <VTextField
-                                      v-model="item.itemAnalyticals[i-1].afterMixing"
+                                      v-model="item.itemAnalyticals[i-1].afterMixingDisplay"
                                       density="compact"
-                                      type="number"
                                       :readonly="validateDisableInoutAferMixing('After Mixing')"
+                                      :rules="decimalRules"
+                                      inputmode="decimal"
+                                      @input="event => onDecimalInput(event, item.itemAnalyticals[i - 1])"
                                     >
                                       <template
                                         v-if="!validateDisableInoutAferMixing('After Mixing')"
