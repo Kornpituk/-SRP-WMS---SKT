@@ -1,6 +1,7 @@
 <script setup>
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { avatarText } from '@core/utils/formatters'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   notifications: {
@@ -25,6 +26,7 @@ const emit = defineEmits([
   'remove',
   'click:notification',
 ])
+
 
 const isAllMarkRead = computed(() => props.notifications.some(item => item.isSeen === false))
 
@@ -139,7 +141,7 @@ const markAllReadOrUnread = () => {
                     <div style="block-size: 28px; inline-size: 28px;">
                       <IconBtn
                         size="x-small"
-                        class="visible-in-hover"
+                        color="red"
                         @click="$emit('remove', notification.id)"
                       >
                         <VIcon
@@ -167,6 +169,7 @@ const markAllReadOrUnread = () => {
 
         <!-- 👉 Footer -->
         <VCardText
+          v-if="false"
           v-show="props.notifications.length"
           class="notification-footer"
         >

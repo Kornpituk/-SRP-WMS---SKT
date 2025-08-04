@@ -16,8 +16,7 @@ const notifications = ref([
     subtitle: 'Won the monthly best seller badge',
     time: 'Today',
     isSeen: true,
-    link: '/skt/shipping', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
-    color: 'deep-purple',
+    link: '/purchase-orders/A00045', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
   },
   {
     id: 2,
@@ -26,8 +25,7 @@ const notifications = ref([
     subtitle: '5 hours ago',
     time: 'Yesterday',
     isSeen: false,
-    link: '/skt/planning/schedule', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
-    color: 'light-blue',
+    link: '/purchase-orders/A00045', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
   },
   {
     id: 3,
@@ -36,8 +34,7 @@ const notifications = ref([
     subtitle: 'You have 10 unread messages',
     time: '11 Aug',
     isSeen: true,
-    link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
-    color: 'deep-orange-derken-4',
+    link: '/purchase-orders/A00045', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
   },
   {
     id: 4,
@@ -96,38 +93,6 @@ const handleNotificationClick = notification => {
   }else{
     console.log("notification not", notification.link)
   }
-}
-
-const swipedId = ref(null)
-const swipeDirection = ref('left' | 'right' | null)
-
-const handleSwipe = (notificationId, direction) => {
-  swipedId.value = notificationId
-  swipeDirection.value = direction
-}
-
-let touchStartX = 0
-let touchEndX = 0
-
-const onTouchStart = e => {
-  touchStartX = e.changedTouches[0].screenX
-}
-
-const onTouchEnd = (notificationId, e) => {
-  touchEndX = e.changedTouches[0].screenX
-
-  const deltaX = touchEndX - touchStartX
-
-  if (Math.abs(deltaX) > 50) {
-    const direction = deltaX > 0 ? 'right' : 'left'
-
-    handleSwipe(notificationId, direction)
-  } else {
-    swipedId.value = null
-    swipeDirection.value = null
-  }
-
-  console.log("Swip", swipeDirection)
 }
 </script>
 

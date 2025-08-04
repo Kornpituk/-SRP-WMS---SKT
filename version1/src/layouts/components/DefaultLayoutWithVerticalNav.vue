@@ -6,6 +6,7 @@ import { useThemeConfig } from '@core/composable/useThemeConfig'
 // Components
 import Footer from '@/layouts/components/Footer.vue'
 import NavBarI18n from '@/layouts/components/NavBarI18n.vue'
+import NavBarNotifications from '@/layouts/components/NavBarNotifications.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
 import WhereHouse from '@/layouts/components/WhereHouse.vue'
@@ -182,6 +183,8 @@ const removeUserCheck = () => {
           class="d-flex justify-end"
         />
 
+       
+
         <VChip color="white">
           <span style="color: black; text-transform: capitalize;"><VIcon icon="ri-user-3-fill" />{{ NameDepartment }}:&nbsp;&nbsp;</span>
 
@@ -195,6 +198,8 @@ const removeUserCheck = () => {
             class="text-primary"
           >-{{ NameRole }}</span>
         </VChip>
+
+        <NavBarNotifications class="me-3" />
 
         <NavbarThemeSwitcher
           v-if="true"

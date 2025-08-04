@@ -140,8 +140,12 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+  if(canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible){
     isReadOnly.value = true
+  }else{
+    if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+      isReadOnly.value = true
+    }
   }
 
   unMountedState.value = true

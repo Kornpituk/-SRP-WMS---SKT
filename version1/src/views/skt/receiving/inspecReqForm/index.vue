@@ -560,6 +560,27 @@ function onDecimalInput(event, item) {
   }
 }
 
+function onDecimalInputActure(event, item) {
+  const input = event.target
+  const value = input.value
+
+  const isValid = /^\d*\.?\d*$/.test(value)
+
+  if (isValid) {
+    item.actureDisplay = value
+    item.acture = parseFloat(value)
+    console.log('✅ afterMixing:', item.acture)
+  } else if(!value){
+    item.acture = ''
+    console.log('invalid afterMixing:', item.acture)
+  }else {
+    // Revert เป็นค่าก่อนหน้า
+    input.value = item.acture != null ? item.acture.toFixed(4) : ''
+    item.actureDisplay = input.value
+    console.log('❌ Invalid: revert to', item.actureDisplay)
+  }
+}
+
 const decimalRules = [
   v => !!v || 'Actual value is required!',
   v => /^\d*\.?\d*$/.test(v) || 'Only decimal numbers allowed!',
@@ -2319,7 +2340,7 @@ const inputRules = [
                                       :readonly="validateDisableInoutAferMixing('Actual In Lorry')"
                                       :rules="decimalRules"
                                       inputmode="decimal"
-                                      @input="event => onDecimalInput(event, item.itemAnalyticals[i - 1])"
+                                      @input="event => onDecimalInputActure(event, item.itemAnalyticals[i - 1])"
                                     >
                                       <template
                                         v-if="!validateDisableInoutAferMixing('Actual In Lorry')"

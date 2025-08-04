@@ -133,8 +133,12 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+  if(canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible){
     isReadOnly.value = true
+  }else{
+    if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+      isReadOnly.value = true
+    }
   }
 })
 
@@ -374,7 +378,7 @@ watchEffect(async () => {
                 <VCheckbox
                   v-model="section.practice.field[0].value"
                   :label="section.practice.startPracticeText"
-                  :readonly="isReadOnly"
+                  :disabled="isReadOnly"
                 />
               </div>
               <div v-else-if="section.practice.type === 'checkbox2'">

@@ -124,8 +124,12 @@ onMounted(async () => {
   statusId.value = lorryFormStatus.data.data[0].statusId
 
   
-  if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+  if(canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible){
     isReadOnly.value = true
+  }else{
+    if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+      isReadOnly.value = true
+    }
   }
 
 })
@@ -624,6 +628,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="OK"
@@ -660,6 +665,7 @@ watchEffect(async () => {
                       v-model="section.result.field[1].value"
                       inline
                       class="justify-center"
+                      :readonly="isReadOnly"
                     >
                       <VRadio
                         label="OK"
