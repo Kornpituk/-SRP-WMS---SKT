@@ -130,7 +130,7 @@ onMounted(async () => {
 
   statusId.value = lorryFormIPAStatus.data.data[0].statusId
 
-  if(canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible){
+  if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible === false){
     isReadOnly.value = true
   }else{
     if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
