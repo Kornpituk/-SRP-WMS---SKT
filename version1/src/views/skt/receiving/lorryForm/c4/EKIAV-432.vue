@@ -122,9 +122,11 @@ onMounted(async () => {
 
   if(!canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     isReadOnly.value = true
+    console.log("periso", isReadOnly.value)
   }else{
     if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
       isReadOnly.value = true
+      console.log("status", isReadOnly.value)
     }
   }
 })
