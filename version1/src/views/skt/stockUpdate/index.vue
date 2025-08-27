@@ -577,10 +577,13 @@ const refeshPage = () => {
   <!-- Title Page -->
   <div>
     <VCard>
-      <VCardTitle>
+      <VCardTitle class="pa-2">
         <div class="d-flex align-center">
           <VRow class="d-flex align-center">
-            <VCol cols="2">
+            <VCol
+              cols="2"
+              class="pa-1"
+            >
               <IconBtn
                 class="cursor-pointer"
                 color="#FFFFFF"
@@ -596,7 +599,7 @@ const refeshPage = () => {
             </VCol>
             <VCol
               cols="8"
-              class="text-center"
+              class="text-center pa-1"
             >
               <div>
                 <span
@@ -607,14 +610,13 @@ const refeshPage = () => {
             </VCol>
             <VCol
               cols="2"
-              class="d-flex justify-end"
+              class="d-flex justify-end pa-1"
             >
               <VBtn
-                variant="flat"
+                variant="text"
+                icon="ri-equalizer-line"
                 @click="panel = panel.length ? [] : ['filter']"
-              >
-                <VIcon icon="ri-equalizer-line" />
-              </VBtn>
+              />
             </VCol>
           </VRow>
         </div>
@@ -1037,18 +1039,18 @@ const refeshPage = () => {
     <VCard>
       <VCardText class="pa-2">
         <VRow>
-          <VCol cols="10" />
+          <VCol cols="10" class="pa-1" />
           <VCol
             cols="2"
-            class="d-flex justify-end"
+            class="d-flex justify-end pa-1"
           >
             <VBtn
               icon
-              size="small"
+              size="30"
               @click="refeshPage"
             >
               <VIcon
-                size="20"
+                size="15"
                 icon="ri-restart-line"
                 :class="{ spinning: isSpinning }"
               />
@@ -1067,7 +1069,7 @@ const refeshPage = () => {
 
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section>
-    <VCard class="mt-6">
+    <VCard class="mt-2">
       <div>
         <div
           v-if="errorMessage"

@@ -1450,8 +1450,8 @@ const statusText = statusId => {
   <!-- ----------             Production plan                                ------------------------------------ -->
   <section>
     <!-- VData table -->
-    <VCard>
-      <VCardText>
+    <VCard class="pa-0 ma-0">
+      <VCardText class="pa-0 ma-0">
         <VProgressLinear
           v-if="progressLinearNoData"
           height="20"

@@ -3743,7 +3743,7 @@ const handleSavetruckOrder = async type => {
 
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
   <section v-if="disableShowDataByDepartment()">
-    <VCard class="mt-6">
+    <VCard class="mt-2">
       <div>
         <div
           v-if="errorMessage"

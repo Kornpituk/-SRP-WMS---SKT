@@ -2146,6 +2146,7 @@ const isSpinning = ref(false)
 const insetSwitch1 = ref('')
 
 //---------------------- Test Mock-
+const showExpensionFilter = ref(false)
 </script>
 
 <template>
@@ -2157,7 +2158,7 @@ const insetSwitch1 = ref('')
           <VRow class="d-flex align-center">
             <VCol
               cols="2"
-              class="py-2"
+              class="py-1"
             >
               <IconBtn
                 v-if="false"
@@ -2185,7 +2186,7 @@ const insetSwitch1 = ref('')
             </VCol>
             <VCol
               cols="8"
-              class="text-center py-2"
+              class="text-center py-1"
             >
               <div>
                 <span
@@ -2196,26 +2197,40 @@ const insetSwitch1 = ref('')
             </VCol>
             <VCol
               cols="2"
-              class="d-flex justify-end py-2"
+              class="d-flex justify-end py-1"
             >
               <VBtn
-                style="height: 30px;"
-                variant="flat"
+                variant="text"
+                icon="ri-equalizer-line"
                 @click="panel = panel.length ? [] : ['filter']"
-              >
-                <VIcon icon="ri-equalizer-line" />
-              </VBtn>
+              />
+
+              <VBtn
+                v-if="false"
+                :icon="showExpensionFilter ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                @click="showExpensionFilter = !showExpensionFilter"
+              />
             </VCol>
           </VRow>
         </div>
       </VCardTitle>
+      <VExpandTransition>
+        <div v-show="showExpensionFilter">
+          <VDivider />
+
+          <VCardText>
+            {{ showExpensionFilter }}
+            I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
+          </VCardText>
+        </div>
+      </VExpandTransition>
     </VCard>
     <!-- Expension Filter -->
     <section>
       <VExpansionPanels
         v-model="panel"
         multiple
-        class="pa-0"
+        class="pa-1"
       >
         <VExpansionPanel
           class="px-1"
@@ -2455,8 +2470,8 @@ const insetSwitch1 = ref('')
 
     <!-- Btn Approve -->
     <section
-      v-if="false"
-      class="mb-4 mt-2"
+      v-if="true"
+      class="my-2"
     >
       <VCard>
         <VCardText class="pa-2 d-flex justify-space-between align-center">
