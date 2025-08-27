@@ -4323,7 +4323,7 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 PO No -->
               <td
-                v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-start px-3 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
                 :style="{

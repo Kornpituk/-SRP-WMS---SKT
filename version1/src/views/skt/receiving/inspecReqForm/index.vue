@@ -1974,7 +1974,7 @@ const inputRules = [
                     <div class="image-wrapper">
                       <VZoomer
                         ref="zoomer"
-                        class="image-zoomer bg-blue-grey-darken-4"
+                        class="image-zoomer bg-white"
                         :max-scale="5"
                         :min-scale="1"
                         pivot="cursor"
@@ -1986,7 +1986,7 @@ const inputRules = [
                         <VImg
                           :src="currentItemCustomCarousel.fileUri"
                           alt="Image"
-                          class="image-content"
+                          class="image-content bg-white"
                         />
                       </VZoomer>
                     </div>
@@ -1996,8 +1996,6 @@ const inputRules = [
             </div>
           </div>
         </VCol>
-
-        
         <VCol :cols="colsMainContent">
           <div>
             <!-- Raw Material Inspection Request Form -->
@@ -2887,9 +2885,6 @@ const inputRules = [
                       -->
                       </template>
                     </tr>
-
-            
-
                     <!-- Footer Note -->
                     <tr>
                       <td

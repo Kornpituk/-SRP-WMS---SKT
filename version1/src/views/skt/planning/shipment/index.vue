@@ -493,7 +493,7 @@ const isDialogVisiblePrintTruck = ref(false)
                 <span
                   style="font-size: 18px;"
                   class="text-center"
-                >{{ $t('Shipment Plan sss') }}</span>
+                >{{ $t('Shipment Plan') }}</span>
               </div>
             </VCol>
             <VCol

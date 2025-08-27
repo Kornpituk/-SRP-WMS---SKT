@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 const props = defineProps({
   notifications: {
     type: Array,
+    default: () => [],
     required: true,
   },
   badgeProps: {
@@ -30,6 +31,63 @@ const emit = defineEmits([
 
 const isAllMarkRead = computed(() => props.notifications.some(item => item.isSeen === false))
 
+// ✅ ใช้ ref สำหรับ test
+const testNotifications = ref([...props.notifications])
+
+// state สำหรับควบคุมการสั่น
+const isShaking = ref(false)
+let timeoutId = null
+
+const groupedNotifications = computed(() => {
+  const groups = {}
+
+  props.notifications.forEach(noti => {
+    if (!groups[noti.statusId]) {
+      groups[noti.statusId] = {
+        ...noti,            // เก็บข้อมูล item แรกไว้ใช้แสดง
+        count: 1,           // เริ่มนับ 1
+        items: [noti],       // เก็บรายการทั้งหมดใน group
+      }
+    } else {
+      groups[noti.statusId].count++
+      groups[noti.statusId].items.push(noti)
+    }
+  })
+
+  return Object.values(groups)
+})
+
+// เพิ่มแจ้งเตือนใหม่เพื่อทดสอบ
+const addTestNotification = () => {
+  const newId = Date.now()
+
+  testNotifications.value.push({
+    id: newId,
+    title: `New Alert ${newId}`,
+    subtitle: 'This is a test notification',
+    time: 'Just now',
+    isSeen: false,
+    color: 'primary',
+    icon: 'mdi-bell-alert',
+  })
+}
+
+// Watch ดูว่า notifications เพิ่มขึ้นไหม
+watch(
+  () => props.notifications,
+  (newVal, oldVal) => {
+    if (oldVal && newVal.length > oldVal.length) {
+      // มีแจ้งเตือนใหม่เข้ามา
+      isShaking.value = true
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        isShaking.value = false
+      }, 1200) // ให้สั่น 1.2 วินาทีแล้วหยุด
+    }
+  },
+  { deep: true },
+)
+
 const markAllReadOrUnread = () => {
   const allNotificationsIds = props.notifications.map(item => item.id)
   if (!isAllMarkRead.value)
@@ -40,6 +98,16 @@ const markAllReadOrUnread = () => {
 </script>
 
 <template>
+  <!-- ปุ่มทดสอบ -->
+  <VBtn
+    v-if="false"
+    color="primary"
+    class="ma-4"
+    @click="addTestNotification"
+  >
+    Add Test Notification
+  </VBtn>
+  
   <IconBtn id="notification-btn">
     <VBadge
       dot
@@ -50,7 +118,10 @@ const markAllReadOrUnread = () => {
       offset-x="1"
       offset-y="1"
     >
-      <VIcon icon="mdi-bell-outline" />
+      <VIcon
+        icon="mdi-bell-outline"
+        :class="{ 'bell-shake': isShaking }"
+      />
     </VBadge>
 
     <VMenu
@@ -72,7 +143,7 @@ const markAllReadOrUnread = () => {
               v-show="props.notifications.length"
               @click="markAllReadOrUnread"
             >
-              <VIcon :icon="!isAllMarkRead ? 'mdi-email-outline' : 'mdi-email-open-outline' " />
+              <VIcon :icon="!isAllMarkRead ? 'mdi-email-open-outline' : 'mdi-email-outline' " />
 
               <VTooltip
                 activator="parent"
@@ -93,56 +164,74 @@ const markAllReadOrUnread = () => {
         >
           <VList class="py-0">
             <template
-              v-for="(notification, index) in props.notifications"
-              :key="notification.title"
+              v-for="(group, index) in groupedNotifications"
+              :key="group.statusId"
             >
               <VDivider v-if="index > 0" />
+
               <VListItem
                 link
                 lines="one"
                 min-height="66px"
                 class="list-item-hover-class"
-                @click="$emit('click:notification', notification)"
               >
                 <!-- Slot: Prepend -->
-                <!-- Handles Avatar: Image, Icon, Text -->
-                <template #prepend>
+                <!--
+                  <template #prepend>
                   <VListItemAction start>
-                    <VAvatar
-                      size="40"
-                      :color="notification.color && notification.icon ? notification.color : undefined"
-                      :image="notification.img || undefined"
-                      :icon="notification.icon || undefined"
-                      :variant="notification.img ? undefined : 'tonal' "
-                    >
-                      <span v-if="notification.text">{{ avatarText(notification.text) }}</span>
-                    </VAvatar>
+                  <VAvatar
+                  size="40"
+                  :color="group.color && group.icon ? group.color : undefined"
+                  :image="group.img || undefined"
+                  :icon="group.icon || undefined"
+                  :variant="group.img ? undefined : 'tonal'"
+                  >
+                  <span v-if="group.text">{{ avatarText(group.text) }}</span>
+                  </VAvatar>
                   </VListItemAction>
-                </template>
+                  </template> 
+                -->
 
+                <!-- Title & Counter -->
                 <VListItemTitle>
-                  <span class="text-sm text-high-emphasis font-weight-medium">{{ notification.title }}</span>
+                  <VBtn
+                    :color="group.color"
+                    variant="text"
+                    @click="$emit('click:notification', group.items[0])"
+                    class="px-0"
+                  >
+                    <VIcon icon="ri-error-warning-fill" />
+                    <span class="text-sm">
+                      {{ group.status }}
+                    </span>
+                    <span class="text-xs">({{ group.count }}) Items</span>
+                  </VBtn>
                 </VListItemTitle>
-                <VListItemSubtitle>
-                  <span class="text-xs">{{ notification.subtitle }}</span>
-                </VListItemSubtitle>
-                <span class="text-xs text-disabled">{{ notification.time }}</span>
+
+                <span class="text-xs text-disabled">
+                  {{ group.time }}
+                </span>
 
                 <!-- Slot: Append -->
                 <template #append>
                   <div class="d-flex flex-column align-center gap-4">
                     <VBadge
                       dot
-                      :color="!notification.isSeen ? 'primary' : '#a8aaae'"
-                      :class="`${notification.isSeen ? 'visible-in-hover' : ''} ms-1`"
-                      @click.stop="$emit(notification.isSeen ? 'unread' : 'read', [notification.id])"
+                      :color="group.items.some(item => !item.isSeen) ? 'primary' : '#a8aaae'"
+                      :class="`${group.items.every(item => item.isSeen) ? 'visible-in-hover' : ''} ms-1`"
+                      @click.stop="
+                        $emit(
+                          group.items.every(item => item.isSeen) ? 'unread' : 'read',
+                          group.items.map(i => i.id)
+                        )
+                      "
                     />
 
                     <div style="block-size: 28px; inline-size: 28px;">
                       <IconBtn
                         size="x-small"
                         color="red"
-                        @click="$emit('remove', notification.id)"
+                        @click="$emit('remove', group.items.map(i => i.id))"
                       >
                         <VIcon
                           size="20"
@@ -156,7 +245,7 @@ const markAllReadOrUnread = () => {
             </template>
 
             <VListItem
-              v-show="!props.notifications.length"
+              v-show="!groupedNotifications.length"
               class="text-center text-medium-emphasis"
               style="block-size: 56px;"
             >
@@ -201,5 +290,20 @@ const markAllReadOrUnread = () => {
       display: block;
     }
   }
+}
+
+@keyframes bell-shake {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(-15deg); }
+  20% { transform: rotate(15deg); }
+  30% { transform: rotate(-10deg); }
+  40% { transform: rotate(10deg); }
+  50% { transform: rotate(-5deg); }
+  60% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.bell-shake {
+  animation: bell-shake 1.2s ease;
 }
 </style>

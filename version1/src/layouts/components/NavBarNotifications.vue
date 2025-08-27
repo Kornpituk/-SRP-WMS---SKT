@@ -15,8 +15,10 @@ const notifications = ref([
     title: 'Congratulation Flora! 🎉',
     subtitle: 'Won the monthly best seller badge',
     time: 'Today',
+    status: 'Waiting for Inspection',
+    statusId: 4,
     isSeen: true,
-    link: '/skt/shipping', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
+    link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
     color: 'deep-purple',
   },
   {
@@ -26,8 +28,10 @@ const notifications = ref([
     subtitle: '5 hours ago',
     time: 'Yesterday',
     isSeen: false,
-    link: '/skt/planning/schedule', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
-    color: 'light-blue',
+    status: 'Waiting for Inspection',
+    statusId: 4,
+    link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
+    color: 'deep-purple',
   },
   {
     id: 3,
@@ -36,8 +40,10 @@ const notifications = ref([
     subtitle: 'You have 10 unread messages',
     time: '11 Aug',
     isSeen: true,
+    status: 'Waiting for Inspection',
+    statusId: 4,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
-    color: 'deep-orange-derken-4',
+    color: 'deep-purple',
   },
   {
     id: 4,
@@ -46,8 +52,10 @@ const notifications = ref([
     subtitle: 'Received Payment',
     time: '25 May',
     isSeen: false,
-    color: 'error',
-    link: '/purchase-orders/A00045', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
+    color: 'light-blue',
+    status: 'Waiting for INSP APVL',
+    statusId: 6,
+    link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
   },
   {
     id: 5,
@@ -55,16 +63,20 @@ const notifications = ref([
     title: 'Received Order 📦',
     subtitle: 'New order received from john',
     time: '19 Mar',
+    color: 'light-blue',
     isSeen: true,
-    link: '/purchase-orders/A00045', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
+    status: 'Waiting for INSP APVL',
+    statusId: 6,
+    link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
   },
 ])
 
-const removeNotification = notificationId => {
-  notifications.value.forEach((item, index) => {
-    if (notificationId === item.id)
-      notifications.value.splice(index, 1)
-  })
+const removeNotification = notificationIds => {
+  if (!Array.isArray(notificationIds)) notificationIds = [notificationIds]
+
+  notifications.value = notifications.value.filter(
+    item => !notificationIds.includes(item.id),
+  )
 }
 
 const markRead = notificationId => {
@@ -85,18 +97,27 @@ const markUnRead = notificationId => {
   })
 }
 
-const handleNotificationClick = notification => {
-  console.log("notification not", notification.link)
-  if (!notification.isSeen)
-    markRead([notification.id])
+const handleNotificationClick = notifications => {
+  // แปลงเป็น array เสมอ
+  const notis = Array.isArray(notifications) ? notifications : [notifications]
 
-  if (notification.link){
-    console.log("notification", notification.link)
-    router.push(notification.link)
-  }else{
-    console.log("notification not", notification.link)
+  // mark read
+  markRead(notis.map(n => n.id))
+
+  // เก็บ status ลง sessionStorage
+  sessionStorage.setItem("fileterStatusInPAI", notis[0]?.status)
+
+  const firstLink = notis[0]?.link
+  if (!firstLink) return
+
+  // ถ้าอยู่หน้าเดิม ใช้ replace + query เพื่อ force reload
+  if (router.currentRoute.value.fullPath === firstLink) {
+    window.location.reload()
+  } else {
+    router.push(firstLink)
   }
 }
+
 
 const swipedId = ref(null)
 const swipeDirection = ref('left' | 'right' | null)
