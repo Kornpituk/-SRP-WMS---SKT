@@ -104,6 +104,15 @@ const handleNotificationClick = notifications => {
   // mark read
   markRead(notis.map(n => n.id))
 
+  sessionStorage.setItem('deliveryDateFrom', '')
+  sessionStorage.setItem('deliveryDateTo', '')
+  sessionStorage.setItem('productId', '')
+  sessionStorage.setItem('productName', '')
+  sessionStorage.setItem('supplierId', '')
+  sessionStorage.setItem('supplierName', '')
+  sessionStorage.setItem('purchaseOrderNo', '')
+  sessionStorage.setItem('fileterStatusInPAI', '')
+
   // เก็บ status ลง sessionStorage
   sessionStorage.setItem("fileterStatusInPAI", notis[0]?.status)
 

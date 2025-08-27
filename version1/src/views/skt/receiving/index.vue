@@ -2454,7 +2454,10 @@ const insetSwitch1 = ref('')
     </section>
 
     <!-- Btn Approve -->
-    <section class="mb-4 mt-2">
+    <section
+      v-if="false"
+      class="mb-4 mt-2"
+    >
       <VCard>
         <VCardText class="pa-2 d-flex justify-space-between align-center">
           <VRow>
@@ -2741,7 +2744,10 @@ const insetSwitch1 = ref('')
             />
           </div>
           <div class="text-center">
-            <span style="font-size: 22px; font-weight: bolder;">Would You Like To {{ wordForSubmit }} Transaction?</span>
+            <span style="font-size: 22px; font-weight: bolder;">Would You Like To</span>
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">{{ wordForSubmit }} Transaction?</span>
           </div>
         </VCardText>
 
@@ -3490,6 +3496,7 @@ const insetSwitch1 = ref('')
           :items="products"
           height="550"
           :items-per-page="tableDataPerpage"
+          stlye="padding: 2px;"
           item-selectable="selectable"
           class="elevation-1"
           :header-props="{ 'sort-icon': 'mdi-triangle-down' }"

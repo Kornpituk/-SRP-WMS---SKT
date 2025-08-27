@@ -37,6 +37,8 @@ const testNotifications = ref([...props.notifications])
 // state สำหรับควบคุมการสั่น
 const isShaking = ref(false)
 let timeoutId = null
+const loadingIconAlert = ref(false)
+const loadingIconAlertId = ref('')
 
 const groupedNotifications = computed(() => {
   const groups = {}
@@ -203,7 +205,13 @@ const markAllReadOrUnread = () => {
                     :color="group.color"
                     variant="text"
                     class="px-0"
-                    @click="$emit('click:notification', group.items[0])"
+                    @click="$emit('click:notification', group.items[0]), loadingIconAlert = true, loadingIconAlertId = group.status"
+                    @click.stop="
+                      $emit(
+                        group.items.every(item => item.isSeen) ? 'unread' : 'read',
+                        group.items.map(i => i.id)
+                      )
+                    "
                   >
                     <VIcon icon="ri-error-warning-fill" />
                     <span class="text-sm">
@@ -246,6 +254,11 @@ const markAllReadOrUnread = () => {
                     </div>
                   </div>
                 </template>
+                <VProgressLinear
+                  v-if="loadingIconAlert && loadingIconAlertId === group.status"
+                  color="primary"
+                  indeterminate
+                />
               </VListItem>
             </template>
 

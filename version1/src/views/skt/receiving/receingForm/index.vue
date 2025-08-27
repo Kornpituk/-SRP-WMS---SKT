@@ -646,7 +646,7 @@ const handleSelectLorryLoading = word => {
   sessionStorage.setItem('typeLorryInfoId', selectLorryInfoKey.value)
   typeLorryOnce.value = selectLorryInfoKey.value
 
-  // location.reload()
+  location.reload()
 
   isDialogSubmitSuccessVisible.value = true
 

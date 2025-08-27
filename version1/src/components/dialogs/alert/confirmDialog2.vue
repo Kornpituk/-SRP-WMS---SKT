@@ -9,6 +9,26 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['confirm', 'cancel'])
+
+const prefix = "LORRY LOADING"
+
+// แยก LORRY LOADING ออกมา และส่วนที่เหลือ
+const firstPart = computed(() => {
+  if (props.message.startsWith(prefix)) {
+    return prefix
+  }
+  
+  return ''
+})
+
+const remainingPart = computed(() => {
+  if (props.message.startsWith(prefix)) {
+    return props.message.slice(prefix.length).trim()
+  }
+  
+  return props.message
+})
+
 const dialog = ref(false)
 
 function openDialog() {
@@ -50,7 +70,10 @@ defineExpose({
           />
         </div>
         <div class="text-center">
-          <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ props.message }}
+          <span style="font-size: 22px; font-weight: bolder;">Would you like to {{ firstPart }}</span>
+        </div>
+        <div class="text-center">
+          <span style="font-size: 22px; font-weight: bolder;">{{ remainingPart }}
             Transaction?</span>
         </div>
       </VCardText>
