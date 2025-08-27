@@ -182,9 +182,6 @@ const removeUserCheck = () => {
           disabled
           class="d-flex justify-end"
         />
-
-       
-
         <VChip color="white">
           <span style="color: black; text-transform: capitalize;"><VIcon icon="ri-user-3-fill" />{{ NameDepartment }}:&nbsp;&nbsp;</span>
 
@@ -199,12 +196,14 @@ const removeUserCheck = () => {
           >-{{ NameRole }}</span>
         </VChip>
 
-        <NavBarNotifications class="me-3" />
+        <NavBarNotifications class="mx-4" />
 
-        <NavbarThemeSwitcher
+        <!--
+          <NavbarThemeSwitcher
           v-if="true"
           class="me-1"
-        />
+          /> 
+        -->
         <UserProfile v-if="false" />
 
         <VHover

@@ -1896,6 +1896,9 @@ const inputRules = [
                 />
                 <div class="pa-0">
                   <div class="d-flex justify-space-between align-center py-1 bg-primary ">
+                    <span class="text-sm text-gray-600 mx-2">
+                      รูปที่ {{ currentIndexCustomCarousel + 1 }} / {{ coaFiles.length }}
+                    </span>
                     <VBtn
                       v-if="false"
                       icon="mdi-minus"
@@ -1903,26 +1906,19 @@ const inputRules = [
                       size="30px"
                       @click="model = Math.max(model - 1, 0)"
                     />
-                    <div class="px-8">
-                      <div class="d-flex justify-space-between align-center mt-2">
-                        <VBtn
-                          :disabled="currentIndexCustomCarousel === 0"
-                          icon="ri-arrow-left-fill"
-                          size="30"
-                          @click="prev"
-                        />
-                        <span class="text-sm text-gray-600">
-                          รูปที่ {{ currentIndexCustomCarousel + 1 }} / {{ coaFiles.length }}
-                        </span>
-                        <VBtn
-                          :disabled="currentIndexCustomCarousel === coaFiles.length - 1"
-                          icon="ri-arrow-right-fill"
-                          size="30"
-                          @click="next"
-                        />
-                      </div>
-                    </div>
                     <div class="px-4">
+                      <VBtn
+                        :disabled="currentIndexCustomCarousel === 0"
+                        icon="ri-arrow-left-fill"
+                        size="30"
+                        @click="prev"
+                      />
+                      <VBtn
+                        :disabled="currentIndexCustomCarousel === coaFiles.length - 1"
+                        icon="ri-arrow-right-fill"
+                        size="30"
+                        @click="next"
+                      />
                       <VBtn
                         icon
                         size="30"

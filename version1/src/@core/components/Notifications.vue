@@ -61,7 +61,8 @@ const groupedNotifications = computed(() => {
 const addTestNotification = () => {
   const newId = Date.now()
 
-  testNotifications.value.push({
+  // eslint-disable-next-line vue/no-mutating-props
+  props.notifications.push({
     id: newId,
     title: `New Alert ${newId}`,
     subtitle: 'This is a test notification',
@@ -70,6 +71,8 @@ const addTestNotification = () => {
     color: 'primary',
     icon: 'mdi-bell-alert',
   })
+  emit('update:notifications', props.notifications)
+  isShaking.value = true
 }
 
 // Watch ดูว่า notifications เพิ่มขึ้นไหม
@@ -89,6 +92,8 @@ watch(
 )
 
 const markAllReadOrUnread = () => {
+  isShaking.value = false
+
   const allNotificationsIds = props.notifications.map(item => item.id)
   if (!isAllMarkRead.value)
     emit('unread', allNotificationsIds)
@@ -110,10 +115,10 @@ const markAllReadOrUnread = () => {
   
   <IconBtn id="notification-btn">
     <VBadge
-      dot
       v-bind="props.badgeProps"
       :model-value="props.notifications.some(n => !n.isSeen)"
       color="error"
+      :content="props.notifications.filter(n => !n.isSeen).length"
       bordered
       offset-x="1"
       offset-y="1"
@@ -197,8 +202,8 @@ const markAllReadOrUnread = () => {
                   <VBtn
                     :color="group.color"
                     variant="text"
-                    @click="$emit('click:notification', group.items[0])"
                     class="px-0"
+                    @click="$emit('click:notification', group.items[0])"
                   >
                     <VIcon icon="ri-error-warning-fill" />
                     <span class="text-sm">
@@ -306,4 +311,14 @@ const markAllReadOrUnread = () => {
 .bell-shake {
   animation: bell-shake 1.2s ease;
 }
+
+.v-badge__badge {
+  block-size: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-inline-size: 20px;
+  padding-block: 0 1px;
+  padding-inline: 0 1px;
+}
 </style>
+
