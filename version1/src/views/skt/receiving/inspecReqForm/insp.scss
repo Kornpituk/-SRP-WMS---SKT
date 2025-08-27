@@ -115,3 +115,30 @@
 .vel-modal {
   background-color: transparent !important;
 }
+
+.image-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: calc(100vh - 200px); /* ใช้แทน height */
+  max-block-size: 80vh;           /* ใช้แทน max-height */
+  /* stylelint-disable-next-line order/properties-order */
+  inline-size: 100%;              /* ใช้แทน width */
+  /* stylelint-disable-next-line order/properties-order */
+  overflow: hidden;
+  background-color: #263238; /* สีพื้นหลัง */
+}
+
+.image-zoomer {
+  block-size: 100%;  /* ใช้แทน height */
+  inline-size: 100%; /* ใช้แทน width */
+}
+
+.image-content {
+  max-inline-size: 100%; /* ใช้แทน max-width */
+  /* stylelint-disable-next-line order/properties-order */
+  max-block-size: 100%;  /* ใช้แทน max-height */
+  object-fit: contain;
+  /* stylelint-disable-next-line order/properties-order */
+  cursor: grab;
+}

@@ -18,13 +18,14 @@ import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 
-import { fetchAndMapInspectionHeader,
+import {
+  fetchAndMapInspectionHeader,
+  useAnalysisItems,
   useGenerateInspection,
   useGenerateJournalIdInspection,
-  useAnalysisItems,
-  useSaveLotInsp,
   useSaveHeaderInspect,
   useSaveLorryAfterMixing,
+  useSaveLotInsp,
 } from './composables/useInspection'
 
 //-------------------------------------------- Permission -----------------------------------------
@@ -1069,7 +1070,6 @@ const getCOAReceivingForm = () => {
 onMounted(() => {
   getCOAReceivingForm() // เรียกใช้ฟังก์ชันเพื่อโหลดข้อมูลจาก API
 })
- 
 import VuePdfApp from "vue3-pdf-app"
 
 // import this to use default icons for buttons
@@ -1089,9 +1089,20 @@ const onProgress = progressData => {
   console.log('Loading progress:', progressData)
 }
 
-//------------------------ vue-easy-lightbox
+const idConfig = {
+  zoomIn: "zoomInBtn",
+  zoomOut: "zoomOutBtn",
+  previous: "prevPageBtn",
+  next: "nextPageBtn",
+  download: "downloadBtn",
+  print: "printBtn",
+}
 
-console.log("coa", coaFiles.value)
+const pdfConfig = {
+  toolbar: false, // ปิด toolbar ทั้งหมด
+}
+
+//------------------------ vue-easy-lightbox
 
 const lightboxImages = ref([])
 const VueEasyLightBoxShow = ref(false)
@@ -1105,6 +1116,24 @@ const showLightbox = async item => {
 const hideLightbox = () => {
   VueEasyLightBoxShow.value = false
 }
+
+//------------------- Zoome
+const zoomer = ref(null)
+
+const zoomIn = () => {
+  zoomer.value?.zoomIn(1.2) // ซูมเข้า 1.2 เท่า
+}
+
+const zoomOut = () => {
+  zoomer.value?.zoomOut(0.8) // ซูมออก 0.8 เท่า
+}
+
+const resetZoom = () => {
+  zoomer.value?.reset() // รีเซ็ตกลับค่าเริ่มต้น
+}
+
+//------------------------------------
+
 
 //------------------ custom carusor
 
@@ -1132,7 +1161,6 @@ const next = () => {
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
 
-import { pdfToImages } from './utils/pdfToImages'
 
 //----------------- COA ---------------------------------------------
 const  colors = [
@@ -1853,10 +1881,7 @@ const inputRules = [
           class="d-flex"
         >
           <div class="mt-7 flex-grow-1">
-            <VCard
-              class="h-100 w-100 d-flex flex-column"
-              style="width: 100%;"
-            >
+            <VCard>
               <VCardTitle
                 v-if="false"
                 class="bg-primary d-flex justify-space-between align-center"
@@ -1878,8 +1903,24 @@ const inputRules = [
                       size="30px"
                       @click="model = Math.max(model - 1, 0)"
                     />
-                    <div class="px-4">
-                      <span>COA {{ currentIndexCustomCarousel+1 }}</span>
+                    <div class="px-8">
+                      <div class="d-flex justify-space-between align-center mt-2">
+                        <VBtn
+                          :disabled="currentIndexCustomCarousel === 0"
+                          icon="ri-arrow-left-fill"
+                          size="30"
+                          @click="prev"
+                        />
+                        <span class="text-sm text-gray-600">
+                          รูปที่ {{ currentIndexCustomCarousel + 1 }} / {{ coaFiles.length }}
+                        </span>
+                        <VBtn
+                          :disabled="currentIndexCustomCarousel === coaFiles.length - 1"
+                          icon="ri-arrow-right-fill"
+                          size="30"
+                          @click="next"
+                        />
+                      </div>
                     </div>
                     <div class="px-4">
                       <VBtn
@@ -1894,27 +1935,6 @@ const inputRules = [
                         />
                       </VBtn>
                     </div>
-                    <VRow v-if="false">
-                      <VCol
-                        class="d-flex justify-center align-center"
-                        cols="10"
-                      >
-                        <span>COA {{ selectedImageIndex+1 }}</span>
-                      </VCol>
-                      <VCol cols="2">
-                        <VBtn
-                          icon
-                          size="30"
-                          @click="openDialog('0')"
-                        >
-                          <VIcon
-                            size="20"
-                            color="white"
-                            icon="ri-close-large-line"
-                          />
-                        </VBtn>
-                      </VCol>
-                    </VRow>
                 
                     <VBtn
                       v-if="false"
@@ -1924,67 +1944,60 @@ const inputRules = [
                       @click="model = Math.min(model + 1, 4)"
                     />
                   </div>
-                  <div class="relative w-full max-w-xl mx-auto">
-                    <!-- แสดงภาพหรือ PDF ทีละรายการ -->
-                    <div class="relative h-[450px] overflow-hidden rounded-md border">
-                      <template v-if="currentItemCustomCarousel">
-                        <!-- ถ้าเป็น PDF -->
-                        <VuePdfApp
-                          v-if="currentItemCustomCarousel.fileUri.endsWith('.pdf')"
-                          :pdf="currentItemCustomCarousel.fileUri"
-                          :style="{ height: `${imgPdfCOAHSize}px` }" 
-                        />
-        
-                        <!-- ถ้าเป็นรูป -->
-                        <div
-                          v-else
-                          class=""
-                        >
-                          <VImg
-                            v-if="!VueEasyLightBoxShow"
-                            :src="currentItemCustomCarousel.fileUri"
-                            alt="Image"
-                            class="zoomable w-full h-full object-contain cursor-zoom-in"
-                            @click="showLightbox(currentItemCustomCarousel)"
-                          />
-                        </div>
-                      </template>
-                    </div>
-
-                    <!-- Lightbox สำหรับรูปภาพ -->
-                    <VueEasyLightbox
-                      :visible="VueEasyLightBoxShow"
-                      :imgs="lightboxImages"
-                      @hide="hideLightbox"
-                    />
-                  </div>
-
-                <!-- Lightbox เดียว แสดงตามไฟล์ที่กด -->
-                </div>
-              </VCardText>
-              <VCardText class="py-2">
-                <!-- ปุ่มควบคุม -->
-                <div class="d-flex justify-space-between align-center mt-2">
-                  <VBtn
-                    :disabled="currentIndexCustomCarousel === 0"
-                    icon="ri-arrow-left-fill"
-                    size="30"
-                    @click="prev"
-                  />
-                  <span class="text-sm text-gray-600">
-                    รูปที่ {{ currentIndexCustomCarousel + 1 }} / {{ coaFiles.length }}
-                  </span>
-                  <VBtn
-                    :disabled="currentIndexCustomCarousel === coaFiles.length - 1"
-                    icon="ri-arrow-right-fill"
-                    size="30"
-                    @click="next"
-                  />
                 </div>
               </VCardText>
             </VCard>
+            <div
+              class="overflow-y-auto relative bg-white shadow-md"
+              style="position: sticky; z-index: 10; top: 20px; height: 600px;"
+            >
+              <!-- แสดงภาพหรือ PDF ทีละรายการ -->
+              <div>
+                <template v-if="currentItemCustomCarousel">
+                  <!-- ถ้าเป็น PDF -->
+                  <div v-if="currentItemCustomCarousel.fileUri.endsWith('.pdf')">
+                    <!-- ✅ PDF Viewer -->
+                    <VuePdfApp
+                      :pdf="currentItemCustomCarousel.fileUri"
+                      :config="pdfConfig"
+                      page-scale="page-width"
+                      style="width: 100%; height: 600px;"
+                      class="sticky top-0 bg-white z-10 "
+                    />
+                  </div>
+
+                  <!-- ถ้าเป็นรูป -->
+                  <div
+                    v-else
+                    class="bg-white relative"
+                  >
+                    <div class="image-wrapper">
+                      <VZoomer
+                        ref="zoomer"
+                        class="image-zoomer bg-blue-grey-darken-4"
+                        :max-scale="5"
+                        :min-scale="1"
+                        pivot="cursor"
+                        zooming-elastic
+                        limit-translation
+                        double-click-to-zoom
+                        mouse-wheel-to-zoom
+                      >
+                        <VImg
+                          :src="currentItemCustomCarousel.fileUri"
+                          alt="Image"
+                          class="image-content"
+                        />
+                      </VZoomer>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
           </div>
         </VCol>
+
+        
         <VCol :cols="colsMainContent">
           <div>
             <!-- Raw Material Inspection Request Form -->
@@ -2948,54 +2961,78 @@ const inputRules = [
             </VCol>
           </VRow>
         </VCol>
-        <VCol
-          cols="12"
-          class="py-0"
-        >
-          <table class="custom-table">
-            <tbody>
-              <tr>
-                <td colspan="6">
-                  <VTextarea
-                    v-model="headerInsp.note"
-                    :readonly="frozeCheckNotDetialCheck"
-                    counter
-                    auto-grow
-                    :rules="[
-                      v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
-                    ]" 
-                    @input="limitTextInputLine4Note" 
+      </VRow>
+
+      <VRow>
+        <VCol cols="12">
+          <div>
+            <VRow>
+              <!-- ช่องซ้าย -->
+              <VCol
+                cols="6"
+                style="border: 1px solid black; border-right: 1px solid black;"
+              >
+                <VTextarea
+                  v-model="headerInsp.note"
+                  :readonly="frozeCheckNotDetialCheck"
+                  style="max-width: 100%;"
+                  counter
+                  :rules="[
+                    v => v.length <= 363 || 'Max 363 characters per line.',
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheckNotDetialCheck"
+                    #label
                   >
-                    <template
-                      v-if="!frozeCheckNotDetialCheck"
-                      #label
-                    >
-                      <VIcon icon="ri-edit-line" />
-                    </template>
-                  </VTextarea>
-                </td>
-                <td colspan="6">
-                  <VTextarea
-                    v-model="headerInsp.details"
-                    :readonly="frozeCheckNotDetialCheck"
-                    counter
-                    auto-grow
-                    :rules="[
-                      v => v.length <= 520 || 'Max 130 characters per line, 4 lines max.',
-                    ]" 
-                    @input="limitTextInputLine4Details"
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+              </VCol>
+
+              <!-- ช่องขวา -->
+              <VCol
+                cols="6"
+                style="border: 1px solid black; border-left: none;"
+              >
+                <VTextarea
+                  v-if="headerInsp.spacialCase"
+                  v-model="headerInsp.details"
+                  style="max-width: 100%;"
+                  :readonly="frozeCheckNotDetialCheck"
+                  counter
+                  :rules="[
+                    v => v.length <= 267 || 'Max 267 characters per line.',
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheckNotDetialCheck"
+                    #label
                   >
-                    <template
-                      v-if="!frozeCheckNotDetialCheck"
-                      #label
-                    >
-                      <VIcon icon="ri-edit-line" />
-                    </template>
-                  </VTextarea>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+
+                <VTextarea
+                  v-else
+                  v-model="headerInsp.details"
+                  style="max-width: 100%;"
+                  :readonly="frozeCheckNotDetialCheck"
+                  counter
+                  :rules="[
+                    v => v.length <= 363 || 'Max 363 characters per line.',
+                  ]"
+                >
+                  <template
+                    v-if="!frozeCheckNotDetialCheck"
+                    #label
+                  >
+                    <VIcon icon="ri-edit-line" />
+                  </template>
+                </VTextarea>
+              </VCol>
+            </VRow>
+          </div>
         </VCol>
       </VRow>
     </section>
