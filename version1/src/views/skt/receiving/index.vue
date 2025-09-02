@@ -16,6 +16,18 @@ import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/item
 
 import { useCookie } from '@/stores/skt/receingFormStore/useCookie'
 
+const userInfo = ref(null)
+
+onMounted(() => {
+  const storedData = sessionStorage.getItem("userData")
+  if (storedData) {
+    userInfo.value = JSON.parse(storedData)
+  }else{
+    userInfo.value = "NotFooundUserInfor"
+  }
+  console.log("User", userInfo.value)
+})
+
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
 
@@ -3482,7 +3494,7 @@ const showExpensionFilter = ref(false)
   </div>
 
   <!-- Data Table Beta1.0 -->
-  <section v-if="resultPermission?.length > 0">
+  <section>
     <VCard>
       <CardText>
         <VProgressLinear

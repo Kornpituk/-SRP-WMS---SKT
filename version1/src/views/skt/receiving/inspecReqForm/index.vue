@@ -1953,12 +1953,26 @@ const inputRules = [
                   <!-- ถ้าเป็น PDF -->
                   <div v-if="currentItemCustomCarousel.fileUri.endsWith('.pdf')">
                     <!-- ✅ PDF Viewer -->
-                    <VuePdfApp
+                    
+                    
+                    <!--
+                      <VuePdfApp
                       :pdf="currentItemCustomCarousel.fileUri"
                       :config="pdfConfig"
                       page-scale="page-width"
                       style="width: 100%; height: 600px;"
                       class="sticky top-0 bg-white z-10 "
+                      />   
+                    -->
+                   
+
+                    
+                    <iframe
+                      :src="`https://docs.google.com/gview?url=${encodeURIComponent(currentItemCustomCarousel.fileUri)}&embedded=true&rm=embedded?theme=light`"
+                      width="100%"
+                      height="600px"
+                      style="border: none; background-color: white; color-scheme: light;"
+                      class="white-bg-iframe"
                     />
                   </div>
 
