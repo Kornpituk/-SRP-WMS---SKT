@@ -4123,6 +4123,7 @@ const insetSwitch1 = ref('')
   <!-- Data Table Beta1.0 -->
   <section v-if="resultPermission?.length > 0">
     <VCard>
+     --> {{ resultPermission?.length }}
       <CardText>
         <VProgressLinear
           v-if="progressLinearNoData"

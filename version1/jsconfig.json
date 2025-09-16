@@ -18,7 +18,7 @@
     "baseUrl": "./",
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "jsx": "preserve",
     "paths": {
       "@/*": [
@@ -55,7 +55,6 @@
     "types": [
       "vite/client",
       "vite-plugin-pages/client",
-      "vite-plugin-vue-layouts/client",
       "unplugin-vue-define-options/macros-global"
     ]
   }

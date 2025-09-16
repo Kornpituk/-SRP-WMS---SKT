@@ -38,6 +38,23 @@ const accountRole = ref('issues')
 const dataRowModel = ref()
 const roleAccount = ref('issues')
 
+//--------------------------  authorizetion Department
+import { hasPermission } from "@/utilities/composables/authorized"
+ 
+watch( () => {
+  if (hasPermission("Receiving plan", "visible")) {
+    console.log("✅ User เห็น Receiving plan")
+  } else {
+    console.log("❌ ไม่มีสิทธิ์เห็น Receiving plan")
+  }
+
+  if (hasPermission("Receiving plan", "execute")) {
+    console.log("✅ User แก้ไข Receiving plan ได้")
+  } else {
+    console.log("❌ ไม่มีสิทธิ์แก้ไข Receiving plan")
+  }
+})
+
 //------------------------------- alert --------------------------------------------
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
@@ -3494,7 +3511,7 @@ const showExpensionFilter = ref(false)
   </div>
 
   <!-- Data Table Beta1.0 -->
-  <section>
+  <section v-if="hasPermission('Receiving plan', 'visible')">
     <VCard>
       <CardText>
         <VProgressLinear
