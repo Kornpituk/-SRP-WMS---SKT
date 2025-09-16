@@ -1029,7 +1029,7 @@ const trikerSaveDrft = ref(false)
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const saveShipmentPlan = async row => {
-  //console.log("save plan start...", row.csLfStatusId)
+  console.log("save plan start...", row)
   saveDraftLoadingSOERow.value = row.soEtlLogDetailJournalID
 
   if (
@@ -1269,18 +1269,15 @@ const submitLoading = ref(false)
 const submitLoadingSOERow = ref('')
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID, rawData) => {
+const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
   console.log('submitShipmentPlanBySoEId start!!', type, soEtlLogDetailJournalID)
   trikerSaveDrft.value = true
   submitLoadingSOERow.value = soEtlLogDetailJournalID || '0'
 
-  //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
+  if (type !== 'approve' && type !== 'reject' && type !== 'back') {
+    console.log('submitShipmentPlanBySoEId start!! 1.1', type)
 
-  if (type !== 'approve' || type !== 'reject' || type !== 'back') {
     const saveDraftRes = await saveShipmentPlan(productRowModel.value)
-
-    //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
-
     if (!saveDraftRes) {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
       throw new Error('saveDraftRes failed: ' + saveDraftRes)
@@ -2020,6 +2017,7 @@ const printShipmentPDFBySoEId = async type => {
   if (!disabledModel.value) {
     // ✅ บันทึกข้อมูลก่อนพิมพ์
     await saveShipmentPlan(dataRowForUse.value)
+    console.log("printShipmentPDFBySoEId")
   }
 
   try {
@@ -2673,8 +2671,6 @@ const handleSavetruckOrder = async type => {
   trikerSaveDrft.value = true
 
   const saveDraftRes = await saveShipmentPlan(dataRowModel.value)
-
-  //console.log('submitShipmentPlanBySoEId start!!', trikerSaveDrft.value)
 
   if (!saveDraftRes) {
     textAlertDialogFunction(alertWordConst.saveDraft, false)
