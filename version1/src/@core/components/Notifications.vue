@@ -2,6 +2,7 @@
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { avatarText } from '@core/utils/formatters'
 import { useRouter } from 'vue-router'
+import { watchEffect } from 'vue'
 
 const props = defineProps({
   notifications: {
@@ -61,6 +62,7 @@ const groupedNotifications = computed(() => {
 
 // เพิ่มแจ้งเตือนใหม่เพื่อทดสอบ
 const addTestNotification = () => {
+
   const newId = Date.now()
 
   // eslint-disable-next-line vue/no-mutating-props
@@ -75,17 +77,23 @@ const addTestNotification = () => {
   })
   emit('update:notifications', props.notifications)
   isShaking.value = true
+
+  console.log("sShaking.value", isShaking.value, props.notifications)
 }
 
 // Watch ดูว่า notifications เพิ่มขึ้นไหม
-watch(
+watchEffect(
   () => props.notifications,
   (newVal, oldVal) => {
+    console.log("sShaking.value", isShaking.value)
     if (oldVal && newVal.length > oldVal.length) {
+      console.log("sShaking.value", isShaking.value)
+
       // มีแจ้งเตือนใหม่เข้ามา
       isShaking.value = true
       clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
+        console.log("sShaking.value", isShaking.value)
         isShaking.value = false
       }, 1200) // ให้สั่น 1.2 วินาทีแล้วหยุด
     }

@@ -3419,7 +3419,7 @@ const handleSavetruckOrder = async type => {
                     v-model="personInchargeTruckCompanyModel"
                     style="min-width: 250px;"
                     density="compact"
-                    label="Driver's Name"
+                    label="Contact Name"
                     class="text-center"
                   />
                   <span v-if="false">{{ personInchargeTruckCompanyModel }}</span>
@@ -3494,7 +3494,7 @@ const handleSavetruckOrder = async type => {
                   class="text-center"
                 >
                   <template #label>
-                    รายชื่อและเบอร์โทรผู ้ติดต่อ
+                    ผู้ขับรถ&เบอร์โทร
                   </template>
                 </VTextField>
               </th>
@@ -4223,7 +4223,7 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <span>{{ (currentPageDataTable - 1) * 10 + index + 1 }}</span>
+                <span>{{ (currentPage - 1) * 10 + index + 1 }}</span>
               </td>
               <td
                 class="sticky-columnBody cursor-pointer"

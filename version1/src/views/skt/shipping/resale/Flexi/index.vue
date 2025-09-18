@@ -661,7 +661,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
               colspan="12"
               class="text-center"
             >
-              Filling Direction & Report to FLEXI
+              Filling Direction & Report to FLEXI 
             </th>
           </tr>
           <tr>
@@ -2064,6 +2064,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         >
           Save Draft
         </VBtn>
+        {{ statusModel  }}
         <VBtn
           v-if="statusModel === 1102 && canVisibleUserPermission(statusPermission,'BTN_LF_WH_APPROVE').canVisible || 
             statusModel === 1103 && canVisibleUserPermission(statusPermission,'BTN_LF_WH_APPROVE').canVisible || 
