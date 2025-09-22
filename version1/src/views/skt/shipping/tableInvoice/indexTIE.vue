@@ -4031,7 +4031,7 @@ const handleSavetruckOrder = async type => {
                 </span>
               </th>
               <th
-                v-if="department === 'Warehouse'"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canVisible"
                 class="text-center"
               >
                 <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
@@ -4967,7 +4967,7 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 truckOrder -->
               <td
-                v-if="department === 'Warehouse'"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canVisible"
                 class="text-start px-2 cursor-pointer"
                 style="min-width: 200px; font-size: 12px;"
                 :style="{
