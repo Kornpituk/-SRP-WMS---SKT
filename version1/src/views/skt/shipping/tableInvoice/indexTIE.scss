@@ -109,3 +109,14 @@
 .sticky-columnBody:nth-child(3) { /* คอลัมน์ที่ 3 */
   inset-inline-start: 100px;
 }
+
+.sticky-action {
+  position: sticky;
+  z-index: 2; /* ให้เด่นกว่าคอลัมน์อื่น */
+  background: #f5f5f7; /* ให้พื้นหลังไม่โปร่งใส */
+  inset-inline-end: 0;
+}
+
+.sticky-action-table th.sticky-action {
+  z-index: 3; /* header ให้อยู่บนสุด */
+}

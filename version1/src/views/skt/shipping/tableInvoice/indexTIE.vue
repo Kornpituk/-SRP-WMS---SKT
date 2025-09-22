@@ -4176,9 +4176,12 @@ const handleSavetruckOrder = async type => {
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
-                class="text-center"
+                class="text-center "
               >
                 <span style="font-weight: bold;" />
+              </th>
+              <th class="sticky-action">
+                <span style="font-weight: bold;">{{ $t('Action') }}</span>
               </th>
             </tr>
           </thead>
@@ -5434,6 +5437,102 @@ const handleSavetruckOrder = async type => {
                   @click="actionBtn(product)"
                 >
                   <span style="font-size: 12px;">Action</span>
+                </VBtn>
+              </td>
+
+              <td
+                style="max-width: 150px; font-size: 12px;"
+                class="text-center px-1 sticky-action"
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
+                <VBtn color="primary">
+                  <VIcon icon="ri-menu-line" />
+                  <VMenu activator="parent">
+                    <VList>
+                      <VListItem
+                        key="1"
+                        value="1"
+                      >
+                        <VBtn
+                          :color="accountINSP ? 'grey' : 'pink-lighten-2'"
+                          @click="actionBtn(product)"
+                        >
+                          <span style="font-size: 12px;">Action</span>
+                        </VBtn>
+                      </VListItem>
+                      <VListItem
+                        v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
+                        key="2"
+                        value="1"
+                      >
+                        <VBtn
+                          :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
+                            !canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
+                          :color="accountINSP ? 'grey' : 'warning'"
+                          @click="saveShipmentPlan(product), saveDraftLoading = true"
+                        >
+                          <span
+                            v-if="saveDraftLoading && product.soEtlLogDetailJournalID === saveDraftLoadingSOERow"
+                            style="font-size: 12px;"
+                          >
+                            <VProgressCircular
+                              :size="30"
+                              color="primary"
+                              indeterminate
+                            />
+                          </span>
+                          <span
+                            v-else
+                            style="font-size: 12px;"
+                          >Save Draft</span>
+                        </VBtn>
+                      </VListItem>
+                      <VListItem
+                        v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
+                        key="3"
+                        value="1"
+                      >
+                        <VBtn
+                          :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
+                            || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
+                          class="mx-2"
+                          :color="accountINSP ? 'grey' : 'primary'"
+                          @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
+                        >
+                          <span
+                            v-if="submitLoading && product.soEtlLogDetailJournalID === submitLoadingSOERow"
+                            style="font-size: 12px;"
+                          >
+                            <VProgressCircular
+                              :size="30"
+                              color="primary"
+                              indeterminate
+                            />
+                          </span>
+                          <span
+                            v-else
+                            style="font-size: 12px;"
+                          >Submit </span>
+                        </VBtn>
+                      </VListItem>
+                      <VListItem
+                        key="4"
+                        value="1"
+                      >
+                        <VListItemTitle>1</VListItemTitle>
+                      </VListItem>
+                    </VList>
+                  </VMenu>
                 </VBtn>
               </td>
             </tr>
