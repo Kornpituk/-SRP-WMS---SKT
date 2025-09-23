@@ -4180,7 +4180,7 @@ const handleSavetruckOrder = async type => {
               >
                 <span style="font-weight: bold;" />
               </th>
-              <th class="sticky-action">
+              <th v-if="false" class="sticky-action">
                 <span style="font-weight: bold;">{{ $t('Action') }}</span>
               </th>
             </tr>
@@ -5441,6 +5441,7 @@ const handleSavetruckOrder = async type => {
               </td>
 
               <td
+              v-if="false"
                 style="max-width: 150px; font-size: 12px;"
                 class="text-center px-1 sticky-action"
                 :style="{
@@ -5462,6 +5463,7 @@ const handleSavetruckOrder = async type => {
                       <VListItem
                         key="1"
                         value="1"
+                        class="px-1 d-flex justify-center"
                       >
                         <VBtn
                           :color="accountINSP ? 'grey' : 'pink-lighten-2'"
@@ -5474,6 +5476,7 @@ const handleSavetruckOrder = async type => {
                         v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
                         key="2"
                         value="1"
+                        class="px-1 d-flex justify-center"
                       >
                         <VBtn
                           :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
@@ -5501,6 +5504,7 @@ const handleSavetruckOrder = async type => {
                         v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
                         key="3"
                         value="1"
+                        class="px-1 d-flex justify-center"
                       >
                         <VBtn
                           :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
@@ -5526,10 +5530,34 @@ const handleSavetruckOrder = async type => {
                         </VBtn>
                       </VListItem>
                       <VListItem
+                        v-if="accountWHSub"
                         key="4"
                         value="1"
+                        class="px-1 d-flex justify-center"
                       >
-                        <VListItemTitle>1</VListItemTitle>
+                        <td
+                          
+                          style="max-width: 130px; font-size: 12px;"
+                          class="text-center px-1"
+                          :style="{
+                            backgroundColor:
+                              dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                              isSelected(product) ? '#E0F7FA' :
+                              '',
+                            borderTop:
+                              dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                            borderBottom:
+                              dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                          }"
+                          @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+                        >
+                          <VBtn
+                            width="100%"
+                            :color="accountINSP ? 'grey' : 'primary'"
+                          >
+                            <span style="font-size: 12px;">Approve</span>
+                          </VBtn>
+                        </td>
                       </VListItem>
                     </VList>
                   </VMenu>
