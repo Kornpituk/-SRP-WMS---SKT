@@ -1690,9 +1690,13 @@ const personInchargeTruckCompanyModel = ref('')
 const contactTruckCompanyModel = ref('')
 
 const selectedTruckCompany2 = () => {
-  const foundItem = TruckCompanyModel.value.find(item => item.truck === TruckCompanyPrint.value)
+  const foundItem = truckModel.value.find(item => item.truck === TruckCompanyPrint.value)
+
+  console.log("Select", foundItem?.personIncharge)
   if (foundItem) {
+    console.log("Select", foundItem.personIncharge)
     personInchargeTruckCompanyModel.value = foundItem.personIncharge || ''
+    console.log("Select personInchargeTruckCompanyModel", personInchargeTruckCompanyModel.value)
     contactTruckCompanyModel.value = foundItem.contact || ''
   } else {
     //console.log('selectedTruckCompany2', TruckCompanyPrint.value, '==')
@@ -1845,6 +1849,7 @@ const rowDataHistoryTruckOrder = ref(JSON.parse(sessionStorage.getItem('rowDataH
 const showDialogTruckOrder = (SoId, SoeId, rowData) => {
 
   dataRowModel.value = rowData
+  selectedTruckCompany2()
   isDialogVisiblePrintTruck.value = true
   saleOrderNo.value = SoId
   soEIdModel.value = SoeId
@@ -2394,6 +2399,7 @@ const paramsTruckOrder = ref({
   dateOrderBy: dateCurrent.value,
   authorizedBy: dateCurrent.value,
   dateAuthorizedBy: dateCurrent.value,
+  driverAndTel: '',
 })
 
 
@@ -2458,6 +2464,7 @@ const getDataTruckOrder = async () => {
           paramsTruckOrder.value.orderDate = getTruckOrderDataResult?.value.orderDate
           paramsTruckOrder.value.authorizedBy = getTruckOrderDataResult?.value.authorizedBy
           paramsTruckOrder.value.authorizedDate = getTruckOrderDataResult?.value.authorizedDate
+          paramsTruckOrder.value.driverAndTel = getTruckOrderDataResult?.value.driverAndTel
 
           TruckTypePrint.value = getTruckOrderDataResult?.value.truckType
           contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
@@ -2614,6 +2621,7 @@ const bodySaveTruckOrder = data => ({
   remark: data.remark,
 
   driverName: personInchargeTruckCompanyModel.value,
+  driverAndTel: data.driverAndTel,
 
   orderBy: userDataInfo?.value.firstName,
   contactAndTel: contactTruckCompanyModel.value,
@@ -2665,6 +2673,8 @@ const handleSavetruckOrder = async type => {
   // }else{
   //   body = bodySaveTruckOrder(paramsTruckOrder.value)
   // }
+
+  console.log("Params T", paramsTruckOrder.value)
 
   const body = bodySaveTruckOrder(paramsTruckOrder.value)
 
@@ -3365,7 +3375,7 @@ const handleSavetruckOrder = async type => {
                     class="text-center"
                     density="compact"
                     label="Transportation Company Name"
-                    :items="TruckCompanyModel"
+                    :items="truckModel"
                     item-title="truck"
                     item-value="truck"
                   />
@@ -3489,7 +3499,7 @@ const handleSavetruckOrder = async type => {
             <tr>
               <th colspan="4">
                 <VTextField
-                  v-model="contactTruckCompanyModel"
+                  v-model="paramsTruckOrder.driverAndTel"
                   density="compact"
                   class="text-center"
                 >
@@ -4180,7 +4190,10 @@ const handleSavetruckOrder = async type => {
               >
                 <span style="font-weight: bold;" />
               </th>
-              <th v-if="false" class="sticky-action">
+              <th
+                v-if="false"
+                class="sticky-action"
+              >
                 <span style="font-weight: bold;">{{ $t('Action') }}</span>
               </th>
             </tr>
@@ -5441,7 +5454,7 @@ const handleSavetruckOrder = async type => {
               </td>
 
               <td
-              v-if="false"
+                v-if="false"
                 style="max-width: 150px; font-size: 12px;"
                 class="text-center px-1 sticky-action"
                 :style="{
