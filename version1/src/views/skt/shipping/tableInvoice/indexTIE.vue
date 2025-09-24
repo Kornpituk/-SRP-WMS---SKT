@@ -2550,7 +2550,7 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.truckType = TruckTypePrint.value
   paramsTruckOrder.value.driverName = personInchargeTruckCompanyModel.value
   paramsTruckOrder.value.tel = contactTruckCompanyModel.value
-  paramsTruckOrder.value.driverBy = contactTruckCompanyModel.value
+  paramsTruckOrder.value.driverBy = paramsTruckOrder.value.driverAndTel
   paramsTruckOrder.value.orderBy = userDataInfo.value.firstName
   paramsTruckOrder.value.runningNum = dataRowModel?.value.truckReservingNumber
 
