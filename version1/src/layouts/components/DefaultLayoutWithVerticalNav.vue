@@ -196,7 +196,7 @@ const removeUserCheck = () => {
           >-{{ NameRole }}</span>
         </VChip>
 
-        <NavBarNotifications class="mx-4" />
+        <!-- <NavBarNotifications class="mx-4" /> -->
 
         <!--
           <NavbarThemeSwitcher

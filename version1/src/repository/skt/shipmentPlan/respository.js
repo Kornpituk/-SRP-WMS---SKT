@@ -171,6 +171,7 @@ export const shipmentPlanRepository = {
           driverName: body.driverName,
           contactAndTel: body.contactAndTel,
           remark: body.remark,
+          driverAndTel: body.driverAndTel,
           orderBy: body.orderBy,
           authorizedBy: body.authorizedBy,
           contactDate: body.contactDate,
