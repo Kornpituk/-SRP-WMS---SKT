@@ -41,24 +41,24 @@ let timeoutId = null
 const loadingIconAlert = ref(false)
 const loadingIconAlertId = ref('')
 
-// const groupedNotifications = computed(() => {
-//   const groups = {}
+const groupedNotifications = computed(() => {
+  const groups = {}
 
-//   props.notifications.forEach(noti => {
-//     if (!groups[noti.statusId]) {
-//       groups[noti.statusId] = {
-//         ...noti,            // เก็บข้อมูล item แรกไว้ใช้แสดง
-//         count: 1,           // เริ่มนับ 1
-//         items: [noti],       // เก็บรายการทั้งหมดใน group
-//       }
-//     } else {
-//       groups[noti.statusId].count++
-//       groups[noti.statusId].items.push(noti)
-//     }
-//   })
+  props.notifications.forEach(noti => {
+    if (!groups[noti.statusId]) {
+      groups[noti.statusId] = {
+        ...noti,            // เก็บข้อมูล item แรกไว้ใช้แสดง
+        count: 1,           // เริ่มนับ 1
+        items: [noti],       // เก็บรายการทั้งหมดใน group
+      }
+    } else {
+      groups[noti.statusId].count++
+      groups[noti.statusId].items.push(noti)
+    }
+  })
 
-//   return Object.values(groups)
-// })
+  return Object.values(groups)
+})
 
 // เพิ่มแจ้งเตือนใหม่เพื่อทดสอบ
 const addTestNotification = () => {
@@ -139,7 +139,6 @@ const markAllReadOrUnread = () => {
       />
     </VBadge>
 
-
     <VMenu
       activator="parent"
       width="380px"
@@ -179,97 +178,9 @@ const markAllReadOrUnread = () => {
           style="max-block-size: 23.75rem;"
         >
           <VList class="py-0">
-            <!--
-              <template
+            <template
               v-for="(group, index) in groupedNotifications"
               :key="group.statusId"
-              >
-              <VDivider v-if="index > 0" />
-
-              <VListItem
-              link
-              lines="one"
-              min-height="66px"
-              class="list-item-hover-class"
-              >
-              <template #prepend>
-              <VListItemAction start>
-              <VAvatar
-              size="40"
-              :color="group.color && group.icon ? group.color : undefined"
-              :image="group.img || undefined"
-              :icon="group.icon || undefined"
-              :variant="group.img ? undefined : 'tonal'"
-              >
-              <span v-if="group.text">{{ avatarText(group.text) }}</span>
-              </VAvatar>
-              </VListItemAction>
-              </template> 
-              <VListItemTitle>
-              <VBtn
-              :color="group.color"
-              variant="text"
-              class="px-0"
-              @click="$emit('click:notification', group.items[0]), loadingIconAlert = true, loadingIconAlertId = group.status"
-              @click.stop="
-              $emit(
-              group.items.every(item => item.isSeen) ? 'unread' : 'read',
-              group.items.map(i => i.id)
-              )
-              "
-              >
-              <VIcon icon="ri-error-warning-fill" />
-              <span class="text-sm">
-              {{ group.status }}
-              </span>
-              <span class="text-xs">({{ group.count }}) Items</span>
-              </VBtn>
-              </VListItemTitle>
-
-              <span class="text-xs text-disabled">
-              {{ group.time }}
-              </span>
-
-              <template #append>
-              <div class="d-flex flex-column align-center gap-4">
-              <VBadge
-              dot
-              :color="group.items.some(item => !item.isSeen) ? 'primary' : '#a8aaae'"
-              :class="`${group.items.every(item => item.isSeen) ? 'visible-in-hover' : ''} ms-1`"
-              @click.stop="
-              $emit(
-              group.items.every(item => item.isSeen) ? 'unread' : 'read',
-              group.items.map(i => i.id)
-              )
-              "
-              />
-
-              <div style="block-size: 28px; inline-size: 28px;">
-              <IconBtn
-              size="x-small"
-              color="red"
-              @click="$emit('remove', group.items.map(i => i.id))"
-              >
-              <VIcon
-              size="20"
-              icon="mdi-close"
-              />
-              </IconBtn>
-              </div>
-              </div>
-              </template>
-              <VProgressLinear
-              v-if="loadingIconAlert && loadingIconAlertId === group.status"
-              color="primary"
-              indeterminate
-              />
-              </VListItem>
-              </template> 
-            -->
-
-            <template
-              v-for="(noti, index) in props.notifications"
-              :key="noti.id"
             >
               <VDivider v-if="index > 0" />
 
@@ -278,46 +189,70 @@ const markAllReadOrUnread = () => {
                 lines="one"
                 min-height="66px"
                 class="list-item-hover-class"
-                @click.stop="
-                  $emit(noti.isSeen ? 'unread' : 'read', [noti.id])
-                "
               >
+                <!-- Slot: Prepend -->
+                <!--
+                  <template #prepend>
+                  <VListItemAction start>
+                  <VAvatar
+                  size="40"
+                  :color="group.color && group.icon ? group.color : undefined"
+                  :image="group.img || undefined"
+                  :icon="group.icon || undefined"
+                  :variant="group.img ? undefined : 'tonal'"
+                  >
+                  <span v-if="group.text">{{ avatarText(group.text) }}</span>
+                  </VAvatar>
+                  </VListItemAction>
+                  </template> 
+                -->
+
+                <!-- Title & Counter -->
                 <VListItemTitle>
                   <VBtn
-                    :color="noti.color"
+                    :color="group.color"
                     variant="text"
-                    class="px-0 "
-                    @click="$emit('click:notification', noti), loadingIconAlert = true, loadingIconAlertId = noti.id, $emit(noti.isSeen ? 'unread' : 'read', [noti.id])"
+                    class="px-0"
+                    @click="$emit('click:notification', group.items[0]), loadingIconAlert = true, loadingIconAlertId = group.status"
                     @click.stop="
-                      $emit(noti.isSeen ? 'unread' : 'read', [noti.id])
+                      $emit(
+                        group.items.every(item => item.isSeen) ? 'unread' : 'read',
+                        group.items.map(i => i.id)
+                      )
                     "
                   >
                     <VIcon icon="ri-error-warning-fill" />
                     <span class="text-sm">
-                      {{ noti.status }}
+                      {{ group.status }}
                     </span>
-                    <!-- <span class="text-xs">({{ noti.title }})</span> -->
+                    <span class="text-xs">({{ group.count }}) Items</span>
                   </VBtn>
                 </VListItemTitle>
 
                 <span class="text-xs text-disabled">
-                  {{ noti.time }}
+                  {{ group.time }}
                 </span>
 
+                <!-- Slot: Append -->
                 <template #append>
                   <div class="d-flex flex-column align-center gap-4">
                     <VBadge
                       dot
-                      :color="!noti.isSeen ? 'primary' : '#a8aaae'"
-                      :class="`${noti.isSeen ? 'visible-in-hover' : ''} ms-1`"
-                      @click.stop="$emit(noti.isSeen ? 'unread' : 'read', [noti.id])"
+                      :color="group.items.some(item => !item.isSeen) ? 'primary' : '#a8aaae'"
+                      :class="`${group.items.every(item => item.isSeen) ? 'visible-in-hover' : ''} ms-1`"
+                      @click.stop="
+                        $emit(
+                          group.items.every(item => item.isSeen) ? 'unread' : 'read',
+                          group.items.map(i => i.id)
+                        )
+                      "
                     />
 
                     <div style="block-size: 28px; inline-size: 28px;">
                       <IconBtn
                         size="x-small"
                         color="red"
-                        @click="$emit('remove', [noti.id])"
+                        @click="$emit('remove', group.items.map(i => i.id))"
                       >
                         <VIcon
                           size="20"
@@ -327,18 +262,16 @@ const markAllReadOrUnread = () => {
                     </div>
                   </div>
                 </template>
-
                 <VProgressLinear
-                  v-if="loadingIconAlert && loadingIconAlertId === noti.id"
+                  v-if="loadingIconAlert && loadingIconAlertId === group.status"
                   color="primary"
                   indeterminate
                 />
               </VListItem>
             </template>
 
-
             <VListItem
-              v-show="!props.notifications.length"
+              v-show="!groupedNotifications.length"
               class="text-center text-medium-emphasis"
               style="block-size: 56px;"
             >

@@ -17,7 +17,7 @@ const notifications = ref([
     time: 'Today',
     status: 'Waiting for Inspection',
     statusId: 4,
-    isSeen: true,
+    isSeen: false,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
     color: 'deep-purple',
   },
@@ -39,7 +39,7 @@ const notifications = ref([
     title: 'New message received 👋🏻',
     subtitle: 'You have 10 unread messages',
     time: '11 Aug',
-    isSeen: true,
+    isSeen: false,
     status: 'Waiting for Inspection',
     statusId: 4,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
@@ -64,7 +64,7 @@ const notifications = ref([
     subtitle: 'New order received from john',
     time: '19 Mar',
     color: 'light-blue',
-    isSeen: true,
+    isSeen: false,
     status: 'Waiting for INSP APVL',
     statusId: 6,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
