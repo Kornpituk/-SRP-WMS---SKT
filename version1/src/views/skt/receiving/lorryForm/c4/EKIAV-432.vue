@@ -120,7 +120,7 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(!canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     isReadOnly.value = true
     console.log("periso", isReadOnly.value)
   }else{

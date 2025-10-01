@@ -119,7 +119,7 @@ onMounted(async () => {
 
   console.log("StatusId ", statusId.value)
 
-  if(!canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
     isReadOnly.value = true
   }else{
     if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
