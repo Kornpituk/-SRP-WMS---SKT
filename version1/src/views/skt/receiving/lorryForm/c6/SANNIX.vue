@@ -14,6 +14,7 @@ import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/receiving/lorryForm/c6/FA-703V.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
+import readOnlyInput from "@/views/skt/receiving/lorryForm/utility/configReadOnly"
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
@@ -133,15 +134,18 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
-    isReadOnly.value = true
-    console.log("periso", isReadOnly.value)
-  }else{
-    if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
-      isReadOnly.value = true
-      console.log("status", isReadOnly.value)
-    }
-  }
+  // if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  //   isReadOnly.value = true
+  //   console.log("periso", isReadOnly.value)
+  // }else{
+  //   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+  //     isReadOnly.value = true
+  //     console.log("status", isReadOnly.value)
+  //   }
+  // }
+
+  isReadOnly.value = readOnlyInput(statusId.value, 'BTN_SAVE_DRAFT')
+
 })
 
 

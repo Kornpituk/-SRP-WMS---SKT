@@ -14,6 +14,7 @@ import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/receiving/lorryForm/c3/Diesel.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
+import readOnlyInput from "@/views/skt/receiving/lorryForm/utility/configReadOnly"
 
 //-------------------------------------------- Permission -----------------------------------------
 
@@ -131,13 +132,16 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
-    isReadOnly.value = true
-  }else{
-    if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
-      isReadOnly.value = true
-    }
-  }
+  // if(!canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  //   isReadOnly.value = true
+  // }else{
+  //   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+  //     isReadOnly.value = true
+  //   }
+  // }
+
+  isReadOnly.value = readOnlyInput(statusId.value, 'BTN_SAVE_DRAFT')
+
 
   unMountedState.value = true
 

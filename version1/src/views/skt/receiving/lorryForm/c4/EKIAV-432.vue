@@ -5,6 +5,7 @@ import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import image01 from '@/views/skt/receiving/lorryForm/c4/EKI-A ( 432 ).png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
+import readOnlyInput from "@/views/skt/receiving/lorryForm/utility/configReadOnly"
 
 //--------------------- alertDialog--------------------------------------------------------
 import AuthenticatorDialog from '@/components/dialogs/alert/alertDialog.vue'
@@ -120,15 +121,15 @@ onMounted(async () => {
 
   statusId.value = lorryFormStatus.data.data[0].statusId
 
-  if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
-    isReadOnly.value = true
-    console.log("periso", isReadOnly.value)
-  }else{
-    if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
-      isReadOnly.value = true
-      console.log("status", isReadOnly.value)
-    }
-  }
+  // if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  //   isReadOnly.value = true
+  // }else{
+  //   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+  //     isReadOnly.value = true
+  //   }
+  // }
+
+  isReadOnly.value = readOnlyInput(statusId.value)
 })
 
 

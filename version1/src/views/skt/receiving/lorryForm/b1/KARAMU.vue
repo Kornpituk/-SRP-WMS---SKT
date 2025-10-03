@@ -12,6 +12,7 @@ import { hour, minute } from '@/utilities/time'
 import image01 from '@/views/skt/receiving/lorryForm/b1/CAPOLACTUM.png'
 import axios from '@axios'
 import { ref, watchEffect } from 'vue'
+import readOnlyInput from "@/views/skt/receiving/lorryForm/utility/configReadOnly"
 
 //-------------------------------------------- Permission -----------------------------------------
 
@@ -119,13 +120,16 @@ onMounted(async () => {
 
   console.log("StatusId ", statusId.value)
 
-  if(canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
-    isReadOnly.value = true
-  }else{
-    if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
-      isReadOnly.value = true
-    }
-  }
+  // if(!canVisibleUserPermission(statusPermission.value, 'BTN_SAVE_DRAFT').canVisible){
+  //   isReadOnly.value = true
+  // }else{
+  //   if(statusId.value === 15 || statusId.value === 18 || statusId.value === 17){
+  //     isReadOnly.value = true
+  //   }
+  // }
+
+  isReadOnly.value = readOnlyInput(statusId.value, 'BTN_SAVE_DRAFT')
+
 
 })
 
