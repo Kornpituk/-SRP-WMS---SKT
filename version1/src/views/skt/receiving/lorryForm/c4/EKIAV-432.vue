@@ -129,7 +129,7 @@ onMounted(async () => {
   //   }
   // }
 
-  isReadOnly.value = readOnlyInput(statusId.value)
+  isReadOnly.value = readOnlyInput(statusId.value, 'BTN_SAVE_DRAFT')
 })
 
 

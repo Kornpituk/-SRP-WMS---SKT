@@ -7,10 +7,17 @@ const canVisibleUserPermission = (statusId, uiControlContextId) => {
 
 const readOnlyInput = (status, uiControlContextId) => {
 
-  if(status === 15 || status ===     18 || status === 17){
+
+  if(canVisibleUserPermission('-1', uiControlContextId).canVisible){
+    if(status === 15 || status ===     18 || status === 17){
+      console.log('s')
+      
+      return true
+    }else{
+      return false
+    }
+  }else{
     return true
-  }else if(canVisibleUserPermission('-1', uiControlContextId).canVisible){
-    return false
   }
 }
 

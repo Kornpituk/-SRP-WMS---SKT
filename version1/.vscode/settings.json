@@ -95,5 +95,6 @@
   "i18n-ally.localesPaths": [
     "src/plugins/i18n",
     "src/plugins/i18n/locales"
-  ]
+  ],
+  "vue3snippets.enable-compile-vue-file-on-did-save-code": true
 }

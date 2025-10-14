@@ -85,7 +85,7 @@ function openConfirmDialog(word) {
 }
 
 function handleConfirmAction() {
-  console.log('Confirmed! Executing action...')
+  // console.log('Confirmed! Executing action...')
 
   if(wordForSubmit.value === "SUBMIT"){
     submit()
@@ -96,7 +96,7 @@ function handleConfirmAction() {
 }
 
 function handleCancel() {
-  console.log('Action canceled.')
+  // console.log('Action canceled.')
 }
 
 
@@ -110,7 +110,7 @@ onMounted(async () => {
  
   var lorryForm =  await get(poEtlLogDetailJournalIDQueryParameters.value)
 
-  console.log(hakuItemTemplate)
+  // console.log(hakuItemTemplate)
   lorryRequestData.value = lorryForm.data.data
 
   poNo.value = lorryForm.data.data.purchaseOrderNo
@@ -118,8 +118,8 @@ onMounted(async () => {
     
     let index = 0
     for (var f of i.result.field) {
-      console.log(f.name)
-      console.log(i.result.type)
+      // console.log(f.name)
+      // console.log(i.result.type)
       f.value = passInitialData(i.result.type, lorryRequestData.value[f.name], index)
       index++
     }
@@ -127,8 +127,8 @@ onMounted(async () => {
     index = 0
     if(i.practice.field != undefined){
       for (var f of i.practice.field) {
-        console.log(f.name)
-        console.log(i.result.type)
+        // console.log(f.name)
+        // console.log(i.result.type)
         f.value = passInitialData(i.practice.type, lorryRequestData.value[f.name], index)
         index++
       }
@@ -147,7 +147,7 @@ onMounted(async () => {
   //   }
   // }
 
-  isReadOnly.value = readOnlyInput(statusId.value)
+  isReadOnly.value = readOnlyInput(statusId.value, 'BTN_SAVE_DRAFT')
 })
 
 
@@ -173,7 +173,7 @@ async function saveDraft(e) {
       // location.reload()
     }, 1000) // 10000 มิลลิวินาที = 10 วินาที
   } else {
-    console.error(response.data)
+    // console.error(response.data)
     e.preventDefault()
   }
 }
@@ -246,7 +246,7 @@ async function submit(e) {
         window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
       }, 1000) // 10000 มิลลิวินาที = 10 วินาที
     } else {
-      console.error(response.data)
+      // console.error(response.data)
     }
   }
 }
@@ -267,7 +267,7 @@ async function approve(e) {
     textAlertDialogFunction(alertWordConst.approve, true)
     window.location.href = '/skt/receiving' // ใส่ URL ของหน้าที่ต้องการไป
   } else {
-    console.error(response.data)
+    // console.error(response.data)
   }
 }
 watchEffect(async () => {
