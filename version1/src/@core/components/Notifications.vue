@@ -287,7 +287,7 @@ const markAllReadOrUnread = () => {
                     :color="noti.color"
                     variant="text"
                     class="px-0 "
-                    @click="$emit('click:notification', noti), loadingIconAlert = true, loadingIconAlertId = noti.id, $emit(noti.isSeen ? 'unread' : 'read', [noti.id])"
+                    @click="$emit(noti.isSeen ? 'unread' : 'read', [noti.id]), $emit('click:notification', noti), loadingIconAlert = true, loadingIconAlertId = noti.id"
                     @click.stop="
                       $emit(noti.isSeen ? 'unread' : 'read', [noti.id])
                     "
@@ -300,9 +300,12 @@ const markAllReadOrUnread = () => {
                   </VBtn>
                 </VListItemTitle>
 
-                <span class="text-xs text-disabled">
+                <div class="text-xs text-disabled">
+                  P/O No:<span class="font-weight-bold">{{ noti.po }}</span>, Lot:<span class="font-weight-bold">{{ noti.lot }}</span>
+                </div>
+                <div class="text-xs text-disabled">
                   {{ noti.time }}
-                </span>
+                </div>
 
                 <template #append>
                   <div class="d-flex flex-column align-center gap-4">

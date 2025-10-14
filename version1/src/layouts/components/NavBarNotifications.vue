@@ -20,6 +20,8 @@ const notifications = ref([
     isSeen: false,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
     color: 'deep-purple',
+    po: "4500058379",
+    lot: "1N25030036",
   },
   {
     id: 2,
@@ -32,6 +34,8 @@ const notifications = ref([
     statusId: 4,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
     color: 'deep-purple',
+    po: "4500058091",
+    lot: "1N25030003",
   },
   {
     id: 3,
@@ -44,6 +48,8 @@ const notifications = ref([
     statusId: 4,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
     color: 'deep-purple',
+    po: "4500058381",
+    lot: "1N25030004",
   },
   {
     id: 4,
@@ -56,6 +62,8 @@ const notifications = ref([
     status: 'Waiting for INSP APVL',
     statusId: 6,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
+    po: "4500058304",
+    lot: "1N25030034",
   },
   {
     id: 5,
@@ -68,6 +76,8 @@ const notifications = ref([
     status: 'Waiting for INSP APVL',
     statusId: 6,
     link: '/skt/receiving', // 👈 เพิ่มลิงก์ที่ใช้ไปยังหน้ารายละเอียด
+    po: "4500058305",
+    lot: "1N25030035",
   },
 ])
 
@@ -115,6 +125,8 @@ const handleNotificationClick = notifications => {
 
   // เก็บ status ลง sessionStorage
   sessionStorage.setItem("fileterStatusInPAI", notis[0]?.status)
+  sessionStorage.setItem("purchaseOrderNo", notis[0]?.po)
+  sessionStorage.setItem("supplierName", notis[0]?.lot)
 
   const firstLink = notis[0]?.link
   if (!firstLink) return
