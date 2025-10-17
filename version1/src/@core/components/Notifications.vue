@@ -1,8 +1,8 @@
 <script setup>
-import { PerfectScrollbar } from "vue3-perfect-scrollbar";
-import { avatarText } from "@core/utils/formatters";
-import { useRouter } from "vue-router";
-import { watchEffect } from "vue";
+import { PerfectScrollbar } from "vue3-perfect-scrollbar"
+import { avatarText } from "@core/utils/formatters"
+import { useRouter } from "vue-router"
+import { watchEffect } from "vue"
 
 const props = defineProps({
   notifications: {
@@ -20,22 +20,22 @@ const props = defineProps({
     required: false,
     default: "bottom end",
   },
-});
+})
 
-const emit = defineEmits(["read", "unread", "remove", "click:notification"]);
+const emit = defineEmits(["read", "unread", "remove", "click:notification"])
 
 const isAllMarkRead = computed(() =>
-  props.notifications.some((item) => item.isSeen === false)
-);
+  props.notifications.some(item => item.isSeen === false),
+)
 
 // ✅ ใช้ ref สำหรับ test
-const testNotifications = ref([...props.notifications]);
+const testNotifications = ref([...props.notifications])
 
 // state สำหรับควบคุมการสั่น
-const isShaking = ref(false);
-let timeoutId = null;
-const loadingIconAlert = ref(false);
-const loadingIconAlertId = ref("");
+const isShaking = ref(false)
+let timeoutId = null
+const loadingIconAlert = ref(false)
+const loadingIconAlertId = ref("")
 
 // const groupedNotifications = computed(() => {
 //   const groups = {}
@@ -58,7 +58,7 @@ const loadingIconAlertId = ref("");
 
 // เพิ่มแจ้งเตือนใหม่เพื่อทดสอบ
 const addTestNotification = () => {
-  const newId = Date.now();
+  const newId = Date.now()
 
   // eslint-disable-next-line vue/no-mutating-props
   props.notifications.push({
@@ -69,64 +69,68 @@ const addTestNotification = () => {
     isSeen: false,
     color: "primary",
     icon: "mdi-bell-alert",
-  });
-  emit("update:notifications", props.notifications);
-  isShaking.value = true;
+  })
+  emit("update:notifications", props.notifications)
+  isShaking.value = true
 
-  console.log("sShaking.value", isShaking.value, props.notifications);
-};
+}
 
 // Watch ดูว่า notifications เพิ่มขึ้นไหม
 watchEffect(
   () => props.notifications,
   (newVal, oldVal) => {
-    console.log("sShaking.value", isShaking.value);
     if (oldVal && newVal.length > oldVal.length) {
-      console.log("sShaking.value", isShaking.value);
-
       // มีแจ้งเตือนใหม่เข้ามา
-      isShaking.value = true;
-      clearTimeout(timeoutId);
+      isShaking.value = true
+      clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
-        console.log("sShaking.value", isShaking.value);
-        isShaking.value = false;
-      }, 1200); // ให้สั่น 1.2 วินาทีแล้วหยุด
+        isShaking.value = false
+      }, 1200) // ให้สั่น 1.2 วินาทีแล้วหยุด
     }
   },
-  { deep: true }
-);
+  { deep: true },
+)
 
 const markAllReadOrUnread = () => {
-  isShaking.value = false;
+  isShaking.value = false
 
-  const allNotificationsIds = props.notifications.map((item) => item.id);
-  if (!isAllMarkRead.value) emit("unread", allNotificationsIds);
-  else emit("read", allNotificationsIds);
-};
+  const allNotificationsIds = props.notifications.map(item => item.id)
+  if (!isAllMarkRead.value) emit("unread", allNotificationsIds)
+  else emit("read", allNotificationsIds)
+}
 
-const handleClickNotification = (noti) => {
-  if (loadingIconAlert.value) return; // ป้องกัน spam click
+const handleClickNotification = async noti => {
+  if (loadingIconAlert.value) return
 
-  // ถ้าอ่านแล้วไม่ต้อง emit อีก
-  if (noti.isSeen) return;
+  loadingIconAlert.value = true
+  loadingIconAlertId.value = noti.id
 
-  emit("read", [noti.id]);
+  // ✅ ถ้ายังไม่อ่าน → ต้องรอ emit("read") ก่อน
+  if (!noti.isSeen) {
+    await new Promise(resolve => {
+      emit("read", [noti.id])
+      setTimeout(resolve, 500) // รอ 500ms ให้ API ทำงาน
+    })
+  }
 
-  // emit("click:notification", noti);
+  // ✅ ถ้าอ่านแล้ว หรืออ่านเสร็จแล้ว → emit click:notification
+  emit("click:notification", noti)
 
-  loadingIconAlert.value = true;
-  loadingIconAlertId.value = noti.id;
-
-  // mock simulate loading done
+  // ✅ ปิด loading
   setTimeout(() => {
-    loadingIconAlert.value = false;
-  }, 1000);
-};
+    loadingIconAlert.value = false
+  }, 1000)
+}
 </script>
 
 <template>
   <!-- ปุ่มทดสอบ -->
-  <VBtn v-if="false" color="primary" class="ma-4" @click="addTestNotification">
+  <VBtn
+    v-if="false"
+    color="primary"
+    class="ma-4"
+    @click="addTestNotification"
+  >
     Add Test Notification
   </VBtn>
 
@@ -140,7 +144,10 @@ const handleClickNotification = (noti) => {
       offset-x="1"
       offset-y="1"
     >
-      <VIcon icon="mdi-bell-outline" :class="{ 'bell-shake': isShaking }" />
+      <VIcon
+        icon="mdi-bell-outline"
+        :class="{ 'bell-shake': isShaking }"
+      />
     </VBadge>
 
     <VMenu
@@ -180,7 +187,10 @@ const handleClickNotification = (noti) => {
           style="max-block-size: 23.75rem"
         >
           <VList class="py-0">
-            <template v-for="(noti, index) in props.notifications" :key="noti.id">
+            <template
+              v-for="(noti, index) in props.notifications"
+              :key="noti.id"
+            >
               <VDivider v-if="index > 0" />
 
               <VListItem
@@ -193,19 +203,14 @@ const handleClickNotification = (noti) => {
                   borderLeft: `${!noti.isSeen ? '8px solid #02E60A' : ''}`,
                   transition: 'border-color 0.3s ease',
                 }"
-                @click.stop="handleClickNotification(noti)"
+                @click="handleClickNotification(noti)"
               >
                 <VListItemTitle>
                   <VBtn
                     :color="!noti.isSeen ? noti.color : 'grey'"
                     :variant="!noti.isSeen ? 'tonal' : 'outlined'"
                     class="px-2"
-                    @click="
-                      $emit(noti.isSeen ? 'unread' : 'read', [noti.id]),
-                        $emit('click:notification', noti),
-                        (loadingIconAlert = true),
-                        (loadingIconAlertId = noti.id)
-                    "
+                    @click="handleClickNotification(noti)"
                   >
                     <VIcon icon="ri-error-warning-fill" />
                     <span class="text-sm">
@@ -215,8 +220,7 @@ const handleClickNotification = (noti) => {
                 </VListItemTitle>
 
                 <div class="text-xs text-disabled mt-2">
-                  P/O No:<span class="font-weight-bold">{{ noti.po }}</span
-                  >, Lot:<span class="font-weight-bold">{{ noti.lot }}</span>
+                  P/O No:<span class="font-weight-bold">{{ noti.po }}</span>, Lot:<span class="font-weight-bold">{{ noti.lot }}</span>
                 </div>
                 <div class="text-xs text-disabled">
                   {{ noti.dateTime }}
@@ -257,7 +261,9 @@ const handleClickNotification = (noti) => {
           v-show="props.notifications.length"
           class="notification-footer"
         >
-          <VBtn block> VIEW ALL NOTIFICATIONS </VBtn>
+          <VBtn block>
+            VIEW ALL NOTIFICATIONS
+          </VBtn>
         </VCardText>
       </VCard>
     </VMenu>

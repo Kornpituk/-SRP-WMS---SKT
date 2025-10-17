@@ -41,19 +41,19 @@ const roleAccount = ref('issues')
 //--------------------------  authorizetion Department
 import { hasPermission } from "@/utilities/composables/authorized"
  
-watch( () => {
-  if (hasPermission("Receiving plan", "visible")) {
-    console.log("✅ User เห็น Receiving plan")
-  } else {
-    console.log("❌ ไม่มีสิทธิ์เห็น Receiving plan")
-  }
+// watch( () => {
+//   if (hasPermission("Receiving plan", "visible")) {
+//     console.log("✅ User เห็น Receiving plan")
+//   } else {
+//     console.log("❌ ไม่มีสิทธิ์เห็น Receiving plan")
+//   }
 
-  if (hasPermission("Receiving plan", "execute")) {
-    console.log("✅ User แก้ไข Receiving plan ได้")
-  } else {
-    console.log("❌ ไม่มีสิทธิ์แก้ไข Receiving plan")
-  }
-})
+//   if (hasPermission("Receiving plan", "execute")) {
+//     console.log("✅ User แก้ไข Receiving plan ได้")
+//   } else {
+//     console.log("❌ ไม่มีสิทธิ์แก้ไข Receiving plan")
+//   }
+// })
 
 //------------------------------- alert --------------------------------------------
 
@@ -1954,11 +1954,11 @@ watchEffect(() => {
   btnApprove.value = canApprove ? '1' : '0'
   btnCancel.value = canCancel ? '1' : '0'
   
-  console.log('Approve/Cancel status:', {
-    approve: btnApprove.value,
-    cancel: btnCancel.value,
-    selectedItems: selectedDataTables.value,
-  })
+  // console.log('Approve/Cancel status:', {
+  //   approve: btnApprove.value,
+  //   cancel: btnCancel.value,
+  //   selectedItems: selectedDataTables.value,
+  // })
 })
 
 const cancelReceivingPlant = () => {

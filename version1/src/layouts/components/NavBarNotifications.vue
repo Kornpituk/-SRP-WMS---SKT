@@ -18,20 +18,63 @@ const {
   NotificationGetFunc,
 } = useNotificationService();
 
+const colorStatusWithId2 = id => {
+  switch (id) {
+  case 0:
+    return { color: "grey-darken-1", message: "grey-darken-1" };
+  case 1:
+    return { color: "red", message: "red" };
+  case 2:
+    return { color: "pink", message: "pink-darken-4" };
+  case 3:
+    return { color: "purple", message: "purple" };
+  case 4:
+    return { color: "deep-purple", message: "deep-purple" };
+  case 5:
+    return { color: "indigo", message: "indigo" };
+  case 6:
+    return { color: "blue", message: "blue" };
+  case 7:
+    return { color: "light-blue", message: "light-blue" };
+  case 8:
+    return { color: "cyan", message: "cyan-darken-4" };
+  case 9:
+    return { color: "teal", message: "teal" };
+  case 10:
+    return { color: "light-green", message: "cycan" };
+  case 11:
+    return { color: "lime-darken-4", message: "cycan" };
+  case 12:
+    return { color: "yellow-darken-4", message: "brown" };
+  case 13:
+    return { color: "orange", message: "orange" };
+  case 14:
+    return { color: "deep-orange", message: "deep-orange-derken-4" };
+  case 15:
+    return { color: "brown", message: "brown" };
+  case 16:
+    return { color: "red-darken-2", message: "red-darken-2" };
+  case 17:
+    return { color: "green-darken-2", message: "green-darken-2" };
+  case 18:
+    return { color: "orange-darken-4", message: "green-darken-2" };
+  default:
+    return { color: "grey", message: "grey" };
+  }
+};
+
 const notifications = ref([]); // ว่างตอนแรก
 
 const fetchNotification = async () => {
   try {
-    await NotificationGetFunc();
+    await NotificationGetFunc(sessionStorage.getItem("accessTokenAtStore"));
 
     // ตรวจสอบว่า responseNotiGet มีค่าและมี datas
 
-    console.log("responseNotiGet.value ", responseNotiGet.value.data.datas);
-
-    const apiData = responseNotiGet.value.data.datas || [];
+    const apiData = ref(responseNotiGet.value.data.datas || []);
 
     // map ข้อมูลจาก API เป็นรูปแบบ notifications ที่ต้องการ
-    notifications.value = apiData.map((item) => ({
+    notifications.value = apiData.value.map(item => ({
       id: item.notiId,
       title: item.statusText || "No title",
       subtitle: item.messageResult || "", // หรือใช้ฟิลด์อื่นจาก API
@@ -46,72 +89,77 @@ const fetchNotification = async () => {
       statusId: item.statusID,
       isSeen: item.isRead,
       link: "/skt/receiving", // หรือ dynamic link ถ้ามี
-      color: "deep-purple", // หรือ map จาก statusID เป็นสี
+      color: colorStatusWithId2(item.statusID).color, // หรือ map จาก statusID เป็นสี
       po: item.purchaseOrderNo,
       lot: item.lot,
       img: "", // ถ้าไม่มีรูปใน API
     }));
 
-    console.log("notifications updated:", notifications.value);
   } catch (error) {
     console.error("Error fetching notifications:", error);
   }
 };
 
-const setReadNotification = async (id) => {
+const setReadNotification = async (id, token) => {
   try {
-    await NotificationSetReadFunc(id);
+    await NotificationSetReadFunc(id, token);
 
     // ตรวจสอบว่า responseNotiGet มีค่าและมี datas
 
     // setTimeout(() => {
     //   location.reload();
     // }, 1000); // 10000 มิลลิวินาที = 10 วินาที
-
-    console.log("responseNotiGet.value ", responseNotiGet.value.data.datas);
   } catch (error) {
     console.error("Error fetching notifications:", error);
   }
 };
 
-watchEffect(() => {
+onMounted(() => {
   fetchNotification();
+
+  const interval = setInterval(() => {
+    fetchNotification();
+  }, 3000);
+
+  onUnmounted(() => clearInterval(interval));
 });
 
-const removeNotification = (notificationIds) => {
+const removeNotification = notificationIds => {
   if (!Array.isArray(notificationIds)) notificationIds = [notificationIds];
 
   notifications.value = notifications.value.filter(
-    (item) => !notificationIds.includes(item.id)
+    item => !notificationIds.includes(item.id),
   );
 };
 
-const markRead = (notificationId) => {
-  notifications.value.forEach((item) => {
-    notificationId.forEach((id) => {
-      if (id === item.id) {
-        item.isSeen = true;
+const markRead = async notificationIds => {
+  const token = sessionStorage.getItem("accessTokenAtStore")
 
-        // setReadNotification(item.id);
-      }
-    });
-  });
-};
+  for (const id of notificationIds) {
+    const target = notifications.value.find(item => item.id === id)
+    if (target) {
+      target.isSeen = true
+      await setReadNotification(target.id, token)  // ✅ รอให้ API เสร็จ
+    }
+  }
 
-const markUnRead = (notificationId) => {
-  notifications.value.forEach((item) => {
-    notificationId.forEach((id) => {
+  return true // ส่งค่ากลับให้ child รู้ว่าเสร็จแล้ว
+}
+
+const markUnRead = notificationId => {
+  notifications.value.forEach(item => {
+    notificationId.forEach(id => {
       if (id === item.id) item.isSeen = false;
     });
   });
 };
 
-const handleNotificationClick = (notifications) => {
+const handleNotificationClick = notifications => {
   // แปลงเป็น array เสมอ
   const notis = Array.isArray(notifications) ? notifications : [notifications];
 
   // mark read
-  markRead(notis.map((n) => n.id));
+  markRead(notis.map(n => n.id));
 
   sessionStorage.setItem("deliveryDateFrom", "");
   sessionStorage.setItem("deliveryDateTo", "");
@@ -149,7 +197,7 @@ const handleSwipe = (notificationId, direction) => {
 let touchStartX = 0;
 let touchEndX = 0;
 
-const onTouchStart = (e) => {
+const onTouchStart = e => {
   touchStartX = e.changedTouches[0].screenX;
 };
 
@@ -166,8 +214,6 @@ const onTouchEnd = (notificationId, e) => {
     swipedId.value = null;
     swipeDirection.value = null;
   }
-
-  console.log("Swip", swipeDirection);
 };
 </script>
 

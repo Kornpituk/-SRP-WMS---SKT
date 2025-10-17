@@ -1928,11 +1928,11 @@ watchEffect(() => {
   btnApprove.value = canApprove ? '1' : '0'
   btnCancel.value = canCancel ? '1' : '0'
   
-  console.log('Approve/Cancel status:', {
-    approve: btnApprove.value,
-    cancel: btnCancel.value,
-    selectedItems: selectedDataTables.value,
-  })
+  // console.log('Approve/Cancel status:', {
+  //   approve: btnApprove.value,
+  //   cancel: btnCancel.value,
+  //   selectedItems: selectedDataTables.value,
+  // })
 })
 
 const cancelReceivingPlant = () => {

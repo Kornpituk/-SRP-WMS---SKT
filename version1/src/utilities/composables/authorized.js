@@ -14,8 +14,10 @@ function getUserPermissions(username) {
 
   // console.log("user Aut", userData.value)
 
+  console.log("users", users) 
+
   // หา user
-  const user = users.find(u => u["Column2"] === username)
+  const user = users.find(u => u?.["Column2"]?.trim() === username)
   if (!user) return {}
 
   const permissions = {}

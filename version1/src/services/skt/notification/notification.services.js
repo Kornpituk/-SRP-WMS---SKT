@@ -1,4 +1,4 @@
-import { notificationSetReadRepository, notificationGetRepository,
+import { notificationSetReadRepository,
 } from '@/repository/skt/notification/notific.repo'
 
 export const useNotificationService = () => {
@@ -7,13 +7,13 @@ export const useNotificationService = () => {
   const responseNotiGet = ref(null)
   const errorMessageNotiGet = ref(null)
   
-  const NotificationSetReadFunc = async NotiId => {
+  const NotificationSetReadFunc = async (NotiId, accessTokenAtStore) => {
     try {
       errorMessageNotiSetRead.value = null
 
       //console.log('New Produtcion Plan Func...')
   
-      const result = await notificationSetReadRepository.setReadNotification(NotiId)
+      const result = await notificationSetReadRepository.setReadNotification(NotiId, accessTokenAtStore)
         
       if (result) {
         //console.log('New Produtcion Plan Func result:', result)
@@ -27,13 +27,13 @@ export const useNotificationService = () => {
     }
   }
 
-  const NotificationGetFunc = async () => {
+  const NotificationGetFunc = async accessTokenAtStore => {
     try {
       errorMessageNotiGet.value = null
 
       //console.log('New Produtcion Plan Func...')
   
-      const result = await notificationSetReadRepository.getNotification()
+      const result = (await notificationSetReadRepository.getNotification(accessTokenAtStore))
         
       if (result) {
         //console.log('New Produtcion Plan Func result:', result)
