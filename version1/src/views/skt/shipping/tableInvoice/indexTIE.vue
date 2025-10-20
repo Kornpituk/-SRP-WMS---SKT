@@ -14,7 +14,7 @@ const dataRowModel = ref()
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
 
-  if (dataRow?.statusId === 205) {
+  if (dataRow?.statusId === 206 || dataRow?.statusId === 207) {
     return true
   } else if (
     department.value === 'Warehouse' &&
@@ -22,15 +22,17 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
   ) {
     return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
   }
-  else if (department.value === 'Warehouse' && whStatusId === 404) {
-    return true
-  } else if (department.value === 'Logistic' && logStatusId === 504) {
-    return true
-  } else if (department.value === 'Inspection' && inspStatusId === 604) {
-    return true
-  } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
-    return true
-  } else {
+
+  // else if (department.value === 'Warehouse' && whStatusId === 404) {
+  //   return true
+  // } else if (department.value === 'Logistic' && logStatusId === 504) {
+  //   return true
+  // } else if (department.value === 'Inspection' && inspStatusId === 604) {
+  //   return true
+  // } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
+  //   return true
+  // } 
+  else {
     return false
   }
 }
@@ -4350,7 +4352,18 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                {{ product.poNo }}
+                <span v-if="product.statusId === 207 || product.statusId === 206">
+                  {{ product.poNo }} 
+                </span>
+                
+                <VTextField
+                  v-if="product.statusId !== 207 && product.statusId !== 206"
+                  v-model="product.poNo"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canExecute || 
+                    disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  density="compact"
+                  style=" min-width: 150px;"
+                />
               </td>
 
               <!-- 👉 PO Attachment -->
@@ -4405,7 +4418,18 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                {{ product.sapInvoiceNo }}
+                <span v-if="product.statusId === 207 || product.statusId === 206">
+                  {{ product.sapInvoiceNo }} 
+                </span>
+                
+                <VTextField
+                  v-if="product.statusId !== 207 && product.statusId !== 206"
+                  v-model="product.sapInvoiceNo"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SAP_INVOICE_NO').canExecute || 
+                    disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  density="compact"
+                  style=" min-width: 150px;"
+                />
               </td>
               <!-- 👉 payerName -->
               <td
@@ -4710,7 +4734,8 @@ const handleSavetruckOrder = async type => {
               >
                 <VAutocomplete
                   v-model="product.freightForwarder"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_FREIGHT_FORWARDER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_FREIGHT_FORWARDER').canExecute 
+                    || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   :items="freightForwarderModel"
                   item-title="freightForwarder"
                   item-value="freightForwarder"
@@ -4756,7 +4781,8 @@ const handleSavetruckOrder = async type => {
               >
                 <VAutocomplete
                   v-model="product.carrier"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_CARRIER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_CARRIER').canExecute || 
+                    disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   :items="carrierModel"
                   class="truncate-select"
                   item-title="carrier"
@@ -4806,7 +4832,8 @@ const handleSavetruckOrder = async type => {
                   :items="vesselsModel"
                   item-title="carrier"
                   item-value="carrier"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_VESSEL_NAME').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_VESSEL_NAME').canExecute ||
+                    disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
                   dense
                 >
@@ -4848,7 +4875,8 @@ const handleSavetruckOrder = async type => {
               >
                 <VTextField
                   v-model="product.voy"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_VOY').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_VOY').canExecute || 
+                    disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
                   style=" min-width: 150px;"
                 />
@@ -4889,7 +4917,8 @@ const handleSavetruckOrder = async type => {
                       item-title="truck"
                       class="truncate-select"
                       item-value="truck"
-                      :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                      :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK').canExecute || 
+                        disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                       density="compact"
                       dense
                     >
@@ -4935,7 +4964,8 @@ const handleSavetruckOrder = async type => {
                   v-if="true"
                   v-model="product.truckReservingNumber"
                   density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canExecute || 
+                    disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   style=" min-width: 150px;"
                 />
                 <VTooltip
@@ -4967,7 +4997,8 @@ const handleSavetruckOrder = async type => {
               >
                 <VTextField
                   v-model="product.truckFee"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_FEE').canExecute || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId) || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_FEE').canExecute || 
+                    disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
                   style=" min-width: 150px;"
                 />
@@ -5017,7 +5048,8 @@ const handleSavetruckOrder = async type => {
                   >
                     <FileInputDialogCarousels
                       title-dialog="Truck Order"
-                      :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                      :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canExecute || 
+                        disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                       :type-file-input="typeFileInput"
                       file-name="Truck Order"
                       :files-from-a-p-i="product.getTruckOrderFileData"
@@ -5086,8 +5118,7 @@ const handleSavetruckOrder = async type => {
               >
                 <AppDateTimePicker
                   v-if="canVisibleUserPermission(statusPermission, 'COL_LOADING_DATE').canExecute &&
-                    !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) &&
-                    !disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
+                    !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   v-model="product.logUpdatedDate"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -5114,7 +5145,8 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
-                  v-if="canVisibleUserPermission(statusPermission, 'COL_ETD').canExecute && !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) && !disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
+                  v-if="canVisibleUserPermission(statusPermission, 'COL_ETD').canExecute && 
+                    !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   v-model="product.etd"
                   density="compact"
                   prepend-inner-icon="ri-calendar-schedule-fill"
@@ -5141,7 +5173,8 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <AppDateTimePicker
-                  v-if="canVisibleUserPermission(statusPermission, 'COL_ETA').canExecute && !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) && !disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
+                  v-if="canVisibleUserPermission(statusPermission, 'COL_ETA').canExecute && 
+                    !disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   v-model="product.eta"
                   disabeld
                   density="compact"
@@ -5171,7 +5204,8 @@ const handleSavetruckOrder = async type => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="Delivery Note"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_DELIVERY_NOTE').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_DELIVERY_NOTE').canExecute || 
+                      disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.getDeliveryNoteFileData"
                     file-name="Delivery Note"
@@ -5386,7 +5420,7 @@ const handleSavetruckOrder = async type => {
               >
                 <VBtn
                   :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
-                    || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
+                    || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible "
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
                   @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
