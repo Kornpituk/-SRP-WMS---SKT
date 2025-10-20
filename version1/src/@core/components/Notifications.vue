@@ -1,8 +1,6 @@
 <script setup>
-import { PerfectScrollbar } from "vue3-perfect-scrollbar"
-import { avatarText } from "@core/utils/formatters"
-import { useRouter } from "vue-router"
 import { watchEffect } from "vue"
+import { PerfectScrollbar } from "vue3-perfect-scrollbar"
 
 const props = defineProps({
   notifications: {
@@ -184,7 +182,7 @@ const handleClickNotification = async noti => {
         <!-- 👉 Notifications list -->
         <PerfectScrollbar
           :options="{ wheelPropagation: false }"
-          style="max-block-size: 23.75rem"
+          style="max-block-size: 23.75rem;"
         >
           <VList class="py-0">
             <template
@@ -246,7 +244,7 @@ const handleClickNotification = async noti => {
             <VListItem
               v-show="!props.notifications.length"
               class="text-center text-medium-emphasis"
-              style="block-size: 56px"
+              style="block-size: 56px;"
             >
               <VListItemTitle>No Notification Found!</VListItemTitle>
             </VListItem>
@@ -295,24 +293,31 @@ const handleClickNotification = async noti => {
   0% {
     transform: rotate(0deg);
   }
+
   10% {
     transform: rotate(-15deg);
   }
+
   20% {
     transform: rotate(15deg);
   }
+
   30% {
     transform: rotate(-10deg);
   }
+
   40% {
     transform: rotate(10deg);
   }
+
   50% {
     transform: rotate(-5deg);
   }
+
   60% {
     transform: rotate(5deg);
   }
+
   100% {
     transform: rotate(0deg);
   }

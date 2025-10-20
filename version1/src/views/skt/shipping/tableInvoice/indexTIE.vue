@@ -5674,7 +5674,6 @@ const handleSavetruckOrder = async type => {
     </VProgressLinear>
   </section>
 
-
   <!-- Footer -->
   <section
     v-if="false"
