@@ -39,17 +39,11 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
 
 const disabledStatusWithOutAdminUser = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
 
-  if (department.value === 'Warehouse' && whStatusId === 404) {
-    return true
-  } else if (department.value === 'Logistic' && logStatusId === 504) {
-    return true
-  } else if (department.value === 'Inspection' && inspStatusId === 604) {
-    return true
-  } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
-    return true
-  } else {
-    return false
-  }
+  return false
+}
+
+const checkStatusInComplete = status => {
+  return !!(status === 207 || status === 206)
 }
 
 //------------------------------- alert --------------------------------------------
@@ -3684,7 +3678,7 @@ const handleSavetruckOrder = async type => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023' || userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
+              v-if="canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="primary"
@@ -3694,7 +3688,7 @@ const handleSavetruckOrder = async type => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023' || userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission, 'BTN_REJECT').canVisible"
+              v-if="canVisibleUserPermission(statusPermission, 'BTN_REJECT').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="error"
@@ -3704,7 +3698,7 @@ const handleSavetruckOrder = async type => {
             </VBtn>
 
             <VBtn
-              v-if="userDataInfo.id === '00023' || userDataInfo.id === '00025' || canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible"
+              v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="purple-accent-4"
@@ -4337,7 +4331,7 @@ const handleSavetruckOrder = async type => {
 
               <!-- 👉 PO No -->
               <td
-                v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
+                v-if="canVisibleUserPermission(statusPermission, 'COL_SAP_INVOICE_NO').canVisible"
                 class="text-start px-3 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
                 :style="{
@@ -4359,7 +4353,7 @@ const handleSavetruckOrder = async type => {
                 <VTextField
                   v-if="product.statusId !== 207 && product.statusId !== 206"
                   v-model="product.poNo"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canExecute || 
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SAP_INVOICE_NO').canExecute || 
                     disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
                   style=" min-width: 150px;"
@@ -5236,7 +5230,7 @@ const handleSavetruckOrder = async type => {
                   variant="outlined"
                   :color="product.saL_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark SAL', product.saL_Remarks, product.soEtlLogDetailJournalID,
-                                                     disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId),
+                                                     checkStatusInComplete(product.statusId),
                                                      canVisibleUserPermission(statusPermission, 'COL_REMARK_SAL').canExecute)"
                 >
                   <span
@@ -5273,7 +5267,7 @@ const handleSavetruckOrder = async type => {
                   variant="outlined"
                   :color="product.wH_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark WH', product.wH_Remarks, product.soEtlLogDetailJournalID,
-                                                     disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId),
+                                                     checkStatusInComplete(product.statusId),
                                                      canVisibleUserPermission(statusPermission, 'COL_REMARK_WH').canExecute)"
                 >
                   <span
@@ -5281,6 +5275,8 @@ const handleSavetruckOrder = async type => {
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
                   >{{
                     product.wH_Remarks }}</span>
+
+                    
                   <span
                     v-else
                     style="font-size: 12px;"
@@ -5310,14 +5306,13 @@ const handleSavetruckOrder = async type => {
                   variant="outlined"
                   :color="product.loG_Remarks ? 'primary' : 'grey'"
                   @click="textAreaRemarkDialogActive('Remark LOG', product.loG_Remarks, product.soEtlLogDetailJournalID,
-                                                     disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId),
+                                                     checkStatusInComplete(product.statusId),
                                                      canVisibleUserPermission(statusPermission, 'COL_REMARK_LOG').canExecute)"
                 >
                   <span
                     v-if="product.loG_Remarks"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
-                  >{{
-                    product.loG_Remarks }}</span>
+                  >{{product.loG_Remarks }}</span>
                   <span
                     v-else
                     style="font-size: 12px;"
