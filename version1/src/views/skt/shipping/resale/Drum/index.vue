@@ -717,7 +717,7 @@ const handleSubmit = async type => {
       if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, true)
         setTimeout(() => {
-          window.location.href = `${window.location.origin}/skt/shipping`
+          // window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else{
         submitCheckSheetResult.value = result
@@ -728,7 +728,7 @@ const handleSubmit = async type => {
 
         //console.log("requestData 3")
         setTimeout(() => {
-          window.location.href = `${window.location.origin}/skt/shipping`
+          // window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }
       
@@ -736,7 +736,7 @@ const handleSubmit = async type => {
       if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, true)
         setTimeout(() => {
-          window.location.href = `${window.location.origin}/skt/shipping`
+          // window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else{
         //console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
