@@ -80,7 +80,6 @@ const soEIdConfirmDialog = ref('')
 const productRowModel = ref(null)
 
 function openConfirmDialog(type, SoEId, productRow) {
-  //console.log('openConfirmDialog', type, SoEId)
   productRowModel.value = productRow
 
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
@@ -89,7 +88,6 @@ function openConfirmDialog(type, SoEId, productRow) {
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
 
-    //console.log('openConfirmDialog', type, SoEId, wordForSubmit.value)
 
   } else if (type === 'back') {
     wordForSubmit.value = "SEND BACK"
@@ -101,7 +99,6 @@ function openConfirmDialog(type, SoEId, productRow) {
 
   // selectedDataTables.value.forEach(item => {
   //   // กำหนดค่าเริ่มต้น
-  //   //console.log("selectedDataTables", item.statusId)
   //   selectedDataTablesStatusId.value = item.statusId
 
   //   if (item.statusId === 102 || item.statusId === 107 ) {
@@ -1688,14 +1685,10 @@ const contactTruckCompanyModel = ref('')
 const selectedTruckCompany2 = () => {
   const foundItem = truckModel.value.find(item => item.truck === TruckCompanyPrint.value)
 
-  console.log("Select", foundItem?.personIncharge)
   if (foundItem) {
-    console.log("Select", foundItem.personIncharge)
     personInchargeTruckCompanyModel.value = foundItem.personIncharge || ''
-    console.log("Select personInchargeTruckCompanyModel", personInchargeTruckCompanyModel.value)
     contactTruckCompanyModel.value = foundItem.contact || ''
   } else {
-    //console.log('selectedTruckCompany2', TruckCompanyPrint.value, '==')
   }
 }
 
@@ -1852,6 +1845,12 @@ const showDialogTruckOrder = (SoId, SoeId, rowData) => {
 
 
   //console.log("RowData", rowData)
+
+  if(rowData.statusId === 206 || rowData.statusId === 207){
+    disabledModel.value = true
+  }else{
+    disabledModel.value = false
+  }
 
   CompanyPrint.value = rowData.shipperName || ' '
   AddressPrint.value = rowData.shipperLocation || ' '
@@ -2018,7 +2017,6 @@ const printShipmentPDFBySoEId = async type => {
   if (!disabledModel.value) {
     // ✅ บันทึกข้อมูลก่อนพิมพ์
     await saveShipmentPlan(dataRowForUse.value)
-    console.log("printShipmentPDFBySoEId")
   }
 
   try {
@@ -2238,13 +2236,11 @@ const handlePrintDPFCheckSheet = async type => {
 
     setTimeout(() => {
       isDialogLoadingVisible.value = false
-    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
-    //console.log('Completed')
+    }, 3 * 1000) // ระยะเวลาในการหมุน 
   } else if (getShippingCheckSheetResult2?.value.isLorry) {
     handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet('ShippingLorry')
 
-    //console.log("getShippingCheckSheetResult?.value.isLorry", getShippingCheckSheetResult2?.value.isLorry)
 
     setTimeout(() => {
       isDialogLoadingVisible.value = false
@@ -2252,8 +2248,6 @@ const handlePrintDPFCheckSheet = async type => {
   } else if (!getShippingCheckSheetResult2?.value.isLorry) {
     handleDialogLoading("PRINT CHECK SHEETS")
     callAPIPrintPDFChecksheet('ShippingFlexi')
-
-    //console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
 
     setTimeout(() => {
       isDialogLoadingVisible.value = false
@@ -2267,7 +2261,6 @@ const handlePrintDPFCheckSheet = async type => {
     //   isDialogLoadingVisible.value = false
     // }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
 
-    //console.log("getShippingCheckSheetResult2?.value.Flexi", getShippingCheckSheetResult2?.value.isLorry)
   }
 
 }
@@ -2309,13 +2302,11 @@ const { printExportExcelResult,
   printExportExcelService } = usePrintExportExcelService()
 
 const testExport = () => {
-  //console.log('printShipmentPDFBySoEIdPlan')
 }
 
 const printShipmentPDFBySoEIdPlan = async () => {
   loadingPrint.value = true
 
-  //console.log('loadingPrint', loadingPrint.value)
 
 
   const etaDateForApi = ref(etaDateModel.value)
@@ -2360,7 +2351,6 @@ const printShipmentPDFBySoEIdPlan = async () => {
     )
 
     if (result) {
-      //console.log('result print', result)
 
       // textAlertDialogFunction(alertWordConst.print, true)
 
@@ -2466,7 +2456,6 @@ const getDataTruckOrder = async () => {
           contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
           personInchargeTruckCompanyModel.value = getTruckOrderDataResult?.value.driverName
 
-          //console.log('getDataTruckOrder', getTruckOrderDataResult?.value)
         }
       } else {
         // conslolr
@@ -2476,7 +2465,6 @@ const getDataTruckOrder = async () => {
 
     }
   } catch (error) {
-    //console.log(error)
   }
 }
 
@@ -2494,7 +2482,6 @@ const getDataTruckOrder = async () => {
 const loadingPrintTruckOrderForm = ref(false)
 
 const clearParamsTruckOrder = () => {
-  //console.log('clearParamsTruckOrder', CompanyPrint.value)
 
   sessionStorage.removeItem('savedTruckOrder')
   dataRowModel.value = null
@@ -2526,7 +2513,6 @@ const clearParamsTruckOrder = () => {
   personInchargeTruckCompanyModel.value = ''
   contactTruckCompanyModel.value = ''
 
-  //console.log('clearParamsTruckOrder', CompanyPrint.value)
 
   // sessionStorage.setItem('sOHistoryTruckOrderSST', 'null')
   // sessionStorage.setItem('sOeIdHistoryTruckOrderSST', 'null')
@@ -2553,8 +2539,6 @@ const handlePrintTruckOrderPDF = () => {
   paramsTruckOrder.value.dateDriverBy = dateCurrent.value || ''
   paramsTruckOrder.value.dateOrderBy = dateCurrent.value || ''
   paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value || ''
-
-  //console.log('loading.......')
 
 
   try {
@@ -2656,7 +2640,6 @@ const handleSavetruckOrder = async type => {
 
   loadingSaveTruckOrderForm.value = true
 
-  //console.log('paramsTruckOrder', paramsTruckOrder.value)
 
   paramsTruckOrder.value.dateOrderBy = dateCurrent.value
   paramsTruckOrder.value.dateDriverBy = dateCurrent.value
@@ -2670,18 +2653,21 @@ const handleSavetruckOrder = async type => {
   //   body = bodySaveTruckOrder(paramsTruckOrder.value)
   // }
 
-  console.log("Params T", paramsTruckOrder.value)
-
   const body = bodySaveTruckOrder(paramsTruckOrder.value)
 
   trikerSaveDrft.value = true
 
-  const saveDraftRes = await saveShipmentPlan(dataRowModel.value)
+  if(disabledModel.value === false){
+    const saveDraftRes = await saveShipmentPlan(dataRowModel.value)
 
-  if (!saveDraftRes) {
-    textAlertDialogFunction(alertWordConst.saveDraft, false)
-    throw new Error('saveDraftRes failed: ' + saveDraftRes)
+
+    if (!saveDraftRes) {
+      textAlertDialogFunction(alertWordConst.saveDraft, false)
+      throw new Error('saveDraftRes failed: ' + saveDraftRes)
+    }
   }
+
+  
 
 
   try {
@@ -2694,22 +2680,18 @@ const handleSavetruckOrder = async type => {
     )
 
     if (result) {
-      //console.log('saveTruckOrderResult', saveTruckOrderResult?.value)
-
 
       sessionStorage.removeItem('sOHistoryTruckOrderSST')
       sessionStorage.removeItem('sOeIdHistoryTruckOrderSST')
       sessionStorage.removeItem('rowDataHistoryTruckOrderSST')
 
       if (trickerSaveTruckOrder.value == !1) {
-        console.log("asdasdasd", trickerSaveTruckOrder.value)
         textAlertDialogFunction("SAVE TRUCK ORDER", true)
         setTimeout(() => {
           location.reload()
         }, 500)
       }
     } else {
-      //console.log('errorSaveTruckOrder', errorSaveTruckOrder.value)
       textAlertDialogFunction("SAVE TRUCK ORDER", false)
 
       trikerSaveDrft.value = false
@@ -3558,14 +3540,13 @@ const handleSavetruckOrder = async type => {
 
         <VCardText class="d-flex justify-end">
           <VBtn
+            v-if="!disabledModel"
             color="warning"
             class="d-flex justify-space-between mx-2"
             @click="trickerSaveTruckOrder = 0, trikerSaveDrft = true, handleSavetruckOrder(), loadingSaveTruckOrderForm = true"
           >
             <span v-if="!loadingSaveTruckOrderForm">
-
               Save
-
             </span>
 
             <div>
@@ -5312,7 +5293,7 @@ const handleSavetruckOrder = async type => {
                   <span
                     v-if="product.loG_Remarks"
                     style="overflow: hidden; max-width: 130px; font-size: 12px; text-overflow: ellipsis;"
-                  >{{product.loG_Remarks }}</span>
+                  >{{ product.loG_Remarks }}</span>
                   <span
                     v-else
                     style="font-size: 12px;"
