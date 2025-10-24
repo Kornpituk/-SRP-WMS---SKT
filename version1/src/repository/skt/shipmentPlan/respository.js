@@ -803,8 +803,7 @@ export const checkSheetShipmentPlanRepository = {
       }
     } catch (error) {
       //console.log('Error repo Error Try submit CheckSheet...')
-      console.error('Error in submitCheckSheet:', error)
-      throw new Error(`Failed to fetch submit CheckSheet ${error.response?.data?.message || error.message}`)
+      throw new Error(`${error.response?.data?.message || error.message}`)
     }
   },
 
@@ -1012,7 +1011,7 @@ export const checkSheetLorryFlexiRepository = {
             Authorization: `Bearer ${accessToken}`,
           },
         })
-      }else if(form === 'reject'){
+      }else if(form === 'reject' || form === 'Reject'){
         response = await axios.post(`${urlApi}/api/v1/ShippingLorryFlexi/${form}/${edId}`, {}, {
           headers: {
             'accept': '*/*',

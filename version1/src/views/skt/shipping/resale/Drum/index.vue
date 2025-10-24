@@ -700,33 +700,42 @@ const { submitCheckSheetResult,
   submitCheckSheetError,
   submitCheckSheetFunction } = useSubmitCheckSheetService()
 
+
+const WH1ACCEPTLoading = ref(false)
+ 
 const handleSubmit = async type => {
 
   trickerSaveDraft.value = true
+
+  WH1ACCEPTLoading.value = true
 
   await habdleSaveDraft()
 
   try {
     //console.log("requestData 1")
 
-    const result = submitCheckSheetFunction(urlApi.value, type, whereHouse, 
+    const result = await submitCheckSheetFunction(urlApi.value, type, whereHouse, 
       accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
 
-    //console.log("requestData 2")
+
+
     if(result || submitCheckSheetResult.value){
       if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, true)
         setTimeout(() => {
           // window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
-      }else{
+      }else if(type === 'Reject'){
+        textAlertDialogFunction(alertWordConst.reject, true)
+        setTimeout(() => {
+          // window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
+      }
+      else{
         submitCheckSheetResult.value = result
-        submitCheckSheetError.value = null
 
-        //console.log('submitCheckSheetResult', result)
-        textAlertDialogFunction(alertWordConst.submit, true)
+        textAlertDialogFunction(submitCheckSheetError.value, false)
 
-        //console.log("requestData 3")
         setTimeout(() => {
           // window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
@@ -734,15 +743,19 @@ const handleSubmit = async type => {
       
     }else{
       if(type === 'back'){
-        textAlertDialogFunction(alertWordConst.sendBack, true)
+        textAlertDialogFunction(alertWordConst.sendBack, false)
+        setTimeout(() => {
+          // window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
+      }else if(type === 'Reject'){
+        textAlertDialogFunction(alertWordConst.reject, false)
         setTimeout(() => {
           // window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else{
-        //console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
-        textAlertDialogFunction(alertWordConst.submit, false)
 
-        //console.log("requestData 4")
+        textAlertDialogFunction(submitCheckSheetError.value, false)
+
         setTimeout(() => {
         // location.reload()
         }, 500) // 0.5 วินาที
@@ -752,6 +765,8 @@ const handleSubmit = async type => {
   } catch (error) {
     submitCheckSheetError.value = error.message
   }
+
+  WH1ACCEPTLoading.value = false
 }
 
 import { 
@@ -2762,6 +2777,12 @@ const dessertsMockAmountView = [
             color="green"
             @click="handleSubmit('submit')"
           >
+            <VProgressCircular
+              v-if="WH1ACCEPTLoading"
+              :width="3"
+              color="green-darken-4"
+              indeterminate
+            />
             WH1 ACCEPT
           </VBtn>
           <VBtn
@@ -2771,6 +2792,14 @@ const dessertsMockAmountView = [
             @click="openConfirmDialog('back')"
           >
             Send Back
+          </VBtn>
+          <VBtn
+            v-if="statusModel === 1004 && canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"
+            class="mx-2"
+            color="red"
+            @click="handleSubmit('Reject')"
+          >
+            Reject
           </VBtn>
           <VBtn
             v-if="statusModel === 1004 && canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"

@@ -2664,6 +2664,11 @@ const handleSavetruckOrder = async type => {
     if (!saveDraftRes) {
       textAlertDialogFunction(alertWordConst.saveDraft, false)
       throw new Error('saveDraftRes failed: ' + saveDraftRes)
+    }else{
+      textAlertDialogFunction(alertWordConst.saveDraft, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 500 มิลลิวินาที = 0.5 วินาที
     }
   }
 
@@ -5463,6 +5468,7 @@ const handleSavetruckOrder = async type => {
                 </VBtn>
               </td>
 
+              <!-- Action Dev -->
               <td
                 v-if="false"
                 style="max-width: 150px; font-size: 12px;"
