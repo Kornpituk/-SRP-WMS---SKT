@@ -486,19 +486,19 @@ const handleSubmit = async type => {
       }
     }else{
       if(type === 'submit'){
-        textAlertDialogFunction(alertWordConst.submit, false)
+        textAlertDialogFunction(errorShippingCheckSheetLorry.value, false)
         setTimeout(() => {
-          // location.reload()
+          // location.reload()1
         }, 500) // 0.5 วินาที
       }else if(type === 'leaderapprove'){
         textAlertDialogFunction(alertWordConst.approve, false)
         setTimeout(() => {
-          // location.reload()
+          location.reload()
         }, 500) // 0.5 วินาที
       }else if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, false)
         setTimeout(() => {
-          // location.reload()
+          location.reload()
         }, 500) // 0.5 วินาที
       }else if(type === 'Reject'){
         textAlertDialogFunction(alertWordConst.reject, false)
@@ -509,6 +509,7 @@ const handleSubmit = async type => {
     }
   }catch(error){
     //console.log(error)
+    errorShippingCheckSheetLorry.value = error.message
   }
 }
 

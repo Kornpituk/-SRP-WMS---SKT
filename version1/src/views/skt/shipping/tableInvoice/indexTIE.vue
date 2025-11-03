@@ -14,14 +14,14 @@ const dataRowModel = ref()
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
 
-  if (dataRow?.statusId === 206 || dataRow?.statusId === 207) {
-    return true
-  } else if (
-    department.value === 'Warehouse' &&
-    (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
-  ) {
-    return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
-  }
+  return !!(dataRow?.statusId === 206 || dataRow?.statusId === 207)
+
+  // else if (
+  //   department.value === 'Warehouse' &&
+  //   (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
+  // ) {
+  //   return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
+  // }
 
   // else if (department.value === 'Warehouse' && whStatusId === 404) {
   //   return true
@@ -32,9 +32,28 @@ const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, data
   // } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
   //   return true
   // } 
-  else {
-    return false
-  }
+ 
+}
+
+const disabledStatusSaveDraft = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
+
+
+  if(dataRow?.statusId === 206 || dataRow?.statusId === 207){
+    return true
+  // eslint-disable-next-line sonarjs/no-duplicated-branches
+  }else if (department.value === 'Warehouse' && whStatusId === 404) {
+    return true
+  // eslint-disable-next-line sonarjs/no-duplicated-branches
+  } else if (department.value === 'Logistic' && logStatusId === 504) {
+    return true
+  // eslint-disable-next-line sonarjs/no-duplicated-branches
+  } else if (department.value === 'Inspection' && inspStatusId === 604) {
+    return true
+  // eslint-disable-next-line sonarjs/no-duplicated-branches
+  } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
+    return true
+  } 
+
 }
 
 const disabledStatusWithOutAdminUser = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
@@ -78,9 +97,54 @@ const confirmDialog2 = ref('')
 const typeConfirmDialog = ref('')
 const soEIdConfirmDialog = ref('')
 const productRowModel = ref(null)
+const checkConfirmBottonActive = ref(false)
+const checkCancelBottonActive = ref(false)
+const rowData = ref(null)
 
-function openConfirmDialog(type, SoEId, productRow) {
+const resetValueInCheckBottonConfirm = () => {
+  checkConfirmBottonActive.value = false
+  checkCancelBottonActive.value = false
+}
+
+
+const confirmSapIn = async () => {
+
+  if(typeSap.value === "save draft"){
+    saveShipmentPlan(dataRowDailog.value)
+  }else if(typeSap.value === "submit"){
+    openConfirmDialog(typeSap.value, soEIdSap.value, dataRowDailog.value)
+  }
+
+  isDialogSapInV.value = false
+}
+
+
+const handleOpenConfirmDialogWrapSapInV = async (type, SoEId, productRow) => {
+
+  dataRowDailog.value = productRow
+  typeSap.value = type
+  soEIdSap.value = SoEId
+
+  const resultSap = await searchShipmentPlanSapInV(productRow)
+
+  if(!resultSap || getSearchPlanSapInVResult.value?.datas.length < 1 ){
+    
+    openConfirmDialog(type, SoEId, productRow)
+
+  
+  }else if( getSearchPlanSapInVResult.value?.datas.length > 0){
+    isDialogSapInV.value = true
+  }
+
+
+
+}
+
+
+const openConfirmDialog = async (type, SoEId, productRow) => {
   productRowModel.value = productRow
+
+  resetValueInCheckBottonConfirm()
 
   // เรียกใช้ฟังก์ชัน openDialog ที่เปิดเผยจาก ConfirmDialog.vue
   if (type === 'submit') {
@@ -88,35 +152,18 @@ function openConfirmDialog(type, SoEId, productRow) {
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
 
-
   } else if (type === 'back') {
     wordForSubmit.value = "SEND BACK"
+    typeConfirmDialog.value = type
+    soEIdConfirmDialog.value = SoEId
+  }else if (type === 'check sap invoice no') {
+    rowData.value = productRow
+    wordForSubmit.value = "Confirm sap invoice no"
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
   }
 
   confirmDialog2.value.openDialog()
-
-  // selectedDataTables.value.forEach(item => {
-  //   // กำหนดค่าเริ่มต้น
-  //   selectedDataTablesStatusId.value = item.statusId
-
-  //   if (item.statusId === 102 || item.statusId === 107 ) {
-  //     wordForSubmit.value = alertWordConst.approve
-  //     confirmDialog2.value.openDialog()
-  //     isDialogVisibleAlertDialog.value = false
-  //     //console.log("selectedDataTables 102")
-  //   }else if(item.statusId === 101){
-  //     textSubAlertDialogFunction('SELECT APPROVE', "Plase select Plan Status 'Waitting for plan APVL' for approve.", false)
-  //     //console.log("selectedDataTables 101")
-  //   }
-  //   else{
-  //     //console.log("selectedDataTables failded")
-  //     isDialogVisibleAlertDialog.value = false
-  //   }
-
-  // })
-
 }
 
 function handleConfirmAction() {
@@ -125,13 +172,16 @@ function handleConfirmAction() {
   } else if (wordForSubmit.value === 'SEND BACK') {
     submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
 
-    //console.log('back')
+  }else if(wordForSubmit.value === 'Confirm sap invoice no'){
+    saveShipmentPlan(rowData.value)
   }
-
+  checkConfirmBottonActive.value = true
 }
 
 function handleCancel() {
   //console.log('Action canceled.')
+
+  checkCancelBottonActive.value = true
 }
 
 //------------------------------ Formate --------------------------------------
@@ -179,6 +229,7 @@ import {
   useGetDataTruckOrderService,
   useGetFileFormService,
   useGetSearchPlanService,
+  useGetSearchPlanSapinvoicenoIsexistService,
   useGetSelectDataService,
   usePrintExportExcelService,
   usePrintPDFService, 
@@ -482,6 +533,10 @@ const handleDialogSubmit = data => {
 //------------------------------- Function Get Search plan -----------------
 
 const { getSearchPlanResult, errorGetSearchPlan, fetchSearchPlan } = useGetSearchPlanService()
+
+const { getSearchPlanSapInVResult, 
+  errorGetSearchPlanSapInV, 
+  fetchSearchPlanSapInV } = useGetSearchPlanSapinvoicenoIsexistService()
 
 const searchPlanData = ref([])
 const isLoading = ref(false)
@@ -995,6 +1050,8 @@ const mapRequestData = data => ({
   soEtlLogDetailJournalID: getOrDefault(data.soEtlLogDetailJournalID, 0),
   loadingDate: formatDateSave(getOrDefault(data.logUpdatedDate, null)),
   updatedBy: getOrDefault(data.salUpdatedBy, "system"),
+  poNo: getOrDefault(data.poNo),
+  sapInvoiceNo: getOrDefault(data.sapInvoiceNo),
   shipperMark: getOrDefault(data.shipperMark, ""),
   shipperConditions: getOrDefault(data.shipperConditions, ""),
   shippingEndUser: getOrDefault(data.shippingEndUser, ""),
@@ -1019,10 +1076,74 @@ const saveDraftLoading = ref(false)
 const saveDraftLoadingSOERow = ref('')
 
 const trikerSaveDrft = ref(false)
+const isDialogSapInV = ref(false)
+const dataRowDailog = ref(null)
+const typeSap = ref(null)
+const soEIdSap = ref(null)
+
+const searchShipmentPlanSapInV = async row => {
+  try {
+    const result = await fetchSearchPlanSapInV(
+      urlApi.value,
+      'sapinvoiceno/isexist',
+      whereHouse,
+      accessTokenAtStore,
+      row.soEtlLogDetailJournalID,
+      row.sapInvoiceNo,
+    )
+
+    if (result && getSearchPlanSapInVResult.value.datas) {
+
+
+      return result
+
+      // //console.log(`Fetched search plan:`, searchPlanData.value)
+    } else {
+      console.error('No result from API')
+      searchPlanData.value = [] // Set empty data if no result
+    }
+  } catch (error) {
+    console.error(`Error fetching search plan:`, error)
+    console.error(`Error(service) fetching search plan:`, errorGetSearchPlan)
+    searchPlanData.value = [] // Set empty data on error
+  } finally {
+    isLoading.value = false // Stop loading indicator
+  }
+}
+
+const handleSaveRowShipmentPlan = async (row, type) => {
+  dataRowDailog.value = row
+  typeSap.value = type
+
+  const resultSap = await searchShipmentPlanSapInV(row)
+
+  if(!resultSap || getSearchPlanSapInVResult.value?.datas.length < 1 ){
+    saveShipmentPlan(row)
+
+    return
+  }
+
+  isDialogSapInV.value = true
+
+  // openConfirmDialog('check sap invoice no', row.soEtlLogDetailJournalID, row)
+
+}
+
+const handleFilterSap = (SOEI, ETD) => {
+  // localStorage.setItem('ETDSearchProductionFilter', ETD)
+  // localStorage.setItem('SalesOrderNoSearchProductionFilter', SOEI)
+
+  etdDateModel.value = ETD
+  filterForSearchPlan.value.SalesOrderNoSearch = SOEI
+  isDialogSapInV.value = false
+
+  searchShipmentPlan()
+}
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const saveShipmentPlan = async row => {
   console.log("save plan start...", row)
+
   saveDraftLoadingSOERow.value = row.soEtlLogDetailJournalID
 
   if (
@@ -1569,26 +1690,6 @@ const colorStatusWithId = id => {
 }
 
 const statuses = ['Approve', 'Reject', 'Back to Edit']
-
-// ฟังก์ชันสำหรับสุ่มสถานะ
-function getRandomStatus() {
-  const randomIndex = Math.floor(Math.random() * statuses.length)
-
-  return statuses[randomIndex]
-}
-
-function getRandomDate(start, end) {
-  const startDate = new Date(start)
-  const endDate = new Date(end)
-  const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime())
-  const randomDate = new Date(randomTime)
-
-  const year = randomDate.getFullYear()
-  const month = String(randomDate.getMonth() + 1).padStart(2, '0') // Months are zero-based
-  const day = String(randomDate.getDate()).padStart(2, '0')
-
-  return `${day}/${month}/${year}`
-}
 
 const checkBgTruck = truck => {
   if (truck === 'BTS') {
@@ -5362,10 +5463,10 @@ const handleSavetruckOrder = async type => {
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 <VBtn
-                  :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
+                  :disabled="disabledStatusSaveDraft(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
                     !canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
                   :color="accountINSP ? 'grey' : 'warning'"
-                  @click="saveShipmentPlan(product), saveDraftLoading = true"
+                  @click="handleSaveRowShipmentPlan(product, 'save draft'), saveDraftLoading = true"
                 >
                   <span
                     v-if="saveDraftLoading && product.soEtlLogDetailJournalID === saveDraftLoadingSOERow"
@@ -5404,7 +5505,7 @@ const handleSavetruckOrder = async type => {
                     || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible "
                   class="mx-2"
                   :color="accountINSP ? 'grey' : 'primary'"
-                  @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
+                  @Click="handleOpenConfirmDialogWrapSapInV('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
                 >
                   <span
                     v-if="submitLoading && product.soEtlLogDetailJournalID === submitLoadingSOERow"
@@ -6030,6 +6131,109 @@ const handleSavetruckOrder = async type => {
         </div>
       </VCardText>
     </VCard>
+  </VDialog>
+
+  <!-- Dialog Sap NiV -->
+  <VDialog
+    v-model="isDialogSapInV"
+    max-width="500"
+  >
+    <template #default="{ isActive }">
+      <VCard>
+        <VCardText class="px-2">
+          <div class="d-flex justify-center">
+            <VIcon
+              size="100"
+              color="warning"
+              icon="ri-question-line"
+            />
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">There are duplicated SAP invoice No.{{ getSearchPlanSapInVResult?.datas[0].sapInvoiceNo }}
+            </span>
+          </div>
+          <div class="text-center">
+            <span style="font-size: 22px; font-weight: bolder;">Would you like to confirm the transactions?</span>
+          </div>
+
+          
+          <VTable>
+            <thead class="text-no-wrap">
+              <tr>
+                <!--
+                  <th class="text-left">
+                  soEtlLogDetailJournalID
+                  </th> 
+                -->
+                
+                <!--
+                  <th class="text-left">
+                  shippingUserCode
+                  </th>
+                  <th class="text-left">
+                  shippingUserName
+                  </th>  
+                -->
+               
+                <th>No.</th>
+                <th class="text-left">
+                  sales Order No.
+                </th>
+                <th class="text-left">
+                  sap Invoice No.
+                </th>
+                
+                <th class="text-left">
+                  etd
+                </th>
+                <th>
+                  Filter
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(item, index) in getSearchPlanSapInVResult?.datas"
+                :key="index"
+              >
+                <!--
+                  <td>{{ item.soEtlLogDetailJournalID }}</td>
+                  <td>{{ item.salesOrderNo }}</td>
+                  <td>{{ item.shippingUserCode }}</td>
+                  <td>{{ item.shippingUserName }}</td>  
+                -->
+                <td>{{ index+1 }}</td>
+                <td>{{ item.salesOrderNo }}</td>
+                <td>{{ item.sapInvoiceNo }}</td>
+                <td>{{ formatToDate(item.etd) }}</td>
+                <td>
+                  <VBtn
+                    icon="ri-arrow-right-circle-line"
+                    variant="text"
+                    @click="handleFilterSap(item.salesOrderNo, item.etd)"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </VTable>
+        </VCardText>
+
+        <VCardActions class="d-flex justify-space-between">
+          <VBtn
+            text="Close"
+            color="red"
+            variant="flat"
+            @click="isActive.value = false"
+          />
+          <VBtn
+            text="Confirm"
+            color="green"
+            variant="flat"
+            @click="confirmSapIn"
+          />
+        </VCardActions>
+      </VCard>
+    </template>
   </VDialog>
   <div />
 </template>

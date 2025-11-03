@@ -226,10 +226,6 @@ export const useSubmitCheckSheetService = () => {
     } catch (error) {
       
       submitCheckSheetError.value = error
-
-      console.log("error3", submitCheckSheetError.value.message)
-
-      console.log("error-2", submitCheckSheetResult.value)
     }
   }
   

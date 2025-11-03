@@ -118,7 +118,7 @@ const statusModel = ref(dataProductRow.value.csLfStatusId)
 
 //console.log('journalIdModel', dataProductRow.value.journalID)
 
-//------------------------------- disabled input ---------------------------
+//--------------------------handleSubmit----- disabled input ---------------------------
 
 const disableInpit = () => {
   return statusModel.value === 1005
@@ -625,7 +625,7 @@ const habdleSaveDraft = async () => {
   if(!file){
     textAlertDialogFunction('FILE', false)
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 0.5 วินาที
     
     return
@@ -634,7 +634,7 @@ const habdleSaveDraft = async () => {
   if(!file2){
     textAlertDialogFunction('FILE2', false)
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 0.5 วินาที
     
     return
@@ -645,7 +645,7 @@ const habdleSaveDraft = async () => {
   if(!file3){
     textAlertDialogFunction('FILE3', false)
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 0.5 วินาที
     
     return
@@ -672,7 +672,6 @@ const habdleSaveDraft = async () => {
       if(!trickerSaveDraft.value){
         textAlertDialogFunction(alertWordConst.saveDraft, true)
         setTimeout(() => {
-        // location.reload()
 
           location.reload()
         }, 500) // 0.5 วินาที
@@ -683,7 +682,7 @@ const habdleSaveDraft = async () => {
       if(!trickerSaveDraft.value){
         textAlertDialogFunction(alertWordConst.saveDraft, false)
         setTimeout(() => {
-        // location.reload()
+          location.reload()
         }, 500) // 0.5 วินาที
       }
       
@@ -723,21 +722,21 @@ const handleSubmit = async type => {
       if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, true)
         setTimeout(() => {
-          // window.location.href = `${window.location.origin}/skt/shipping`
+          window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else if(type === 'Reject'){
         textAlertDialogFunction(alertWordConst.reject, true)
         setTimeout(() => {
-          // window.location.href = `${window.location.origin}/skt/shipping`
+          window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }
       else{
         submitCheckSheetResult.value = result
 
-        textAlertDialogFunction(submitCheckSheetError.value, false)
+        textAlertDialogFunction(alertWordConst.submit, true)
 
         setTimeout(() => {
-          // window.location.href = `${window.location.origin}/skt/shipping`
+          window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }
       
@@ -745,19 +744,19 @@ const handleSubmit = async type => {
       if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, false)
         setTimeout(() => {
-          // window.location.href = `${window.location.origin}/skt/shipping`
+          window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else if(type === 'Reject'){
         textAlertDialogFunction(alertWordConst.reject, false)
         setTimeout(() => {
-          // window.location.href = `${window.location.origin}/skt/shipping`
+          window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else{
 
         textAlertDialogFunction(submitCheckSheetError.value, false)
 
         setTimeout(() => {
-        // location.reload()
+          // location.reload()
         }, 500) // 0.5 วินาที
       }
       
@@ -783,22 +782,24 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
   try{
     //console.log('submitShipmentPlanBySoEId start!!')
 
-    // if(type === 'submit'){
+    if(type === 'submit'){
 
-    // }else if(type === 'approve' || type === 'reject'){
-    //   //console.log('submitShipmentPlanBySoEId start!! 3')
-    //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-    //   //console.log('submitShipmentPlanBySoEId start!! 2')
-    // }else if(type === 'back'){
-    //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-    //   //console.log('submitShipmentPlanBySoEId back !! 3')
-    // }
+    }else if(type === 'approve' || type === 'reject'){
+      //console.log('submitShipmentPlanBySoEId start!! 3')
+      soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
-    // if(!statusCommnetValue.value && type === 'reject'){
-    //   textAlertDialogFunction('Please enter Reject Comment.', false)
+      //console.log('submitShipmentPlanBySoEId start!! 2')
+    }else if(type === 'back'){
+      soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+
+      //console.log('submitShipmentPlanBySoEId back !! 3')
+    }
+
+    if(!statusCommnetValue.value && type === 'reject'){
+      textAlertDialogFunction('Please enter Reject Comment.', false)
       
-    //   return
-    // }
+      return
+    }
 
     soEtlLogDetailJournalID = SoEtlLogDetailJournalIDModel.value
     
@@ -1492,7 +1493,7 @@ const dessertsMockAmountView = [
                 >
                   <td>{{ index+1 }}</td>
                   <td>
-                    <span v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0">
+                    <span v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 1004 || statusModel === 0">
                       <VTextField
                         v-model="item.containerNo_LicPlNo"
                         :readonly="disableInpit()"

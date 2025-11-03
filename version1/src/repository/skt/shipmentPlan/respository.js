@@ -125,6 +125,32 @@ export const shipmentPlanRepository = {
     }
   },
 
+  async getSearchPlanSapinvoicenoIsexist(urlApi, form, whereHouse, accessToken, SoEtlLogDetailJournalID, SAPInvoiceNo ) {
+    try {
+      const response = await axios.get(`${urlApi}/api/v1/ShipmentPlan/${form}/${SoEtlLogDetailJournalID}/${SAPInvoiceNo}`, {
+        headers: {
+          'accept': '*/*',
+          'x-location': whereHouse,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+    
+      if (response && response.data) {
+
+        // //console.log('Service Response data getSearchPlan:', response.data)
+            
+        return { data: response.data, success: true }
+      } else {
+        //console.log('Error repo Error If getSearchPlan...')
+        throw new Error('No data received from the server')
+      }
+    } catch (error) {
+      //console.log('Error repo Error Try getSearchPlan...')
+      console.error('Error in getProductionPlan:', error)
+      throw new Error(`Failed to fetch getSearchPlan ${error.response?.data?.message || error.message}`)
+    }
+  },
+
   //---------------------------- post --------------------------------
   async saveSearchPlan(urlApi, form, whereHouse, accessToken, body) {
     try {
@@ -1037,7 +1063,7 @@ export const checkSheetLorryFlexiRepository = {
     } catch (error) {
       //console.log('Error repo Error Try submit Shipment Plan...')
       console.error('Error in getProductionPlan:', error)
-      throw new Error(`Failed to fetch submit Shipment Plan ${error.response?.data?.message || error.message}`)
+      throw new Error(`${error.response?.data?.message || error.message}`)
     }
   },
 
