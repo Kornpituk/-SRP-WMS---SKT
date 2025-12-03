@@ -1,15 +1,14 @@
 <script setup>
-import { onMounted, ref, watch, watchEffect } from "vue"
+import { onMounted, ref, watch } from "vue"
 
 import iconMock1 from '@images/icons/Group 1000004801.png'
 import iconMock2 from '@images/icons/Group 1000004802.png'
 import iconMock3 from '@images/icons/Icon.png'
 
 
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
-import { VDataTable } from 'vuetify/labs/VDataTable'
+import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
-import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
 
@@ -76,7 +75,7 @@ const showBtnCheckSheet = () => {
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 
 const paramsForGetPermission = ref({
@@ -154,11 +153,16 @@ function getCurrentDate() {
 
 //------------------------------------ import service --------------------------------
 
-import { useGenerateFormService, useGetShippingCheckSheetService,
-  useGetShippingChecksheetImageService, useShippingCheckSheetService,
-  useSubmitCheckSheetService, useGetShippingCheckSheetFileIconService,
-  useGetFileFormService, useShippingCheckSheetFileFormService,
-  useGetShippingSpecialConditionIconService, useDeleteFileFormService,
+import {
+  useDeleteFileFormService,
+  useGetFileFormService,
+  useGetShippingCheckSheetFileIconService,
+  useGetShippingCheckSheetService,
+  useGetShippingChecksheetImageService,
+  useGetShippingSpecialConditionIconService,
+  useShippingCheckSheetFileFormService,
+  useShippingCheckSheetService,
+  useSubmitCheckSheetService,
 } from '@/services/skt/shipmentPlan/checkSheetServices'
 
 //------------------------------------ generate section ----------------------
@@ -195,8 +199,10 @@ onMounted( () => {
 
 //------------------------------------ Get ShippingCheckSheet  ----------------------
 
-import { GBSmockDataIm, specialRequestsIm,
-  validateAfterPickingIm, resaleProductShippingIm,
+import {
+  GBSmockDataIm,
+  resaleProductShippingIm,
+  validateAfterPickingIm,
 } from './GBSMockData'
 
 
@@ -279,7 +285,7 @@ const showImagNew = file => {
 }
 
 const showData = () => {
-  //console.log('Data Current', getShippingCheckSheetResult.value)
+  console.log('Data Current', getShippingCheckSheetResult.value)
 }
 
 const tableData = ref({
@@ -768,7 +774,7 @@ const handleSubmit = async type => {
   WH1ACCEPTLoading.value = false
 }
 
-import { 
+import {
   useSubmitShipmentPlanService,
 } from '@/services/skt/shipmentPlan/services'
 
@@ -991,8 +997,6 @@ onMounted(async () => {
   fetIconCondition()
 })
 
-import image01 from '@/views/skt/shipping/image/01.png'
-import image02 from '@/views/skt/shipping/image/02.png'
 
 
 
@@ -1326,6 +1330,14 @@ const dessertsMockAmountView = [
     protein: 4,
   },
 ]
+
+const packagingChecksOtherTrue = computed(() => {
+  return (
+    getShippingCheckSheetResult.value?.packagingChecks?.filter(
+      item => item.isOther && item.checkedValue === true,
+    ) || []
+  )
+})
 </script>
 
 <template>
@@ -2179,80 +2191,136 @@ const dessertsMockAmountView = [
                 </th>
               </tr>
             </thead>
+            <!--
+              <tbody>
+              <tr
+              v-for="(item , index) in getShippingCheckSheetResult?.packagingChecks"
+              :key="index"
+              >
+              <td colspan="4">
+              <div class="d-flex justify-center">
+              {{ item.displayText }}
+              </div>
+              </td>
+              <td colspan="4">
+              <div class="d-flex justify-center">
+              <div
+              v-if="item.option1Text === 'Wood'"
+              class="d-flex justify-center align-center"
+              >
+              <VCheckbox
+              v-model="item.checkedValue"
+              :readonly="disableInpit()"
+              :value="checkThePackagingCheckTrue"
+              />
+              Wood
+              </div>
+              <div
+              v-else
+              class="d-flex justify-center align-center"
+              >
+              <VCheckbox
+              v-model="item.checkedValue"
+              :readonly="disableInpit()"
+              :value="checkThePackagingCheckTrue"
+              />
+              Yes
+              </div>
+              </div>
+              </td>
+              <td colspan="4">
+              <div class="d-flex justify-center">
+              <div
+              v-if="item.option2Text === 'Plastic'"
+              class="d-flex justify-center align-center"
+              >
+              <VCheckbox
+              v-model="item.checkedValue"
+              :readonly="disableInpit()"
+              :value="false"
+              />
+              Plastic 
+              </div>
+              <div
+              v-else
+              class="d-flex justify-center align-center"
+              >
+              <VCheckbox
+              v-model="item.checkedValue"
+              :readonly="disableInpit()"
+              :value="false"
+              />
+              NO 
+              </div>
+              </div>
+              </td>
+              </tr>
+              <tr v-if="getShippingCheckSheetResult?.packagingChecks[3]?.checkedValue">
+              <td colspan="12">
+              <div>
+              <VTextarea
+              v-model="getShippingCheckSheetResult.reportCheckSheet.other"
+              :readonly="disableInpit()"
+              counter
+              label="Other"
+              placeholder="Enter Other"
+              />
+              </div>
+              </td>
+              </tr>
+              </tbody> 
+            -->
+
             <tbody>
               <tr
-                v-for="(item , index) in getShippingCheckSheetResult?.packagingChecks"
-                :key="index"
+                v-for="(item) in getShippingCheckSheetResult?.packagingChecks"
+                :key="item.journalID"
               >
+                <!-- Display Text -->
                 <td colspan="4">
                   <div class="d-flex justify-center">
                     {{ item.displayText }}
                   </div>
                 </td>
+
+                <!-- Option 1 -->
                 <td colspan="4">
-                  <div class="d-flex justify-center">
-                    <div
-                      v-if="item.option1Text === 'Wood'"
-                      class="d-flex justify-center align-center"
-                    >
-                      <VCheckbox
-                        v-model="item.checkedValue"
-                        :readonly="disableInpit()"
-                        :value="checkThePackagingCheckTrue"
-                      />
-                      Wood
-                    </div>
-                    <div
-                      v-else
-                      class="d-flex justify-center align-center"
-                    >
-                      <VCheckbox
-                        v-model="item.checkedValue"
-                        :readonly="disableInpit()"
-                        :value="checkThePackagingCheckTrue"
-                      />
-                      Yes
-                    </div>
+                  <div class="d-flex justify-center align-center">
+                    <VCheckbox
+                      v-model="item.checkedValue"
+                      :readonly="disableInpit()"
+                      :value="checkThePackagingCheckTrue"
+                    />
+                    {{ item.option1Text || 'Yes' }}
                   </div>
                 </td>
+
+                <!-- Option 2 -->
                 <td colspan="4">
-                  <div class="d-flex justify-center">
-                    <div
-                      v-if="item.option2Text === 'Plastic'"
-                      class="d-flex justify-center align-center"
-                    >
-                      <VCheckbox
-                        v-model="item.checkedValue"
-                        :readonly="disableInpit()"
-                        :value="false"
-                      />
-                      Plastic 
-                    </div>
-                    <div
-                      v-else
-                      class="d-flex justify-center align-center"
-                    >
-                      <VCheckbox
-                        v-model="item.checkedValue"
-                        :readonly="disableInpit()"
-                        :value="false"
-                      />
-                      NO 
-                    </div>
+                  <div class="d-flex justify-center align-center">
+                    <VCheckbox
+                      v-model="item.checkedValue"
+                      :readonly="disableInpit()"
+                      :value="false"
+                    />
+                    {{ item.option2Text || 'No' }}
                   </div>
                 </td>
               </tr>
-              <tr v-if="getShippingCheckSheetResult?.packagingChecks[3].checkedValue">
+
+              <!-- OTHER ROW -->
+              <tr
+                v-for="(item, index) in packagingChecksOtherTrue"
+                :key="'other-' + index"
+              >
                 <td colspan="12">
-                  <div>
-                    <VTextarea
-                      v-model="getShippingCheckSheetResult.reportCheckSheet.other"
-                      :readonly="disableInpit()"
-                      counter
-                      label="Other"
-                      placeholder="Enter Other"
-                    />
-                  </div>
+                  <VTextarea
+                    v-model="getShippingCheckSheetResult.reportCheckSheet.other"
+                    :readonly="disableInpit()"
+                    counter
+                    label="Other"
+                    placeholder="Enter Other"
+                  />
                 </td>
               </tr>
             </tbody>

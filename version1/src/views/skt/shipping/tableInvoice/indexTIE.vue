@@ -2305,10 +2305,16 @@ const handlePrintDPFCheckSheet = async type => {
   const countPage = ref(1)
 
   if (type === 'ShippingCheckSheetIBC2') {
-    //console.log('type.value', type)
+    console.log('countPage.value 1', countPage.value)
     handleDialogLoading("PRINT CHECK SHEETS")
     await callAPIPrintPDFChecksheet('ShippingCheckSheet', '', countPage.value++)
+    console.log('countPage.value 2', countPage.value)
     await callAPIPrintPDFChecksheet(type, '', countPage.value++)
+    console.log('countPage.value 3', countPage.value)
+
+    // if(countPage.value === 3){
+    //   await callAPIPrintPDFChecksheet(type, '', countPage.value)
+    // }
 
     const licensePlates = Array.isArray(licensePlate.value)
       ? licensePlate.value
@@ -2317,7 +2323,7 @@ const handlePrintDPFCheckSheet = async type => {
     for (const item of licensePlates) {
       await callAPIPrintPDFChecksheet('ShippingCheckSheetContainer', item.containerNo_LicPlNo, countPage.value++)
     }
-
+    console.log('countPage.value end', countPage.value)
     setTimeout(() => {
       isDialogLoadingVisible.value = false
     }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
