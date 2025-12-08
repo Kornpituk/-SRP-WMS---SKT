@@ -1334,6 +1334,7 @@ const saveShipmentPlan = async row => {
 
         if (trikerSaveDrft.value === false) {
           textAlertDialogFunction(alertWordConst.saveDraft, true)
+
           setTimeout(() => {
             location.reload()
           }, 500) // 500 มิลลิวินาที = 0.5 วินาที
@@ -5905,6 +5906,7 @@ const handleSavetruckOrder = async type => {
               >
                 <VBtn
                   variant="flat"
+                  :disabled="!activeShipMarkModel"
                   color="warning"
                   @click="printShipmentPDFBySoEId('ShipperMarkLabel')"
                 >
