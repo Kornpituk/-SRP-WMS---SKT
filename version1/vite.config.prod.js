@@ -12,6 +12,32 @@ import vuetify from 'vite-plugin-vuetify'
 // @ts-expect-error Known error: https://github.com/sxzz/unplugin-vue-macros/issues/257#issuecomment-1410752890
 import DefineOptions from 'unplugin-vue-define-options/vite'
 
+function getThaiTimestamp() {
+  const now = new Date()
+
+  const formatter = new Intl.DateTimeFormat("th-TH", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Bangkok",
+  })
+
+  const parts = formatter.formatToParts(now)
+
+  const get = type =>
+    parts.find(p => p.type === type)?.value || ""
+
+  // ตัวอย่างผลลัพธ์: 20251208_215830
+  return (
+    `${get("year")}${get("month")}${get("day")}_` +
+    `${get("hour")}.${get("minute")}.${get("second")}`
+  )
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -98,6 +124,7 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 5000,
+    outDir: `dist/SKT-Webapp.${getThaiTimestamp()}`,
   },
   optimizeDeps: {
     exclude: ['vuetify'],
