@@ -14,6 +14,7 @@ import permission from './permission'
 import expireDate from './expireDate'
 import minMax from './minMax'
 import performance from './performance'
+
 import skt from './skt'
 
 // export default [...dashboard, ...inventory, ...configuration, ...countStock  ]
