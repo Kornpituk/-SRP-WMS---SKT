@@ -5,6 +5,7 @@ const alertWordConst = {
   approve: 'APPROVE',
   submit: 'SUBMIT',
   cancel: 'CENCEL',
+  delete: 'DELETE',
   newPlan: 'NEWPLAN',
   generateLot: 'GENERATE LOT',
   plase: 'PLASE',

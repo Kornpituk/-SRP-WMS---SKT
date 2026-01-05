@@ -5,21 +5,59 @@ const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import { useStatusAndPermissions } from './composables/useStatusAndPermissions'
+import { useShipmentState } from './composables/useShipmentState'
+import { useShipmentOperations } from './composables/useShipmentOperations'
+import { useFileManagement } from './composables/useFileManagement'
+
+// =============== Utility Imports (Refactored) ===============
+import { dialogConfig } from './utils/dialogConfig'
+import {
+  convertDateFormat,
+  convertToISO8601,
+  formatDate,
+  formatDateSave,
+  formatDecimal,
+  formatToDate,
+  getCurrentDateFormatted,
+} from './utils/formatters'
+import {
+  checkBgTruck,
+  checkStatusInComplete,
+  colorStatusWithId,
+  getStatusIdByName,
+  itemsStatus,
+  redirectBasedOnStatus,
+} from './utils/statusHelpers'
+import { getOrDefault } from './utils/validators'
+
+// =============== Composable Imports (Level 2) ===============
 
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 const department = ref(userDataInfo.value.departmentName)
 const dataRowModel = ref()
 
-const { checkIfForBtnDeleteSOE } = useStatusAndPermissions()
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
 
   return !!(dataRow?.statusId === 206 || dataRow?.statusId === 207)
 
+  // else if (
+  //   department.value === 'Warehouse' &&
+  //   (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
+  // ) {
+  //   return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
+  // }
 
+  // else if (department.value === 'Warehouse' && whStatusId === 404) {
+  //   return true
+  // } else if (department.value === 'Logistic' && logStatusId === 504) {
+  //   return true
+  // } else if (department.value === 'Inspection' && inspStatusId === 604) {
+  //   return true
+  // } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
+  //   return true
+  // } 
  
 }
 
@@ -49,9 +87,6 @@ const disabledStatusWithOutAdminUser = (inspStatusId, logStatusId, salStatusId, 
   return false
 }
 
-const checkStatusInComplete = status => {
-  return !!(status === 207 || status === 206)
-}
 
 //------------------------------- alert --------------------------------------------
 
@@ -145,7 +180,7 @@ const openConfirmDialog = async (type, SoEId, productRow) => {
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
   }else if (type === 'delete') {
-    wordForSubmit.value = "DELETE SO Sale Order No: "+productRowModel.value.salesOrderNo
+    wordForSubmit.value = "DELETE"
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
   }else if (type === 'check sap invoice no') {
@@ -154,20 +189,16 @@ const openConfirmDialog = async (type, SoEId, productRow) => {
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
   }
+  console.log('selectedDataTables', selectedDataTables.value)
 
-  // console.log("select deta", selectedDataTables.value[0].soEtlLogDetailJournalID)
   confirmDialog2.value.openDialog()
 }
 
 function handleConfirmAction() {
-  
   if (wordForSubmit.value === 'submit') {
     submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
   } else if (wordForSubmit.value === 'SEND BACK') {
     submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
-
-  }else if (typeConfirmDialog.value === 'delete') {
-    submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
 
   }else if(wordForSubmit.value === 'Confirm sap invoice no'){
     saveShipmentPlan(rowData.value)
@@ -181,55 +212,37 @@ function handleCancel() {
   checkCancelBottonActive.value = true
 }
 
-//------------------------------ Formate --------------------------------------
-function formatDateSave(date) {
-  if (!date) return null // หากค่าว่างให้คืน null
 
-  const [day, month, year] = date.split('/') // แยกวันที่ตามรูปแบบ dd/mm/yyyy
-  if (!day || !month || !year) return null // ตรวจสอบว่าแยกข้อมูลสำเร็จ
+//----------------------------- Validate Btn Delete for logistic ---------------------------
+// const validateBtnDeleteForLogistic = ( lengthForSelect ) => {
+//   if (logStatusId === 504) {
+//     return true
+//   }
+  
+//   return false
+// }
 
-  // สร้างวันที่ในรูปแบบ yyyy-mm-dd
-  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-}
 
-function convertDateFormat(dateString) {
-  const parts = dateString.split("/") // แยกส่วนของวันที่
-  if (parts.length === 3) {
-    const [dd, mm, yyyy] = parts // จัดเรียงใหม่
-
-    return `${yyyy}-${mm}-${dd}`
-  }
-
-  return "Invalid Date Format" // กรณีรูปแบบไม่ถูกต้อง
-}
+//------------------------------ Formate (Now using utils/formatters.js) --------------------------------------
+// formatDateSave, convertDateFormat, getCurrentDateFormatted are imported from './utils/formatters'
 
 const dateCurrent = ref()
 
-function getCurrentDateFormatted() {
-  const today = new Date()
-  const day = String(today.getDate()).padStart(2, '0')
-  const month = String(today.getMonth() + 1).padStart(2, '0') // เดือนเริ่มที่ 0 ต้อง +1
-  const year = today.getFullYear()
-
-  dateCurrent.value = `${day}/${month}/${year}`
-
-  return `${day}/${month}/${year}`
-}
-
 onMounted(() => {
-  getCurrentDateFormatted()
+  dateCurrent.value = getCurrentDateFormatted()
 })
+
 
 //------------------------------ fetch data from API --------------------------------
 import {
   useDeleteFileFormService,
   useGetDataTruckOrderService,
   useGetFileFormService,
-  useGetSearchPlanService,
   useGetSearchPlanSapinvoicenoIsexistService,
+  useGetSearchPlanService,
   useGetSelectDataService,
   usePrintExportExcelService,
-  usePrintPDFService, 
+  usePrintPDFService,
   usePrintShipmentPDFService,
   usePrintTruckOrderFormPDFService,
   useSaveFileFormService,
@@ -333,11 +346,7 @@ const dialogRemark = ref('')
 
 const shipmentModel = ref([])
 
-const itemsTruck = [
-  'LEO',
-  'BTS',
-  'LCL',
-]
+// itemsTruck is now imported from './utils/dialogConfig'
 
 const shippingCondition = ref('')
 const shippingmark = ref('')
@@ -355,18 +364,7 @@ const disabledModel = ref(false)
 
 //------ function for dialog text area ----------------------------------------------
 
-// กำหนดค่าคอนฟิกสำหรับแต่ละ type
-const dialogConfig = {
-  ShipCon: { title: 'Shipping Condition', type: 'ShipCon', sapIn: '', btn: 'nonPrint' },
-  ShipMark: { title: 'Shipping Mark', type: 'ShipMark', sapIn: 'TIX2406001', btn: 'nonPrint' },
-  ShipMC: { title: 'Shipping Mark Con', type: 'ShipMC', sapIn: 'TIX2406001', btn: 'twinPrint' },
-  Lot: { title: 'Lot', type: 'Lot', sapIn: 'TIX2406001', btn: 'nonPrint' },
-  ShipMarkPrint: { title: 'Shipping Mark', type: 'ShipMark', sapIn: 'TIX240602', btn: 'print' },
-  ShipConPrint: { title: 'Shipping Condition', type: 'ShipCon', sapIn: 'TIX240602', btn: 'print' },
-  RemarkWH: { title: 'Remark WH', type: 'RemarkWH', sapIn: 'TIX2406001', btn: 'nonPrint' },
-  RemarkSAL: { title: 'Remark SAL', type: 'RemarkSAL', sapIn: 'TIX2406001', btn: 'nonPrint' },
-  RemarkLOG: { title: 'Remark LOG', type: 'RemarkLOG', sapIn: 'TIX2406001', btn: 'nonPrint' },
-}
+// dialogConfig is now imported from './utils/dialogConfig'
 
 // ฟังก์ชันสำหรับเปิด dialog
 const textAreaDialogActive = (type, data, index) => {
@@ -535,13 +533,60 @@ const { getSearchPlanSapInVResult,
   errorGetSearchPlanSapInV, 
   fetchSearchPlanSapInV } = useGetSearchPlanSapinvoicenoIsexistService()
 
-const searchPlanData = ref([])
-const isLoading = ref(false)
-const selectedDataTables = ref([])
+// =============== Initialize Composables (Level 2) ===============
+const {
+  searchPlanData,
+  isLoading,
+  currentPage,
+  itemsPerPage,
+  selectedItemsPerPage,
+  totalItems,
+  totalPages,
+  paginatedData,
+  selectedDataTables,
+  filterForSearchPlan,
+  etaDateModel,
+  etdDateModel,
+  sortColumn,
+  sortDirection,
+  saveHistoryFilter,
+  goToFirstPage,
+  goToPrevPage,
+  goToNextPage,
+  goToLastPage,
+} = useShipmentState()
 
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
-const selectedItemsPerPage = ref(10)
+const {
+  filesFromUploaderSO,
+  filesFromUploaderPO,
+  filesFromUploaderCOA,
+  filesFromUploaderTruckOrder,
+  filesFromUploaderDeliNote,
+  handleFileUpdatesSO,
+  handleFileUpdatesPO,
+  handleFileUpdatesCOA,
+  handleFileUpdatesTruckOrder,
+  handleFileUpdatesDeliNote,
+  resetAllFiles,
+} = useFileManagement()
+
+// These variables are now from composables (commented duplicates below)
+// const searchPlanData = ref([])
+// const isLoading = ref(false)
+// const selectedDataTables = ref([])
+// const currentPage = ref(1)
+// const itemsPerPage = ref(10)
+// const selectedItemsPerPage = ref(10)
+// ... etc
+
+
+// const searchPlanData = ref([])
+// const isLoading = ref(false)
+// const selectedDataTables = ref([])
+
+// const currentPage = ref(1)
+// const itemsPerPage = ref(10)
+// const selectedItemsPerPage = ref(10)
 
 watch(selectedItemsPerPage, newVal => {
   const newItems = newVal === 'All' ? totalItems.value : newVal
@@ -551,84 +596,10 @@ watch(selectedItemsPerPage, newVal => {
   }
 })
 
-const totalItems = computed(() => searchPlanData.value.length)
-
-// คำนวณจำนวนหน้าทั้งหมด
-const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value))
-
 watch(currentPage, newVal => {
   if (newVal < 1) currentPage.value = 1
   if (newVal > totalPages.value) currentPage.value = totalPages.value
 })
-
-const formatToDate = dateString => {
-  if (!dateString) return null // จัดการค่าว่าง
-  const date = new Date(dateString)
-  if (isNaN(date)) return null // จัดการค่าที่ไม่ใช่วันที่
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const year = date.getFullYear()
-
-  return `${day}/${month}/${year}`
-}
-
-const goToFirstPage = () => (currentPage.value = 1)
-const goToPrevPage = () => (currentPage.value = Math.max(1, currentPage.value - 1))
-const goToNextPage = () => (currentPage.value = Math.min(totalPages.value, currentPage.value + 1))
-const goToLastPage = () => (currentPage.value = totalPages.value)
-
-const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = currentPage.value * itemsPerPage.value
-
-  return searchPlanData.value.slice(start, end)
-
-})
-
-const sortColumn = ref('')
-const sortDirection = ref('')
-
-const itemsStatus = ([
-  { name: 'Cancel', id: 200, color: 'blue-grey' },
-  { name: 'ETL Failed!', id: 201, color: 'deep-orange' },
-  { name: 'Waiting for Shipping', id: 202, color: 'pink' },
-  { name: 'Draft Shipping', id: 203, color: 'amber' },
-
-  { name: 'In Submitting', id: 204, color: 'pink' },
-  { name: 'Waiting for WH APVL', id: 205, color: 'brown' },
-  { name: 'Shipping Rejected', id: 206, color: 'red' },
-  { name: 'Shipping Completed', id: 207, color: 'green' },
-
-  { name: 'All', id: 0, color: 'grey' },
-
-])
-
-const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
-const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
-
-const filterForSearchPlan = ref({
-  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
-  ETA: etaDateModel.value || '',
-  ETD: etdDateModel.value || '',
-  ETDDateFrom: '',
-  ETDDateTo: '',
-  SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
-  PayerNameSearch: sessionStorage.getItem("PayerNameSearchProductionFilter") || '',
-  ItemNameSearch: sessionStorage.getItem("ItemNameSearchProductionFilter") || '',
-  LotSearch: sessionStorage.getItem("LotSearchProductionFilter") || '',
-  SortColumn: '',
-  SortDirection: '',
-})
-
-const saveHistoryFilter = () => {
-  sessionStorage.setItem("StatusIdSearchProductionFilter", filterForSearchPlan.value.StatusId || ''),
-  sessionStorage.setItem("ETASearchProductionFilter", etaDateModel.value) || '',
-  sessionStorage.setItem("ETDSearchProductionFilter", etdDateModel.value) || '',
-  sessionStorage.setItem("SalesOrderNoSearchProductionFilter", filterForSearchPlan.value.SalesOrderNoSearch) || '',
-  sessionStorage.setItem("PayerNameSearchProductionFilter", filterForSearchPlan.value.PayerNameSearch) || '',
-  sessionStorage.setItem("LotSearchProductionFilter", filterForSearchPlan.value.LotSearch) || '',
-  sessionStorage.setItem("ItemNameSearchProductionFilter", filterForSearchPlan.value.ItemNameSearch) || ''
-}
 
 // ฟังก์ชันสำหรับสลับสถานะของไอคอนแต่ละตัว
 const toggleDirection = async key => {
@@ -642,12 +613,6 @@ const toggleDirection = async key => {
 }
 
 //- เปรียบเทียบ status text = id
-function getStatusIdByName(statusName) {
-  const matchedItem = itemsStatus.find(item => item.name === statusName)
-
-  return matchedItem ? matchedItem.id : '' // คืนค่า id หรือ null หากไม่พบ
-}
-
 const disabledBtnExport = ref(false)
 
 watchEffect(() => {
@@ -803,12 +768,6 @@ const viewAllData = () => {
 }
 
 const typeFileInput = ref('hideInput')
-
-const filesFromUploaderSO = ref([])
-const filesFromUploaderPO = ref([])
-const filesFromUploaderCOA = ref([])
-const filesFromUploaderTruckOrder = ref([])
-const filesFromUploaderDeliNote = ref([])
 
 const typeNameFileInput = ref('')
 
@@ -978,29 +937,6 @@ const showFileFormByTypeAndSoId = async (type, soId) => {
   }
 }
 
-// showFileFormByTypeAndSoId('GetSo', '152')
-
-const handleFileUpdatesSO = updatedFiles => {
-  filesFromUploaderSO.value = updatedFiles
-
-}
-
-const handleFileUpdatesPO = updatedFiles => {
-  filesFromUploaderPO.value = updatedFiles
-
-}
-
-const handleFileUpdatesCOA = updatedFiles => {
-  filesFromUploaderCOA.value = updatedFiles
-}
-
-const handleFileUpdatesTruckOrder = updatedFiles => {
-  filesFromUploaderTruckOrder.value = updatedFiles
-}
-
-const handleFileUpdatesDeliNote = updatedFiles => {
-  filesFromUploaderDeliNote.value = updatedFiles
-}
 
 
 //------------------------------- Function save Search plan -----------------
@@ -1016,7 +952,6 @@ const mapRequestData = data => ({
   shipperMark: getOrDefault(data.shipperMark, ""),
   shipperConditions: getOrDefault(data.shipperConditions, ""),
   shippingEndUser: getOrDefault(data.shippingEndUser, ""),
-  shipperLocation: getOrDefault(data.shipperLocation, ""),
   shippingMarkActive: getOrDefault(data.shippingMarkActive, ""),
   freightForwarder: getOrDefault(data.freightForwarder, ""),
   carrier: getOrDefault(data.carrier, ""),
@@ -1032,7 +967,6 @@ const mapRequestData = data => ({
   loG_Remarks: getOrDefault(data.loG_Remarks, ""),
 })
 
-const getOrDefault = (value, defaultValue) => value ?? defaultValue
 
 const saveDraftLoading = ref(false)
 const saveDraftLoadingSOERow = ref('')
@@ -1086,7 +1020,6 @@ const handleSaveRowShipmentPlan = async (row, type) => {
   }
 
   isDialogSapInV.value = true
-
 
 }
 
@@ -1230,6 +1163,7 @@ const saveShipmentPlan = async row => {
   }
 
 
+  //console.log("submitShipmentPlanBySoEId start. save draft", trikerSaveDrft.value)
   if (row.statusId === 207) {
     //console.log('Saved Shipment plan if', row.csLfStatusId)
     saveDraftLoading.value = false
@@ -1345,10 +1279,12 @@ const submitLoadingSOERow = ref('')
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
+  console.log('submitShipmentPlanBySoEId start!!', type, soEtlLogDetailJournalID)
   trikerSaveDrft.value = true
   submitLoadingSOERow.value = soEtlLogDetailJournalID || '0'
 
-  if (type !== 'approve' && type !== 'reject' && type !== 'back' && type !== 'delete') {
+  if (type !== 'approve' && type !== 'reject' && type !== 'back') {
+    console.log('submitShipmentPlanBySoEId start!! 1.1', type)
 
     const saveDraftRes = await saveShipmentPlan(productRowModel.value)
     if (!saveDraftRes) {
@@ -1358,15 +1294,19 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
   }
 
   try {
+    console.log('submitShipmentPlanBySoEId start!!3.1')
     if (type === 'submit') {
 
     } else if (type === 'approve' || type === 'reject') {
+      console.log('submitShipmentPlanBySoEId start!! 3')
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
-    } else if (type === 'back' ) {
+      console.log('submitShipmentPlanBySoEId start!! 2', selectedDataTables.value)
+    } else if (type === 'back') {
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
-    } 
+      //console.log('submitShipmentPlanBySoEId back !! 3')
+    }
 
     if (!statusCommnetValue.value && type === 'reject') {
       textAlertDialogFunction('Please enter Reject Comment.', false)
@@ -1374,8 +1314,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       return
     }
 
-
-    const result = await submitShipmentPlan(urlApi.value,
+    const result = submitShipmentPlan(urlApi.value,
       type,
       whereHouse,
       accessTokenAtStore,
@@ -1383,8 +1322,9 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       statusCommnetValue.value,
     )
 
-    if (result) {
-      console.log("result", result)
+    //console.log('submitShipmentPlanBySoEId start!! 3')
+
+    if (submitShipmentPlanResult.value || result) {
       if (type === 'submit') {
         textAlertDialogFunction(alertWordConst.submit, true)
         setTimeout(() => {
@@ -1405,20 +1345,9 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      }else if (type === 'delete') {
-        if(errorSubmitShipmentPlan.value){
-          textAlertDialogFunction(alertWordConst.delete, false)
-          setTimeout(() => {
-            location.reload()
-          }, 500) // 10000 มิลลิวินาที = 10 วินาที
-        }else{
-          textAlertDialogFunction(alertWordConst.delete, true)
-          setTimeout(() => {
-            location.reload()
-          }, 500) // 10000 มิลลิวินาที = 10 วินาที
-        }
-        
       }
+
+      //console.log('submitShipmentPlanBySoEId start!! 4')
 
     } else {
       if (type === 'submit') {
@@ -1440,12 +1369,6 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         textAlertDialogFunction(alertWordConst.sendBack, false)
         setTimeout(() => {
           location.reload()
-        }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      } else if (type === 'delete') {
-        console.log("errorSubmitShipmentPlan.value", errorSubmitShipmentPlan.value)
-        textAlertDialogFunction(errorSubmitShipmentPlan.value, false)
-        setTimeout(() => {
-          // location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
     }
@@ -1497,23 +1420,6 @@ import { useGetCOAFormController } from '@/utilities/format'
 
 const { formatNumber } = useGetCOAFormController()
 
-const formatDecimal = decimal => {
-  const configsShowDigit = localStorage.getItem('configsShowDigit')
-  if (configsShowDigit == 'true') {
-    return Math.ceil(decimal)
-  } else {
-    return decimal
-  }
-}
-
-const formatDate = date => {
-  const d = new Date(date)
-  const day = d.getDate().toString().padStart(2, '0')
-  const month = (d.getMonth() + 1).toString().padStart(2, '0')
-  const year = d.getFullYear()
-
-  return `${day}/${month}/${year}`
-}
 
 //------------------------ Dialog Image ----------------------------
 const isDialogImageVisible = ref(false)
@@ -1550,85 +1456,7 @@ const showExpansionDialog = ref(false)
 
 const colorStatus = ref('grey')
 
-const colorStatusWithId = id => {
-  switch (id) {
-  case 200:
-    return { color: 'grey', message: 'orange-darken-1', text: 'Cancel', bgColor: '#E0E0E0' }
-  case 201:
-    return { color: 'deep-orange', message: 'green', text: 'ETL Failed!', bgColor: '#EF9A9A' }
-  case 202:
-    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Shipping', bgColor: '#FCE4EC' }
-  case 203:
-    return { color: 'amber', message: 'purple', text: 'Draft Shipping', bgColor: '#FFC107' }
-
-  case 302:
-    return { color: 'pink', message: 'brown', text: 'Waiting for SAL Draft', bgColor: '#EFEBE9' }
-  case 303:
-    return { color: 'amber', message: 'green', text: 'SAL Draft Shipping', bgColor: '#E8F5E9' }
-  case 304:
-    return { color: 'teal', message: 'red', text: 'SAL Submitted', bgColor: '#FFEBEE' }
-
-  case 402:
-    return { color: 'pink', message: 'red', text: 'Waiting for WH Draft', bgColor: '#FFEBEE' }
-  case 403:
-    return { color: 'amber', message: 'red', text: 'WH Draft Shipping', bgColor: '#FFEBEE' }
-  case 404:
-    return { color: 'teal', message: 'red', text: 'WH Submitted', bgColor: '#FFEBEE' }
-
-  case 502:
-    return { color: 'pink', message: 'red', text: 'Waiting FOR LOG Draft', bgColor: '#FFEBEE' }
-  case 503:
-    return { color: 'amber', message: 'red', text: 'LOG Draft Shipping', bgColor: '#FFEBEE' }
-  case 504:
-    return { color: 'teal', message: 'red', text: 'LOG Submitted', bgColor: '#FFEBEE' }
-
-  case 602:
-    return { color: 'pink', message: 'red', text: 'Waiting FOR INSP Draft', bgColor: '#FFEBEE' }
-  case 603:
-    return { color: 'amber', message: 'red', text: 'INSP Draft Shipping', bgColor: '#FFEBEE' }
-  case 604:
-    return { color: 'teal', message: 'red', text: 'INSP Submitted', bgColor: '#FFEBEE' }
-
-  case 1002:
-    return { color: 'pink', message: 'red', text: 'Waiting for CS Draft', bgColor: '#FFEBEE' }
-  case 1003:
-    return { color: 'amber', message: 'red', text: 'CS1 Draft Shipping', bgColor: '#FFEBEE' }
-  case 1004:
-    return { color: 'amber', message: 'red', text: 'CS2 Draft Shipping', bgColor: '#FFEBEE' }
-  case 1005:
-    return { color: 'teal', message: 'red', text: 'CS Submitted', bgColor: '#FFEBEE' }
-
-  case 1102:
-    return { color: 'pink', message: 'red', text: 'Waiting for Draft', bgColor: '#FFEBEE' }
-  case 1103:
-    return { color: 'amber', message: 'red', text: 'Draft Shipping LF', bgColor: '#FFEBEE' }
-  case 1104:
-    return { color: 'amber', message: 'red', text: 'Waiting for Lorry/Flex APVL', bgColor: '#FFEBEE' }
-  case 1105:
-    return { color: 'teal', message: 'red', text: 'Lorry/Flex Submitted', bgColor: '#FFEBEE' }
-
-  case 204:
-    return { color: 'pink', message: 'red', text: 'In Submitting (SWL )', bgColor: '#FFEBEE' }
-  case 205:
-    return { color: 'brown', message: 'red', text: 'Waiting for WH APVL', bgColor: '#FFEBEE' }
-  case 206:
-    return { color: 'red', message: 'red', text: 'Shipping Rejected', bgColor: '#FFEBEE' }
-  case 207:
-    return { color: 'green', message: 'red', text: 'Shipping Completed', bgColor: '#FFEBEE' }
-  default:
-    return { color: 'grey', message: 'grey', text: '', bgColor: '#FFF3E0' }
-  }
-}
-
 const statuses = ['Approve', 'Reject', 'Back to Edit']
-
-const checkBgTruck = truck => {
-  if (truck === 'BTS') {
-    return 'bg-red-lighten-4'
-  } else if (truck === 'LCL') {
-    return 'bg-warning'
-  }
-}
 
 //----------------------------------------- fetch data ----------------------------------
 //---- select data --------------------------------
@@ -1926,63 +1754,6 @@ const imgDialogPDF = ref('')
 const imgDialogPng = ref('')
 
 //------------------------------------------ Check Sheet To Page Resale -----------------------
-async function redirectBasedOnStatus(product) {
-  // ดึงเฉพาะตัวเลขหลักแรกของ status
-  const mainStatus = Math.floor(product.statusId / 100)
-
-  // กำหนดประเภทตามเลขหลักแรกของ status
-  const statusMapping = {
-    1: "Drum",
-    2: "Drum",
-    3: "Drum",
-    4: "Drum",
-    0: "Drum",
-    8: "Drum",
-    9: "Drum",
-    5: "IBC",
-    6: "Flexi",
-    7: "Lorry",
-    10: "Flexi",
-  }
-
-  const mainCheckSheetTypeName = (product.checkSheetTypeID)
-
-
-
-  const checkSheetTypeNameMapping = {
-    0: '',
-    1: 'Drum',
-    2: 'Drum',
-    3: 'Flexi',
-    4: 'Flexi',
-
-  }
-
-  // ตรวจสอบว่า status มีใน mapping หรือไม่
-  const subPath = checkSheetTypeNameMapping[mainCheckSheetTypeName] || "unknown-status"
-
-  // ต่อ URL เดิมด้วย path ใหม่
-  const currentPath = window.location.pathname // ดึง path ปัจจุบัน
-  const newPath = `${currentPath}/${subPath}` // ต่อท้าย subPath
-
-  const params = new URLSearchParams({
-    journalIdParams: product.journalID,
-    SoEtlLogDetailJournalIDParams: product.soEtlLogDetailJournalID,
-    statusParams: product.statusId,
-    salesOrderNoParams: product.salesOrderNo,
-    itemCodeParams: product.itemCode,
-    checkSheetTypeNameParams: product.checkSheetTypeName,
-    csLfStatusIdParams: product.csLfStatusId,
-  }).toString()
-
-  sessionStorage.setItem('productDataSession', JSON.stringify(product))
-
-  // 🔥 Redirect ไปยัง URL ใหม่พร้อม Query
-  const finalPath = `${newPath}`
-
-  //console.log(`Redirecting to: ${finalPath}`)
-  window.location.href = finalPath
-}
 
 const actionIsDialogVisible = ref(false)
 const prouctRowAction = ref()
@@ -2404,23 +2175,6 @@ const paramsTruckOrder = ref({
 
 
 //------------------- formate truck date
-
-function convertToISO8601(dateStr) {
-  // แยกค่าจากรูปแบบ "DD/MM/YYYY"
-  const [day, month, year] = dateStr.split('/')
-  const date = new Date(`${year}-${month}-${day}T00:00:00.000Z`)
-
-  return date.toISOString() || ''
-}
-
-function convertToDDMMYYYY(isoDateStr) {
-  const date = new Date(isoDateStr)
-  const day = String(date.getUTCDate()).padStart(2, '0')
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-  const year = date.getUTCFullYear()
-
-  return `${day}/${month}/${year}` || ''
-}
 
 const { getTruckOrderDataResult,
   errorGetTruckOrderData,
@@ -3681,13 +3435,24 @@ const handleSavetruckOrder = async type => {
             </VBtn>
 
             <VBtn
-              v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible "
+              v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="purple-accent-4"
               @click="openConfirmDialog('back', '001')"
             >
               <span style="font-size: 12px;">Send Back</span>
+            </VBtn>
+
+            <VBtn
+              v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible"
+              :disabled="selectedDataTables.length < 1"
+              class="mx-2"
+              color="red"
+              variant="outlined"
+              @click="openConfirmDialog('delete', '001')"
+            >
+              <span style="font-size: 12px;">Delete SO</span>
             </VBtn>
 
             <VBtn
@@ -3756,7 +3521,6 @@ const handleSavetruckOrder = async type => {
           <thead class="">
             <tr>
               <th
-                v-if="false"
                 style="width: 60px;"
                 class="sticky-column"
               >
@@ -3767,10 +3531,6 @@ const handleSavetruckOrder = async type => {
                   @click="toggleSelectAll"
                 />
               </th>
-              <th
-                style="width: 60px;"
-                class="sticky-column"
-              />
               <th
                 scope="row"
                 class="sticky-column text-center px-1"
@@ -4190,7 +3950,7 @@ const handleSavetruckOrder = async type => {
             >
               <td
                 style="min-width: 60px;"
-                class="sticky-columnBody cursor-pointer flex-d justify-center"
+                class="sticky-columnBody cursor-pointer"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -4203,33 +3963,11 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <div class="cell-center">
-                  <VCheckboxBtn
-                    v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023'
-                      || checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00025'
-                      || checkStatusBeforeAvtion(product.statusId) && canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
-                    v-model="selectedDataTables"
-                    :value="product"
-                  />
-
-                  <VBtn
-                    v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible && checkIfForBtnDeleteSOE(product)"
-                    color="red"
-                    variant="outlined"
-                    @click="openConfirmDialog('delete', product.soEtlLogDetailJournalID, product)"
-                  >
-                    <span style="font-size: 12px;">
-                      <VIcon icon="ri-delete-bin-line" /> SO
-                    </span>
-
-                    <VTooltip
-                      activator="parent"
-                      location="end"
-                    >
-                      Delete SO
-                    </VTooltip>
-                  </VBtn>
-                </div>
+                <VCheckboxBtn
+                  v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023' || checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00025' || checkStatusBeforeAvtion(product.statusId) && canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
+                  v-model="selectedDataTables"
+                  :value="product"
+                />
               </td>
               <td
                 class="sticky-columnBody cursor-pointer"
@@ -4512,8 +4250,8 @@ const handleSavetruckOrder = async type => {
                 <VTextField
                   v-model="product.shipperLocation"
                   density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canVisible || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   class="text-field"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   style=" min-width: 150px; font-size: 12px !important;"
                 >
                   <template #label>
@@ -4728,7 +4466,7 @@ const handleSavetruckOrder = async type => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="COA"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_COA').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) || product.catId !== '03'"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_COA').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.getCOAFileData"
                     file-name="COA"
@@ -5997,7 +5735,7 @@ const handleSavetruckOrder = async type => {
     asdM
   </VBtn>
 
-  <!-- Dialog Print -->
+  <!-- Dialog -->
   <VDialog
     v-model="isDialogLoadingVisible"
     width="700"

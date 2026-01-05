@@ -240,7 +240,7 @@ export const useSubmitShipmentPlanService = () => {
     try {
       errorSubmitShipmentPlan.value = null
 
-      //console.log('submitShipmentPlan...')
+      // console.log('submitShipmentPlan...')
   
       const result = await shipmentPlanRepository.submitShipmentPlan(urlApi, form, whereHouse, accessToke, soeId, comment)
         
@@ -253,7 +253,6 @@ export const useSubmitShipmentPlanService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      //console.log('Error in submitShipmentPlan:', error)
       errorSubmitShipmentPlan.value = error.message
     }
   }

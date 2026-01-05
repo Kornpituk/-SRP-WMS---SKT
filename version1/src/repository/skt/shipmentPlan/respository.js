@@ -228,7 +228,7 @@ export const shipmentPlanRepository = {
     //console.log('submitShipmentPlan repo...')
     try {
       let response
-      if(form === 'approve' || form === 'submit' || form === 'back'){
+      if(form === 'approve' || form === 'submit' || form === 'back'|| form === 'delete'){
         response = await axios.post(`${urlApi}/api/v1/ShipmentPlan/${form}/${edId}`, {}, {
           headers: {
             'accept': '*/*',

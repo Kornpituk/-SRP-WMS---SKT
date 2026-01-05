@@ -704,8 +704,6 @@ watchEffect(() => {
   //console.log('checkValueFilter', filterForSearchPlan.valu)
 })
 
-
-
 const searchShipmentPlan = async () => {
   isLoading.value = true
 
@@ -2033,7 +2031,6 @@ const refeshPage = () => {
 }
 
 //----------------------------------------- Print Section -------------------------------
-
 
 const { printShipmentPDFResult, errorPrintShipmentPDF, printShipmentPDF } = usePrintShipmentPDFService()
 const loadingPrint = ref(false)
@@ -3670,12 +3667,6 @@ const handleSavetruckOrder = async type => {
   <!-- Btn Approve / PROD APPROVE / NEW BATCH -->
   <div class="my-2">
     <VCard>
-      <VBtn
-        v-if="false"
-        @click="showText"
-      >
-        asdasd
-      </VBtn>
       <VCardText class="pa-2">
         <VRow>
           <VCol cols="10">
@@ -3724,6 +3715,17 @@ const handleSavetruckOrder = async type => {
               @click="openConfirmDialog('back', '001')"
             >
               <span style="font-size: 12px;">Send Back</span>
+            </VBtn>
+
+            <VBtn
+              v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible"
+              :disabled="selectedDataTables.length < 1"
+              class="mx-2"
+              color="red"
+              variant="outlined"
+              @click="openConfirmDialog('back', '001')"
+            >
+              <span style="font-size: 12px;">Delete SO</span>
             </VBtn>
 
             <VBtn
@@ -4518,7 +4520,25 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                {{ (product.shipperLocation) }}
+                <VTextField
+                  v-model="product.shipperLocation"
+                  density="compact"
+                  class="text-field"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  style=" min-width: 150px; font-size: 12px !important;"
+                >
+                  <template #label>
+                    <span style="font-size: 12px;">Shipper Location</span>
+                  </template>
+                </VTextField>
+                <VTooltip
+                  v-if="product.shipperLocation"
+                  activator="parent"
+                  location="end"
+                  open-on-click
+                >
+                  {{ product.shipperLocation }}
+                </VTooltip>
               </td>
 
               <!-- 👉 Shipping Condition -->
@@ -5624,32 +5644,6 @@ const handleSavetruckOrder = async type => {
                     </VList>
                   </VMenu>
                 </VBtn>
-              </td>
-            </tr>
-          </tbody>
-          <!-- Total -->
-          <tbody v-if="false">
-            <tr>
-              <td class="bg-green-lighten-5" />
-              <td class="bg-green-lighten-5 px-1">
-                <span style="font-size: 12px;">TOTAL</span>
-              </td>
-              <td class="bg-green-lighten-5" />
-              <td
-                v-if="accountAmin || accountViewerKK || accountINSP || accountSALLOG || accountWH || accountAll"
-                class="bg-green-lighten-5 px-1"
-              >
-                <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
-              </td>
-              <td
-                v-if="accountAmin || accountViewerKK || accountAll"
-                class="bg-green-lighten-5"
-              />
-              <td
-                v-if="accountAmin || accountViewerKK || accountSALLOG || accountWH || accountAll"
-                class="bg-green-lighten-5"
-              >
-                <span style="font-size: 12px;">{{ mockData.length }} INVOICES</span>
               </td>
             </tr>
           </tbody>

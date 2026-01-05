@@ -110,6 +110,13 @@
   inset-inline-start: 100px;
 }
 
+.cell-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 100%;
+}
+
 .sticky-action {
   position: sticky;
   z-index: 2; /* ให้เด่นกว่าคอลัมน์อื่น */
