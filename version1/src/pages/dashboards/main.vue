@@ -10,6 +10,8 @@ const accessToken = localStorage.getItem('accessTokenAtStore')
 import { urlApi } from '@/api'
 import axios from '@axios'
 
+import { useDataMoveStore, useDataNonMoveStore } from '@/pages/dashboards/data/move/data'
+
 const whereRoomNameSet = ref('')
 
 const itemsWarehouse = []
@@ -199,6 +201,8 @@ const clickDialogProductStore = () => {
 //------------------------------------------------------ Top Product -----------
 const isDialogTopProductVisible = ref(false)
 
+
+
 //- -------------------------------------- Data ----------------------------------------------------------
 const dataset1 = [
   {
@@ -213,6 +217,181 @@ const dataset2 = [
     item: 350,
   },
 ]
+
+const dayMove = ref(30) // หรือรับจาก props/refs ก็ได้
+const dayNonMove = ref(30) // หรือรับจาก props/refs ก็ได้
+
+const dataMoveStore = useDataMoveStore()
+const dataMoveTopStore = useDataMoveStore()
+
+const dataNonMoveStore = useDataNonMoveStore()
+const dataNonNonMoveStore = useDataNonMoveStore()
+
+const reveresDaysMove = ref('last 30 days')
+const reverseDaysNonMove = ref('last 30 days')
+
+
+const calDateReverse30Days = computed(() => {
+  const [dayStr, monthStr, yearStr] = formattedDateTime.value.split('/')
+  const date = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)) // ✅ เดือน -1 เพราะ JavaScript นับเดือนจาก 0
+
+  date.setDate(date.getDate() - dayMove.value) // ลบ 30 วัน
+
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+
+  return `${day}/${month}/${year}`
+})
+
+const calDateReverse30DaysNonMove = computed(() => {
+  const [dayStr, monthStr, yearStr] = formattedDateTime.value.split('/')
+  const date = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)) // ✅ เดือน -1 เพราะ JavaScript นับเดือนจาก 0
+
+  date.setDate(date.getDate() - dayNonMove.value) // ลบ 30 วัน
+
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+
+  return `${day}/${month}/${year}`
+})
+
+const typeDataMove = [
+  { title: 'last 30 days', value: 30 }, 
+  { title: 'last 15 days', value: 15 }, 
+  { title: 'last 7 days', value: 7 },
+  { title: 'Today', value: 1 },
+]
+
+function handleSelectDay(value, type, title) {
+  if(type === 'move'){
+    dayMove.value = value
+    reveresDaysMove.value = title
+  }else{
+    dayNonMove.value = value
+    reverseDaysNonMove.value = title
+  }
+  
+}
+
+const typeDataNonMove = [
+  { title: 'last 30 days', value: 30 }, 
+  { title: 'last 15 days', value: 15 }, 
+  { title: 'last 7 days', value: 7 },
+  { title: 'Today', value: 1 },
+]
+
+watchEffect(() => {
+  const accessToken = localStorage.getItem('accessTokenAtStore')
+  const whereHouse = localStorage.getItem('whereHouseName')
+  
+
+  dataMoveStore.fetchDataMove(dayMove.value, accessToken, whereHouse, 'MovingDayBack')
+  dataMoveTopStore.fetchDataMove(dayMove.value, accessToken, whereHouse, 'MovingDayBack')
+  dataNonMoveStore.fetchDataNonMove(dayNonMove.value, accessToken, whereHouse, 'NonMovingDayBack')
+  dataNonNonMoveStore.fetchDataNonMove(dayNonMove.value, accessToken, whereHouse, 'NonMovingDayBack')
+})
+
+const charDataItemMove = ref()
+const charDataItemNonMove = ref()
+
+// แปลงข้อมูลเป็น chartData
+const chartDataMove = computed(() => {
+  const rawData = dataMoveStore.dataMove?.map(cat => {
+    // const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
+    const totalQty = cat.products
+    
+    return {
+      category: cat.categoryName,
+      qty: totalQty,
+    }
+  }) || []
+
+  // เรียงจากมากไปน้อย
+  const sorted = rawData.sort((a, b) => b.qty - a.qty)
+
+  const categories = sorted.map(item => item.category)
+  const series = sorted.map(item => item.qty)
+
+  return {
+    categories,
+    series,
+  }
+})
+
+
+console.log('chartDataMove', chartDataMove)
+
+const chartDataTopMove = computed(() => {
+  if (!dataMoveTopStore.dataMove) return { groupedItems: [] }
+
+  const groupedItems = dataMoveTopStore.dataMove.map(cat => ({
+    categoryName: cat.categoryName,
+    catId: cat.catId,
+    items: [...(cat.items || [])].sort((a, b) => (b.qty || 0) - (a.qty || 0)),
+  }))
+
+  // เรียง category ตามจำนวน products ทั้งหมด
+  groupedItems.sort((a, b) => 
+    (b.items.reduce((sum, item) => sum + (item.qty || 0), 0)) - 
+    (a.items.reduce((sum, item) => sum + (item.qty || 0), 0)),
+  )
+
+  return {
+    groupedItems,
+  }
+})
+
+console.log('chartDataTopMove', chartDataTopMove.value.groupedItems)
+
+const chartDataNonMove = computed(() => {
+  const rawData = dataNonMoveStore.dataNonMove?.map(cat => {
+    // const totalQty = cat.items.reduce((sum, item) => sum + item.qty, 0)
+    const totalQty = cat.products
+    
+    return {
+      category: cat.categoryName,
+      qty: totalQty,
+    }
+  }) || []
+
+  // เรียงจากมากไปน้อย
+  const sorted = rawData.sort((a, b) => b.qty - a.qty)
+
+  const categories = sorted.map(item => item.category)
+  const series = sorted.map(item => item.qty)
+
+
+  return {
+    categories,
+    series,
+  }
+})
+
+console.log('chartDataNonMove', chartDataNonMove)
+
+const chartDataTopNonMove = computed(() => {
+  if (!dataNonNonMoveStore.dataNonMove) return { groupedItems: [] }
+
+  const groupedItems = dataNonNonMoveStore.dataNonMove.map(cat => ({
+    categoryName: cat.categoryName,
+    catId: cat.catId,
+    items: [...(cat.items || [])].sort((a, b) => (b.qty || 0) - (a.qty || 0)),
+  }))
+
+  // เรียง category ตามจำนวน products ทั้งหมด
+  groupedItems.sort((a, b) => 
+    (b.items.reduce((sum, item) => sum + (item.qty || 0), 0)) - 
+    (a.items.reduce((sum, item) => sum + (item.qty || 0), 0)),
+  )
+
+  return {
+    groupedItems,
+  }
+})
+
+console.log('chartDataTopNonMove', chartDataTopNonMove.value.groupedItems)
 
 //-------------------------------------------------- Date Data ---------------------------------------------------
 import AppDataTimePickerAllWay from '@/views/dashboard/main/dateData/appTImePicker/appDatatimePicker.vue'
@@ -406,7 +585,7 @@ const summaryAll = (switchAll, obj1, obj2) => {
   if(switchAll === 1){
     complateAll.value = mergedObj.receivedPo + mergedObj.tranferIn + mergedObj.receivedOther + mergedObj.tranferOut + mergedObj.pickingDelivery + mergedObj.pickingWriteOff
   } else if(switchAll === 2){
-    awaitAll.value = mergedObj.receivedPo + mergedObj.tranferIn + mergedObj.receivedOther + mergedObj.tranferOut + mergedObj.pickingDelivery + mergedObj.pickingWriteOff
+    awaitAll.value = mergedObj.receivedPo + mergedObj.tranferIn + mergedObj.tranferOut + mergedObj.pickingDelivery 
   }
   
 }
@@ -417,7 +596,7 @@ const getDataForAPI = async () => {
       headers: {
         'accept': '*/*',
         'Content-Type': 'application/json',
-        'x-location': `${whereHouse}`,
+        'x-location': whereHouse,
         Authorization: `Bearer ${accessTokenAtStore}`,
       },
 
@@ -437,8 +616,6 @@ const getDataForAPI = async () => {
     summaryAll(1, dateSetReceivedSuccess.value, dateSetPickingSuccess.value)
     summaryAll(2, dateSetReceivedPending.value, dateSetPickingPending.value)
 
-    // complateAll.vale = dateSetReceivedSuccess.value + dateSetPickingSuccess.value
-    // awaitAll.value = dateSetReceivedPending.value + dateSetPickingPending.value
 
     console.log('response.data', response.data)
     console.log('complateAll', complateAll.value, 'awaitAll', awaitAll.value)
@@ -448,7 +625,7 @@ const getDataForAPI = async () => {
   }
 }
 
-watchEffect(() => {
+watch(() => {
   getDataForAPI()
 
 })
@@ -528,79 +705,68 @@ onMounted(() => {
     <VCol cols="12">
       <!-- Row 1 WareHouse & Date -->
       <div>
-        <VRow class="match-height">
-          <!-- Select Week -->
+        <VRow class="align-center justify-space-between">
+          <!-- ซ้าย: Dashboard Today + วันที่และเวลา -->
           <VCol
             cols="12"
-            lg="8"
-            sm="6"
+            lg="10"
+            sm="9"
           >
-            <span style="font-size: 25px; font-weight: bolder;">{{ $t('Dashboard Overview') }}</span>
+            <VRow class="align-center">
+              <!-- หัวข้อ -->
+              <VCol
+                cols="auto"
+                class="pa-2"
+              >
+                <span class="text-h5 font-weight-bold">{{ $t('Dashboard Today') }}</span>
+              </VCol>
+
+              <!-- วันที่และเวลาในการ์ด -->
+              <VCol
+                cols="auto"
+                class="pa-2"
+              >
+                <VCard
+                  class="pa-2 d-flex align-center"
+                  style="min-width: 260px;"
+                  elevation="2"
+                >
+                  <VIcon
+                    icon="ri-calendar-2-fill"
+                    class="me-2"
+                    size="20"
+                  />
+                  <span class="me-4">{{ formattedDateTime }}</span>
+
+                  <VIcon
+                    icon="ri-time-line"
+                    class="me-2"
+                    size="20"
+                  />
+                  <span>{{ time }}</span>
+                </VCard>
+              </VCol>
+            </VRow>
           </VCol>
+
+          <!-- ขวาสุด: เลือกคลัง -->
           <VCol
             cols="12"
             lg="2"
             sm="3"
-            class="px-2"
+            class="pa-1"
           >
-            <VCard>
+            <VCard class="pa-0">
               <VCardText class="pa-2">
-                <VRow>
-                  <VCol cols="12">
-                    <VAutocomplete
-                      v-model="wareHouseSection"
-                      :label="$t('Warehouse')"
-                      density="compact"
-                      placeholder="Select State"
-                      :items="itemsWarehouseGetForAPI"
-                      item-title="name"
-                      item-value="id"
-                    />
-                  </VCol>
-                </VRow>
-              </VCardText>
-            </VCard>
-          </VCol>
-          <VCol
-            cols="12"
-            lg="2"
-            sm="3"
-            class="px-2"
-          >
-            <VCard class="d-flex justify-center align-center">
-              <VCardText class="pa-2 ">
-                <div>
-                  <VRow>
-                    <VCol
-                      v-if="false"
-                      class="d-flex"
-                      cols="3"
-                    >
-                      <div class="">
-                        <VIcon
-                          size="30"
-                          icon="ri-calendar-2-fill"
-                        />
-                      </div>
-                    </VCol>
-                    <VCol
-                      class="d-flex align-center justify-center py-1"
-                      cols="12"
-                    >
-                      <div class="d-flex justify-center align-center py-0">
-                        <span class="d-flex justify-center align-center" style="font-size: 18px; font-weight: bolder;">{{ formattedDateTime }}</span>
-                      </div>
-                    </VCol>
-                    <VCol
-                      class="d-flex align-center justify-center py-1"
-                      cols="12"
-                    >
-                      <div class="d-flex justify-center align-center py-0">
-                        <span class="d-flex justify-center align-center" style="font-size: 18px; font-weight: bolder;">{{ time }}</span>
-                      </div>
-                    </VCol>
-                  </VRow>
-                </div>
+                <VAutocomplete
+                  v-model="wareHouseSection"
+                  :label="$t('Warehouse')"
+                  density="compact"
+                  placeholder="Select Warehouse"
+                  :items="itemsWarehouseGetForAPI"
+                  item-title="name"
+                  item-value="id"
+                />
               </VCardText>
             </VCard>
           </VCol>
@@ -655,6 +821,7 @@ onMounted(() => {
               :history="dialogHistory"
               :complate-all-props="complateAll"
               :await-all-props="awaitAll"
+              :date-current="formattedDateTime"
             />
           </VCol>
         </VRow>
@@ -671,14 +838,17 @@ onMounted(() => {
             lg="3"
           >
             <VCard style="height: 100%;">
-              <VCardTitle>
+              <VCardTitle v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
                 >{{ $t('Inventory Arrived') }}</span>
               </VCardTitle>
               <VCardText>
-                <ReceiptSuccess :dataset="dateSetReceivedSuccess" />
+                <ReceiptSuccess
+                  :date-formate="formattedDateNow"
+                  :dataset="dateSetReceivedSuccess"
+                />
               </VCardText>
             </VCard>
           </VCol>
@@ -691,11 +861,11 @@ onMounted(() => {
             lg="3"
           >
             <VCard style="height: 100%;">
-              <VCardTitle>
+              <VCardTitle v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
-                >{{ $t('Await Received') }}</span>
+                >{{ $t('Await Receiving') }}</span>
               </VCardTitle>
               <VCardText>
                 <ReceiptWaiting :dataset="dateSetReceivedPending" />
@@ -711,11 +881,11 @@ onMounted(() => {
             sm="6"
           >
             <VCard style="height: 100%;">
-              <VCardTitle>
+              <VCardTitle v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
-                >{{ $t('Inventory Delivery') }}</span>
+                >{{ $t('Picking Request') }}</span>
               </VCardTitle>
               <VCardText>
                 <PickingSuccess :dataset="dateSetPickingSuccess" />
@@ -731,7 +901,7 @@ onMounted(() => {
             lg="3"
           >
             <VCard style="height: 100%;">
-              <VCardTitle>
+              <VCardTitle v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
@@ -898,52 +1068,197 @@ onMounted(() => {
       <div v-if="!logicLuxOn && !operationOn">
         <VRow>
           <VCol cols="6">
-            <VWindow
-              v-model="onboardingMove"
-              show-arrows="hover"
-            >
-              <VWindowItem
-                v-for="n in lengthMove"
-                :key="`card-${n}`"
+            <VCard class="">
+              <VCardTitle> 
+                <div class="d-flex justify-space-between">
+                  <span>{{ $t('Moving Stock') }} ( {{ reveresDaysMove }} ): {{ calDateReverse30Days }} - {{ formattedDateTime }} </span>
+                  <VMenu location="end">
+                    <template #activator="{ props }">
+                      <VBtn
+                        icon="ri-more-2-fill"
+                        size="20"
+                        variant="text"
+                        v-bind="props"
+                      />
+                    </template>
+
+                    <VList>
+                      <VListItem
+                        v-for="item in typeDataMove"
+                        :key="item.value"
+                        :title="item.title"
+                        :active="dayMove === item.value"
+                        color="primary"
+                        @click="handleSelectDay(item.value,'move', item.title)"
+                      />
+                    </VList>
+                  </VMenu>
+                </div>
+              </VCardTitle>
+              <VCardText class="pa-1">
+                <div>
+                  <VWindow
+                    v-model="onboardingMove"
+                    show-arrows="hover"
+                  >
+                    <VWindowItem
+                      v-for="n in lengthMove"
+                      :key="`card-${n}`"
+                    >
+                      <VCardText
+                        v-if="chartDataMove.series.length === 0 "
+                        class="pa-1"
+                      >
+                        <div class="text-center">
+                          <VIcon
+                            size="220"
+                            color="grey lighten-1"
+                          >
+                            mdi-chart-bar
+                          </VIcon>
+                          <p class="mt-2">
+                            {{ $t('No data available') }}
+                          </p>
+                        </div>
+                      </VCardText>
+                      <VCardText
+                        v-else-if="onboardingMove === 0"
+                        class="pa-1"
+                      >
+                        <ChartJsBarChartMove
+                          v-if="onboardingMove === 0"
+                          :categories="chartDataMove.categories"
+                          :series="chartDataMove.series"
+                          :date="formattedDateTime"
+                        />
+                      </VCardText>
+                      <VCardText
+                        v-else
+                        class="pa-1"
+                      >
+                        <TopProductMove
+                          v-if="onboardingMove === 1 && chartDataTopMove.groupedItems.length > 0"
+                          :grouped-items="chartDataTopMove.groupedItems"
+                        />
+                      </VCardText>
+                    </VWindowItem>
+                  </VWindow> 
+                </div>
+              </VCardText>
+            </VCard>
+           
+
+            <!--
+              <VCardText
+              v-if="onboardingMove === 0"
+              class="pa-1"
               >
-                <VCardText
-                  v-if="onboardingMove === 0"
-                  class="pa-1"
-                >
-                  <ChartJsBarChartMove v-if="onboardingMove === 0" />
-                </VCardText>
-                <VCardText
-                  v-else
-                  class="pa-1"
-                >
-                  <TopProductMove v-if="onboardingMove === 1" />
-                </VCardText>
-              </VWindowItem>
-            </VWindow>
+              <ChartJsBarChartMove
+              v-if="onboardingMove === 0"
+              :categories="chartDataMove.categories"
+              :series="chartDataMove.series"
+              :date="formattedDateTime"
+              />
+              </VCardText> 
+            -->
           </VCol>
           <VCol cols="6">
-            <VWindow
-              v-model="onboardingNonMove"
-              show-arrows="hover"
-            >
-              <VWindowItem
-                v-for="n in lengthNonMove"
-                :key="`card-${n}`"
+            <VCard class="">
+              <VCardTitle> 
+                <div class="d-flex justify-space-between">
+                  <span>{{ $t('Non Moving Stock') }} ( {{ reverseDaysNonMove }} ) : {{ calDateReverse30DaysNonMove }} - {{ formattedDateTime }}</span>
+                  <VMenu location="end">
+                    <template #activator="{ props }">
+                      <VBtn
+                        icon="ri-more-2-fill"
+                        variant="text"
+                        v-bind="props"
+                        size="20"
+                      />
+                    </template>
+
+                    <VList>
+                      <VListItem
+                        v-for="item in typeDataNonMove"
+                        :key="item.value"
+                        :title="item.title"
+                        :active="dayNonMove === item.value"
+                        color="primary"
+                        @click="handleSelectDay(item.value,'nonMove', item.title)"
+                      />
+                    </VList>
+                  </VMenu>
+                </div>
+              </VCardTitle>
+              <VCardText class="pa-1">
+                <div>
+                  <VWindow
+                    v-model="onboardingNonMove"
+                    show-arrows="hover"
+                  >
+                    <VWindowItem
+                      v-for="n in lengthNonMove"
+                      :key="`card-${n}`"
+                    >
+                      <VCardText
+                        v-if="chartDataNonMove.series.length === 0"
+                        class="pa-1"
+                      >
+                        <div class="text-center">
+                          <VIcon
+                            size="220"
+                            color="grey lighten-1"
+                          >
+                            mdi-chart-bar
+                          </VIcon>
+                          <p class="mt-2">
+                            {{ $t('No data available') }}
+                          </p>
+                        </div>
+                      </VCardText>
+                     
+                      <VCardText
+                        v-else-if="onboardingNonMove === 0"
+                        class="pa-1"
+                      >
+                        <ChartJsBarChartNonMove
+                          v-if="onboardingNonMove === 0"
+                          :categories="chartDataNonMove.categories"
+                          :series="chartDataNonMove.series"
+                          :date="formattedDateTime"
+                        />
+                      </VCardText>
+                      <VCardText
+                        v-else
+                        class="pa-1"
+                      >
+                        <TopProductNonMove
+                          v-if="onboardingNonMove === 1"
+                          :grouped-items="chartDataTopNonMove.groupedItems"
+                        />
+                      </VCardText>
+                    </VWindowItem>
+                  </VWindow> 
+                </div>
+              </VCardText>
+            </VCard>
+           
+            
+           
+
+            <!--
+              <VCardText
+              v-if="onboardingNonMove === 0"
+              class="pa-1"
               >
-                <VCardText
-                  v-if="onboardingNonMove === 0"
-                  class="pa-1"
-                >
-                  <ChartJsBarChartNonMove v-if="onboardingNonMove === 0" />
-                </VCardText>
-                <VCardText
-                  v-else
-                  class="pa-1"
-                >
-                  <TopProductNonMove v-if="onboardingNonMove === 1" />
-                </VCardText>
-              </VWindowItem>
-            </VWindow>
+              <ChartJsBarChartNonMove
+              v-if="onboardingNonMove === 0"
+              :categories="chartDataNonMove.categories"
+              :series="chartDataNonMove.series"
+              :date="formattedDateTime"
+              />
+              </VCardText> 
+            -->
           </VCol>
         </VRow>
       </div>

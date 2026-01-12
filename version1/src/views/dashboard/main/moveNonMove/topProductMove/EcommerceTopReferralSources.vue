@@ -1,70 +1,12 @@
 <script setup>
-import shoes01 from "@images/topProductMove/shoes/shoes01.jpg"
-import shoes02 from "@images/topProductMove/shoes/shoes02.jpg"
-import shoes03 from "@images/topProductMove/shoes/shoes03.jpg"
-import shoes04 from "@images/topProductMove/shoes/shoes04.jpg"
-import shoes05 from "@images/topProductMove/shoes/shoes05.jpg"
-import shoes06 from "@images/topProductMove/shoes/shoes06.jpg"
-import shoes07 from "@images/topProductMove/shoes/shoes07.jpg"
-import shoes08 from "@images/topProductMove/shoes/shoes08.jpg"
-import shoes09 from "@images/topProductMove/shoes/shoes09.jpg"
-import shoes010 from "@images/topProductMove/shoes/shoes010.jpg"
+import { format } from 'date-fns'
 
-const imageShoes = [shoes01, shoes02, shoes03, shoes04, shoes05, shoes06, shoes07, shoes08, shoes09, shoes010]
-
-//-------------------- Import Top Product Ladies ----------------------------
-//*** Move */
-import L01 from "@images/topProductMove/ladies/L01.webp"
-import L02 from "@images/topProductMove/ladies/L02.jpg"
-import L03 from "@images/topProductMove/ladies/L03.jpg"
-import L04 from "@images/topProductMove/ladies/L04.jpg"
-import L05 from "@images/topProductMove/ladies/L05.webp"
-import L06 from "@images/topProductMove/ladies/L06.jpg"
-import L07 from "@images/topProductMove/ladies/L07.jpg"
-import L08 from "@images/topProductMove/ladies/L08.jpg"
-import L09 from "@images/topProductMove/ladies/L09.webp"
-
-const imageLs = [L01, L02, L03, L04, L05, L06, L07, L08, L09]
-
-//-------------------- Import Top Product Gentlemen ----------------------------
-//*** Move */
-import genter01 from "@images/topProductMove/genter/genter01.webp"
-import genter02 from "@images/topProductMove/genter/genter02.webp"
-import genter03 from "@images/topProductMove/genter/genter03.webp"
-import genter04 from "@images/topProductMove/genter/genter04.jpg"
-import genter05 from "@images/topProductMove/genter/genter05.jpg"
-import genter06 from "@images/topProductMove/genter/genter06.jpg"
-import genter07 from "@images/topProductMove/genter/genter07.jpg"
-import genter08 from "@images/topProductMove/genter/genter08.jpg"
-import genter09 from "@images/topProductMove/genter/genter09.jpg"
-import genter10 from "@images/topProductMove/genter/genter10.jpg"
-
-const imageGentlemen = [genter01, genter02, genter03, genter04, genter05, genter06, genter07, genter08, genter09, genter10]
-
-//-------------------- Import Top Product shirt ----------------------------
-//*** Move */
-import Shirt01 from "@images/topProductMove/shirt/Shirt01.jpg"
-import Shirt02 from "@images/topProductMove/shirt/Shirt02.jpg"
-import Shirt03 from "@images/topProductMove/shirt/Shirt03.jpg"
-import Shirt04 from "@images/topProductMove/shirt/Shirt04.jpg"
-import Shirt05 from "@images/topProductMove/shirt/Shirt05.jpg"
-import Shirt06 from "@images/topProductMove/shirt/Shirt06.jpg"
-import Shirt07 from "@images/topProductMove/shirt/Shirt07.jpg"
-import Shirt08 from "@images/topProductMove/shirt/Shirt08.jpg"
-import Shirt09 from "@images/topProductMove/shirt/Shirt09.jpg"
-import Shirt10 from "@images/topProductMove/shirt/Shirt04.jpg"
-
-const imageShirt = [Shirt01, Shirt02, Shirt03, Shirt04, Shirt05, Shirt06, Shirt07, Shirt08, Shirt09, Shirt10]
-
-//-------------------- Import Top Product Drink ----------------------------
-//*** Move */
-import Drink01 from "@images/topProductMove/drink/d1.jpg"
-import Drink02 from "@images/topProductMove/drink/d2.jpg"
-import Drink03 from "@images/topProductMove/drink/d3.jpg"
-import Drink04 from "@images/topProductMove/drink/d4.jpg"
-import Drink05 from "@images/topProductMove/drink/d5.jpg"
-
-const imageDrink = [Drink01, Drink02, Drink03, Drink04, Drink05]
+const props = defineProps({
+  groupedItems: {
+    type: Array,
+    default: () => [],
+  },
+})
 
 import axiosIns from "@axios"
 
@@ -83,40 +25,6 @@ const whereHouseSelectedItem = ref(whereHouse)
 const products = ref([])
 const searchByCategoryId = ref("")
 
-const GetStockUpdate = () => {
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns
-    .get(
-      `${urlApi.value}/api/v1/Product/ProductList?page=1` + `&perPage=10`,
-      {
-        params: {
-          categoryId: searchByCategoryId.value,
-
-          // ... and so on with other parameters
-        },
-        headers: {
-          accept: "*/*",
-          "x-location": `${whereHouse}`,
-          Authorization: `Bearer ${accessTokenAtStore}`,
-        },
-      },
-      {},
-    )
-    .then(response => {
-      products.value = response.data.items
-
-      console.log("[products.value]!!: ", products)
-    })
-    .catch(error => {
-      // Handle errors
-      console.error("Error:", error)
-    })
-}
-
-watch(GetStockUpdate)
-
-
-
 const resolveChipColor = status => {
   if (status === "In Stock") return "success"
   if (status === "Out of Stock") return "primary"
@@ -126,71 +34,31 @@ const resolveChipColor = status => {
   if (status === "Discontinued") return "warning"
 }
 
-const itemsCategories = [
-  {
-    title: 'Shoes',
-    value: 'Shoes',
-  },
-  {
-    title: 'Female',
-    value: 'Female',
-  },
-  {
-    title: 'Male',
-    value: 'Male',
-  },
-  {
-    title: 'Shirt',
-    value: 'Shirt',
-  },
-  {
-    title: 'Beverage',
-    value: 'Beverage',
-  },
-]
-
-const categories = [
-  {
-    title: "Shoes",
-    img: {
-      icon: "mdi-shoe-sneaker",
-    },
-  },
-  {
-    title: "Female",
-    img: {
-      icon: "mdi-account-tie-woman",
-    },
-  },
-  {
-    title: "Male",
-    img: {
-      icon: "mdi-account-tie",
-    },
-  },
-  {
-    title: "Shirt",
-    img: {
-      icon: "mdi-tshirt-crew",
-    },
-  },
-  {
-    title: "Beverage",
-    img: {
-      icon: "ri-drinks-line",
-    },
-  },
-]
-
-const itemsCategoriesSelect = ref('')
-
-function getRandomDate() {
-  const start = new Date(2020, 0, 1) // 1st Jan 2020
-  const end = new Date() // Current date
-  const randomDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
+const filteredProducts = computed(() => {
+  if (!props.groupedItems || props.groupedItems.length === 0) return []
   
-  return randomDate.toISOString().split('T')[0] // Format: YYYY-MM-DD
-}
+  const selectedCategory = props.groupedItems.find(
+    group => group.categoryName === currentTab.value,
+  ) || props.groupedItems[0]
+  
+  return selectedCategory?.items?.map(item => ({ ...item })) || []
+})
+
+// สร้าง itemsCategories จากข้อมูล groupedItems ที่ส่งเข้ามา
+const itemsCategories = computed(() => {
+  return props.groupedItems.map(group => ({
+    title: group.categoryName,
+    value: group.categoryName,
+
+    // สามารถเพิ่ม field อื่นๆ ตามต้องการ
+  }))
+})
+
+const currentTab = ref(
+  itemsCategories.value[0]?.value || 
+  (props.groupedItems[0]?.categoryName || ''),
+)
+
 
 // ฟังก์ชันเพื่อแปลงวันที่เป็นรูปแบบ "วว/ดด/ปปปป"
 function formatDate(dateString) {
@@ -199,100 +67,15 @@ function formatDate(dateString) {
   return `${day}/${month}/${year}`
 }
 
-const currentTab = ref("Shoes")
+const formattedDate = date => {
+  return format(new Date(date), 'dd/MM/yyyy')
+}
 
 const handleSelectCategories = item => {
-  console.log('handleSelectCategories', item.id)
   currentTab.value = item.id
 }
 
 const lengthData = (5)
-
-const productData = ref({
-  
-  Shoes: Array.from({ length: lengthData }, (_, index) => ({
-    no: index + 1,
-    image: imageShoes[index],
-    product: `Product ${index + 1}`+" "+`Shoes`+" "+`Color`+" "+'Sized'+" "+'Details',
-    code: `Cd-${index + 1}`+Math.floor(Math.random() * 10000) + 100,
-    status: index % 6 === 0 ? "คู่" : index % 6 === 1 ? "อัน" : index % 6 === 2 ? "ตัว" : index % 6 === 3 ? "ชิ้น" : index % 6 === 4 ? "แก้ว" : "โหล",
-    price: Math.floor(Math.random() * 10000) + 100, // สุ่มราคาให้ตั้งแต่ 100 ถึง 10,100
-    moveSummary: Math.floor(Math.random() * 50) + 1, // สุ่มจำนวนการเคลื่อนย้ายสินค้า
-    lastUpdate: formatDate(getRandomDate()), // สุ่มวันที่ล่าสุด
-  })),
-  Female: Array.from({ length: lengthData }, (_, index) => ({
-    no: index + 1,
-    product: `Product ${index + 1}`+" "+` Female`+" "+` Color`+" "+' Sized'+" "+' Details',
-    code: `Cd-${index + 1}`+Math.floor(Math.random() * 10000) + 100,
-    status: index % 6 === 0 ? "คู่" : index % 6 === 1 ? "อัน" : index % 6 === 2 ? "ตัว" : index % 6 === 3 ? "ชิ้น" : index % 6 === 4 ? "แก้ว" : "โหล",
-    price: Math.floor(Math.random() * 10000) + 100, // สุ่มราคาให้ตั้งแต่ 100 ถึง 10,100
-    moveSummary: Math.floor(Math.random() * 50) + 1, // สุ่มจำนวนการเคลื่อนย้ายสินค้า
-    lastUpdate: formatDate(getRandomDate()), // สุ่มวันที่ล่าสุด
-    image: imageLs[index],
-  })),
-  Male: Array.from({ length: lengthData }, (_, index) => ({
-    no: index + 1,
-    product: `Product ${index + 1}`+" "+`Male`+" "+`Color`+" "+'Sized'+" "+'Details',
-    code: `Cd-${index + 1}`+Math.floor(Math.random() * 10000) + 100,
-    status: index % 6 === 0 ? "คู่" : index % 6 === 1 ? "อัน" : index % 6 === 2 ? "ตัว" : index % 6 === 3 ? "ชิ้น" : index % 6 === 4 ? "แก้ว" : "โหล",
-    price: Math.floor(Math.random() * 10000) + 100, // สุ่มราคาให้ตั้งแต่ 100 ถึง 10,100
-    moveSummary: Math.floor(Math.random() * 50) + 1, // สุ่มจำนวนการเคลื่อนย้ายสินค้า
-    lastUpdate: formatDate(getRandomDate()), // สุ่มวันที่ล่าสุด
-    image: imageGentlemen[index],
-  })),
-  Shirt: Array.from({ length: lengthData }, (_, index) => ({
-    no: index + 1,
-    product: `Product ${index + 1}`+" "+`Shirt`+" "+`Color`+" "+'Sized'+" "+'Details',
-    code: `Cd-${index + 1}`+Math.floor(Math.random() * 10000) + 100,
-    status: index % 6 === 0 ? "คู่" : index % 6 === 1 ? "อัน" : index % 6 === 2 ? "ตัว" : index % 6 === 3 ? "ชิ้น" : index % 6 === 4 ? "แก้ว" : "โหล",
-    price: Math.floor(Math.random() * 10000) + 100, // สุ่มราคาให้ตั้งแต่ 100 ถึง 10,100
-    moveSummary: Math.floor(Math.random() * 50) + 1, // สุ่มจำนวนการเคลื่อนย้ายสินค้า
-    lastUpdate: formatDate(getRandomDate()), // สุ่มวันที่ล่าสุด
-    image: imageShirt[index],
-  })),
-  Beverage: Array.from({ length: lengthData }, (_, index) => ({
-    no: index + 1,
-    product: `Product ${index + 1}`+" "+`Beverage`+" "+`color`+" "+'sized'+" "+'details',
-    code: `Cd-${index + 1}`+Math.floor(Math.random() * 10000) + 100,
-    status: index % 6 === 0 ? "คู่" : index % 6 === 1 ? "Backordered" : index % 6 === 2 ? "Reserved" : index % 6 === 3 ? "Damaged" : index % 6 === 4 ? "Discontinued" : "In Stock",
-    price: Math.floor(Math.random() * 10000) + 100, // สุ่มราคาให้ตั้งแต่ 100 ถึง 10,100
-    moveSummary: Math.floor(Math.random() * 50) + 1, // สุ่มจำนวนการเคลื่อนย้ายสินค้า
-    lastUpdate: formatDate(getRandomDate()), // สุ่มวันที่ล่าสุด
-    image: imageDrink[index],
-  })),
-})
-
-const headers = [
-  {
-    title: 'NO.',
-    sortable: false,
-    key: 'no',
-  },
-  {
-    title: 'IMAGE',
-    key: 'image',
-  },
-  {
-    title: 'PRODUCT NAME',
-    key: 'product',
-  },
-  {
-    title: 'STATUS',
-    key: 'status',
-  },
-  {
-    title: 'PRICE',
-    key: 'price',
-  },
-  {
-    title: 'MOVE SUMMARY',
-    key: 'moveSummary',
-  },
-  {
-    title: 'LAST UPDATE',
-    key: 'lastUpdate',
-  },
-]
 
 //------------------ Dialog details ---------------------------------
 const dialogDetails = ref(false)
@@ -319,60 +102,6 @@ const isDialogAddCatPoVisible = ref(false)
 
 const ModelCatAdd = ref([])
 const ModelCatIconAdd = ref([])
-
-const itemsCat = [
-  {
-    title: "Clothing",
-    value: "Clothing",
-  },
-  {
-    title: "Shirt",
-    value: "Shirt",
-  },
-  {
-    title: "Pants",
-    value: "Pants",
-  },
-  {
-    title: "Shoes",
-    value: "Shoes",
-  },
-  {
-    title: "Jewellery",
-    value: "Jewellery",
-  },
-  {
-    title: "Accessories",
-    value: "Accessories",
-  },
-]
-
-const itemsCatIcon = [
-  {
-    title: "Clothing",
-    value: "mdi-hanger",
-  },
-  {
-    title: "Shirt",
-    value: "mdi-tshirt-v",
-  },
-  {
-    title: "Pants",
-    value: "mdi-lingerie",
-  },
-  {
-    title: "Shoes",
-    value: "mdi-shoe-sneaker",
-  },
-  {
-    title: "Jewellery",
-    value: "mdi-ring",
-  },
-  {
-    title: "Accessories",
-    value: "mdi-cards-playing-diamond-outline",
-  },
-]
 
 const addPoCat = (title, icon) => {
   categories.push({
@@ -411,64 +140,9 @@ const addPoCat = (title, icon) => {
               </VCol>
               <VCol
                 cols="12"
-                lg="10"
+                lg="8"
                 class="px-0"
               >
-                <div v-if="false">
-                  <VSlideGroup
-                    v-model="currentTab"
-                    show-arrows
-                    mandatory
-                  >
-                    <VSlideGroupItem
-                      v-for="category in categories"
-                      :key="category.title"
-                      v-slot="{ isSelected, toggle }"
-                      :value="category.title"
-                    >
-                      <div
-                        :class="
-                          isSelected ? 'selected-category' : 'not-selected-category'
-                        "
-                        class="d-flex flex-column justify-center align-center cursor-pointer rounded me-2"
-                        style="border-color: #ffff; block-size: 2rem; inline-size: 2rem;"
-                        @click="toggle"
-                      >
-                        <VIcon
-                          v-bind="category.img"
-                          alt="slide-img"
-                          size="20px"
-                          color="white"
-                        />
-                        <VTooltip
-                          activator="parent"
-                          location="top"
-                        >
-                          {{ category.title }}
-                        </VTooltip>
-                      </div>
-                    </VSlideGroupItem>
-
-                    <VSlideGroupItem>
-                      <div
-                        class="d-flex flex-column justify-center align-center cursor-pointer rounded me-4 not-selected-category"
-                        style="border-color: #ffff; block-size: 2rem; inline-size: 2rem;"
-                        @click="isDialogAddCatPoVisible = true"
-                      >
-                        <VAvatar
-                          rounded
-                          size="20px"
-                          color="white"
-                          variant="tonal"
-                          class="text-disabled"
-                        >
-                          <VIcon icon="mdi-plus" />
-                        </VAvatar>
-                      </div>
-                    </VSlideGroupItem>
-                  </VSlideGroup>
-                </div>
-
                 <div>
                   <VMenu location="bottom">
                     <template #activator="{ props }">
@@ -480,30 +154,35 @@ const addPoCat = (title, icon) => {
                       </VBtn>
                     </template>
 
-                    <VList :items="itemsCategories" @click:select="handleSelectCategories" />
+                    <VList
+                      :items="itemsCategories"
+                      @click:select="handleSelectCategories"
+                    />
                   </VMenu>
                 </div>
+              </VCol>
+              <VCol
+                class="d-flex align-center justify-end"
+                cols="2"
+              >
+                <span>(Top 5)</span>
               </VCol>
             </VRow>
           </VCardText>
 
           <!-- Table -->
-          <VCardText class="py-0">
+          <VCardText class="pa-0">
             <VTable
               density="compact"
               class="text-no-wrap mb-5 text-sm"
             >
               <thead class="">
                 <tr>
-                  <th
-                    scope="col"
-                    style="padding-inline: 1px;"
-                  >
+                  <th scope="col" class="px-1">
                     {{ $t('No.') }}
                   </th>
                   <th
                     scope="col"
-                    style="padding-inline: 1px;"
                     class=" text-center"
                   >
                     {{ $t('IMAGE') }}
@@ -518,7 +197,7 @@ const addPoCat = (title, icon) => {
                     scope="col"
                     class="text-end"
                   >
-                    {{ $t('QTY.') }}
+                    {{ $t('Stock QTY.') }}
                   </th>
                   <th
                     scope="col"
@@ -537,18 +216,18 @@ const addPoCat = (title, icon) => {
 
               <tbody class="text-high-emphasis ">
                 <tr
-                  v-for="(currentProduct, index) in productData[currentTab]"
+                  v-for="(currentProduct, index) in filteredProducts"
                   :key="index"
                 >
-                  <td style="padding-inline: 1px;">
+                  <td >
                     {{ index + 1 }}
                   </td>
                   <td
                     class="cursor-pointer"
-                    style="padding-inline: 1px;"
+                    
                     @click="
                       showDetailsProduct(
-                        currentProduct.product,
+                        currentProduct.productName ,
                         currentProduct.image,
                         currentProduct.status,
                         currentProduct.price,
@@ -572,27 +251,27 @@ const addPoCat = (title, icon) => {
                     class="font-weight-medium"
                     style="inline-size: 20vw;"
                   >
-                    {{ currentProduct.code }}
+                    {{ currentProduct.productId }}
                   </td>
                   <td
                     class="font-weight-medium"
                     style="inline-size: 20vw;"
                   >
-                    {{ currentProduct.product }}
+                    {{ currentProduct.productName }}
                   </td>
 
                   <td class="text-end font-weight-medium">
-                    {{ currentProduct.moveSummary }}
+                    {{ (currentProduct.qty).toLocaleString('en-US') }}
                   </td>
 
                   <td class="text-end font-weight-medium">
-                    {{ currentProduct.status }}
+                    {{ currentProduct.unitName }}
                   </td>
 
-                  <td class="font-weight-medium text-end">
-                    <span>
+                  <td class="font-weight-medium text-end ">
+                    <span text-center>
                       {{
-                        currentProduct.lastUpdate
+                        formattedDate(currentProduct.lastUpdate)
                       }}
                     </span>
                   </td>
@@ -723,10 +402,6 @@ const addPoCat = (title, icon) => {
                       <span style="font-size: large; font-weight: 900;">{{
                         $t("Details :")
                       }}</span>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Quo dolore reprehenderit, doloribus nesciunt, ullam
-                      quisquam, nam ipsum itaque delectus inventore et natus
-                      odit alias ipsam magnam consequatur sed! Sequi, provident?
                     </div>
                   </VCardText>
                 </div>

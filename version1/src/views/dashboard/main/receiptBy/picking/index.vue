@@ -2,10 +2,16 @@
 import { urlApi } from '@/api'
 import ChartPerformanceReceived from '@/views/dashboard/main/receiptBy/picking/Chart/chartPerformance.vue'
 import ChartPerformancePickingPie from '@/views/dashboard/main/receiptBy/picking/Chart/chartPerformancePie.vue'
-import { defineProps, watchEffect } from 'vue'
+import { defineProps, watch, watchEffect } from 'vue'
 import axios from '@axios'
 
 import { useRoute } from 'vue-router'
+
+import DetailsTransferPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/transferOut/datails.vue"
+import DetailsDeliveryPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/delivery/datails.vue"
+import DetailsWriteOfPicking from "@/views/dashboard/main/shortCutMenu/pickingUp/writeOff/datails.vue"
+
+import { useDashboardStore } from '@/pages/dashboards/store/performance/operations'
  
 const props = defineProps({
   data: {
@@ -25,6 +31,40 @@ const props = defineProps({
     required: true,
   },
 })
+
+const formateDateNew = inputDate => {
+  const [day, month, year] = inputDate.split('/')
+
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+
+const dashboardStore = useDashboardStore()
+
+const dateRange = ref({
+  dateSt: '2025-06-17',
+  dateSp: '2025-06-17',
+})
+
+onMounted(async () => {
+
+  console.log("props.datepickerDataStart", props.datepickerDataStart)
+
+  if(props.datepickerDataStart){
+    dateRange.value.dateSt = formateDateNew(props.datepickerDataStart)
+    dateRange.value.dateSp = formateDateNew(props.datepickerDataStart)
+  }
+
+  await fetchDataChartPerformance()
+})
+
+async function fetchDataChartPerformance() {
+  await dashboardStore.fetchPerformanceData({
+    stockId: whereHouse,
+    ...dateRange.value,
+  })
+}
+
 
 const route = useRoute()
 const MAX= 100
@@ -49,6 +89,7 @@ const colorIconOther = ref('teal-lighten-3') //
 const typeDatepicker = ref('')
 const dateStartProp = ref(new Date())
 const dateEndProp = ref(new Date())
+const typeTableReceiving = ref('Transfer Out')
 
 watchEffect(() => {
 
@@ -64,12 +105,41 @@ watchEffect(() => {
   }
 
   if(isHoveredOther === true){
-    colorAvatarReceived.value = 'green'
-    colorAvatarTransferIn.value = 'deep-orange'
-    colorAvatarOther.value = 'teal'
-    colorIconReceived.value = 'green'
-    colorIconTransferIn.value = 'deep-orange'
-    colorIconOther.value = 'teal'
+    colorAvatarReceived.value = 'light-blue'
+    colorAvatarTransferIn.value = 'amber'
+    colorAvatarOther.value = 'purple'
+    colorIconReceived.value = 'light-blue'
+    colorIconTransferIn.value = 'amber'
+    colorIconOther.value = 'purple'
+  }
+
+  if(typeTableReceiving.value === 'Transfer Out'){
+    colorAvatarReceived.value = 'light-blue'
+    colorIconReceived.value = 'white'
+    colorIconTransferIn.value = 'amber'
+    colorAvatarTransferIn.value = ''
+    colorAvatarOther.value = ''
+    colorIconOther.value = 'purple'
+  }else if(typeTableReceiving.value === 'Delivery'){
+    colorIconTransferIn.value = 'white'
+    colorAvatarTransferIn.value = 'amber'
+    colorAvatarReceived.value = ''
+    colorIconReceived.value = 'light-blue'
+    colorAvatarOther.value = ''
+    colorIconOther.value = 'purple'
+  }else if(typeTableReceiving.value === 'Other'){
+    colorIconTransferIn.value = 'amber'
+    colorAvatarTransferIn.value = ''
+    colorAvatarReceived.value = ''
+    colorIconReceived.value = 'light-blue'
+    colorAvatarOther.value = 'purple'
+    colorIconOther.value = 'white'
+  }else{
+    colorAvatarReceived.value = 'light-blue'
+    
+    colorAvatarTransferIn.value = 'amber'
+    
+    colorAvatarTransferIn.value = 'amber'
   }
   
 })
@@ -151,8 +221,8 @@ const getHeaderGroupTimeNew = () => {
     // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: dateEndProp.value,
-      dateSp: dateStartProp.value,
+      dateSt: formateDateNew(props.datepickerDataStart),
+      dateSp: formateDateNew(props.datepickerDataStart),
 
       // ... and so on with other parameters
     },
@@ -187,8 +257,8 @@ const getHeaderGroupDayNew = () => {
       // dateSp: dateSpData.value,
 
       stockId: whereHouse,
-      dateSt: dateEndProp.value,
-      dateSp: dateStartProp.value,
+      dateSt: formateDateNew(props.datepickerDataStart),
+      dateSp: formateDateNew(props.datepickerDataStart),
 
     // ... and so on with other parameters
     },
@@ -208,15 +278,16 @@ const getHeaderGroupDayNew = () => {
     })
 }
 
-getHeaderGroupTimeNew()
 
-watch([dateStartProp, dateEndProp, typeDateProps], ([newDateStart, newDateEnd, newTypeDate]) => {
-  if (newTypeDate === 8) {
-    getHeaderGroupTimeNew()
-  } else if(newTypeDate === 7){
-    getHeaderGroupDayNew()
-  }
-})
+
+
+// watch([dateStartProp, dateEndProp, typeDateProps], ([newDateStart, newDateEnd, newTypeDate]) => {
+//   if (newTypeDate === 8) {
+//     getHeaderGroupTimeNew()
+//   } else if(newTypeDate === 7){
+//     getHeaderGroupDayNew()
+//   }
+// })
 
 watchEffect(() => {
   if(!props.datepickerDataEnd && !props.datepickerDataStart){
@@ -227,13 +298,16 @@ watchEffect(() => {
 
   console.log('Props datepickerDataEnd picking', props.datepickerDataEnd, props.datepickerDataStart)
 
-  if (typeDateProps === 8) {
-    getHeaderGroupTimeNew()
-  } else if(typeDateProps === 7){
-    getHeaderGroupDayNew()
-  }
+  // if (typeDateProps === 8) {
+  //   getHeaderGroupTimeNew()
+  // } else if(typeDateProps === 7){
+  //   getHeaderGroupDayNew()
+  // }
 
+})
 
+watch(() => {
+  getHeaderGroupDayNew()
 })
 </script>
 
@@ -245,16 +319,12 @@ watchEffect(() => {
       <!-- Transfer Out  -->
       <VCol
         cols="12"
-        lg="4"
+        lg="6"
       >
         <VCard
           v-ripple
-          :to="{ name: 'dashboards-shortCutMenu-pickingUp-transferOut',
-                 query: { dateStart: dateEndProp,
-                          dateEnd: dateStartProp,
-                          typeDate: typeDatepicker
-                 }, }"
           class="cursor-pointer"
+          @click="typeTableReceiving = 'Transfer Out'"
           @mouseenter="isHoveredReceived = true"
           @mouseleave="isHoveredReceived = false"
         >
@@ -268,10 +338,10 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="light-blue-lighten-4"
+                    :color="colorAvatarReceived"
                   >
                     <VIcon
-                      color="light-blue"
+                      :color="colorIconReceived"
                       icon="ri-logout-box-line"
                     />
                   </VAvatar><span
@@ -305,16 +375,12 @@ watchEffect(() => {
       <!-- Delivery  -->
       <VCol
         cols="12"
-        lg="4"
+        lg="6"
       >
         <VCard
           v-ripple
-          :to="{ name: 'dashboards-shortCutMenu-pickingUp-delivery',
-                 query: { dateStart: dateEndProp,
-                          dateEnd: dateStartProp,
-                          typeDate: typeDatepicker
-                 }, }"
           class="cursor-pointer"
+          @click="typeTableReceiving = 'Delivery'"
           @mouseenter="isHoveredTransferIn = true"
           @mouseleave="isHoveredTransferIn = false"
         >
@@ -328,10 +394,10 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="amber-lighten-4"
+                    :color="colorAvatarTransferIn"
                   >
                     <VIcon
-                      color="amber"
+                      :color="colorIconTransferIn"
                       icon="ri-truck-line"
                     />
                   </VAvatar><span
@@ -364,17 +430,14 @@ watchEffect(() => {
       </VCol>
       <!--  White Off -->
       <VCol
+        v-if="false"
         cols="12"
         lg="4"
       >
         <VCard
           v-ripple
-          :to="{ name: 'dashboards-shortCutMenu-pickingUp-writeOff',
-                 query: { dateStart: dateEndProp,
-                          dateEnd: dateStartProp,
-                          typeDate: typeDatepicker
-                 }, }"
           class="cursor-pointer"
+          @click="typeTableReceiving = 'Write Off'"
           @mouseenter="isHoveredOther = true"
           @mouseleave="isHoveredOther = false"
         >
@@ -388,10 +451,10 @@ watchEffect(() => {
                 <div class="px-2">
                   <VAvatar
                     rounded
-                    color="purple-lighten-3"
+                    :color="colorAvatarOther"
                   >
                     <VIcon
-                      color="purple"
+                      :color="colorIconOther"
                       icon="ri-sparkling-2-line"
                     />
                   </VAvatar><span
@@ -431,9 +494,23 @@ watchEffect(() => {
         lg="8"
       >
         <ChartPerformanceReceived
+          v-if="false"
           :data="dataBar"
           :pure-data="dataDatepicker"
           :type-date="typeDatepicker"
+        />
+
+        <DetailsTransferPicking
+          v-if="typeTableReceiving === 'Transfer Out'"
+          :date="formateDateNew(props.datepickerDataStart)"
+        />
+        <DetailsDeliveryPicking
+          v-if="typeTableReceiving === 'Delivery'"
+          :date="formateDateNew(props.datepickerDataStart)"
+        />
+        <DetailsWriteOfPicking
+          v-if="typeTableReceiving === 'Write Off'"
+          :date="formateDateNew(props.datepickerDataStart)"
         />
       </VCol>
       <VCol
@@ -443,6 +520,10 @@ watchEffect(() => {
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"
+          :data-chart-white="dashboardStore.pickingSuccessfully.pickingWriteOff"
+          :data-chart-transfer-out="dashboardStore.pickingSuccessfully.tranferOut"
+          :data-chart-delivery="dashboardStore.pickingSuccessfully.pickingDelivery"
+          type-data="sussess"
         />
       </VCol>
     </VRow>

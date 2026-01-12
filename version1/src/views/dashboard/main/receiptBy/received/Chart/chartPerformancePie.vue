@@ -1,83 +1,53 @@
 <script setup>
+import { ref, computed, watch, watchEffect, onMounted } from 'vue'
 import VueApexCharts from "vue3-apexcharts"
 import { useTheme } from "vuetify"
 import { getDonutChartConfigPOSuccess } from "@/views/dashboard/main/receiptBy/received/Chart/apexCharConfig"
 
-import { defineProps, watch, watchEffect } from 'vue'
-
-//------------------------------------- Define Props -------------------------------
 const props = defineProps({
-  data: {
-    type: Array,
+  data: { type: Array, required: true },
+  pureData: { type: Array, required: true },
+  dataChartPO: { type: [String, Number], required: true },
+  dataChartTransferIn: { type: [String, Number], required: true },
+  dataChartOther: { type: [String, Number], required: true },
+  typeData: {
+    type: String,
     required: true,
   },
-  pureData: {
-    type: Array,
-    required: true,
-  },
 })
 
-watchEffect(() => {
- 
-})
-
-const dataTotalRecieved = ref([])
-const dataTotalTransferIn = ref([])
-const dataTotalOther = ref([])
-const series = ref([dataTotalRecieved, dataTotalTransferIn, dataTotalOther])
-
-watchEffect(() => {
-  console.log("pureData ## in Pie", props.pureData)
-
-  if(props.pureData){
-    const data = (props.pureData)
-
-    const dataSorted = ref('')
-    const typeDateFirst = ref('')
-
-    typeDateFirst.value = props.typeDate
-    if(props.typeDate  === 8){
-      dataSorted.value = sortDataByTimeHour(data)
-    } else {
-      dataSorted.value = data
-    }
-    const dayNames = dataSorted.value.filter(item => item.dayName).map(item => item.dayName)
-    const timeHours = dataSorted.value.filter(item => item.timeHour).map(item => item.timeHour.toString())
-
-    const dayNos = dataSorted.value.filter(item => item.dayNo).map(item => item.dayNo.toString())
-    const qtyPo = dataSorted.value.filter(item => item.qty && item.qty.po !== undefined).map(item => item.qty.po)
-    const qtyOther = dataSorted.value.filter(item => item.qty && item.qty.other !== undefined).map(item => item.qty.other)
-    const qtyTransfer = dataSorted.value.filter(item => item.qty && item.qty.transferIn !== undefined).map(item => item.qty.transferIn)
-
-    const sumQtyPo = qtyPo.reduce((acc, curr) => acc + curr, 0)
-    const sumQtyOther = qtyOther.reduce((acc, curr) => acc + curr, 0)
-    const sumQtyTransfer = qtyTransfer.reduce((acc, curr) => acc + curr, 0)
-
-    series.value = [
-      sumQtyPo, sumQtyOther, sumQtyTransfer,
-    ]
-    
-
-  }
-})
-
-function generateRandomData(min, max, count) {
-  const data = []
-  for (let i = 0; i < count; i++) {
-    const randomValue = Math.floor(Math.random() * (max - min + 1)) + min
-
-    data.push(randomValue)
-  }
-  
-  return data
-}
-
-
+const series = ref([])
 const vuetifyTheme = useTheme()
+const chartConfig = ref({})
 
-const expenseRationChartConfig = computed(() =>
-  getDonutChartConfigPOSuccess(vuetifyTheme.current.value),
-)
+// ตรวจสอบ props และอัปเดต series
+watch(() => ({
+  po: props.dataChartPO,
+  transferIn: props.dataChartTransferIn,
+  other: props.dataChartOther,
+}), ({ po, transferIn, other }) => {
+  series.value = [
+    Number(po) || 0,
+    Number(transferIn) || 0,
+    Number(other) || 0,
+  ]
+}, { immediate: true, deep: true })
+
+// ตรวจสอบ theme และอัปเดตการตั้งค่าแผนภูมิ
+watchEffect(() => {
+  if (vuetifyTheme.current.value) {
+    chartConfig.value = {
+      ...getDonutChartConfigPOSuccess(vuetifyTheme.current.value),
+      
+      chart: { animations: { enabled: true } },
+    }
+  }
+})
+
+// Debug
+onMounted(() => {
+  console.log('Component mounted with series:', series.value)
+})
 </script>
 
 <template>
@@ -85,17 +55,25 @@ const expenseRationChartConfig = computed(() =>
     <VCol cols="12">
       <VCard>
         <VCardTitle class="py-5">
-          <span>{{ $t('Total Performance Received') }}</span>
+          <span v-if="props.typeData ==='Await'">{{ $t('Total Performance Await Receiving') }}</span>
+          <span v-else>{{ $t('Total Performance Received') }}</span>
         </VCardTitle>
         <VDivider />
         <VCardText>
-          <div>
-            <VueApexCharts
-              type="pie"
-              height="450"
-              :options="expenseRationChartConfig"
-              :series="series"
-            />
+          <div style="width: 100%; height: 400px;">
+            <template v-if="series.length > 0">
+              <VueApexCharts
+                type="pie"
+                height="450"
+                :options="chartConfig"
+                :series="series"
+              />
+            </template>
+            <template v-else>
+              <div class="text-center py-4">
+                <VProgressCircular indeterminate />
+              </div>
+            </template>
           </div>
         </VCardText>
       </VCard>

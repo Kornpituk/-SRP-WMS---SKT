@@ -1,9 +1,7 @@
 <script setup>
-import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
-import { themeConfig } from '@themeConfig'
 import axiosIns from '@axios'
 
-import { ref, watchEffect  } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 
@@ -1126,13 +1124,13 @@ const showExpansionDialog = ref(false)
                     <strong>{{ $t('TolTalQTY') }}:</strong>
                   </p>
                   <p
-                    v-if="checkRFID"
+                    v-if="checkRFID && productsLocation.tags"
                     style="margin: -0.5px; font-size: 15px;"
                   >
                     <strong>Tag:</strong> {{ (formatDecimal(productsLocation.tags)).toLocaleString('en-US') }}
                   </p>
                   <p
-                    v-if="checkRFID"
+                    v-if="checkRFID && productsLocation.nonTags"
                     style="margin-top: -0.5px; margin-bottom: -0.5px; font-size: 15px;"
                   >
                     <strong>Non-Tag:</strong> {{ (formatDecimal(productsLocation.nonTags)).toLocaleString('en-US') }}
@@ -1204,6 +1202,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Lot/Batch') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"
@@ -1267,7 +1266,7 @@ const showExpansionDialog = ref(false)
               v-if="!serialNoIsVisible"
               class="text-start px-1"
             >
-              {{ $t('Serial') }}
+              {{ $t('SERIAL NO.') }}
             </th>
             <th
               v-if="expiryDateIsVisible"
@@ -1285,7 +1284,7 @@ const showExpansionDialog = ref(false)
               v-if="checkRFID"
               class="text-end px-1"
             >
-              {{ $t('ManyTags') }}
+              {{ $t('TAG QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1293,8 +1292,11 @@ const showExpansionDialog = ref(false)
                 @click="toggleSortType('sortByTags')"
               />
             </th>
-            <th v-if="checkRFID" class="text-end px-1">
-              {{ $t('ManyNonTags') }}
+            <th
+              v-if="checkRFID"
+              class="text-end px-1"
+            >
+              {{ $t('NON-TAG QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1303,7 +1305,7 @@ const showExpansionDialog = ref(false)
               />
             </th>
             <th class="text-end px-1">
-              {{ $t('QTY') }}
+              {{ $t('TOTAL QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1360,15 +1362,21 @@ const showExpansionDialog = ref(false)
               class="text-end px-6"
             >
               <span v-if="product.tags">{{ (formatDecimal(product.tags)).toLocaleString('en-US') }}</span> 
+              <span v-else>0</span>
             </td>
 
             <!--  Number(Non-Tag) -->
-            <td v-if="checkRFID" class="text-end px-6">
+            <td
+              v-if="checkRFID"
+              class="text-end px-6"
+            >
               <span v-if="product.nonTags"> {{ (formatDecimal(product.nonTags)).toLocaleString('en-US') }}</span>
+              <span v-else>0</span>
             </td>
             <!--  Total quantity of products -->
             <td class="text-end px-6">
               <span v-if="product.qty">{{ (formatDecimal(product.qty)).toLocaleString('en-US') }}</span> 
+              <span v-else>0</span>
             </td>
           </tr>
         </tbody>

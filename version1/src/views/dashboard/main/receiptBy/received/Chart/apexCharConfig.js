@@ -42,10 +42,13 @@ export const getDonutChartConfigPOSuccess = themeColors => {
   
   return {
     chart: {
+      animations: {
+        enabled: true, // ปิด animation ชั่วคราวเพื่อทดสอบ
+      },
       stacked: true,
       parentHeightOffset: 0,
       toolbar: {
-        show: true,
+        show: false,
         offsetX: 0,
         offsetY: -50,
         theme: 'dark',

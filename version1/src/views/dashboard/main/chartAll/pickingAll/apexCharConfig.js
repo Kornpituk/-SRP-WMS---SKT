@@ -89,9 +89,67 @@ export const getDonutChartConfigPOSuccess = themeColors => {
       stacked: true,
       parentHeightOffset: 0,
       toolbar: { 
-        show: true, 
+        show: false, 
         offsetX: 0,
-        offsetY: 5 },
+        offsetY: 5, 
+        export: {
+          csv: {
+            filename: function() {
+              const now = new Date()
+              const dateStr = now.toISOString().slice(0, 10)
+              const timeStr = now.toTimeString().slice(0, 5).replace(':', '')
+              
+              return `Picking_Request_${dateStr}_${timeStr}`
+            }(),
+  
+            columnDelimiter: ',',
+            headerCategory: 'Category',
+            headerValue: 'Value',
+          },
+          svg: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Picking_Request_${date}_${time}`
+            })(),
+          },
+          png: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Picking_Request_${date}_${time}`
+            })(),
+          },
+        },
+      },
+    },
+    title: {
+      text: 'Picking Request',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+        color: themeSecondaryTextColor,
+      },
     },
     stroke: { width: 0 },
     labels: ['TRANSFER OUT', 'PICKING DELIVERY', 'PICKING WRITE OFF'],
@@ -129,12 +187,10 @@ export const getDonutChartConfigPOSuccess = themeColors => {
               formatter(w) {
                 const totalValue = w.globals.seriesTotals.reduce((a, b) => {
                   return a + b
-                }, 0) / w.globals.series.length
-  
-                if (totalValue % 1 === 0)
-                  return `${totalValue}%`
-                else
-                  return `${totalValue.toFixed(2)}%`
+                }, 0)
+ 
+                
+                return `${totalValue}`
               },
               color: themePrimaryTextColor,
             },
@@ -197,9 +253,67 @@ export const getDonutChartConfigPOWaiting = themeColors => {
       stacked: true,
       parentHeightOffset: 0,
       toolbar: { 
-        show: true, 
+        show: false, 
         offsetX: 0,
-        offsetY: 5 },
+        offsetY: 5, 
+        export: {
+          csv: {
+            filename: function() {
+              const now = new Date()
+              const dateStr = now.toISOString().slice(0, 10)
+              const timeStr = now.toTimeString().slice(0, 5).replace(':', '')
+              
+              return `Await_Picking_${dateStr}_${timeStr}`
+            }(),
+  
+            columnDelimiter: ',',
+            headerCategory: 'Category',
+            headerValue: 'Value',
+          },
+          svg: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Await_Picking_${date}_${time}`
+            })(),
+          },
+          png: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Await_Picking_${date}_${time}`
+            })(),
+          },
+        },
+      },
+    },
+    title: {
+      text: 'Await Picking',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+        color: themeSecondaryTextColor,
+      },
     },
     stroke: { width: 0 },
     labels: ['TRANSFER OUT', 'PICKING DELIVERY'],
@@ -237,12 +351,10 @@ export const getDonutChartConfigPOWaiting = themeColors => {
               formatter(w) {
                 const totalValue = w.globals.seriesTotals.reduce((a, b) => {
                   return a + b
-                }, 0) / w.globals.series.length
-  
-                if (totalValue % 1 === 0)
-                  return `${totalValue}%`
-                else
-                  return `${totalValue.toFixed(2)}%`
+                }, 0)
+ 
+                
+                return `${totalValue}`
               },
               color: themePrimaryTextColor,
             },
@@ -309,7 +421,65 @@ export const getDonutChartConfigPOSuccessNoData = themeColors => {
       toolbar: { 
         show: false, 
         offsetX: 0,
-        offsetY: 5 },
+        offsetY: 5,
+        export: {
+          csv: {
+            filename: function() {
+              const now = new Date()
+              const dateStr = now.toISOString().slice(0, 10)
+              const timeStr = now.toTimeString().slice(0, 5).replace(':', '')
+              
+              return `Picking_Request_${dateStr}_${timeStr}`
+            }(),
+  
+            columnDelimiter: ',',
+            headerCategory: 'Category',
+            headerValue: 'Value',
+          },
+          svg: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Picking_Request_${date}_${time}`
+            })(),
+          },
+          png: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Picking_Request_${date}_${time}`
+            })(),
+          },
+        },
+      },
+    },
+    title: {
+      text: 'Picking Request',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+        color: themeSecondaryTextColor,
+      },
     },
     stroke: { width: 0 },
     colors: [donutColors.series2],
@@ -406,7 +576,65 @@ export const getDonutChartConfigPOWaitingNoData = themeColors => {
       toolbar: { 
         show: false, 
         offsetX: 0,
-        offsetY: 5 },
+        offsetY: 5, 
+        export: {
+          csv: {
+            filename: function() {
+              const now = new Date()
+              const dateStr = now.toISOString().slice(0, 10)
+              const timeStr = now.toTimeString().slice(0, 5).replace(':', '')
+              
+              return `Await_Picking_${dateStr}_${timeStr}`
+            }(),
+  
+            columnDelimiter: ',',
+            headerCategory: 'Category',
+            headerValue: 'Value',
+          },
+          svg: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Await_Picking_${date}_${time}`
+            })(),
+          },
+          png: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Await_Picking_${date}_${time}`
+            })(),
+          },
+        },
+      },
+    },
+    title: {
+      text: 'Await Picking',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+        color: themeSecondaryTextColor,
+      },
     },
     stroke: { width: 0 },
     colors: [donutColors.series2],

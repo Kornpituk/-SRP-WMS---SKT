@@ -19,4 +19,9 @@ import skt from './skt'
 
 export default [...dashboard, ...inventory, ...configuration, ...countStock  ]
 
+<<<<<<< HEAD
+=======
+export default [...dashboard, ...inventory, ...charts]
+
+>>>>>>> origin/Gun-dev-Asaki-Branch-Debug
 // export default [ ...skt]

@@ -914,10 +914,16 @@ const showExpansionDialog = ref('')
                   <p style="margin: -0.5px; font-size: 15px;">
                     <strong>{{ $t('TolTalQTY') }}:</strong>
                   </p>
-                  <p v-if="checkRFID" style="margin: -0.5px; font-size: 15px;">
+                  <p
+                    v-if="checkRFID"
+                    style="margin: -0.5px; font-size: 15px;"
+                  >
                     <strong>Tag:</strong><span v-if="productsLocation.tags">{{ (formatDecimal(productsLocation.tags)).toLocaleString('en-US') }}</span> 
                   </p>
-                  <p v-if="checkRFID" style="margin-top: -0.5px; margin-bottom: -0.5px; font-size: 15px;">
+                  <p
+                    v-if="checkRFID"
+                    style="margin-top: -0.5px; margin-bottom: -0.5px; font-size: 15px;"
+                  >
                     <strong>Non-Tag:</strong><span v-if="productsLocation.nonTags">{{ (formatDecimal(productsLocation.nonTags)).toLocaleString('en-US') }}</span> 
                   </p>
                 </VCol>
@@ -987,6 +993,7 @@ const showExpansionDialog = ref('')
               {{ $t('Lot/Batch') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"
@@ -1063,6 +1070,7 @@ const showExpansionDialog = ref('')
               {{ $t('Warehouse') }} 
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuStock"
                 :close-on-content-click="false"
                 location="end"
@@ -1125,6 +1133,7 @@ const showExpansionDialog = ref('')
               {{ $t('Zone') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuZone"
                 :close-on-content-click="false"
                 location="end"
@@ -1188,6 +1197,7 @@ const showExpansionDialog = ref('')
               {{ $t('Area') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuArea"
                 :close-on-content-click="false"
                 location="end"
@@ -1252,6 +1262,7 @@ const showExpansionDialog = ref('')
               {{ $t('Sub Area') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSubArea"
                 :close-on-content-click="false"
                 location="end"
@@ -1316,7 +1327,7 @@ const showExpansionDialog = ref('')
               v-if="checkRFID"
               class="text-end px-1"
             >
-              {{ $t('ManyTags') }}
+              {{ $t('TAG QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1328,7 +1339,7 @@ const showExpansionDialog = ref('')
               v-if="checkRFID"
               class="text-end px-1"
             >
-              {{ $t('ManyNonTags') }}
+              {{ $t('NON-TAG QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1337,7 +1348,7 @@ const showExpansionDialog = ref('')
               />
             </th>
             <th class="text-end px-1">
-              {{ $t('QTY') }}
+              {{ $t('TOTAL QTY.') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 icon="mdi-pan-vertical"
@@ -1363,11 +1374,17 @@ const showExpansionDialog = ref('')
             :key="index"
           >
             <!-- 👉 Ordinal Number -->
-            <td v-if="false" class="px-1">
+            <td
+              v-if="false"
+              class="px-1"
+            >
               {{ (currentPage - 1) * rowPerPage + index + 1 }}
             </td>
 
-            <td v-if="true" class="px-1">
+            <td
+              v-if="true"
+              class="px-1"
+            >
               {{ index + 1 }}
             </td>
 
@@ -1418,6 +1435,7 @@ const showExpansionDialog = ref('')
               class="text-end px-6"
             >
               <span v-if="product.tags">{{ (formatDecimal(product.tags)).toLocaleString('en-US') }}</span>
+              <span v-else>0</span>
             </td>
 
             <!--  Number(Non-Tag) -->
@@ -1426,10 +1444,12 @@ const showExpansionDialog = ref('')
               class="text-end px-6"
             >
               <span v-if="product.nonTags">{{ (formatDecimal(product.nonTags)).toLocaleString('en-US') }}</span>
+              <span v-else>0</span>
             </td>
             <!--  Total quantity of products -->
             <td class="text-end px-6">
               <span v-if="product.qty">{{ (formatDecimal(product.qty)).toLocaleString('en-US') }}</span>
+              <span v-else>0</span>
             </td>
             <!-- 👉 Actions -->
             <td

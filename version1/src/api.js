@@ -29,5 +29,9 @@ const urlEnv = ref(process.env.VITE_API_URL)
 
 // const urlEnv = ref(urlSktTrue)
 
+<<<<<<< HEAD
 export const urlApi = urlApiWebOriginal
+=======
+export const urlApi = urlAsaki
+>>>>>>> origin/Gun-dev-Asaki-Branch-Debug
 

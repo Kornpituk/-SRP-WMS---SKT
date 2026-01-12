@@ -8,6 +8,8 @@ import { ref, watchEffect } from 'vue'
 
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 
+import { useToast } from "vue-toastification" //---------------- Import Toast alert
+
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
 const whereHouseSelectedItem = ref(whereHouse)
@@ -23,7 +25,10 @@ const totalCount = ref(0)
 
 const rowPerPage = ref(10)
 const currentPage = ref(1)
-const totalPage = ref(1)
+
+const totalPage = computed(() => {
+  return Math.ceil(totalCount.value / rowPerPage.value)
+})
 
 //------------------- Model ID For search ------------------------------------
 const searchByCategoryId = ref(null)
@@ -165,7 +170,7 @@ const clearValuesNeo = () => {
   }
 }
 
-const GetStockUpdate = () => {
+const GetStockUpdate = async () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
   axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
@@ -194,7 +199,7 @@ const GetStockUpdate = () => {
       'sortByType': sortByType.value,
       'sortBySubType': sortBySubType.value,
       'sortByBarcode': sortByBarcode.value,
-      'sortByProductId': sortByProductId.value,
+      'sortByProductId': sortByProductId.value || 'asc',
       'sortByProductName': sortByProductName.value,
       'sortByUnit': sortByUnit.value,
       'sortByQty': sortByQty.value,
@@ -220,7 +225,8 @@ const GetStockUpdate = () => {
 
       totalCount.value = response.data.totalCount
       currentPage.value = response.data.page
-      totalPage.value = response.data.totalPages
+
+      // totalPage.value = response.data.totalCount
       rowPerPage.value = response.data.perPage
 
       console.log('[products.value]!!: ', products)
@@ -299,25 +305,28 @@ const GetStockUpdateForPagination = () => {
     })
 }
 
-watch(GetStockUpdate)
+watch( async () => {
+  await GetStockUpdate()
+})
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
-watch(() => {
+watchEffect(() => {
   if (currentPage.value > totalPage.value)
     currentPage.value = totalPage.value
+
+  if (currentPage.value < 1)
+    currentPage.value = 1
 })
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
+  if (!products.value.length) return '0'
 
-  // console.log('const firstIndex ',firstIndex,'=','products.value.length:'+products.value.length,'?',(currentPage.value - 1)* rowPerPage.value + 1)
-  // console.log('const lastIndex ',lastIndex,'=',products.value.length,'+',(currentPage.value - 1),'*',rowPerPage.value)
-  // console.log('products.value.length: ',products.value.length)
-  
-  return `${ firstIndex }-${ lastIndex } of ${ totalCount.value }`
+  const firstIndex = (currentPage.value - 1) * rowPerPage.value + 1
+  const lastIndex = firstIndex + products.value.length - 1
+
+  return `${firstIndex}-${lastIndex} of ${totalCount.value}`
 })
 
 // SECTION Checkbox toggle
@@ -510,7 +519,7 @@ watch(getItemLocalZone)
 //--------------------------------------- FetchItems for Search  Area ----------------------------------------
 
 const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}api/v1/Locations/area/all`, {
+  axiosIns.get(`${urlApi.value}/api/v1/Locations/area/all`, {
     params: {
       'zoneCode': searchByZoneId.value,
     },
@@ -577,49 +586,79 @@ watchEffect(getItemLocalSubArea)
 // -------------------------------------- Export Bar Excel - --------------------------------
 
 const stockUpdateExcel = () => {
+  const toast = useToast()
+
+  toast.info("Exporting Excel...", { timeout: 1000 })
+
   axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
     headers: {
       'accept': '*/*',
       'x-location': `${whereHouse}`,
       Authorization: `Bearer ${accessTokenAtStore}`,
     },
-    responseType: 'blob', // ให้เซิร์ฟเวอร์รีเทิร์น blob สำหรับไฟล์ Excel
+    params: {
+      categoryId: searchByCategoryId.value,
+      typeId: searchByTypeId.value,
+      subTypeId: searchBySubTypeId.value,
+
+      // barcode: searchByBarcode.value,
+      // productId: searchByProductId.value,
+      // productName: searchByProductName.value,
+      unitId: searchByUOMId.value,
+      zoneId: searchByZoneId.value,
+      areaId: searchByAreaId.value,
+      subAreaId: searchBySubAreaId.value,
+      serialNo: serialProductCode.value,
+
+      searchByCategory: searchByCategoryName.value,
+      searchByType: searchByTypeName.value,
+      searchBySubType: searchBySubTypeName.value,
+      searchByBarcode: searchByBarcodeName.value,
+      searchByProductId: searchByProductCodeName.value,
+      searchByProductName: searchByProductNameFilter.value,
+      searchByUnit: searchByUnitName.value,
+
+      'sortByCategory': sortByCategory.value,
+      'sortByType': sortByType.value,
+      'sortBySubType': sortBySubType.value,
+      'sortByBarcode': sortByBarcode.value,
+      'sortByProductId': sortByProductId.value || 'asc',
+      'sortByProductName': sortByProductName.value,
+      'sortByUnit': sortByUnit.value,
+      'sortByQty': sortByQty.value,
+      'sortByTags': sortByTags.value,
+      'sortByNonTags': sortByNonTags.value,
+
+      // ... and so on with other parameters
+    },
+    responseType: 'blob',
   })
     .then(response => {
-      // สร้าง URL ของไฟล์ Excel จาก binary data
       const url = window.URL.createObjectURL(new Blob([response.data]))
 
-      const currentDate = new Date() // สร้างวัตถุ Date ปัจจุบัน
-      const year = currentDate.getFullYear() // ดึงปีปัจจุบัน
-      let fileYear
-      const threshold = 2500 // กำหนดจุดแบ่ง พ.ศ. กับ ค.ศ.
-
-      if (year > threshold) {
-        // พ.ศ. เปลี่ยนเป็น ค.ศ.
-        fileYear = year - 543
-      } else {
-        // ค.ศ.
-        fileYear = year
-      }
+      const currentDate = new Date()
+      const year = currentDate.getFullYear()
+      const threshold = 2500
+      const fileYear = year > threshold ? year - 543 : year
 
       const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
+      const fileName = `Stock_Update_Export_${dateString}.xlsx`
 
-      const fileName = `stock_update_Tag_${dateString}.xlsx` // ตั้งชื่อไฟล์โดยรวมกับวันที่
-
-      // สร้างลิงก์สำหรับดาวน์โหลดไฟล์ Excel
       const link = document.createElement('a')
 
       link.href = url
-      link.setAttribute('download', fileName) // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
+      link.setAttribute('download', fileName)
       document.body.appendChild(link)
       link.click()
 
-      // ลบ URL หลังจากดาวน์โหลดเสร็จเรียบร้อยแล้ว
       window.URL.revokeObjectURL(url)
+
+      // ✅ แจ้งผู้ใช้ว่าโหลดสำเร็จ
+      toast.success("Export successful!")
     })
     .catch(error => {
-      // จัดการข้อผิดพลาด
       console.error('Error:', error)
+      toast.error("Export failed. Please try again.")
     })
 }
 
@@ -681,7 +720,7 @@ const groupProduct = ref('')
 const groupSupProduct = ref('')
 const totalProduct = ref('')
 const unitNameProduct = ref('')
-const detailsProduct = ref('')
+const detailsProduct = ref()
 
 const showDialogImage = (code, name, img, barcode, categories, group, groupSup, total, unitName, details) => {
   codeProduct.value = code
@@ -695,7 +734,7 @@ const showDialogImage = (code, name, img, barcode, categories, group, groupSup, 
   unitNameProduct.value = unitName
   detailsProduct.value = details
   isDialogImageVisible.value = true
-  console.log('showImageFunction!!')
+  console.log('showImageFunction!!', details)
 }
 
 const showExpansionDialog = ref(false)
@@ -754,303 +793,6 @@ const showExpansionDialog = ref(false)
     </VCard>
   </div>
   <!-- ----------           Search bar                                   ------------------------------------ -->
-  <section v-if="false">
-    <VCard class="ma-2">
-      <VContainer
-        fluid
-        ma-6
-        pa-6
-        fill-height
-      >
-        <VForm @submit.prevent="submitSearchButton">
-          <!-- Warehouse  | Storehouse barcode | Store area | Sub Storage area -->
-
-          <VRow>
-            <!-- 👉 Select WareHouse -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VAutocomplete
-                v-model="searchByWareHouseId"
-                :label="$t('Warehouse')"
-                :items="wareHouseItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                item-text="name"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select Storehouse Zone -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VAutocomplete
-                v-model="searchByZoneId"
-                :label="$t('Store Zone')"
-                :items="zoneItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select Store area -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VAutocomplete
-                v-model="searchByAreaId"
-                :label="$t('Store Area')"
-                :items="areaItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select Sub Storage area -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VAutocomplete
-                v-model="searchBySubAreaId"
-                :label="$t('Sub Area')"
-                :items="subAreaItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-          </VRow>
-
-          <!-- product categories | Group | Sub Group | Counting unit -->
-          <VRow>
-            <!-- 👉 Select  product categories  -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <!-- 👉 Search categories -->
-
-              <section>
-                <VAutocomplete
-                  v-model="searchByCategoryId"
-                  :label="$t('Categories')"
-                  :items="itemsSearchByCategoryId"
-                  :custom-filter="customFilter"
-                  item-title="name"
-                  item-value="id"
-                  density="compact"
-                  clearable
-                  clear-icon="mdi-close"
-                />
-              </section>
-            </VCol>
-
-            <!-- 👉 Select Group -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-              md="6"
-            >
-              <!-- 👉 Search ProductID -->
-              <VAutocomplete
-                v-model="searchByTypeId"
-                :label="$t('Product Group')"
-                :items="typeItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="id"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select  Sub Group -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <!-- 👉 Search Description -->
-              <VAutocomplete
-                v-model="searchBySubTypeId"
-                :label="$t('Product Sub Group')"
-                :items="subTypeItemsSearchById"
-                :custom-filter="customFilter"
-                item-title="name"
-                item-value="name"
-                density="compact"
-                clearable
-                clear-icon="mdi-close"
-              />
-            </VCol>
-
-            <!-- 👉 Select Counting unit -->
-            <VCol
-              v-if="false"
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <section>
-                <VAutocomplete
-                  v-model="searchByUOMId"
-                  :label="$t('Counting Unit')"
-                  :items="itemsSearchByUOMId"
-                  :custom-filter="customFilter"
-                  item-title="name"
-                  item-value="id"
-                  density="compact"
-                  clearable
-                  clear-icon="mdi-close"
-                />
-              </section>
-            </VCol>
-            <!-- 👉 Select Counting Serial -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <section>
-                <VTextField
-                  v-model="searchByUOMId"
-                  :label="$t('Serial')"
-                  density="compact"
-                  clearable
-                />
-              </section>
-            </VCol>
-          </VRow>
-    
-          <!-- Barcode | Product code | Product Name | Button Export -->
-          <VRow>
-            <!-- 👉 Select Barcode -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <!-- 👉 Search Product code -->
-              <VTextField
-                v-model="searchByBarcode"
-                :label="$t('Barcode')"
-                type="Barcode"
-                density="compact"
-                append-inner-icon="mdi-barcode-scan"
-              />
-            </VCol>
-
-            <!-- 👉 Select Product code -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VTextField
-                v-model="searchByProductId"
-                :label="$t('Product Code')"
-                type="Product Code"
-                density="compact"
-              />
-            </VCol>
-
-            <!-- 👉 Select Product Name -->
-            <VCol
-              cols="12"
-              lg="3"
-              sm="6"
-            >
-              <VTextField
-                v-model="searchByProductName"
-                :label="$t('Product Name')"
-                type="Product Name"
-                density="compact"
-              />
-            </VCol>
-
-            <!-- 👉 Button Search and Export -->
-            <VCol
-              cols="12"
-              xs="4"
-              sm="4"
-              md="3"
-            >
-              <VRow>
-                <!-- 👉 Button Search  -->
-                <VCol
-                  xs="4"
-                  sm="6"
-                  cols="6"
-                >
-                  <VBtn
-                    type="submit"
-                    density="compact"
-                    size="x-large"
-                    class="px-16 px-sm-12 custom-small-btn-search"
-                    style="width: 100%; height: 100%;"
-                    @click="GetStockUpdate"
-                  >
-                    <VIcon
-                      icon="mdi-magnify"
-                      size="20px"
-                    />
-                    {{ $t('Search') }}
-                  </VBtn>
-                </VCol>
-                <!--  Export -->
-                <VCol
-                  sm="6"
-                  cols="6"
-                >
-                  <VBtn
-                    density="compact"
-                    class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
-                    color="warning"
-                    style="width: 100%; height: 100%;"
-                    @click="stockUpdateExcel"
-                  >
-                    <img
-                      src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
-                      style="width: 27px;"
-                      class="custom-small-img"
-                    >
-                    {{ $t('Export file') }}
-                  </VBtn>
-                </VCol>
-              </VRow>
-            </VCol>
-          </VRow>
-        </VForm>
-      </VContainer>
-    </VCard>
-  </section>
-
   <section
     v-if="true"
     class="my-2"
@@ -1487,7 +1229,7 @@ const showExpansionDialog = ref(false)
                 </VRow>
                 <span style="font-size: large; font-weight: 900;">{{
                   $t("Details ")
-                }} :</span>{{ detailsProduct }}
+                }} :</span>{{ detailsProduct?.note }}
               </div>
             </VCardText>
           </div>
@@ -1524,6 +1266,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1591,6 +1334,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Secondary product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1658,6 +1402,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Sub product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1720,11 +1465,12 @@ const showExpansionDialog = ref(false)
             </th>
             <th
               scope="row"
-              class="text-center"
+              class="text-center px-1"
             >
               {{ $t('Barcode') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -1792,6 +1538,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Product Code') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1859,6 +1606,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Product Name') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1937,7 +1685,7 @@ const showExpansionDialog = ref(false)
               scope="row"
               class="text-end px-1"
             >
-              Tag
+              TAG QTY.
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 color="primary"
@@ -1950,7 +1698,7 @@ const showExpansionDialog = ref(false)
               scope="row"
               class="text-end px-1"
             >
-              Non-Tag
+              NON-TAG QTY.
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 color="primary"
@@ -1962,7 +1710,7 @@ const showExpansionDialog = ref(false)
               scope="row"
               class="text-end px-1"
             >
-              {{ $t('QTY') }}
+              {{ $t('TOTAL QTY.') }} 
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
                 color="primary"
@@ -1977,6 +1725,7 @@ const showExpansionDialog = ref(false)
               {{ $t('Counting Unit') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
@@ -2039,7 +1788,7 @@ const showExpansionDialog = ref(false)
             </th>
             <th
               scope="row"
-              class="text-center px-4"
+              class="text-center px-1"
             >
               Action
             </th>
@@ -2092,7 +1841,7 @@ const showExpansionDialog = ref(false)
                       product.subTypeName,
                       product.qty,
                       product.unitName,
-                      product.details,
+                      product,
                       
                     )"
                   />
@@ -2124,7 +1873,7 @@ const showExpansionDialog = ref(false)
                         product.subTypeName,
                         product.qty,
                         product.unitName,
-                        product.details,
+                        product,
                       )"
                     >
                       <VExpandTransition>
@@ -2164,15 +1913,18 @@ const showExpansionDialog = ref(false)
 
             <!-- 👉 Barcode -->
             <td class="text-start px-1">
-              <VueBarcode
-                v-if="product.barcode"
-                :options="{
-                  width: '1%',
-                  height: '30%',
-                  fontSize: '16px', 
-                }"
-                :value="product.barcode"
-              />
+              <div class="d-flex justify-center align-items-center">
+                <VueBarcode
+                  v-if="product.barcode"
+                  class="text-start"
+                  :options="{
+                    width: '1%',
+                    height: '20%',
+                    fontSize: '16px', 
+                  }"
+                  :value="product.barcode"
+                />
+              </div>
             </td>
 
             <!-- 👉 Product code -->
@@ -2196,7 +1948,7 @@ const showExpansionDialog = ref(false)
             <!-- 👉 Number(Tag) -->
             <td
               v-if="checkRFID"
-              class="text-end px-6"
+              class="text-end px-1"
             >
               {{ (formatDecimal(product.tags)).toLocaleString('en-US') }}
             </td>
@@ -2204,18 +1956,18 @@ const showExpansionDialog = ref(false)
             <!-- 👉 Number(Non-Tag) -->
             <td
               v-if="checkRFID"
-              class="text-end  px-6"
+              class="text-end  px-1"
             >
               {{ (formatDecimal(product.nonTags)).toLocaleString('en-US') }}
             </td>
             <!-- 👉 Total quantity of products -->
-            <td class="text-end px-6">
+            <td class="text-end px-1">
               {{ (formatDecimal(product.qty)).toLocaleString('en-US') }}
             </td>
 
             <!-- 👉 Counting unit -->
             <td
-              class="text-start "
+              class="text-start px-1"
               style="width: 5rem;"
             >
               {{ product.unitName }}

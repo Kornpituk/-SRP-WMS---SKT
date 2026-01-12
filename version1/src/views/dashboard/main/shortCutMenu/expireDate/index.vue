@@ -7,7 +7,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
+import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
@@ -875,7 +875,6 @@ import p8 from "@images/topProductMove/ladies/L08.jpg"
 import p9 from "@images/topProductMove/ladies/L09.webp"
 
 import p10 from "@images/topProductMove/genter/genter01.webp"
-import p11 from "@images/topProductMove/genter/genter02.webp"
 import p12 from "@images/topProductMove/genter/genter03.webp"
 import p13 from "@images/topProductMove/genter/genter04.jpg"
 import p14 from "@images/topProductMove/genter/genter05.jpg"
@@ -958,7 +957,6 @@ const pushBtnTable = (productId, productUnitId) => {
 }
 
 //--------------------------------------- Menu Filter -------------------------------------------
-import avatar1 from '@images/avatars/avatar-1.png'
 
 const dialogHistory = (true)
 const menu = ref(false)
@@ -1415,6 +1413,7 @@ const getColorMenuStatus = title => {
               {{ $t('Status') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuStatus"
                 location="end"
               >
@@ -1482,6 +1481,7 @@ const getColorMenuStatus = title => {
               {{ $t('Categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1549,6 +1549,7 @@ const getColorMenuStatus = title => {
               {{ $t('Secondary product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1616,6 +1617,7 @@ const getColorMenuStatus = title => {
               {{ $t('Sub product categories') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1683,6 +1685,7 @@ const getColorMenuStatus = title => {
               {{ $t('Barcode') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -1750,6 +1753,7 @@ const getColorMenuStatus = title => {
               {{ $t('Product Code') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1817,6 +1821,7 @@ const getColorMenuStatus = title => {
               {{ $t('Product Name') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1885,6 +1890,7 @@ const getColorMenuStatus = title => {
               {{ $t('Lot') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuLot"
                 :close-on-content-click="false"
                 location="end"
@@ -2017,6 +2023,7 @@ const getColorMenuStatus = title => {
               {{ $t('Counting Unit') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
@@ -2112,6 +2119,7 @@ const getColorMenuStatus = title => {
               >
                 {{ $t('Alert') }}
               </VChip>
+              <h3><span class="text-amber">{{ $t('Alert') }}</span></h3>
             </td>
 
             <!-- 👉 Total quantity of products -->
@@ -2126,7 +2134,7 @@ const getColorMenuStatus = title => {
               >
                 {{ $t('Expiry') }}
               </VChip>
-              <span class="text-red">{{ $t('Expired') }}</span>
+              <h3><span class="text-red">{{ $t('Expired') }}</span></h3>
             </td>
 
             <!-- 👉 Image -->

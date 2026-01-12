@@ -15,57 +15,54 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-})
-
-watchEffect(() => {
- 
-})
-
-const dataTotalRecieved = ref([])
-const dataTotalTransferIn = ref([])
-const dataTotalOther = ref([])
-const series = ref([dataTotalRecieved, dataTotalTransferIn, dataTotalOther])
-
-watchEffect(() => {
-  console.log("pureData ## in Pie", props.pureData)
-
-  if(props.pureData){
-    const data = (props.pureData)
-
-    const dataSorted = ref('')
-    const typeDateFirst = ref('')
-
-    typeDateFirst.value = props.typeDate
-    if(props.typeDate  === 8){
-      dataSorted.value = sortDataByTimeHour(data)
-    } else {
-      dataSorted.value = data
-    }
-    const dayNames = dataSorted.value.filter(item => item.dayName).map(item => item.dayName)
-    const timeHours = dataSorted.value.filter(item => item.timeHour).map(item => item.timeHour.toString())
-
-    const dayNos = dataSorted.value.filter(item => item.dayNo).map(item => item.dayNo.toString())// *** not working
-
-    const qtyTransferOut = dataSorted.value.filter(item => item.qty && item.qty.transferOut !== undefined).map(item => item.qty.transferOut)
-    const qtyDelivery = dataSorted.value.filter(item => item.qty && item.qty.delivery !== undefined).map(item => item.qty.delivery)
-    const qtyWhiteOff = dataSorted.value.filter(item => item.qty && item.qty.writeOff !== undefined).map(item => item.qty.writeOff)
-    
-    const sumQtyTransferOut = qtyTransferOut.reduce((acc, curr) => acc + curr, 0)
-    const sumQtyDelivery = qtyDelivery.reduce((acc, curr) => acc + curr, 0)
-    const sumQtyWhite = qtyWhiteOff.reduce((acc, curr) => acc + curr, 0)
-
-    series.value = [
-      sumQtyTransferOut, sumQtyDelivery, sumQtyWhite,
-    ]
-    
-  }
+  dataChartWhite: {
+    type: String,
+    required: true,
+  },
+  dataChartTransferOut: {
+    type: String,
+    required: true,
+  },
+  dataChartDelivery: {
+    type: String,
+    required: true,
+  },
+  typeData: {
+    type: String,
+    required: true,
+  },
 })
 
 const vuetifyTheme = useTheme()
+const series = ref([])
+const chartConfig = ref({})
 
-const expenseRationChartConfig = computed(() =>
-  getDonutChartConfigPOSuccess(vuetifyTheme.current.value),
-)
+// ตรวจสอบ props และอัปเดต series
+watch(() => ({
+  tranferOut: props.dataChartTransferOut,
+  pickingDelivery: props.dataChartDelivery,
+  pickingWriteOff: props.dataChartWhite,
+}), ({ tranferOut, pickingDelivery, pickingWriteOff }) => {
+  series.value = [
+    Number(tranferOut) || 0,
+    Number(pickingDelivery) || 0,
+    Number(pickingWriteOff) || 0,
+  ]
+}, { immediate: true, deep: true })
+
+// ตรวจสอบ theme และอัปเดตการตั้งค่าแผนภูมิ
+watchEffect(() => {
+  if (vuetifyTheme.current.value) {
+    chartConfig.value = {
+      ...getDonutChartConfigPOSuccess(vuetifyTheme.current.value),
+    }
+  }
+})
+
+// Debug
+onMounted(() => {
+  console.log('Component mounted with series:', series.value)
+})
 </script>
 
 <template>
@@ -73,17 +70,25 @@ const expenseRationChartConfig = computed(() =>
     <VCol cols="12">
       <VCard>
         <VCardTitle class="py-5">
-          <span>{{ $t('Total Performance Picking') }}</span>
+          <span v-if="props.typeData ==='Await'">{{ $t('Total Performance Await Picking') }}</span>
+          <span v-else>{{ $t('Total Performance Picked') }}</span>
         </VCardTitle>
         <VDivider />
         <VCardText>
-          <div>
-            <VueApexCharts
-              type="pie"
-              height="450"
-              :options="expenseRationChartConfig"
-              :series="series"
-            />
+          <div style="width: 100%; height: 400px;">
+            <template v-if="series.length > 0">
+              <VueApexCharts
+                type="pie"
+                height="450"
+                :options="chartConfig"
+                :series="series"
+              />
+            </template>
+            <template v-else>
+              <div class="text-center py-4">
+                <VProgressCircular indeterminate />
+              </div>
+            </template>
           </div>
         </VCardText>
       </VCard>

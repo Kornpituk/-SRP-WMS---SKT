@@ -89,10 +89,87 @@ export const getDonutChartConfigPOSuccess = themeColors => {
     chart: {
       stacked: true,
       parentHeightOffset: 0,
+      animations: {
+        enabled: false, // ปิด animation ชั่วคราวเพื่อทดสอบ
+      },
       toolbar: { 
-        show: true, 
+        show: false, 
         offsetX: 0,
-        offsetY: 5 },
+        offsetY: 5,
+        export: {
+          csv: {
+            filename: function() {
+              const now = new Date()
+              const dateStr = now.toISOString().slice(0, 10)
+              const timeStr = now.toTimeString().slice(0, 5).replace(':', '')
+              
+              return `Inventory_Arrived_${dateStr}_${timeStr}`
+            }(),
+  
+            columnDelimiter: ',',
+            headerCategory: 'Category',
+            headerValue: 'Value',
+          },
+          svg: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Inventory_Arrived_${date}_${time}`
+            })(),
+          },
+          png: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Inventory_Arrived_${date}_${time}`
+            })(),
+          },
+          beforeExport: (chart, options) => {
+            const currentUser = 'John Doe'
+            const exportTime = new Date().toLocaleString('th-TH')
+
+            return {
+              ...options,
+              title: {
+                ...(options.title || {}),
+                text: `Inventory Arrived | ส่งออกโดย: ${currentUser}`,
+              },
+              subtitle: {
+                ...(options.subtitle || {}),
+                text: `ข้อมูล ณ วันที่: ${exportTime}`,
+              },
+            }
+          },
+        },
+      },
+    },
+    title: {
+      text: 'Inventory Arrived',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+        color: themeSecondaryTextColor,
+      },
     },
     stroke: { width: 0 },
     labels: ['RECEIVED PO', 'TRANSFER IN', 'RECEIVED OTHER'],
@@ -131,8 +208,7 @@ export const getDonutChartConfigPOSuccess = themeColors => {
                 const totalValue = w.globals.seriesTotals.reduce((a, b) => {
                   return a + b
                 }, 0)
- 
-                
+
                 return `${totalValue}`
               },
               color: themePrimaryTextColor,
@@ -196,15 +272,73 @@ export const getDonutChartConfigPOWaiting = themeColors => {
       stacked: true,
       parentHeightOffset: 0,
       toolbar: { 
-        show: true, 
+        show: false, 
         offsetX: 0,
-        offsetY: 5 },
+        offsetY: 5,
+        export: {
+          csv: {
+            filename: function() {
+              const now = new Date()
+              const dateStr = now.toISOString().slice(0, 10)
+              const timeStr = now.toTimeString().slice(0, 5).replace(':', '')
+              
+              return `Await_Receiving_${dateStr}_${timeStr}`
+            }(),
+  
+            columnDelimiter: ',',
+            headerCategory: 'Category',
+            headerValue: 'Value',
+          },
+          svg: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Await_Receiving_${date}_${time}`
+            })(),
+          },
+          png: {
+            filename: (() => {
+              const date = new Date().toLocaleDateString('th-TH').replace(/\//g, '-')
+
+              const time = new Date().toLocaleTimeString('th-TH', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+              }).replace(':', '')
+
+              return `Await_Receiving_${date}_${time}`
+            })(),
+          },
+        },
+      },
       zoom: {
         enabled: false,
       },
     },
+    title: {
+      text: 'Await Receiving',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+        color: themeSecondaryTextColor,
+      },
+    },
     stroke: { width: 0 },
-    labels: ['RECEIVED PO', 'TRANSFER IN'],
+    labels: ['PO', 'TRANSFER IN'],
     colors: [donutColors.series2, donutColors.series3, donutColors.series4],
     dataLabels: {
       enabled: true,
@@ -319,6 +453,22 @@ export const getDonutChartConfigPOSuccessNoData = themeColors => {
         offsetX: 0,
         offsetY: 5 },
     },
+    title: {
+      text: 'Inventory Arrived',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+        color: themeSecondaryTextColor,
+      },
+    },
     stroke: { width: 0 },
     colors: [donutColors.series2],
     dataLabels: {
@@ -414,6 +564,22 @@ export const getDonutChartConfigPOWaitingNoData = themeColors => {
         show: false, 
         offsetX: 0,
         offsetY: 5 },
+    },
+    title: {
+      text: 'Await Receiving',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: themePrimaryTextColor,
+      },
+    },
+    subtitle: {
+      text: '',
+      align: 'center',
+      style: {
+        fontSize: '14px',
+        color: themeSecondaryTextColor,
+      },
     },
     stroke: { width: 0 },
     colors: [donutColors.series2],

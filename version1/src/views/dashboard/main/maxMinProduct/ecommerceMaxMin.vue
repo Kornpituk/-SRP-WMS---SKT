@@ -70,6 +70,7 @@ const maxCatSummary = ref(0)
 const maxProductSummary = ref(0)
 
 const getSummaryMinMax = () => {
+  console.log('getSummaryMinMax')
   axios.get(`${urlApi.value}/api/v1/Dashboard/Summary/StockMaxMin`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -79,12 +80,16 @@ const getSummaryMinMax = () => {
     .then(response => {
       const responseData = response.data
 
+      
       minMaxDateSummary.value = responseData
 
-      minCatSummary.value = responseData.stockMin.categorys
-      minProductSummary.value = responseData.stockMin.products
-      maxCatSummary.value = responseData.stockMax.categorys
-      maxProductSummary.value = responseData.stockMax.products
+      console.log('getSummaryMinMax2', responseData.stockMax.categorys)
+      minCatSummary.value = responseData.stockMin?.categorys || 0
+      minProductSummary.value = responseData.stockMin?.products || 0
+      maxCatSummary.value = responseData.stockMax?.categorys || 0
+      maxProductSummary.value = responseData.stockMax?.products || 0
+
+      
 
       // console.log('Response Length product:', responseLength)
       console.log("MinMax", minMaxDateSummary.value)

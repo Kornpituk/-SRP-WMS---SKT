@@ -9234,10 +9234,17 @@ vue-template-es2015-compiler@^1.9.0:
   resolved "https://registry.npmjs.org/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz"
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
 
+<<<<<<< HEAD
 vue-zoomer@^0.4.0-beta.2:
   version "0.4.0-beta.2"
   resolved "https://registry.yarnpkg.com/vue-zoomer/-/vue-zoomer-0.4.0-beta.2.tgz#6adbc0c05b0f36a9b8d366cd8036f5f52e9c9ccb"
   integrity sha512-qS/EoO86oDDHbaSMT4gg24YYcDElROFvRjUSFcYg9P7IHpScUT+qRnywZMChjB+0mS+GXQJWXqQa8uztmwF+pw==
+=======
+vue-toastification@^2.0.0-rc.5:
+  version "2.0.0-rc.5"
+  resolved "https://registry.yarnpkg.com/vue-toastification/-/vue-toastification-2.0.0-rc.5.tgz#92798604d806ae473cfb76ed776fae294280f8f8"
+  integrity sha512-q73e5jy6gucEO/U+P48hqX+/qyXDozAGmaGgLFm5tXX4wJBcVsnGp4e/iJqlm9xzHETYOilUuwOUje2Qg1JdwA==
+>>>>>>> origin/Gun-dev-Asaki-Branch-Debug
 
 vue3-apexcharts@1.4.1:
   version "1.4.1"

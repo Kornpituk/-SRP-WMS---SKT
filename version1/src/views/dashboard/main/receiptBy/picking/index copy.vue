@@ -16,6 +16,7 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  
 })
 
 const MAX= 100

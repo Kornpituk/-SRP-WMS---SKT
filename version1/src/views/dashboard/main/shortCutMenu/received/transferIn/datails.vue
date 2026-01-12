@@ -6,6 +6,14 @@ import { ref, watch, watchEffect } from 'vue'
 import { VDataTable } from 'vuetify/labs/VDataTable'
 import { useRoute } from 'vue-router'
 
+const props = defineProps({
+  date: {
+    type: String,
+    required: true,
+  },
+})
+
+
 const route = useRoute()
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
@@ -256,6 +264,14 @@ const checkReceiveNos = receivedPO => {
   return false
 }
 
+const formateDateNew = inputDate => {
+
+  const [day, month, year] = inputDate.split('/')
+  
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+
 const GetReceivedPoDetails = () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
@@ -270,13 +286,13 @@ const GetReceivedPoDetails = () => {
       // dateSt: dateStData.value,
       // dateSp: dateSpData.value,
       stockId: stockIdData.value,
-      dateSt: startDate.value,
-      dateSp: endDate.value,
+      dateSt: formateDateNew(props.date),
+      dateSp: formateDateNew(props.date),
 
-      receiveDate: receiveDateData.value,
-      requestDate: requestDateData.value,
-      deliveryDate: deliveryDateData.value,
-      pickingGoodsDate: pickingGoodsDateData.value,
+      // receiveDate: receiveDateData.value,
+      // requestDate: requestDateData.value,
+      // deliveryDate: deliveryDateData.value,
+      // pickingGoodsDate: pickingGoodsDateData.value,
 
       receiveNo: receiveNoData.value,
       receiveBy: receiveByData.value,
@@ -827,7 +843,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
   <!-- ----------          New Search bar  Expansion  pannels               ------------------------------------ -->
 
   <!-- Expansion Filter -->
-  <section>
+  <section v-if="false">
     <VExpansionPanels>
       <VExpansionPanel>
         <VExpansionPanelTitle
@@ -1153,9 +1169,11 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
   <section>
     <VCard
       v-if="true"
-      class="mt-6"
+      class=""
     >
-      <VDivider />
+      <VCardTitle class="text-center bg-deep-orange">
+        Transfer In : Received
+      </VCardTitle>
 
       <VTable class="text-no-wrap table-header-bg rounded-0">
         <!-- 👉 table head -->
@@ -1168,17 +1186,27 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('No.') }}
             </th>
             <th
+              v-if="false"
+              scope="row"
+              class="text-center px-1"
+            >
+              {{ $t('Status') }}
+            </th>
+            <th
+              v-if="false"
               scope="row"
               class="text-center px-1"
             >
               {{ $t('Image') }}
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Category') }}
+              {{ $t('Categories') }}
               <VMenu
+                v-if="false"
                 v-model="menuCategory"
                 :close-on-content-click="false"
                 location="end"
@@ -1202,9 +1230,9 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           md="12"
                         >
                           <VTextField
-                            v-model="categoryNameData"
+                            v-model="searchByCategoryName"
                             class="mt-4"
-                            :label="$t('Category')"
+                            :label="$t('Categories')"
                           />
                         </VCol>
 
@@ -1216,7 +1244,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="categoryNameData = ''"
+                            @click="searchByCategoryName = ''"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -1240,12 +1268,15 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </VMenu>
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
               {{ $t('Group') }}
               <VMenu
+                v-if="false"
                 v-model="menuGroup"
+                s
                 :close-on-content-click="false"
                 location="end"
               >
@@ -1268,7 +1299,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           md="12"
                         >
                           <VTextField
-                            v-model="typeNameData"
+                            v-model="searchByTypeName"
                             class="mt-4"
                             :label="$t('Group')"
                           />
@@ -1282,7 +1313,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="typeNameData = ' ' "
+                            @click="searchByTypeName = ' '"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -1306,11 +1337,13 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </VMenu>
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-start px-1"
             >
               {{ $t('Sub Group') }}
               <VMenu
+                v-if="false"
                 v-model="menuSubGroup"
                 :close-on-content-click="false"
                 location="end"
@@ -1334,7 +1367,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           md="12"
                         >
                           <VTextField
-                            v-model="subTypeNameData"
+                            v-model="searchBySubTypeName"
                             class="mt-4"
                             :label="$t('Sub Group')"
                           />
@@ -1348,7 +1381,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="subTypeNameData = ''"
+                            @click="searchBySubTypeName = ''"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -1372,11 +1405,13 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </VMenu>
             </th>
             <th
+              v-if="false"
               scope="row"
               class="text-center px-1"
             >
               {{ $t('Barcode') }}
               <VMenu
+                v-if="false"
                 v-model="menuBarcode"
                 :close-on-content-click="false"
                 location="end"
@@ -1400,7 +1435,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           md="12"
                         >
                           <VTextField
-                            v-model="barcodeDataData"
+                            v-model="searchByBarcodeName"
                             class="mt-4"
                             :label="$t('Barcode')"
                           />
@@ -1414,7 +1449,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="barcodeDataData = ''"
+                            @click="searchByBarcodeName = ''"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -1441,8 +1476,47 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               scope="row"
               class="text-start px-1"
             >
+              {{ $t('Received No.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              v-if="checkConfigUser(nameUser)"
+              scope="row"
+              class="text-end px-1"
+            >
+              {{ $t('Received By') }}
+              <!-- ----------------------------- Icon Search By --------------------- -->
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              Picked Date
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Request NO.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Request Date') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
               {{ $t('Product Code') }}
               <VMenu
+                v-if="false"
                 v-model="menuProductCode"
                 :close-on-content-click="false"
                 location="end"
@@ -1466,7 +1540,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           md="12"
                         >
                           <VTextField
-                            v-model="productIdData"
+                            v-model="searchByProductCodeName"
                             class="mt-4"
                             :label="$t('Product Code')"
                           />
@@ -1480,7 +1554,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="productIdData = ''"
+                            @click="searchByProductCodeName = ''"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -1509,6 +1583,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ $t('Product Name') }}
               <VMenu
+                v-if="false"
                 v-model="menuProductName"
                 :close-on-content-click="false"
                 location="end"
@@ -1532,7 +1607,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           md="12"
                         >
                           <VTextField
-                            v-model="productNameData"
+                            v-model="searchByProductNameFilter"
                             class="mt-4"
                             :label="$t('Product Name')"
                           />
@@ -1546,7 +1621,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="productNameData = ''"
+                            @click="searchByProductNameFilter = ''"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -1569,422 +1644,22 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 </VCard>
               </VMenu>
             </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Received No.') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuReceiveNo"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="receiveNoData"
-                            class="mt-4"
-                            :label="$t('Received No.')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="receiveNoData = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuReceiveNo = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Received date') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Received Location') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Lot') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuLot"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="lotData"
-                            class="mt-4"
-                            :label="$t('Lot')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="lotData = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuLot = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Receive By') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuReceiveBy"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="receiveByData"
-                            class="mt-4"
-                            :label="$t('Receive By')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="receiveByData = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuReceiveBy = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Picking Goods No') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuPickingGoodsNo"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="pickingGoodsNoData"
-                            class="mt-4"
-                            :label="$t('Receive By')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="pickingGoodsNoData = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuPickingGoodsNo = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('QTY Picking') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Request No') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              <VMenu
-                v-model="menuRequestNo"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="requestNoData"
-                            class="mt-4"
-                            :label="$t('Request No')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="requestNoData = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuRequestNo = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
-            </th>
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Request Date') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByColDeliveryDate')"
-              />
-            </th>
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-start px-1"
-            >
-              {{ $t('Request Warehouse') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-            </th>
-            <th
-              scope="row"
-              class="text-end px-1"
-            >
-              {{ $t('QTY Received') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByTags')"
-              />
-            </th>
-            <th
-              v-if="checkConfigUser(nameUser)"
-              scope="row"
-              class="text-end px-1"
-            >
-              {{ $t('QTY Request') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              <VIcon
-                color="primary"
-                icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByTags')"
-              />
-            </th>
 
             <th
               v-if="checkConfigUser(nameUser)"
               scope="row"
               class="text-end px-1"
             >
-              {{ $t('QTY. Picking') }}
+              {{ $t("Received Qty.") }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VIcon
+                v-if="false"
                 color="primary"
                 icon="mdi-pan-vertical"
-                @click="toggleSortType('sortByTags')"
+                @click="sortByReceive = sortByReceive === 'asc' ? 'desc' : 'asc'"
               />
             </th>
+
             <th
               v-if="checkConfigUser(nameUser)"
               scope="row"
@@ -1993,6 +1668,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ $t('UoM') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
+                v-if="false"
                 v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
@@ -2016,7 +1692,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           md="12"
                         >
                           <VTextField
-                            v-model="uomData"
+                            v-model="searchByUnitName"
                             class="mt-4"
                             :label="$t('UoM')"
                           />
@@ -2030,7 +1706,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="uomData = ''"
+                            @click="searchByUnitName = ''"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -2053,15 +1729,32 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 </VCard>
               </VMenu>
             </th>
+
+            <th
+              v-if="checkConfigUser(nameUser)"
+              scope="row"
+              class="text-end px-1"
+            >
+              {{ $t(" PICKED QTY.") }}
+              <!-- ----------------------------- Icon Search By --------------------- -->
+              <VIcon
+                v-if="false"
+                color="primary"
+                icon="mdi-pan-vertical"
+                @click="sortByQtyOrder = sortByQtyOrder === 'asc' ? 'desc' : 'asc'"
+              />
+            </th>
+
             <th
               v-if="checkConfigUser(nameUser)"
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Remark Request') }}
+              {{ $t('UoM') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
               <VMenu
-                v-model="menuRemarkRequest"
+                v-if="false"
+                v-model="menuUoM"
                 :close-on-content-click="false"
                 location="end"
               >
@@ -2084,9 +1777,9 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           md="12"
                         >
                           <VTextField
-                            v-model="remarkRequestData"
+                            v-model="searchByUnitName"
                             class="mt-4"
-                            :label="$t('Remark Request')"
+                            :label="$t('UoM')"
                           />
                         </VCol>
 
@@ -2098,7 +1791,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                             type="submit"
                             style="width: 100%;"
                             color="warning"
-                            @click="remarkRequestData = ''"
+                            @click="searchByUnitName = ''"
                           >
                             {{ $t('Reset') }}
                           </VBtn>
@@ -2110,7 +1803,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                           <VBtn
                             type="submit"
                             style="width: 100%;"
-                            @click="menuRemarkRequest = false"
+                            @click="menuUoM = false"
                           >
                             {{ $t('Cancel') }}
                           </VBtn>
@@ -2121,72 +1814,43 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 </VCard>
               </VMenu>
             </th>
+
             <th
               scope="row"
               class="text-start px-1"
             >
-              {{ $t('Remark TransferIn') }}
+              {{ $t('Delivered Date') }}
+            </th>
+
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('PICKED FROM') }}
               <!-- ----------------------------- Icon Search By --------------------- -->
-              <VMenu
-                v-model="menuRemarkTranferIn"
-                :close-on-content-click="false"
-                location="end"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    color="primary"
-                    icon="mdi-magnify"
-                  />
-                </template>
-
-                <VCard min-width="300">
-                  <VDivider />
-
-                  <VList>
-                    <VListItem>
-                      <VRow>
-                        <VCol
-                          cols="12"
-                          md="12"
-                        >
-                          <VTextField
-                            v-model="remarkTranferInData"
-                            class="mt-4"
-                            :label="$t('Remark Transfer In')"
-                          />
-                        </VCol>
-
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            color="warning"
-                            @click="remarkTranferInData = ''"
-                          >
-                            {{ $t('Reset') }}
-                          </VBtn>
-                        </VCol>
-                        <VCol
-                          class="text-end"
-                          cols="6"
-                        >
-                          <VBtn
-                            type="submit"
-                            style="width: 100%;"
-                            @click="menuRemarkTranferIn = false"
-                          >
-                            {{ $t('Cancel') }}
-                          </VBtn>
-                        </VCol>
-                      </VRow>
-                    </VListItem>
-                  </VList>
-                </VCard>
-              </VMenu>
+            </th>
+            <th
+              v-if="false"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Location') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              v-if="false"
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('Ref. Doc.') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+            </th>
+            <th
+              scope="row"
+              class="text-start px-1"
+            >
+              {{ $t('PICKED DATE') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
             </th>
           </tr>
         </thead>
@@ -2202,11 +1866,27 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               :class="resolveChipColorTable(product.status)"
               class="text-center px-1"
             >
-              {{ index+1 }}
+              {{ index + 1 }}
+            </td>
+
+            <td
+              v-if="false"
+              :class="resolveChipColorTable(product.status)"
+              class="text-center px-1"
+            >
+              <VChip
+                v-if="checkReceiveNos(product.receiveNo)"
+                :color="resolveChipColor(checkReceiveNos(product.receiveNo))"
+                label
+              >
+                <span :class="resolveTextColorTable(checkReceiveNos(product.receiveNo))">{{
+                  checkReceiveNos(product.receiveNo) }}</span>
+              </VChip>
             </td>
 
             <!-- 👉 Image -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-center px-1"
             >
@@ -2258,17 +1938,17 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                       cover
                       class="image-transition"
                       @click="showDialogImage(
-                        product.productCode,
+                        product.productId,
                         product.productName,
                         product.color,
                         product.size,
                         product.status,
                         product.image,
                         product.barcode,
-                        product.categories,
-                        product.group,
-                        product.groupSup,
-                        product.total,
+                        product.category,
+                        product.typeName,
+                        product.subTypeName,
+                        product.qtyPo,
                         product.unitName,
                         product.details,
                       )"
@@ -2295,6 +1975,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Product categories -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-start px-1"
             >
@@ -2303,6 +1984,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Secondary product categories -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-start px-1"
             >
@@ -2311,6 +1993,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Sub product categories -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-start px-1"
             >
@@ -2319,6 +2002,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
 
             <!-- 👉 Barcode -->
             <td
+              v-if="false"
               :class="resolveChipColorTable(product.status)"
               class="text-center px-1"
             >
@@ -2327,11 +2011,52 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 :options="{
                   width: '1%',
                   height: '30%',
-                  fontSize: '16px', 
+                  fontSize: '16px',
                 }"
                 :value="product.barcode"
               />
             </td>
+
+            <!-- 👉 Number(Tag) -->
+            <td
+              :class="resolveChipColorTable(product.status)"
+              class="text-start  px-1"
+            >
+              {{ (product.receiveNo) }}
+            </td>
+
+            <!-- 👉 Actions -->
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ product.receiveBy }}
+            </td>
+
+            <!-- 👉 Number(Non-Tag) -->
+            <td
+              :class="resolveChipColorTable(product.status)"
+              class="text-start  px-1"
+            >
+              {{ formatDate(product.receiveDate) }}
+            </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ (product.requestNo	) }}
+            </td>
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ formatDate(product.requestDate	) }}
+            </td>
+
 
             <!-- 👉 Product code -->
             <td
@@ -2349,80 +2074,6 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               {{ (product.productName) }}
             </td>
 
-            <!-- 👉 Number(Tag) -->
-            <td
-              :class="resolveChipColorTable(product.status)"
-              class="text-start  px-1"
-            >
-              {{ (product.receiveNo) }}
-            </td>
-
-            <!-- 👉 Number(Non-Tag) -->
-            <td
-              :class="resolveChipColorTable(product.status)"
-              class="text-start  px-1"
-            >
-              {{ formatDate(product.receiveDate) }}
-            </td>
-            <!-- 👉 Total quantity of products -->
-            <td
-              :class="resolveChipColorTable(product.status)"
-              class="text-start  px-1"
-            >
-              {{ (product.locationReceive) }}
-            </td>
-
-            <!-- 👉 Counting unit -->
-            <td
-              :class="resolveChipColorTable(product.status)"
-              class="text-start  px-1"
-              style="width: 5rem;"
-            >
-              {{ product.lot }}
-            </td>
-
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-start px-1"
-            >
-              {{ (product.receiveBy) }}
-            </td>
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
-            >
-              {{ product.pickingGoodsNo }}
-            </td>
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
-            >
-              {{ product.qtyPicking }}
-            </td>
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
-            >
-              {{ product.requestNo }}
-            </td>
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-start px-1"
-            >
-              {{ formatDate(product.requestDate) }}
-            </td>
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-start px-1"
-            >
-              {{ product.requestWarhouse }}
-            </td>
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
@@ -2430,40 +2081,70 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
             >
               {{ product.qtyReceived }}
             </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ product.unitName }}
+            </td>
+
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
               class="text-end px-1"
             >
-              {{ product.qtyRequest }}
+              {{ product.qtyPicking }}
+            </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ product.unitName }}
+            </td>
+
+            <td
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ formatDate(product.deliveryDate) }}
+            </td>
+
+            <!-- 👉 Total quantity of products -->
+            <td
+              :class="resolveChipColorTable(product.status)"
+              class="text-start  px-1"
+            >
+              {{ (product.pickingWarhouse) }}
+            </td>
+
+            <!-- 👉 Counting unit -->
+            <td
+              v-if="false"
+              :class="resolveChipColorTable(product.status)"
+              class="text-start  px-1"
+              style="width: 5rem;"
+            >
+              {{ product.refDoc }}
+            </td>
+            <td
+              v-if="false"
+              :class="resolveChipColorTable(product.status)"
+              style="width: 8rem;"
+              class="text-start px-1"
+            >
+              {{ product.unitName }}
             </td>
             <td
               :class="resolveChipColorTable(product.status)"
               style="width: 8rem;"
-              class="text-end px-1"
+              class="text-start px-1"
             >
-              {{ (product.qtyPicking) }}
-            </td>
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
-            >
-              {{ (product.unitName) }}
-            </td>
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
-            >
-              {{ (product.remarkRequest) }}
-            </td>
-            <td
-              :class="resolveChipColorTable(product.status)"
-              style="width: 8rem;"
-              class="text-end px-1"
-            >
-              {{ (product.remarkTranferIn) }}
+              {{ formatDate(product.pickingDate) }}
             </td>
           </tr>
         </tbody>
