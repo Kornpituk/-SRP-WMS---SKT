@@ -318,7 +318,7 @@ const translatedKeys = {
   noDentOrDeform: "-ไม่บุบ ไม่เสียรูปทรง",
   strongBaseSupport: "-ฐานรองรับแข็งแรง",
   labelNotTorn: "2.Label ไม่ฉีกขาด",
-  correctLotNo: "- Lot No.ถูกต้อง",
+  correctLotNo: "- Lot No.",
   correctWeight: "- น้ำหนักถูกต้อง",
   correctLabelPosition: "- ตำแหน่ง Label ถูกต้อง (อยู่ตรงกลาง)",
   noTopVentHole: "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า",
@@ -369,7 +369,7 @@ onMounted(async () => {
     tableData.value.strongBaseSupport.push(!!item.baseStrong)
 
     tableData.value.labelNotTorn.push(!!item.labelIntact)
-    tableData.value.correctLotNo.push(!!item.correctLotNo)
+    tableData.value.correctLotNo.push(item.correctLotNo || '')  // ✅ ใช้ค่าจริง สำหรับ text input
     tableData.value.correctWeight.push(!!item.accurateWeight)
     tableData.value.correctLabelPosition.push(!!item.centeredLabel)
 
@@ -519,7 +519,7 @@ const mapShippingCheckSheetData = data => {
       noDents: item.noDents || false,
       baseStrong: item.baseStrong || false,
       labelIntact: item.labelIntact || false,
-      correctLotNo: item.correctLotNo || false,
+      correctLotNo: item.correctLotNo || "",
       accurateWeight: item.accurateWeight || false,
       centeredLabel: item.centeredLabel || false,
       capSeal: item.capSeal || false,
@@ -528,6 +528,13 @@ const mapShippingCheckSheetData = data => {
       capCondition: item.capCondition || false,
       topSeal: item.topSeal || false,
       bottomSeal: item.bottomSeal || false,
+    })),
+
+    shipperConditions: data.shipperConditions.map(item => ({
+      soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+      idx: item.idx,
+      shipperCondition: item.shipperCondition,
+      isChecked: item.isChecked,
     })),
 
     reportCheckSheet: data.reportCheckSheet 
@@ -688,7 +695,6 @@ const habdleSaveDraft = async () => {
       if(!trickerSaveDraft.value){
         textAlertDialogFunction(alertWordConst.saveDraft, false)
         setTimeout(() => {
-          location.reload()
         }, 500) // 0.5 วินาที
       }
       
@@ -1714,19 +1720,23 @@ const packagingChecksOtherTrue = computed(() => {
             <tbody>
               <!--  Condition check for special request | Check by -->
               <tr
-                v-for="item in getShippingCheckSheetResult?.specialRequestChecks"
+                v-for="item in getShippingCheckSheetResult?.shipperConditions"
                 :key="item.journalID"
               >
-                <td colspan="4">
+                <td
+                  style="width: 90px; max-width: 90px;"
+                  colspan="1"
+                >
                   <div class="d-flex justify-center">
                     <VCheckbox
-                      v-model="item.checkedValue"
+                      v-model="item.isChecked"
+                      
                       :readonly="disableInpit()"
                     />
                   </div>
                 </td>
                 <td colspan="8">
-                  {{ item.displayText }}
+                  {{ item.shipperCondition }}
                 </td>
               </tr>
               <tr v-if="getShippingSpecialConditionIconResult">
@@ -2127,7 +2137,10 @@ const packagingChecksOtherTrue = computed(() => {
               v-for="(item , index) in getShippingCheckSheetResult?.itemChecks"
               :key="index"
             >
-              <td colspan="1">
+              <td
+                colspan="1"
+                style="width: 90px; max-width: 90px;"
+              >
                 <div class="d-flex justify-center align-center">
                   <VCheckbox
                     v-model="item.checkedValue"
@@ -2435,12 +2448,19 @@ const packagingChecksOtherTrue = computed(() => {
                   :key="index"
                   colspan="2"
                 >
-                  <div v-if="checkboxKeys.includes(key)">
+                  <div v-if="key === 'correctLotNo'">
+                    <VTextField
+                      v-model="tableData[key][index]"
+                      :readonly="disableInpit()"
+                    />
+                  </div>
+                  <div v-else-if="checkboxKeys.includes(key)">
                     <VCheckbox
                       v-model="tableData[key][index]"
                       :readonly="disableInpit()"
                     />
                   </div>
+                  
                   <div v-else>
                     {{ value }}
                   </div>
@@ -2450,13 +2470,6 @@ const packagingChecksOtherTrue = computed(() => {
           </table>
         </div>
       </section>
-
-      <VBtn
-        v-if="false"
-        @click="showData"
-      >
-        asdasd
-      </VBtn>
 
       <div v-if="true">
         <section

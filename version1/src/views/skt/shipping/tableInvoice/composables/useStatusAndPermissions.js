@@ -151,7 +151,7 @@ export function useStatusAndPermissions() {
   /** Check If for btn Delete SOE */
   function checkIfForBtnDeleteSOE(product) {
     if(product.statusId === 202 || product.statusId === 203 || product.statusId === 204){
-      return product.csLfStatusId === 1002 || product.csLfStatusId === 1003 || product.csLfStatusId === 1103 || product.csLfStatusId === 1104
+      return product.csLfStatusId === 1002 || product.csLfStatusId === 1102 || product.csLfStatusId === 1003 || product.csLfStatusId === 1103 || product.csLfStatusId === 1104 || product.csLfStatusId === 1004
     }else{
       return false
     }

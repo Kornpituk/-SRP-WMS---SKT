@@ -101,7 +101,7 @@ const testShowFIle = () => {
 
 const checkColorBtnShowImage = (files, filesModel) => {
   if(files || filesModel){
-    if(props.disabledProp){
+    if(!props.disabledProp){
       return 1
     }else{
       return 2
@@ -119,7 +119,7 @@ const getIconType = (filesLength, filesModelLength) => {
   const status = checkColorBtnShowImage(filesLength, filesModelLength)
   if (status === 1) return 'ri-checkbox-circle-fill'
   if (status === 2) return 'mdi-camera'
-  if (status === 3) return 'mdi-file-image'
+  if (status === 3) return 'ri-upload-2-fill'
   
   return 'ri-close-circle-fill' // Default icon
 }
@@ -135,8 +135,8 @@ const getIconColor = (filesLength, filesModelLength) => {
 
 const getIconColorBtnInput = (filesLength, filesModelLength) => {
   const status = checkColorBtnShowImage(filesLength, filesModelLength)
-  if (status === 1) return 'blue'
-  if (status === 2) return 'info'
+  if (status === 1) return 'success'
+  if (status === 2) return 'green'
   if (status === 3) return 'blue'
   
   return 'grey' // Default color
@@ -242,7 +242,7 @@ const getVariantType = (filesLength, filesModelLength) => {
           style="width: 100%;"
           @click="openInputDialog"
         >
-          <div><VIcon icon="ri-upload-2-fill" />+{{ files.length }}</div>
+          <div><VIcon :icon="getIconType(files.length, filesModel.length)"  />+{{ files.length }}</div>
         </VBtn>
       </VCol>
       <VCol

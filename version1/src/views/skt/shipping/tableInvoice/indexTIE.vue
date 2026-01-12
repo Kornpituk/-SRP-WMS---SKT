@@ -4512,7 +4512,7 @@ const handleSavetruckOrder = async type => {
                 <VTextField
                   v-model="product.shipperLocation"
                   density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canVisible || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   class="text-field"
                   style=" min-width: 150px; font-size: 12px !important;"
                 >
@@ -4728,7 +4728,9 @@ const handleSavetruckOrder = async type => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="COA"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_COA').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) || product.catId !== '03'"
+                    :disabled-prop="canVisibleUserPermission(statusPermission, 'COL_COA').canExecute &&
+                      disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) || 
+                      product.catId !== '04'"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.getCOAFileData"
                     file-name="COA"
