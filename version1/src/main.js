@@ -25,14 +25,14 @@ import '@vuepic/vue-datepicker/dist/main.css'
 // import VueColumnsResizableVuetify from 'vue-columns-resizable-vuetify'
 import resizable from './plugins/resizable/resizable' // Import resizable directive
 
-import Toast from "vue-toastification"
-import "vue-toastification/dist/index.css"
+// import Toast from "vue-toastification"
+// import "vue-toastification/dist/index.css"
 
-const options = {
-  timeout: 2000,
-  position: "bottom-right",
-  closeOnClick: true,
-}
+// const options = {
+//   timeout: 2000,
+//   position: "bottom-right",
+//   closeOnClick: true,
+// }
 
 
 
@@ -42,7 +42,7 @@ loadFonts()
 // Create vue app
 const app = createApp(App)
 
-app.use(Toast, options)
+// app.use(Toast, options)
 
 // Use plugins
 app.use(vuetify)
