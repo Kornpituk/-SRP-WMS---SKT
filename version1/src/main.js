@@ -18,7 +18,7 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
 import VuePanzoom from "vue-panzoom"
-import VueZoomer from 'vue-zoomer'
+// import VueZoomer from 'vue-zoomer'
 
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
@@ -27,21 +27,16 @@ import '@vuepic/vue-datepicker/dist/main.css'
 // import VueColumnsResizableVuetify from 'vue-columns-resizable-vuetify'
 import resizable from './plugins/resizable/resizable' // Import resizable directive
 
-<<<<<<< HEAD
-import VueEasyLightbox from 'vue-easy-lightbox'
-import VuePdfEmbed from 'vue-pdf-embed'
-=======
-import Toast from "vue-toastification"
-import "vue-toastification/dist/index.css"
+// import Toast from "vue-toastification"
+// import "vue-toastification/dist/index.css"
 
-const options = {
-  timeout: 2000,
-  position: "bottom-right",
-  closeOnClick: true,
-}
+// const options = {
+//   timeout: 2000,
+//   position: "bottom-right",
+//   closeOnClick: true,
+// }
 
 
->>>>>>> origin/Gun-dev-Asaki-Branch-Debug
 
 loadFonts()
 
@@ -49,7 +44,7 @@ loadFonts()
 // Create vue app
 const app = createApp(App)
 
-app.use(Toast, options)
+// app.use(Toast, options)
 
 // Use plugins
 app.use(vuetify)
@@ -64,7 +59,7 @@ app.use(i18n)
 app.use(VueEasyLightbox)
 app.use(VuePdfEmbed)
 app.use(VuePanzoom)
-app.use(VueZoomer)
+// app.use(VueZoomer)
 
 // app.use(VueColumnsResizableVuetify)
 app.directive('resizable', resizable)

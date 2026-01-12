@@ -3,8 +3,8 @@ import VueApexCharts from "vue3-apexcharts"
 import { useTheme } from "vuetify"
 import { hexToRgb } from "@layouts/utils"
 
-import TopProductMove from "@/views/dashboard/main/topProductMove/EcommerceTopReferralSources.vue"
-import TopProductNonMove from "@/views/dashboard/main/topProductNonMove/EcommerceTopReferralSources.vue"
+// import TopProductMove from "@/views/dashboard/main/topProductMove/EcommerceTopReferralSources.vue"
+// import TopProductNonMove from "@/views/dashboard/main/topProductNonMove/EcommerceTopReferralSources.vue"
 
 
 // console.log("Average of Move:", averages[0].toFixed(2)) // 172.71428571428572
