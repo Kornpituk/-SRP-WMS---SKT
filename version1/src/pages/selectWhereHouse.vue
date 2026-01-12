@@ -111,9 +111,9 @@ const onSubmitWhereHouse = () => {
 
     // router.replace(route.query.to ? String(route.query.to) : '/dashboard/store')
 
-    router.replace('/skt/receiving')
+    // router.replace('/skt/receiving')
 
-    // router.replace('/dashboards/main')
+    router.replace('/dashboards/main')
   }
 
   // saveToLocalStorage()
