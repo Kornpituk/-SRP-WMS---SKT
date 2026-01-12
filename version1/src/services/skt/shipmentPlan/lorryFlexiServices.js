@@ -127,7 +127,7 @@ export const useShippingCheckSheetLorryService = () => {
       }
     } catch (error) {
       //console.log('Error in submitShipmentPlan:', error)
-      errorShippingCheckSheetLorry.value = error.message
+      errorShippingCheckSheetLorry.value = error
     }
   }
   

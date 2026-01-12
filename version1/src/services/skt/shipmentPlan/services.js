@@ -134,6 +134,36 @@ export const useGetSearchPlanService = () => {
   }
 }
 
+export const useGetSearchPlanSapinvoicenoIsexistService = () => {
+  const getSearchPlanSapInVResult = ref(null)
+  const errorGetSearchPlanSapInV = ref(null)
+  
+  const fetchSearchPlanSapInV = async (urlApi, form, whereHouse, accessToke, SoEtlLogDetailJournalID, SAPInvoiceNo) => {
+    try {
+      errorGetSearchPlanSapInV.value = null
+  
+      const result = await shipmentPlanRepository.getSearchPlanSapinvoicenoIsexist(urlApi, form, whereHouse, accessToke, SoEtlLogDetailJournalID, SAPInvoiceNo)
+        
+      if (result) {
+        getSearchPlanSapInVResult.value = result.data
+        
+        return result.data
+      } else {
+        console.warn('No data returned from the API')
+      }
+    } catch (error) {
+      errorGetSearchPlanSapInV.value = error.message
+    }
+  }
+  
+  return {
+    getSearchPlanSapInVResult,
+    errorGetSearchPlanSapInV,
+    fetchSearchPlanSapInV,
+  }
+}
+
+
 //---------------------------------- post ---------------------------------
 export const useSaveSearchPlanService = () => {
   const saveSearchPlanResult = ref(null)
@@ -210,7 +240,7 @@ export const useSubmitShipmentPlanService = () => {
     try {
       errorSubmitShipmentPlan.value = null
 
-      //console.log('submitShipmentPlan...')
+      // console.log('submitShipmentPlan...')
   
       const result = await shipmentPlanRepository.submitShipmentPlan(urlApi, form, whereHouse, accessToke, soeId, comment)
         
@@ -223,7 +253,6 @@ export const useSubmitShipmentPlanService = () => {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      //console.log('Error in submitShipmentPlan:', error)
       errorSubmitShipmentPlan.value = error.message
     }
   }

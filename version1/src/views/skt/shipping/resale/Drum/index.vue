@@ -1,15 +1,14 @@
 <script setup>
-import { onMounted, ref, watch, watchEffect } from "vue"
+import { onMounted, ref, watch } from "vue"
 
 import iconMock1 from '@images/icons/Group 1000004801.png'
 import iconMock2 from '@images/icons/Group 1000004802.png'
 import iconMock3 from '@images/icons/Icon.png'
 
 
-import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
-import { VDataTable } from 'vuetify/labs/VDataTable'
+import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
-import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 const itemStore = useItemStore()
 
@@ -76,7 +75,7 @@ const showBtnCheckSheet = () => {
 //-------------------------------------------- Permission -----------------------------------------
 
 // const { getUserPermissionResult, errorGetUserPermission, fetchUserPermission } = useGetUserPermissionService()
-import { fetchUserPermissions, canVisibleUserPermissionPermission } from '@/utilities/permission'
+import { canVisibleUserPermissionPermission, fetchUserPermissions } from '@/utilities/permission'
 
 
 const paramsForGetPermission = ref({
@@ -118,7 +117,7 @@ const statusModel = ref(dataProductRow.value.csLfStatusId)
 
 //console.log('journalIdModel', dataProductRow.value.journalID)
 
-//------------------------------- disabled input ---------------------------
+//--------------------------handleSubmit----- disabled input ---------------------------
 
 const disableInpit = () => {
   return statusModel.value === 1005
@@ -154,11 +153,16 @@ function getCurrentDate() {
 
 //------------------------------------ import service --------------------------------
 
-import { useGenerateFormService, useGetShippingCheckSheetService,
-  useGetShippingChecksheetImageService, useShippingCheckSheetService,
-  useSubmitCheckSheetService, useGetShippingCheckSheetFileIconService,
-  useGetFileFormService, useShippingCheckSheetFileFormService,
-  useGetShippingSpecialConditionIconService, useDeleteFileFormService,
+import {
+  useDeleteFileFormService,
+  useGetFileFormService,
+  useGetShippingCheckSheetFileIconService,
+  useGetShippingCheckSheetService,
+  useGetShippingChecksheetImageService,
+  useGetShippingSpecialConditionIconService,
+  useShippingCheckSheetFileFormService,
+  useShippingCheckSheetService,
+  useSubmitCheckSheetService,
 } from '@/services/skt/shipmentPlan/checkSheetServices'
 
 //------------------------------------ generate section ----------------------
@@ -195,8 +199,10 @@ onMounted( () => {
 
 //------------------------------------ Get ShippingCheckSheet  ----------------------
 
-import { GBSmockDataIm, specialRequestsIm,
-  validateAfterPickingIm, resaleProductShippingIm,
+import {
+  GBSmockDataIm,
+  resaleProductShippingIm,
+  validateAfterPickingIm,
 } from './GBSMockData'
 
 
@@ -279,7 +285,7 @@ const showImagNew = file => {
 }
 
 const showData = () => {
-  //console.log('Data Current', getShippingCheckSheetResult.value)
+  console.log('Data Current', getShippingCheckSheetResult.value)
 }
 
 const tableData = ref({
@@ -312,7 +318,7 @@ const translatedKeys = {
   noDentOrDeform: "-ไม่บุบ ไม่เสียรูปทรง",
   strongBaseSupport: "-ฐานรองรับแข็งแรง",
   labelNotTorn: "2.Label ไม่ฉีกขาด",
-  correctLotNo: "- Lot No.ถูกต้อง",
+  correctLotNo: "- Lot No.",
   correctWeight: "- น้ำหนักถูกต้อง",
   correctLabelPosition: "- ตำแหน่ง Label ถูกต้อง (อยู่ตรงกลาง)",
   noTopVentHole: "3.ฝาปิดด้านบนไม่มีรูระบายอากาศ/น้ำไม่เข้า",
@@ -363,7 +369,7 @@ onMounted(async () => {
     tableData.value.strongBaseSupport.push(!!item.baseStrong)
 
     tableData.value.labelNotTorn.push(!!item.labelIntact)
-    tableData.value.correctLotNo.push(!!item.correctLotNo)
+    tableData.value.correctLotNo.push(item.correctLotNo || '')  // ✅ ใช้ค่าจริง สำหรับ text input
     tableData.value.correctWeight.push(!!item.accurateWeight)
     tableData.value.correctLabelPosition.push(!!item.centeredLabel)
 
@@ -513,7 +519,7 @@ const mapShippingCheckSheetData = data => {
       noDents: item.noDents || false,
       baseStrong: item.baseStrong || false,
       labelIntact: item.labelIntact || false,
-      correctLotNo: item.correctLotNo || false,
+      correctLotNo: item.correctLotNo || "",
       accurateWeight: item.accurateWeight || false,
       centeredLabel: item.centeredLabel || false,
       capSeal: item.capSeal || false,
@@ -522,6 +528,13 @@ const mapShippingCheckSheetData = data => {
       capCondition: item.capCondition || false,
       topSeal: item.topSeal || false,
       bottomSeal: item.bottomSeal || false,
+    })),
+
+    shipperConditions: data.shipperConditions.map(item => ({
+      soEtlLogDetailJournalID: item.soEtlLogDetailJournalID,
+      idx: item.idx,
+      shipperCondition: item.shipperCondition,
+      isChecked: item.isChecked,
     })),
 
     reportCheckSheet: data.reportCheckSheet 
@@ -625,7 +638,7 @@ const habdleSaveDraft = async () => {
   if(!file){
     textAlertDialogFunction('FILE', false)
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 0.5 วินาที
     
     return
@@ -634,7 +647,7 @@ const habdleSaveDraft = async () => {
   if(!file2){
     textAlertDialogFunction('FILE2', false)
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 0.5 วินาที
     
     return
@@ -645,7 +658,7 @@ const habdleSaveDraft = async () => {
   if(!file3){
     textAlertDialogFunction('FILE3', false)
     setTimeout(() => {
-      // location.reload()
+      location.reload()
     }, 500) // 0.5 วินาที
     
     return
@@ -672,7 +685,6 @@ const habdleSaveDraft = async () => {
       if(!trickerSaveDraft.value){
         textAlertDialogFunction(alertWordConst.saveDraft, true)
         setTimeout(() => {
-        // location.reload()
 
           location.reload()
         }, 500) // 0.5 วินาที
@@ -683,7 +695,6 @@ const habdleSaveDraft = async () => {
       if(!trickerSaveDraft.value){
         textAlertDialogFunction(alertWordConst.saveDraft, false)
         setTimeout(() => {
-        // location.reload()
         }, 500) // 0.5 วินาที
       }
       
@@ -700,33 +711,42 @@ const { submitCheckSheetResult,
   submitCheckSheetError,
   submitCheckSheetFunction } = useSubmitCheckSheetService()
 
+
+const WH1ACCEPTLoading = ref(false)
+ 
 const handleSubmit = async type => {
 
   trickerSaveDraft.value = true
+
+  WH1ACCEPTLoading.value = true
 
   await habdleSaveDraft()
 
   try {
     //console.log("requestData 1")
 
-    const result = submitCheckSheetFunction(urlApi.value, type, whereHouse, 
+    const result = await submitCheckSheetFunction(urlApi.value, type, whereHouse, 
       accessTokenAtStore, SoEtlLogDetailJournalIDModel.value)
 
-    //console.log("requestData 2")
+
+
     if(result || submitCheckSheetResult.value){
       if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, true)
         setTimeout(() => {
           window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
-      }else{
+      }else if(type === 'Reject'){
+        textAlertDialogFunction(alertWordConst.reject, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
+      }
+      else{
         submitCheckSheetResult.value = result
-        submitCheckSheetError.value = null
 
-        //console.log('submitCheckSheetResult', result)
         textAlertDialogFunction(alertWordConst.submit, true)
 
-        //console.log("requestData 3")
         setTimeout(() => {
           window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
@@ -734,17 +754,21 @@ const handleSubmit = async type => {
       
     }else{
       if(type === 'back'){
-        textAlertDialogFunction(alertWordConst.sendBack, true)
+        textAlertDialogFunction(alertWordConst.sendBack, false)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
+      }else if(type === 'Reject'){
+        textAlertDialogFunction(alertWordConst.reject, false)
         setTimeout(() => {
           window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
       }else{
-        //console.log('submitCheckSheetError !result ', submitCheckSheetError.value)
-        textAlertDialogFunction(alertWordConst.submit, false)
 
-        //console.log("requestData 4")
+        textAlertDialogFunction(submitCheckSheetError.value, false)
+
         setTimeout(() => {
-        // location.reload()
+          // location.reload()
         }, 500) // 0.5 วินาที
       }
       
@@ -752,9 +776,11 @@ const handleSubmit = async type => {
   } catch (error) {
     submitCheckSheetError.value = error.message
   }
+
+  WH1ACCEPTLoading.value = false
 }
 
-import { 
+import {
   useSubmitShipmentPlanService,
 } from '@/services/skt/shipmentPlan/services'
 
@@ -768,22 +794,24 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
   try{
     //console.log('submitShipmentPlanBySoEId start!!')
 
-    // if(type === 'submit'){
+    if(type === 'submit'){
 
-    // }else if(type === 'approve' || type === 'reject'){
-    //   //console.log('submitShipmentPlanBySoEId start!! 3')
-    //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-    //   //console.log('submitShipmentPlanBySoEId start!! 2')
-    // }else if(type === 'back'){
-    //   soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
-    //   //console.log('submitShipmentPlanBySoEId back !! 3')
-    // }
+    }else if(type === 'approve' || type === 'reject'){
+      //console.log('submitShipmentPlanBySoEId start!! 3')
+      soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
-    // if(!statusCommnetValue.value && type === 'reject'){
-    //   textAlertDialogFunction('Please enter Reject Comment.', false)
+      //console.log('submitShipmentPlanBySoEId start!! 2')
+    }else if(type === 'back'){
+      soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
+
+      //console.log('submitShipmentPlanBySoEId back !! 3')
+    }
+
+    if(!statusCommnetValue.value && type === 'reject'){
+      textAlertDialogFunction('Please enter Reject Comment.', false)
       
-    //   return
-    // }
+      return
+    }
 
     soEtlLogDetailJournalID = SoEtlLogDetailJournalIDModel.value
     
@@ -975,8 +1003,6 @@ onMounted(async () => {
   fetIconCondition()
 })
 
-import image01 from '@/views/skt/shipping/image/01.png'
-import image02 from '@/views/skt/shipping/image/02.png'
 
 
 
@@ -1310,6 +1336,14 @@ const dessertsMockAmountView = [
     protein: 4,
   },
 ]
+
+const packagingChecksOtherTrue = computed(() => {
+  return (
+    getShippingCheckSheetResult.value?.packagingChecks?.filter(
+      item => item.isOther && item.checkedValue === true,
+    ) || []
+  )
+})
 </script>
 
 <template>
@@ -1477,7 +1511,7 @@ const dessertsMockAmountView = [
                 >
                   <td>{{ index+1 }}</td>
                   <td>
-                    <span v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 0">
+                    <span v-if="statusModel === 1002 || statusModel === 1003 || statusModel === 1004 || statusModel === 0">
                       <VTextField
                         v-model="item.containerNo_LicPlNo"
                         :readonly="disableInpit()"
@@ -1686,19 +1720,23 @@ const dessertsMockAmountView = [
             <tbody>
               <!--  Condition check for special request | Check by -->
               <tr
-                v-for="item in getShippingCheckSheetResult?.specialRequestChecks"
+                v-for="item in getShippingCheckSheetResult?.shipperConditions"
                 :key="item.journalID"
               >
-                <td colspan="4">
+                <td
+                  style="width: 90px; max-width: 90px;"
+                  colspan="1"
+                >
                   <div class="d-flex justify-center">
                     <VCheckbox
-                      v-model="item.checkedValue"
+                      v-model="item.isChecked"
+                      
                       :readonly="disableInpit()"
                     />
                   </div>
                 </td>
                 <td colspan="8">
-                  {{ item.displayText }}
+                  {{ item.shipperCondition }}
                 </td>
               </tr>
               <tr v-if="getShippingSpecialConditionIconResult">
@@ -2099,7 +2137,10 @@ const dessertsMockAmountView = [
               v-for="(item , index) in getShippingCheckSheetResult?.itemChecks"
               :key="index"
             >
-              <td colspan="1">
+              <td
+                colspan="1"
+                style="width: 90px; max-width: 90px;"
+              >
                 <div class="d-flex justify-center align-center">
                   <VCheckbox
                     v-model="item.checkedValue"
@@ -2163,80 +2204,136 @@ const dessertsMockAmountView = [
                 </th>
               </tr>
             </thead>
+            <!--
+              <tbody>
+              <tr
+              v-for="(item , index) in getShippingCheckSheetResult?.packagingChecks"
+              :key="index"
+              >
+              <td colspan="4">
+              <div class="d-flex justify-center">
+              {{ item.displayText }}
+              </div>
+              </td>
+              <td colspan="4">
+              <div class="d-flex justify-center">
+              <div
+              v-if="item.option1Text === 'Wood'"
+              class="d-flex justify-center align-center"
+              >
+              <VCheckbox
+              v-model="item.checkedValue"
+              :readonly="disableInpit()"
+              :value="checkThePackagingCheckTrue"
+              />
+              Wood
+              </div>
+              <div
+              v-else
+              class="d-flex justify-center align-center"
+              >
+              <VCheckbox
+              v-model="item.checkedValue"
+              :readonly="disableInpit()"
+              :value="checkThePackagingCheckTrue"
+              />
+              Yes
+              </div>
+              </div>
+              </td>
+              <td colspan="4">
+              <div class="d-flex justify-center">
+              <div
+              v-if="item.option2Text === 'Plastic'"
+              class="d-flex justify-center align-center"
+              >
+              <VCheckbox
+              v-model="item.checkedValue"
+              :readonly="disableInpit()"
+              :value="false"
+              />
+              Plastic 
+              </div>
+              <div
+              v-else
+              class="d-flex justify-center align-center"
+              >
+              <VCheckbox
+              v-model="item.checkedValue"
+              :readonly="disableInpit()"
+              :value="false"
+              />
+              NO 
+              </div>
+              </div>
+              </td>
+              </tr>
+              <tr v-if="getShippingCheckSheetResult?.packagingChecks[3]?.checkedValue">
+              <td colspan="12">
+              <div>
+              <VTextarea
+              v-model="getShippingCheckSheetResult.reportCheckSheet.other"
+              :readonly="disableInpit()"
+              counter
+              label="Other"
+              placeholder="Enter Other"
+              />
+              </div>
+              </td>
+              </tr>
+              </tbody> 
+            -->
+
             <tbody>
               <tr
-                v-for="(item , index) in getShippingCheckSheetResult?.packagingChecks"
-                :key="index"
+                v-for="(item) in getShippingCheckSheetResult?.packagingChecks"
+                :key="item.journalID"
               >
+                <!-- Display Text -->
                 <td colspan="4">
                   <div class="d-flex justify-center">
                     {{ item.displayText }}
                   </div>
                 </td>
+
+                <!-- Option 1 -->
                 <td colspan="4">
-                  <div class="d-flex justify-center">
-                    <div
-                      v-if="item.option1Text === 'Wood'"
-                      class="d-flex justify-center align-center"
-                    >
-                      <VCheckbox
-                        v-model="item.checkedValue"
-                        :readonly="disableInpit()"
-                        :value="checkThePackagingCheckTrue"
-                      />
-                      Wood
-                    </div>
-                    <div
-                      v-else
-                      class="d-flex justify-center align-center"
-                    >
-                      <VCheckbox
-                        v-model="item.checkedValue"
-                        :readonly="disableInpit()"
-                        :value="checkThePackagingCheckTrue"
-                      />
-                      Yes
-                    </div>
+                  <div class="d-flex justify-center align-center">
+                    <VCheckbox
+                      v-model="item.checkedValue"
+                      :readonly="disableInpit()"
+                      :value="checkThePackagingCheckTrue"
+                    />
+                    {{ item.option1Text || 'Yes' }}
                   </div>
                 </td>
+
+                <!-- Option 2 -->
                 <td colspan="4">
-                  <div class="d-flex justify-center">
-                    <div
-                      v-if="item.option2Text === 'Plastic'"
-                      class="d-flex justify-center align-center"
-                    >
-                      <VCheckbox
-                        v-model="item.checkedValue"
-                        :readonly="disableInpit()"
-                        :value="false"
-                      />
-                      Plastic 
-                    </div>
-                    <div
-                      v-else
-                      class="d-flex justify-center align-center"
-                    >
-                      <VCheckbox
-                        v-model="item.checkedValue"
-                        :readonly="disableInpit()"
-                        :value="false"
-                      />
-                      NO 
-                    </div>
+                  <div class="d-flex justify-center align-center">
+                    <VCheckbox
+                      v-model="item.checkedValue"
+                      :readonly="disableInpit()"
+                      :value="false"
+                    />
+                    {{ item.option2Text || 'No' }}
                   </div>
                 </td>
               </tr>
-              <tr v-if="getShippingCheckSheetResult?.packagingChecks[3].checkedValue">
+
+              <!-- OTHER ROW -->
+              <tr
+                v-for="(item, index) in packagingChecksOtherTrue"
+                :key="'other-' + index"
+              >
                 <td colspan="12">
-                  <div>
-                    <VTextarea
-                      v-model="getShippingCheckSheetResult.reportCheckSheet.other"
-                      :readonly="disableInpit()"
-                      counter
-                      label="Other"
-                      placeholder="Enter Other"
-                    />
-                  </div>
+                  <VTextarea
+                    v-model="getShippingCheckSheetResult.reportCheckSheet.other"
+                    :readonly="disableInpit()"
+                    counter
+                    label="Other"
+                    placeholder="Enter Other"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -2351,12 +2448,19 @@ const dessertsMockAmountView = [
                   :key="index"
                   colspan="2"
                 >
-                  <div v-if="checkboxKeys.includes(key)">
+                  <div v-if="key === 'correctLotNo'">
+                    <VTextField
+                      v-model="tableData[key][index]"
+                      :readonly="disableInpit()"
+                    />
+                  </div>
+                  <div v-else-if="checkboxKeys.includes(key)">
                     <VCheckbox
                       v-model="tableData[key][index]"
                       :readonly="disableInpit()"
                     />
                   </div>
+                  
                   <div v-else>
                     {{ value }}
                   </div>
@@ -2366,13 +2470,6 @@ const dessertsMockAmountView = [
           </table>
         </div>
       </section>
-
-      <VBtn
-        v-if="false"
-        @click="showData"
-      >
-        asdasd
-      </VBtn>
 
       <div v-if="true">
         <section
@@ -2762,6 +2859,12 @@ const dessertsMockAmountView = [
             color="green"
             @click="handleSubmit('submit')"
           >
+            <VProgressCircular
+              v-if="WH1ACCEPTLoading"
+              :width="3"
+              color="green-darken-4"
+              indeterminate
+            />
             WH1 ACCEPT
           </VBtn>
           <VBtn
@@ -2771,6 +2874,14 @@ const dessertsMockAmountView = [
             @click="openConfirmDialog('back')"
           >
             Send Back
+          </VBtn>
+          <VBtn
+            v-if="statusModel === 1004 && canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"
+            class="mx-2"
+            color="red"
+            @click="handleSubmit('Reject')"
+          >
+            Reject
           </VBtn>
           <VBtn
             v-if="statusModel === 1004 && canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"

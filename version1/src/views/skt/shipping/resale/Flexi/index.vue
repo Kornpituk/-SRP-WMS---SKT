@@ -186,6 +186,10 @@ function openConfirmDialog(type, SoEId, productRow) {
     wordForSubmit.value = "SEND BACK"
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
+  }else if(type === 'Reject'){
+    wordForSubmit.value = "Reject"
+    typeConfirmDialog.value = type
+    soEIdConfirmDialog.value = SoEId
   }
 
   confirmDialog2.value.openDialog()
@@ -198,6 +202,11 @@ function handleConfirmAction() {
   }else if(wordForSubmit.value === 'SEND BACK'){
     // submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
     handleSubmit('back')
+
+    //console.log('back')
+  }else if(wordForSubmit.value === 'Reject'){
+    // submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
+    handleSubmit('Reject')
 
     //console.log('back')
   }
@@ -469,20 +478,30 @@ const handleSubmit = async type => {
         setTimeout(() => {
           window.location.href = `${window.location.origin}/skt/shipping`
         }, 500) // 0.5 วินาที
+      }else if(type === 'Reject'){
+        textAlertDialogFunction(alertWordConst.reject, true)
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/skt/shipping`
+        }, 500) // 0.5 วินาที
       }
     }else{
       if(type === 'submit'){
-        textAlertDialogFunction(alertWordConst.submit, false)
+        textAlertDialogFunction(errorShippingCheckSheetLorry.value, false)
         setTimeout(() => {
-          // location.reload()
+          // location.reload()1
         }, 500) // 0.5 วินาที
       }else if(type === 'leaderapprove'){
         textAlertDialogFunction(alertWordConst.approve, false)
         setTimeout(() => {
-          // location.reload()
+          location.reload()
         }, 500) // 0.5 วินาที
       }else if(type === 'back'){
         textAlertDialogFunction(alertWordConst.sendBack, false)
+        setTimeout(() => {
+          location.reload()
+        }, 500) // 0.5 วินาที
+      }else if(type === 'Reject'){
+        textAlertDialogFunction(alertWordConst.reject, false)
         setTimeout(() => {
           // location.reload()
         }, 500) // 0.5 วินาที
@@ -490,6 +509,7 @@ const handleSubmit = async type => {
     }
   }catch(error){
     //console.log(error)
+    errorShippingCheckSheetLorry.value = error.message
   }
 }
 
@@ -2064,7 +2084,6 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         >
           Save Draft
         </VBtn>
-        {{ statusModel  }}
         <VBtn
           v-if="statusModel === 1102 && canVisibleUserPermission(statusPermission,'BTN_LF_WH_APPROVE').canVisible || 
             statusModel === 1103 && canVisibleUserPermission(statusPermission,'BTN_LF_WH_APPROVE').canVisible || 
@@ -2075,7 +2094,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
           WH1 ACCEPT
         </VBtn>
         <VBtn
-          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_LF_LEADER_APPROVE').canVisible"
+          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"
           class="mx-2"
           color="purple-accent-4"
           @click="openConfirmDialog('back')"
@@ -2084,6 +2103,14 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         </VBtn>
         <VBtn
           v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_SEND_BACK').canVisible"
+          class="mx-2"
+          color="red"
+          @click="openConfirmDialog('Reject')"
+        >
+          Reject
+        </VBtn>
+        <VBtn
+          v-if="statusModel === 1104 && canVisibleUserPermission(statusPermission,'BTN_LF_LEADER_APPROVE').canVisible"
           class="mx-2"
           @click="handleSubmit('leaderapprove')"
         >

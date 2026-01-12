@@ -3283,19 +3283,19 @@ const getDisabledFollowStatusNRole = () => {
       <!-- RM for RSPO -->
       <VCol
         v-if="purchaseOrder.viewRSPO"
-        cols="4"
+        cols="6"
       >
         <Table class="custom-table">
           <tr>
             <th>
-              <div class="demo-space-x">
+              <div class="demo-space-x flex align-center">
                 <VCheckbox
                   v-model="purchaseOrder.isForRspoProduct"
                   :readonly="readonlyAllInput()"
                 >
                   <template #label>
                     <span style="font-size: 12px;">
-                      RM for RSPO Product
+                      RM for RSPO Product&ensp; RSPO NO: CU-RSPO SCC-889147/MB  
                     </span>
                   </template>
                 </VCheckbox>

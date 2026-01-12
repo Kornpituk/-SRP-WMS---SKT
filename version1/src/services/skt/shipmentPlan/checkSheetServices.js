@@ -218,14 +218,14 @@ export const useSubmitCheckSheetService = () => {
       if (result) {
         // //console.log('submitCheckSheetFunctio:', result)
         submitCheckSheetResult.value = result.data
+
         
-        return result.data
       } else {
         console.warn('No data returned from the API')
       }
     } catch (error) {
-      //console.log('Error in submitCheckSheetFunctio:', error)
-      submitCheckSheetError.value = error.message
+      
+      submitCheckSheetError.value = error
     }
   }
   

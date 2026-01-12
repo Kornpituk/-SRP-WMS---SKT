@@ -5,21 +5,33 @@ const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import { useStatusAndPermissions } from './composables/useStatusAndPermissions'
 
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 const department = ref(userDataInfo.value.departmentName)
 const dataRowModel = ref()
 
-const { checkIfForBtnDeleteSOE } = useStatusAndPermissions()
-
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
 
   return !!(dataRow?.statusId === 206 || dataRow?.statusId === 207)
 
+  // else if (
+  //   department.value === 'Warehouse' &&
+  //   (dataRow?.csLfStatusId === 1005 || dataRow?.csLfStatusId === 1105)
+  // ) {
+  //   return !['00022', '00023', '00025'].includes(userDataInfo.value.id)
+  // }
 
+  // else if (department.value === 'Warehouse' && whStatusId === 404) {
+  //   return true
+  // } else if (department.value === 'Logistic' && logStatusId === 504) {
+  //   return true
+  // } else if (department.value === 'Inspection' && inspStatusId === 604) {
+  //   return true
+  // } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
+  //   return true
+  // } 
  
 }
 
@@ -144,10 +156,6 @@ const openConfirmDialog = async (type, SoEId, productRow) => {
     wordForSubmit.value = "SEND BACK"
     typeConfirmDialog.value = type
     soEIdConfirmDialog.value = SoEId
-  }else if (type === 'delete') {
-    wordForSubmit.value = "DELETE SO Sale Order No: "+productRowModel.value.salesOrderNo
-    typeConfirmDialog.value = type
-    soEIdConfirmDialog.value = SoEId
   }else if (type === 'check sap invoice no') {
     rowData.value = productRow
     wordForSubmit.value = "Confirm sap invoice no"
@@ -155,19 +163,14 @@ const openConfirmDialog = async (type, SoEId, productRow) => {
     soEIdConfirmDialog.value = SoEId
   }
 
-  // console.log("select deta", selectedDataTables.value[0].soEtlLogDetailJournalID)
   confirmDialog2.value.openDialog()
 }
 
 function handleConfirmAction() {
-  
   if (wordForSubmit.value === 'submit') {
     submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
   } else if (wordForSubmit.value === 'SEND BACK') {
     submitShipmentPlanBySoEId('back', soEIdConfirmDialog.value)
-
-  }else if (typeConfirmDialog.value === 'delete') {
-    submitShipmentPlanBySoEId(typeConfirmDialog.value, soEIdConfirmDialog.value)
 
   }else if(wordForSubmit.value === 'Confirm sap invoice no'){
     saveShipmentPlan(rowData.value)
@@ -581,6 +584,14 @@ const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = currentPage.value * itemsPerPage.value
 
+  // ตัดข้อมูลเฉพาะที่ต้องแสดงในหน้านั้น
+  // จัดรูปแบบวันที่สำหรับ `eta` และ `etd`
+  // return pageData.map(item => ({
+  //   ...item,
+  //   eta: formatToDate(item.eta),
+  //   etd: formatToDate(item.etd),
+  // }))
+
   return searchPlanData.value.slice(start, end)
 
 })
@@ -593,6 +604,32 @@ const itemsStatus = ([
   { name: 'ETL Failed!', id: 201, color: 'deep-orange' },
   { name: 'Waiting for Shipping', id: 202, color: 'pink' },
   { name: 'Draft Shipping', id: 203, color: 'amber' },
+
+  // { name: 'Waiting for SAL Draft', id: 302, color: 'pink' },
+  // { name: 'SAL Draft Shipping', id: 303, color: 'amber' },
+  // { name: 'SAL Submitted', id: 304, color: 'teal' },
+
+  // { name: 'Waiting for WH Draft', id: 402, color: 'pink' },
+  // { name: 'WH Draft Shipping', id: 403, color: 'amber' },
+  // { name: 'WH Submitted', id: 404, color: 'teal' },
+
+  // { name: 'Waiting FOR LOG Draft', id: 502, color: 'pink' },
+  // { name: 'LOG Draft Shipping', id: 503, color: 'amber' },
+  // { name: 'LOG Submitted', id: 504, color: 'teal' },
+
+  // { name: 'Waiting FOR INSP Draft', id: 602, color: 'pink' },
+  // { name: 'INSP Draft Shipping', id: 603, color: 'amber' },
+  // { name: 'INSP Submitted', id: 604, color: 'teal' },
+
+  // { name: 'Waiting for CS Draft', id: 1002, color: 'pink' },
+  // { name: 'CS1 Draft Shipping', id: 1003, color: 'amber' },
+  // { name: 'CS2 Draft Shipping', id: 1004, color: 'amber' },
+  // { name: 'CS Submitted', id: 1005, color: 'teal' },
+
+  // { name: 'Waiting for Draft', id: 1102, color: 'pink' },
+  // { name: 'Draft Shipping LF', id: 1103, color: 'amber' },
+  // { name: 'Waiting for Lorry/Flex APVL', id: 1104, color: 'amber' },
+  // { name: 'Lorry/Flex Submitted', id: 1105, color: 'teal' },
 
   { name: 'In Submitting', id: 204, color: 'pink' },
   { name: 'Waiting for WH APVL', id: 205, color: 'brown' },
@@ -1016,7 +1053,6 @@ const mapRequestData = data => ({
   shipperMark: getOrDefault(data.shipperMark, ""),
   shipperConditions: getOrDefault(data.shipperConditions, ""),
   shippingEndUser: getOrDefault(data.shippingEndUser, ""),
-  shipperLocation: getOrDefault(data.shipperLocation, ""),
   shippingMarkActive: getOrDefault(data.shippingMarkActive, ""),
   freightForwarder: getOrDefault(data.freightForwarder, ""),
   carrier: getOrDefault(data.carrier, ""),
@@ -1087,6 +1123,7 @@ const handleSaveRowShipmentPlan = async (row, type) => {
 
   isDialogSapInV.value = true
 
+  // openConfirmDialog('check sap invoice no', row.soEtlLogDetailJournalID, row)
 
 }
 
@@ -1230,6 +1267,7 @@ const saveShipmentPlan = async row => {
   }
 
 
+  //console.log("submitShipmentPlanBySoEId start. save draft", trikerSaveDrft.value)
   if (row.statusId === 207) {
     //console.log('Saved Shipment plan if', row.csLfStatusId)
     saveDraftLoading.value = false
@@ -1345,10 +1383,12 @@ const submitLoadingSOERow = ref('')
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
+  console.log('submitShipmentPlanBySoEId start!!', type, soEtlLogDetailJournalID)
   trikerSaveDrft.value = true
   submitLoadingSOERow.value = soEtlLogDetailJournalID || '0'
 
-  if (type !== 'approve' && type !== 'reject' && type !== 'back' && type !== 'delete') {
+  if (type !== 'approve' && type !== 'reject' && type !== 'back') {
+    console.log('submitShipmentPlanBySoEId start!! 1.1', type)
 
     const saveDraftRes = await saveShipmentPlan(productRowModel.value)
     if (!saveDraftRes) {
@@ -1358,15 +1398,19 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
   }
 
   try {
+    console.log('submitShipmentPlanBySoEId start!!3.1')
     if (type === 'submit') {
 
     } else if (type === 'approve' || type === 'reject') {
+      console.log('submitShipmentPlanBySoEId start!! 3')
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
-    } else if (type === 'back' ) {
+      console.log('submitShipmentPlanBySoEId start!! 2', selectedDataTables.value)
+    } else if (type === 'back') {
       soEtlLogDetailJournalID = selectedDataTables.value.map(item => item.soEtlLogDetailJournalID)
 
-    } 
+      //console.log('submitShipmentPlanBySoEId back !! 3')
+    }
 
     if (!statusCommnetValue.value && type === 'reject') {
       textAlertDialogFunction('Please enter Reject Comment.', false)
@@ -1374,8 +1418,7 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       return
     }
 
-
-    const result = await submitShipmentPlan(urlApi.value,
+    const result = submitShipmentPlan(urlApi.value,
       type,
       whereHouse,
       accessTokenAtStore,
@@ -1383,8 +1426,9 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
       statusCommnetValue.value,
     )
 
-    if (result) {
-      console.log("result", result)
+    //console.log('submitShipmentPlanBySoEId start!! 3')
+
+    if (submitShipmentPlanResult.value || result) {
       if (type === 'submit') {
         textAlertDialogFunction(alertWordConst.submit, true)
         setTimeout(() => {
@@ -1405,20 +1449,9 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         setTimeout(() => {
           location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      }else if (type === 'delete') {
-        if(errorSubmitShipmentPlan.value){
-          textAlertDialogFunction(alertWordConst.delete, false)
-          setTimeout(() => {
-            location.reload()
-          }, 500) // 10000 มิลลิวินาที = 10 วินาที
-        }else{
-          textAlertDialogFunction(alertWordConst.delete, true)
-          setTimeout(() => {
-            location.reload()
-          }, 500) // 10000 มิลลิวินาที = 10 วินาที
-        }
-        
       }
+
+      //console.log('submitShipmentPlanBySoEId start!! 4')
 
     } else {
       if (type === 'submit') {
@@ -1440,12 +1473,6 @@ const submitShipmentPlanBySoEId = async (type, soEtlLogDetailJournalID) => {
         textAlertDialogFunction(alertWordConst.sendBack, false)
         setTimeout(() => {
           location.reload()
-        }, 500) // 10000 มิลลิวินาที = 10 วินาที
-      } else if (type === 'delete') {
-        console.log("errorSubmitShipmentPlan.value", errorSubmitShipmentPlan.value)
-        textAlertDialogFunction(errorSubmitShipmentPlan.value, false)
-        setTimeout(() => {
-          // location.reload()
         }, 500) // 10000 มิลลิวินาที = 10 วินาที
       }
     }
@@ -3681,13 +3708,24 @@ const handleSavetruckOrder = async type => {
             </VBtn>
 
             <VBtn
-              v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible "
+              v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
               color="purple-accent-4"
               @click="openConfirmDialog('back', '001')"
             >
               <span style="font-size: 12px;">Send Back</span>
+            </VBtn>
+
+            <VBtn
+              v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible"
+              :disabled="selectedDataTables.length < 1"
+              class="mx-2"
+              color="red"
+              variant="outlined"
+              @click="openConfirmDialog('back', '001')"
+            >
+              <span style="font-size: 12px;">Delete SO</span>
             </VBtn>
 
             <VBtn
@@ -3756,7 +3794,6 @@ const handleSavetruckOrder = async type => {
           <thead class="">
             <tr>
               <th
-                v-if="false"
                 style="width: 60px;"
                 class="sticky-column"
               >
@@ -3767,10 +3804,6 @@ const handleSavetruckOrder = async type => {
                   @click="toggleSelectAll"
                 />
               </th>
-              <th
-                style="width: 60px;"
-                class="sticky-column"
-              />
               <th
                 scope="row"
                 class="sticky-column text-center px-1"
@@ -4190,7 +4223,7 @@ const handleSavetruckOrder = async type => {
             >
               <td
                 style="min-width: 60px;"
-                class="sticky-columnBody cursor-pointer flex-d justify-center"
+                class="sticky-columnBody cursor-pointer"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -4203,33 +4236,11 @@ const handleSavetruckOrder = async type => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <div class="cell-center">
-                  <VCheckboxBtn
-                    v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023'
-                      || checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00025'
-                      || checkStatusBeforeAvtion(product.statusId) && canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
-                    v-model="selectedDataTables"
-                    :value="product"
-                  />
-
-                  <VBtn
-                    v-if="canVisibleUserPermission(statusPermission, 'BTN_SENDBACK').canVisible && checkIfForBtnDeleteSOE(product)"
-                    color="red"
-                    variant="outlined"
-                    @click="openConfirmDialog('delete', product.soEtlLogDetailJournalID, product)"
-                  >
-                    <span style="font-size: 12px;">
-                      <VIcon icon="ri-delete-bin-line" /> SO
-                    </span>
-
-                    <VTooltip
-                      activator="parent"
-                      location="end"
-                    >
-                      Delete SO
-                    </VTooltip>
-                  </VBtn>
-                </div>
+                <VCheckboxBtn
+                  v-if="checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00023' || checkStatusBeforeAvtion(product.statusId) && userDataInfo.id === '00025' || checkStatusBeforeAvtion(product.statusId) && canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
+                  v-model="selectedDataTables"
+                  :value="product"
+                />
               </td>
               <td
                 class="sticky-columnBody cursor-pointer"
@@ -4512,8 +4523,8 @@ const handleSavetruckOrder = async type => {
                 <VTextField
                   v-model="product.shipperLocation"
                   density="compact"
-                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   class="text-field"
+                  :disabled="!canVisibleUserPermission(statusPermission, 'COL_SHIPPER_LOCATION').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   style=" min-width: 150px; font-size: 12px !important;"
                 >
                   <template #label>
@@ -4728,9 +4739,7 @@ const handleSavetruckOrder = async type => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="COA"
-                    :disabled-prop="canVisibleUserPermission(statusPermission, 'COL_COA').canExecute &&
-                      disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) || 
-                      product.catId !== '04'"
+                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_COA').canExecute || disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.getCOAFileData"
                     file-name="COA"
@@ -5999,7 +6008,7 @@ const handleSavetruckOrder = async type => {
     asdM
   </VBtn>
 
-  <!-- Dialog Print -->
+  <!-- Dialog -->
   <VDialog
     v-model="isDialogLoadingVisible"
     width="700"
