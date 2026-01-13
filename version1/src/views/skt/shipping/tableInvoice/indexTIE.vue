@@ -4728,8 +4728,8 @@ const handleSavetruckOrder = async type => {
                 <div>
                   <FileInputDialogCarousels
                     title-dialog="COA"
-                    :disabled-prop="canVisibleUserPermission(statusPermission, 'COL_COA').canExecute &&
-                      disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) || 
+                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_COA').canExecute ||
+                      disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
                       product.catId !== '04'"
                     :type-file-input="typeFileInput"
                     :files-from-a-p-i="product.getCOAFileData"
