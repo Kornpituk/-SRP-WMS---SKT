@@ -117,7 +117,7 @@ const checkColorBtnShowImage = (files, filesModel) => {
 
 const getIconType = (filesLength, filesModelLength) => {
   const status = checkColorBtnShowImage(filesLength, filesModelLength)
-  if (status === 1) return 'ri-checkbox-circle-fill'
+  if (status === 1) return 'ri-upload-2-fill'
   if (status === 2) return 'mdi-camera'
   if (status === 3) return 'ri-upload-2-fill'
   
@@ -135,8 +135,8 @@ const getIconColor = (filesLength, filesModelLength) => {
 
 const getIconColorBtnInput = (filesLength, filesModelLength) => {
   const status = checkColorBtnShowImage(filesLength, filesModelLength)
-  if (status === 1) return 'success'
-  if (status === 2) return 'green'
+  if (status === 1) return 'blue'
+  if (status === 2) return 'blue'
   if (status === 3) return 'blue'
   
   return 'grey' // Default color

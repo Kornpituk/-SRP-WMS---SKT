@@ -17,8 +17,9 @@ import '@styles/styles.scss'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
-import VuePanzoom from "vue-panzoom"
-import VueZoomer from 'vue-zoomer'
+
+// import VuePanzoom from "vue-panzoom"
+// import VueZoomer from 'vue-zoomer'
 
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
@@ -28,7 +29,8 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import resizable from './plugins/resizable/resizable' // Import resizable directive
 
 import VueEasyLightbox from 'vue-easy-lightbox'
-import VuePdfEmbed from 'vue-pdf-embed'
+
+// import VuePdfEmbed from 'vue-pdf-embed'
 
 loadFonts()
 
@@ -48,9 +50,11 @@ app.use(router)
 app.use(layoutsPlugin)
 app.use(i18n)
 app.use(VueEasyLightbox)
-app.use(VuePdfEmbed)
-app.use(VuePanzoom)
-app.use(VueZoomer)
+
+// app.use(VuePdfEmbed)
+
+// app.use(VuePanzoom)
+// app.use(VueZoomer)
 
 // app.use(VueColumnsResizableVuetify)
 app.directive('resizable', resizable)
