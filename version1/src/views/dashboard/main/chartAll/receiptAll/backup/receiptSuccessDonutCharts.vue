@@ -119,19 +119,20 @@ watchEffect(() => {
       </div>
       <div
         v-if="!checkSeries"
-        class="d-flex flex-column justify-center align-center text-grey"
-        style="min-height: 200px;"
+        class="d-flex justify-center alight-center"
       >
-        <div class="text-subtitle-1 font-weight-bold">
-          Await Received
-        </div>
-        <VIcon
-          icon="ri-donut-chart-line"
-          size="160"
-          class="mb-2"
+        <VueApexCharts
+          type="donut"
+          height="250"
+          :options="expenseRationChartConfigNoData"
+          :series="seriesNoData"
         />
-        <div class="text-subtitle-1 font-weight-medium">
-          No Data
+        
+        <div class="d-flex justify-center align-center">
+          <VIcon icon="ri-donut-chart-fill" />
+        </div>
+        <div class="d-flex justify-center align-center">
+          NO DATA
         </div>
       </div>
     </VCol>

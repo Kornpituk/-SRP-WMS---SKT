@@ -838,7 +838,7 @@ onMounted(() => {
             lg="3"
           >
             <VCard style="height: 100%;">
-              <VCardTitle v-if="false">
+              <VCardTitle  v-if="false">
                 <span
                   class="d-flex justify-center"
                   style="font-size: 16px; font-weight: 800;"
@@ -914,7 +914,6 @@ onMounted(() => {
           </VCol>
         </VRow>
       </div>
-
       <div v-if="logicLuxOn">
         <VRow>
           <!-- 👉 Receipt Success -->

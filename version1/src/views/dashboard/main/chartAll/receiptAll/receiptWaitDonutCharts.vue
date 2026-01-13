@@ -55,14 +55,20 @@ watch(() => {
       </div>
       <div
         v-if="!checkSeries"
-        class="d-flex justify-center alight-center"
+        class="d-flex flex-column justify-center align-center text-grey"
+        style="min-height: 200px;"
       >
-        <VueApexCharts
-          type="donut"
-          height="250"
-          :options="expenseRationChartConfigNoData"
-          :series="seriesNoData"
+        <div class="text-subtitle-1 font-weight-bold">
+          Await Receiving
+        </div>
+        <VIcon
+          icon="ri-donut-chart-line"
+          size="160"
+          class="mb-2"
         />
+        <div class="text-subtitle-1 font-weight-medium">
+          No Data
+        </div>
       </div>
     </VCol>
   </VRow>

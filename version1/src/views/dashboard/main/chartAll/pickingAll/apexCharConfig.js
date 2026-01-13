@@ -152,7 +152,7 @@ export const getDonutChartConfigPOSuccess = themeColors => {
       },
     },
     stroke: { width: 0 },
-    labels: ['TRANSFER OUT', 'PICKING DELIVERY', 'PICKING WRITE OFF'],
+    labels: ['PICKING TRANSFER OUT', 'PICKING DELIVERY', 'WRITE OFF'],
     colors: [donutColors.series2, donutColors.series3, donutColors.series4],
     dataLabels: {
       enabled: true,
