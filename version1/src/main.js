@@ -19,7 +19,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
 
 // import VuePanzoom from "vue-panzoom"
-// import VueZoomer from 'vue-zoomer'
+import VueZoomer from 'vue-zoomer'
 
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
@@ -54,7 +54,7 @@ app.use(VueEasyLightbox)
 // app.use(VuePdfEmbed)
 
 // app.use(VuePanzoom)
-// app.use(VueZoomer)
+app.use(VueZoomer)
 
 // app.use(VueColumnsResizableVuetify)
 app.directive('resizable', resizable)
