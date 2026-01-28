@@ -226,19 +226,7 @@ const GetStockUpdate = async () => {
       totalCount.value = response.data.totalCount
       currentPage.value = response.data.page
 
-      // totalPage.value = response.data.totalCount
       rowPerPage.value = response.data.perPage
-
-      console.log('[products.value]!!: ', products)
-      console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
-
-      // console.log('perPage: ',perPage)
-      // console.log('currentPage: ',currentPage)
-      // console.log('totalCount: ',totalCount)
-      // console.log('totalPages: ',totalPage)
-
-      // console.log('subTypeId',searchBySubTypeId.value)
-
       
     })
     .catch(error => {
@@ -274,39 +262,50 @@ function getSerialData(index) {
   return serials
 }
 
-const GetStockUpdateForPagination = () => {
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${searchByWareHouseId.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    params: {
-      // ... and so on with other parameters
-    },
-  }, {})
-    .then(response => {
+// ใช้ watchDebounced สำหรับ search fields
+watchDebounced(
+  [
+    searchByCategoryName,
+    searchByTypeName,
+    searchBySubTypeName,
+    searchByBarcodeName,
+    searchByProductCodeName,
+    searchByProductNameFilter,
+    searchByUnitName,
+    searchByBarcode,
+    searchByProductId,
+    searchByProductName,
+    serialProductCode,
+  ],
+  () => {
+    // Reset to page 1 when search criteria changes
+    currentPage.value = 1
+    GetStockUpdate()
+  },
+  { debounce: 800, maxWait: 1500 }, // รอ 800ms หลังจากหยุดพิมพ์
+)
 
+// Watch สำหรับ dropdown selections (ไม่ต้อง debounce)
+watch(
+  [
+    searchByCategoryId,
+    searchByTypeId,
+    searchBySubTypeId,
+    searchByUOMId,
+    searchByZoneId,
+    searchByAreaId,
+    searchBySubAreaId,
+  ],
+  () => {
+    currentPage.value = 1
+    GetStockUpdate()
+  },
+)
 
-      products.value = response.data.items
-      totalCount.value = response.data.totalCount
-      currentPage.value = response.data.page
-      totalPage.value = response.data.totalPages
-      rowPerPage.value = response.data.perPage
-
-      console.log('[products.value]!!: ', products.value)
-    
-    })
-    .catch(error => {
-    // Handle errors
-      console.error('Error:', error)
-    })
-}
-
-watch( async () => {
-  await GetStockUpdate()
+// เปลี่ยนจาก watchEffect เป็น watch specific values
+watch([currentPage, rowPerPage], () => {
+  GetStockUpdate()
 })
 
 //--------------------------------------- Function Pagination --------------------------------------------
