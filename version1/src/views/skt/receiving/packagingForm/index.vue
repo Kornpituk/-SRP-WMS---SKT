@@ -64,10 +64,6 @@ if(data.value){
 
 const statusId = ref('')
 
-watch(() => {
-  
-})
-
 const mockData = ref([
   { AItem: "Appearance(Dent/Clearness/Scratch)", CheckM: "By Sight", SR: "No Dent, Clearness, NoScratch", ActualC: [], A: [], B: [] },
   { AItem: "Color (Body and Top)", CheckM: "By Sight", SR: "Green, White (SK), B2C ", ActualC: [], A: [], B: [] },
@@ -163,11 +159,6 @@ const progressPercentage = ref('0%') // Percentage text
 const interval = ref()
 
 const maxFileSizeMB = 2 // Set max file size to 1 MB
-
-watchEffect(() => {
-  //console.log('fileMuti++',  fileMuti.value)
-  //console.log('files+++',  files.value)
-})
 
 const getCOAReceivingForm = () => {
   if (poEtlLogDetailJournalIDQueryParameters.value) {
@@ -500,6 +491,8 @@ const wordForSubmit = ref('Word')
 watch(() => {
   const { packagingFormGenerate, errorMessageGenerate, fetchPackagingFormGenerate } = useGeneratePackagingFormController()
 
+  if(!poEtlLogDetailJournalIDQueryParameters.value) return
+
   fetchPackagingFormGenerate(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
   if (packagingFormGenerate.value) {
@@ -517,6 +510,8 @@ watch(() => {
   } else {
     console.info("%cgen get error", "color: red; font-weight: bold; font-size: 14px;", packagingFormGenerateView.value)
   }
+
+
 })
 
 //------------------------------------------- generate view---
@@ -690,7 +685,7 @@ const { packagingFormLot, errorMessageLot, fetchPackagingFormLot } = useGetLotPa
 
 fetchPackagingFormLot(poEtlLogDetailJournalIDQueryParameters.value, urlApi.value, whereHouse.value, accessTokenAtStore)
 
-watchEffect(() => {
+watch(() => {
   // ตรวจสอบว่า packagingFormHeader มีข้อมูลหรือไม่
   if (packagingFormHeader.value && packagingFormHeader.value.length > 0) {
     const receivedData = packagingFormHeader.value[0] // รับข้อมูลอ็อบเจกต์แรก
@@ -756,6 +751,9 @@ watchEffect(() => {
     loadingGenerated.value = false
   }else{
   }
+
+  console.log('dataHeader.value', dataHeader.value)
+  console.log('analyticalItemsData.value', analyticalItemsData.value)
 
   if(analyticalItemsData.value.length < 1 || dataHeader.value.length < 1){
     

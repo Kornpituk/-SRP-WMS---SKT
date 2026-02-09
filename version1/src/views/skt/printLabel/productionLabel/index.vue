@@ -733,14 +733,14 @@ const printProdcutLabel = async () => {
               >
                 <AppDateTimePicker
                   v-model="paramsFetchDataPrintLabel.producingDate"
-                  placeholder="Producing Date (dd/mm/yyyy To dd/mm/yyyy)"
+                  placeholder="Select Producing Date"
                   density="compact"
                   :config="{ dateFormat: 'd/m/Y' }"
                   prepend-inner-icon="ri-calendar-schedule-fill"
                   class="custom-date-time-picker"
                 >
                   <template #label>
-                    <span>Received Date</span>
+                    <span>Producing Date</span>
                   </template>
                 </AppDateTimePicker>
               </VCol>

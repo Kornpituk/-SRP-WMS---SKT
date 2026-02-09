@@ -16,12 +16,15 @@ import { urlApi } from '../api'
 
 import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import { watchEffect } from 'vue'
+import { useAuthExStore } from '@/stores/AuthExpireStore' // ปรับ path ตามโครงสร้างโปรเจคของคุณ
 
 const itemStore = useItemStore()
 
 const cookieStore = useCookieStore()
 
 const router = useRouter() 
+
+const authExStore = useAuthExStore()
 
 const isPasswordVisible = ref(false)
 const authV2LoginMask = useGenerateImageVariant(authV2LoginMaskLight, authV2LoginMaskDark)
@@ -187,6 +190,7 @@ const login = async () => {
 const userData = ref([])
 
 const getInfoUserData = async () => {
+  const authStore = useAuthExStore()
   const accessToken = localStorage.getItem('accessToken')
 
   var response =  await axios.get(`${urlApi.value}/api/v1/User/me`, {
@@ -196,6 +200,8 @@ const getInfoUserData = async () => {
   })
 
   if(response.status == 200){
+    authStore.setUser(response.data)      
+
     userData.value  = response.data
     itemStore.setItemDetails(userData.value, 'UserDataCookies')
 

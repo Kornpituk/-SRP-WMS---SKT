@@ -5,7 +5,7 @@ import authV1LoginMaskDark from '@images/pages/auth-v1-login-mask-dark.png'
 import authV1LoginMaskLight from '@images/pages/auth-v1-login-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
-
+import { useAuthExStore } from '@/stores/AuthExpireStore' // ปรับ path ตามโครงสร้างโปรเจคของคุณ
 
 const router = useRouter() 
 
@@ -111,7 +111,14 @@ const onSubmitWhereHouse = () => {
 
     // router.replace(route.query.to ? String(route.query.to) : '/dashboard/store')
 
-    router.replace('/skt/receiving')
+    const authStore = useAuthExStore()
+
+    if(authStore.user.id === "20303" || authStore.user.id === "20302"){
+      router.replace('/skt/shipping')
+    }else{
+      router.replace('/skt/receiving')
+    }
+
 
     // router.replace('/dashboards/main')
   }

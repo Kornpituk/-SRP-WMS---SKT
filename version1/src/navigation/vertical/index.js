@@ -1,3 +1,7 @@
+import { MENU_LIST } from '@/navigation/vertical/skt'
+import { getUserFromLocalStorage, validateMenuByUser } from '@/navigation/nav.utils'
+import { useAuthExStore } from '@/stores/AuthExpireStore' // ปรับ path ตามโครงสร้างโปรเจคของคุณ
+
 import appAndPages from './app-and-pages'
 import charts from './charts'
 import dashboard from './dashboard'
@@ -15,8 +19,27 @@ import expireDate from './expireDate'
 import minMax from './minMax'
 import performance from './performance'
 
-import skt from './skt'
+// import skt from './skt'
 
 // export default [...dashboard, ...inventory, ...configuration, ...countStock  ]
 
-export default [ ...skt]
+const user = getUserFromLocalStorage()
+
+// const menus = validateMenuByUser(MENU_LIST, user)
+
+// export default [ ...menus]
+
+const getMenus = () => {
+  const authStore = useAuthExStore()
+  
+  return computed(() => {
+    const user = authStore.user || getUserFromLocalStorage()
+    const menus = validateMenuByUser(MENU_LIST, user)
+
+    console.log('menus updated:', menus)
+    
+    return menus
+  })
+}
+
+export default getMenus()
