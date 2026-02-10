@@ -889,6 +889,7 @@ const handleFilterSap = (SOEI, ETD) => {
   searchShipmentPlan()
 }
 
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const saveShipmentPlan = async row => {
   console.log("save plan start...", row)
@@ -916,7 +917,6 @@ const saveShipmentPlan = async row => {
 
     if (filesFromUploaderSO.value) {
       if (filesFromUploaderSO.value.length === 0) {
-        //console.log("SaveSo")
       } else {
         deleteFie1.value = await handleDeleteFileForm(
           filesFromUploaderSO.value,
@@ -934,7 +934,6 @@ const saveShipmentPlan = async row => {
 
     if (filesFromUploaderPO.value) {
       if (filesFromUploaderPO.value.length === 0) {
-        //console.log("SaveSo")
       } else {
         deleteFie1.value = await handleDeleteFileForm(
           filesFromUploaderPO.value,
@@ -952,7 +951,6 @@ const saveShipmentPlan = async row => {
 
     if (filesFromUploaderCOA.value) {
       if (filesFromUploaderCOA.value.length === 0) {
-        //console.log("SaveCOA")
       } else {
         deleteFie2.value = await handleDeleteFileForm(
           filesFromUploaderCOA.value,
@@ -970,7 +968,6 @@ const saveShipmentPlan = async row => {
 
     if (filesFromUploaderTruckOrder.value) {
       if (filesFromUploaderTruckOrder.value.length === 0) {
-        //console.log("SaveTruckOrder")
       } else {
         deleteFie3.value = await handleDeleteFileForm(
           filesFromUploaderTruckOrder.value,
@@ -988,7 +985,6 @@ const saveShipmentPlan = async row => {
 
     if (filesFromUploaderDeliNote.value) {
       if (filesFromUploaderDeliNote.value.length === 0) {
-        //console.log("SaveDeliveryNote")
       } else {
         deleteFie4.value = await handleDeleteFileForm(
           filesFromUploaderDeliNote.value,
@@ -1003,23 +999,12 @@ const saveShipmentPlan = async row => {
         )
       }
     }
-
-    // if(!deleteFie1.value||!deleteFie2.value||!deleteFie3.value||!deleteFie4.value){
-    //   throw 'Delete File Fiald!'
-    // }
-
-    // if(!saveFile1||!saveFile2||!saveFile3||!saveFile4){
-    //   throw 'Save File Fiald!'
-    // }
-
-    //console.log("File upload completed.", row.soEtlLogDetailJournalID)
   } else {
     //console.log("File not foand", filesFromUploaderSO.value)
   }
 
 
   if (row.statusId === 207) {
-    //console.log('Saved Shipment plan if', row.csLfStatusId)
     saveDraftLoading.value = false
     if (disabledModel.value !== true) {
       if (trikerSaveDrft.value === false) {
@@ -1049,10 +1034,6 @@ const saveShipmentPlan = async row => {
 
 
   } else {
-    //console.log('saveShipmentPlan complated', row)
-
-    // ตรวจสอบและรอให้การอัปโหลดไฟล์เสร็จสิ้น
-    // Mapping request data และส่งคำขอ
     const requestData = mapRequestData(row)
 
     const response = await saveSearchPlan(
@@ -1103,9 +1084,6 @@ const saveShipmentPlan = async row => {
     }
 
     saveDraftLoading.value = false
-
-
-    //console.log(`Saved search plan:`, response)
   }
 
   saveDraftLoading.value = false

@@ -1563,7 +1563,6 @@ const dessertsMockAmountView = [
                 </div>
               </td>
             </tr>
-
           </tbody>
         </table>
         
