@@ -4,65 +4,54 @@ import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 const whereHouse = localStorage.getItem('whereHouseName')
 const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
-// Import Composable
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import { useStatusAndPermissions } from './tableInvoice/composables/useStatusAndPermissions'
-import { useTruckOrder } from './composables/useTruckOrder'
-
-// Import Component
-import ShipmentPlanFilter from './components/header/ShipmentPlanFilter.vue'
-import ShippingMarkDialog from './components/dialog/ShippingMarkDialog.vue'
-import TruckOrderDialog from './components/dialog/truckOrderDialog/truckOrderDialog.vue'
-
-// Import Utils
-import { 
-  isDraftDisabled, 
-  isDraftLoading, 
-  isSubmitDisabled, 
-  isSubmitLoading,
-  disabledStatus,
-  disabledStatusSaveDraft,
-  checkStatusInComplete,
-  disableShowDataByDepartment,
-  checkStatusBeforeAvtion,
-  checkBgTruck,
-} from './utils/validators'
-
-//import formatters
-import {
-  formatDate,
-  formatDateSave,
-  convertDateFormat,
-} from './utils/formatters'
-
-//import dataConstant
-import {
-  itemsStatus,
-} from './utils/dataConstant'
-
-//import status
-import {
-  colorStatusWithId,
-} from './utils/status'
 
 const itemStore = useItemStore()
 const userDataInfo = ref(itemStore.getItemDetails('UserDataCookies'))
 const department = ref(userDataInfo.value.departmentName)
+const dataRowModel = ref()
 
 const { checkIfForBtnDeleteSOE } = useStatusAndPermissions()
 
-// Initialize composable
-const {
-  isDialogVisible: isDialogVisiblePrintTruck,
-  currentSaleOrderNo: saleOrderNo,
-  currentDataRow: dataRowModel,
-  existingTruckData,
-  showDialog: showDialogTruckOrder,
-  closeDialog: closeDialogTruckOrder,
-  saveTruckOrderData,
-  printTruckOrderDocument,
-  restoreFromSession,
-} = useTruckOrder(urlApi, whereHouse, accessTokenAtStore)
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const disabledStatus = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
+
+  return !!(dataRow?.statusId === 206 || dataRow?.statusId === 207)
+
+
+ 
+}
+
+const disabledStatusSaveDraft = (inspStatusId, logStatusId, salStatusId, whStatusId, dataRow) => {
+
+
+  if(dataRow?.statusId === 206 || dataRow?.statusId === 207){
+    return true
+  // eslint-disable-next-line sonarjs/no-duplicated-branches
+  }else if (department.value === 'Warehouse' && whStatusId === 404) {
+    return true
+  // eslint-disable-next-line sonarjs/no-duplicated-branches
+  } else if (department.value === 'Logistic' && logStatusId === 504) {
+    return true
+  // eslint-disable-next-line sonarjs/no-duplicated-branches
+  } else if (department.value === 'Inspection' && inspStatusId === 604) {
+    return true
+  // eslint-disable-next-line sonarjs/no-duplicated-branches
+  } else if (department.value === 'Sale and Marketing' && salStatusId === 304) {
+    return true
+  } 
+
+}
+
+const disabledStatusWithOutAdminUser = (inspStatusId, logStatusId, salStatusId, whStatusId) => {
+
+  return false
+}
+
+const checkStatusInComplete = status => {
+  return !!(status === 207 || status === 206)
+}
 
 //------------------------------- alert --------------------------------------------
 
@@ -105,7 +94,9 @@ const resetValueInCheckBottonConfirm = () => {
   checkCancelBottonActive.value = false
 }
 
+
 const confirmSapIn = async () => {
+
   if(typeSap.value === "save draft"){
     saveShipmentPlan(dataRowDailog.value)
   }else if(typeSap.value === "submit"){
@@ -115,7 +106,9 @@ const confirmSapIn = async () => {
   isDialogSapInV.value = false
 }
 
+
 const handleOpenConfirmDialogWrapSapInV = async (type, SoEId, productRow) => {
+
   dataRowDailog.value = productRow
   typeSap.value = type
   soEIdSap.value = SoEId
@@ -130,7 +123,11 @@ const handleOpenConfirmDialogWrapSapInV = async (type, SoEId, productRow) => {
   }else if( getSearchPlanSapInVResult.value?.datas.length > 0){
     isDialogSapInV.value = true
   }
+
+
+
 }
+
 
 const openConfirmDialog = async (type, SoEId, productRow) => {
   productRowModel.value = productRow
@@ -179,10 +176,32 @@ function handleConfirmAction() {
 }
 
 function handleCancel() {
+  //console.log('Action canceled.')
+
   checkCancelBottonActive.value = true
 }
 
 //------------------------------ Formate --------------------------------------
+function formatDateSave(date) {
+  if (!date) return null // หากค่าว่างให้คืน null
+
+  const [day, month, year] = date.split('/') // แยกวันที่ตามรูปแบบ dd/mm/yyyy
+  if (!day || !month || !year) return null // ตรวจสอบว่าแยกข้อมูลสำเร็จ
+
+  // สร้างวันที่ในรูปแบบ yyyy-mm-dd
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+function convertDateFormat(dateString) {
+  const parts = dateString.split("/") // แยกส่วนของวันที่
+  if (parts.length === 3) {
+    const [dd, mm, yyyy] = parts // จัดเรียงใหม่
+
+    return `${yyyy}-${mm}-${dd}`
+  }
+
+  return "Invalid Date Format" // กรณีรูปแบบไม่ถูกต้อง
+}
 
 const dateCurrent = ref()
 
@@ -250,6 +269,20 @@ const canVisibleUserPermission = (statusId, uiControlContextId) => {
   return canVisibleUserPermissionPermission(statusId, uiControlContextId)
 }
 
+const disShowTableShipmentPLand = () => !['00011',
+  '00012',
+  '00013',
+  '00014',
+  '00015',
+  '00029',
+  '00030',
+  '00031',
+  '00033',
+  '00032',
+  '00034',
+  '00044',
+  '00045'].includes(userDataInfo.value.id)
+
 const userData = ref(null)
 
 watch(() => {
@@ -258,6 +291,32 @@ watch(() => {
     userData.value = JSON.parse(storedData)
   }
 })
+
+const disableShowDataByDepartment = () => {
+
+
+  if (userData?.value) {
+    return !(userData.value.departmentId === '007' ||
+      userData.value.departmentId === '008' ||
+      userData.value.departmentId === '010' ||
+      userData.value.departmentId === '009')
+  }
+}
+
+//------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
+
+const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
+
+const perPage = ref(10)
+const page = ref(0)
+const totalCount = ref(0)
+
+const rowPerPage = ref(10)
+const totalPage = ref(1)
+
+const router = useRouter()
+
+const serialProductCode = ref(null)
 
 /// ------------------------------ Import Component --------------------------------
 // --- Dialog Text Area --------------------------------
@@ -271,6 +330,14 @@ const dialogVisibleTextarea = ref(false)
 const dialogRemark = ref('')
 
 // --- define Model
+
+const shipmentModel = ref([])
+
+const itemsTruck = [
+  'LEO',
+  'BTS',
+  'LCL',
+]
 
 const shippingCondition = ref('')
 const shippingmark = ref('')
@@ -288,6 +355,36 @@ const disabledModel = ref(false)
 
 //------ function for dialog text area ----------------------------------------------
 
+// กำหนดค่าคอนฟิกสำหรับแต่ละ type
+const dialogConfig = {
+  ShipCon: { title: 'Shipping Condition', type: 'ShipCon', sapIn: '', btn: 'nonPrint' },
+  ShipMark: { title: 'Shipping Mark', type: 'ShipMark', sapIn: 'TIX2406001', btn: 'nonPrint' },
+  ShipMC: { title: 'Shipping Mark Con', type: 'ShipMC', sapIn: 'TIX2406001', btn: 'twinPrint' },
+  Lot: { title: 'Lot', type: 'Lot', sapIn: 'TIX2406001', btn: 'nonPrint' },
+  ShipMarkPrint: { title: 'Shipping Mark', type: 'ShipMark', sapIn: 'TIX240602', btn: 'print' },
+  ShipConPrint: { title: 'Shipping Condition', type: 'ShipCon', sapIn: 'TIX240602', btn: 'print' },
+  RemarkWH: { title: 'Remark WH', type: 'RemarkWH', sapIn: 'TIX2406001', btn: 'nonPrint' },
+  RemarkSAL: { title: 'Remark SAL', type: 'RemarkSAL', sapIn: 'TIX2406001', btn: 'nonPrint' },
+  RemarkLOG: { title: 'Remark LOG', type: 'RemarkLOG', sapIn: 'TIX2406001', btn: 'nonPrint' },
+}
+
+// ฟังก์ชันสำหรับเปิด dialog
+const textAreaDialogActive = (type, data, index) => {
+  typeDialogTextArea.value = type
+  indexDataDialogTextArea.value = index
+
+  // โหลดค่าจากคอนฟิก
+  const config = dialogConfig[type]
+  if (config) {
+    titleDialogView.value = config.title
+    typeDialogView.value = config.type
+    sapInValueView.value = config.sapIn
+    typeBtnView.value = config.btn
+    dialogDataTextArea.value = data // ตั้งค่า dialogDataTextArea ด้วยค่า data
+  }
+
+  dialogVisible.value = true
+}
 
 const btnCloseShipCon = async () => {
   // ค้นหาและอัปเดตค่าใน paginatedData
@@ -309,6 +406,7 @@ const btnCloseShipCon = async () => {
 }
 
 const btnTextarea = () => {
+  //console.log('textAreaRemarkDialogActive', typeDialogTextArea.value)
   paginatedData.value.forEach(item => {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
       if (typeDialogTextArea.value === 'Remark WH') {
@@ -426,6 +524,7 @@ const handleDialogSubmit = data => {
     console.warn(`Index ${index} is out of range for mockData.`)
   }
 
+  //console.log('Updated mockData:', data)
 }
 
 //------------------------------- Function Get Search plan -----------------
@@ -489,6 +588,21 @@ const paginatedData = computed(() => {
 const sortColumn = ref('')
 const sortDirection = ref('')
 
+const itemsStatus = ([
+  { name: 'Cancel', id: 200, color: 'blue-grey' },
+  { name: 'ETL Failed!', id: 201, color: 'deep-orange' },
+  { name: 'Waiting for Shipping', id: 202, color: 'pink' },
+  { name: 'Draft Shipping', id: 203, color: 'amber' },
+
+  { name: 'In Submitting', id: 204, color: 'pink' },
+  { name: 'Waiting for WH APVL', id: 205, color: 'brown' },
+  { name: 'Shipping Rejected', id: 206, color: 'red' },
+  { name: 'Shipping Completed', id: 207, color: 'green' },
+
+  { name: 'All', id: 0, color: 'grey' },
+
+])
+
 const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
 const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
 
@@ -521,6 +635,7 @@ const toggleDirection = async key => {
   if (key) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
 
+    //console.log(`Sorting direction is now: ${sortDirection.value} --> ${key}`)
   }
   sortColumn.value = key
   await searchShipmentPlan()
@@ -554,6 +669,9 @@ watchEffect(() => {
 
 const searchShipmentPlan = async () => {
   isLoading.value = true
+
+  // Format ค่า ETA และ ETD ก่อนส่ง API
+  // filterForSearchPlan.value.ETA = formatDateSave(filterForSearchPlan.value.ETA)
 
   const etaDateForApi = ref(etaDateModel.value)
   const etdDateForApi = ref(etdDateModel.value)
@@ -604,8 +722,17 @@ const searchShipmentPlan = async () => {
           eta: formatToDate(item.eta),
           etd: formatToDate(item.etd),
           logUpdatedDate: formatToDate(item.loadingDate),
+
+          // fileSo: await getFileForm('GetSo', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          // fileCoA: await getFileForm('GetCoA', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          // fileTruckOrder: await getFileForm('GetTruckOrder', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
+          // fileDeliveryNote: await getFileForm('GetDeliveryNote', item.soEtlLogDetailJournalID), // ใช้ await ที่นี่
         })),
       )
+
+      //console.log('searchPlanData.value', searchPlanData.value)
+
+      // //console.log(`Fetched search plan:`, searchPlanData.value)
     } else {
       console.error('No result from API')
       searchPlanData.value = [] // Set empty data if no result
@@ -646,6 +773,10 @@ const clearFilterPlanFunctionBtn = async () => {
 const allData = ref([]) // ข้อมูลทั้งหมดที่แสดงในตาราง
 const isSelectAll = ref(false) // สถานะของ Checkbox "Select All"
 
+const testValue = () => {
+  //console.log('Test Value', selectedDataTables.value)
+}
+
 // คำนวณว่าทุกแถวถูกเลือกหรือไม่
 const isAllSelected = watch(() => {
   return paginatedData.value.length > 0 && selectedDataTables.value.length === paginatedData.value.length
@@ -666,6 +797,10 @@ const toggleSelectAll = () => {
 
 import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
 import { onMounted, watch, watchEffect } from 'vue'
+
+const viewAllData = () => {
+  //console.log(mockData.value)
+}
 
 const typeFileInput = ref('hideInput')
 
@@ -699,20 +834,31 @@ const handleDeleteFileForm = async (file,
       accessTokenAtStore,
     )
 
-    if (deleteFileFormResult.value?.success) {
+    //console.log("Response from functionSaveFileForm:", response)
 
+    if (deleteFileFormResult.value?.success) {
+      // textAlertDialogFunction(alertWordConst.delete, true)
+      //console.log(`Saved File Plan:`, deleteFileFormResult.value)
+
+      // Reload หลังแจ้งเตือนสำเร็จ
       setTimeout(() => {
         // location.reload()
       }, 500) // 0.5 วินาที
 
       return true
     } else {
+      // กรณีบันทึกไม่สำเร็จ
       console.error(`Error saving File plan:`, errorMessageDeleteFileForm.value)
+
+      // textAlertDialogFunction(errorMessageDeleteFileForm.value, false)
 
       return false
     }
   } catch (error) {
+    // กรณีเกิดข้อผิดพลาดในกระบวนการ
     console.error(`Error saving File plan:`, error)
+
+    // textAlertDialogFunction("An error occurred while saving the file.", false)
 
     return false
   }
@@ -726,8 +872,10 @@ const saveFileFormShipment = async (
   typeFile,
   soEtlLogDetailJournalID,
 ) => {
+  //console.log("save file start...", soEtlLogDetailJournalID)
 
   try {
+    // ตรวจสอบว่า row เป็นอาร์เรย์หรือออบเจ็กต์เดี่ยว
     const requestData = file
 
     const response = await functionSaveFileForm(
@@ -739,18 +887,30 @@ const saveFileFormShipment = async (
       accessTokenAtStore,
     )
 
+    //console.log("Response from functionSaveFileForm:", response)
 
     if (resultSaveFielForm.value?.success) {
       if (disabledModel.value) {
+        // textAlertDialogFunction('Print', true)
+
+        // // Reload หลังแจ้งเตือนสำเร็จ
+        // setTimeout(() => {
+        // location.reload()
+        // }, 500) // 0.5 วินาที
       } else {
         if (trikerSaveDrft.value === false) {
           textAlertDialogFunction(alertWordConst.saveDraft, true)
+
+          //console.log(`Saved File Plan:`, resultSaveFielForm.value)
+
+          // Reload หลังแจ้งเตือนสำเร็จ
           setTimeout(() => {
             // location.reload()
           }, 500) // 0.5 วินาที
         }
 
       }
+
 
       return true
     } else {
@@ -768,6 +928,57 @@ const saveFileFormShipment = async (
     return false
   }
 }
+
+//------------------------------- Function Get File Form --------------------------
+const { getFileFormResult, errorMessageGetFileForm, getFileFormFunction } = useGetFileFormService()
+
+const getSoFileModel = ref([])
+const getPoFileModel = ref([])
+const getCoAFileModel = ref([])
+const getTruckOrderFileModel = ref([])
+const getDeliveryNoteFileModel = ref([])
+
+const getFileForm = async (
+  typeFile,
+  soEtlLogDetailJournalID,
+) => {
+  try {
+
+    const response = await getFileFormFunction(
+      soEtlLogDetailJournalID,
+      'ShippingFile',
+      typeFile,
+      urlApi.value,
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if (getFileFormResult.value?.success) {
+
+      return response.data.data
+    } else {
+
+      return ''
+    }
+  } catch (error) {
+
+    return ''
+  }
+}
+
+const showFileFormByTypeAndSoId = async (type, soId) => {
+  if (type === 'GetSo') {
+    //console.log('showFileFormByTypeAndSoId', await getFileForm(type, soId))
+
+    getSoFileModel.value = await getFileForm(type, soId)
+
+    //console.log(`showFileFormByTypeAnd${soId}`, getSoFileModel.value)
+
+    // return await getFileForm(type, soId)
+  }
+}
+
+// showFileFormByTypeAndSoId('GetSo', '152')
 
 const handleFileUpdatesSO = updatedFiles => {
   filesFromUploaderSO.value = updatedFiles
@@ -875,6 +1086,7 @@ const handleSaveRowShipmentPlan = async (row, type) => {
   }
 
   isDialogSapInV.value = true
+
 
 }
 
@@ -1116,6 +1328,16 @@ const saveShipmentPlan = async row => {
 const isDialogVisibleCommentDialog = ref(false)
 const statusCommnetValue = ref('')
 
+const checkStatusBeforeAvtion = sataus => {
+  if (sataus === 205) {
+    return true
+  } else if (sataus === 206) {
+    return false
+  } else {
+    return false
+  }
+}
+
 const { submitShipmentPlanResult, errorSubmitShipmentPlan, submitShipmentPlan } = useSubmitShipmentPlanService()
 
 const submitLoading = ref(false)
@@ -1275,10 +1497,29 @@ import { useGetCOAFormController } from '@/utilities/format'
 
 const { formatNumber } = useGetCOAFormController()
 
+const formatDecimal = decimal => {
+  const configsShowDigit = localStorage.getItem('configsShowDigit')
+  if (configsShowDigit == 'true') {
+    return Math.ceil(decimal)
+  } else {
+    return decimal
+  }
+}
+
+const formatDate = date => {
+  const d = new Date(date)
+  const day = d.getDate().toString().padStart(2, '0')
+  const month = (d.getMonth() + 1).toString().padStart(2, '0')
+  const year = d.getFullYear()
+
+  return `${day}/${month}/${year}`
+}
+
 //------------------------ Dialog Image ----------------------------
 const isDialogImageVisible = ref(false)
 const urlImage = ref('')
 const nameImage = ref('')
+
 const checkRFID = ref('')
 
 watchEffect(() => {
@@ -1291,6 +1532,103 @@ watchEffect(() => {
     checkRFID.value = false
   }
 })
+
+const codeProduct = ref('')
+const nameProduct = ref('')
+const imgProduct = ref('')
+const barcodeProduct = ref('')
+const categoriesProduct = ref('')
+const groupProduct = ref('')
+const groupSupProduct = ref('')
+const totalProduct = ref('')
+const unitNameProduct = ref('')
+const detailsProduct = ref('')
+
+const showExpansionDialog = ref(false)
+
+//---------------------------- check Status ---------------------------------
+
+const colorStatus = ref('grey')
+
+const colorStatusWithId = id => {
+  switch (id) {
+  case 200:
+    return { color: 'grey', message: 'orange-darken-1', text: 'Cancel', bgColor: '#E0E0E0' }
+  case 201:
+    return { color: 'deep-orange', message: 'green', text: 'ETL Failed!', bgColor: '#EF9A9A' }
+  case 202:
+    return { color: 'pink', message: 'pink-darken-4', text: 'Waiting for Shipping', bgColor: '#FCE4EC' }
+  case 203:
+    return { color: 'amber', message: 'purple', text: 'Draft Shipping', bgColor: '#FFC107' }
+
+  case 302:
+    return { color: 'pink', message: 'brown', text: 'Waiting for SAL Draft', bgColor: '#EFEBE9' }
+  case 303:
+    return { color: 'amber', message: 'green', text: 'SAL Draft Shipping', bgColor: '#E8F5E9' }
+  case 304:
+    return { color: 'teal', message: 'red', text: 'SAL Submitted', bgColor: '#FFEBEE' }
+
+  case 402:
+    return { color: 'pink', message: 'red', text: 'Waiting for WH Draft', bgColor: '#FFEBEE' }
+  case 403:
+    return { color: 'amber', message: 'red', text: 'WH Draft Shipping', bgColor: '#FFEBEE' }
+  case 404:
+    return { color: 'teal', message: 'red', text: 'WH Submitted', bgColor: '#FFEBEE' }
+
+  case 502:
+    return { color: 'pink', message: 'red', text: 'Waiting FOR LOG Draft', bgColor: '#FFEBEE' }
+  case 503:
+    return { color: 'amber', message: 'red', text: 'LOG Draft Shipping', bgColor: '#FFEBEE' }
+  case 504:
+    return { color: 'teal', message: 'red', text: 'LOG Submitted', bgColor: '#FFEBEE' }
+
+  case 602:
+    return { color: 'pink', message: 'red', text: 'Waiting FOR INSP Draft', bgColor: '#FFEBEE' }
+  case 603:
+    return { color: 'amber', message: 'red', text: 'INSP Draft Shipping', bgColor: '#FFEBEE' }
+  case 604:
+    return { color: 'teal', message: 'red', text: 'INSP Submitted', bgColor: '#FFEBEE' }
+
+  case 1002:
+    return { color: 'pink', message: 'red', text: 'Waiting for CS Draft', bgColor: '#FFEBEE' }
+  case 1003:
+    return { color: 'amber', message: 'red', text: 'CS1 Draft Shipping', bgColor: '#FFEBEE' }
+  case 1004:
+    return { color: 'amber', message: 'red', text: 'CS2 Draft Shipping', bgColor: '#FFEBEE' }
+  case 1005:
+    return { color: 'teal', message: 'red', text: 'CS Submitted', bgColor: '#FFEBEE' }
+
+  case 1102:
+    return { color: 'pink', message: 'red', text: 'Waiting for Draft', bgColor: '#FFEBEE' }
+  case 1103:
+    return { color: 'amber', message: 'red', text: 'Draft Shipping LF', bgColor: '#FFEBEE' }
+  case 1104:
+    return { color: 'amber', message: 'red', text: 'Waiting for Lorry/Flex APVL', bgColor: '#FFEBEE' }
+  case 1105:
+    return { color: 'teal', message: 'red', text: 'Lorry/Flex Submitted', bgColor: '#FFEBEE' }
+
+  case 204:
+    return { color: 'pink', message: 'red', text: 'In Submitting (SWL )', bgColor: '#FFEBEE' }
+  case 205:
+    return { color: 'brown', message: 'red', text: 'Waiting for WH APVL', bgColor: '#FFEBEE' }
+  case 206:
+    return { color: 'red', message: 'red', text: 'Shipping Rejected', bgColor: '#FFEBEE' }
+  case 207:
+    return { color: 'green', message: 'red', text: 'Shipping Completed', bgColor: '#FFEBEE' }
+  default:
+    return { color: 'grey', message: 'grey', text: '', bgColor: '#FFF3E0' }
+  }
+}
+
+const statuses = ['Approve', 'Reject', 'Back to Edit']
+
+const checkBgTruck = truck => {
+  if (truck === 'BTS') {
+    return 'bg-red-lighten-4'
+  } else if (truck === 'LCL') {
+    return 'bg-warning'
+  }
+}
 
 //----------------------------------------- fetch data ----------------------------------
 //---- select data --------------------------------
@@ -1361,50 +1699,11 @@ onMounted(async () => {
   CompanyModel.value = company.sort((a, b) => a.company.localeCompare(b.company))
   AddressModel.value = address
 
-  // กู้คืนข้อมูลจาก session storage (ถ้ามี)
-  restoreFromSession()
-
 })
-
-// Handler สำหรับบันทึก
-const handleSaveTruckOrder = async formData => {
-  try {
-    const result = await saveTruckOrderData(
-      formData,
-      saveShipmentPlan,      // function ที่มีอยู่แล้ว
-      disabledModel,         // ref ที่มีอยู่แล้ว
-      trikerSaveDrft,         // ref ที่มีอยู่แล้ว
-    )
-    
-    if (result) {
-      textAlertDialogFunction("SAVE TRUCK ORDER", true)
-      setTimeout(() => location.reload(), 500)
-    } else {
-      textAlertDialogFunction("SAVE TRUCK ORDER", false)
-    }
-  } catch (error) {
-    console.error('Error:', error)
-    textAlertDialogFunction("SAVE TRUCK ORDER", false)
-  }
-}
-
-// Handler สำหรับพิมพ์
-const handlePrintTruckOrder = async formData => {
-  try {
-    await printTruckOrderDocument(formData)
-  } catch (error) {
-    console.error('Error:', error)
-    textAlertDialogFunction("PRINT TRUCK ORDER", false)
-  }
-}
-
-// Handler สำหรับปิด Dialog
-const handleCloseTruckOrder = () => {
-  closeDialogTruckOrder()
-}
 
 //---------------------- Select Model ----------------------------------------------
 
+const addressTruckCompanyModel = ref('')
 const personInchargeTruckCompanyModel = ref('')
 const contactTruckCompanyModel = ref('')
 
@@ -1430,9 +1729,119 @@ const TruckTypePrint = ref([])
 import mockData from './tableInvoice/dataMock'
 
 //------------------------ Set Permissions (Hiden and Show Column) ------------------------
-
+const accountAmin = ref(false)
+const accountViewerKK = ref(false)
 const accountINSP = ref(false)
+const accountSALLOG = ref(false)
+const accountSAL = ref(false)
+const accountLOG = ref(false)
+const accountWH = ref(false)
 const accountWHSub = ref(false)
+const accountAll = ref(true)
+
+const setAccount = role => {
+  accountAmin.value = false
+  accountViewerKK.value = false
+  accountINSP.value = false
+  accountSALLOG.value = false
+
+  accountSAL.value = false
+  accountLOG.value = false
+
+  accountWH.value = false
+  accountAll.value = false
+
+  accountWHSub.value = false
+
+  if (role === 'Amin') {
+    accountAmin.value = true
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSALLOG.value = false
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = false
+  } else if (role === 'ViewerKK') {
+    accountAmin.value = false
+    accountViewerKK.value = true
+    accountINSP.value = false
+    accountSALLOG.value = false
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = false
+  } else if (role === 'INSP') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = true
+    accountSALLOG.value = false
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = false
+  } else if (role === 'SALLOG') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSALLOG.value = true
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = false
+  }
+
+  else if (role === 'SAL') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSAL.value = true
+    accountLOG.value = false
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = false
+  }
+
+  else if (role === 'LOG') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSAL.value = false
+    accountLOG.value = true
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = false
+  }
+
+  else if (role === 'WH') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSALLOG.value = false
+    accountWH.value = true
+    accountWHSub.value = false
+    accountAll.value = false
+
+  } else if (role === 'WHSub') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSALLOG.value = false
+    accountWH.value = false
+    accountWHSub.value = true
+    accountAll.value = false
+
+  }
+  else if (role === 'All') {
+    accountAmin.value = false
+    accountViewerKK.value = false
+    accountINSP.value = false
+    accountSALLOG.value = false
+    accountWH.value = false
+    accountWHSub.value = false
+    accountAll.value = true
+  }
+
+  //console.log('Switch Acc', accountAmin.value, accountViewerKK.value, accountINSP.value, accountSALLOG.value, accountWH.value, accountAll.value)
+
+  // สามารถเพิ่มเงื่อนไขสำหรับ role อื่นๆ ได้ที่นี่
+}
 
 //-------------------
 //----- Rune
@@ -1442,6 +1851,52 @@ const rules = [v => v.length <= 150 || 'Max 25 characters']
 const panel = ref(['filter'])
 
 ///---------------- Dialog  truck order ------------------
+const isDialogVisiblePrintTruck = ref(false)
+const saleOrderNo = ref('')
+
+const sOHistoryTruckOrder = ref()
+const sOeIdHistoryTruckOrder = ref()
+const rowDataHistoryTruckOrder = ref(JSON.parse(sessionStorage.getItem('rowDataHistoryTruckOrderSST')))
+
+
+
+const showDialogTruckOrder = (SoId, SoeId, rowData) => {
+
+  dataRowModel.value = rowData
+  selectedTruckCompany2()
+  isDialogVisiblePrintTruck.value = true
+  saleOrderNo.value = SoId
+  soEIdModel.value = SoeId
+
+
+  //console.log("RowData", rowData)
+
+  if(rowData.statusId === 206 || rowData.statusId === 207){
+    disabledModel.value = true
+  }else{
+    disabledModel.value = false
+  }
+
+  CompanyPrint.value = rowData.shipperName || ' '
+  AddressPrint.value = rowData.shipperLocation || ' '
+  TruckCompanyPrint.value = rowData.truck || ' '
+
+  // 🔹 บันทึกค่าไว้ใน sessionStorage
+  sessionStorage.setItem("savedTruckOrder", JSON.stringify({ SoId, SoeId, rowData }))
+
+  getDataTruckOrder()
+}
+
+const clearHistoryTruckOrder = () => {
+  saleOrderNo.value = ""
+  soEIdModel.value = ""
+  dataRowModel.value = null
+  isDialogVisiblePrintTruck.value = false
+
+  // 🔹 ลบค่าจาก sessionStorage
+  sessionStorage.removeItem("savedTruckOrder")
+}
+
 // ⏳ ตรวจสอบเมื่อเปิดหน้าใหม่ (onMounted)
 onMounted(() => {
   const savedData = sessionStorage.getItem("savedTruckOrder")
@@ -1556,6 +2011,9 @@ const loadingPrint = ref(false)
 const printShipmentPDFBySoEId = async type => {
   loadingPrint.value = true
 
+  //console.log('loadingPrint', loadingPrint.value)
+
+
   // ✅ ใช้ for...of เพื่อรองรับ async/await
   for (const item of paginatedData.value) {
     if (item.soEtlLogDetailJournalID === soEIdModel.value) {
@@ -1666,7 +2124,9 @@ const paramsPrintPDFCheckSheet = ref({
   LicensePlate: [],
 })
 
-const licensePlate = ref({})
+const licensePlate = ref({
+
+})
 
 const mapProductRowToPramsPrint = async item => {
   // ถ้า item ไม่ใช่ array ให้แปลงเป็น array
@@ -1855,8 +2315,13 @@ const { printExportExcelResult,
   printExportExcelErrorMessage,
   printExportExcelService } = usePrintExportExcelService()
 
+const testExport = () => {
+}
+
 const printShipmentPDFBySoEIdPlan = async () => {
   loadingPrint.value = true
+
+
 
   const etaDateForApi = ref(etaDateModel.value)
   const etdDateForApi = ref(etdDateModel.value)
@@ -1937,7 +2402,87 @@ const paramsTruckOrder = ref({
   driverAndTel: '',
 })
 
+
 //------------------- formate truck date
+
+function convertToISO8601(dateStr) {
+  // แยกค่าจากรูปแบบ "DD/MM/YYYY"
+  const [day, month, year] = dateStr.split('/')
+  const date = new Date(`${year}-${month}-${day}T00:00:00.000Z`)
+
+  return date.toISOString() || ''
+}
+
+function convertToDDMMYYYY(isoDateStr) {
+  const date = new Date(isoDateStr)
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const year = date.getUTCFullYear()
+
+  return `${day}/${month}/${year}` || ''
+}
+
+const { getTruckOrderDataResult,
+  errorGetTruckOrderData,
+  fetchTruckOrderData } = useGetDataTruckOrderService()
+
+const getDataTruckOrder = async () => {
+
+
+  paramsTruckOrder.value.dateOrderDate = dateCurrent.value
+  paramsTruckOrder.value.dateDriverDate = dateCurrent.value
+  paramsTruckOrder.value.dateAuthorizedDate = dateCurrent.value
+
+  try {
+    const result = await fetchTruckOrderData(
+      urlApi.value,
+      soEIdModel.value,
+      'get',
+      'ShippingTruckOrder',
+      whereHouse,
+      accessTokenAtStore,
+    )
+
+    if (result) {
+
+
+      if (getTruckOrderDataResult?.value) {
+        if (paramsTruckOrder.value) {
+
+          paramsTruckOrder.value.address = getTruckOrderDataResult?.value.address
+          paramsTruckOrder.value.company = getTruckOrderDataResult?.value.company
+          paramsTruckOrder.value.contactAndTel = getTruckOrderDataResult?.value.contactAndTel
+          paramsTruckOrder.value.remark = getTruckOrderDataResult?.value.remark
+          paramsTruckOrder.value.transComName = getTruckOrderDataResult?.value.transComName
+          paramsTruckOrder.value.truckLicense = getTruckOrderDataResult?.value.truckLicense
+          paramsTruckOrder.value.truckType = getTruckOrderDataResult?.value.truckType
+          paramsTruckOrder.value.updatedDateTime = getTruckOrderDataResult?.value.updatedDateTime
+
+          paramsTruckOrder.value.contactDate = getTruckOrderDataResult?.value.contactDate
+          paramsTruckOrder.value.driverName = getTruckOrderDataResult?.value.driverName
+          paramsTruckOrder.value.orderBy = getTruckOrderDataResult?.value.orderBy
+          paramsTruckOrder.value.orderDate = getTruckOrderDataResult?.value.orderDate
+          paramsTruckOrder.value.authorizedBy = getTruckOrderDataResult?.value.authorizedBy
+          paramsTruckOrder.value.authorizedDate = getTruckOrderDataResult?.value.authorizedDate
+          paramsTruckOrder.value.driverAndTel = getTruckOrderDataResult?.value.driverAndTel
+
+          TruckTypePrint.value = getTruckOrderDataResult?.value.truckType
+          contactTruckCompanyModel.value = getTruckOrderDataResult?.value.contactAndTel
+          personInchargeTruckCompanyModel.value = getTruckOrderDataResult?.value.driverName
+
+        }
+      } else {
+        // conslolr
+      }
+
+      return getTruckOrderDataResult.value
+
+    }
+  } catch (error) {
+  }
+}
+
+const loadingPrintTruckOrderForm = ref(false)
 
 const clearParamsTruckOrder = () => {
 
@@ -1971,22 +2516,554 @@ const clearParamsTruckOrder = () => {
   personInchargeTruckCompanyModel.value = ''
   contactTruckCompanyModel.value = ''
 
+
+  // sessionStorage.setItem('sOHistoryTruckOrderSST', 'null')
+  // sessionStorage.setItem('sOeIdHistoryTruckOrderSST', 'null')
+  // sessionStorage.setItem('rowDataHistoryTruckOrderSST', null)
+
+
+}
+
+const handlePrintTruckOrderPDF = () => {
+  setTimeout(() => {
+    loadingPrintTruckOrderForm.value = true
+  }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+
+  paramsTruckOrder.value.comName = CompanyPrint.value
+  paramsTruckOrder.value.address = AddressPrint.value
+  paramsTruckOrder.value.transportComName = TruckCompanyPrint.value
+  paramsTruckOrder.value.truckType = TruckTypePrint.value
+  paramsTruckOrder.value.driverName = personInchargeTruckCompanyModel.value
+  paramsTruckOrder.value.tel = contactTruckCompanyModel.value
+  paramsTruckOrder.value.driverBy = paramsTruckOrder.value.driverAndTel
+  paramsTruckOrder.value.orderBy = userDataInfo.value.firstName
+  paramsTruckOrder.value.runningNum = dataRowModel?.value.truckReservingNumber
+
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value || ''
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value || ''
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value || ''
+
+
+  try {
+    const result = printTruckOrderFormPDF(
+      urlApi.value,
+      paramsTruckOrder.value,
+      whereHouse,
+      accessTokenAtStore,
+      soEIdModel.value)
+
+    if (result) {
+      // textAlertDialogFunction(alertWordConst.print, true)
+      // setTimeout(() => {
+      //   location.reload()
+      // }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      // loadingPrintTruckOrderForm.value = false
+
+
+      setTimeout(() => {
+        loadingPrintTruckOrderForm.value = false
+      }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+
+    } else {
+      setTimeout(() => {
+        loadingPrintTruckOrderForm.value = false
+      }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+      textAlertDialogFunction(alertWordConst.print, false)
+      setTimeout(() => {
+      }, 500) // 10000 มิลลิวินาที = 10 วินาที
+      loadingPrintTruckOrderForm.value = false
+
+    }
+  } catch (e) {
+    setTimeout(() => {
+
+    }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+    console.error(`Error saving search plan:`, error)
+    loadingPrintTruckOrderForm.value = false
+
+  }
+  setTimeout(() => {
+
+  }, 3 * 1000) // ระยะเวลาในการหมุน (1000 มิลลิวินาที = 1 วินาที)
+  loadingPrintTruckOrderForm.value = false
+
+
+}
+
+const { saveTruckOrderResult,
+  errorSaveTruckOrder,
+  saveTruckOrder } = useSaveTruckOrderService()
+
+const bodySaveTruckOrder = data => ({
+  soEtlLogDetailJournalID: soEIdModel.value,
+  company: CompanyPrint.value,
+  address: AddressPrint.value,
+  transComName: TruckCompanyPrint.value,
+  truckType: TruckTypePrint.value,
+  truckLicense: data.truckLicense,
+  remark: data.remark,
+
+  driverName: personInchargeTruckCompanyModel.value,
+  driverAndTel: data.driverAndTel,
+
+  orderBy: userDataInfo?.value.firstName,
+  contactAndTel: contactTruckCompanyModel.value,
+  authorizedBy: data.authorizedBy,
+
+  contactDate: convertToISO8601(data.dateDriverBy) || convertToISO8601(dateCurrent.value) || '',
+  orderDate: data.orderDate || convertToISO8601(dateCurrent.value),
+  authorizedDate: data.authorizedDate || convertToISO8601(dateCurrent.value),
+  lastPrintDateTime: data.orderDate || convertToISO8601(dateCurrent.value),
+})
+
+const bodyFirstTruckOrder = ref(
+  {
+    "soEtlLogDetailJournalID": 0,
+    "company": "string",
+    "address": "string",
+    "transComName": "string",
+    "truckType": "string",
+    "truckLicense": "string",
+    "driverName": "string",
+    "contactAndTel": "string",
+    "remark": "string",
+    "orderBy": "string",
+    "authorizedBy": "string",
+    "contactDate": "2025-03-10T04:43:53.887Z",
+    "orderDate": "2025-03-10T04:43:53.887Z",
+    "authorizedDate": "2025-03-10T04:43:53.887Z",
+    "lastPrintDateTime": "2025-03-10T04:43:53.887Z",
+  },
+)
+
+const loadingSaveTruckOrderForm = ref(false)
+const trickerSaveTruckOrder = ref(0)
+
+const handleSavetruckOrder = async type => {
+
+  loadingSaveTruckOrderForm.value = true
+
+
+  paramsTruckOrder.value.dateOrderBy = dateCurrent.value
+  paramsTruckOrder.value.dateDriverBy = dateCurrent.value
+  paramsTruckOrder.value.dateAuthorizedBy = dateCurrent.value
+
+  // const body = null
+
+  // if(type ==='first'){
+  //   body = bodyFirstTruckOrder()
+  // }else{
+  //   body = bodySaveTruckOrder(paramsTruckOrder.value)
+  // }
+
+  const body = bodySaveTruckOrder(paramsTruckOrder.value)
+
+  trikerSaveDrft.value = true
+
+  if(disabledModel.value === false){
+    const saveDraftRes = await saveShipmentPlan(dataRowModel.value)
+
+
+    if (!saveDraftRes) {
+      textAlertDialogFunction(alertWordConst.saveDraft, false)
+      throw new Error('saveDraftRes failed: ' + saveDraftRes)
+    }else{
+      textAlertDialogFunction(alertWordConst.saveDraft, true)
+      setTimeout(() => {
+        location.reload()
+      }, 500) // 500 มิลลิวินาที = 0.5 วินาที
+    }
+  }
+
+  
+
+
+  try {
+    const result = await saveTruckOrder(
+      urlApi.value,
+      'save',
+      whereHouse,
+      accessTokenAtStore,
+      body,
+    )
+
+    if (result) {
+
+      sessionStorage.removeItem('sOHistoryTruckOrderSST')
+      sessionStorage.removeItem('sOeIdHistoryTruckOrderSST')
+      sessionStorage.removeItem('rowDataHistoryTruckOrderSST')
+
+      if (trickerSaveTruckOrder.value == !1) {
+        textAlertDialogFunction("SAVE TRUCK ORDER", true)
+        setTimeout(() => {
+          location.reload()
+        }, 500)
+      }
+    } else {
+      textAlertDialogFunction("SAVE TRUCK ORDER", false)
+
+      trikerSaveDrft.value = false
+    }
+  } catch (error) {
+    trikerSaveDrft.value = false
+  }
+
+  loadingSaveTruckOrderForm.value = false
+  trikerSaveDrft.value = false
 }
 </script>
 
 <template>
   <!-- Title Page -->
+  <div>
+    <VCard>
+      <VCardTitle>
+        <div class="d-flex align-center">
+          <VRow class="d-flex align-center">
+            <VCol cols="2">
+              <IconBtn
+                class="cursor-pointer"
+                color="#FFFFFF"
+                :to="{
+                  name: 'skt-receiving',
+                }"
+              >
+                <VIcon
+                  size="30"
+                  icon="ri-close-circle-fill"
+                  color="#000000"
+                />
+              </IconBtn>
+            </VCol>
+            <VCol
+              cols="8"
+              class="text-center"
+            >
+              <div>
+                <span
+                  style="font-size: 22px; font-weight: bold;"
+                  class="text-center"
+                >{{ $t('Shipment Plan') }}</span>
+              </div>
+            </VCol>
+            <VCol
+              cols="2"
+              class="d-flex justify-end"
+            >
+              <VBtn
+                variant="flat"
+                @click="panel = panel.length ? [] : ['filter']"
+              >
+                <VIcon icon="ri-equalizer-line" />
+              </VBtn>
+            </VCol>
+          </VRow>
+        </div>
+      </VCardTitle>
+    </VCard>
+  </div>
+
+  <!-- Expansion -->
   <section>
-    <ShipmentPlanFilter
-      v-model:filter-form="filterForSearchPlan"  
-      v-model:etd-date="etdDateModel"
-      v-model:panel-state="panel"
-      :items-status="itemsStatus"
-      :disabled-btn-export="disabledBtnExport"
-      @search="searchFilterPlanFunctionBtn"
-      @clear="clearFilterPlanFunctionBtn"
-      @export="printShipmentPDFBySoEIdPlan"
-    />  
+    <div>
+      <VExpansionPanels
+        v-model="panel"
+        multiple
+      >
+        <VExpansionPanel value="filter">
+          <VExpansionPanelText>
+            <VForm @submit.prevent="submitSearchButton">
+              <!-- Barcode | Product code | Product Name | Button Export -->
+              <VRow>
+                <!-- 👉 Select Barcode -->
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <VSelect
+                    v-model="filterForSearchPlan.StatusId"
+                    :items="itemsStatus"
+                    item-title="name"
+                    item-value="name"
+                    clearable
+                    density="compact"
+                  >
+                    <template #label>
+                      <span
+                        class="d-flex align-center"
+                        style="font-size: 12px;"
+                      >
+                        Select Status
+                      </span>
+                    </template>
+
+                    <template #selection="{ item }">
+                      <VChip
+                        variant="elevated"
+                        size="x-small"
+                        style="min-height: 20px;"
+                        :color="item.raw.color ? item.raw.color : 'grey'"
+                      >
+                        <span
+                          v-if="item.raw.name"
+                          class="text-white"
+                        >{{ item.raw.name }}</span>
+                        <span
+                          v-else
+                          class="text-white"
+                        >All</span>
+                      </VChip>
+                    </template>
+                  </VSelect>
+                </VCol>
+
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <VTextField
+                    v-model="filterForSearchPlan.PayerNameSearch"
+                    density="compact"
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Payer Name</span>
+                    </template>
+                  </VTextField>
+                </VCol>
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <VTextField
+                    v-model="filterForSearchPlan.ItemNameSearch"
+                    density="compact"
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Item Name</span>
+                    </template>
+                  </VTextField>
+                </VCol>
+
+
+                <!-- 👉 Select Product code -->
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <!-- 👉 Search Product code -->
+                  <AppDateTimePicker
+                    v-model="etdDateModel"
+                    prepend-inner-icon="ri-calendar-schedule-fill"
+                    placeholder="ETD (dd/mm/yyyy To dd/mm/yyyy)"
+                    density="compact"
+                    style="font-size: 14px;"
+                    :config="{ dateFormat: 'd/m/Y', mode: 'range' }"
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">ETD</span>
+                    </template>
+                  </AppDateTimePicker>
+                </VCol>
+
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <!-- 👉 Search Product code -->
+                  <VTextField
+                    v-model="filterForSearchPlan.SalesOrderNoSearch"
+                    density="compact"
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Sale Order No.</span>
+                    </template>
+                  </VTextField>
+                </VCol>
+
+                <!-- 👉 Select Product Name -->
+                <VCol
+                  cols="12"
+                  lg="4"
+                  sm="6"
+                  class="py-1"
+                >
+                  <VTextField
+                    v-model="filterForSearchPlan.LotSearch"
+                    density="compact"
+                  >
+                    <template #label>
+                      <span style="font-size: 12px;">Lot</span>
+                    </template>
+                  </VTextField>
+                </VCol>
+
+                <!-- 👉 Button Search and Export -->
+                <VCol cols="8" />
+                <VCol
+                  cols="12"
+                  lg="4"
+                  class="py-1"
+                >
+                  <VRow class="d-flex justify-end">
+                    <VCol cols="4">
+                      <VBtn
+                        height="100%"
+                        width="100%"
+                        color="green"
+                        density="compact"
+                        class="mx-0"
+                        @click="searchFilterPlanFunctionBtn"
+                      >
+                        <span style="font-size: 12px;">{{ $t('Search') }}</span>
+                      </VBtn>
+                    </VCol>
+                    <VCol cols="4">
+                      <VBtn
+                        color="red"
+                        height="100%"
+                        width="100%"
+                        density="compact"
+                        @click="clearFilterPlanFunctionBtn"
+                      >
+                        <span style="font-size: 12px;">{{ $t('Clear') }}</span>
+                      </VBtn>
+                    </VCol>
+                    <VCol
+                      cols="4"
+                      md="4"
+                    >
+                      <VBtn
+                        :disabled="!disabledBtnExport"
+                        density="compact"
+                        class=" px-16 px-sm-12 pa-sm-1 custom-small-btn-excel"
+                        color="warning"
+                        style="width: 100%; height: 40px;"
+                        @click="printShipmentPDFBySoEIdPlan"
+                      >
+                        <img
+                          src="/src/assets/images/icons/vscode-icons_file-type-excel2.png"
+                          style="width: 27px;"
+                          class="custom-small-img"
+                        >
+                        <span style="font-size: 12px;">{{ $t('Export file') }}</span>
+                      </VBtn>
+                    </VCol>
+                  </VRow>
+                </VCol>
+              </VRow>
+            </VForm>
+          </VExpansionPanelText>
+        </VExpansionPanel>
+      </VExpansionPanels>
+    </div>
+  </section>
+
+  <!-- Dialog Image -->
+  <section>
+    <VDialog
+      v-model="isDialogImageVisible"
+      persistent
+      class=""
+      max-width="500"
+    >
+      <VCard class="">
+        <VCardTitle class="d-flex justify-space-between bg-primary">
+          <div>
+            <span class="text-white">{{ $t('Image Product') }}</span>
+          </div>
+          <div>
+            <IconBtn
+              size="30"
+              @click="isDialogImageVisible = false"
+            >
+              <VIcon
+                size="30"
+                icon="mdi-close-circle"
+              />
+            </IconBtn>
+          </div>
+        </VCardTitle>
+        <VImg
+          style="width: 100%;"
+          :src="imgProduct"
+          cover
+        />
+        <VCardActions
+          class="bg-primary"
+          style="width: 100%; padding: 0;"
+        >
+          <VBtn
+            color="red-green-1"
+            variant="text"
+            style="width: 100%;"
+            @click="showExpansionDialog = !showExpansionDialog"
+          >
+            <VIcon
+              size="40px"
+              color="white"
+              :icon="showExpansionDialog ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            />
+            <span class="text-white">{{ $t('Details') }}</span>
+          </VBtn>
+        </VCardActions>
+
+        <VExpandTransition>
+          <div v-show="showExpansionDialog">
+            <VCardText class="bg-green-lighten-3">
+              <div>
+                <VRow>
+                  <VCol
+                    cols="12"
+                    lg="6"
+                  >
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Name")
+                    }}:&nbsp;</span>&nbsp;{{ nameProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Code")
+                    }}:&nbsp;</span>&nbsp;{{ codeProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Barcode")
+                    }}:&nbsp;</span>&nbsp;{{ barcodeProduct }}<br>
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    lg="6"
+                  >
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Categories")
+                    }}:&nbsp;</span>&nbsp;{{ categoriesProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Group")
+                    }}:&nbsp;</span>&nbsp;{{ groupProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Sup Group")
+                    }}:&nbsp;</span>&nbsp;{{ groupSupProduct }}<br>
+                    <span style="font-size: large; font-weight: 900;">{{
+                      $t("Total")
+                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{
+                      (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
+                  </VCol>
+                </VRow>
+                <span style="font-size: large; font-weight: 900;">{{
+                  $t("Details ")
+                }} :</span>{{ detailsProduct }}
+              </div>
+            </VCardText>
+          </div>
+        </VExpandTransition>
+      </VCard>
+    </VDialog>
   </section>
 
   <!-- Dialog Print Shipping Mark -->
@@ -2070,33 +3147,459 @@ const clearParamsTruckOrder = () => {
     </VDialog>
   </div>
 
-  <section>
-    <ShippingMarkDialog
-      v-model:is-visble="isDialogVisiblePrintShippingMark"
-      v-model:print-copy="printCopyModel"
-      :sale-order-no="exmpleSaleOrder"
-      :shipping-mark="exmpleShippingMark"
-      @confirm-print="printLabel"
-    />
-  </section>
+  <!-- Btn Test Role -->
+  <div
+    v-if="false"
+    class="mt-4"
+  >
+    <VCard>
+      <VCardText>
+        <VRow>
+          <VCol cols="6">
+            <VBtn
+              color="yellow"
+              @click="setAccount('Amin')"
+            >
+              Admin
+            </VBtn>
+            <VBtn
+              color="blue"
+              @click="setAccount('ViewerKK')"
+            >
+              ViewerKK
+            </VBtn>
+            <VBtn
+              color="brown"
+              @click="setAccount('INSP')"
+            >
+              INSP
+            </VBtn>
+            <VBtn
+              color="light-blue"
+              @click="setAccount('SAL')"
+            >
+              SAL
+            </VBtn>
+            <VBtn
+              color="light-blue"
+              @click="setAccount('LOG')"
+            >
+              LOG
+            </VBtn>
+            <VBtn
+              color="light-blue"
+              @click="setAccount('SALLOG')"
+            >
+              SAL/LOG
+            </VBtn>
+            <VBtn
+              color="deep-purple"
+              @click="setAccount('WH')"
+            >
+              WH
+            </VBtn>
+            <VBtn
+              color="deep-purple"
+              @click="setAccount('WHSub')"
+            >
+              WH Sub
+            </VBtn>
+            <VBtn @click="setAccount('All')">
+              All
+            </VBtn>
+            <VBtn @click="viewAllData">
+              All
+            </VBtn>
+          </VCol>
+        </VRow>
+      </VCardText>
+    </VCard>
+  </div>
 
   <!-- Truck Order -->
   <section>
-    <TruckOrderDialog
+    <VDialog
       v-model="isDialogVisiblePrintTruck"
-      :sale-order-number="saleOrderNo"
-      :data-row="dataRowModel"
-      :disabled="disabledModel"
-      :company-list="CompanyModel"
-      :address-list="AddressModel"
-      :truck-list="TruckCompanyModel"
-      :truck-type-list="TruckTypeModel"
-      :current-user="userDataInfo"
-      :existing-data="existingTruckData"
-      @save="handleSaveTruckOrder"
-      @print="handlePrintTruckOrder"
-      @close="handleCloseTruckOrder"
-    />
+      width="100%"
+      persistent
+    >
+      <!-- Dialog Content -->
+      <VCard>
+        <DialogCloseBtn
+          variant="text"
+          size="default"
+          @click="trikerSaveDrft = false, trickerSaveTruckOrder = 1, handleSavetruckOrder(), isDialogVisiblePrintTruck = false, clearParamsTruckOrder(), clearHistoryTruckOrder()"
+        />
+
+        <VCardTitle class="text-center">
+          Truck Order
+        </VCardTitle>
+
+        <VCardText style="overflow-x: auto;">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th
+                  colspan="12"
+                  class="text-center"
+                >
+                  SANYO KASEI (THAILAND) LTD.
+                </th>
+              </tr>
+              <tr>
+                <th
+                  colspan="12"
+                  class="text-center"
+                >
+                  Rojana Industrial Park-Rayong, 5/5 Moo 11 T. Nongbua, A.Bankhai, Rayong 21120
+                </th>
+              </tr>
+              <tr>
+                <th
+                  colspan="12"
+                  class="text-center"
+                >
+                  Tel. (038) 627-050 Fax. (038) 946-07
+                </th>
+              </tr>
+              <tr>
+                <th
+                  colspan="12"
+                  class="text-center"
+                >
+                  ใบสั่งรถขนส่ง / Truck Order
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th colspan="4">
+                  วันที่ส่งสินค้า
+                </th>
+                <td
+                  colspan="8"
+                  class="text-start"
+                >
+                  {{ dataRowModel?.logUpdatedDate }}
+                </td>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  เลขที่ใบสั่งงานรถขนส่ง (Truck Order No)
+                </th>
+                <td colspan="8">
+                  <VTextField
+                    v-if="false"
+                    style="min-width: 250px;"
+                    density="compact"
+                    class="text-center"
+                  >
+                    <template #prepend>
+                      Running Number:
+                    </template>
+                  </VTextField>
+                  {{ dataRowModel?.truckReservingNumber }}
+                </td>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  เลขที่อ้างอิง (Ref SO No.)
+                </th>
+                <td
+                  colspan="8"
+                  class="text-start"
+                >
+                  {{ saleOrderNo }}
+                </td>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  ชื่อลูกค้า
+                </th>
+                <th colspan="8">
+                  <VAutocomplete
+                    v-model="CompanyPrint"
+                    class="text-start"
+                    density="compact"
+                    label="Company"
+                    :items="CompanyModel"
+                    item-title="company"
+                    item-value="company"
+                  />
+                </th>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  สถานที่จัดส่ง
+                </th>
+                <td
+                  colspan="8"
+                  class="text-start"
+                  style="min-width: 500px; max-width: 500px;"
+                >
+                  <VAutocomplete
+                    v-model="AddressPrint"
+                    class="text-start"
+                    density="compact"
+                    label="Address"
+                    :items="AddressModel"
+                    item-title="shipperLocation"
+                    item-value="shipperLocation"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  บริษัทขนส่ง (Transportation Company Name)
+                </th>
+                <th
+                  colspan="8"
+                  class="text-center"
+                >
+                  <VAutocomplete
+                    v-model="TruckCompanyPrint"
+                    class="text-center"
+                    density="compact"
+                    label="Transportation Company Name"
+                    :items="truckModel"
+                    item-title="truck"
+                    item-value="truck"
+                  />
+                </th>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  ประเภทรถ (Truck Type)
+                </th>
+                <th
+                  colspan="8"
+                  class="text-center"
+                >
+                  <VAutocomplete
+                    v-model="TruckTypePrint"
+                    class="text-center"
+                    density="compact"
+                    label="Truck Type"
+                    :items="TruckTypeModel"
+                    item-title="truckType"
+                    item-value="truckType"
+                  />
+                </th>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  ทะเบียนรถ (Truck License)
+                </th>
+                <th
+                  colspan="8"
+                  class="text-center"
+                >
+                  <VTextField
+                    v-model="paramsTruckOrder.truckLicense"
+                    style="min-width: 250px;"
+                    density="compact"
+                    label="Enter Truck License"
+                    class="text-center"
+                  />
+                </th>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  ชื่อผู้ติดต่อ
+                </th>
+                <td
+                  colspan="8"
+                  class="text-start"
+                >
+                  <VTextField
+                    v-model="personInchargeTruckCompanyModel"
+                    style="min-width: 250px;"
+                    density="compact"
+                    label="Contact Name"
+                    class="text-center"
+                  />
+                  <span v-if="false">{{ personInchargeTruckCompanyModel }}</span>
+                </td>
+              </tr>
+              <tr v-if="false">
+                <th colspan="4">
+                  เลขที่อ้างอิง (Ref SO No.)
+                </th>
+                <td
+                  colspan="8"
+                  class="text-center"
+                >
+                  <VTextField
+                    v-model="personInchargeTruckCompanyModel"
+                    style="min-width: 250px;"
+                    density="compact"
+                    label="Ref SO No."
+                    placeholder="000000000"
+                    class="text-center"
+                  />
+                  <span v-if="selectedTruckCompany2('contact')">{{ selectedTruckCompany2('contact') }}</span>
+                </td>
+              </tr>
+              <tr>
+                <th colspan="4">
+                  รายชื่อและเบอร์โทรผู้ติดต่อ
+                </th>
+                <td
+                  colspan="8"
+                  class="text-start"
+                >
+                  <span v-if="false">{{ (selectedTruckCompany2('contact')) }}</span>
+                  <VTextField
+                    v-model="contactTruckCompanyModel"
+                    style="min-width: 250px;"
+                    density="compact"
+                    label="Contact & Tel."
+                    class="text-center"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <th
+                  colspan="4"
+                  style="text-align: start; vertical-align: top;"
+                >
+                  <span>หมายเหตุ (Remark) </span>
+                </th>
+                <th
+                  colspan="8"
+                  class="text-center"
+                >
+                  <VTextarea
+                    v-model="paramsTruckOrder.remark"
+                    label="Default"
+                    placeholder="Enter Remark"
+                    clearable
+                    clear-icon="ri-close-line"
+                    row-height="30"
+                  />
+                </th>
+              </tr>
+            </tbody>
+          </table>
+          <table class="custom-table">
+            <tr>
+              <th colspan="4">
+                <VTextField
+                  v-model="paramsTruckOrder.driverAndTel"
+                  density="compact"
+                  class="text-center"
+                >
+                  <template #label>
+                    ผู้ขับรถ&เบอร์โทร
+                  </template>
+                </VTextField>
+              </th>
+              <th colspan="4">
+                <VTextField
+                  v-model="userDataInfo.firstName"
+                  density="compact"
+                  class="text-center"
+                >
+                  <template #label>
+                    ผู้สั่งการ / Order By
+                  </template>
+                </VTextField>
+              </th>
+              <th colspan="4">
+                <VTextField
+                  v-model="paramsTruckOrder.authorizedBy"
+                  density="compact"
+                  class="text-center"
+                >
+                  <template #label>
+                    ผู้อนุมัติ / Authorized By
+                  </template>
+                </VTextField>
+              </th>
+            </tr>
+            <tr>
+              <th colspan="4">
+                <AppDateTimePicker
+                  v-model="paramsTruckOrder.dateDriverDate"
+                  density="compact"
+                  placeholder="Select date"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+              </th>
+              <th colspan="4">
+                <AppDateTimePicker
+                  v-model="paramsTruckOrder.dateOrderDate"
+                  density="compact"
+                  placeholder="Select date"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+              </th>
+              <th colspan="4">
+                <AppDateTimePicker
+                  v-model="paramsTruckOrder.dateAuthorizedDate"
+                  density="compact"
+                  placeholder="Select date"
+                  :config="{ dateFormat: 'd/m/Y' }"
+                />
+              </th>
+            </tr>
+          </table>
+        </VCardText>
+
+        <VCardText class="d-flex justify-end">
+          <VBtn
+            v-if="!disabledModel"
+            color="warning"
+            class="d-flex justify-space-between mx-2"
+            @click="trickerSaveTruckOrder = 0, trikerSaveDrft = true, handleSavetruckOrder(), loadingSaveTruckOrderForm = true"
+          >
+            <span v-if="!loadingSaveTruckOrderForm">
+              Save
+            </span>
+
+            <div>
+              <VProgressCircular
+                v-if="loadingSaveTruckOrderForm"
+                start
+                :rotate="360"
+                :size="30"
+                indeterminate
+                :model-value="progressValue"
+                color="primary"
+              />
+            </div>
+          </VBtn>
+
+          <VBtn
+            color="warning"
+            class="d-flex justify-space-between"
+            @click="handlePrintTruckOrderPDF(), loadingPrintTruckOrderForm = true"
+          >
+            <span v-if="!loadingPrintTruckOrderForm">
+              <VIcon
+                start
+                icon="ri-printer-fill"
+              />
+
+              Print
+
+            </span>
+
+            <div>
+              <VProgressCircular
+                v-if="loadingPrintTruckOrderForm"
+                start
+                :rotate="360"
+                :size="30"
+                indeterminate
+                :model-value="progressValue"
+                color="primary"
+              />
+            </div>
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </section>
 
   <!-- Dialog PDF -->
@@ -2141,6 +3644,23 @@ const clearParamsTruckOrder = () => {
         <VRow>
           <VCol cols="10">
             <VBtn
+              v-if="false"
+              class="mx-2"
+              color="warning"
+              @click="saveShipmentPlan"
+            >
+              <span style="font-size: 12px;">Save</span>
+            </VBtn>
+            <VBtn
+              v-if="false"
+              class="mx-2"
+              color="primary"
+              @click="submitShipmentPlanBySoEId"
+            >
+              <span style="font-size: 12px;">Submit</span>
+            </VBtn>
+
+            <VBtn
               v-if="canVisibleUserPermission(statusPermission, 'BTN_APPROVE').canVisible"
               :disabled="selectedDataTables.length < 1"
               class="mx-2"
@@ -2169,6 +3689,15 @@ const clearParamsTruckOrder = () => {
             >
               <span style="font-size: 12px;">Send Back</span>
             </VBtn>
+
+            <VBtn
+              v-if="false"
+              color="info"
+              class="mx-2"
+              @click="saveShipmentPlan"
+            >
+              <span style="font-size: 12px;">Add Item</span>
+            </VBtn>
           </VCol>
           <VCol
             cols="2"
@@ -2186,13 +3715,19 @@ const clearParamsTruckOrder = () => {
               />
             </VBtn>
           </VCol>
+          <VBtn
+            v-if="false"
+            @click="testValue"
+          >
+            Test
+          </VBtn>
         </VRow>
       </VCardText>
     </VCard>
   </div>
 
   <!-- ----------             Product  SKT                                  ------------------------------------ -->
-  <section v-if="disableShowDataByDepartment(userData)">
+  <section v-if="disableShowDataByDepartment()">
     <VCard class="mt-2">
       <div>
         <div
@@ -2234,7 +3769,7 @@ const clearParamsTruckOrder = () => {
               </th>
               <th
                 style="width: 60px;"
-                class="sticky-column px-1"
+                class="sticky-column"
               />
               <th
                 scope="row"
@@ -2242,12 +3777,12 @@ const clearParamsTruckOrder = () => {
               >
                 <span style="font-weight: bold;">{{ $t('No.') }}</span>
               </th>
-              <th class="sticky-column text-center px-1">
+              <th class="sticky-column text-center">
                 <span style="font-weight: bold;">{{ $t('Status') }}</span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
-                class="px-1"
+                class="px-2"
               >
                 <span style="font-weight: bold;">{{ $t('Sale Order No.') }}
                   <VIcon
@@ -2260,21 +3795,19 @@ const clearParamsTruckOrder = () => {
               
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
-                class="text-center text-wrap px-1"
-                style="max-width: 80px;"
+                class="text-center"
               >
                 <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
-                class="text-start px-1"
+                class="text-start"
               >
                 <span style="font-weight: bold;">{{ $t('PO No.') }}</span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
-                class="text-center px-1"
-                style="max-width: 80px;"
+                class="text-center"
               >
                 <span style="font-weight: bold;">{{ $t('PO attachment') }}</span>
               </th>
@@ -2343,10 +3876,7 @@ const clearParamsTruckOrder = () => {
                   </span>
                 </div>
               </th>
-              <th
-                v-if="canVisibleUserPermission(statusPermission, 'COL_END_USER').canVisible"
-                class="px-1"
-              >
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_END_USER').canVisible">
                 <span style="font-weight: bold;">{{ $t('End User') }}</span>
               </th>
               <th
@@ -2373,10 +3903,7 @@ const clearParamsTruckOrder = () => {
                   />
                 </span>
               </th>
-              <th
-                v-if="canVisibleUserPermission(statusPermission, 'COL_LOT_NUMBER').canVisible"
-                class="px-1"
-              >
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_LOT_NUMBER').canVisible">
                 <span style="font-weight: bold;">{{ $t('Lot') }}
                   <VIcon
                     :icon="sortColumn === 'lot' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
@@ -2387,7 +3914,7 @@ const clearParamsTruckOrder = () => {
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_QTY_KG').canVisible"
-                class="text-end px-1"
+                class="text-end px-2"
               >
                 <span style="font-weight: bold;">{{ $t('Qty. (Kg.)') }}
                   <VIcon
@@ -2399,8 +3926,7 @@ const clearParamsTruckOrder = () => {
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_COA').canVisible"
-                class="text-center px-1"
-                style="max-width: 80px;"
+                class="text-center"
               >
                 <span style="font-weight: bold;">{{ $t('COA') }}</span>
               </th>
@@ -2479,8 +4005,7 @@ const clearParamsTruckOrder = () => {
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canVisible"
-                class="bg-yellow-lighten-3 texct-end px-1"
-                style=" max-width: 150px; "
+                class="bg-yellow-lighten-3 texct-end"
               >
                 <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}
                   <VIcon
@@ -2490,10 +4015,7 @@ const clearParamsTruckOrder = () => {
                   />
                 </span>
               </th>
-              <th
-                v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_FEE').canVisible"
-                class="px-1"
-              >
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_FEE').canVisible">
                 <span style="font-weight: bold;">{{ $t('Truck fee') }}
                   <VIcon
                     :icon="sortColumn === 'truckFee' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
@@ -2504,13 +4026,13 @@ const clearParamsTruckOrder = () => {
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canVisible"
-                class="text-center px-1"
+                class="text-center"
               >
                 <span style="padding-left: 1px; font-weight: bold;">{{ $t('Truck Order') }}</span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_DO_EX').canVisible"
-                class="px-1"
+                class="px-4"
               >
                 <span style="font-weight: bold;">{{ $t('DO/EX') }}
                   <VIcon
@@ -2534,7 +4056,7 @@ const clearParamsTruckOrder = () => {
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_LOADING_DATE').canVisible"
-                class="text-center px-1"
+                class="text-start px-2"
               >
                 <span style="font-weight: bold;">{{ $t('Loading date') }}
                   <VIcon
@@ -2544,48 +4066,55 @@ const clearParamsTruckOrder = () => {
                   />
                 </span>
               </th>
-              <th
-                v-if="canVisibleUserPermission(statusPermission, 'COL_ETD').canVisible"
-                class="px-1 text-center"
-              >
-                <span style="font-weight: bold;">{{ $t('ETD') }}</span>
-                <VIcon
-                  size="25"
-                  icon="ri-calendar-todo-fill"
-                />
-                <VIcon
-                  :icon="sortColumn === 'etd' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('etd')"
-                />
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_ETD').canVisible">
+                <VRow>
+                  <VCol cols="6">
+                    <span style="font-weight: bold;">{{ $t('ETD') }}</span>
+                  </VCol>
+                  <VCol
+                    class="d-flex justify-end"
+                    cols="6"
+                  >
+                    <VIcon
+                      :icon="sortColumn === 'etd' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                      class="clickable-icon"
+                      @click="toggleDirection('etd')"
+                    />
+                    <VIcon
+                      size="25"
+                      icon="ri-calendar-todo-fill"
+                    />
+                  </VCol>
+                </VRow>
               </th>
-              <th
-                v-if="canVisibleUserPermission(statusPermission, 'COL_ETA').canVisible"
-                class="px-1 text-center"
-              >
-                <span style="font-weight: bold;">{{ $t('ETA') }}</span>
-                
-                <VIcon
-                  size="25"
-                  icon="ri-calendar-todo-fill"
-                />
-                <VIcon
-                  :icon="sortColumn === 'eta' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
-                  class="clickable-icon"
-                  @click="toggleDirection('eta')"
-                />
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_ETA').canVisible">
+                <VRow>
+                  <VCol cols="6">
+                    <span style="font-weight: bold;">{{ $t('ETA') }}</span>
+                  </VCol>
+                  <VCol
+                    class="d-flex justify-end"
+                    cols="6"
+                  >
+                    <VIcon
+                      :icon="sortColumn === 'eta' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
+                      class="clickable-icon"
+                      @click="toggleDirection('eta')"
+                    />
+                    <VIcon
+                      size="25"
+                      icon="ri-calendar-todo-fill"
+                    />
+                  </VCol>
+                </VRow>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_DELIVERY_NOTE').canVisible"
-                class="text-center px-1"
-                style="max-width: 100px;"
+                class="text-center"
               >
                 <span style="font-weight: bold;">{{ $t('Delivery note') }}</span>
               </th>
-              <th
-                v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_SAL').canVisible"
-                class="px-1"
-              >
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_SAL').canVisible">
                 <span style="font-weight: bold;">{{ $t('Remark (SAL)') }}
                   <VIcon
                     :icon="sortColumn === 'saL_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
@@ -2594,10 +4123,7 @@ const clearParamsTruckOrder = () => {
                   />
                 </span>
               </th>
-              <th
-                v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_WH').canVisible"
-                class="px-1"
-              >
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_WH').canVisible">
                 <span style="font-weight: bold;">{{ $t('Remark (WH)') }}
                   <VIcon
                     :icon="sortColumn === 'wH_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
@@ -2606,10 +4132,7 @@ const clearParamsTruckOrder = () => {
                   />
                 </span>
               </th>
-              <th
-                v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_LOG').canVisible"
-                class="px-1"
-              >
+              <th v-if="canVisibleUserPermission(statusPermission, 'COL_REMARK_LOG').canVisible">
                 <span style="font-weight: bold;">{{ $t('Remark (LOG)') }}
                   <VIcon
                     :icon="sortColumn === 'loG_Remarks' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
@@ -2627,7 +4150,7 @@ const clearParamsTruckOrder = () => {
                   />
                 </span>
               </th>
-              <th class="px-1 text-center">
+              <th class="px-1">
                 <span style="font-weight: bold;">{{ $t('Updated Date') }}
                   <VIcon
                     :icon="sortColumn === 'updatedDate' && sortDirection === 'desc' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"
@@ -2636,27 +4159,23 @@ const clearParamsTruckOrder = () => {
                   />
                 </span>
               </th>
-              <!-- Action Dev -->
-              <section v-if="false">
-                <th
-                  v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
-                  class="text-center"
-                >
-                  <span style="font-weight: bold;" />
-                </th>
-                <th class="text-center">
-                  <span style="font-weight: bold;">{{ $t('Action') }}</span>
-                </th>
-                <th
-                  v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
-                  class="text-center "
-                >
-                  <span style="font-weight: bold;" />
-                </th>
-              </section>
-              
               <th
-                v-if="true"
+                v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
+                class="text-center"
+              >
+                <span style="font-weight: bold;" />
+              </th>
+              <th class="text-center">
+                <span style="font-weight: bold;">{{ $t('Action') }}</span>
+              </th>
+              <th
+                v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
+                class="text-center "
+              >
+                <span style="font-weight: bold;" />
+              </th>
+              <th
+                v-if="false"
                 class="sticky-action"
               >
                 <span style="font-weight: bold;">{{ $t('Action') }}</span>
@@ -2713,7 +4232,7 @@ const clearParamsTruckOrder = () => {
                 </div>
               </td>
               <td
-                class="sticky-columnBody cursor-pointer px-1"
+                class="sticky-columnBody cursor-pointer"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -2729,7 +4248,7 @@ const clearParamsTruckOrder = () => {
                 <span>{{ (currentPage - 1) * 10 + index + 1 }}</span>
               </td>
               <td
-                class="sticky-columnBody cursor-pointer px-1"
+                class="sticky-columnBody cursor-pointer"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -2769,7 +4288,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 80px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -2789,7 +4308,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 80px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -2855,7 +4374,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 80px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3015,7 +4534,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SHIPPING_MARK').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="max-width: 170px; font-size: 12px;"
+                style="min-width: 180px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3030,6 +4549,7 @@ const clearParamsTruckOrder = () => {
               >
                 <div class="text-start cursor-pointer">
                   <VBtn
+                    style="min-width: 160px; max-width: 160px;"
                     variant="outlined"
                     :color="product.shipperConditions ? 'primary' : 'grey'"
                     @click="textAreaShipDialogActive2('ShipMC', product.shipperMark,
@@ -3181,8 +4701,8 @@ const clearParamsTruckOrder = () => {
                   borderBottom:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
                 }"
-                class="text-end px-1 cursor-pointer"
-                style="min-width: 100px; font-size: 12px;"
+                class="text-end px-2 cursor-pointer"
+                style="min-width: 120px; font-size: 12px;"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
                 {{ formatNumber(product.quantity) }}
@@ -3192,7 +4712,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_COA').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 80px; font-size: 12px;"
+                style="min-width: 100px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3451,7 +4971,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canVisible"
                 class="text-center px-1 cursor-pointer"
-                style="min-width: 150px; font-size: 12px;"
+                style="min-width: 250px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3470,6 +4990,7 @@ const clearParamsTruckOrder = () => {
                   density="compact"
                   :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canExecute || 
                     disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                  style=" min-width: 150px;"
                 />
                 <VTooltip
                   v-if="product.truckReservingNumber"
@@ -3503,7 +5024,7 @@ const clearParamsTruckOrder = () => {
                   :disabled="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_FEE').canExecute || 
                     disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
                   density="compact"
-                  style=" min-width: 90px;"
+                  style=" min-width: 150px;"
                 />
                 <VTooltip
                   v-if="product.truckFee"
@@ -3518,8 +5039,8 @@ const clearParamsTruckOrder = () => {
               <!-- 👉 truckOrder -->
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canVisible"
-                class="text-start px-1 cursor-pointer"
-                style="min-width: 100px; font-size: 12px;"
+                class="text-start px-2 cursor-pointer"
+                style="min-width: 200px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3532,34 +5053,41 @@ const clearParamsTruckOrder = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <div class="d-flex align-center justify-center">
-                  <VBtn
-                    color="warning"
-                    class="mx-2"
-                    @click="showDialogTruckOrder(product.salesOrderNo, product.soEtlLogDetailJournalID, product)"
+                <VRow>
+                  <VCol cols="6">
+                    <VBtn
+                      color="warning"
+                      class="mx-2"
+                      @click="showDialogTruckOrder(product.salesOrderNo, product.soEtlLogDetailJournalID, product)"
+                    >
+                      <VIcon
+                        size="30"
+                        icon="ri-pencil-line"
+                      />
+                    </VBtn>
+                  </VCol>
+                  <VCol
+                    style="width: 50px;"
+                    cols="6"
                   >
-                    <VIcon
-                      size="30"
-                      icon="ri-pencil-line"
+                    <FileInputDialogCarousels
+                      title-dialog="Truck Order"
+                      :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canExecute || 
+                        disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
+                      :type-file-input="typeFileInput"
+                      file-name="Truck Order"
+                      :files-from-a-p-i="product.getTruckOrderFileData"
+                      @updateFiles="handleFileUpdatesTruckOrder"
                     />
-                  </VBtn>
-                  <FileInputDialogCarousels
-                    title-dialog="Truck Order"
-                    :disabled-prop="!canVisibleUserPermission(statusPermission, 'COL_TRUCK_ORDER').canExecute || 
-                      disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)"
-                    :type-file-input="typeFileInput"
-                    file-name="Truck Order"
-                    :files-from-a-p-i="product.getTruckOrderFileData"
-                    @updateFiles="handleFileUpdatesTruckOrder"
-                  />
-                </div>
+                  </VCol>
+                </VRow>
               </td>
 
               <!-- 👉 doEx -->
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_DO_EX').canVisible"
-                class="text-start px-1 cursor-pointer"
-                style="min-width: 50px; font-size: 12px;"
+                class="text-start px-4 cursor-pointer"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3579,7 +5107,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_COUNTRY').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 100px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3599,7 +5127,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_LOADING_DATE').canVisible"
                 class="text-start px-1"
-                style="min-width: 130px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3627,7 +5155,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_ETD').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 130px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3655,7 +5183,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_ETA').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 130px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3684,7 +5212,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_DELIVERY_NOTE').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 100px; font-size: 12px;"
+                style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3843,8 +5371,8 @@ const clearParamsTruckOrder = () => {
 
               <!-- 👉 update date -->
               <td
-                class="text-center px-1 cursor-pointer"
-                style="max-width: 90px; font-size: 12px;"
+                class="text-start px-1 cursor-pointer"
+                style="min-width: 130px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3861,134 +5389,132 @@ const clearParamsTruckOrder = () => {
               </td>
 
               <!-- 👉 Actions -->
-              <section v-if="false">
-                <td
-                  v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
-                  style="width: 150px; font-size: 12px;"
-                  class="text-center px-1 cursor-pointer"
-                  :style="{
-                    backgroundColor:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
-                      isSelected(product) ? '#E0F7FA' :
-                      '',
-                    borderTop:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
-                    borderBottom:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
-                  }"
-                  @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              <td
+                v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
+                style="width: 150px; font-size: 12px;"
+                class="text-center px-1 cursor-pointer"
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
+                <VBtn
+                  :disabled="disabledStatusSaveDraft(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
+                    !canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
+                  :color="accountINSP ? 'grey' : 'warning'"
+                  @click="handleSaveRowShipmentPlan(product, 'save draft'), saveDraftLoading = true"
                 >
-                  <VBtn
-                    :disabled="disabledStatusSaveDraft(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
-                      !canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
-                    :color="accountINSP ? 'grey' : 'warning'"
-                    @click="handleSaveRowShipmentPlan(product, 'save draft'), saveDraftLoading = true"
+                  <span
+                    v-if="saveDraftLoading && product.soEtlLogDetailJournalID === saveDraftLoadingSOERow"
+                    style="font-size: 12px;"
                   >
-                    <span
-                      v-if="saveDraftLoading && product.soEtlLogDetailJournalID === saveDraftLoadingSOERow"
-                      style="font-size: 12px;"
-                    >
-                      <VProgressCircular
-                        :size="30"
-                        color="primary"
-                        indeterminate
-                      />
-                    </span>
-                    <span
-                      v-else
-                      style="font-size: 12px;"
-                    >Save Draft</span>
-                  </VBtn>
-                </td>
-                <td
-                  v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
-                  style="width: 150px; font-size: 12px;"
-                  :style="{
-                    backgroundColor:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
-                      isSelected(product) ? '#E0F7FA' :
-                      '',
-                    borderTop:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
-                    borderBottom:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
-                  }"
-                  class="text-center px-1"
-                  @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+                    <VProgressCircular
+                      :size="30"
+                      color="primary"
+                      indeterminate
+                    />
+                  </span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >Save Draft</span>
+                </VBtn>
+              </td>
+              <td
+                v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
+                style="width: 150px; font-size: 12px;"
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                class="text-center px-1"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
+                <VBtn
+                  :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
+                    || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible "
+                  class="mx-2"
+                  :color="accountINSP ? 'grey' : 'primary'"
+                  @Click="handleOpenConfirmDialogWrapSapInV('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
                 >
-                  <VBtn
-                    :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
-                      || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible "
-                    class="mx-2"
-                    :color="accountINSP ? 'grey' : 'primary'"
-                    @Click="handleOpenConfirmDialogWrapSapInV('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
+                  <span
+                    v-if="submitLoading && product.soEtlLogDetailJournalID === submitLoadingSOERow"
+                    style="font-size: 12px;"
                   >
-                    <span
-                      v-if="submitLoading && product.soEtlLogDetailJournalID === submitLoadingSOERow"
-                      style="font-size: 12px;"
-                    >
-                      <VProgressCircular
-                        :size="30"
-                        color="primary"
-                        indeterminate
-                      />
-                    </span>
-                    <span
-                      v-else
-                      style="font-size: 12px;"
-                    >Submit </span>
-                  </VBtn>
-                </td>
-                <td
-                  v-if="accountWHSub"
-                  style="max-width: 130px; font-size: 12px;"
-                  class="text-center px-1"
-                  :style="{
-                    backgroundColor:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
-                      isSelected(product) ? '#E0F7FA' :
-                      '',
-                    borderTop:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
-                    borderBottom:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
-                  }"
-                  @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+                    <VProgressCircular
+                      :size="30"
+                      color="primary"
+                      indeterminate
+                    />
+                  </span>
+                  <span
+                    v-else
+                    style="font-size: 12px;"
+                  >Submit </span>
+                </VBtn>
+              </td>
+              <td
+                v-if="accountWHSub"
+                style="max-width: 130px; font-size: 12px;"
+                class="text-center px-1"
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
+                <VBtn
+                  width="100%"
+                  :color="accountINSP ? 'grey' : 'primary'"
                 >
-                  <VBtn
-                    width="100%"
-                    :color="accountINSP ? 'grey' : 'primary'"
-                  >
-                    <span style="font-size: 12px;">Approve</span>
-                  </VBtn>
-                </td>
-                <td
-                  style="max-width: 150px; font-size: 12px;"
-                  class="text-center px-1"
-                  :style="{
-                    backgroundColor:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
-                      isSelected(product) ? '#E0F7FA' :
-                      '',
-                    borderTop:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
-                    borderBottom:
-                      dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
-                  }"
-                  @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+                  <span style="font-size: 12px;">Approve</span>
+                </VBtn>
+              </td>
+              <td
+                style="max-width: 150px; font-size: 12px;"
+                class="text-center px-1"
+                :style="{
+                  backgroundColor:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                    isSelected(product) ? '#E0F7FA' :
+                    '',
+                  borderTop:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                  borderBottom:
+                    dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                }"
+                @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+              >
+                <VBtn
+                  :color="accountINSP ? 'grey' : 'pink-lighten-2'"
+                  @click="actionBtn(product)"
                 >
-                  <VBtn
-                    :color="accountINSP ? 'grey' : 'pink-lighten-2'"
-                    @click="actionBtn(product)"
-                  >
-                    <span style="font-size: 12px;">Action</span>
-                  </VBtn>
-                </td>
-              </section>
-              
+                  <span style="font-size: 12px;">Action</span>
+                </VBtn>
+              </td>
+
               <!-- Action Dev -->
               <td
-                v-if="true"
+                v-if="false"
                 style="max-width: 150px; font-size: 12px;"
                 class="text-center px-1 sticky-action"
                 :style="{
@@ -4005,78 +5531,107 @@ const clearParamsTruckOrder = () => {
               >
                 <VBtn color="primary">
                   <VIcon icon="ri-menu-line" />
-                  <VMenu
-                    activator="parent"
-                    location="start"
-                  >
-                    <VList
-                      density="compact"
-                      min-width="200"
-                    >
-                      <!-- Action -->
+                  <VMenu activator="parent">
+                    <VList>
                       <VListItem
-                        prepend-icon="ri-flashlight-line"
-                        title="Action"
-                        :disabled="accountINSP"
-                        @click="actionBtn(product)"
-                      />
-
-                      <!-- Save Draft -->
-                      <VListItem
-                        title="Save Draft"
-                        :disabled="isDraftDisabled(product, accountINSP, disabledStatus)"
-                        @click="saveShipmentPlan(product), saveDraftLoading = true"
+                        key="1"
+                        value="1"
+                        class="px-1 d-flex justify-center"
                       >
-                        <template #prepend>
-                          <VIcon
-                            icon="ri-save-line"
-                            :color="isDraftDisabled(product, accountINSP, disabledStatus) ? undefined : 'warning'"
-                          />
-                        </template>
-
-                        <template #append>
-                          <VProgressCircular
-                            v-if="isDraftLoading(saveDraftLoading, product)"
-                            size="16"
-                            indeterminate
-                          />
-                        </template>
+                        <VBtn
+                          :color="accountINSP ? 'grey' : 'pink-lighten-2'"
+                          @click="actionBtn(product)"
+                        >
+                          <span style="font-size: 12px;">Action</span>
+                        </VBtn>
                       </VListItem>
-                      <!-- Submit -->
+                      <VListItem
+                        v-if="canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
+                        key="2"
+                        value="1"
+                        class="px-1 d-flex justify-center"
+                      >
+                        <VBtn
+                          :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product) ||
+                            !canVisibleUserPermission(statusPermission, 'BTN_SAVE_DRAFT').canVisible"
+                          :color="accountINSP ? 'grey' : 'warning'"
+                          @click="saveShipmentPlan(product), saveDraftLoading = true"
+                        >
+                          <span
+                            v-if="saveDraftLoading && product.soEtlLogDetailJournalID === saveDraftLoadingSOERow"
+                            style="font-size: 12px;"
+                          >
+                            <VProgressCircular
+                              :size="30"
+                              color="primary"
+                              indeterminate
+                            />
+                          </span>
+                          <span
+                            v-else
+                            style="font-size: 12px;"
+                          >Save Draft</span>
+                        </VBtn>
+                      </VListItem>
                       <VListItem
                         v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
-                        title="Submit"
-                        :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
-                          || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible "
-                        @click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
+                        key="3"
+                        value="1"
+                        class="px-1 d-flex justify-center"
                       >
-                        <template #prepend>
-                          <VIcon
-                            icon="ri-send-plane-line"
-                            :color="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
-                              || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible ? undefined : 'success'"
-                          />
-                        </template>
-                        <template #append>
-                          <VProgressCircular
-                            v-if="isSubmitLoading(product, submitLoading)"
-                            indeterminate
-                            size="16"
-                          />
-                        </template>
+                        <VBtn
+                          :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
+                            || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible || disabledStatusWithOutAdminUser(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId)"
+                          class="mx-2"
+                          :color="accountINSP ? 'grey' : 'primary'"
+                          @Click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
+                        >
+                          <span
+                            v-if="submitLoading && product.soEtlLogDetailJournalID === submitLoadingSOERow"
+                            style="font-size: 12px;"
+                          >
+                            <VProgressCircular
+                              :size="30"
+                              color="primary"
+                              indeterminate
+                            />
+                          </span>
+                          <span
+                            v-else
+                            style="font-size: 12px;"
+                          >Submit </span>
+                        </VBtn>
                       </VListItem>
-
-                      <!-- Divider -->
-                      <VDivider v-if="accountWHSub" />
-
-                      <!-- Approve -->
                       <VListItem
                         v-if="accountWHSub"
-                        prepend-icon="ri-check-line"
-                        title="Approve"
-                        class="text-success"
-                        @click="onApprove(product)"
-                      />
+                        key="4"
+                        value="1"
+                        class="px-1 d-flex justify-center"
+                      >
+                        <td
+                          
+                          style="max-width: 130px; font-size: 12px;"
+                          class="text-center px-1"
+                          :style="{
+                            backgroundColor:
+                              dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
+                              isSelected(product) ? '#E0F7FA' :
+                              '',
+                            borderTop:
+                              dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : '',
+                            borderBottom:
+                              dataTableNummberedToggle === product.soEtlLogDetailJournalID ? '1px solid #BBDEFB' : ''
+                          }"
+                          @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
+                        >
+                          <VBtn
+                            width="100%"
+                            :color="accountINSP ? 'grey' : 'primary'"
+                          >
+                            <span style="font-size: 12px;">Approve</span>
+                          </VBtn>
+                        </td>
+                      </VListItem>
                     </VList>
                   </VMenu>
                 </VBtn>
@@ -4436,6 +5991,13 @@ const clearParamsTruckOrder = () => {
       </VCard>
     </VDialog>
   </div>
+
+  <VBtn
+    v-if="false"
+    @click=" isDialogLoadingVisible = true"
+  >
+    asdM
+  </VBtn>
 
   <!-- Dialog Print -->
   <VDialog

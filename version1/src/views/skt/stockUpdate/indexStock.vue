@@ -1,9 +1,4 @@
 <script setup>
-
-//// --------------------------------------------------------------------------------------
-
-//---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
-
 import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
 const whereHouse = localStorage.getItem('whereHouseName')
