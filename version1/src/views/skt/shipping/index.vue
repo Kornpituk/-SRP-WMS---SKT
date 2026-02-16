@@ -8,11 +8,20 @@ const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 import { useStatusAndPermissions } from './tableInvoice/composables/useStatusAndPermissions'
 import { useTruckOrder } from './composables/useTruckOrder'
+import { useSearchPlan } from './composables/APIcalls/useSearchPlan'
+import { usefileInput } from './composables/file/usefileInput'
+import { useTextAreanaDialog } from './composables/textAreana/useTextAreanaDialog'
+import { useStateAlert } from './composables/alert/useState'
+
+/// API Calls
+import { useSaveSearchPlan } from './composables/APIcalls/useSaveSearchPlan'
 
 // Import Component
 import ShipmentPlanFilter from './components/header/ShipmentPlanFilter.vue'
 import ShippingMarkDialog from './components/dialog/ShippingMarkDialog.vue'
 import TruckOrderDialog from './components/dialog/truckOrderDialog/truckOrderDialog.vue'
+
+
 
 // Import Utils
 import { 
@@ -38,6 +47,7 @@ import {
 //import dataConstant
 import {
   itemsStatus,
+  getStatusIdByName,
 } from './utils/dataConstant'
 
 //import status
@@ -64,46 +74,31 @@ const {
   restoreFromSession,
 } = useTruckOrder(urlApi, whereHouse, accessTokenAtStore)
 
-//------------------------------- alert --------------------------------------------
+const {
+  isDialogVisibleAlertDialog,
+  wordForSubmit,
+  subWordForSubmit,
+  successDialAlert,
+  textAlertDialogFunction,
+
+  isDialogLoadingVisible,
+  wordLoading,
+  handleDialogLoading,
+
+  confirmDialog2,
+  typeConfirmDialog,
+  soEIdConfirmDialog,
+  productRowModel,
+  checkConfirmBottonActive,
+  checkCancelBottonActive,
+  rowData,
+  resetValueInCheckBottonConfirm,
+} = useStateAlert()
+
 
 import AlertWord2 from '@/components/dialogs/alert/alertDialog2.vue'
 import ConfirmDialog2 from '@/components/dialogs/alert/confirmDialog2.vue'
 import alertWordConst from '@/utilities/constant'
-
-const isDialogVisibleAlertDialog = ref(false)
-const wordForSubmit = ref('')
-const subWordForSubmit = ref('')
-const successDialAlert = ref(false)
-
-const textAlertDialogFunction = (word, success) => {
-  subWordForSubmit.value = ''
-  wordForSubmit.value = word
-  successDialAlert.value = success
-  isDialogVisibleAlertDialog.value = true
-}
-
-//------------------------------ Alert Loading -----------------------------------
-const isDialogLoadingVisible = ref(false)
-const wordLoading = ref('')
-
-const handleDialogLoading = type => {
-  wordLoading.value = type
-  isDialogLoadingVisible.value = true
-}
-
-//------------------------------ Alert Confirm ---------------------------
-const confirmDialog2 = ref('')
-const typeConfirmDialog = ref('')
-const soEIdConfirmDialog = ref('')
-const productRowModel = ref(null)
-const checkConfirmBottonActive = ref(false)
-const checkCancelBottonActive = ref(false)
-const rowData = ref(null)
-
-const resetValueInCheckBottonConfirm = () => {
-  checkConfirmBottonActive.value = false
-  checkCancelBottonActive.value = false
-}
 
 const confirmSapIn = async () => {
   if(typeSap.value === "save draft"){
@@ -264,27 +259,16 @@ watch(() => {
 
 import TextAreaDialog from '@/components/dialogs/alert/textAreaDialog.vue' //--------- import component
 
-const dialogDataTextArea = ref('')
-const dialogData2TextArea = ref('')
-const dialogVisible = ref(false)
-const dialogVisibleTextarea = ref(false)
-const dialogRemark = ref('')
-
-// --- define Model
-
-const shippingCondition = ref('')
-const shippingmark = ref('')
-const typeDialogTextArea = ref('')
-
-const sapInValueView = ref('')
-const lotValueView = ref('')
-const typeDialogView = ref('')
-const typeBtnView = ref('')
-const titleDialogView = ref('')
-const soEIdModel = ref('')
-const indexDataDialogTextArea = ref('')
-const activeShipMarkModel = ref('')
-const disabledModel = ref(false)
+const { 
+  dialogDataTextArea, 
+  dialogData2TextArea, 
+  dialogVisible, 
+  dialogVisibleTextarea, 
+  dialogRemark, shippingCondition, 
+  typeDialogTextArea, sapInValueView, 
+  lotValueView, typeDialogView, typeBtnView, 
+  titleDialogView, soEIdModel, indexDataDialogTextArea, 
+  activeShipMarkModel, disabledModel } = useTextAreanaDialog()
 
 //------ function for dialog text area ----------------------------------------------
 
@@ -436,13 +420,23 @@ const { getSearchPlanSapInVResult,
   errorGetSearchPlanSapInV, 
   fetchSearchPlanSapInV } = useGetSearchPlanSapinvoicenoIsexistService()
 
-const searchPlanData = ref([])
-const isLoading = ref(false)
-const selectedDataTables = ref([])
 
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
-const selectedItemsPerPage = ref(10)
+//Initialize Search Plan
+const {
+  searchPlanData,
+  isLoading,
+  selectedDataTables,
+  currentPage,
+  itemsPerPage,
+  selectedItemsPerPage,
+  sortColumn,
+  sortDirection,
+  etaDateModel,
+  etdDateModel,
+  filterForSearchPlan,
+
+  saveHistoryFilter,
+} = useSearchPlan()
 
 watch(selectedItemsPerPage, newVal => {
   const newItems = newVal === 'All' ? totalItems.value : newVal
@@ -486,36 +480,6 @@ const paginatedData = computed(() => {
 
 })
 
-const sortColumn = ref('')
-const sortDirection = ref('')
-
-const etaDateModel = ref(sessionStorage.getItem("ETASearchProductionFilter"))
-const etdDateModel = ref(sessionStorage.getItem("ETDSearchProductionFilter"))
-
-const filterForSearchPlan = ref({
-  StatusId: sessionStorage.getItem("StatusIdSearchProductionFilter") || '',
-  ETA: etaDateModel.value || '',
-  ETD: etdDateModel.value || '',
-  ETDDateFrom: '',
-  ETDDateTo: '',
-  SalesOrderNoSearch: sessionStorage.getItem("SalesOrderNoSearchProductionFilter") || '',
-  PayerNameSearch: sessionStorage.getItem("PayerNameSearchProductionFilter") || '',
-  ItemNameSearch: sessionStorage.getItem("ItemNameSearchProductionFilter") || '',
-  LotSearch: sessionStorage.getItem("LotSearchProductionFilter") || '',
-  SortColumn: '',
-  SortDirection: '',
-})
-
-const saveHistoryFilter = () => {
-  sessionStorage.setItem("StatusIdSearchProductionFilter", filterForSearchPlan.value.StatusId || ''),
-  sessionStorage.setItem("ETASearchProductionFilter", etaDateModel.value) || '',
-  sessionStorage.setItem("ETDSearchProductionFilter", etdDateModel.value) || '',
-  sessionStorage.setItem("SalesOrderNoSearchProductionFilter", filterForSearchPlan.value.SalesOrderNoSearch) || '',
-  sessionStorage.setItem("PayerNameSearchProductionFilter", filterForSearchPlan.value.PayerNameSearch) || '',
-  sessionStorage.setItem("LotSearchProductionFilter", filterForSearchPlan.value.LotSearch) || '',
-  sessionStorage.setItem("ItemNameSearchProductionFilter", filterForSearchPlan.value.ItemNameSearch) || ''
-}
-
 // ฟังก์ชันสำหรับสลับสถานะของไอคอนแต่ละตัว
 const toggleDirection = async key => {
   if (key) {
@@ -524,13 +488,6 @@ const toggleDirection = async key => {
   }
   sortColumn.value = key
   await searchShipmentPlan()
-}
-
-//- เปรียบเทียบ status text = id
-function getStatusIdByName(statusName) {
-  const matchedItem = itemsStatus.find(item => item.name === statusName)
-
-  return matchedItem ? matchedItem.id : '' // คืนค่า id หรือ null หากไม่พบ
 }
 
 const disabledBtnExport = ref(false)
@@ -667,15 +624,12 @@ const toggleSelectAll = () => {
 import FileInputDialogCarousels from '@/components/golbal/flieUploadDialogCarousels.vue' //--------- import component
 import { onMounted, watch, watchEffect } from 'vue'
 
-const typeFileInput = ref('hideInput')
-
-const filesFromUploaderSO = ref([])
-const filesFromUploaderPO = ref([])
-const filesFromUploaderCOA = ref([])
-const filesFromUploaderTruckOrder = ref([])
-const filesFromUploaderDeliNote = ref([])
-
-const typeNameFileInput = ref('')
+const { typeFileInput, 
+  filesFromUploaderSO, 
+  filesFromUploaderPO, 
+  filesFromUploaderCOA, 
+  filesFromUploaderTruckOrder, 
+  filesFromUploaderDeliNote } = usefileInput()
 
 // ฟังก์ชันจัดการข้อมูลที่ส่งมาจาก FileUploader
 
@@ -796,41 +750,15 @@ const handleFileUpdatesDeliNote = updatedFiles => {
 
 const { saveSearchPlanResult, errorSaveSearchPlan, saveSearchPlan } = useSaveSearchPlanService()
 
-const mapRequestData = data => ({
-  soEtlLogDetailJournalID: getOrDefault(data.soEtlLogDetailJournalID, 0),
-  loadingDate: formatDateSave(getOrDefault(data.logUpdatedDate, null)),
-  updatedBy: getOrDefault(data.salUpdatedBy, "system"),
-  poNo: getOrDefault(data.poNo),
-  sapInvoiceNo: getOrDefault(data.sapInvoiceNo),
-  shipperMark: getOrDefault(data.shipperMark, ""),
-  shipperConditions: getOrDefault(data.shipperConditions, ""),
-  shippingEndUser: getOrDefault(data.shippingEndUser, ""),
-  shipperLocation: getOrDefault(data.shipperLocation, ""),
-  shippingMarkActive: getOrDefault(data.shippingMarkActive, ""),
-  freightForwarder: getOrDefault(data.freightForwarder, ""),
-  carrier: getOrDefault(data.carrier, ""),
-  vesselName: getOrDefault(data.vesselName, ""),
-  voy: getOrDefault(data.voy, ""),
-  truck: getOrDefault(data.truck, ""),
-  truckReservingNumber: getOrDefault(data.truckReservingNumber, ""),
-  truckFee: getOrDefault(data.truckFee, ""),
-  etd: formatDateSave(getOrDefault(data.etd, null)),
-  eta: formatDateSave(getOrDefault(data.eta, null)),
-  saL_Remarks: getOrDefault(data.saL_Remarks, ""),
-  wH_Remarks: getOrDefault(data.wH_Remarks, ""),
-  loG_Remarks: getOrDefault(data.loG_Remarks, ""),
-})
-
-const getOrDefault = (value, defaultValue) => value ?? defaultValue
-
-const saveDraftLoading = ref(false)
-const saveDraftLoadingSOERow = ref('')
-
-const trikerSaveDrft = ref(false)
-const isDialogSapInV = ref(false)
-const dataRowDailog = ref(null)
-const typeSap = ref(null)
-const soEIdSap = ref(null)
+const { 
+  saveDraftLoading, 
+  saveDraftLoadingSOERow, 
+  trikerSaveDrft, 
+  isDialogSapInV, 
+  dataRowDailog, 
+  typeSap, 
+  soEIdSap, 
+  mapRequestData } = useSaveSearchPlan()
 
 const searchShipmentPlanSapInV = async row => {
   try {
@@ -888,7 +816,6 @@ const handleFilterSap = (SOEI, ETD) => {
 
   searchShipmentPlan()
 }
-
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const saveShipmentPlan = async row => {
@@ -2239,20 +2166,20 @@ const clearParamsTruckOrder = () => {
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-center text-wrap px-1"
-                style="max-width: 80px;"
+                style="max-width: 140px;"
               >
                 <span style="font-weight: bold;">{{ $t('SO attachment') }}</span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
-                class="text-start px-1"
+                class="text-start px-2"
               >
                 <span style="font-weight: bold;">{{ $t('PO No.') }}</span>
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-center px-1"
-                style="max-width: 80px;"
+                style="max-width: 100px;"
               >
                 <span style="font-weight: bold;">{{ $t('PO attachment') }}</span>
               </th>
@@ -2488,7 +2415,7 @@ const clearParamsTruckOrder = () => {
               </th>
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_DO_EX').canVisible"
-                class="px-1"
+                class="px-2"
               >
                 <span style="font-weight: bold;">{{ $t('DO/EX') }}
                   <VIcon
@@ -2747,7 +2674,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SALE_ORDER_NO').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 80px; font-size: 12px;"
+                style="min-width: 140px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -2801,7 +2728,7 @@ const clearParamsTruckOrder = () => {
               <!-- 👉 PO No -->
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SAP_INVOICE_NO').canVisible"
-                class="text-start px-3 cursor-pointer"
+                class="text-start px-2 cursor-pointer"
                 style="min-width: 150px; font-size: 12px;"
                 :style="{
                   backgroundColor:
@@ -2833,7 +2760,7 @@ const clearParamsTruckOrder = () => {
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_SO_ATTACHMENT').canVisible"
                 class="text-start px-1 cursor-pointer"
-                style="min-width: 80px; font-size: 12px;"
+                style="min-width: 100px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3536,8 +3463,8 @@ const clearParamsTruckOrder = () => {
               <!-- 👉 doEx -->
               <td
                 v-if="canVisibleUserPermission(statusPermission, 'COL_DO_EX').canVisible"
-                class="text-start px-1 cursor-pointer"
-                style="min-width: 50px; font-size: 12px;"
+                class="text-start px-2 cursor-pointer"
+                style="min-width: 80px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -3821,8 +3748,8 @@ const clearParamsTruckOrder = () => {
 
               <!-- 👉 update date -->
               <td
-                class="text-center px-1 cursor-pointer"
-                style="max-width: 90px; font-size: 12px;"
+                class="text-start px-1 cursor-pointer"
+                style="min-width: 130px; font-size: 12px;"
                 :style="{
                   backgroundColor:
                     dataTableNummberedToggle === product.soEtlLogDetailJournalID ? dataTableColor :
@@ -4065,7 +3992,7 @@ const clearParamsTruckOrder = () => {
         </VTable>
 
         <VDivider />
-        <VCardText>
+        <VCardText class="pa-0">
           <div class="d-flex align-center flex-no-wrap justify-end pa-2">
             <VSelect
               v-model="selectedItemsPerPage"

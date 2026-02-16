@@ -12,3 +12,10 @@ export const itemsStatus = ([
   { name: 'All', id: 0, color: 'grey' },
 
 ])
+
+
+export const getStatusIdByName = statusName => {
+  const matchedItem = itemsStatus.find(item => item.name === statusName)
+
+  return matchedItem ? matchedItem.id : '' // คืนค่า id หรือ null หากไม่พบ
+}
