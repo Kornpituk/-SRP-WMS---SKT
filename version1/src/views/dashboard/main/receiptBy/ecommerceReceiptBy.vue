@@ -750,42 +750,6 @@ watch(datePickerMaster, newValue => {
 const datePropMasterStart =  ref((formattedDateTime))
 const datePropMasterEnd =  ref((formattedDateTime))
 
-// watchEffect(() => {
-//   if(localStorage.getItem('startDateFromPerformance') && localStorage.getItem('endDateFromPerformance')){
-//     datePropMasterStart.value = localStorage.getItem('startDateFromPerformance')
-//     datePropMasterEnd.value = localStorage.getItem('endDateFromPerformance')
-//   }
-// })
-
-// watchEffect(() => {
-//   // console.log('datePickerMaster value format Date', formatDateMaster(startDate.value), formatDateMaster(endDate.value), formatDateYMD(startDate.value),  formatDateYMD(endDate.value))
-//   // console.log('datePicker Query***', startDateQuery.value, endDateQuery.value)
-//   if(startDateQuery.value && endDateQuery.value){
-//     datePropMasterStart.value = formatDateMaster(startDateQuery.value)
-//     datePropMasterEnd.value = formatDateMaster(endDateQuery.value)
-//   }else if(showDatepickerCustom.value){
-//     datePropMasterStart.value = formatDateMaster(startDate.value)
-//     datePropMasterEnd.value = formatDateMaster(endDate.value)
-//   }else if(showDatepickerMonth.value){
-//     datePropMasterStart.value = formatDateYMD(startDate.value)
-//     datePropMasterEnd.value = formatDateYMD(endDate.value)
-//   }else if(showDatepickerWeek.value){
-//     datePropMasterStart.value = formatDateMaster(startDate.value)
-//     datePropMasterEnd.value = formatDateMaster(endDate.value)
-//     "Week"
-//   }else if(showDatepickerDateMax.value){
-//     datePropMasterStart.value = formatDateMaster(startDate.value)
-//     datePropMasterEnd.value = formatDateMaster(endDate.value)
-//     "Date"
-//   }
-
-//   console.log('Prop Date Master', datePropMasterStart.value, datePropMasterEnd.value, typeDate.value)
-//   if(datePropMasterStart.value && datePropMasterEnd.value) {
-//     localStorage.setItem('startDateFromPerformance', datePropMasterStart.value)
-//     localStorage.setItem('endDateFromPerformance', datePropMasterEnd.value)
-//   }
- 
-// })
 
 const router = useRouter()
 
