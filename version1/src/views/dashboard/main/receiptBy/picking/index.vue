@@ -511,9 +511,9 @@ watch(() => {
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"
-          :data-chart-white="dashboardStore.pickingPending.pickingWriteOff"
-          :data-chart-transfer-out="dashboardStore.pickingPending.tranferOut"
-          :data-chart-delivery="dashboardStore.pickingPending.pickingDelivery"
+          :data-chart-white="dashboardStore.pickingSuccessfully.pickingWriteOff"
+          :data-chart-transfer-out="dashboardStore.pickingSuccessfully.tranferOut"
+          :data-chart-delivery="dashboardStore.pickingSuccessfully.pickingDelivery"
           typeData="sussess"
         />
       </VCol>

@@ -8,11 +8,6 @@ import axiosIns from '@axios'
 import { defineProps, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
-import DetailsPoReceiving from "@/views/dashboard/main/shortCutMenu/received/po/datails.vue"
-import DetailsTranferInReceiving from "@/views/dashboard/main/shortCutMenu/received/transferIn/datails.vue"
-import DetailsOtherReceiving from "@/views/dashboard/main/shortCutMenu/received/other/datails.vue"
-
-
 //------------------------------------- Define Props -------------------------------
 const props = defineProps({
   dataset: {
@@ -94,90 +89,16 @@ const getDataProductNewData = () => {
 
 watchEffect(getDataProductNewData)
 
-
-//-------------------------- Import Chart Receipt By ----------------------------------------------
-
-//-------------------------- Import Table ----------------------------------------------------------------
-import TableDetailsPerformancePickingDelivery from '@/views/dashboard/main/receiptBy/details/tablePerformancePickingDelivery.vue'
-import TableDetailsPerformanceReceivedPO from '@/views/dashboard/main/receiptBy/details/tablePerformanceReceivedPO.vue'
-import TableDetailsPerformanceTransferIn from '@/views/dashboard/main/receiptBy/details/tablePerformanceTransferIn.vue'
-import TableDetailsPerformanceTransferOut from '@/views/dashboard/main/receiptBy/details/tablePerformanceTransferOut.vue'
-
-
 import PerformancePicking from '@/views/dashboard/main/receiptBy/picking/index.vue'
 import PerformanceReceived from '@/views/dashboard/main/receiptBy/received/index.vue'
-
-
-import TableDetailsPerformancePickingDeliveryAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformancePickingDelivery.vue'
-import TableDetailsPerformanceReceivedPOAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceReceivedPO.vue'
-import TableDetailsPerformanceTransferInAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceTransferIn.vue'
-import TableDetailsPerformanceTransferOutAwait from '@/views/dashboard/main/receiptByAwait/details/tablePerformanceTransferOut.vue'
 
 
 import PerformancePickingAwait from '@/views/dashboard/main/receiptByAwait/picking/index.vue'
 import PerformanceReceivedAwait from '@/views/dashboard/main/receiptByAwait/received/index.vue'
 
-import PerformanceRecevingNew from '@/views/dashboard/main/receiptBy/performance/receiving/index.vue'
 
 const vuetifyTheme = useTheme()
 
-
-const series = ref([
-  {
-    name: 'MAX',
-    data: [44],
-  },
-  {
-    name: 'MIN',
-    data: [76],
-  },
-])
-
-const chartConfig = computed(() => {
-  const themeColors = vuetifyTheme.current.value.colors
-  const variableTheme = vuetifyTheme.current.value.variables
-  const borderColor = `rgba(${hexToRgb(String(variableTheme['border-color']))},${variableTheme['border-opacity']})`
-  const disabledText = `rgba(${hexToRgb(String(themeColors['on-background']))},${variableTheme['disabled-opacity']})`
-  const primaryText = `rgba(${hexToRgb(String(themeColors['on-background']))},${variableTheme['high-emphasis-opacity']})`
-
-  return {
-    chart: {
-      type: 'bar',
-      height: 100,
-      stacked: true,
-      stackType: '100%',
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-      },
-    },
-    stroke: {
-      width: 1,
-      colors: ['#fff'],
-    },
-    xaxis: {
-      height: 50,
-      categories: [2008, 2009, 2010, 2011, 2012, 2013, 2014],
-    },
-    tooltip: {
-      y: {
-        formatter: function (val) {
-          return val + "K"
-        },
-      },
-    },
-    colors: [
-      `rgba(${hexToRgb(String(themeColors.primary))}, 1)`,
-      `rgba(${hexToRgb(String(themeColors.error))}, 1)`,
-    ],
-    legend: {
-      position: 'top',
-      horizontalAlign: 'left',
-      offsetX: 40,
-    },
-  }
-})
 
 //--------------------------------------- Card Action expand-transition------------------
 const show = ref(false)
@@ -213,31 +134,7 @@ const blockHistoryProp = type => {
 }
 
 watchEffect(() => {
-  
-  // const historyBlock = sessionStorage.getItem('historyPropBlock')
 
-  // if(historyBlock === "false"){
-  //   isDialogDetailVisible.value = true
-  //   historyProp.value = props.history
-  // }else if(historyBlock === "true"){
-  //   historyProp.value = false
-  //   isDialogDetailVisible.value = false
-  // }
-   
-  // complateAll.value = props.complateAllProps
-  // awaitAll.value = props.awaitAllProps
-
-
-  // const historyBlockAwait = sessionStorage.getItem('historyPropBlockAwait')
-
-  // if(historyBlockAwait === "false"){
-  //   isDialogDetailVisibleAwait.value = true
-  //   historyPropAwait.value = props.history
-  // }else if(historyBlockAwait === "true"){
-  //   historyPropAwait.value = false
-  //   isDialogDetailVisibleAwait.value = false
-  // }
-   
   complateAll.value = props.complateAllProps
   awaitAll.value = props.awaitAllProps
 })
@@ -280,157 +177,6 @@ watchEffect(() => {
   }
 })
 
-//----------------------------------- Data Table ------------------------------------------
-
-//--------------------------------- Chart Receipt & Picking ------------------------------------
-//** Receipt */
-
-//** Picking */
-
-const headers = [
-  { title: 'Employee Total', sortable: true, value: 'id' },
-  { title: 'NAME', key: 'name' },
-  {
-    title: 'Waiting For Receipt',
-    align: 'center',
-    children: [
-      { title: 'Waiting For Receipt', key: 'waitingForReceiptRPO' },
-      { title: 'Receipt Success', key: 'receiptSuccessRPO' },
-    ],
-  },
-  {
-    title: 'Receipt Success',
-    align: 'center',
-    children: [
-      { title: 'Waiting For Receipt', key: 'waitingForReceiptRPO' },
-      { title: 'Receipt Success', key: 'receiptSuccessRPO' },
-    ],
-  },
-  {
-    title: 'Transfer In',
-    align: 'center',
-    children: [
-      { title: 'Waiting For Receipt', value: 'waitingForReceiptTI' },
-      { title: 'Receipt Success', value: 'receiptSuccessTI' },
-    ],
-  },
-  {
-    title: 'Picking For Delivery',
-    align: 'center',
-    children: [
-      { title: 'Waiting For Delivery', value: 'waitingForDeliveryPD' },
-      { title: 'Approved', value: 'ApprovedPD' },
-    ],
-  },
-  {
-    title: 'Transfer Out',
-    align: 'center',
-    children: [
-      { title: 'Waiting For Receipt', value: 'waitingForReceiptTO' },
-      { title: 'Receipt Success', value: 'receiptSuccessTO' },
-    ],
-  },
-]
-
-const randomizeNumber = (min, max) => {
-  return Math.floor(Math.random() * (max - min) + min)
-}
-
-// Example usage: generating a random number between 1 and 999
-const randomIntNumber = ref(randomizeNumber(1, 999))
-
-const desserts = [
-  {
-    id: 'Successfully',
-    po: 34,
-    transferIn: 12,
-    Other: 56,
-    TransferOut: 10, 
-    delivery: 23,
-    writeOff: 23,
-  },
-  {
-    id: 'Successfully Partial ',
-    po: 34,
-    transferIn: 12,
-    Other: 56,
-    TransferOut: 10, 
-    delivery: 23,
-    writeOff: 23,
-  },
-  {
-    id: 'Pending',
-    po: 34,
-    transferIn: 12,
-    Other: 56,
-    TransferOut: 10, 
-    delivery: 23,
-    writeOff: 23,
-  },
-  {
-    id: 'Pending Partial',
-    po: 34,
-    transferIn: 12,
-    Other: 56,
-    TransferOut: 10, 
-    delivery: 23,
-    writeOff: 23,
-  },
-]
-
-//-------------------- Tabs Table Performance --------------------------------------
-const currentTab = ref(0)
-
-const items = [
-  'Received PO',
-  'Transfer In',
-  'Transfer Out',
-  'Picking For Delivery',
-]
-
-const tabItemText = [
-  TableDetailsPerformanceReceivedPO, 
-  TableDetailsPerformanceTransferIn, 
-  TableDetailsPerformanceTransferOut, 
-  TableDetailsPerformancePickingDelivery,
-]
-
-const totalTabs = items.length
-
-const preTab = () => {
-  if (currentTab.value !== 0)
-    currentTab.value -= 1
-}
-
-const nextTab = () => {
-  if (currentTab.value !== totalTabs - 1)
-    currentTab.value += 1
-}
-
-//*** change color bg Tabs */
-const resolveColorTabs = index => {
-  if (index === 0)
-    return 'light-green'
-  else if(index === 1){
-    // console.log('resolveColorTabs Transfer In', index)
-    
-    return 'deep-orange'
-  } else if(index === 2){
-    // console.log('resolveColorTabs Out', index)
-    
-    return 'blue'
-  } else if(index === 3){
-    // console.log('resolveColorTabs ', index)
-    
-    return 'amber'
-  } else {
-    // console.log('resolveColorTabs', index)
-    
-    return 'error'
-  }
-}
-
-
 //----------------------------------------------------- Tabs -------------------------------------------
 const currentTabChartMix = ref(0)
 
@@ -444,29 +190,6 @@ watchEffect( () => {
   } else {
   }
 })
-
-const itemsDate = [
-  {
-    title: 'Daily',
-    value: 8,
-  },
-  
-  {
-    title: 'Weekly',
-    value: 7,
-  },
-
-  {
-    title: 'Monthly',
-    value: 4,
-  },
-
-  {
-    title: 'Custom',
-    value: 0,
-  },
-
-]
 
 import '@vuepic/vue-datepicker/dist/main.css'
 
@@ -548,53 +271,6 @@ const itemsMenuTypeDate = [
 ]
 
 const typeSelectDatepicker = ref(0)
-
-watchEffect(() => {
-  const typeSelectDatepickerHistoryCheck = ref('no data')
-
-  typeSelectDatepickerHistoryCheck.value = localStorage.getItem('typeSelectDatepickerHistory', typeSelectDatepickerHistoryCheck.value)
-  
-  // if(typeSelectDatepickerHistoryCheck.value === 'day true'){
-  //   typeSelectDatepicker.value = 1
-  // } else if(typeSelectDatepickerHistoryCheck.value === 'week true'){
-  //   typeSelectDatepicker.value = 2
-  //   console.log('typeSelectDatepicker2222 week = ', typeSelectDatepicker.value)
-  // } else if(typeSelectDatepickerHistoryCheck.value === 'month true'){
-  //   typeSelectDatepicker.value = 3
-  // } else if(typeSelectDatepickerHistoryCheck.value === 'custom true'){
-  //   typeSelectDatepicker.value = 4
-  // } 
-
-  // console.log('typeSelectDatepicker111', typeSelectDatepicker.value)
-  
-})
-
-const titleTyleSelectDatepicker = ref('')
-
-const selectTypeDatepicker = (value, title) => {
-  typeSelectDatepicker.value = value
-  titleTyleSelectDatepicker.value = title
-
-}
-
-const formatForShowDatepicker = date => {
-  // ตรวจสอบว่าเป็น range หรือ single date picker
-  if (Array.isArray(date)) { 
-    // Range picker
-    const [startDate, endDate] = date
-    const start = `${startDate.getDate()}/${startDate.getMonth() + 1}/${startDate.getFullYear()}`
-    const end = `${endDate.getDate()}/${endDate.getMonth() + 1}/${endDate.getFullYear()}`
-    
-    return `${start} - ${end}`
-  } else {
-    // Single date picker
-    const day = date.getDate()
-    const month = date.getMonth() + 1
-    const year = date.getFullYear()
-    
-    return `${day}/${month}/${year}`
-  }
-}
 
 watchEffect(() => { // function check type datepicker with select
 
@@ -689,35 +365,6 @@ watchEffect(() => {
 })
 
 
-
-const formatDateMaster = date => {
-  if (!date) return ''
-  
-  // return date.toLocaleString('en-GB', {
-  //   year: 'numeric',
-  //   month: '2-digit',
-  //   day: '2-digit',
-
-  //   // hour: '2-digit',
-  //   // minute: '2-digit',
-  //   // second: '2-digit',
-  //   // hour12: false,
-  // })
-
-
-
-  return formatDateYMD(date).replace(/\//g, '-') // แปลงเป็นรูปแบบ YYYY-MM-D
-}
-
-const formatDateYMD = date => {
-  if (!date) return ''
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')  // เดือนจะเริ่มจาก 0
-  const day = String(date.getDate()).padStart(2, '0')
-  
-  return `${year}/${month}/${day}`
-}
-
 watch(datePickerMaster, newValue => {
   if (Array.isArray(newValue)) {
     // ถ้าเป็น Array ให้เก็บค่าของ startDate และ endDate จาก Array นั้น
@@ -744,19 +391,9 @@ watch(datePickerMaster, newValue => {
   }
 }, { immediate: true })
 
-// const datePropMasterStart =  ref(localStorage.getItem('startDateFromPerformance'))
-// const datePropMasterEnd =  ref(localStorage.getItem('EndDateFromPerformance'))
 
 const datePropMasterStart =  ref((formattedDateTime))
 const datePropMasterEnd =  ref((formattedDateTime))
-
-
-const router = useRouter()
-
-const pushBtnDetails = MaxOrMin => {
-  sessionStorage.setItem('indicationMaxMin', MaxOrMin)
-  router.push('/dashboards/shortCutMenu/MinMax')
-}
 </script>
 
  <!-- @click="isDialogDetailVisible = true" -->

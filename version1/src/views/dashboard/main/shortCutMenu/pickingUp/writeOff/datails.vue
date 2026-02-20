@@ -16,7 +16,7 @@ const route = useRoute()
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
-import { urlApi } from '@/api'; //---------------------- Import Api for Url *****
+import { urlApi } from '@/api' //---------------------- Import Api for Url *****
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
@@ -223,89 +223,91 @@ const checkReceiveNos = receivedPO => {
   return false
 }
 
-const GetReceivedPoDetails = () => {
+const loadingFetchDetails = ref(true)
+const errorMessage = ref(null)      
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/PickingWriteOff/Detail?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${searchByWareHouseId.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    params: {
-      // stockId: stockIdData.value,
-      // dateSt: dateStData.value,
-      // dateSp: dateSpData.value,
-      stockId: stockIdData.value,
-      dateSt: props.date,
-      dateSp: props.date,
+const GetReceivedPoDetails = async () => {
+  loadingFetchDetails.value = true
+  errorMessage.value = null
 
-      barcode: barcodeData.value,
-      productId: productIdData.value,
-      productName: productNameData.value,
+  try {
+    const response = await axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/PickingWriteOff/Detail?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+      headers: {
+        'accept': '*/*',
+        'x-location': `${searchByWareHouseId.value}`,
+        Authorization: `Bearer ${accessTokenAtStore}`,
+      },
+      params: {
+        stockId: stockIdData.value,
+        dateSt: props.date,
+        dateSp: props.date,
 
-      issueNo: issueNoData.value,
-      issueDate: issueDateData.value,
-      refNo: refNoData.value,
-      remark: remarkData.value,
-      reason: reasonData.value,
-      issueBy: issueByData.value,
+        barcode: barcodeData.value,
+        productId: productIdData.value,
+        productName: productNameData.value,
 
-      Lot: '',
-      UoM: lotData.value,
+        issueNo: issueNoData.value,
+        issueDate: issueDateData.value,
+        refNo: refNoData.value,
+        remark: remarkData.value,
+        reason: reasonData.value,
+        issueBy: issueByData.value,
 
-      categoryId: categoryIdData.value,
-      typeId: typeIdData.value,
+        Lot: lotData.value,
+        UoM: uomData.value,  // แก้ไขจากเดิมที่ส่งค่าผิด
 
-      subTypeId: subTypeIdData.value,
+        categoryId: categoryIdData.value,
+        typeId: typeIdData.value,
+        subTypeId: subTypeIdData.value,
 
-      Category: categoryIdData.value,
-      TypeName: typeIdData.value,
-      SubTypeName: subTypeIdData.value,
+        Category: categoryNameData.value,  // แก้ไขให้ถูกต้อง
+        TypeName: typeNameData.value,      // แก้ไขให้ถูกต้อง
+        SubTypeName: subTypeNameData.value, // แก้ไขให้ถูกต้อง
 
-      sortByColIssueDate: sortByColIssueDateData.value,
-      sortByColQty: sortByColQty.value,
-      sortByColLocation: sortByColLocation.value,
-
-    // ... and so on with other parameters
-    },
-  }, {})
-    .then(response => {
-
-      products.value = response.data.items
-      totalCount.value = response.data.totalCount
-
-      // currentPage.value = response.data.page
-      totalPage.value = response.data.totalPages
-
-      // rowPerPage.value = response.data.perPage
-
-      console.log('[products.value.RecPODetails]!!: ', products.value)
-
-      // console.log('Warehouse At StockUpdate :', whereHouseSelectedItem.value)
-
-      // ตรวจสอบข้อมูล receiveNo ในเพจนี้กับข้อมูลใน partialReceiveNos และ completeReceiveNos
-      const checkReceiveNos = currentPageReceiveNos => {
-        const matchedPartial = currentPageReceiveNos.filter(receiveNo => partialReceiveNos.value.includes(receiveNo))
-        const matchedComplete = currentPageReceiveNos.filter(receiveNo => completeReceiveNos.value.includes(receiveNo))
-
-        return { matchedPartial, matchedComplete }
-      }
-
-      const currentPageReceiveNos = products.value.map(item => item.receiveNo)
-      const matchedReceiveNos = checkReceiveNos(currentPageReceiveNos)
-
-      console.log('Matched Partial ReceiveNos:', matchedReceiveNos.matchedPartial)
-      console.log('Matched Complete ReceiveNos:', matchedReceiveNos.matchedComplete)
-  
+        sortByColIssueDate: sortByColIssueDateData.value,
+        sortByColQty: sortByColQty.value,
+        sortByColLocation: sortByColLocation.value,
+      },
     })
-    .catch(error => {
-      // Handle errors
-      console.error('Error:', error)
-    })
+
+    products.value = response.data.items
+    totalCount.value = response.data.totalCount
+    totalPage.value = response.data.totalPages
+
+    console.log('[products.value.RecPODetails]!!: ', products.value)
+
+    // ตรวจสอบข้อมูล receiveNo ในเพจนี้กับข้อมูลใน partialReceiveNos และ completeReceiveNos
+    const checkReceiveNos = currentPageReceiveNos => {
+      const matchedPartial = currentPageReceiveNos.filter(receiveNo => partialReceiveNos.value.includes(receiveNo))
+      const matchedComplete = currentPageReceiveNos.filter(receiveNo => completeReceiveNos.value.includes(receiveNo))
+
+      return { matchedPartial, matchedComplete }
+    }
+
+    const currentPageReceiveNos = products.value.map(item => item.receiveNo)
+    const matchedReceiveNos = checkReceiveNos(currentPageReceiveNos)
+
+    console.log('Matched Partial ReceiveNos:', matchedReceiveNos.matchedPartial)
+    console.log('Matched Complete ReceiveNos:', matchedReceiveNos.matchedComplete)
+
+  } catch (error) {
+    console.error('Error:', error)
+    errorMessage.value = 'ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง'
+    products.value = []
+  } finally {
+    loadingFetchDetails.value = false
+  }
 }
 
-watch(GetReceivedPoDetails)
+// ✅ เรียกตอน mount
+onMounted(() => {
+  GetReceivedPoDetails()
+})
+
+// ✅ เรียกเมื่อเปลี่ยนหน้าหรือ rows per page
+watch([currentPage, rowPerPage], () => {
+  GetReceivedPoDetails()
+})
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
