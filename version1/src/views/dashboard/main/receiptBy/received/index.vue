@@ -59,7 +59,7 @@ onMounted(async () => {
 
 async function fetchDataChartPerformance() {
   await dashboardStore.fetchPerformanceData({
-    stockId: '001',
+    stockId: localStorage.getItem('whereHouseName'),
     ...dateRange.value,
   })
 }
@@ -508,6 +508,7 @@ watch(() => {
         cols="12"
         lg="4"
       >
+      
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"

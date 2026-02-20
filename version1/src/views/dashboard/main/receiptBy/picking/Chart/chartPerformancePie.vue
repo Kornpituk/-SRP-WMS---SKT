@@ -61,7 +61,7 @@ watchEffect(() => {
 
 // Debug
 onMounted(() => {
-  console.log('Component mounted with series:', series.value)
+  console.log('Total Performance Await Picking series:', series.value)
 })
 </script>
 

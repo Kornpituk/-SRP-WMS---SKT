@@ -60,10 +60,12 @@ onMounted(async () => {
 
 async function fetchDataChartPerformance() {
   await dashboardStore.fetchPerformanceData({
-    stockId: '001',
+    stockId: localStorage.getItem('whereHouseName'),
     ...dateRange.value,
   })
 }
+
+console.log("dashboardStore.pickingSuccessfully", dashboardStore.pickingSuccessfully)
 
 const route = useRoute()
 const MAX= 100
@@ -506,9 +508,9 @@ watchEffect(() => {
         <ChartPerformancePickingPie
           :pure-data="dataDatepicker"
           :data="dataPie"
-          :data-chart-white="dashboardStore.pickingSuccessfully.pickingWriteOff"
-          :data-chart-transfer-out="dashboardStore.pickingSuccessfully.tranferOut"
-          :data-chart-delivery="dashboardStore.pickingSuccessfully.pickingDelivery"
+          :data-chart-white="dashboardStore.pickingPending.pickingWriteOff"
+          :data-chart-transfer-out="dashboardStore.pickingPending.tranferOut"
+          :data-chart-delivery="dashboardStore.pickingPending.pickingDelivery"
           type-data="Await"
         />
       </VCol>
