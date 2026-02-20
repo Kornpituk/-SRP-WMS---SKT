@@ -24,7 +24,7 @@ const urlSktDev = ref('https://sktdevwebapi.easetrackwms.com')
 const urlTestSRP =ref('https://skttest1webapi.easetrackwms.com')
 
 const urlAsaki =ref('https://asakiwebapi.easetrackwms.com')
-const urlKTB =ref('https://ktb.easetrackwms.com')
+const urlKTB =ref('https://pocwebapi.easetrackwms.com')
 
 const urlEnv = ref(process.env.VITE_API_URL)
 

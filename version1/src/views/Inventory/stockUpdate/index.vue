@@ -2,7 +2,7 @@
 import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
@@ -122,54 +122,6 @@ const clearModel = () => {
   serialProductCode.value = null
 }
 
-const searchParams = {
-  searchByCategoryId,
-  searchByTypeId,
-  searchBySubTypeId,
-  searchByBarcode,
-  searchByProductId,
-  searchByProductName,
-  searchByUOMId,
-  searchByZoneId,
-  searchByAreaId,
-  searchBySubAreaId,
-  serialProductCode,
-
-  searchByCategoryName,
-  searchByTypeName,
-  searchBySubTypeName,
-  searchByBarcodeName,
-  searchByProductCodeName,
-  searchByProductNameFilter,
-  searchByUnitName,
-}
-
-const sortParams = {
-  sortByCategory,
-  sortByType,
-  sortBySubType,
-  sortByBarcode,
-  sortByProductId,
-  sortByProductName,
-  sortByUnit,
-  sortByQty,
-  sortByTags,
-  sortByNonTags,
-}
-
-// Clear function to reset all values
-const clearValuesNeo = () => {
-  // Reset search parameters
-  for (const key in searchParams) {
-    searchParams[key].value = null
-  }
-
-  // Reset sort parameters
-  for (const key in sortParams) {
-    sortParams[key].value = null
-  }
-}
-
 const GetStockUpdate = async () => {
 
   // console.log('searchByCategoryName: ',searchByCategoryName)
@@ -248,20 +200,6 @@ const resetSearchKey = () => {
 }
 
 //------------------------------- Function Get StockUpdate Auto Search -----------------
-// Function to get serial data for a given index
-function getSerialData(index) {
-  // Array to store generated serial numbers
-  const serials = []
-
-  // Generate 10 random serial numbers
-  for (let i = 0; i < 10; i++) {
-    serials.push(Math.floor(10000000 + Math.random() * 90000000) + index)
-  }
-
-  // Return the serial data for the given index
-  return serials
-}
-
 
 // ใช้ watchDebounced สำหรับ search fields
 watchDebounced(
@@ -305,6 +243,10 @@ watch(
 
 // เปลี่ยนจาก watchEffect เป็น watch specific values
 watch([currentPage, rowPerPage], () => {
+  GetStockUpdate()
+})
+
+onMounted(() => {
   GetStockUpdate()
 })
 
@@ -387,7 +329,10 @@ const fetchItemsWareHouse = () => {
 
 }
 
-watch(fetchItemsWareHouse)
+// ✅ ควรเป็น
+onMounted(() => {
+  fetchItemsWareHouse()
+})
 
 //--------------------------------------- FetchItems for Search  Unit  ----------------------------------------
 
@@ -417,7 +362,10 @@ const getItemsProductUnit = () => {
     
 }
 
-watchEffect(getItemsProductUnit)
+// ✅ ควรเป็น
+onMounted(() => {
+  getItemsProductUnit()
+})
 
 //--------------------------------------- FetchItems for Search  Type(Group) ----------------------------------------
 
@@ -450,7 +398,10 @@ const getItemsProductType = () => {
     
 }
 
-watchEffect(getItemsProductType)
+// ✅ ควรเป็น
+onMounted(() => {
+  getItemsProductType()
+})
 
 //--------------------------------------- FetchItems for Search Sub Type(Sub Group) ----------------------------------------
 
@@ -483,7 +434,10 @@ const getItemsProductSubType = () => {
     
 }
 
-watchEffect(getItemsProductSubType)
+// ✅ ควรเป็น
+onMounted(() => {
+  getItemsProductSubType()
+})
 
 //--------------------------------------- FetchItems for Search  Zone  ----------------------------------------
 
@@ -513,7 +467,10 @@ const getItemLocalZone = () => {
     
 }
 
-watch(getItemLocalZone)
+// ✅ ควรเป็น
+onMounted(() => {
+  getItemLocalZone()
+})
 
 //--------------------------------------- FetchItems for Search  Area ----------------------------------------
 
@@ -546,7 +503,10 @@ const getItemLocalArea = () => {
     
 }
 
-watchEffect(getItemLocalArea)
+// ✅ ควรเป็น
+onMounted(() => {
+  getItemLocalArea()
+})
 
 //--------------------------------------- FetchItems for Search Sub Area ----------------------------------------
 
@@ -580,7 +540,10 @@ const getItemLocalSubArea = () => {
     
 }
 
-watchEffect(getItemLocalSubArea)
+// ✅ ควรเป็น
+onMounted(() => {
+  getItemLocalSubArea()
+})
 
 // -------------------------------------- Export Bar Excel - --------------------------------
 
@@ -702,12 +665,7 @@ watchEffect(() =>{
     // console.log('RFID Check False:'+ checkRFIDUpdate.value)
     checkRFID.value = false
   }
-})
-
-const nameProductDialog = ref('')
-const qtyProductDialog = ref('')
-const unitProductDialog = ref('')
-const barcodeProductDialog = ref('')
+}) 
 
 const codeProduct = ref('')
 const nameProduct = ref('')
