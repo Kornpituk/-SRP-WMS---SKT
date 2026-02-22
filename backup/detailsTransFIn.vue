@@ -3,6 +3,7 @@ import axiosIns from '@axios'
 
 //// --------------------------------------------------------------------------------------
 import { ref, watch, watchEffect } from 'vue'
+import { VDataTable } from 'vuetify/labs/VDataTable'
 import { useRoute } from 'vue-router'
 
 const props = defineProps({
@@ -12,11 +13,12 @@ const props = defineProps({
   },
 })
 
+
 const route = useRoute()
 
 //---------------------------------------------------------------  Get All Product From X-Location(Where House) ------------------------
 
-import { urlApi } from '@/api' //---------------------- Import Api for Url *****
+import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 
 sessionStorage.setItem('historyPropBlock2222', false)
 
@@ -74,10 +76,6 @@ const remarkTranferInData = ref('')
 const reasonRequestData = ref('')
 const reasonTranferInData = ref('')
 const receiveByData = ref('')
-const RefDocData = ref('')
-const reasonData = ref('')
-const remarkData = ref('')
-const supplierNameData = ref('')
 
 // ตัวแปร ref สำหรับข้อมูลที่เกี่ยวข้องกับสินค้า
 const barcodeDataData = ref('')
@@ -143,15 +141,14 @@ const menuRequestNo = ref(false)
 const menuRequestDate = ref(false)
 const menuDeliveryDate = ref(false)
 const menuPickingWarehouse = ref(false)
-const menuSupplierName = ref(false)
+const menuCustomerName = ref(false)
 const menuRemarkRequest = ref(false)
 const menuRemarkTranferIn = ref(false)
 const menuReasonRequest = ref(false)
 const menuReasonTranferIn = ref(false)
 const menuReceiveBy = ref(false)
 
-const menuRemark = ref( false)
-const menuRefDoc = ref( false)
+
 const menuUoM = ref( false)
 const menuLot = ref(false)
 
@@ -190,7 +187,7 @@ const sortByColDeliveryDateData = ref('')
 const sortByColQtyRequestData = ref('')
 const sortByColQtyPickingData = ref('')
 const sortByColQtyReceiveData = ref('')
-const sortByColQtyData = ref('')
+
 
 const toggleSortType = sortBy => {
   const sortRefs = { sortByCategory, sortByType, sortBySubType, sortByBarcode, sortByProductId, sortByProductName, sortByUnit, sortByQty, sortByTags, sortByNonTags }
@@ -274,28 +271,16 @@ const formateDateNew = inputDate => {
   return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
 }
 
-const formatDate = dateString => {
-  const date = new Date(dateString)
-
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const year = date.getFullYear()
-
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-
-  return `${day}/${month}/${year}`
-}
-
 const loadingFetchDetails = ref(true)
-const errorMessage = ref(null)  
+const errorMessage = ref(null)    
+
 
 const GetReceivedPoDetails = async () => {
   loadingFetchDetails.value = true
   errorMessage.value = null
 
   try {
-    const response = await axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/ReceiveOther/Detail?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
+    const response = await axiosIns.get(`${urlApi.value}/api/v1/Dashboard/Performance/TranferIn/Detail?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
       headers: {
         'accept': '*/*',
         'x-location': `${searchByWareHouseId.value}`,
@@ -303,24 +288,22 @@ const GetReceivedPoDetails = async () => {
       },
       params: {
         stockId: stockIdData.value,
-        
         dateSt: formateDateNew(props.date),
         dateSp: formateDateNew(props.date),
-
-        receiveDate: receiveDateData.value,
-        requestDate: requestDateData.value,
-        deliveryDate: deliveryDateData.value,
 
         receiveNo: receiveNoData.value,
         receiveBy: receiveByData.value,
 
+        pickingGoodsNo: pickingGoodsNoData.value,
+        pickingWarehouse: pickingWarehouseData.value,
+
         requestNo: requestNoData.value,
         remarkRequest: remarkRequestData.value,
         reasonRequest: reasonRequestData.value,
-        RefDoc: RefDocData.value,
-        reason: reasonData.value,
-        remark: remarkData.value,
-        supplierName: supplierNameData.value,
+
+        customerName: customerNameData.value,
+        remarkTranferIn: remarkTranferInData.value,
+        reasonTranferIn: reasonTranferInData.value,
         
         barcode: barcodeDataData.value,
         productId: productIdData.value,
@@ -336,8 +319,13 @@ const GetReceivedPoDetails = async () => {
         Lot: lotData.value,
         UoM: uomData.value,
 
-        sortByColReceiveDate: sortByColQtyReceiveData.value,
-        sortByColQty: sortByColQtyData.value,
+        sortByColReceiveDate: sortByColReceiveDateData.value,
+        sortByColPickingDate: sortByColPickingDateData.value,
+        sortByColRequestDate: sortByColRequestDateData.value,
+        sortByColDeliveryDate: sortByColDeliveryDateData.value,
+        sortByColQtyRequest: sortByColQtyRequestData.value,
+        sortByColQtyPicking: sortByColQtyPickingData.value,
+        sortByColQtyReceive: sortByColQtyReceiveData.value,
       },
     })
 
@@ -379,7 +367,6 @@ onMounted(() => {
 watch([currentPage, rowPerPage], () => {
   GetReceivedPoDetails()
 })
-
 
 //--------------------------------------- Function Pagination --------------------------------------------
 // 👉 watching current page
@@ -736,14 +723,14 @@ const formatDecimal = decimal => {
 }
 
 //------------------------------ fotmate Date Data -----------------------
-// const formatDate = dateString => {
-//   const date = new Date(dateString)
-//   const day = String(date.getDate()).padStart(2, '0')
-//   const month = String(date.getMonth() + 1).padStart(2, '0')
-//   const year = String(date.getFullYear())
+const formatDate = dateString => {
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = String(date.getFullYear())
   
-//   return `${day}/${month}/${year}`
-// }
+  return `${day}/${month}/${year}`
+}
 
 /// ----------------------- check config Barcode / Tag ----------------
 const nameUser = localStorage.getItem('userCheck')
@@ -797,6 +784,9 @@ const showDialogImage = (
   console.log('showImageFunction!!')
 }
 
+
+
+
 function getRandomDate() {
   const start = new Date(2020, 0, 1) // 1st Jan 2020
   const end = new Date() // Current date
@@ -829,7 +819,10 @@ const resolveCardDialogTitleColorTable = status => {
   if (status === "Partially Pending") return "bg-orange"
 }
 
+
+
 //--------------------------------------- Menu Filter -------------------------------------------
+import avatar1 from '@images/avatars/avatar-1.png'
 
 const dialogHistory = (true)
 const cardBtnHistory = ('received')
@@ -942,6 +935,48 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 :max-date="new Date()"
                 :enable-time-picker="false"
                 placeholder="Receive Date"
+              />
+            </VCol>
+            <!-- Picking good Date -->
+            <VCol
+              class="py-1"
+              cols="12"
+              lg="4"
+              sm="6"
+            >
+              <VueDatePicker
+                v-model="pickingGoodsDateData"
+                :max-date="new Date()"
+                :enable-time-picker="false"
+                placeholder="PickingGoods Date"
+              />
+            </VCol>
+            <!-- Request Date -->
+            <VCol
+              class="py-1"
+              cols="12"
+              lg="4"
+              sm="6"
+            >
+              <VueDatePicker
+                v-model="requestDateData"
+                :max-date="new Date()"
+                :enable-time-picker="false"
+                placeholder="Request Date"
+              />
+            </VCol>
+            <!-- Delivery Date -->
+            <VCol
+              class="py-1"
+              cols="12"
+              lg="4"
+              sm="6"
+            >
+              <VueDatePicker
+                v-model="deliveryDateData"
+                :max-date="new Date()"
+                :enable-time-picker="false"
+                placeholder="Delivery Date"
               />
             </VCol>
             
@@ -1134,8 +1169,8 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
       v-if="true"
       class=""
     >
-      <VCardTitle class="text-center bg-teal">
-        Other : Received
+      <VCardTitle class="text-center bg-deep-orange">
+        Transfer In : Received
       </VCardTitle>
 
       <!-- ✅ State 1: Loading — Skeleton -->
@@ -1143,7 +1178,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
         <VCardText class="px-0">
           <VProgressLinear
             v-model="skill"
-            color="teal"
+            color="deep-orange"
             height="25"
             indeterminate
           >
@@ -1499,7 +1534,14 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 {{ $t('Received No.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               </th>
-            
+              <th
+                v-if="checkConfigUser(nameUser)"
+                scope="row"
+                class="text-end px-1"
+              >
+                {{ $t('Received By') }}
+              <!-- ----------------------------- Icon Search By --------------------- -->
+              </th>
               <th
                 scope="row"
                 class="text-start px-1"
@@ -1509,19 +1551,17 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </th>
 
               <th
-                v-if="false"
                 scope="row"
                 class="text-start px-1"
               >
-                {{ $t('PO NO.') }}
+                {{ $t('Request NO.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               </th>
               <th
-                v-if="false"
                 scope="row"
                 class="text-start px-1"
               >
-                {{ $t('PO Date') }}
+                {{ $t('Request Date') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               </th>
 
@@ -1746,70 +1786,124 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </th>
 
               <th
+                v-if="checkConfigUser(nameUser)"
+                scope="row"
+                class="text-end px-1"
+              >
+                {{ $t("Request Qty.") }}
+                <!-- ----------------------------- Icon Search By --------------------- -->
+                <VIcon
+                  v-if="false"
+                  color="primary"
+                  icon="mdi-pan-vertical"
+                  @click="sortByQtyOrder = sortByQtyOrder === 'asc' ? 'desc' : 'asc'"
+                />
+              </th>
+
+              <th
+                v-if="checkConfigUser(nameUser)"
+                scope="row"
+                class="text-start px-1"
+              >
+                {{ $t('UoM') }}
+                <!-- ----------------------------- Icon Search By --------------------- -->
+                <VMenu
+                  v-if="false"
+                  v-model="menuUoM"
+                  :close-on-content-click="false"
+                  location="end"
+                >
+                  <template #activator="{ props }">
+                    <VIcon
+                      v-bind="props"
+                      color="primary"
+                      icon="mdi-magnify"
+                    />
+                  </template>
+
+                  <VCard min-width="300">
+                    <VDivider />
+
+                    <VList>
+                      <VListItem>
+                        <VRow>
+                          <VCol
+                            cols="12"
+                            md="12"
+                          >
+                            <VTextField
+                              v-model="searchByUnitName"
+                              class="mt-4"
+                              :label="$t('UoM')"
+                            />
+                          </VCol>
+
+                          <VCol
+                            class="text-end"
+                            cols="6"
+                          >
+                            <VBtn
+                              type="submit"
+                              style="width: 100%;"
+                              color="warning"
+                              @click="searchByUnitName = ''"
+                            >
+                              {{ $t('Reset') }}
+                            </VBtn>
+                          </VCol>
+                          <VCol
+                            class="text-end"
+                            cols="6"
+                          >
+                            <VBtn
+                              type="submit"
+                              style="width: 100%;"
+                              @click="menuUoM = false"
+                            >
+                              {{ $t('Cancel') }}
+                            </VBtn>
+                          </VCol>
+                        </VRow>
+                      </VListItem>
+                    </VList>
+                  </VCard>
+                </VMenu>
+              </th>
+
+              <th
+                scope="row"
+                class="text-start px-1"
+              >
+                {{ $t('Delivered Date') }}
+              </th>
+
+              <th
+                v-if="checkConfigUser(nameUser)"
+                scope="row"
+                class="text-start px-1"
+              >
+                {{ $t('Picking Warehouse') }}
+              <!-- ----------------------------- Icon Search By --------------------- -->
+              </th>
+              <th
+                v-if="false"
+                scope="row"
+                class="text-start px-1"
+              >
+                {{ $t('Location') }}
+              <!-- ----------------------------- Menu Search By --------------------- -->
+              </th>
+              <th
+                v-if="false"
                 scope="row"
                 class="text-start px-1"
               >
                 {{ $t('Ref. Doc.') }}
               <!-- ----------------------------- Menu Search By --------------------- -->
               </th>
-
-              <th
-                scope="row"
-                class="text-start px-1"
-              >
-                {{ $t('reason') }}
-              <!-- ----------------------------- Menu Search By --------------------- -->
-              </th>
-
-              <th
-                v-if="checkConfigUser(nameUser)"
-                scope="row"
-                class="text-start px-1"
-              >
-                {{ $t('Supplier Code.') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              </th>
-              <th
-                scope="row"
-                class="text-start px-1"
-              >
-                {{ $t('Supplier Name') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              </th>
-
-              <th
-                scope="row"
-                class="text-start px-1"
-              >
-                {{ $t('Lot') }}
-              </th>
-
-              <th
-                scope="row"
-                class="text-start px-1"
-              >
-                {{ $t('Location') }}
-              </th>
-
-              <th
-                v-if="checkConfigUser(nameUser)"
-                scope="row"
-                class="text-end px-1"
-              >
-                {{ $t('Received By') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              </th>
-
-              <th
-                v-if="checkConfigUser(nameUser)"
-                scope="row"
-                class="text-end px-1"
-              >
-                {{ $t('Remark') }}
-              <!-- ----------------------------- Icon Search By --------------------- -->
-              </th>
             </tr>
           </thead>
+        
           <!-- 👉 table body -->
           <tbody>
             <tr
@@ -1980,6 +2074,15 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 {{ (product.receiveNo) }}
               </td>
 
+              <!-- 👉 Actions -->
+              <td
+                :class="resolveChipColorTable(product.status)"
+                style="width: 8rem;"
+                class="text-start px-1"
+              >
+                {{ product.receiveBy }}
+              </td>
+
               <!-- 👉 Number(Non-Tag) -->
               <td
                 :class="resolveChipColorTable(product.status)"
@@ -1987,6 +2090,22 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               >
                 {{ formatDate(product.receiveDate) }}
               </td>
+
+              <td
+                :class="resolveChipColorTable(product.status)"
+                style="width: 8rem;"
+                class="text-start px-1"
+              >
+                {{ (product.requestNo	) }}
+              </td>
+              <td
+                :class="resolveChipColorTable(product.status)"
+                style="width: 8rem;"
+                class="text-start px-1"
+              >
+                {{ formatDate(product.requestDate	) }}
+              </td>
+
 
               <!-- 👉 Product code -->
               <td
@@ -2005,21 +2124,19 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
               </td>
 
               <td
-                v-if="false"
                 :class="resolveChipColorTable(product.status)"
                 style="width: 8rem;"
-                class="text-start px-1"
+                class="text-end px-1"
               >
-                {{ (product.pickingGoodsNo	) }}
+                {{ product.qtyReceived }}
               </td>
 
               <td
-                v-if="false"
                 :class="resolveChipColorTable(product.status)"
                 style="width: 8rem;"
                 class="text-start px-1"
               >
-                {{ formatDate(product.pickingDate) }}
+                {{ product.unitName }}
               </td>
 
               <td
@@ -2027,7 +2144,7 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 style="width: 8rem;"
                 class="text-end px-1"
               >
-                {{ product.qty }}
+                {{ product.qtyRequest }}
               </td>
 
               <td
@@ -2043,63 +2160,33 @@ const tabItemText = 'hortbread chocolate bar marshmallow bear claw tiramisu choc
                 style="width: 8rem;"
                 class="text-start px-1"
               >
-                {{ (product.ref	) }}
+                {{ formatDate(product.deliveryDate) }}
               </td>
 
-              <td
-                :class="resolveChipColorTable(product.status)"
-                style="width: 8rem;"
-                class="text-start px-1"
-              >
-                {{ (product.reason ) }}
-              </td>
-
-              <td
-                :class="resolveChipColorTable(product.status)"
-                style="width: 8rem;"
-                class="text-start px-1"
-              >
-                {{ product.supplierId }}
-              </td>
-              <td
-                :class="resolveChipColorTable(product.status)"
-                style="width: 8rem;"
-                class="text-start px-1"
-              >
-                {{ product.supplierName }}
-              </td>
-              <!-- 👉 Counting unit -->
-              <td
-                :class="resolveChipColorTable(product.status)"
-                class="text-start  px-1"
-                style="width: 5rem;"
-              >
-                {{ product.lot }}
-              </td>
               <!-- 👉 Total quantity of products -->
               <td
                 :class="resolveChipColorTable(product.status)"
                 class="text-start  px-1"
               >
-                {{ (product.locationReceive	) }}
-              </td>
-
-              <!-- 👉 Actions -->
-              <td
-                :class="resolveChipColorTable(product.status)"
-                style="width: 8rem;"
-                class="text-start px-1"
-              >
-                {{ product.receiveBy }}
+                {{ (product.pickingWarhouse) }}
               </td>
 
               <!-- 👉 Counting unit -->
               <td
+                v-if="false"
                 :class="resolveChipColorTable(product.status)"
                 class="text-start  px-1"
                 style="width: 5rem;"
               >
-                {{ product.remark }}
+                {{ product.refDoc }}
+              </td>
+              <td
+                v-if="false"
+                :class="resolveChipColorTable(product.status)"
+                style="width: 8rem;"
+                class="text-start px-1"
+              >
+                {{ product.unitName }}
               </td>
             </tr>
           </tbody>
