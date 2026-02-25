@@ -6,7 +6,7 @@ const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
 // Import Composable
 import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
-import { useStatusAndPermissions } from './tableInvoice/composables/useStatusAndPermissions'
+import { useStatusAndPermissions } from './composables/useStatusAndPermissions'
 import { useTruckOrder } from './composables/useTruckOrder'
 import { useSearchPlan } from './composables/APIcalls/useSearchPlan'
 import { usefileInput } from './composables/file/usefileInput'
@@ -383,33 +383,23 @@ const textAreaShipDialogActive2 = (type, data, data2,
   disabledModel.value = disabledCanExecute.value
 }
 
+const fieldMap = {
+  ShipCon: 'shippingCondition',
+  ShipMark: 'shippingMark',
+  RemarkSAL: 'remarkSal',
+  RemarkWH: 'remarkWh',
+  RemarkLOG: 'remarkLog',
+}
+
 const handleDialogSubmit = data => {
-  dialogDataTextArea.value = data
-
   const index = indexDataDialogTextArea.value
+  const field = fieldMap[typeDialogTextArea.value]
 
-  if (index >= 0 && index < mockData.value.length) {
-    const item = mockData.value[index]
-
-    // อัปเดตค่าของ item
-    item.value = data
-
-    // ใช้งานข้อมูลตาม type
-    if (typeDialogTextArea.value === 'ShipCon') {
-      item.shippingCondition = data
-    } else if (typeDialogTextArea.value === 'ShipMark') {
-      item.shippingMark = data
-    } else if (typeDialogTextArea.value === 'RemarkSAL') {
-      item.remarkSal = data
-    } else if (typeDialogTextArea.value === 'RemarkWH') {
-      item.remarkWh = data
-    } else if (typeDialogTextArea.value === 'RemarkLOG') {
-      item.remarkLog = data
-    }
+  if (index >= 0 && index < paginatedData.value.length && field) {
+    paginatedData.value[index][field] = data
   } else {
-    console.warn(`Index ${index} is out of range for mockData.`)
+    console.warn(`Invalid index or type`)
   }
-
 }
 
 //------------------------------- Function Get Search plan -----------------
@@ -1330,9 +1320,6 @@ watchEffect(() => {
 
 
 const TruckTypePrint = ref([])
-
-//------------------------------------------ Mock Data --------------------------------
-import mockData from './tableInvoice/dataMock'
 
 //------------------------ Set Permissions (Hiden and Show Column) ------------------------
 
@@ -3908,83 +3895,90 @@ const clearParamsTruckOrder = () => {
                 }"
                 @dblclick="dataTableCliclHighlightIsToggle(product.soEtlLogDetailJournalID)"
               >
-                <VBtn color="primary">
-                  <VIcon icon="ri-menu-line" />
-                  <VMenu
-                    activator="parent"
-                    location="start"
-                  >
-                    <VList
-                      density="compact"
-                      min-width="200"
+                <VMenu
+                  activator="parent"
+                  location="start"
+                  open-on-hover
+                >
+                  <template #activator="{ props }">
+                    <VBtn
+                      color="primary"
+                      v-bind="props"
                     >
-                      <!-- Action -->
-                      <VListItem
-                        prepend-icon="ri-flashlight-line"
-                        title="Action"
-                        :disabled="accountINSP"
-                        @click="actionBtn(product)"
-                      />
+                      <VIcon icon="ri-menu-line" />
+                    </VBtn>
+                  </template>
+                    
+                  <VList
+                    density="compact"
+                    min-width="200"
+                  >
+                    <!-- Action -->
+                    <VListItem
+                      prepend-icon="ri-flashlight-line"
+                      title="Action"
+                      :disabled="accountINSP"
+                      @click="actionBtn(product)"
+                    />
 
-                      <!-- Save Draft -->
-                      <VListItem
-                        title="Save Draft"
-                        :disabled="isDraftDisabled(product, accountINSP, disabledStatus)"
-                        @click="saveShipmentPlan(product), saveDraftLoading = true"
-                      >
-                        <template #prepend>
-                          <VIcon
-                            icon="ri-save-line"
-                            :color="isDraftDisabled(product, accountINSP, disabledStatus) ? undefined : 'warning'"
-                          />
-                        </template>
+                    <!-- Save Draft -->
+                    <VListItem
+                      title="Save Draft"
+                      :disabled="isDraftDisabled(product, accountINSP, disabledStatus)"
+                      @click="saveShipmentPlan(product), saveDraftLoading = true"
+                    >
+                      <template #prepend>
+                        <VIcon
+                          icon="ri-save-line"
+                          :color="isDraftDisabled(product, accountINSP, disabledStatus) ? undefined : 'warning'"
+                        />
+                      </template>
 
-                        <template #append>
-                          <VProgressCircular
-                            v-if="isDraftLoading(saveDraftLoading, product)"
-                            size="16"
-                            indeterminate
-                          />
-                        </template>
-                      </VListItem>
-                      <!-- Submit -->
-                      <VListItem
-                        v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
-                        title="Submit"
-                        :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
-                          || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible "
-                        @click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
-                      >
-                        <template #prepend>
-                          <VIcon
-                            icon="ri-send-plane-line"
-                            :color="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
-                              || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible ? undefined : 'success'"
-                          />
-                        </template>
-                        <template #append>
-                          <VProgressCircular
-                            v-if="isSubmitLoading(product, submitLoading)"
-                            indeterminate
-                            size="16"
-                          />
-                        </template>
-                      </VListItem>
+                      <template #append>
+                        <VProgressCircular
+                          v-if="isDraftLoading(saveDraftLoading, product)"
+                          size="16"
+                          indeterminate
+                        />
+                      </template>
+                    </VListItem>
+                    <!-- Submit -->
+                    <VListItem
+                      v-if="canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible"
+                      title="Submit"
+                      :disabled="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
+                        || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible "
+                      @click="openConfirmDialog('submit', product.soEtlLogDetailJournalID, product), submitLoading = true"
+                    >
+                      <template #prepend>
+                        <VIcon
+                          icon="ri-send-plane-line"
+                          :color="disabledStatus(product.inspStatusId, product.logStatusId, product.salStatusId, product.whStatusId, product)
+                            || !canVisibleUserPermission(statusPermission, 'BTN_SUBMIT').canVisible ? undefined : 'success'"
+                        />
+                      </template>
+                      <template #append>
+                        <VProgressCircular
+                          v-if="isSubmitLoading(product, submitLoading)"
+                          indeterminate
+                          size="16"
+                        />
+                      </template>
+                    </VListItem>
 
-                      <!-- Divider -->
-                      <VDivider v-if="accountWHSub" />
+                    <!-- Divider -->
+                    <VDivider v-if="accountWHSub" />
 
-                      <!-- Approve -->
-                      <VListItem
-                        v-if="accountWHSub"
-                        prepend-icon="ri-check-line"
-                        title="Approve"
-                        class="text-success"
-                        @click="onApprove(product)"
-                      />
-                    </VList>
-                  </VMenu>
-                </VBtn>
+                    <!-- Approve -->
+                    <VListItem
+                      v-if="accountWHSub"
+                      prepend-icon="ri-check-line"
+                      title="Approve"
+                      class="text-success"
+                      @click="onApprove(product)"
+                    />
+                  </VList>
+                </VMenu>
               </td>
             </tr>
           </tbody>
