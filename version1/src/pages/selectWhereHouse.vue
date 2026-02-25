@@ -113,8 +113,12 @@ const onSubmitWhereHouse = () => {
 
     const authStore = useAuthExStore()
 
-    if(authStore.user.id === "20303" || authStore.user.id === "20302"){
-      router.replace('/skt/shipping')
+    if(authStore.user.id){
+      if(authStore.user.id === "20303" || authStore.user.id === "20302"){
+        router.replace('/skt/shipping')
+      }else{
+        router.replace('/skt/receiving')
+      }
     }else{
       router.replace('/skt/receiving')
     }
