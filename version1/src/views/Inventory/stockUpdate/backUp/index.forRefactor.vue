@@ -8,196 +8,117 @@ import { onMounted, ref, watchEffect } from 'vue'
 
 import { urlApi } from '@/api'  //---------------------- Import Api for Url *****
 
-import { useToast } from "vue-toastification" //---------------- Import Toast alert
+
+
+//-------------------------- Import Use -----------------------------------
+import { useStockupdate } from './hooks/useStockupdate'
+import { useItemSearch } from './hooks/useItemSearch'
+import { dialogImage, formatDecimal } from './utility/helper'
+
+//-------------------------- Import Component -----------------------------------
+import ProductImageDialog from './components/ProductImageDialog.vue'
 
 //------------------------ Get Where House Name From LocalStorage and define to whereHouseSelectedItem ---------------------------
 const whereHouse = localStorage.getItem('whereHouseName')
-const whereHouseSelectedItem = ref(whereHouse)
-
-const products = ref([]) //---------------- variable for get All Product From X-Location(Where House) *****
 
 // Get access token from localStorage in another page
 const accessTokenAtStore = sessionStorage.getItem('accessTokenAtStore')
 
-const perPage = ref(10)
-const page = ref(0)
-const totalCount = ref(0)
+//-------------------------- Init Use -----------------------------------
+const { 
+  products,
+  searchByCategoryId,
+  searchByTypeId,
+  searchBySubTypeId,
+  searchByBarcode,
+  searchByProductId,
+  searchByProductName,
+  searchByUOMId,
+  searchByWareHouseId,
+  searchByZoneId,
+  searchByAreaId,
+  searchBySubAreaId,
+  searchByCategoryName,
+  searchByTypeName,
+  searchBySubTypeName,
+  searchByBarcodeName,
+  searchByProductCodeName,
+  searchByProductNameFilter,
+  searchByUnitName,
+  menuCategory,
+  menuGroup,
+  menuSubGroup,
+  menuBarcode,
+  menuProductCode,
+  menuProductName,
+  menuUoM,
+  itemsSearchByCategoryId,
+  typeItemsSearchById,
+  subTypeItemsSearchById,
+  itemsSearchByUOMId,
+  wareHouseItemsSearchById,
+  zoneItemsSearchById,
+  areaItemsSearchById,
+  subAreaItemsSearchById,
+  sortByCategory,
+  sortByType,
+  sortBySubType,
+  sortByBarcode,
+  sortByProductId,
+  sortByProductName,
+  sortByUnit,
+  sortByQty,
+  sortByTags,
+  sortByNonTags, 
 
-const rowPerPage = ref(10)
-const currentPage = ref(1)
+  serialProductCode,
 
-const totalPage = computed(() => {
-  return Math.ceil(totalCount.value / rowPerPage.value)
-})
+  totalCount,
+  currentPage,
+  rowPerPage,
+  totalPage,
 
-//------------------- Model ID For search ------------------------------------
-const searchByCategoryId = ref(null)
-const searchByTypeId = ref(null)
-const searchBySubTypeId = ref(null)
-const searchByBarcode = ref(null)
-const searchByProductId = ref(null)
-const searchByProductName = ref(null)
-const searchByUOMId = ref(null)
+  GetStockUpdate,
+  resetSearchKey,
+  clearModel,
+  toggleSortType,
+  stockUpdateExcel,
+} = useStockupdate(whereHouse, accessTokenAtStore)
 
-const searchByWareHouseId = ref([whereHouse])
+const { 
+  fetchItemsWareHouse,
+  getItemsProductUnit,
+  getItemsProductType,
+  getItemsProductSubType,
+  getItemLocalZone,
+  getItemLocalArea,
+  getItemLocalSubArea,
+  fetchItemsSearchBy,
+} = useItemSearch(
+  urlApi, 
+  accessTokenAtStore,
+  whereHouse,
+  wareHouseItemsSearchById,
+  itemsSearchByUOMId,
+  searchByCategoryId,
+  typeItemsSearchById,
+  subTypeItemsSearchById,
+  searchByTypeId,
+  zoneItemsSearchById,
+  areaItemsSearchById,
+  searchByZoneId,
+  subAreaItemsSearchById,
+  searchByAreaId,
+)
 
-const searchByZoneId = ref(null)
-const searchByAreaId = ref(null)
-const searchBySubAreaId = ref(null)
+const { 
+  imgProduct,
+  isDialogImageVisible,
 
-//------------------------ Model Name for search ------------------------------
-const searchByCategoryName = ref(null)
-const searchByTypeName = ref(null)
-const searchBySubTypeName = ref(null)
-const searchByBarcodeName = ref(null)
-const searchByProductCodeName = ref(null)
-const searchByProductNameFilter = ref(null)
-const searchByUnitName = ref(null)
+  currentProduct,
 
-//----- Search Filter Icon Header Table[Product Category, Group, Sub Group, Barcode, Product Category Code, Product Name]
-const menuCategory= ref( false)
-const menuGroup = ref( false)
-const menuSubGroup = ref( false)
-const menuBarcode = ref( false)
-const menuProductCode = ref( false)
-const menuProductName = ref( false)
-const menuUoM = ref( false)
-
-//------------------------ item ID for search ------------------------------
-const itemsSearchByCategoryId = ref([])
-const typeItemsSearchById = ref([])
-const subTypeItemsSearchById = ref([])
-const itemsSearchByUOMId = ref([])
-const wareHouseItemsSearchById = ref([])
-const zoneItemsSearchById = ref([])
-const areaItemsSearchById = ref([])
-const subAreaItemsSearchById = ref([])
-
-//----------------------  Variable for SortBy -------------------------------------
-const sortByCategory = ref('')
-const sortByType = ref('')
-const sortBySubType = ref('')
-const sortByBarcode = ref('')
-const sortByProductId = ref('')
-const sortByProductName = ref('')
-const sortByUnit = ref('')
-const sortByQty = ref('')
-const sortByTags = ref('')
-const sortByNonTags = ref('')
-
-
-const toggleSortType = sortBy => {
-  const sortRefs = { sortByCategory, sortByType, sortBySubType, sortByBarcode, sortByProductId, sortByProductName, sortByUnit, sortByQty, sortByTags, sortByNonTags }
-
-  for (const key in sortRefs) {
-    if (key === sortBy) {
-      sortRefs[key].value = sortRefs[key].value === 'asc' ? 'desc' : 'asc'
-    } else {
-      sortRefs[key].value = '' // ล้างค่าที่ไม่เกี่ยวข้อง
-    }
-
-    // console.log("Sort type:",sortRefs[key],'Key',[key])
-  }
-
-  // console.log("Sort type:",sortRefs[key],'Key',[key])
-}
-
-const router = useRouter()
-
-const serialProductCode = ref(null)
-
-//------------------------------- Function Get StockUpdate Need Enter Search -----------------
-
-const clearModel = () => {
-  searchByCategoryId.value = null
-  searchByTypeId.value = null
-  searchBySubTypeId.value = null
-  searchByBarcode.value = null
-  searchByProductId.value = null
-  searchByProductName.value = null
-  searchByUOMId.value = null
-  searchByZoneId.value = null
-  searchByAreaId.value = null
-  searchBySubAreaId.value = null
-  serialProductCode.value = null
-}
-
-const GetStockUpdate = async () => {
-
-  // console.log('searchByCategoryName: ',searchByCategoryName)
-  axiosIns.get(`${urlApi.value}/api/v1/StockUpdate?page=`+currentPage.value+`&perPage=`+rowPerPage.value, {
-    params: {
-      categoryId: searchByCategoryId.value,
-      typeId: searchByTypeId.value,
-      subTypeId: searchBySubTypeId.value,
-      barcode: searchByBarcode.value,
-      productId: searchByProductId.value,
-      productName: searchByProductName.value,
-      unitId: searchByUOMId.value,
-      zoneId: searchByZoneId.value,
-      areaId: searchByAreaId.value,
-      subAreaId: searchBySubAreaId.value,
-      serialNo: serialProductCode.value,
-
-      searchByCategory: searchByCategoryName.value,
-      searchByType: searchByTypeName.value,
-      searchBySubType: searchBySubTypeName.value,
-      searchByBarcode: searchByBarcodeName.value,
-      searchByProductId: searchByProductCodeName.value,
-      searchByProductName: searchByProductNameFilter.value,
-      searchByUnit: searchByUnitName.value,
-
-      'sortByCategory': sortByCategory.value,
-      'sortByType': sortByType.value,
-      'sortBySubType': sortBySubType.value,
-      'sortByBarcode': sortByBarcode.value,
-      'sortByProductId': sortByProductId.value || 'asc',
-      'sortByProductName': sortByProductName.value,
-      'sortByUnit': sortByUnit.value,
-      'sortByQty': sortByQty.value,
-      'sortByTags': sortByTags.value,
-      'sortByNonTags': sortByNonTags.value,
-
-      // ... and so on with other parameters
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${searchByWareHouseId.value}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }, {})
-    .then(response => {
-
-      products.value = response.data.items.map((item, index) => {
-        return {
-          ...item,
-          noItem: (response.data.page - 1) * response.data.perPage + index + 1,
-        }
-      })
-
-      totalCount.value = response.data.totalCount
-      currentPage.value = response.data.page
-
-      rowPerPage.value = response.data.perPage
-      
-    })
-    .catch(error => {
-      // Handle errors
-      console.error('Error:', error)
-    })
-  
-}
-
-//----------------------------------- Function Reset search Key word ---------------
-const resetSearchKey = () => {
-  searchByCategoryName.value = ('')
-  searchByTypeName.value = ('')
-  searchBySubTypeName.value = ('')
-  searchByBarcodeName.value = ('')
-  searchByProductCodeName.value = ('')
-  searchByProductNameFilter.value = ('')
-  searchByUnitName.value = ('')
-}
+  showDialogImage,
+} = dialogImage(urlApi, accessTokenAtStore, whereHouse)
 
 //------------------------------- Function Get StockUpdate Auto Search -----------------
 
@@ -273,25 +194,7 @@ const paginationData = computed(() => {
 // SECTION Checkbox toggle
 const selectedRows = ref([])
 
-//----------------------------------- End Function Pagination -----------------------------------------------
-
 ///--------------------------------------- FetchItems for Search Box ----------------------------------------------
-
-const fetchItemsSearchBy = nameSearch => {
-  return axiosIns.get(`${urlApi.value}/api/v1/Product/${nameSearch}`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  }).then(response => {
-    return response.data
-  }).catch(error => {
-    console.error('Error:', error)
-    
-    return null
-  })
-}
 
 fetchItemsSearchBy('categories').then(data => {
   itemsSearchByCategoryId.value = data
@@ -309,330 +212,23 @@ const submitSearchButton = () => {
   GetStockUpdate()
 }
 
-//--------------------------------------- FetchItems for Search WareHouse  ----------------------------------------
-
-const fetchItemsWareHouse = () => {
-  axiosIns.get(`${urlApi.value}/api/Auth/GetLocation`, {
-    headers: {
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      wareHouseItemsSearchById.value = response.data
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-}
-
-// ✅ ควรเป็น
 onMounted(() => {
   fetchItemsWareHouse()
 })
 
-//--------------------------------------- FetchItems for Search  Unit  ----------------------------------------
-
-const getItemsProductUnit = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/`+searchByCategoryId.value+'/Unit', {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      itemsSearchByUOMId.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('itemsSearchByUOMId.value At index',itemsSearchByUOMId.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-// ✅ ควรเป็น
-onMounted(() => {
-  getItemsProductUnit()
-})
-
-//--------------------------------------- FetchItems for Search  Type(Group) ----------------------------------------
-
-const getItemsProductType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/Types`, {
-    params: {
-      'CategoryId': searchByCategoryId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      typeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-// ✅ ควรเป็น
-onMounted(() => {
+// ✅ ระบุ dependency ชัดเจน
+watch(searchByCategoryId, () => {
   getItemsProductType()
-})
+  getItemsProductUnit()
+}, { immediate: true })
 
-//--------------------------------------- FetchItems for Search Sub Type(Sub Group) ----------------------------------------
+watch(searchByTypeId, getItemsProductSubType, { immediate: true })
+watch(searchByZoneId, getItemLocalArea, { immediate: true })
+watch([searchByZoneId, searchByAreaId], getItemLocalSubArea, { immediate: true })
 
-const getItemsProductSubType = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Product/SubTypes/All`, {
-    params: {
-      'TypeId': searchByTypeId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subTypeItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('wareHouse.value At index',wareHouseItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-// ✅ ควรเป็น
-onMounted(() => {
-  getItemsProductSubType()
-})
-
-//--------------------------------------- FetchItems for Search  Zone  ----------------------------------------
-
-const getItemLocalZone = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/zone/all`, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      zoneItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('zoneItemsSearchById At index',zoneItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-// ✅ ควรเป็น
 onMounted(() => {
   getItemLocalZone()
 })
-
-//--------------------------------------- FetchItems for Search  Area ----------------------------------------
-
-const getItemLocalArea = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/area/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      areaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-// ✅ ควรเป็น
-onMounted(() => {
-  getItemLocalArea()
-})
-
-//--------------------------------------- FetchItems for Search Sub Area ----------------------------------------
-
-const getItemLocalSubArea = () => {
-  axiosIns.get(`${urlApi.value}/api/v1/Locations/subArea/all`, {
-    params: {
-      'zoneCode': searchByZoneId.value,
-      'areaCode': searchByAreaId.value,
-    },
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-  })
-    .then(response => {
-
-      subAreaItemsSearchById.value = response.data
-
-      // Now `items` contains an array of objects with id and name properties
-      // console.log('areaItemsSearchById At index',areaItemsSearchById.value)
-
-      
-    })
-    .catch(error => {
-      // Handle errors
-      selectError.value = 'Where house not selected!!'
-      console.error('Error:', error)
-    })
-
-    
-}
-
-// ✅ ควรเป็น
-onMounted(() => {
-  getItemLocalSubArea()
-})
-
-// -------------------------------------- Export Bar Excel - --------------------------------
-
-const stockUpdateExcel = () => {
-  const toast = useToast()
-
-  toast.info("Exporting Excel...", { timeout: 1000 })
-
-  axiosIns.post(`${urlApi.value}/api/v1/StockUpdate/Excel`, {}, {
-    headers: {
-      'accept': '*/*',
-      'x-location': `${whereHouse}`,
-      Authorization: `Bearer ${accessTokenAtStore}`,
-    },
-    params: {
-      categoryId: searchByCategoryId.value,
-      typeId: searchByTypeId.value,
-      subTypeId: searchBySubTypeId.value,
-      barcode: searchByBarcode.value,
-      productId: searchByProductId.value,
-      productName: searchByProductName.value,
-      unitId: searchByUOMId.value,
-      zoneId: searchByZoneId.value,
-      areaId: searchByAreaId.value,
-      subAreaId: searchBySubAreaId.value,
-      serialNo: serialProductCode.value,
-
-      searchByCategory: searchByCategoryName.value,
-      searchByType: searchByTypeName.value,
-      searchBySubType: searchBySubTypeName.value,
-      searchByBarcode: searchByBarcodeName.value,
-      searchByProductId: searchByProductCodeName.value,
-      searchByProductName: searchByProductNameFilter.value,
-      searchByUnit: searchByUnitName.value,
-
-      'sortByCategory': sortByCategory.value,
-      'sortByType': sortByType.value,
-      'sortBySubType': sortBySubType.value,
-      'sortByBarcode': sortByBarcode.value,
-      'sortByProductId': sortByProductId.value || 'asc',
-      'sortByProductName': sortByProductName.value,
-      'sortByUnit': sortByUnit.value,
-      'sortByQty': sortByQty.value,
-      'sortByTags': sortByTags.value,
-      'sortByNonTags': sortByNonTags.value,
-
-      // ... and so on with other parameters
-    },
-    responseType: 'blob',
-  })
-    .then(response => {
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-
-      const currentDate = new Date()
-      const year = currentDate.getFullYear()
-      const threshold = 2500
-      const fileYear = year > threshold ? year - 543 : year
-
-      const dateString = currentDate.toISOString().slice(0, 10).replace(/-/g, '').replace(year.toString(), fileYear.toString())
-      const fileName = `stock_update_Tag_${dateString}.xlsx`
-
-      const link = document.createElement('a')
-
-      link.href = url
-      link.setAttribute('download', fileName)
-      document.body.appendChild(link)
-      link.click()
-
-      window.URL.revokeObjectURL(url)
-
-      // ✅ แจ้งผู้ใช้ว่าโหลดสำเร็จ
-      toast.success("Export successful!")
-    })
-    .catch(error => {
-      console.error('Error:', error)
-      toast.error("Export failed. Please try again.")
-    })
-}
-
-//-------------------------- format decimal -------------------
-
-const formatDecimal = decimal => {
-  const configsShowDigit = localStorage.getItem('configsShowDigit')
-  if (configsShowDigit == 'true') {
-    return Math.ceil(decimal)
-  } else {
-    return decimal
-  }
-}
 
 /// ----------------------- check config Barcode / Tag ----------------
 const nameUser = localStorage.getItem('userCheck')
@@ -650,9 +246,6 @@ const checkConfigUser = nameUser => {
 checkConfigUser(nameUser)
 
 //------------------------ Dialog Image ----------------------------
-const isDialogImageVisible = ref(false)
-const urlImage = ref('')
-const nameImage = ref('')
 
 const checkRFID = ref ('')
 
@@ -666,63 +259,10 @@ watchEffect(() =>{
     checkRFID.value = false
   }
 }) 
-
-const codeProduct = ref('')
-const nameProduct = ref('')
-const imgProduct = ref('')
-const barcodeProduct = ref('')
-const categoriesProduct = ref('')
-const groupProduct = ref('')
-const groupSupProduct = ref('')
-const totalProduct = ref('')
-const unitNameProduct = ref('')
-const detailsProduct = ref()
-
-const showDialogImage = (code, name, img, barcode, categories, group, groupSup, total, unitName, details) => {
-  codeProduct.value = code
-  nameProduct.value = name
-  imgProduct.value = img
-  barcodeProduct.value = barcode
-  categoriesProduct.value = categories
-  groupProduct.value = group
-  groupSupProduct.value = groupSup
-  totalProduct.value = total
-  unitNameProduct.value = unitName
-  detailsProduct.value = details
-  isDialogImageVisible.value = true
-  console.log('showImageFunction!!', details)
-}
-
-const showExpansionDialog = ref(false)
 </script>
 
 <template>
   <!-- Title Page -->
-  <div v-if="false">
-    <VCard>
-      <VCardTitle
-        style="background-color: #ffd66b;"
-        class=" d-flex justify-space-between"
-      >
-        <div class="d-flex justify-space-between">
-          <IconBtn
-            class="cursor-pointer"
-            color="#FFFFFF"
-            :to="{ name: 'dashboards-main',
-            }"
-          >
-            <VIcon
-              size="35"
-              icon="ri-close-circle-fill"
-            />
-          </IconBtn>
-          <h3 class="text-white">
-            {{ $t('Stock Update') }}
-          </h3>
-        </div>
-      </VCardTitle>
-    </VCard>
-  </div>
   <div>
     <VCard
       height="40px"
@@ -749,10 +289,7 @@ const showExpansionDialog = ref(false)
     </VCard>
   </div>
   <!-- ----------           Search bar                                   ------------------------------------ -->
-  <section
-    v-if="true"
-    class="my-2"
-  >
+  <section class="my-2">
     <VExpansionPanels>
       <VExpansionPanel>
         <VExpansionPanelTitle
@@ -1098,101 +635,14 @@ const showExpansionDialog = ref(false)
   </section>
 
   <!-- Dialog Image -->
-  <section>
-    <VDialog
-      v-model="isDialogImageVisible"
-      persistent
-      class=""
-      max-width="500"
-    >
-      <VCard class="">
-        <VCardTitle class="d-flex justify-space-between bg-primary">
-          <div>
-            <span class="text-white">{{ $t('Image Product') }}</span>
-          </div>
-          <div>
-            <IconBtn
-              size="30"
-              @click="isDialogImageVisible = false"
-            >
-              <VIcon
-                size="30"
-                icon="mdi-close-circle"
-              />
-            </IconBtn>
-          </div>
-        </VCardTitle>
-        <VImg
-          style="width: 100%;"
-          :src="imgProduct"
-          cover
-        />
-        <VCardActions
-          class="bg-primary"
-          style="width: 100%; padding: 0;"
-        >
-          <VBtn
-            color="red-green-1"
-            variant="text"
-            style="width: 100%;"
-            @click="showExpansionDialog = !showExpansionDialog"
-          >
-            <VIcon
-              size="40px"
-              color="white"
-              :icon="showExpansionDialog ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-            />
-            <span class="text-white">{{ $t('Details') }}</span>
-          </VBtn>
-        </VCardActions>
 
-        <VExpandTransition>
-          <div v-show="showExpansionDialog">
-            <VCardText class="bg-green-lighten-3">
-              <div>
-                <VRow>
-                  <VCol
-                    cols="12"
-                    lg="6"
-                  >
-                    <span style="font-size: large; font-weight: 900;">{{
-                      $t("Name")
-                    }}:&nbsp;</span>&nbsp;{{ nameProduct }}<br>
-                    <span style="font-size: large; font-weight: 900;">{{
-                      $t("Code")
-                    }}:&nbsp;</span>&nbsp;{{ codeProduct }}<br>
-                    <span style="font-size: large; font-weight: 900;">{{
-                      $t("Barcode")
-                    }}:&nbsp;</span>&nbsp;{{ barcodeProduct }}<br>
-                  </VCol>
-                  <VCol
-                    cols="12"
-                    lg="6"
-                  >
-                    <span style="font-size: large; font-weight: 900;">{{
-                      $t("Categories")
-                    }}:&nbsp;</span>&nbsp;{{ categoriesProduct }}<br>
-                    <span style="font-size: large; font-weight: 900;">{{
-                      $t("Group")
-                    }}:&nbsp;</span>&nbsp;{{ groupProduct }}<br>
-                    <span style="font-size: large; font-weight: 900;">{{
-                      $t("Sup Group")
-                    }}:&nbsp;</span>&nbsp;{{ groupSupProduct }}<br>
-                    <span style="font-size: large; font-weight: 900;">{{
-                      $t("Total")
-                    }}:&nbsp;</span>&nbsp;<span v-if="totalProduct">{{ (formatDecimal(totalProduct)).toLocaleString('en-US') }} {{ unitNameProduct }}<br><br></span>
-                  </VCol>
-                </VRow>
-                <span style="font-size: large; font-weight: 900;">{{
-                  $t("Details ")
-                }} :</span>{{ detailsProduct?.note }}
-              </div>
-            </VCardText>
-          </div>
-        </VExpandTransition>
-      </VCard>
-    </VDialog>
-  </section>
+  <ProductImageDialog
+    v-model="isDialogImageVisible"
+    :image-src="imgProduct"
+    :product-data="currentProduct"
+    :format-decimal="formatDecimal"
+    @update:model-value="handleDialogClose"
+  />
 
   <!-- ----------             Product  Easetrack                                  ------------------------------------ -->
   <section>

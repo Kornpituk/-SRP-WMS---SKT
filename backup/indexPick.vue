@@ -48,22 +48,23 @@ const dateRange = ref({
 
 onMounted(async () => {
 
-  console.log("props.datepickerDataStart", props.datepickerDataStart)
-
   if(props.datepickerDataStart){
     dateRange.value.dateSt = formateDateNew(props.datepickerDataStart)
     dateRange.value.dateSp = formateDateNew(props.datepickerDataStart)
   }
 
   await fetchDataChartPerformance()
+
 })
 
 async function fetchDataChartPerformance() {
   await dashboardStore.fetchPerformanceData({
-    stockId: whereHouse,
+    stockId: localStorage.getItem('whereHouseName'),
     ...dateRange.value,
   })
 }
+
+console.log("dashboardStore.pickingPending", dashboardStore.pickingPending)
 
 
 const route = useRoute()
@@ -95,8 +96,6 @@ watchEffect(() => {
 
 
   typeDatepicker.value = props.selectTypeDate
-
-  // console.log('Props datepickerDataEnd', props.datepickerDataEnd, props.datepickerDataStart)
 
   //---------------- Set Date With Prop Data -----------------------------
   if(props.datepickerDataEnd && props.datepickerDataStart){
@@ -208,7 +207,6 @@ const dataDatepicker = ref()
 
 const getHeaderGroupTimeNew = () => {
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)Receive Picking
   axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Picking/GroupTime`, {
     headers: {
       'accept': '*/*',
@@ -231,8 +229,6 @@ const getHeaderGroupTimeNew = () => {
 
       dataDatepicker.value = response.data
 
-      console.log('Chart Data New Time PK:', dataDatepicker.value)
-
       // currentPage.value = response.data.page
       // totalPage.value = response.data.totalPages
     })
@@ -244,7 +240,6 @@ const getHeaderGroupTimeNew = () => {
 
 const getHeaderGroupDayNew = () => {
 
-  // console.log('searchByCategoryName: ',searchByCategoryName)
   axios.get(`${urlApi.value}/api/v1/Dashboard/Performance/Picking/GroupDay`, {
     headers: {
       'accept': '*/*',
@@ -266,8 +261,6 @@ const getHeaderGroupDayNew = () => {
     .then(response => {
 
       dataDatepicker.value = response.data
-
-      console.log('Chart Data New Day PK:', response.data)
 
       // currentPage.value = response.data.page
       // totalPage.value = response.data.totalPages
@@ -291,12 +284,10 @@ const getHeaderGroupDayNew = () => {
 
 watchEffect(() => {
   if(!props.datepickerDataEnd && !props.datepickerDataStart){
-    console.log('Props datepickerDataEnd Empty picking', props.datepickerDataEnd, props.datepickerDataStart, props.selectTypeDate)
     dateEndProp.value = route.query.startDate
     dateStartProp.value = route.query.endDate
   }
 
-  console.log('Props datepickerDataEnd picking', props.datepickerDataEnd, props.datepickerDataStart)
 
   // if (typeDateProps === 8) {
   //   getHeaderGroupTimeNew()
@@ -523,7 +514,7 @@ watch(() => {
           :data-chart-white="dashboardStore.pickingSuccessfully.pickingWriteOff"
           :data-chart-transfer-out="dashboardStore.pickingSuccessfully.tranferOut"
           :data-chart-delivery="dashboardStore.pickingSuccessfully.pickingDelivery"
-          type-data="sussess"
+          typeData="sussess"
         />
       </VCol>
     </VRow>
