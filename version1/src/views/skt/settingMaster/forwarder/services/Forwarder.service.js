@@ -17,44 +17,40 @@ const maybeThrowMockError = () => {
     throw new Error('Mock service error')
 }
 
-const makeMockRow = (index, label) => ({
-  id: index,
-  code: 'TOP' + String(index).padStart(3, '0'),
-  name: label,
-  abb: 'Term of Payment master record ' + index,
-  termOfPaymentName: ['Somchai K.', 'Worathida P.', 'Tossapol N.', 'Siriporn A.', 'Anongrat B.'][index % 5],
-  contactNo: '08' + (10000000 + index * 1379).toString().slice(0, 8),
-  status: index % 4 === 0 ? 'INACTIVE' : 'ACTIVE',
-  startDate: `2024-${String((index % 12) + 1).padStart(2, '0')}-${String((index % 27) + 1).padStart(2, '0')}`,
-  updatedAt: `2025-${String(((index + 2) % 12) + 1).padStart(2, '0')}-${String(((index + 6) % 27) + 1).padStart(2, '0')}`,
-})
-
-let mockRows = [
-  makeMockRow(1, 'Net 30 days'),
-  makeMockRow(2, 'Cash on Delivery'),
-  makeMockRow(3, 'Advance 50% before shipment'),
-  makeMockRow(4, 'Net 45 with credit approval'),
-  makeMockRow(5, 'End of month + 15 days'),
-  makeMockRow(6, 'Letter of Credit at sight'),
-  makeMockRow(7, 'Bank transfer within 7 days'),
-  makeMockRow(8, 'Installment 3 terms'),
-  makeMockRow(9, 'Prompt payment 2% discount'),
-  makeMockRow(10, 'Net 60 enterprise terms'),
-  makeMockRow(11, 'Payment against shipping documents'),
-  makeMockRow(12, 'Prepaid before production'),
-  makeMockRow(13, 'Net 15 fast settlement'),
-  makeMockRow(14, 'Quarterly settlement agreement'),
-  makeMockRow(15, 'Milestone-based payment'),
-  makeMockRow(16, 'Deferred payment seasonal'),
-  makeMockRow(17, 'Open account arrangement'),
-  makeMockRow(18, 'Cash in advance for custom orders'),
-  makeMockRow(19, 'Split payment with retention'),
-  makeMockRow(20, 'Net 90 strategic account'),
-]
 
 const mockRowTable = [
-  { id: 1, abb: "T/T ", termOfPaymentName: "T/T 30 DAYS FROM B/L DATE", startDate: "B/L Date", days: "30" },
-  { id: 2, abb: "T/T ", termOfPaymentName: "T/T 30 DAYS FROM END OF DELIVERY MONTH", startDate: "END MONTH", days: "30" },
+  { 
+    id: 1, 
+    abb: "MPL", 
+    forwarderName: "MASS POWER LOGISTICS CO.,LTD.", 
+    address: "716/44 Sol Watchannai, Bangkolaem, Bangkokloam, Bangkok 10120", 
+    contactName: "SIRIPORN", 
+    contactNo: "091-5450630", 
+  },
+  { 
+    id: 2, 
+    abb: "LEO", 
+    forwarderName: "LEO Global Logistics Public Company Limited", 
+    address: "251/1 Soi Pakdee, Rama 3 Road, Bangkokreem, Bangkok 10120 Thailand", 
+    contactName: "TOSAPOL", 
+    contactNo: "084-3878325", 
+  },
+  { 
+    id: 3, 
+    abb: "TVL", 
+    forwarderName: "T.V.L.Global Logistics (Thailand) Co.Ltd.", 
+    address: "11/4 Ratchadaphisek Road, Chongnonsi, Yannawa, Bangkok 10120", 
+    contactName: "WORATHIDA", 
+    contactNo: "02-6781685 # 309", 
+  },
+  { 
+    id: 4, 
+    abb: "HCL", 
+    forwarderName: "HazChem Logistics Management Co.Ltd.", 
+    address: "628, 4th Floor, Triple i Builg, Soi Klab Chom, Nonsee Road, Chongnonsee, Yannawa, Bangkok 10120", 
+    contactName: "SURAWADEE", 
+    contactNo: "085-1256648", 
+  },
 ]
 
 const fetchMock = async () => {
@@ -109,7 +105,7 @@ const deleteMock = async id => {
 
 const basePath = `${urlApi.value}/api/v1/SettingMaster/term-of-payment`
 
-export const fetchTermOfPaymentListService = async (params = {}) => {
+export const fetchListService = async (params = {}) => {
   if (USE_MOCK)
     return fetchMock()
 
@@ -121,7 +117,7 @@ export const fetchTermOfPaymentListService = async (params = {}) => {
   return response.data?.data || response.data || []
 }
 
-export const createTermOfPaymentService = async payload => {
+export const createService = async payload => {
   if (USE_MOCK)
     return createMock(payload)
 
@@ -132,7 +128,7 @@ export const createTermOfPaymentService = async payload => {
   return response.data
 }
 
-export const updateTermOfPaymentService = async (id, payload) => {
+export const updateService = async (id, payload) => {
   if (USE_MOCK)
     return updateMock(id, payload)
 
@@ -143,7 +139,7 @@ export const updateTermOfPaymentService = async (id, payload) => {
   return response.data
 }
 
-export const deleteTermOfPaymentService = async id => {
+export const deleteService = async id => {
   if (USE_MOCK)
     return deleteMock(id)
 
