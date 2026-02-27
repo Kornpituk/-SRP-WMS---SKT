@@ -1,22 +1,19 @@
 import { ref } from 'vue'
-import { fetchTermOfPricingListService } from '../services/termofpricing.service'
+import { fetchTermOfPricingListService } from '../services/termOfPricing.service'
 
-export const useTermOfPricingData = () => {
-  const rows = ref([])
+export function useTermOfPricingData() {
+  const items = ref([])
   const loading = ref(false)
   const error = ref('')
 
-  const loadRows = async (params = {}) => {
+  const loadItems = async (params = {}) => {
     loading.value = true
     error.value = ''
-
     try {
-      const response = await fetchTermOfPricingListService(params)
-
-      rows.value = Array.isArray(response) ? response : []
+      items.value = await fetchTermOfPricingListService(params)
     } catch (err) {
-      rows.value = []
-      error.value = err?.response?.data?.message || err?.message || 'Failed to load TermOfPricing list'
+      error.value = err?.response?.data?.message || err?.message || 'Failed to load data'
+      items.value = []
       throw err
     } finally {
       loading.value = false
@@ -24,9 +21,9 @@ export const useTermOfPricingData = () => {
   }
 
   return {
-    rows,
+    items,
     loading,
     error,
-    loadRows,
+    loadItems,
   }
 }

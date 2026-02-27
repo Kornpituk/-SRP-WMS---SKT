@@ -1,22 +1,19 @@
 import { ref } from 'vue'
-import { fetchContainerTypeListService } from '../services/containertype.service'
+import { fetchContainerTypeListService } from '../services/containerType.service'
 
-export const useContainerTypeData = () => {
-  const rows = ref([])
+export function useContainerTypeData() {
+  const items = ref([])
   const loading = ref(false)
   const error = ref('')
 
-  const loadRows = async (params = {}) => {
+  const loadItems = async (params = {}) => {
     loading.value = true
     error.value = ''
-
     try {
-      const response = await fetchContainerTypeListService(params)
-
-      rows.value = Array.isArray(response) ? response : []
+      items.value = await fetchContainerTypeListService(params)
     } catch (err) {
-      rows.value = []
-      error.value = err?.response?.data?.message || err?.message || 'Failed to load ContainerType list'
+      error.value = err?.response?.data?.message || err?.message || 'Failed to load data'
+      items.value = []
       throw err
     } finally {
       loading.value = false
@@ -24,9 +21,9 @@ export const useContainerTypeData = () => {
   }
 
   return {
-    rows,
+    items,
     loading,
     error,
-    loadRows,
+    loadItems,
   }
 }

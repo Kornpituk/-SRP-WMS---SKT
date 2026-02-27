@@ -1,22 +1,19 @@
 import { ref } from 'vue'
 import { fetchPortListService } from '../services/port.service'
 
-export const usePortData = () => {
-  const rows = ref([])
+export function usePortData() {
+  const items = ref([])
   const loading = ref(false)
   const error = ref('')
 
-  const loadRows = async (params = {}) => {
+  const loadItems = async (params = {}) => {
     loading.value = true
     error.value = ''
-
     try {
-      const response = await fetchPortListService(params)
-
-      rows.value = Array.isArray(response) ? response : []
+      items.value = await fetchPortListService(params)
     } catch (err) {
-      rows.value = []
-      error.value = err?.response?.data?.message || err?.message || 'Failed to load Port list'
+      error.value = err?.response?.data?.message || err?.message || 'Failed to load data'
+      items.value = []
       throw err
     } finally {
       loading.value = false
@@ -24,9 +21,9 @@ export const usePortData = () => {
   }
 
   return {
-    rows,
+    items,
     loading,
     error,
-    loadRows,
+    loadItems,
   }
 }
