@@ -36,7 +36,7 @@ export const MENU_LIST = [
   },
   {
     title: 'Master Setting',
-    icon: { icon: 'mdi-file-document-outline' },
+    icon: { icon: 'ri-settings-3-line' },
     children: [
       { title: 'Forwarder', to: 'skt-settingMaster-forwarder' },
       { title: 'Term of Payment', to: 'skt-settingMaster-termOfPayment' },
@@ -53,3 +53,4 @@ export const MENU_LIST = [
     ],
   },
 ]
+
