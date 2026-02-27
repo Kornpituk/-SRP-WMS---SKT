@@ -34,4 +34,22 @@ export const MENU_LIST = [
       { title: 'Product Label', to: 'skt-printLabel-productionLabel' },
     ],
   },
+  {
+    title: 'Master Setting',
+    icon: { icon: 'mdi-file-document-outline' },
+    children: [
+      { title: 'Forwarder', to: 'skt-settingMaster-forwarder' },
+      { title: 'Term of Payment', to: 'skt-settingMaster-termOfPayment' },
+      { title: 'Port', to: 'skt-settingMaster-port' },
+      { title: 'Term of Pricing', to: 'skt-settingMaster-termOfPricing' },
+      { title: 'Currency', to: 'skt-settingMaster-currency' },
+      { title: 'Container Type', to: 'skt-settingMaster-containerType' },
+      { title: 'Package', to: 'skt-settingMaster-package' },
+      { title: 'HS Code No', to: 'skt-settingMaster-hsCodeNo' },
+      { title: 'Bank Account No.', to: 'skt-settingMaster-bankAccountNo' },
+      { title: 'Shipping Mode', to: 'skt-settingMaster-shippingMode' },
+      { title: 'Carrier', to: 'skt-settingMaster-carrier' },
+      { title: 'Sale Person', to: 'skt-settingMaster-salePerson' },
+    ],
+  },
 ]

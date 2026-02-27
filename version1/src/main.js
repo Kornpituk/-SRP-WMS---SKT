@@ -30,7 +30,7 @@ import resizable from './plugins/resizable/resizable' // Import resizable direct
 
 import VueEasyLightbox from 'vue-easy-lightbox'
 
-// import VuePdfEmbed from 'vue-pdf-embed'
+import { useAuthExStore } from '@/stores/AuthExpireStore' // ปรับ path ตามโครงสร้างโปรเจคของคุณ
 
 loadFonts()
 
@@ -64,6 +64,11 @@ app.component('VueDatePicker', VueDatePicker) // Vue DateTimePick  New Import
 app.use(abilitiesPlugin, ability, {
   useGlobalProperties: true,
 })
+
+const authStore = useAuthExStore()
+
+authStore.restoreSession()
+
 
 // Mount vue app
 app.mount('#app')
