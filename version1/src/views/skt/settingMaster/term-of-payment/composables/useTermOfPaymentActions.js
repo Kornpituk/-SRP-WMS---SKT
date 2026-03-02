@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { createService, deleteService, updateService } from '../services/termOfPayment.service'
+import { createService, deleteService, updateService } from '../services/termofpayment.service'
 
 export function useActions() {
   const submitting = ref(false)
