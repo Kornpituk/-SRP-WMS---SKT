@@ -1,22 +1,19 @@
 import { ref } from 'vue'
 import { fetchCurrencyListService } from '../services/currency.service'
 
-export const useCurrencyData = () => {
-  const rows = ref([])
+export function useCurrencyData() {
+  const items = ref([])
   const loading = ref(false)
   const error = ref('')
 
-  const loadRows = async (params = {}) => {
+  const loadItems = async (params = {}) => {
     loading.value = true
     error.value = ''
-
     try {
-      const response = await fetchCurrencyListService(params)
-
-      rows.value = Array.isArray(response) ? response : []
+      items.value = await fetchCurrencyListService(params)
     } catch (err) {
-      rows.value = []
-      error.value = err?.response?.data?.message || err?.message || 'Failed to load Currency list'
+      error.value = err?.response?.data?.message || err?.message || 'Failed to load data'
+      items.value = []
       throw err
     } finally {
       loading.value = false
@@ -24,9 +21,9 @@ export const useCurrencyData = () => {
   }
 
   return {
-    rows,
+    items,
     loading,
     error,
-    loadRows,
+    loadItems,
   }
 }

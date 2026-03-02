@@ -1,0 +1,42 @@
+export const fields = [
+  {
+    key: 'abb',
+    label: 'ABB',
+    type: 'text',
+    required: true,
+    width: '80px',
+    searchable: true,
+  },
+  {
+    key: 'forwarderName',
+    label: 'Forwarder Name',
+    type: 'text',
+    required: true,
+    width: '250px',
+    searchable: true,
+  },
+  {
+    key: 'address',
+    label: 'Address',
+    type: 'textarea',
+    required: true,
+    width: '300px',
+    searchable: true,
+  },
+  {
+    key: 'contactName',
+    label: 'Contact Name',
+    type: 'text',
+    required: true,
+    width: '150px',
+    searchable: true,
+  },
+  {
+    key: 'contactNo',
+    label: 'Contact No.',
+    type: 'text',
+    required: true,
+    width: '150px',
+    searchable: true,
+  },
+]

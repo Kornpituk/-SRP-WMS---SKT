@@ -1,22 +1,19 @@
 import { ref } from 'vue'
 import { fetchCarrierListService } from '../services/carrier.service'
 
-export const useCarrierData = () => {
-  const rows = ref([])
+export function useCarrierData() {
+  const items = ref([])
   const loading = ref(false)
   const error = ref('')
 
-  const loadRows = async (params = {}) => {
+  const loadItems = async (params = {}) => {
     loading.value = true
     error.value = ''
-
     try {
-      const response = await fetchCarrierListService(params)
-
-      rows.value = Array.isArray(response) ? response : []
+      items.value = await fetchCarrierListService(params)
     } catch (err) {
-      rows.value = []
-      error.value = err?.response?.data?.message || err?.message || 'Failed to load Carrier list'
+      error.value = err?.response?.data?.message || err?.message || 'Failed to load data'
+      items.value = []
       throw err
     } finally {
       loading.value = false
@@ -24,9 +21,9 @@ export const useCarrierData = () => {
   }
 
   return {
-    rows,
+    items,
     loading,
     error,
-    loadRows,
+    loadItems,
   }
 }

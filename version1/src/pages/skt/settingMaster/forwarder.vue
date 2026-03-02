@@ -1,5 +1,5 @@
 <script setup>
-import ForwarderView from '@/views/skt/settingMaster/forwarder/ForwarderView.vue'
+import ForwarderView from '@/views/skt/settingMaster/forwarder/Forwarder.vue'
 </script>
 
 <template>
