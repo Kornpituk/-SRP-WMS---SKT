@@ -18,7 +18,7 @@ const maybeThrowMockError = () => {
 }
 
 
-const mockRowTable = [
+let mockRowTable = [
   { 
     id: 1, 
     abb: "MPL", 
@@ -64,7 +64,7 @@ const createMock = async payload => {
   await wait(MOCK_DELAY)
   maybeThrowMockError()
 
-  const id = mockRows.length ? Math.max(...mockRows.map(item => item.id)) + 1 : 1
+  const id = mockRowTable.length ? Math.max(...mockRowTable.map(item => item.id)) + 1 : 1
   const now = new Date().toISOString().slice(0, 10)
 
   const next = {
@@ -75,7 +75,7 @@ const createMock = async payload => {
     updatedAt: now,
   }
 
-  mockRows = [next, ...mockRows]
+  mockRowTable = [next, ...mockRowTable]
 
   return next
 }
@@ -86,19 +86,19 @@ const updateMock = async (id, payload) => {
 
   const now = new Date().toISOString().slice(0, 10)
 
-  mockRows = mockRows.map(item =>
+  mockRowTable = mockRowTable.map(item =>
     item.id === id
       ? { ...item, ...payload, updatedAt: now }
       : item,
   )
 
-  return mockRows.find(item => item.id === id)
+  return mockRowTable.find(item => item.id === id)
 }
 
 const deleteMock = async id => {
   await wait(MOCK_DELAY)
   maybeThrowMockError()
-  mockRows = mockRows.filter(item => item.id !== id)
+  mockRowTable = mockRowTable.filter(item => item.id !== id)
 
   return { success: true }
 }

@@ -1,10 +1,10 @@
 // src/views/TermOfPayment/services/termOfPaymentAdapter.js
 
 import {
-  fetchTermOfPaymentListService,
-  createTermOfPaymentService,
-  updateTermOfPaymentService,
-  deleteTermOfPaymentService,
+  fetchListService,
+  createService,
+  updateService,
+  deleteService,
 } from './termOfPayment.service'
 
 /**
@@ -14,14 +14,14 @@ import {
  */
 export const termOfPaymentService = {
   // BaseMasterCrud เรียก service.getList(params)
-  getList: params => fetchTermOfPaymentListService(params),
+  getList: params => fetchListService(params),
 
   // BaseMasterCrud เรียก service.create(payload)
-  create: payload => createTermOfPaymentService(payload),
+  create: payload => createService(payload),
 
   // BaseMasterCrud เรียก service.update(id, payload)
-  update: (id, payload) => updateTermOfPaymentService(id, payload),
+  update: (id, payload) => updateService(id, payload),
 
   // BaseMasterCrud เรียก service.delete(id)
-  delete: id => deleteTermOfPaymentService(id),
+  delete: id => deleteService(id),
 }

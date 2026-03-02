@@ -1,15 +1,14 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { useTermOfPaymentActions } from './composables/useTermOfPaymentActions'
-import { useTermOfPaymentData } from './composables/useTermOfPaymentData'
+import { useActions } from './composables/useTermOfPaymentActions'
+import { useData } from './composables/useTermOfPaymentData'
 import  BaseMasterCrud  from '../components/BaseMasterCrud.vue'
-import { useMasterCrud } from '../components/useMasterCrud'
 import { termOfPaymentService } from './services/termOfPaymentAdapter'
 import  { fields } from './types/TermOfPaymentView'
 
 const pageTitle = 'Term of Payment'
-const { items, loading, error, loadItems } = useTermOfPaymentData()
-const { submitting, saveItem, removeItem } = useTermOfPaymentActions()
+const { items, loading, error, loadItems } = useData()
+const { submitting, saveItem, removeItem } = useActions()
 const dialog = ref(false)
 const deleteDialog = ref(false)
 const formRef = ref()

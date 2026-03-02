@@ -1,16 +1,16 @@
 import { ref } from 'vue'
-import { createTermOfPaymentService, deleteTermOfPaymentService, updateTermOfPaymentService } from '../services/termOfPayment.service'
+import { createService, deleteService, updateService } from '../services/termOfPayment.service'
 
-export function useTermOfPaymentActions() {
+export function useActions() {
   const submitting = ref(false)
 
   const saveItem = async payload => {
     submitting.value = true
     try {
       if (payload?.id)
-        return await updateTermOfPaymentService(payload.id, payload)
+        return await updateService(payload.id, payload)
 
-      return await createTermOfPaymentService(payload)
+      return await createService(payload)
     } finally {
       submitting.value = false
     }
@@ -19,7 +19,7 @@ export function useTermOfPaymentActions() {
   const removeItem = async id => {
     submitting.value = true
     try {
-      return await deleteTermOfPaymentService(id)
+      return await deleteService(id)
     } finally {
       submitting.value = false
     }
