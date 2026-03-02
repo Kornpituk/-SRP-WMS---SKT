@@ -1,294 +1,360 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useHsCodeNoActions } from './composables/useHsCodeNoActions'
 import { useHsCodeNoData } from './composables/useHsCodeNoData'
 
-const search = reactive({
-  keyword: '',
+const pageTitle = 'HS Code'
+const { items, loading, error, loadItems } = useHsCodeNoData()
+const { submitting, saveItem, removeItem } = useHsCodeNoActions()
+const dialog = ref(false)
+const deleteDialog = ref(false)
+const formRef = ref()
+const selected = ref(null)
+const search = ref('')
+
+const snackbar = ref({
+  show: false,
+  color: 'success',
+  text: '',
 })
 
-const { rows, loading, error, loadRows } = useHsCodeNoData()
-
-const applySearch = async () => {
-  await loadRows({
-    keyword: search.keyword,
-  })
-}
-
-const setError = message => {
-  error.value = message
-}
-
-const {
-  dialogOpen,
-  confirmDeleteOpen,
-  submitting,
-  deleting,
-  form,
-  snackbar,
-  openCreateDialog,
-  openEditDialog,
-  closeDialog,
-  saveItem,
-  openDeleteDialog,
-  closeDeleteDialog,
-  removeItem,
-} = useHsCodeNoActions(applySearch, setError)
+const form = ref({
+  id: null,
+  code: '',
+  name: '',
+  description: '',
+  contactName: '',
+  contactNo: '',
+  status: 'ACTIVE',
+})
 
 const headers = [
   { title: 'Code', key: 'code' },
-  { title: 'Name', key: 'name' },
-  { title: 'Description', key: 'description' },
+  { title: 'HS Code', key: 'name' },
   { title: 'Contact Name', key: 'contactName' },
   { title: 'Contact No.', key: 'contactNo' },
-  { title: 'Status', key: 'active' },
-  { title: 'Actions', key: 'actions', sortable: false, width: 160 },
+  { title: 'Status', key: 'status', align: 'center' },
+  { title: 'Updated At', key: 'updatedAt' },
+  { title: 'Action', key: 'actions', sortable: false, align: 'end' },
 ]
 
-const hasData = computed(() => rows.value.length > 0)
-
-onMounted(async () => {
-  try {
-    await applySearch()
-  } catch (err) {
-    // error state is already handled in composable
-  }
+const filteredItems = computed(() => {
+  if (!search.value)
+    return items.value
+  const keyword = search.value.toLowerCase()
+  
+  return items.value.filter(item =>
+    [item.code, item.name, item.contactName, item.contactNo, item.status]
+      .filter(Boolean)
+      .some(value => String(value).toLowerCase().includes(keyword)),
+  )
 })
+
+const isEmptyState = computed(() => !loading.value && !error.value && filteredItems.value.length === 0)
+
+const resetForm = () => {
+  form.value = { id: null, code: '', name: '', description: '', contactName: '', contactNo: '', status: 'ACTIVE' }
+}
+
+const openCreate = () => {
+  resetForm()
+  dialog.value = true
+}
+
+const openEdit = row => {
+  form.value = {
+    id: row.id,
+    code: row.code || '',
+    name: row.name || '',
+    description: row.description || '',
+    contactName: row.contactName || '',
+    contactNo: row.contactNo || '',
+    status: row.status || 'ACTIVE',
+  }
+  dialog.value = true
+}
+
+const askDelete = row => {
+  selected.value = row
+  deleteDialog.value = true
+}
+
+const showSnack = (text, color = 'success') => {
+  snackbar.value = { show: true, text, color }
+}
+
+const submitForm = async () => {
+  const valid = await formRef.value?.validate()
+  if (valid && !valid.valid)
+    return
+  try {
+    await saveItem(form.value)
+    dialog.value = false
+    await loadItems()
+    showSnack('Saved successfully')
+  } catch (err) {
+    showSnack(err?.response?.data?.message || err?.message || 'Save failed', 'error')
+  }
+}
+
+const confirmDelete = async () => {
+  if (!selected.value?.id)
+    return
+  try {
+    await removeItem(selected.value.id)
+    deleteDialog.value = false
+    selected.value = null
+    await loadItems()
+    showSnack('Deleted successfully')
+  } catch (err) {
+    showSnack(err?.response?.data?.message || err?.message || 'Delete failed', 'error')
+  }
+}
+
+const reload = async () => {
+  try {
+    await loadItems()
+  } catch (err) {
+    showSnack(err?.response?.data?.message || err?.message || 'Unable to load data', 'error')
+  }
+}
+
+onMounted(reload)
 </script>
 
 <template>
-  <VContainer fluid>
-    <VRow>
-      <VCol cols="12">
-        <VCard>
-          <VCardTitle class="d-flex align-center justify-space-between gap-4 flex-wrap">
-            <span>HS Code No</span>
-            <VBtn
-              color="primary"
-              prepend-icon="ri-add-line"
-              @click="openCreateDialog"
+  <VContainer
+    fluid
+    class="setting-master-page"
+  >
+    <div class="setting-master-content">
+      <section class="setting-section">
+        <div class="page-head">
+          <h1 class="page-title">
+            {{ pageTitle }}
+          </h1>
+          <VBtn
+            color="primary"
+            class="action-btn add-btn"
+            @click="openCreate"
+          >
+            Add {{ pageTitle }}
+          </VBtn>
+        </div>
+      </section>
+      <section class="setting-section">
+        <VCard
+          elevation="1"
+          class="setting-card"
+        >
+          <div class="section-title">
+            HS Code List
+          </div>
+          <VTextField
+            v-model="search"
+            density="comfortable"
+            variant="outlined"
+            hide-details
+            placeholder="Search by code, name or contact"
+            class="search-field"
+          />
+          <VAlert
+            v-if="error"
+            type="error"
+            variant="tonal"
+            class="mb-4"
+          >
+            {{ error }}
+          </VAlert>
+          <VSkeletonLoader
+            v-if="loading"
+            type="table"
+          />
+          <template v-else>
+            <div
+              v-if="isEmptyState"
+              class="empty-state"
             >
-              Create
-            </VBtn>
-          </VCardTitle>
-          <VCardText>
-            <VRow>
-              <VCol
-                cols="12"
-                md="4"
-              >
-                <VTextField
-                  v-model="search.keyword"
-                  label="Search"
-                  clearable
-                  density="comfortable"
-                  @keyup.enter="applySearch"
-                />
-              </VCol>
-              <VCol
-                cols="12"
-                md="8"
-                class="d-flex align-center justify-end gap-2"
-              >
-                <VBtn
-                  color="primary"
-                  variant="tonal"
-                  @click="applySearch"
-                >
-                  Search
-                </VBtn>
-                <VBtn
-                  color="secondary"
-                  variant="text"
-                  @click="() => { search.keyword = ''; applySearch() }"
-                >
-                  Clear
-                </VBtn>
-              </VCol>
-            </VRow>
-
-            <VAlert
-              v-if="error"
-              type="error"
-              class="mb-4"
-              variant="tonal"
-            >
-              {{ error }}
-            </VAlert>
-
+              No data found
+            </div>
             <VDataTable
+              v-else
+              density="compact"
+              class="setting-table"
               :headers="headers"
-              :items="rows"
-              :loading="loading"
-              class="text-no-wrap"
-              item-key="id"
+              :items="filteredItems"
+              :items-per-page="10"
             >
-              <template #item.active="{ item }">
+              <template #item.status="{ item }">
                 <VChip
-                  :color="item.active ? 'success' : 'error'"
                   size="small"
+                  :color="item.status === 'ACTIVE' ? 'success' : 'grey'"
+                  variant="tonal"
                 >
-                  {{ item.active ? 'Active' : 'Inactive' }}
+                  {{ item.status }}
                 </VChip>
               </template>
-
               <template #item.actions="{ item }">
-                <div class="d-flex gap-2">
+                <div class="table-actions">
                   <VBtn
-                    size="small"
-                    color="warning"
-                    variant="tonal"
-                    @click="openEditDialog(item)"
+                    variant="text"
+                    color="primary"
+                    class="action-btn edit-btn"
+                    @click="openEdit(item)"
                   >
                     Edit
                   </VBtn>
                   <VBtn
-                    size="small"
                     color="error"
-                    variant="tonal"
-                    @click="openDeleteDialog(item)"
+                    class="action-btn delete-btn"
+                    @click="askDelete(item)"
                   >
                     Delete
                   </VBtn>
                 </div>
               </template>
-
-              <template #no-data>
-                <div class="py-8 text-center">
-                  <p class="text-medium-emphasis mb-0">
-                    {{ loading ? 'Loading data...' : 'No records found' }}
-                  </p>
-                </div>
-              </template>
             </VDataTable>
-            <VAlert
-              v-if="!loading && !error && !hasData"
-              type="info"
-              variant="tonal"
-              class="mt-4"
-            >
-              No data available. Create a new record to get started.
-            </VAlert>
-          </VCardText>
+          </template>
         </VCard>
-      </VCol>
-    </VRow>
-
+      </section>
+    </div>
     <VDialog
-      v-model="dialogOpen"
-      max-width="720"
+      v-model="dialog"
+      max-width="500"
     >
-      <VCard>
-        <VCardTitle>{{ form.id ? 'Edit' : 'Create' }} HS Code No</VCardTitle>
-        <VCardText>
-          <VRow>
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <VTextField
-                v-model="form.code"
-                label="Code"
-                density="comfortable"
-              />
-            </VCol>
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <VTextField
-                v-model="form.name"
-                label="Name"
-                density="comfortable"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VTextarea
-                v-model="form.description"
-                label="Description"
-                rows="3"
-                density="comfortable"
-              />
-            </VCol>
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <VTextField
-                v-model="form.contactName"
-                label="Contact Name"
-                density="comfortable"
-              />
-            </VCol>
-            <VCol
-              cols="12"
-              md="6"
-            >
-              <VTextField
-                v-model="form.contactNo"
-                label="Contact No."
-                density="comfortable"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VSwitch
-                v-model="form.active"
-                label="Active"
-                inset
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-        <VCardActions class="justify-end">
+      <VCard
+        elevation="1"
+        class="setting-card dialog-card"
+      >
+        <div class="section-title">
+          {{ form.id ? `Edit ${pageTitle}` : `Add ${pageTitle}` }}
+        </div>
+        <VForm ref="formRef">
+          <div class="dialog-fields">
+            <VTextField
+              v-model="form.code"
+              label="Code"
+              :rules="[v => !!v || 'Code is required']"
+            />
+            <VTextField
+              v-model="form.name"
+              :label="pageTitle"
+              :rules="[v => !!v || `${pageTitle} is required`]"
+            />
+            <VTextField
+              v-model="form.description"
+              label="Description"
+            />
+            <VTextField
+              v-model="form.contactName"
+              label="Contact Name"
+            />
+            <VTextField
+              v-model="form.contactNo"
+              label="Contact No."
+            />
+            <VSelect
+              v-model="form.status"
+              :items="['ACTIVE', 'INACTIVE']"
+              label="Status"
+            />
+          </div>
+        </VForm>
+        <VCardActions class="dialog-actions">
           <VBtn
             variant="text"
-            @click="closeDialog"
+            class="action-btn"
+            @click="dialog = false"
           >
             Cancel
           </VBtn>
           <VBtn
             color="primary"
+            class="action-btn"
             :loading="submitting"
-            @click="saveItem"
+            @click="submitForm"
           >
             Save
           </VBtn>
         </VCardActions>
       </VCard>
     </VDialog>
-
     <VDialog
-      v-model="confirmDeleteOpen"
-      max-width="420"
+      v-model="deleteDialog"
+      max-width="500"
     >
-      <VCard>
-        <VCardTitle>Delete HS Code No</VCardTitle>
-        <VCardText>Are you sure you want to delete this item?</VCardText>
-        <VCardActions class="justify-end">
+      <VCard
+        elevation="1"
+        class="setting-card dialog-card"
+      >
+        <div class="section-title text-center">
+          Confirm Delete
+        </div>
+        <div class="delete-message">
+          Do you want to delete <strong>{{ selected?.name || '-' }}</strong>?
+        </div>
+        <VCardActions class="dialog-actions justify-center">
           <VBtn
             variant="text"
-            @click="closeDeleteDialog"
+            class="action-btn"
+            @click="deleteDialog = false"
           >
             Cancel
           </VBtn>
           <VBtn
             color="error"
-            :loading="deleting"
-            @click="removeItem"
+            class="action-btn"
+            :loading="submitting"
+            @click="confirmDelete"
           >
-            Confirm
+            Delete
           </VBtn>
         </VCardActions>
       </VCard>
     </VDialog>
-
     <VSnackbar
       v-model="snackbar.show"
       :color="snackbar.color"
       timeout="3000"
-      location="top end"
     >
-      {{ snackbar.message }}
+      {{ snackbar.text }}
     </VSnackbar>
   </VContainer>
 </template>
+
+<style scoped>
+.setting-master-page {
+  padding: 24px;
+}
+.setting-master-content { max-width: 1440px; margin: 0 auto; }
+.setting-section + .setting-section { margin-top: 32px; }
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.page-title { margin: 0; font-size: 20px; font-weight: 600; line-height: 28px; }
+.section-title { margin: 0 0 16px; font-size: 16px; font-weight: 500; line-height: 24px; }
+.setting-card { border-radius: 8px; padding: 24px; }
+.search-field {
+  margin-bottom: 16px;
+}
+.empty-state { color: rgb(var(--v-theme-on-surface), 0.6); text-align: center; padding: 32px 0; }
+.action-btn { min-height: 40px; border-radius: 8px; text-transform: none; }
+.add-btn {
+  padding-inline: 18px;
+}
+.delete-btn {
+  min-width: 84px;
+}
+.table-actions { display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+.dialog-card {
+  border-radius: 8px;
+}
+.dialog-fields { display: grid; gap: 16px; }
+.dialog-actions { margin-top: 16px; gap: 8px; }
+.delete-message { margin: 12px 0 8px; text-align: center; font-size: 15px; }
+:deep(.setting-table .v-data-table-header th) { font-size: 14px; font-weight: 600; }
+:deep(.setting-table tbody tr:hover td) { background: #f6f8fa; }
+</style>

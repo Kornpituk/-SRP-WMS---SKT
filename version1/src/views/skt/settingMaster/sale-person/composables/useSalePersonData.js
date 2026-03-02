@@ -1,22 +1,19 @@
 import { ref } from 'vue'
-import { fetchSalePersonListService } from '../services/saleperson.service'
+import { fetchSalePersonListService } from '../services/salePerson.service'
 
-export const useSalePersonData = () => {
-  const rows = ref([])
+export function useSalePersonData() {
+  const items = ref([])
   const loading = ref(false)
   const error = ref('')
 
-  const loadRows = async (params = {}) => {
+  const loadItems = async (params = {}) => {
     loading.value = true
     error.value = ''
-
     try {
-      const response = await fetchSalePersonListService(params)
-
-      rows.value = Array.isArray(response) ? response : []
+      items.value = await fetchSalePersonListService(params)
     } catch (err) {
-      rows.value = []
-      error.value = err?.response?.data?.message || err?.message || 'Failed to load SalePerson list'
+      error.value = err?.response?.data?.message || err?.message || 'Failed to load data'
+      items.value = []
       throw err
     } finally {
       loading.value = false
@@ -24,9 +21,9 @@ export const useSalePersonData = () => {
   }
 
   return {
-    rows,
+    items,
     loading,
     error,
-    loadRows,
+    loadItems,
   }
 }

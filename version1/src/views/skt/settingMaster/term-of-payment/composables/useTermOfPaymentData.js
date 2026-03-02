@@ -1,22 +1,19 @@
 import { ref } from 'vue'
-import { fetchTermOfPaymentListService } from '../services/termofpayment.service'
+import { fetchListService } from '../services/termOfPayment.service'
 
-export const useTermOfPaymentData = () => {
-  const rows = ref([])
+export function useData() {
+  const items = ref([])
   const loading = ref(false)
   const error = ref('')
 
-  const loadRows = async (params = {}) => {
+  const loadItems = async (params = {}) => {
     loading.value = true
     error.value = ''
-
     try {
-      const response = await fetchTermOfPaymentListService(params)
-
-      rows.value = Array.isArray(response) ? response : []
+      items.value = await fetchListService(params)
     } catch (err) {
-      rows.value = []
-      error.value = err?.response?.data?.message || err?.message || 'Failed to load TermOfPayment list'
+      error.value = err?.response?.data?.message || err?.message || 'Failed to load data'
+      items.value = []
       throw err
     } finally {
       loading.value = false
@@ -24,9 +21,9 @@ export const useTermOfPaymentData = () => {
   }
 
   return {
-    rows,
+    items,
     loading,
     error,
-    loadRows,
+    loadItems,
   }
 }
