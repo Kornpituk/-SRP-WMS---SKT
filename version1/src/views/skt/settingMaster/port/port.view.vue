@@ -1,14 +1,14 @@
 <template>
   <BaseMasterCrud
-    title="Forwarder"
+    title="Port"
     :fields="fields"
-    :service="forwarderService"
+    :service="ProtService"
     delete-name-key="id"
   />
 </template>
 
 <script setup>
 import BaseMasterCrud           from '../components/BaseMasterCrud.vue'
-import { fields }               from './field/Field'
-import { forwarderService } from './services/Forwarder.service'
+import { fields }               from './types/port.types'
+import { ProtService } from './services/port.service'
 </script>

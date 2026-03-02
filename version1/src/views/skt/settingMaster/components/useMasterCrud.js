@@ -2,89 +2,134 @@
  * useMasterCrud.js
  * ─────────────────────────────────────────────────────────────────
  * Composable หลักที่เก็บ logic ทั้งหมดของ BaseMasterCrud
- * ทุก component ย่อยรับ state / fn มาจาก composable นี้เท่านั้น
  * ─────────────────────────────────────────────────────────────────
+ *
+ * PAGINATION STRATEGY
+ * ───────────────────
+ * รองรับ 2 โหมดอัตโนมัติ:
+ *
+ * 1. Client-side (Mock / API คืน array)
+ *    service.getList() → []
+ *    → เราทำ slice เองใน composable
+ *
+ * 2. Server-side (API คืน paginated object)
+ *    service.getList({ page, perPage }) → { data: [], total: N }
+ *    → ใช้ total จาก response โดยตรง
+ *
+ * สลับโหมดอัตโนมัติ ไม่ต้องตั้งค่าอะไรเพิ่ม
  */
 import { ref, reactive, computed, onMounted } from 'vue'
 
-/**
- * @param {object} props - props ของ BaseMasterCrud (title, fields, service)
- * @param {function} emit - emit ของ BaseMasterCrud
- */
 export function useMasterCrud (props, emit) {
 
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
   // DERIVED FIELD SETS
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
 
-  /** คอลัมน์ในตาราง (ไม่รวม hideInTable) */
   const tableFields = computed(() =>
     props.fields.filter(f => !f.hideInTable),
   )
 
-  /** ช่องค้นหา (searchable !== false, max 3 ช่อง) */
   const searchFields = computed(() => {
     const candidates = props.fields.filter(
       f => f.searchable !== false && !f.hideInTable,
     )
+
     
     return candidates.slice(0, 3)
   })
 
-  // ───────────────────────────────────────────────
-  // STATE
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
+  // CORE STATE
+  // ─────────────────────────────────────────────
 
   const items    = ref([])
   const loading  = ref(false)
   const saving   = ref(false)
   const deleting = ref(false)
 
-  // Search bar
+  // ─────────────────────────────────────────────
+  // PAGINATION STATE
+  // ─────────────────────────────────────────────
+
+  const currentPage   = ref(1)
+  const itemsPerPage  = ref(10)
+  const totalItems    = ref(0)
+
+  /** ตัวเลือก rows/page ที่แสดงใน dropdown */
+  const perPageOptions = [10, 25, 50, 100]
+
+  /** จำนวนหน้าทั้งหมด */
+  const totalPages = computed(() =>
+    Math.max(1, Math.ceil(totalItems.value / itemsPerPage.value)),
+  )
+
+  /** ข้อความ "Showing X – Y of Z entries" */
+  const paginationInfo = computed(() => {
+    if (totalItems.value === 0) return 'No entries'
+    const from = (currentPage.value - 1) * itemsPerPage.value + 1
+    const to   = Math.min(currentPage.value * itemsPerPage.value, totalItems.value)
+    
+    return `Showing ${from} – ${to} of ${totalItems.value} entries`
+  })
+
+  // ─────────────────────────────────────────────
+  // SEARCH / FILTER STATE
+  // ─────────────────────────────────────────────
+
   const showSearch   = ref(false)
   const searchParams = reactive({})
 
-  // Create dialog
+  // ─────────────────────────────────────────────
+  // CREATE DIALOG STATE
+  // ─────────────────────────────────────────────
+
   const showCreateDialog = ref(false)
   const createForm       = reactive({})
-  const createFormRef    = ref(null)   // ref ของ <v-form> ใน MasterCreateDialog
+  const createFormRef    = ref(null)
 
-  // Inline edit
+  // ─────────────────────────────────────────────
+  // INLINE EDIT STATE
+  // ─────────────────────────────────────────────
+
   const editingInlineId = ref(null)
   const inlineForm      = reactive({})
 
-  // Delete dialog
+  // ─────────────────────────────────────────────
+  // DELETE DIALOG STATE
+  // ─────────────────────────────────────────────
+
   const showDeleteDialog = ref(false)
   const deleteTarget     = ref(null)
 
-  /**
-   * ชื่อที่แสดงใน delete dialog เช่น "ABC Logistics"
-   * ดึงจาก deleteNameKey prop (default: 'name')
-   * fallback: code → id
-   */
   const deleteItemName = computed(() => {
     if (!deleteTarget.value) return ''
     const key = props.deleteNameKey || 'name'
     
     return (
-      deleteTarget.value[key] ||
-      deleteTarget.value['name'] ||
-      deleteTarget.value['code'] ||
+      deleteTarget.value[key]     ||
+      deleteTarget.value['name']  ||
+      deleteTarget.value['code']  ||
       String(deleteTarget.value.id || '')
     )
   })
 
-  // Snackbar
+  // ─────────────────────────────────────────────
+  // SNACKBAR
+  // ─────────────────────────────────────────────
+
   const snackbar = reactive({ show: false, message: '', color: 'success' })
 
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
   // HELPERS
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
 
   function buildEmptyForm () {
     const form = {}
 
-    props.fields.forEach(f => { form[f.key] = '' })
+    props.fields
+      .filter(f => !f.hideInForm)
+      .forEach(f => { form[f.key] = '' })
     
     return form
   }
@@ -97,16 +142,38 @@ export function useMasterCrud (props, emit) {
 
   const requiredRule = v => !!v || 'This field is required'
 
-  // ───────────────────────────────────────────────
-  // LOAD DATA
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
+  // LOAD DATA  (รองรับ client-side + server-side pagination)
+  // ─────────────────────────────────────────────
 
   async function loadData () {
     loading.value = true
     try {
-      const res = await props.service.getList({ ...searchParams })
+      const params = {
+        ...searchParams,
+        page: currentPage.value,
+        perPage: itemsPerPage.value,
+      }
 
-      items.value = res?.data ?? res ?? []
+      const res = await props.service.getList(params)
+
+      // ── Server-side: { data: [], total: N } ──
+      if (res && !Array.isArray(res) && Array.isArray(res.data)) {
+        items.value      = res.data
+        totalItems.value = res.total ?? res.data.length
+      }
+
+      // ── Client-side: [] (mock returns full array) ──
+      else {
+        const all        = Array.isArray(res) ? res : []
+
+        totalItems.value = all.length
+
+        const start   = (currentPage.value - 1) * itemsPerPage.value
+
+        items.value   = all.slice(start, start + itemsPerPage.value)
+      }
+
     } catch (err) {
       showNotification('Failed to load data', 'error')
       console.error('[useMasterCrud] loadData error', err)
@@ -115,26 +182,44 @@ export function useMasterCrud (props, emit) {
     }
   }
 
-  // ───────────────────────────────────────────────
-  // SEARCH
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
+  // PAGINATION ACTIONS
+  // ─────────────────────────────────────────────
+
+  function goToPage (page) {
+    if (page < 1 || page > totalPages.value) return
+    currentPage.value = page
+    loadData()
+  }
+
+  function changePerPage (val) {
+    itemsPerPage.value = val
+    currentPage.value  = 1   // reset กลับหน้า 1 เสมอ
+    loadData()
+  }
+
+  // ─────────────────────────────────────────────
+  // SEARCH ACTIONS
+  // ─────────────────────────────────────────────
 
   function toggleSearch () {
     showSearch.value = !showSearch.value
   }
 
   async function handleSearch () {
+    currentPage.value = 1   // search ใหม่ → reset หน้า 1
     await loadData()
   }
 
   function handleClear () {
     searchFields.value.forEach(f => { searchParams[f.key] = '' })
+    currentPage.value = 1
     loadData()
   }
 
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
   // CREATE
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
 
   function openCreateDialog () {
     Object.assign(createForm, buildEmptyForm())
@@ -163,9 +248,9 @@ export function useMasterCrud (props, emit) {
     }
   }
 
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
   // INLINE EDIT
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
 
   function startInlineEdit (item) {
     editingInlineId.value = item.id
@@ -187,9 +272,9 @@ export function useMasterCrud (props, emit) {
     }
   }
 
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
   // DELETE
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
 
   function openDeleteDialog (item) {
     deleteTarget.value     = item
@@ -207,10 +292,16 @@ export function useMasterCrud (props, emit) {
     try {
       await props.service.delete(deleteTarget.value.id)
       showNotification(`${props.title} deleted successfully`)
-      if (editingInlineId.value === deleteTarget.value?.id) {
+      if (editingInlineId.value === deleteTarget.value?.id)
         editingInlineId.value = null
-      }
+
       closeDeleteDialog()
+
+      // ถ้าหน้าปัจจุบันว่างหลังลบ → ถอยหลัง 1 หน้า
+      const remainOnPage = items.value.length - 1
+      if (remainOnPage <= 0 && currentPage.value > 1)
+        currentPage.value--
+
       await loadData()
     } catch (err) {
       showNotification('Failed to delete record', 'error')
@@ -220,57 +311,68 @@ export function useMasterCrud (props, emit) {
     }
   }
 
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
   // LIFECYCLE
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
 
   onMounted(() => loadData())
 
-  // ───────────────────────────────────────────────
-  // EXPOSE ทุกอย่างให้ component ย่อยใช้
-  // ───────────────────────────────────────────────
+  // ─────────────────────────────────────────────
+  // EXPOSE
+  // ─────────────────────────────────────────────
   return {
-    // derived
+    // fields
     tableFields,
     searchFields,
 
-    // state
+    // data
     items,
     loading,
     saving,
     deleting,
 
+    // pagination
+    currentPage,
+    itemsPerPage,
+    totalItems,
+    totalPages,
+    perPageOptions,
+    paginationInfo,
+    goToPage,
+    changePerPage,
+
+    // search
     showSearch,
     searchParams,
-
-    showCreateDialog,
-    createForm,
-    createFormRef,
-
-    editingInlineId,
-    inlineForm,
-
-    showDeleteDialog,
-    deleteTarget,
-    deleteItemName,
-
-    snackbar,
-
-    // helpers
-    requiredRule,
-
-    // methods
-    loadData,
     toggleSearch,
     handleSearch,
     handleClear,
+
+    // create dialog
+    showCreateDialog,
+    createForm,
+    createFormRef,
     openCreateDialog,
     closeCreateDialog,
     submitCreate,
+
+    // inline edit
+    editingInlineId,
+    inlineForm,
     startInlineEdit,
     saveInline,
+
+    // delete dialog
+    showDeleteDialog,
+    deleteTarget,
+    deleteItemName,
     openDeleteDialog,
     closeDeleteDialog,
     confirmDelete,
+
+    // misc
+    snackbar,
+    requiredRule,
+    loadData,
   }
 }

@@ -73,10 +73,18 @@
       :inline-form="inlineForm"
       :loading="loading"
       :saving="saving"
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      :total-items="totalItems"
+      :items-per-page="itemsPerPage"
+      :per-page-options="perPageOptions"
+      :pagination-info="paginationInfo"
       @edit="startInlineEdit"
       @save="saveInline"
       @delete="openDeleteDialog"
       @inline-update="(key, val) => (inlineForm[key] = val)"
+      @update:page="goToPage"
+      @update:per-page="changePerPage"
     />
 
     <!-- ⑤ Create Dialog ──────────────────────────── -->
@@ -172,6 +180,16 @@ const {
   deleteItemName,
   snackbar,
 
+  // pagination
+  currentPage,
+  itemsPerPage,
+  totalItems,
+  totalPages,
+  perPageOptions,
+  paginationInfo,
+  goToPage,
+  changePerPage,
+
   // methods
   loadData,
   toggleSearch,
@@ -192,7 +210,10 @@ const {
 .master-crud-wrapper {
   display: flex;
   flex-direction: column;
-  background: #f5f5f5;
   block-size: 100%;
+  /* stylelint-disable-next-line order/properties-order */
+  background: #f5f5f5;
+  /* stylelint-disable-next-line string-quotes */
+  font-family: 'Segoe UI', sans-serif;
 }
 </style>
