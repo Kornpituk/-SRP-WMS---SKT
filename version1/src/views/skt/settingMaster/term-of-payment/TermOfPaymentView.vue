@@ -4,7 +4,6 @@ import { useTermOfPaymentActions } from './composables/useTermOfPaymentActions'
 import { useTermOfPaymentData } from './composables/useTermOfPaymentData'
 import  BaseMasterCrud  from '../components/BaseMasterCrud.vue'
 import { useMasterCrud } from '../components/useMasterCrud'
-import { fetchTermOfPaymentListService } from './services/termOfPayment.service'
 import { termOfPaymentService } from './services/termOfPaymentAdapter'
 import  { fields } from './types/TermOfPaymentView'
 
