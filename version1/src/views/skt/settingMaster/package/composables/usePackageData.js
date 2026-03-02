@@ -1,22 +1,19 @@
 import { ref } from 'vue'
 import { fetchPackageListService } from '../services/package.service'
 
-export const usePackageData = () => {
-  const rows = ref([])
+export function usePackageData() {
+  const items = ref([])
   const loading = ref(false)
   const error = ref('')
 
-  const loadRows = async (params = {}) => {
+  const loadItems = async (params = {}) => {
     loading.value = true
     error.value = ''
-
     try {
-      const response = await fetchPackageListService(params)
-
-      rows.value = Array.isArray(response) ? response : []
+      items.value = await fetchPackageListService(params)
     } catch (err) {
-      rows.value = []
-      error.value = err?.response?.data?.message || err?.message || 'Failed to load Package list'
+      error.value = err?.response?.data?.message || err?.message || 'Failed to load data'
+      items.value = []
       throw err
     } finally {
       loading.value = false
@@ -24,9 +21,9 @@ export const usePackageData = () => {
   }
 
   return {
-    rows,
+    items,
     loading,
     error,
-    loadRows,
+    loadItems,
   }
 }
