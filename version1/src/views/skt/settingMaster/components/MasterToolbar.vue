@@ -21,8 +21,7 @@
     <!-- ── ปุ่ม Refresh ────────────────────── -->
     <VBtn
       icon
-      variant="plain"
-      size="small"
+      variant="tonal"
       :loading="loading"
       @click="emit('refresh')"
     >

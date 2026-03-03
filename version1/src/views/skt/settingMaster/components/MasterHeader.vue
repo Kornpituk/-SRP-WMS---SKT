@@ -73,13 +73,14 @@ const emit = defineEmits([
   background: #fff;
   border-block-end: 1px solid #e0e0e0;
   padding-block: 0;
-  padding-inline: 16px;
+  padding-inline: 10px;
   /* stylelint-disable-next-line order/properties-order */
   block-size: 52px;
   /* stylelint-disable-next-line order/properties-order */
   position: relative;
   /* stylelint-disable-next-line order/properties-order */
   flex-shrink: 0;
+  border-radius: 10px;
 }
 
 .header-side {
@@ -94,10 +95,10 @@ const emit = defineEmits([
 }
 
 .page-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: bold;
   /* stylelint-disable-next-line order/properties-order */
-  color: #212121;
+  color: #000;
   letter-spacing: 0.3px;
   /* stylelint-disable-next-line order/properties-order */
   position: absolute;

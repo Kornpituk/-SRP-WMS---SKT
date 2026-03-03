@@ -43,7 +43,7 @@
       <!-- ─── thead ──────────────────────────── -->
       <thead>
         <tr>
-          <th class="col-no">
+          <th class="col-no text-center">
             No.
           </th>
           <th

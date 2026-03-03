@@ -1,150 +1,65 @@
-import axiosIns from '@axios'
-import { urlApi } from '@/api'
+import { createCrudService } from '@/views/skt/settingMaster/services/serviceUtils'
 
-const USE_MOCK = true
-const MOCK_DELAY = 500
+let mockData = [
+  { 
+    id: 1, 
+    accountNo: "123-4-56789-0", 
+    bankName: "Bangkok Bank Public Company Limited", 
+    address: "333 Silom Road, Silom, Bangrak, Bangkok 10500, Thailand", 
+    swiftCode: "BKKBTHBK",
+  },
+  { 
+    id: 2, 
+    accountNo: "9876543210", 
+    bankName: "Kasikornbank Public Company Limited", 
+    address: "1 Soi Kasikornthai, Rat Burana, Bangkok 10140, Thailand", 
+    swiftCode: "KASITHBK",
+  },
+  { 
+    id: 3, 
+    accountNo: "445566778899", 
+    bankName: "Krungsri (Bank of Ayudhya) Public Company Limited", 
+    address: "1222 Rama III Road, Bang Phongphang, Yannawa, Bangkok 10120, Thailand", 
+    swiftCode: "AYUDTHBK",
+  },
 
-const getHeaders = () => ({
-  Authorization: sessionStorage.getItem('accessToken') || '',
-  'x-location': sessionStorage.getItem('location') || '',
-})
-
-const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-const maybeThrowMockError = () => {
-  const shouldThrow = false
-  if (shouldThrow)
-    throw new Error('Mock service error')
-}
-
-const makeMockRow = (index, label) => ({
-  id: index,
-  code: 'BAN' + String(index).padStart(3, '0'),
-  name: label,
-  description: 'Bank Account master record ' + index,
-  contactName: ['Somchai K.', 'Worathida P.', 'Tossapol N.', 'Siriporn A.', 'Anongrat B.'][index % 5],
-  contactNo: '08' + (10000000 + index * 1379).toString().slice(0, 8),
-  status: index % 4 === 0 ? 'INACTIVE' : 'ACTIVE',
-  createdAt: `2024-${String((index % 12) + 1).padStart(2, '0')}-${String((index % 27) + 1).padStart(2, '0')}`,
-  updatedAt: `2025-${String(((index + 2) % 12) + 1).padStart(2, '0')}-${String(((index + 6) % 27) + 1).padStart(2, '0')}`,
-})
-
-let mockRows = [
-  makeMockRow(1, 'Kasikornbank Corporate Main Account'),
-  makeMockRow(2, 'Bangkok Bank Trade Settlement Account'),
-  makeMockRow(3, 'Krungthai Bank Payroll Account'),
-  makeMockRow(4, 'SCB Import Export Account'),
-  makeMockRow(5, 'Bank of Ayudhya Operations Account'),
-  makeMockRow(6, 'TMBThanachart Treasury Account'),
-  makeMockRow(7, 'CIMB Thai FX Settlement Account'),
-  makeMockRow(8, 'UOB Thailand Collection Account'),
-  makeMockRow(9, 'HSBC Thailand USD Account'),
-  makeMockRow(10, 'Standard Chartered THB Account'),
-  makeMockRow(11, 'Kiatnakin Phatra Reserve Account'),
-  makeMockRow(12, 'Government Savings Bank Project Account'),
-  makeMockRow(13, 'Land and Houses Bank Vendor Account'),
-  makeMockRow(14, 'SME Development Bank Working Capital'),
-  makeMockRow(15, 'Export-Import Bank Guarantee Account'),
-  makeMockRow(16, 'Siam City Bank Legacy Account'),
-  makeMockRow(17, 'Credit Agricole Clearing Account'),
-  makeMockRow(18, 'Mizuho Bangkok Branch Account'),
-  makeMockRow(19, 'MUFG International Settlement'),
-  makeMockRow(20, 'DBS Thailand Commercial Account'),
+  // เพิ่มข้อมูลตัวอย่างธนาคารอื่นๆ
+  { 
+    id: 4, 
+    accountNo: "555-1-23456-7", 
+    bankName: "Siam Commercial Bank Public Company Limited", 
+    address: "9 Ratchadapisek Road, Jatujak, Bangkok 10900, Thailand", 
+    swiftCode: "SICOTHBK",
+  },
+  { 
+    id: 5, 
+    accountNo: "888-9-87654-3", 
+    bankName: "TMBThanachart Bank Public Company Limited", 
+    address: "3000 Phahonyothin Road, Chomphon, Chatuchak, Bangkok 10900, Thailand", 
+    swiftCode: "TMBKTHBK",
+  },
+  { 
+    id: 6, 
+    accountNo: "777-2-34567-8", 
+    bankName: "United Overseas Bank (Thai) Public Company Limited", 
+    address: "191 South Sathorn Road, Sathorn, Bangkok 10120, Thailand", 
+    swiftCode: "UOVBTHBK",
+  },
+  { 
+    id: 7, 
+    accountNo: "666-3-78901-2", 
+    bankName: "CIMB Thai Bank Public Company Limited", 
+    address: "44 Langsuan Road, Lumpini, Pathumwan, Bangkok 10330, Thailand", 
+    swiftCode: "CIMBTHBK",
+  },
+  { 
+    id: 8, 
+    accountNo: "999-5-43210-1", 
+    bankName: "Standard Chartered Bank (Thai) Public Company Limited", 
+    address: "90 North Sathorn Road, Silom, Bangrak, Bangkok 10500, Thailand", 
+    swiftCode: "SCBLTHBK",
+  },
 ]
 
-const fetchMock = async () => {
-  await wait(MOCK_DELAY)
-  maybeThrowMockError()
-
-  return [...mockRows]
-}
-
-const createMock = async payload => {
-  await wait(MOCK_DELAY)
-  maybeThrowMockError()
-
-  const id = mockRows.length ? Math.max(...mockRows.map(item => item.id)) + 1 : 1
-  const now = new Date().toISOString().slice(0, 10)
-
-  const next = {
-    ...payload,
-    id,
-    status: payload.status || 'ACTIVE',
-    createdAt: payload.createdAt || now,
-    updatedAt: now,
-  }
-
-  mockRows = [next, ...mockRows]
-
-  return next
-}
-
-const updateMock = async (id, payload) => {
-  await wait(MOCK_DELAY)
-  maybeThrowMockError()
-
-  const now = new Date().toISOString().slice(0, 10)
-
-  mockRows = mockRows.map(item =>
-    item.id === id
-      ? { ...item, ...payload, updatedAt: now }
-      : item,
-  )
-
-  return mockRows.find(item => item.id === id)
-}
-
-const deleteMock = async id => {
-  await wait(MOCK_DELAY)
-  maybeThrowMockError()
-  mockRows = mockRows.filter(item => item.id !== id)
-
-  return { success: true }
-}
-
-const basePath = `${urlApi.value}/api/v1/SettingMaster/bank-account-no`
-
-export const fetchBankAccountNoListService = async (params = {}) => {
-  if (USE_MOCK)
-    return fetchMock()
-
-  const response = await axiosIns.get(basePath, {
-    params,
-    headers: getHeaders(),
-  })
-
-  return response.data?.data || response.data || []
-}
-
-export const createBankAccountNoService = async payload => {
-  if (USE_MOCK)
-    return createMock(payload)
-
-  const response = await axiosIns.post(basePath, payload, {
-    headers: getHeaders(),
-  })
-
-  return response.data
-}
-
-export const updateBankAccountNoService = async (id, payload) => {
-  if (USE_MOCK)
-    return updateMock(id, payload)
-
-  const response = await axiosIns.put(`${basePath}/${id}`, payload, {
-    headers: getHeaders(),
-  })
-
-  return response.data
-}
-
-export const deleteBankAccountNoService = async id => {
-  if (USE_MOCK)
-    return deleteMock(id)
-
-  const response = await axiosIns.delete(`${basePath}/${id}`, {
-    headers: getHeaders(),
-  })
-
-  return response.data
-}
+// ← เปลี่ยน false = ใช้ API จริง
+export const bankaccountnoService = createCrudService('bank-account-no', mockData, true)
