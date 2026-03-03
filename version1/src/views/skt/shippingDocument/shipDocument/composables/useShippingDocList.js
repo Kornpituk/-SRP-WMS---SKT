@@ -1,0 +1,86 @@
+import { ref, reactive, computed } from 'vue'
+import { fetchShippingDocs } from '../api/shippingDocument.api'
+
+const createDefaultFilters = () => ({
+  status: 'All',
+  invoiceInSAP: '',
+  invoice: '',
+  payerName: '',
+  consignee: '',
+  item: '',
+  shippingMode: '',
+  etdRange: '',
+})
+
+/**
+ * useShippingDocList
+ * @param {'list'|'void'} mode
+ */
+export function useShippingDocList(mode) {
+  const loading    = ref(false)
+  const items      = ref([])
+  const total      = ref(0)
+  const filters    = reactive(createDefaultFilters())
+  const pagination = reactive({ page: 1, itemsPerPage: 10 })
+  const sortBy     = ref([])
+
+  const statusFilterDisabled = computed(() => mode === 'void')
+
+  async function loadData() {
+    loading.value = true
+    try {
+      const { data, total: t } = await fetchShippingDocs({ ...filters }, mode)
+
+      items.value = data
+      total.value = t
+
+      console.log('items.value', items.value)
+      console.log('total.value', total.value)
+    }
+    finally {
+      loading.value = false
+    }
+  }
+
+  function handleSearch() {
+    pagination.page = 1
+    loadData()
+  }
+
+  function handleClear() {
+    Object.assign(filters, createDefaultFilters())
+    pagination.page = 1
+    pagination.itemsPerPage = 10
+    sortBy.value = []
+    loadData()
+  }
+
+  /**
+   * VDataTableServer fires @update:options on mount → initial load
+   * และ fire ซ้ำทุกครั้งที่ page/sort เปลี่ยน
+   * ไม่ต้องเรียก loadData() ใน init แยกต่างหากอีก
+   */
+  function handleUpdateOptions(options) {
+    pagination.page = options.page
+    pagination.itemsPerPage = options.itemsPerPage
+    sortBy.value = options.sortBy ?? []
+    loadData()
+  }
+
+  // ❌ ลบ loadData() ออกจากที่นี่
+  // VDataTableServer จะ fire @update:options ตอน mount เองอยู่แล้ว
+
+  return {
+    loading,
+    items,
+    total,
+    filters,
+    pagination,
+    sortBy,
+    statusFilterDisabled,
+    handleSearch,
+    handleClear,
+    handleUpdateOptions,
+    reload: loadData,
+  }
+}
