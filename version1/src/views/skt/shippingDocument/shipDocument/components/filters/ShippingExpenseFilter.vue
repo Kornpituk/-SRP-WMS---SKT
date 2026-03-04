@@ -96,7 +96,8 @@
           Clear
         </VBtn>
         <VBtn
-          color="success"
+          color="amber"
+          style="color: #fff !important;"
           prepend-icon="mdi-microsoft-excel"
           @click="$emit('export')"
         >

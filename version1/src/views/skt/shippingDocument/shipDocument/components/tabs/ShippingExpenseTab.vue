@@ -1,18 +1,64 @@
 <template>
   <div>
-    <!--
-      ต้องใช้ v-model:filters ไม่ใช่ :filters
-      เพราะ ShippingExpenseFilter ใช้ local copy + emit('update:filters')
-    -->
-    <ShippingExpenseFilter
-      v-model:filters="filters"
-      @search="handleSearch"
-      @clear="handleClear"
-      @export="handleExport"
-    />
+    <!-- ── Filter Header Bar ─────────────────────────────── -->
+    <div class="d-flex align-center px-4 pt-3 pb-2">
+      <VBtn
+        icon="mdi-close"
+        variant="text"
+        size="x-small"
+        density="compact"
+        class="me-3"
+        @click="$emit('close')"
+      />
+
+      <span class="text-subtitle-1 font-weight-bold flex-grow-1 text-center">
+        Shipping Expense
+      </span>
+
+      <VTooltip
+        :text="filterVisible ? 'Hide Filters' : 'Show Filters'"
+        location="left"
+      >
+        <template #activator="{ props: tp }">
+          <VBtn
+            v-bind="tp"
+            icon="mdi-tune"
+            :color="filterVisible ? 'default' : 'primary'"
+            :variant="filterVisible ? 'text' : 'tonal'"
+            size="x-small"
+            density="compact"
+            @click="filterVisible = !filterVisible"
+          />
+        </template>
+      </VTooltip>
+    </div>
+
+    <!-- Smooth slide filter panel -->
+    <Transition
+      name="slide"
+      @before-enter="onBeforeEnter"
+      @enter="onEnter"
+      @after-enter="onAfterEnter"
+      @before-leave="onBeforeLeave"
+      @leave="onLeave"
+      @after-leave="onAfterLeave"
+    >
+      <div
+        v-if="filterVisible"
+        class="filter-body"
+      >
+        <ShippingExpenseFilter
+          v-model:filters="filters"
+          @search="handleSearch"
+          @clear="handleClear"
+          @export="handleExport"
+        />
+      </div>
+    </Transition>
 
     <VDivider />
 
+    <!-- ── Table ─────────────────────────────────────────── -->
     <ShippingExpenseTable
       :items="items"
       :total="total"
@@ -23,6 +69,7 @@
       @action="handleAction"
     />
 
+    <!-- ── Toast ─────────────────────────────────────────── -->
     <VSnackbar
       v-model="snackbar.show"
       :color="snackbar.color"
@@ -38,11 +85,58 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { ref, reactive } from 'vue'
 import { useShippingExpense } from '../../composables/useShippingExpense'
 import ShippingExpenseFilter from '../filters/ShippingExpenseFilter.vue'
 import ShippingExpenseTable  from '../tables/ShippingExpenseTable.vue'
 
+defineEmits(['close'])
+
+// ─── Filter toggle ────────────────────────────────────────────
+const filterVisible = ref(true)
+
+// ─── Slide transition hooks ───────────────────────────────────
+function onBeforeEnter(el) {
+  el.style.height   = '0'
+  el.style.opacity  = '0'
+  el.style.overflow = 'hidden'
+}
+
+function onEnter(el, done) {
+  requestAnimationFrame(() => {
+    el.style.transition = 'height 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease'
+    el.style.height     = `${el.scrollHeight}px`
+    el.style.opacity    = '1'
+    el.addEventListener('transitionend', done, { once: true })
+  })
+}
+
+function onAfterEnter(el) {
+  el.style.height   = 'auto'
+  el.style.overflow = ''
+}
+
+function onBeforeLeave(el) {
+  el.style.height   = `${el.scrollHeight}px`
+  el.style.overflow = 'hidden'
+}
+
+function onLeave(el, done) {
+  requestAnimationFrame(() => {
+    el.style.transition = 'height 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease'
+    el.style.height     = '0'
+    el.style.opacity    = '0'
+    el.addEventListener('transitionend', done, { once: true })
+  })
+}
+
+function onAfterLeave(el) {
+  el.style.height   = ''
+  el.style.overflow = ''
+  el.style.opacity  = ''
+}
+
+// ─── Data ─────────────────────────────────────────────────────
 const {
   loading, items, total,
   filters, pagination, sortBy,
@@ -50,6 +144,7 @@ const {
   handleUpdateOptions,
 } = useShippingExpense()
 
+// ─── Toast ────────────────────────────────────────────────────
 const snackbar = reactive({ show: false, message: '', color: 'primary', icon: 'mdi-information' })
 
 function showToast(message, color = 'primary', icon = 'mdi-information') {
@@ -57,10 +152,12 @@ function showToast(message, color = 'primary', icon = 'mdi-information') {
 }
 
 function handleAction(item) {
-  showToast(`Opening expense: ${item.invoiceInSAP}`, 'primary', 'mdi-cash-multiple')
+  const invoice = item.raw?.invoiceInSAP ?? item.invoiceInSAP
+
+  showToast(`Opening expense: ${invoice}`, 'primary', 'mdi-cash-multiple')
 }
 
 function handleExport() {
-  showToast('Exporting to Excel...', 'success', 'mdi-microsoft-excel')
+  showToast('Exporting to Excel...', '', 'mdi-microsoft-excel')
 }
 </script>
