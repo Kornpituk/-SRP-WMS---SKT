@@ -5,11 +5,11 @@ import img02 from '@/views/skt/shipping/resale/Flexi/img/02.png'
 import img03 from '@/views/skt/shipping/resale/Flexi/img/03.png'
 import img04 from '@/views/skt/shipping/resale/Flexi/img/04.png'
 
-import img05 from '@/views/skt/resale/flexible/img/01.png'
-import img06 from '@/views/skt/resale/flexible/img/02.png'
-import img07 from '@/views/skt/resale/flexible/img/03.png'
-import img08 from '@/views/skt/resale/flexible/img/04.png'
-import img09 from '@/views/skt/resale/flexible/img/05.png'
+import img05 from '@/views/skt/shipping/resale/flexible/img/01.png'
+import img06 from '@/views/skt/shipping/resale/flexible/img/02.png'
+import img07 from '@/views/skt/shipping/resale/flexible/img/03.png'
+import img08 from '@/views/skt/shipping/resale/flexible/img/04.png'
+import img09 from '@/views/skt/shipping/resale/flexible/img/05.png'
 
 //-------------------------- Section Switch Flexi / Lorry ----------------
 const typeResalse = ref('Flexi')
