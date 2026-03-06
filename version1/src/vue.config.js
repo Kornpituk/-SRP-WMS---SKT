@@ -11,6 +11,7 @@ export default defineConfig({
       new DefinePlugin({
         'process.env': {
           BUILD_DATE: JSON.stringify(buildDate),
+          APP_VERSION: JSON.stringify(version),
         },
       }),
     ],
