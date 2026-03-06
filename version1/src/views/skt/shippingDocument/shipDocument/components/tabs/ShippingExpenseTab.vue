@@ -48,7 +48,8 @@
         class="filter-body"
       >
         <ShippingExpenseFilter
-          v-model:filters="filters"
+          :filters="filters"
+          @update:filters="val => Object.assign(filters, val)"
           @search="handleSearch"
           @clear="handleClear"
           @export="handleExport"

@@ -102,6 +102,9 @@ export async function fetchShippingDocs(params, mode) {
   if (params.item)         result = result.filter(r => r.item.toLowerCase().includes(params.item.toLowerCase()))
   if (params.shippingMode) result = result.filter(r => r.shippingMode === params.shippingMode)
 
+  console.log('result', result)
+  console.log('params', params)
+
   return { data: result, total: result.length }
 }
 

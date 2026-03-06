@@ -51,8 +51,9 @@
         class="filter-body"
       >
         <ShippingDocFilter
-          v-model:filters="filters"
+          :filters="filters"
           :status-filter-disabled="statusFilterDisabled"
+          @update:filters="val => Object.assign(filters, val)"
           @search="handleSearch"
           @clear="handleClear"
           @export="handleExport"

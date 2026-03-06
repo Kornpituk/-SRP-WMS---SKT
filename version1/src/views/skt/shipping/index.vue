@@ -2372,7 +2372,7 @@ const clearParamsTruckOrder = () => {
               <th
                 v-if="canVisibleUserPermission(statusPermission, 'COL_TRUCK_RESERVING_NUMBER').canVisible"
                 class="bg-yellow-lighten-3 texct-end px-1"
-                style=" max-width: 150px; "
+                style=" max-width: 150px;"
               >
                 <span style="font-weight: bold;">{{ $t('Truck Reserving Number') }}
                   <VIcon
