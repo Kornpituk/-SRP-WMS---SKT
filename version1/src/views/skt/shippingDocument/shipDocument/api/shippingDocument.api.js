@@ -16,7 +16,7 @@ const MOCK_SHIPPING_DOCS = [
   },
   {
     id: '2', status: ShippingDocStatus.DRAFT,
-    invoiceInSAP: 'TIP2509041', invoice: '1100082196',
+    invoiceInSAP: 'TIP2509042', invoice: '1100082196',
     payerName: 'TOYOTSU CHEMIPLAS(THAILAND)CO.,LTD.',
     consignee: 'TOYOTSU CHEMIPLAS(THAILAND)CO.,LTD.',
     item: 'MAT-105T',                       qty: 3000,
@@ -26,7 +26,7 @@ const MOCK_SHIPPING_DOCS = [
   },
   {
     id: '3', status: ShippingDocStatus.COMPLETED,
-    invoiceInSAP: 'TIP2509042', invoice: '1100082232',
+    invoiceInSAP: 'TIP2509043', invoice: '1100082232',
     payerName: 'SANYO CHEMICAL INDUSTRIES, LTD.',
     consignee: 'SANYO CHEMICAL INDUSTRIES, LTD.',
     item: 'OSMORIN DA-50',                  qty: 41840,
@@ -34,6 +34,10 @@ const MOCK_SHIPPING_DOCS = [
     etd: '05/09/2025', destination: 'SINGAPORE',
     updatedDate: '05/09/2025',              updatedBy: 'Rungthiwa Sunpakeaw',
   },
+]
+
+
+const MOCK_SHIPPING_DOCS_VOID = [
   {
     id: '4', status: ShippingDocStatus.VOID,
     invoiceInSAP: 'TIX2509013', invoice: '1100024635',
@@ -90,7 +94,7 @@ export async function fetchShippingDocs(params, mode) {
 
   // mode=void: backend จะ filter เฉพาะ void เสมอ
   if (mode === 'void') {
-    result = result.filter(r => r.status === ShippingDocStatus.VOID)
+    result = [...MOCK_SHIPPING_DOCS_VOID]
   } else if (params.status && params.status !== 'All') {
     result = result.filter(r => r.status === params.status)
   }

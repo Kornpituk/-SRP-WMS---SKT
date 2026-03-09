@@ -247,6 +247,7 @@ function showToast(message, color = 'primary', icon = 'mdi-information') {
 function handleAction(item) {
   const invoice = item.raw?.invoiceInSAP ?? item.invoiceInSAP
 
+  window.location.href = `/skt/shippingDocument/form/${invoice}`
   showToast(`Opening detail: ${invoice}`, 'primary', 'mdi-file-eye-outline')
 }
 
