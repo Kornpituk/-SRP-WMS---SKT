@@ -1,0 +1,474 @@
+/**
+ * Stylelint: stylelint-config-standard + stylelint-order (grouped)
+ *
+ * Property order:
+ *   1. Positioning  (position, top, z-index)
+ *   2. Box Model    (display, flex, width, margin, padding, border)
+ *   3. Typography   (font, line-height, letter-spacing, text-align, white-space, color)
+ *   4. Visual       (background, opacity, overflow)
+ *   5. Misc         (cursor, transition)
+ */
+
+/* =================================================================
+   Layout
+   ================================================================= */
+
+.tab-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #f5f5f5;
+}
+
+.tab-content {
+  flex: 1;
+  padding: 0;
+}
+
+/* =================================================================
+   Section (shared white bg)
+   ================================================================= */
+
+.section {
+  padding: 24px 32px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fff;
+}
+
+.section-title {
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  color: #222;
+}
+
+/* =================================================================
+   Section 1 — Reference block (always display text)
+   ================================================================= */
+
+.ref-area {
+  display: flex;
+}
+
+.ref-area__spacer {
+  flex: 0 0 50%;
+}
+
+.ref-area__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ref-val {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.ref-val--highlight {
+  display: inline;
+  padding: 2px 8px;
+  border-radius: 2px;
+  background: #fff8e1;
+}
+
+/* Responsive */
+
+@media (max-width: 960px) {
+  .ref-area__spacer {
+    display: none;
+  }
+
+  .ref-area__content {
+    flex: none;
+    width: 100%;
+  }
+}
+
+/* =================================================================
+   Section 2 — Party grid (always text)
+   ================================================================= */
+
+.party-grid {
+  display: flex;
+  gap: 20px;
+}
+
+.party-block {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.party-block--narrow {
+  flex: 0 0 240px;
+  flex-direction: column;
+  gap: 0;
+}
+
+.party-block__label {
+  flex-shrink: 0;
+  padding-top: 2px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+.party-block__body {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* =================================================================
+   Key-Value pair
+   ================================================================= */
+
+.kv-pair {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.kv-pair--spaced {
+  margin-top: 12px;
+}
+
+.kv-pair__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+.kv-pair__value {
+  font-size: 14px;
+  color: #333;
+}
+
+/* =================================================================
+   Section 3 — Shipping (always text)
+   ================================================================= */
+
+.ship-grid {
+  display: flex;
+  gap: 16px;
+}
+
+.ship-grid--spaced {
+  margin-top: 10px;
+}
+
+.ship-cell {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.ship-cell--wide {
+  flex: 1;
+}
+
+.ship-cell--narrow {
+  flex: 0 0 200px;
+}
+
+.ship-label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+.ship-value {
+  font-size: 14px;
+  color: #333;
+}
+
+/* =================================================================
+   Section 4 — Items table
+   ================================================================= */
+
+.tbl-head,
+.tbl-body,
+.tbl-foot {
+  display: flex;
+  align-items: flex-start;
+}
+
+.tbl-head {
+  padding: 10px 0;
+  border-bottom: 2px solid #ddd;
+}
+
+.tbl-head .tbl-c {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #555;
+}
+
+.tbl-body {
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tbl-foot {
+  padding: 10px 0;
+  border-top: 2px solid #ddd;
+}
+
+.tbl-empty {
+  padding: 40px 0;
+  text-align: center;
+  color: #999;
+}
+
+.tbl-c {
+  padding: 0 6px;
+  font-size: 14px;
+}
+
+.tbl-c--marks {
+  flex: 0 0 18%;
+}
+
+.tbl-c--desc {
+  flex: 0 0 24%;
+}
+
+.tbl-c--qty {
+  flex: 0 0 16%;
+}
+
+.tbl-c--price {
+  flex: 0 0 16%;
+}
+
+.tbl-c--amt {
+  flex: 0 0 16%;
+}
+
+.tbl-c--bold {
+  font-weight: 700;
+}
+
+/* Amount currency in header */
+
+.amt-currency {
+  margin-top: 4px;
+}
+
+.amt-currency__select {
+  max-width: 100px;
+}
+
+.amt-currency-text {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #555;
+}
+
+/* =================================================================
+   Section 5 — Pricing rows (CIF / FOB / Freight / Insurance)
+   ================================================================= */
+
+.pricing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  margin-bottom: 6px;
+}
+
+.pricing-row:last-child {
+  margin-bottom: 0;
+}
+
+.pricing-row__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pricing-row__type-select {
+  flex: 0 0 80px;
+}
+
+.pricing-row__type-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.pricing-row__port {
+  font-size: 14px;
+  color: #333;
+}
+
+.pricing-row__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pricing-row__currency {
+  font-size: 13px;
+  color: #777;
+}
+
+.pricing-row__amount {
+  width: 160px;
+}
+
+.pricing-row__val {
+  display: block;
+  font-size: 14px;
+  text-align: right;
+  color: #333;
+}
+
+/* =================================================================
+   Section 6 — Footer (display-only)
+   ================================================================= */
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  min-height: 34px;
+  margin-bottom: 6px;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-row__label {
+  flex: 0 0 180px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #333;
+}
+
+.info-row__value {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+}
+
+/* =================================================================
+   Section 7 — Banking
+   ================================================================= */
+
+.banking-title {
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* =================================================================
+   Helpers
+   ================================================================= */
+
+.highlight-val {
+  padding: 2px 8px;
+  border-radius: 2px;
+  background: #fff8e1;
+}
+
+.text-muted {
+  color: #888;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* =================================================================
+   Responsive — Tablet (≤ 960px)
+   ================================================================= */
+
+@media (max-width: 960px) {
+  .section {
+    padding: 16px;
+  }
+
+  .party-grid {
+    flex-direction: column;
+  }
+
+  .party-block--narrow {
+    flex: none;
+    width: 100%;
+  }
+
+  .ship-grid {
+    flex-wrap: wrap;
+  }
+
+  .ship-cell--wide,
+  .ship-cell--narrow {
+    flex: 1 1 100%;
+  }
+
+  .tbl-head,
+  .tbl-body,
+  .tbl-foot {
+    min-width: 750px;
+  }
+
+  .pricing-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pricing-row__amount {
+    width: 120px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .info-row__label {
+    flex: none;
+  }
+}
+
+/* =================================================================
+   Responsive — Mobile (≤ 600px)
+   ================================================================= */
+
+@media (max-width: 600px) {
+  .ref-block {
+    align-items: stretch;
+  }
+
+  .kv-pair {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .pricing-row__left {
+    flex-wrap: wrap;
+  }
+
+  .pricing-row__amount {
+    width: 100%;
+  }
+}

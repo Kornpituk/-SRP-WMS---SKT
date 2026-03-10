@@ -1,0 +1,726 @@
+.tab-page {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100%;
+  background: #f5f5f5;
+}
+
+.tab-content {
+  flex: 1;
+  padding-block: 0;
+  padding-inline: 0;
+}
+
+/* All sections share same white bg */
+.section {
+  background: #fff;
+  border-block-end: 1px solid #e8e8e8;
+  padding-block: 24px;
+  padding-inline: 32px; /**
+ * Stylelint: stylelint-config-standard + stylelint-order (grouped)
+ *
+ * Property order per block:
+ *   1. Positioning  → position, top, right, bottom, left, z-index
+ *   2. Box Model    → display, flex-*, grid-*, gap, width, height, margin, padding, border
+ *   3. Typography   → font-*, line-height, letter-spacing, text-*, white-space, color
+ *   4. Visual       → background, opacity, overflow
+ *   5. Misc         → cursor, transition
+ */
+
+  /* =================================================================
+   Layout
+   ================================================================= */
+
+  .tab-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    background: #f5f5f5;
+  }
+
+  .tab-content {
+    flex: 1;
+    padding: 0;
+  }
+
+  /* =================================================================
+   Section (shared base — same white bg for ALL including table)
+   ================================================================= */
+
+  .section {
+    padding: 24px 32px;
+    border-bottom: 1px solid #e8e8e8;
+    background: #fff;
+  }
+
+  .section-title {
+    margin-bottom: 24px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-align: center;
+    color: #222;
+  }
+
+  /* =================================================================
+   Section 1 — ref-line
+   Label at center (50% left, right-aligned), input from center→right
+   ================================================================= */
+
+  .ref-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .ref-line:last-child {
+    margin-bottom: 0;
+  }
+
+  .ref-line__label {
+    flex-shrink: 0;
+    width: 50%;
+    padding-right: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    text-align: right;
+    color: #333;
+  }
+
+  .ref-line__field {
+    flex-shrink: 0;
+    width: 50%;
+  }
+
+  .ref-line__field--split {
+    display: flex;
+    gap: 12px;
+  }
+
+  .ref-line__main {
+    flex: 1;
+  }
+
+  .ref-line__sub {
+    flex: 0 0 35%;
+  }
+
+  /* =================================================================
+   Section 2 — Party grid
+   ================================================================= */
+
+  .party-grid {
+    display: flex;
+    gap: 20px;
+  }
+
+  .party-block {
+    display: flex;
+    flex: 1;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .party-block--inputs {
+    flex: 0 0 260px;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .party-block__label {
+    flex-shrink: 0;
+    padding-top: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #333;
+  }
+
+  .party-block__body {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #333;
+  }
+
+  /* =================================================================
+   Key-Value pair (Payment / Due Date)
+   ================================================================= */
+
+  .kv-pair {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .kv-pair--spaced {
+    margin-top: 12px;
+  }
+
+  .kv-pair__label {
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #333;
+  }
+
+  .kv-pair__input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* =================================================================
+   Shipping grid
+   ================================================================= */
+
+  .ship-grid {
+    display: flex;
+    gap: 16px;
+  }
+
+  .ship-grid--spaced {
+    margin-top: 12px;
+  }
+
+  .ship-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ship-cell--wide {
+    flex: 1;
+  }
+
+  .ship-cell--narrow {
+    flex: 0 0 200px;
+  }
+
+  .ship-label {
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #333;
+  }
+
+  /* =================================================================
+   Table (flex-based rows, same white bg)
+   ================================================================= */
+
+  .tbl-head,
+  .tbl-body,
+  .tbl-foot {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .tbl-head {
+    padding: 10px 0;
+    border-bottom: 2px solid #ddd;
+  }
+
+  .tbl-body {
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .tbl-foot {
+    padding: 10px 0;
+    border-top: 2px solid #ddd;
+  }
+
+  .tbl-empty {
+    padding: 40px 0;
+    text-align: center;
+    color: #999;
+  }
+
+  .tbl-c {
+    padding: 0 6px;
+    font-size: 14px;
+  }
+
+  .tbl-head .tbl-c {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .tbl-c--marks {
+    flex: 0 0 16%;
+  }
+
+  .tbl-c--desc {
+    flex: 0 0 20%;
+  }
+
+  .tbl-c--pkg {
+    flex: 0 0 30%;
+  }
+
+  .tbl-c--wt {
+    flex: 0 0 17%;
+  }
+
+  .tbl-c--bold {
+    font-weight: 700;
+  }
+
+  .tbl-field--spaced {
+    margin-bottom: 8px;
+  }
+
+  /* =================================================================
+   Package inline row
+   ================================================================= */
+
+  .pkg-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .pkg-row__qty {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-width: 50px;
+    padding: 6px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    background: #fafafa;
+  }
+
+  .pkg-row__unit {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pkg-row__pallet {
+    flex: 0 0 70px;
+  }
+
+  .pkg-row__text {
+    flex-shrink: 0;
+    font-size: 13px;
+    white-space: nowrap;
+    color: #555;
+  }
+
+  /* =================================================================
+   Tare weight row
+   ================================================================= */
+
+  .tare-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+    font-size: 12px;
+    color: #777;
+  }
+
+  .tare-row__val {
+    font-weight: 500;
+  }
+
+  .tare-row__select {
+    flex: 0 0 80px;
+  }
+
+  /* =================================================================
+   Text helpers
+   ================================================================= */
+
+  .text-muted {
+    color: #888;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+
+  /* =================================================================
+   Section 4 — Footer (display-only info rows)
+   ================================================================= */
+
+  .info-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    min-height: 34px;
+    margin-bottom: 6px;
+  }
+
+  .info-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-row__label {
+    flex: 0 0 180px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #333;
+  }
+
+  .info-row__value {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+  }
+
+  /* =================================================================
+   Responsive — Tablet (≤ 960px)
+   ================================================================= */
+
+  @media (max-width: 960px) {
+    .section {
+      padding: 16px;
+    }
+
+    /* Section 1: stack */
+    .ref-line {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .ref-line__label {
+      width: 100%;
+      margin-bottom: 4px;
+      padding-right: 0;
+      text-align: left;
+    }
+
+    .ref-line__field {
+      width: 100%;
+    }
+
+    /* Section 2: stack parties */
+    .party-grid {
+      flex-direction: column;
+    }
+
+    .party-block--inputs {
+      flex: none;
+      width: 100%;
+    }
+
+    /* Shipping: wrap */
+    .ship-grid {
+      flex-wrap: wrap;
+    }
+
+    .ship-cell--wide,
+    .ship-cell--narrow {
+      flex: 1 1 100%;
+    }
+
+    /* Table: horizontal scroll */
+    .tbl-head,
+    .tbl-body,
+    .tbl-foot {
+      min-width: 800px;
+    }
+
+    /* Footer: stack */
+    .info-row {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .info-row__label {
+      flex: none;
+    }
+  }
+
+  /* =================================================================
+   Responsive — Mobile (≤ 600px)
+   ================================================================= */
+
+  @media (max-width: 600px) {
+    .ref-line__field--split {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ref-line__sub {
+      flex: none;
+    }
+
+    .kv-pair {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+    }
+  }
+}
+
+.section--table {
+  padding-block: 0;
+  padding-inline: 32px;
+}
+
+.section__title {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #333;
+  margin-block-end: 20px;
+}
+
+/* Section 1 */
+.field-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-block-end: 8px;
+}
+
+.field-line:last-child {
+  margin-block-end: 0;
+}
+
+.field-line__spacer {
+  flex: 1 1 0;
+}
+
+.field-line__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  text-align: end;
+}
+
+.field-line__input {
+  flex: 0 0 420px;
+}
+
+.field-line__input--flex {
+  display: flex;
+  gap: 12px;
+  flex: 0 0 420px;
+}
+
+.field-line__input-area {
+  flex: 0 0 520px;
+}
+
+/* Section 2 */
+.party-row {
+  display: flex;
+  gap: 24px;
+}
+
+.party-col {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+}
+
+.party-col--narrow {
+  flex: 0 0 280px;
+  flex-direction: column;
+  gap: 0;
+}
+
+.party-col__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+  padding-block-start: 2px;
+}
+
+.party-col__text {
+  flex: 1;
+}
+
+.party-text {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.7;
+}
+
+.kv {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.kv__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+}
+
+.kv__value {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+/* Shipping */
+.ship-row {
+  display: flex;
+  gap: 16px;
+}
+
+.ship-cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ship-cell--date {
+  flex: 0 0 220px;
+}
+
+.ship-cell__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Table */
+.tbl-header {
+  display: flex;
+  border-block-end: 2px solid #e0e0e0;
+  padding-block: 12px;
+  padding-inline: 0;
+}
+
+.tbl-row {
+  display: flex;
+  border-block-end: 1px solid #f0f0f0;
+  padding-block: 16px;
+  padding-inline: 0;
+}
+
+.tbl-total {
+  display: flex;
+  border-block-start: 2px solid #e0e0e0;
+  padding-block: 12px;
+  padding-inline: 0;
+}
+
+.tbl-empty {
+  text-align: center;
+  color: #999;
+  padding-block: 40px;
+  padding-inline: 0;
+}
+
+.tbl-col {
+  padding-inline: 8px;
+  font-size: 14px;
+}
+
+.tbl-header .tbl-col {
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.tbl-col--marks {
+  flex: 0 0 18%;
+}
+.tbl-col--desc {
+  flex: 0 0 22%;
+}
+.tbl-col--pkg {
+  flex: 0 0 30%;
+}
+.tbl-col--net {
+  flex: 0 0 15%;
+}
+.tbl-col--gross {
+  flex: 0 0 15%;
+}
+
+.pkg-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pkg-inline__qty {
+  max-inline-size: 70px;
+}
+
+.pkg-inline__unit {
+  max-inline-size: 100px;
+}
+
+.pkg-inline__pallet {
+  max-inline-size: 60px;
+}
+
+.pkg-inline__text {
+  font-size: 13px;
+  color: #555;
+  white-space: nowrap;
+}
+
+.tare-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #757575;
+}
+
+.tare-line__select {
+  max-inline-size: 80px;
+}
+
+.multiline {
+  line-height: 1.7;
+  font-size: 13px;
+}
+
+/* Section 4 */
+.info-line {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  min-block-size: 36px;
+  margin-block-end: 8px;
+}
+
+.info-line:last-child {
+  margin-block-end: 0;
+}
+
+.info-line__label {
+  flex: 0 0 180px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  text-transform: uppercase;
+}
+
+.info-line__value {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+}

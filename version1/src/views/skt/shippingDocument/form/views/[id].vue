@@ -180,7 +180,6 @@ onBeforeUnmount(() => cleanup())
 .ship-document-detail {
   display: flex;
   flex-direction: column;
-  block-size: 100vh;
   /* stylelint-disable-next-line order/properties-order */
   background: #f5f5f5;
 }

@@ -1,198 +1,543 @@
-<!-- ============================================================
-  CommercialInvoiceTab.vue
-  Layout matches screenshot Image 1:
-  1. COMMERCIAL INVOICE title + date/invoice/PO/proforma
-  2. Payer | Consignee | Payment + Due Date
-  3. Shipping (Feeder/Vessel/ETD, From/To/ETA)
-  4. Items table (MARKS | DESC | QTY | UNIT PRICE | AMOUNT)
-  5. Total
-  6. CIF/FOB/Ocean Freight/Insurance
-  7. Footer (Packing/Country/Maker/Packaging/Lot No)
-  8. Banking Detail
-============================================================ -->
+<!--
+  CommercialInvoiceTab.vue — Vue 3 + Vuetify 3 + Composition API
+  Stylelint: stylelint-config-standard + stylelint-order (grouped)
+
+  Figma analysis:
+  - Image 1 (SAVED): mostly display text, yellow = pre-filled data
+  Editable: Unit Price, Amount currency, FOB value, Ocean Freight, Insurance, Account No dropdown
+  - Image 2 (CONFIRMED): all display text, no inputs
+
+  Sections:
+  1. Title + refs (always display, yellow highlight when SAVED)
+  2. Payer | Consignee | Payment + Due Date (always text)
+  3. Shipping (always text)
+  4. Items table (unit price = input, amount currency = dropdown)
+  5. CIF/FOB/Freight/Insurance (some inputs)
+  6. Footer (always display text, some yellow highlight)
+  7. Banking Detail (account no = dropdown, rest text)
+-->
 <template>
   <div class="tab-page">
     <div class="tab-content">
-      <div class="text-center py-4">
-        <h2 class="text-h6 font-weight-bold">COMMERCIAL INVOICE</h2>
-      </div>
+      <!-- ================================================ -->
+      <!-- SECTION 1: Title + Reference (always display)     -->
+      <!-- ================================================ -->
+      <div class="section">
+        <h2 class="section-title">
+          COMMERCIAL INVOICE
+        </h2>
 
-      <!-- Date & References (yellow highlighted in screenshot) -->
-      <div class="section-card">
-        <div class="mb-1">
-          <FieldRow label="">
-            <v-text-field v-if="!isReadonly" :model-value="formData.date" type="date" variant="outlined" density="compact" hide-details @update:model-value="(v) => updateField('date', v)" />
-            <v-chip v-else color="amber-lighten-4" variant="flat" size="small">{{ formData.date }}</v-chip>
-          </FieldRow>
+        <div class="ref-area">
+          <div class="ref-area__spacer" />
+          <div class="ref-area__content">
+            <div
+              class="ref-val"
+              :class="{ 'ref-val--highlight': !isConfirmed }"
+            >
+              {{ formData.date }}
+            </div>
+            <div
+              class="ref-val"
+              :class="{ 'ref-val--highlight': !isConfirmed }"
+            >
+              INVOICE NO. : {{ formData.invoiceNo }} ({{ formData.contractNo }})
+            </div>
+            <div
+              class="ref-val"
+              :class="{ 'ref-val--highlight': !isConfirmed }"
+            >
+              PO NO : {{ formData.poNo }}
+            </div>
+            <div class="ref-val">
+              PROFORMA INVOICE NO. : {{ formData.proformaInvoiceNo }}
+            </div>
+          </div>
         </div>
-        <FieldRow label="INVOICE NO. :" class="mb-1">
-          <span v-if="isReadonly"><v-chip color="amber-lighten-4" variant="flat" size="small">{{ formData.invoiceNo }} ({{ formData.contractNo }})</v-chip></span>
-          <v-row v-else dense><v-col cols="7"><v-text-field :model-value="formData.invoiceNo" variant="outlined" density="compact" hide-details @update:model-value="(v) => updateField('invoiceNo', v)" /></v-col><v-col cols="5"><v-text-field :model-value="formData.contractNo" variant="outlined" density="compact" hide-details placeholder="(C-No)" @update:model-value="(v) => updateField('contractNo', v)" /></v-col></v-row>
-        </FieldRow>
-        <FieldRow label="PO NO :" class="mb-1">
-          <v-text-field v-if="!isReadonly" :model-value="formData.poNo" variant="outlined" density="compact" hide-details @update:model-value="(v) => updateField('poNo', v)" />
-          <v-chip v-else color="amber-lighten-4" variant="flat" size="small">PO-{{ formData.poNo }}</v-chip>
-        </FieldRow>
-        <FieldRow label="PROFORMA INVOICE NO. :">
-          <v-text-field v-if="!isReadonly" :model-value="formData.proformaInvoiceNo" variant="outlined" density="compact" hide-details @update:model-value="(v) => updateField('proformaInvoiceNo', v)" />
-          <v-chip v-else color="amber-lighten-4" variant="flat" size="small">{{ formData.proformaInvoiceNo }}</v-chip>
-        </FieldRow>
       </div>
 
-      <!-- Payer / Consignee / Payment -->
-      <div class="section-card">
-        <v-row>
-          <v-col cols="12" md="4">
-            <div class="text-caption font-weight-bold mb-1">Payer :</div>
-            <PartyInfoFields :party="formData.payer" :readonly="isReadonly" @update="(v) => updateField('payer', v)" />
-          </v-col>
-          <v-col cols="12" md="4">
-            <div class="text-caption font-weight-bold mb-1">Consignee :</div>
-            <PartyInfoFields :party="formData.consignee" :readonly="isReadonly" @update="(v) => updateField('consignee', v)" />
-          </v-col>
-          <v-col cols="12" md="4">
-            <FieldRow label="Payment :">
-              <v-select v-if="!isReadonly" :model-value="formData.payment" :items="['T/T in advance','L/C','D/P','D/A']" variant="outlined" density="compact" hide-details @update:model-value="(v) => updateField('payment', v)" />
-              <span v-else>{{ formData.payment }}</span>
-            </FieldRow>
-            <FieldRow label="Due Date :" class="mt-3">
-              <v-text-field v-if="!isReadonly" :model-value="formData.dueDate" type="date" variant="outlined" density="compact" hide-details @update:model-value="(v) => updateField('dueDate', v)" />
-              <span v-else>{{ formData.dueDate }}</span>
-            </FieldRow>
-          </v-col>
-        </v-row>
+      <!-- ================================================ -->
+      <!-- SECTION 2: Payer | Consignee | Payment (all text) -->
+      <!-- ================================================ -->
+      <div class="section">
+        <div class="party-grid">
+          <!-- Payer -->
+          <div class="party-block">
+            <span class="party-block__label">Payer :</span>
+            <div class="party-block__body">
+              <div>{{ formData.payer?.name }}</div>
+              <div>{{ formData.payer?.address }}</div>
+              <div v-if="formData.payer?.address2">
+                {{ formData.payer.address2 }}
+              </div>
+              <div>{{ formData.payer?.city }} {{ formData.payer?.country }}</div>
+              <div v-if="formData.payer?.tel">
+                TEL.: {{ formData.payer.tel }}
+              </div>
+              <div v-if="formData.payer?.attn">
+                ATTN : {{ formData.payer.attn }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Consignee -->
+          <div class="party-block">
+            <span class="party-block__label">Consignee :</span>
+            <div class="party-block__body">
+              <div>{{ formData.consignee?.name }}</div>
+              <div>{{ formData.consignee?.address }}</div>
+              <div v-if="formData.consignee?.address2">
+                {{ formData.consignee.address2 }}
+              </div>
+              <div v-if="formData.consignee?.address3">
+                {{ formData.consignee.address3 }}
+              </div>
+              <div>
+                {{ formData.consignee?.city }}
+                <template v-if="formData.consignee?.country">
+                  - {{ formData.consignee.country }}
+                </template>
+              </div>
+              <div v-if="formData.consignee?.tel">
+                TEL.: {{ formData.consignee.tel }}
+              </div>
+              <div v-if="formData.consignee?.taxId">
+                TAX ID : {{ formData.consignee.taxId }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment + Due Date (always text) -->
+          <div class="party-block party-block--narrow">
+            <div class="kv-pair">
+              <span class="kv-pair__label">Payment :</span>
+              <span class="kv-pair__value">{{ formData.payment }}</span>
+            </div>
+            <div class="kv-pair kv-pair--spaced">
+              <span class="kv-pair__label">Due Date :</span>
+              <span class="kv-pair__value">{{ formData.dueDate }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Shipping Info -->
-      <div class="section-card">
-        <v-row dense>
-          <v-col cols="3"><FieldRow label="Feeder :"><InputOrText :readonly="isReadonly" :value="formData.feeder" @input="(v) => updateField('feeder', v)" /></FieldRow></v-col>
-          <v-col cols="4"><FieldRow label="Vessel :"><InputOrText :readonly="isReadonly" :value="formData.vessel" @input="(v) => updateField('vessel', v)" /></FieldRow></v-col>
-          <v-col cols="2"><FieldRow label="ETD :"><InputOrText :readonly="isReadonly" :value="formData.etd" type="date" @input="(v) => updateField('etd', v)" /></FieldRow></v-col>
-        </v-row>
-        <v-row dense class="mt-1">
-          <v-col cols="3"><FieldRow label="From :"><InputOrText :readonly="isReadonly" :value="formData.from" @input="(v) => updateField('from', v)" /></FieldRow></v-col>
-          <v-col cols="4"><FieldRow label="To :"><InputOrText :readonly="isReadonly" :value="formData.to" @input="(v) => updateField('to', v)" /></FieldRow></v-col>
-          <v-col cols="2"><FieldRow label="ETA:"><InputOrText :readonly="isReadonly" :value="formData.eta" type="date" @input="(v) => updateField('eta', v)" /></FieldRow></v-col>
-        </v-row>
+      <!-- ================================================ -->
+      <!-- SECTION 3: Shipping (always text)                  -->
+      <!-- ================================================ -->
+      <div class="section">
+        <div class="ship-grid">
+          <div class="ship-cell ship-cell--wide">
+            <span class="ship-label">Feeder :</span>
+            <span class="ship-value">{{ formData.feeder }}</span>
+          </div>
+          <div class="ship-cell ship-cell--wide">
+            <span class="ship-label">Vessel :</span>
+            <span class="ship-value">{{ formData.vessel }}</span>
+          </div>
+          <div class="ship-cell ship-cell--narrow">
+            <span class="ship-label">ETD :</span>
+            <span class="ship-value">{{ formData.etd }}</span>
+          </div>
+        </div>
+        <div class="ship-grid ship-grid--spaced">
+          <div class="ship-cell ship-cell--wide">
+            <span class="ship-label">From :</span>
+            <span class="ship-value">{{ formData.from }}</span>
+          </div>
+          <div class="ship-cell ship-cell--wide">
+            <span class="ship-label">To :</span>
+            <span class="ship-value">{{ formData.to }}</span>
+          </div>
+          <div class="ship-cell ship-cell--narrow">
+            <span class="ship-label">ETA:</span>
+            <span class="ship-value">{{ formData.eta }}</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Items Table -->
-      <div class="section-card pa-0">
-        <v-table density="compact">
-          <thead>
-            <tr class="bg-grey-lighten-4">
-              <th style="width:20%">MARKS & NOS</th>
-              <th style="width:25%">DESCRIPTION OF GOODS</th>
-              <th class="text-right" style="width:15%">QUANTITY (KGS)</th>
-              <th class="text-right" style="width:15%">UNIT PRICE (US$/KGS)</th>
-              <th class="text-right" style="width:15%">AMOUNT</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in formData.items" :key="item.id">
-              <td class="py-3">{{ item.marksAndNos }}</td>
-              <td class="py-3">{{ item.descriptionOfGoods }}<br><span class="text-grey">({{ item.subDescription }})</span></td>
-              <td class="text-right py-3">
-                <v-chip v-if="item.quantity" color="amber-lighten-4" variant="flat" size="small">{{ formatNum(item.quantity) }}</v-chip>
-              </td>
-              <td class="text-right py-3">{{ item.unitPrice?.toFixed(2) }}</td>
-              <td class="text-right py-3">{{ formatNum(item.amount) }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr class="font-weight-bold">
-              <td colspan="2" class="pa-3">Total</td>
-              <td class="text-right pa-3"><v-chip color="amber-lighten-4" variant="flat" size="small">{{ formatNum(totalQty) }}<br>({{ formData.totalDescription }})</v-chip></td>
-              <td></td>
-              <td class="text-right pa-3">{{ formatNum(totalAmount) }}</td>
-            </tr>
-          </tfoot>
-        </v-table>
+      <!-- ================================================ -->
+      <!-- SECTION 4: Items Table                             -->
+      <!-- ================================================ -->
+      <div class="section">
+        <!-- Header -->
+        <div class="tbl-head">
+          <div class="tbl-c tbl-c--marks">
+            MARKS &amp; NOS
+          </div>
+          <div class="tbl-c tbl-c--desc">
+            DESCRIPTION OF GOODS
+          </div>
+          <div class="tbl-c tbl-c--qty text-right">
+            QUANTITY<br>(KGS)
+          </div>
+          <div class="tbl-c tbl-c--price text-right">
+            UNIT PRICE<br>(US$/KGS)
+          </div>
+          <div class="tbl-c tbl-c--amt text-right">
+            AMOUNT
+            <!-- Currency dropdown (edit mode only) -->
+            <div
+              v-if="!isReadonly"
+              class="amt-currency"
+            >
+              <VSelect
+                :model-value="formData.amountCurrency || 'US$'"
+                :items="CURRENCY_OPTIONS"
+                variant="outlined"
+                density="compact"
+                hide-details
+                class="amt-currency__select"
+                @update:model-value="(v) => updateField('amountCurrency', v)"
+              />
+            </div>
+            <div
+              v-else
+              class="amt-currency-text"
+            >
+              US$
+            </div>
+          </div>
+        </div>
+
+        <!-- Rows -->
+        <div
+          v-for="(item, idx) in formData.items"
+          :key="item.id || idx"
+          class="tbl-body"
+        >
+          <!-- Marks -->
+          <div class="tbl-c tbl-c--marks">
+            <div
+              v-for="(line, li) in splitLines(item.marksAndNos)"
+              :key="li"
+            >
+              {{ line }}
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="tbl-c tbl-c--desc">
+            <div>{{ item.descriptionOfGoods }}</div>
+            <div class="text-muted">
+              ({{ item.subDescription }})
+            </div>
+          </div>
+
+          <!-- Quantity (display, yellow highlight in edit) -->
+          <div class="tbl-c tbl-c--qty text-right">
+            <span :class="{ 'highlight-val': !isConfirmed }">
+              {{ fmtNum(item.quantity) }}
+            </span>
+          </div>
+
+          <!-- Unit Price (INPUT in edit mode) -->
+          <div class="tbl-c tbl-c--price text-right">
+            <VTextField
+              v-if="!isReadonly"
+              :model-value="item.unitPrice"
+              type="number"
+              variant="outlined"
+              density="compact"
+              hide-details
+              reverse
+              @update:model-value="(v) => handleItemUpdate(idx, 'unitPrice', Number(v))"
+            />
+            <span v-else>{{ item.unitPrice?.toFixed(2) }}</span>
+          </div>
+
+          <!-- Amount (display, calculated) -->
+          <div class="tbl-c tbl-c--amt text-right">
+            {{ fmtNum(item.amount) }}
+          </div>
+        </div>
+
+        <!-- Empty -->
+        <div
+          v-if="!formData.items?.length"
+          class="tbl-empty"
+        >
+          No items
+        </div>
+
+        <!-- Total -->
+        <div class="tbl-foot">
+          <div class="tbl-c tbl-c--marks tbl-c--bold">
+            Total
+          </div>
+          <div class="tbl-c tbl-c--desc" />
+          <div class="tbl-c tbl-c--qty text-right">
+            <div>{{ fmtNum(totalQty) }}</div>
+            <div
+              v-if="formData.totalDescription"
+              :class="{ 'highlight-val': !isConfirmed }"
+            >
+              ({{ formData.totalDescription }})
+            </div>
+          </div>
+          <div class="tbl-c tbl-c--price" />
+          <div class="tbl-c tbl-c--amt text-right tbl-c--bold">
+            {{ fmtNum(totalAmount) }}
+          </div>
+        </div>
       </div>
 
-      <!-- CIF / FOB / Freight / Insurance -->
-      <div class="section-card">
-        <v-row dense v-for="row in pricingRows" :key="row.key" class="mb-1">
-          <v-col cols="2">
-            <v-select v-if="row.hasType && !isReadonly" :model-value="row.type" :items="['CIF','FOB']" variant="outlined" density="compact" hide-details />
-            <span v-else-if="row.hasType" class="font-weight-bold">{{ row.type }}</span>
-            <span v-else>{{ row.label }}</span>
-          </v-col>
-          <v-col cols="5"><span>{{ row.port }}</span></v-col>
-          <v-col cols="1" class="text-right"><span class="text-grey">US$</span></v-col>
-          <v-col cols="4">
-            <v-text-field v-if="!isReadonly" :model-value="formData[row.key]" type="number" variant="outlined" density="compact" hide-details @update:model-value="(v) => updateField(row.key, Number(v))" />
-            <span v-else class="text-right d-block">{{ formatNum(formData[row.key]) }}</span>
-          </v-col>
-        </v-row>
+      <!-- ================================================ -->
+      <!-- SECTION 5: CIF / FOB / Freight / Insurance         -->
+      <!-- ================================================ -->
+      <div class="section">
+        <div
+          v-for="row in pricingRows"
+          :key="row.key"
+          class="pricing-row"
+        >
+          <!-- Type + Port -->
+          <div class="pricing-row__left">
+            <!-- CIF/FOB dropdown in edit mode -->
+            <template v-if="row.hasType && !isReadonly">
+              <VSelect
+                :model-value="row.type"
+                :items="['CIF', 'FOB']"
+                variant="outlined"
+                density="compact"
+                hide-details
+                class="pricing-row__type-select"
+                @update:model-value="(v) => updateField(row.typeKey, v)"
+              />
+            </template>
+            <span
+              v-else-if="row.hasType"
+              class="pricing-row__type-text"
+            >
+              {{ row.type }}
+            </span>
+
+            <span class="pricing-row__port">{{ row.port }}</span>
+          </div>
+
+          <!-- US$ + Value -->
+          <div class="pricing-row__right">
+            <span class="pricing-row__currency">US$</span>
+            <div class="pricing-row__amount">
+              <!-- FOB, Ocean Freight, Insurance = INPUT in edit mode -->
+              <VTextField
+                v-if="!isReadonly && row.editable"
+                :model-value="formData[row.key]"
+                type="number"
+                variant="outlined"
+                density="compact"
+                hide-details
+                reverse
+                @update:model-value="(v) => updateField(row.key, Number(v))"
+              />
+              <span
+                v-else
+                class="pricing-row__val"
+              >
+                {{ fmtNum(formData[row.key]) }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Footer Info -->
-      <div class="section-card">
-        <FieldRow label="PACKING :" class="mb-2">
-          <InputOrText :readonly="isReadonly" :value="formData.packing" highlight @input="(v) => updateField('packing', v)" />
-        </FieldRow>
-        <FieldRow label="COUNTRY OF ORIGIN :" class="mb-2"><InputOrText :readonly="isReadonly" :value="formData.countryOfOrigin" @input="(v) => updateField('countryOfOrigin', v)" /></FieldRow>
-        <FieldRow label="MAKER NAME :" class="mb-2"><InputOrText :readonly="isReadonly" :value="formData.makerName" @input="(v) => updateField('makerName', v)" /></FieldRow>
-        <FieldRow label="PACKAGING :" class="mb-2">
-          <InputOrText :readonly="isReadonly" :value="formData.packaging" highlight @input="(v) => updateField('packaging', v)" />
-        </FieldRow>
-        <FieldRow label="Lot No :"><InputOrText :readonly="isReadonly" :value="formData.lotNo" @input="(v) => updateField('lotNo', v)" /></FieldRow>
+      <!-- ================================================ -->
+      <!-- SECTION 6: Footer (always display text)            -->
+      <!-- ================================================ -->
+      <div class="section">
+        <div
+          v-for="f in FOOTER_FIELDS"
+          :key="f.key"
+          class="info-row"
+        >
+          <span class="info-row__label">{{ f.label }}</span>
+          <span
+            class="info-row__value"
+            :class="{ 'highlight-val': f.highlight && !isConfirmed }"
+          >
+            {{ formData[f.key] }}
+          </span>
+        </div>
       </div>
 
-      <!-- Banking Detail -->
-      <div class="section-card">
-        <h3 class="text-subtitle-2 font-weight-bold mb-3">Banking Detail</h3>
-        <FieldRow label="Account No :" class="mb-2"><InputOrText :readonly="isReadonly" :value="formData.bankingDetail?.accountNo" @input="(v) => updateField('bankingDetail', { ...formData.bankingDetail, accountNo: v })" /></FieldRow>
-        <FieldRow label="Bank Name :" class="mb-2"><InputOrText :readonly="isReadonly" :value="formData.bankingDetail?.bankName" @input="(v) => updateField('bankingDetail', { ...formData.bankingDetail, bankName: v })" /></FieldRow>
-        <FieldRow label="Address :" class="mb-2"><InputOrText :readonly="isReadonly" :value="formData.bankingDetail?.address" @input="(v) => updateField('bankingDetail', { ...formData.bankingDetail, address: v })" /></FieldRow>
-        <FieldRow label="Swift Code :"><InputOrText :readonly="isReadonly" :value="formData.bankingDetail?.swiftCode" @input="(v) => updateField('bankingDetail', { ...formData.bankingDetail, swiftCode: v })" /></FieldRow>
+      <!-- ================================================ -->
+      <!-- SECTION 7: Banking Detail                          -->
+      <!-- ================================================ -->
+      <div class="section">
+        <h3 class="banking-title">
+          Banking Detail
+        </h3>
+
+        <!-- Account No = dropdown in edit mode -->
+        <div class="info-row">
+          <span class="info-row__label">Account No :</span>
+          <div class="info-row__value">
+            <VSelect
+              v-if="!isReadonly"
+              :model-value="formData.bankingDetail?.accountNo"
+              :items="ACCOUNT_OPTIONS"
+              variant="outlined"
+              density="compact"
+              hide-details
+              @update:model-value="(v) => updateBanking('accountNo', v)"
+            />
+            <span v-else>{{ formData.bankingDetail?.accountNo }}</span>
+          </div>
+        </div>
+
+        <!-- Bank Name, Address, Swift Code = always text -->
+        <div class="info-row">
+          <span class="info-row__label">Bank Name :</span>
+          <span class="info-row__value">{{ formData.bankingDetail?.bankName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-row__label">Address :</span>
+          <span class="info-row__value">{{ formData.bankingDetail?.address }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-row__label">Swift Code :</span>
+          <span class="info-row__value">{{ formData.bankingDetail?.swiftCode }}</span>
+        </div>
       </div>
     </div>
 
-    <TabActionBar :tab-key="TabKey.COMMERCIAL_INVOICE" :is-loading="isLoading" :is-dirty="isDirty"
-      @print="handlePrint" @save-draft="saveDraft" @confirm="confirm" />
+    <!-- Action Bar -->
+    <TabActionBar
+      :tab-key="TabKey.COMMERCIAL_INVOICE"
+      :is-loading="isLoading"
+      :is-dirty="isDirty"
+      @print="handlePrint"
+      @save-draft="saveDraft"
+      @confirm="confirm"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { TabKey } from '../../types/shipDocument'
+import { TabKey, TabStatus } from '../../types/shipDocument'
 import { useTabForm } from '../../composables/useTabForm'
 import { usePrint } from '../../composables/usePrint'
 import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
 import TabActionBar from '../shared/TabActionBar.vue'
-import PartyInfoFields from '../shared/PartyInfoFields.vue'
-import FieldRow from '../shared/FieldRow.vue'
-import InputOrText from '../shared/InputOrText.vue'
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const CURRENCY_OPTIONS = ['US$', 'THB', 'EUR']
+
+const ACCOUNT_OPTIONS = [
+  '21-31080051 SANYO KASEI (THAILAND) LTD.',
+]
+
+const FOOTER_FIELDS = [
+  { key: 'packing', label: 'PACKING :', highlight: true },
+  { key: 'countryOfOrigin', label: 'COUNTRY OF ORIGIN :', highlight: false },
+  { key: 'makerName', label: 'MAKER NAME :', highlight: false },
+  { key: 'packaging', label: 'PACKAGING :', highlight: true },
+  { key: 'lotNo', label: 'Lot No :', highlight: false },
+]
+
+// ---------------------------------------------------------------------------
+// Composables
+// ---------------------------------------------------------------------------
 
 const store = useShipDocumentStore()
-const { formData, isDirty, isLoading, isReadonly, updateField, saveDraft, confirm } =
-  useTabForm(TabKey.COMMERCIAL_INVOICE, {
-    onSaveDraft: (d) => tabApiMap[TabKey.COMMERCIAL_INVOICE].save(store.documentId, d),
-    onConfirm: (d) => tabApiMap[TabKey.COMMERCIAL_INVOICE].confirm(store.documentId, d),
-  })
+
+const {
+  formData,
+  isDirty,
+  isLoading,
+  isReadonly,
+  tabStatus,
+  updateField,
+  saveDraft,
+  confirm,
+} = useTabForm(TabKey.COMMERCIAL_INVOICE, {
+  onSaveDraft: data => tabApiMap[TabKey.COMMERCIAL_INVOICE].save(store.documentId, data),
+  onConfirm: data => tabApiMap[TabKey.COMMERCIAL_INVOICE].confirm(store.documentId, data),
+})
+
 const { print: handlePrint } = usePrint(TabKey.COMMERCIAL_INVOICE)
 
-const totalQty = computed(() => formData.value.items.reduce((s, i) => s + (i.quantity || 0), 0))
-const totalAmount = computed(() => formData.value.items.reduce((s, i) => s + (i.amount || 0), 0))
+// ---------------------------------------------------------------------------
+// Computed
+// ---------------------------------------------------------------------------
+
+const isConfirmed = computed(() => tabStatus.value === TabStatus.CONFIRMED)
+
+const totalQty = computed(() => {
+  return (formData.value.items || []).reduce((s, i) => s + (i.quantity || 0), 0)
+})
+
+const totalAmount = computed(() => {
+  return (formData.value.items || []).reduce((s, i) => s + (i.amount || 0), 0)
+})
 
 const pricingRows = computed(() => [
-  { key: 'cifValue', hasType: true, type: 'CIF', port: formData.value.cifPort || 'HCM CITY, VIETNAM', label: '' },
-  { key: 'fobValue', hasType: true, type: 'FOB', port: formData.value.fobPort || 'LAEM CHABANG, THAILAND', label: '' },
-  { key: 'oceanFreight', hasType: false, type: '', port: '', label: 'OCEAN FREIGHT' },
-  { key: 'insurance', hasType: false, type: '', port: '', label: 'INSURANCE' },
+  {
+    key: 'cifValue',
+    typeKey: 'cifType',
+    hasType: true,
+    type: 'CIF',
+    port: formData.value.cifPort || 'HCM CITY, VIETNAM',
+    editable: false,
+  },
+  {
+    key: 'fobValue',
+    typeKey: 'fobType',
+    hasType: true,
+    type: 'FOB',
+    port: formData.value.fobPort || 'LAEM CHABANG, THAILAND',
+    editable: true,
+  },
+  {
+    key: 'oceanFreight',
+    typeKey: '',
+    hasType: false,
+    type: '',
+    port: 'OCEAN FREIGHT',
+    editable: true,
+  },
+  {
+    key: 'insurance',
+    typeKey: '',
+    hasType: false,
+    type: '',
+    port: 'INSURANCE',
+    editable: true,
+  },
 ])
 
-function formatNum(n) {
-  return n != null ? Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'
+// ---------------------------------------------------------------------------
+// Methods
+// ---------------------------------------------------------------------------
+
+function handleItemUpdate(index, field, value) {
+  const items = [...formData.value.items]
+
+  items[index] = { ...items[index], [field]: value }
+  updateField('items', items)
+}
+
+function updateBanking(field, value) {
+  updateField('bankingDetail', {
+    ...formData.value.bankingDetail,
+    [field]: value,
+  })
+}
+
+function splitLines(text) {
+  return text ? String(text).split('\n') : []
+}
+
+function fmtNum(v) {
+  return v != null
+    ? Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : '0.00'
 }
 </script>
 
-<style scoped>
-.tab-page { display: flex; flex-direction: column; min-height: 100%; }
-.tab-content { flex: 1; padding: 0 24px 24px; }
-.section-card { background: #fff; border-radius: 4px; padding: 16px 24px; margin-bottom: 16px; }
+<style src="./css/CommercialInvoiceTab.css">
+
 </style>
