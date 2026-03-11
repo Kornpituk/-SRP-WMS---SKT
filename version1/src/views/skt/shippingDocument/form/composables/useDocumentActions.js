@@ -21,13 +21,16 @@ export function useDocumentActions() {
       const res = await shipDocumentApi.getById(id)
       if (res.success && res.data) {
         store.loadDocument(res.data)
+        
         return true
       }
       fetchError.value = res.message || 'Failed to load document'
+      
       return false
     } catch (err) {
       fetchError.value = 'Network error. Please try again.'
       console.error('[useDocumentActions] fetchDocument:', err)
+      
       return false
     } finally {
       store.isLoading = false
@@ -39,9 +42,11 @@ export function useDocumentActions() {
     try {
       await shipDocumentApi.voidDocument(store.documentId)
       store.voidDocument()
+      
       return true
     } catch (err) {
       console.error('[useDocumentActions] voidDocument:', err)
+      
       return false
     }
   }

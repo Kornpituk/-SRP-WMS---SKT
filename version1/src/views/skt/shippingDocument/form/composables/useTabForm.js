@@ -45,9 +45,11 @@ export function useTabForm(tabKey, options = {}) {
     const errs = options.validate(formData.value)
     if (errs && Object.keys(errs).length > 0) {
       store.setTabErrors(tabKey, errs)
+      
       return false
     }
     store.clearTabErrors(tabKey)
+    
     return true
   }
 
@@ -60,6 +62,7 @@ export function useTabForm(tabKey, options = {}) {
   async function saveDraft() {
     if (!permissions.value.canSave) {
       console.warn(`[useTabForm] Save not allowed for ${tabKey}`)
+      
       return false
     }
     if (!_runValidation()) return false
@@ -71,10 +74,12 @@ export function useTabForm(tabKey, options = {}) {
       if (options.onSaveDraft) await options.onSaveDraft(formData.value)
       const ok = store.executeTransition(tabKey, 'SAVE_DRAFT')
       if (ok) options.onSaveSuccess?.()
+      
       return ok
     } catch (err) {
       _handleApiError(err)
       options.onError?.(err)
+      
       return false
     } finally {
       store.setTabLoading(tabKey, false)
@@ -84,6 +89,7 @@ export function useTabForm(tabKey, options = {}) {
   async function confirm() {
     if (!permissions.value.canConfirm) {
       console.warn(`[useTabForm] Confirm not allowed for ${tabKey}`)
+      
       return false
     }
     if (!_runValidation()) return false
@@ -95,10 +101,12 @@ export function useTabForm(tabKey, options = {}) {
       if (options.onConfirm) await options.onConfirm(formData.value)
       const ok = store.executeTransition(tabKey, 'CONFIRM')
       if (ok) options.onConfirmSuccess?.()
+      
       return ok
     } catch (err) {
       _handleApiError(err)
       options.onError?.(err)
+      
       return false
     } finally {
       store.setTabLoading(tabKey, false)

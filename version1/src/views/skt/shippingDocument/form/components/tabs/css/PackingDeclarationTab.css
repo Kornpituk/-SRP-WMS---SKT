@@ -1,0 +1,259 @@
+/**
+ * Stylelint: stylelint-config-standard + stylelint-order (grouped)
+ * Order: Position → Box Model → Typography → Visual
+ */
+
+/* =================================================================
+   Layout
+   ================================================================= */
+
+.tab-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #f5f5f5;
+}
+
+.tab-content {
+  flex: 1;
+  padding: 0;
+}
+
+/* =================================================================
+   Section
+   ================================================================= */
+
+.section {
+  padding: 24px 48px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fff;
+}
+
+/* =================================================================
+   Header area: Date / REF NO / TO / Title
+   ================================================================= */
+
+.header-date {
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+}
+
+.header-ref {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.header-ref__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+.header-ref__input {
+  max-width: 140px;
+}
+
+.header-to {
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.decl-title {
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  color: #222;
+}
+
+.decl-subtitle {
+  margin-bottom: 0;
+  font-size: 14px;
+  text-align: center;
+  color: #555;
+}
+
+/* =================================================================
+   Table (flex-based, same white bg)
+   ================================================================= */
+
+.tbl-head,
+.tbl-body {
+  display: flex;
+  align-items: flex-start;
+}
+
+.tbl-head {
+  padding: 12px 0;
+  border-bottom: 2px solid #ddd;
+}
+
+.tbl-head .tbl-c {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #555;
+}
+
+.tbl-body {
+  padding: 20px 0;
+}
+
+.tbl-c {
+  padding: 0 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.tbl-c--desc {
+  flex: 0 0 35%;
+}
+
+.tbl-c--pkg {
+  flex: 0 0 30%;
+}
+
+.tbl-c--net {
+  flex: 0 0 18%;
+}
+
+.tbl-c--gross {
+  flex: 0 0 17%;
+}
+
+/* Package column internals */
+
+.pkg-chip {
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.pkg-dim-input {
+  width: 100%;
+}
+
+/* =================================================================
+   Shipment Reference rows
+   ================================================================= */
+
+.ref-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 42px;
+  margin-bottom: 8px;
+}
+
+.ref-row:last-child {
+  margin-bottom: 0;
+}
+
+.ref-row__label {
+  flex: 0 0 180px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+.ref-row__input {
+  flex: 0 0 340px;
+}
+
+/* =================================================================
+   Chip (yellow highlight)
+   ================================================================= */
+
+.chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.chip--yellow {
+  border: 1px solid #f5deb3;
+  background: #fff8e1;
+}
+
+/* =================================================================
+   Text helpers
+   ================================================================= */
+
+.text-right {
+  text-align: right;
+}
+
+/* =================================================================
+   Responsive — Tablet (≤ 960px)
+   ================================================================= */
+
+@media (max-width: 960px) {
+  .section {
+    padding: 16px 20px;
+  }
+
+  .tbl-head,
+  .tbl-body {
+    min-width: 650px;
+  }
+
+  .ref-row {
+    flex-wrap: wrap;
+  }
+
+  .ref-row__label {
+    flex: 0 0 160px;
+  }
+
+  .ref-row__input {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* =================================================================
+   Responsive — Mobile (≤ 600px)
+   ================================================================= */
+
+@media (max-width: 600px) {
+  .section {
+    padding: 12px 16px;
+  }
+
+  .header-ref {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .header-ref__input {
+    max-width: 100%;
+  }
+
+  .ref-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .ref-row__label {
+    flex: none;
+  }
+
+  .ref-row__input {
+    flex: none;
+    width: 100%;
+  }
+}

@@ -22,6 +22,7 @@ export function usePrint(tabKey) {
       const target = options?.target ?? printTarget.value
       const blob = await shipDocumentApi.printTab(store.documentId, tabKey, target)
       const url = URL.createObjectURL(blob)
+
       window.open(url, '_blank')
       setTimeout(() => URL.revokeObjectURL(url), 60000)
     } catch (err) {

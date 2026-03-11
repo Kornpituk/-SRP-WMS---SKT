@@ -15,6 +15,7 @@ export function useDocumentPermissions() {
 
   const documentPermissions = computed(() => {
     const isVoid = documentStatus.value === DocumentStatus.VOID
+    
     return {
       canApprove: !isVoid,
       canVoid: !isVoid,
@@ -42,14 +43,14 @@ export function useTabPermissions(tabKey) {
 
     // Priority 2: Tab status
     switch (tabState.status) {
-      case TabStatus.DRAFT:
-        return { canView: true, canEdit: true, canSave: true, canConfirm: true, canPrint: false, canVoid: false }
-      case TabStatus.SAVED:
-        return { canView: true, canEdit: true, canSave: true, canConfirm: true, canPrint: true, canVoid: false }
-      case TabStatus.CONFIRMED:
-        return { canView: true, canEdit: false, canSave: false, canConfirm: false, canPrint: true, canVoid: false }
-      default:
-        return { canView: true, canEdit: false, canSave: false, canConfirm: false, canPrint: false, canVoid: false }
+    case TabStatus.DRAFT:
+      return { canView: true, canEdit: true, canSave: true, canConfirm: true, canPrint: false, canVoid: false }
+    case TabStatus.SAVED:
+      return { canView: true, canEdit: true, canSave: true, canConfirm: true, canPrint: true, canVoid: false }
+    case TabStatus.CONFIRMED:
+      return { canView: true, canEdit: false, canSave: false, canConfirm: false, canPrint: true, canVoid: false }
+    default:
+      return { canView: true, canEdit: false, canSave: false, canConfirm: false, canPrint: false, canVoid: false }
     }
   })
 
@@ -59,5 +60,6 @@ export function useTabPermissions(tabKey) {
 export function usePermissions(tabKey) {
   const { documentPermissions } = useDocumentPermissions()
   const { permissions: tabPermissions } = useTabPermissions(tabKey)
+  
   return { documentPermissions, tabPermissions }
 }

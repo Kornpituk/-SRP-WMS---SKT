@@ -9,7 +9,7 @@ import { useShipDocumentStore } from '../stores/shipDocumentStore'
 export function useUnsavedChangesGuard() {
   const store = useShipDocumentStore()
 
-  const handler = (e) => {
+  const handler = e => {
     if (store.hasUnsavedChanges) {
       e.preventDefault()
       e.returnValue = ''

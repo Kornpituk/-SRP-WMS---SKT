@@ -58,7 +58,7 @@
         class="bg-white"
       >
         <VTab
-          v-for="tab in orderedTabs"
+          v-for="tab in visibleTabs"
           :key="tab.key"
           :value="tab.key"
         >
@@ -77,7 +77,7 @@
         class="flex-grow-1 overflow-y-auto"
       >
         <VWindowItem
-          v-for="tab in orderedTabs"
+          v-for="tab in visibleTabs"
           :key="tab.key"
           :value="tab.key"
         >
@@ -127,7 +127,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, markRaw } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from 'vue-router'
 import { useShipDocumentStore } from "../stores/shipDocumentStore"
 import { useDocumentActions } from "../composables/useDocumentActions"
 import { useUnsavedChangesGuard } from "../composables/useUnsavedChangesGuard"
@@ -141,8 +141,11 @@ import CommercialInvoiceTab from "../components/tabs/CommercialInvoiceTab.vue"
 import CertificateOfOriginTab from "../components/tabs/CertificateOfOriginTab.vue"
 import PackingDeclarationTab from "../components/tabs/PackingDeclarationTab.vue"
 import ShippingParticularTab from "../components/tabs/ShippingParticularTab.vue"
+import { shipDocumentApi } from '../services/shipDocumentApi'
+import { getVisibleTabs } from '../constants/shippingMode'
 
 const route = useRoute()
+const router = useRouter()   // ← เพิ่มบรรทัดนี้
 const store = useShipDocumentStore()
 
 const { fetchDocument, voidDocument, goBackToList, cleanup, fetchError } =
@@ -151,6 +154,17 @@ const { fetchDocument, voidDocument, goBackToList, cleanup, fetchError } =
 useUnsavedChangesGuard()
 
 const orderedTabs = getOrderedTabs()
+
+// ← เพิ่มตรงนี้
+const shippingMode = computed(() => {
+  return route.query.mode || 'ocean'
+})
+
+const visibleTabs = computed(() => {
+  const allowedKeys = getVisibleTabs(shippingMode.value)
+
+  return orderedTabs.filter(tab => allowedKeys.includes(tab.key))
+})
 
 const tabComponents = {
   [TabKey.PACKING_LIST]: markRaw(PackingListTab),
@@ -171,8 +185,35 @@ async function retry() {
 }
 
 onMounted(async () => {
-  if (route.params.id) await fetchDocument(route.params.id)
+  const id = route.params.id
+  const mode = route.query.mode
+  const sourceId = route.query.sourceId
+
+  if (id === 'create') {
+    // CREATE flow — สร้าง document ใหม่ก่อน แล้วโหลด
+    try {
+      const res = await shipDocumentApi.createDocument(mode, sourceId)
+
+      if (res.success) {
+        store.loadDocument(res.data)
+
+        // เปลี่ยน URL จาก /create เป็น /doc-xxx (ไม่ให้ refresh แล้ว create ซ้ำ)
+        router.replace({
+          path: `/skt/shippingDocument/form/${res.data.id}`,
+          query: { mode },
+        })
+      }
+    }
+    catch (err) {
+      fetchError.value = 'Failed to create document'
+    }
+  }
+  else {
+    // EDIT flow — โหลด document เดิม
+    await fetchDocument(id)
+  }
 })
+
 onBeforeUnmount(() => cleanup())
 </script>
 
