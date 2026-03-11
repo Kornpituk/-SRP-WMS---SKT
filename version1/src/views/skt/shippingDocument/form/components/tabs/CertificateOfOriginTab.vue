@@ -35,7 +35,7 @@
         CERTIFICATE OF ORIGIN
       </h2>
     </div>
-    
+
     <div class="tab-content">
       <!-- Sentence block -->
       <div class="cert-body">
@@ -48,14 +48,15 @@
           <span>IN</span>
           <span class="cert-sentence__input">
             <VTextField
+              v-if="!isReadonly"
               :model-value="formData.containerCount"
-              :readonly="isReadonly"
               variant="outlined"
               density="compact"
               hide-details
               class="cert-inline-field"
               @update:model-value="(v) => updateField('containerCount', v)"
             />
+            <span v-else>{{ formData.containerCount }}</span>
           </span>
           <span>' CONTAINER</span>
         </div>

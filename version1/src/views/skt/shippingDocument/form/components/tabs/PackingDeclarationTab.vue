@@ -44,14 +44,15 @@
         <div class="header-ref">
           <span class="header-ref__label">REF NO. :</span>
           <VTextField
+            v-if="!isReadonly"
             :model-value="formData.refNo"
-            :readonly="isReadonly"
             variant="outlined"
             density="compact"
             hide-details
             class="header-ref__input"
             @update:model-value="(v) => updateField('refNo', v)"
           />
+          <span v-else>{{ formData.refNo }}</span>
         </div>
 
         <!-- TO -->
@@ -101,8 +102,8 @@
               {{ formData.packageType }}
             </span>
             <VTextField
+              v-if="!isReadonly"
               :model-value="formData.packageDimensions"
-              :readonly="isReadonly"
               variant="outlined"
               density="compact"
               hide-details
@@ -110,6 +111,7 @@
               class="pkg-dim-input"
               @update:model-value="(v) => updateField('packageDimensions', v)"
             />
+            <span v-else>{{ formData.packageDimensions }}</span>
           </div>
 
           <!-- Net Weight — yellow chip (display) -->
@@ -163,13 +165,14 @@
           <span class="ref-row__label">B/L NO. :</span>
           <div class="ref-row__input">
             <VTextField
+              v-if="!isReadonly"
               :model-value="formData.blNo"
-              :readonly="isReadonly"
               variant="outlined"
               density="compact"
               hide-details
               @update:model-value="(v) => updateField('blNo', v)"
             />
+            <span v-else>{{ formData.blNo }}</span>
           </div>
         </div>
       </div>

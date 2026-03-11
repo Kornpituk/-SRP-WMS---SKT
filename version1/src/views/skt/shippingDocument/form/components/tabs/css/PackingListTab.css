@@ -1,8 +1,8 @@
 .tab-page {
   display: flex;
   flex-direction: column;
-  min-block-size: 100%;
   background: #f5f5f5;
+  min-block-size: 100%;
 }
 
 .tab-content {
@@ -34,8 +34,8 @@
   .tab-page {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
     background: #f5f5f5;
+    min-block-size: 100%;
   }
 
   .tab-content {
@@ -48,18 +48,19 @@
    ================================================================= */
 
   .section {
-    padding: 24px 32px;
-    border-bottom: 1px solid #e8e8e8;
     background: #fff;
+    border-block-end: 1px solid #e8e8e8;
+    padding-block: 24px;
+    padding-inline: 32px;
   }
 
   .section-title {
-    margin-bottom: 24px;
+    color: #222;
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.5px;
+    margin-block-end: 24px;
     text-align: center;
-    color: #222;
   }
 
   /* =================================================================
@@ -70,27 +71,27 @@
   .ref-line {
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    margin-block-end: 8px;
   }
 
   .ref-line:last-child {
-    margin-bottom: 0;
+    margin-block-end: 0;
   }
 
   .ref-line__label {
     flex-shrink: 0;
-    width: 50%;
-    padding-right: 16px;
+    color: #333;
     font-size: 13px;
     font-weight: 500;
+    inline-size: 50%;
+    padding-inline-end: 16px;
+    text-align: end;
     white-space: nowrap;
-    text-align: right;
-    color: #333;
   }
 
   .ref-line__field {
     flex-shrink: 0;
-    width: 50%;
+    inline-size: 50%;
   }
 
   .ref-line__field--split {
@@ -118,8 +119,8 @@
   .party-block {
     display: flex;
     flex: 1;
-    gap: 12px;
     align-items: flex-start;
+    gap: 12px;
   }
 
   .party-block--inputs {
@@ -130,17 +131,17 @@
 
   .party-block__label {
     flex-shrink: 0;
-    padding-top: 2px;
+    color: #333;
     font-size: 13px;
     font-weight: 700;
+    padding-block-start: 2px;
     white-space: nowrap;
-    color: #333;
   }
 
   .party-block__body {
+    color: #333;
     font-size: 13px;
     line-height: 1.8;
-    color: #333;
   }
 
   /* =================================================================
@@ -154,20 +155,20 @@
   }
 
   .kv-pair--spaced {
-    margin-top: 12px;
+    margin-block-start: 12px;
   }
 
   .kv-pair__label {
     flex-shrink: 0;
+    color: #333;
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
-    color: #333;
   }
 
   .kv-pair__input {
     flex: 1;
-    min-width: 0;
+    min-inline-size: 0;
   }
 
   /* =================================================================
@@ -180,7 +181,7 @@
   }
 
   .ship-grid--spaced {
-    margin-top: 12px;
+    margin-block-start: 12px;
   }
 
   .ship-cell {
@@ -199,10 +200,10 @@
 
   .ship-label {
     flex-shrink: 0;
+    color: #333;
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
-    color: #333;
   }
 
   /* =================================================================
@@ -217,37 +218,42 @@
   }
 
   .tbl-head {
-    padding: 10px 0;
-    border-bottom: 2px solid #ddd;
+    border-block-end: 2px solid #ddd;
+    padding-block: 10px;
+    padding-inline: 0;
   }
 
   .tbl-body {
-    padding: 14px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-block-end: 1px solid #f0f0f0;
+    padding-block: 14px;
+    padding-inline: 0;
   }
 
   .tbl-foot {
-    padding: 10px 0;
-    border-top: 2px solid #ddd;
+    border-block-start: 2px solid #ddd;
+    padding-block: 10px;
+    padding-inline: 0;
   }
 
   .tbl-empty {
-    padding: 40px 0;
-    text-align: center;
     color: #999;
+    padding-block: 40px;
+    padding-inline: 0;
+    text-align: center;
   }
 
   .tbl-c {
-    padding: 0 6px;
     font-size: 14px;
+    padding-block: 0;
+    padding-inline: 6px;
   }
 
   .tbl-head .tbl-c {
+    color: #555;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.3px;
     text-transform: uppercase;
-    color: #555;
   }
 
   .tbl-c--marks {
@@ -271,7 +277,7 @@
   }
 
   .tbl-field--spaced {
-    margin-bottom: 8px;
+    margin-block-end: 8px;
   }
 
   /* =================================================================
@@ -282,26 +288,27 @@
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    width: 100%;
     gap: 6px;
+    inline-size: 100%;
   }
 
   .pkg-row__qty {
     display: flex;
     flex: 0 0 auto;
     align-items: center;
-    min-width: 50px;
-    padding: 6px 12px;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
-    font-size: 14px;
-    color: #333;
     background: #fafafa;
+    color: #333;
+    font-size: 14px;
+    min-inline-size: 50px;
+    padding-block: 6px;
+    padding-inline: 12px;
   }
 
   .pkg-row__unit {
     flex: 1;
-    min-width: 0;
+    min-inline-size: 0;
   }
 
   .pkg-row__pallet {
@@ -310,9 +317,9 @@
 
   .pkg-row__text {
     flex-shrink: 0;
+    color: #555;
     font-size: 13px;
     white-space: nowrap;
-    color: #555;
   }
 
   /* =================================================================
@@ -323,10 +330,10 @@
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    width: 100%;
-    gap: 6px;
-    font-size: 12px;
     color: #777;
+    font-size: 12px;
+    gap: 6px;
+    inline-size: 100%;
   }
 
   .tare-row__val {
@@ -335,6 +342,7 @@
 
   .tare-row__select {
     flex: 0 0 80px;
+    max-inline-size: 100px;
   }
 
   /* =================================================================
@@ -346,7 +354,7 @@
   }
 
   .text-right {
-    text-align: right;
+    text-align: end;
   }
 
   /* =================================================================
@@ -357,26 +365,26 @@
     display: flex;
     align-items: baseline;
     gap: 16px;
-    min-height: 34px;
-    margin-bottom: 6px;
+    margin-block-end: 6px;
+    min-block-size: 34px;
   }
 
   .info-row:last-child {
-    margin-bottom: 0;
+    margin-block-end: 0;
   }
 
   .info-row__label {
     flex: 0 0 180px;
+    color: #333;
     font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
-    color: #333;
   }
 
   .info-row__value {
     flex: 1;
-    font-size: 14px;
     color: #333;
+    font-size: 14px;
   }
 
   /* =================================================================
@@ -395,14 +403,14 @@
     }
 
     .ref-line__label {
-      width: 100%;
-      margin-bottom: 4px;
-      padding-right: 0;
-      text-align: left;
+      inline-size: 100%;
+      margin-block-end: 4px;
+      padding-inline-end: 0;
+      text-align: start;
     }
 
     .ref-line__field {
-      width: 100%;
+      inline-size: 100%;
     }
 
     /* Section 2: stack parties */
@@ -412,7 +420,7 @@
 
     .party-block--inputs {
       flex: none;
-      width: 100%;
+      inline-size: 100%;
     }
 
     /* Shipping: wrap */
@@ -429,7 +437,7 @@
     .tbl-head,
     .tbl-body,
     .tbl-foot {
-      min-width: 800px;
+      min-inline-size: 800px;
     }
 
     /* Footer: stack */
@@ -471,12 +479,12 @@
 }
 
 .section__title {
-  text-align: center;
+  color: #333;
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 1px;
-  color: #333;
   margin-block-end: 20px;
+  text-align: center;
 }
 
 /* Section 1 */
@@ -497,11 +505,11 @@
 
 .field-line__label {
   flex-shrink: 0;
+  color: #333;
   font-size: 13px;
   font-weight: 500;
-  color: #333;
-  white-space: nowrap;
   text-align: end;
+  white-space: nowrap;
 }
 
 .field-line__input {
@@ -510,8 +518,8 @@
 
 .field-line__input--flex {
   display: flex;
-  gap: 12px;
   flex: 0 0 420px;
+  gap: 12px;
 }
 
 .field-line__input-area {
@@ -525,8 +533,8 @@
 }
 
 .party-col {
-  flex: 1;
   display: flex;
+  flex: 1;
   gap: 16px;
 }
 
@@ -538,11 +546,11 @@
 
 .party-col__label {
   flex-shrink: 0;
+  color: #333;
   font-size: 13px;
   font-weight: 700;
-  color: #333;
-  white-space: nowrap;
   padding-block-start: 2px;
+  white-space: nowrap;
 }
 
 .party-col__text {
@@ -550,8 +558,8 @@
 }
 
 .party-text {
-  font-size: 13px;
   color: #333;
+  font-size: 13px;
   line-height: 1.7;
 }
 
@@ -563,9 +571,9 @@
 
 .kv__label {
   flex-shrink: 0;
+  color: #333;
   font-size: 13px;
   font-weight: 700;
-  color: #333;
   white-space: nowrap;
 }
 
@@ -581,8 +589,8 @@
 }
 
 .ship-cell {
-  flex: 1;
   display: flex;
+  flex: 1;
   align-items: center;
   gap: 12px;
 }
@@ -593,9 +601,9 @@
 
 .ship-cell__label {
   flex-shrink: 0;
+  color: #333;
   font-size: 13px;
   font-weight: 700;
-  color: #333;
   white-space: nowrap;
 }
 
@@ -622,37 +630,41 @@
 }
 
 .tbl-empty {
-  text-align: center;
   color: #999;
   padding-block: 40px;
   padding-inline: 0;
+  text-align: center;
 }
 
 .tbl-col {
-  padding-inline: 8px;
   font-size: 14px;
+  padding-inline: 8px;
 }
 
 .tbl-header .tbl-col {
+  color: #555;
   font-size: 12px;
   font-weight: 700;
-  color: #555;
-  text-transform: uppercase;
   letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 .tbl-col--marks {
   flex: 0 0 18%;
 }
+
 .tbl-col--desc {
   flex: 0 0 22%;
 }
+
 .tbl-col--pkg {
   flex: 0 0 30%;
 }
+
 .tbl-col--net {
   flex: 0 0 15%;
 }
+
 .tbl-col--gross {
   flex: 0 0 15%;
 }
@@ -676,17 +688,17 @@
 }
 
 .pkg-inline__text {
-  font-size: 13px;
   color: #555;
+  font-size: 13px;
   white-space: nowrap;
 }
 
 .tare-line {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
   color: #757575;
+  font-size: 12px;
+  gap: 8px;
 }
 
 .tare-line__select {
@@ -694,8 +706,8 @@
 }
 
 .multiline {
-  line-height: 1.7;
   font-size: 13px;
+  line-height: 1.7;
 }
 
 /* Section 4 */
@@ -703,8 +715,8 @@
   display: flex;
   align-items: baseline;
   gap: 16px;
-  min-block-size: 36px;
   margin-block-end: 8px;
+  min-block-size: 36px;
 }
 
 .info-line:last-child {
@@ -713,14 +725,268 @@
 
 .info-line__label {
   flex: 0 0 180px;
+  color: #333;
   font-size: 13px;
   font-weight: 700;
-  color: #333;
   text-transform: uppercase;
 }
 
 .info-line__value {
   flex: 1;
-  font-size: 14px;
   color: #333;
+  font-size: 14px;
+}
+
+/* ══════════════════════════════════════════════════════
+   SECTION 1 — Reference fields
+   ══════════════════════════════════════════════════════
+
+   Structure:
+   ┌─────────────────────────────────────────────────┐
+   │           PACKING LIST (centered)                │
+   │                    │ [ date picker ]             │
+   │                    │ INVOICE NO. :  110008 [inp] │
+   │                    │ PO NO :        [input     ] │
+   │                    │ PROFORMA :     [input     ] │
+   └─────────────────────────────────────────────────┘
+   - ref-block starts exactly at horizontal center (margin-left: 50%)
+   - labels left-aligned within right half (no right-align)
+   - fields fill remaining space
+*/
+
+.ref-block {
+  margin-inline-start: 50%; /* push entire block to start at center line */
+}
+
+.ref-row {
+  display: flex;
+  align-items: flex-start;
+  margin-block-end: 10px;
+}
+
+.ref-row:last-child {
+  margin-block-end: 0;
+}
+
+/* Label: LEFT-aligned, auto-width, hugs content */
+.ref-row__label {
+  flex: 0 0 auto;
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+  padding-block-start: 7px; /* vertically align with Vuetify compact input */
+  padding-inline-end: 12px;
+  text-align: start; /* left-aligned — sits at left edge of right half */
+  white-space: nowrap;
+}
+
+/* Field: fills remaining space in right half */
+.ref-row__field {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+/* Invoice row: bold number + small suffix input inline */
+.ref-row__field--invoice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.invoice-num {
+  flex-shrink: 0;
+  color: #111;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.invoice-suffix {
+  flex: 0 0 180px;
+}
+
+/* Read-only display text */
+.ref-row__text {
+  display: inline-block;
+  color: #333;
+  font-size: 14px;
+  padding-block-start: 6px;
+}
+
+/* Responsive: collapse to full-width on tablet/mobile */
+@media (max-width: 960px) {
+  .ref-block {
+    margin-inline-start: 0;
+  }
+}
+
+/* ── Date warning ───────────────────────────────────── */
+.field-warning {
+  color: #e53935;
+  font-size: 0.75rem;
+  margin-block-start: 4px;
+}
+
+/* ── Due Date ───────────────────────────────────────── */
+.due-date-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.due-date-info {
+  flex-shrink: 0;
+}
+
+/* ── Gross Weight ───────────────────────────────────── */
+.gross-weight-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gross-info {
+  flex-shrink: 0;
+}
+
+/* ── Packaging preview ──────────────────────────────── */
+.packaging-preview {
+  color: #666;
+  font-size: 0.78rem;
+  margin-block-start: 4px;
+}
+
+/* ── Notes ──────────────────────────────────────────── */
+.notes-section {
+  padding-block-start: 8px;
+}
+
+.notes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-end: 8px;
+}
+
+.note-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ffe082;
+  border-radius: 16px;
+  background: #fff8e1;
+  cursor: pointer;
+  font-size: 0.8rem;
+  gap: 4px;
+  padding-block: 4px;
+  padding-inline: 10px;
+  transition: background 0.15s;
+}
+
+.note-chip:hover {
+  background: #fff3cd;
+}
+
+.note-chip__preview {
+  overflow: hidden;
+  max-inline-size: 200px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-add-btn {
+  display: inline-flex;
+  align-items: center;
+  color: #9e9e9e;
+  cursor: pointer;
+  font-size: 0.85rem;
+  gap: 6px;
+  padding-block: 6px;
+  padding-inline: 0;
+  transition: color 0.15s;
+}
+
+.note-add-btn:hover {
+  color: #616161;
+}
+
+.note-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-inline-size: 520px;
+}
+
+.note-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ref-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+/* Responsive: collapse to full-width on tablet/mobile */
+@media (max-width: 960px) {
+  .ref-block {
+    margin-left: 0;
+  }
+}
+
+.pkg-type-select {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.pkg-tare-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  column-gap: 8px;
+  row-gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ptg-qty {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  text-align: left;
+  margin-left: 20px;
+}
+
+.ptg-pallet {
+  width: 115px;
+}
+
+.ptg-pallet-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.ptg-tare-text {
+  font-size: 12px;
+  color: #777;
+  white-space: nowrap;
+}
+
+.ptg-tare-val {
+  font-size: 12px;
+  margin-left: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Row 4: packaging summary */
+.pkg-summary-label {
+  font-size: 12px;
+  color: #888;
 }
