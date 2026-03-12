@@ -222,6 +222,26 @@
         PRINT
       </VBtn>
 
+      <div class="print-section d-flex align-center ga-1">
+        <VSelect
+          v-if="printTargets && printTargets.length"
+          v-model="internalSelected"
+          :items="printTargets"
+          item-title="title"
+          item-value="value"
+          density="compact"
+          hide-details
+          style="min-width: 120px;"
+        />
+        <VBtn
+          :loading="isPrinting"
+          :disabled="!canPrint"
+          @click="$emit('print', internalSelected)"
+        >
+          พิมพ์
+        </VBtn>
+      </div>
+
       <!-- SAVE DRAFT -->
       <VBtn
         :disabled="!permissions.canSave"
@@ -296,6 +316,13 @@ const props = defineProps({
   isPrinting: { type: Boolean, default: false },
   showPrintOptions: { type: Boolean, default: true },
   notes: { type: Array, default: () => [] },
+  isPrinting: Boolean,
+  canPrint: Boolean,
+  printTargets: {
+    type: Array,
+    default: () => [],
+  },
+  selectedTarget: String,
 })
 
 const emit = defineEmits([
@@ -305,6 +332,8 @@ const emit = defineEmits([
   'add-note',
   'delete-note',
   'edit-note',
+  'print',
+  'update:selectedTarget',
 ])
 
 const { permissions } = useTabPermissions(props.tabKey)
@@ -318,6 +347,7 @@ const currentAction = ref(null)
 
 function handleSaveDraft() {
   currentAction.value = 'save'
+  // eslint-disable-next-line vue/custom-event-name-casing
   emit('save-draft')
 }
 
@@ -352,11 +382,13 @@ function saveNote() {
   }
 
   if (editingNote.value) {
+    // eslint-disable-next-line vue/custom-event-name-casing
     emit('edit-note', {
       id: editingNote.value.id,
       text,
     })
   } else {
+    // eslint-disable-next-line vue/custom-event-name-casing
     emit('add-note', text)
   }
 
@@ -399,232 +431,22 @@ function closeViewNote() {
 }
 
 function deleteNote(noteId) {
+  // eslint-disable-next-line vue/custom-event-name-casing
   emit('delete-note', noteId)
   closeViewNote()
 }
+
+// ---------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------
+import { computed } from 'vue'
+
+
+const internalSelected = computed({
+  get: () => props.selectedTarget,
+  set: val => emit('update:selectedTarget', val),
+})
 </script>
 
-<style scoped>
-/**
- * Stylelint: stylelint-config-standard + stylelint-order (grouped)
- * Order: Position → Box Model → Typography → Visual
- */
+<style src="./css/TabActionBar.css" />
 
-/* =================================================================
-   Action bar (sticky bottom)
-   ================================================================= */
-
-.action-bar {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px;
-  border-top: 1px solid #e0e0e0;
-  background: #fff;
-}
-
-/* =================================================================
-   Left side — Notes
-   ================================================================= */
-
-.action-bar__left {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
-
-/* "Click To Add Note" button */
-
-.add-note-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0;
-  border: none;
-  font-size: 13px;
-  color: #666;
-  background: none;
-  cursor: pointer;
-}
-
-.add-note-btn:hover {
-  color: #333;
-}
-
-.add-note-btn__text {
-  text-decoration: underline;
-}
-
-/* Saved note chip (green check + text) */
-
-.note-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #2e7d32;
-  cursor: pointer;
-}
-
-.note-chip:hover {
-  text-decoration: underline;
-}
-
-/* =================================================================
-   Note Popup (shared for Add + View)
-   ================================================================= */
-
-.note-popup {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  z-index: 20;
-  width: 340px;
-  margin-bottom: 8px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
-}
-
-.note-popup__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px 8px;
-}
-
-.note-popup__title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
-}
-
-.note-popup__close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  color: #666;
-  background: none;
-  cursor: pointer;
-}
-
-.note-popup__close:hover {
-  background: #f5f5f5;
-}
-
-.note-popup__body {
-  padding: 0 16px 12px;
-}
-
-.note-popup__hint {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #999;
-}
-
-.note-popup__content {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #333;
-}
-
-.note-popup__meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 4px;
-}
-
-.note-popup__date {
-  font-size: 13px;
-  color: #777;
-}
-
-.note-popup__delete {
-  padding: 0;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-  color: #e53935;
-  background: none;
-  cursor: pointer;
-}
-
-.note-popup__edit {
-  padding: 0;
-  border: none;
-  font-size: 13px;
-  font-weight: 700;
-  margin-inline-end: 20px;
-  color: #5a5244;
-  background: none;
-  cursor: pointer;
-}
-
-.note-popup__edit:hover {
-  text-decoration: underline;
-}
-
-.note-popup__delete:hover {
-  text-decoration: underline;
-}
-
-.note-popup__footer {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 16px 12px;
-}
-
-/* =================================================================
-   Right side — Buttons
-   ================================================================= */
-
-.action-bar__right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* =================================================================
-   Responsive
-   ================================================================= */
-
-@media (max-width: 960px) {
-  .action-bar {
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 12px 16px;
-  }
-
-  .action-bar__left {
-    flex: 1 1 100%;
-  }
-
-  .action-bar__right {
-    flex: 1 1 100%;
-    justify-content: flex-end;
-  }
-
-  .note-popup {
-    width: 300px;
-  }
-}
-
-@media (max-width: 600px) {
-  .action-bar__right {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-}
-</style>

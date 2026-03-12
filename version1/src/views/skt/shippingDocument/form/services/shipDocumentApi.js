@@ -7,6 +7,9 @@
 
 import { TabKey } from '../types/shipDocument'
 import { mockDocumentList, mockDocumentDetail, mockVoidedDocument } from '../mocks/mockData'
+import { getMapper } from '@/views/skt/shippingDocument/printForn/mappers'
+import pdfMake from 'pdfmake/build/pdfmake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 // ★★★ เปลี่ยนเป็น false เมื่อ backend พร้อม ★★★
 const USE_MOCK = true
@@ -30,6 +33,7 @@ const MOCK_DELAY = 500
 // Mock Helpers
 // ---------------------------------------------------------------------------
 
+// eslint-disable-next-line promise/param-names
 const delay = (ms = MOCK_DELAY) => new Promise(r => setTimeout(r, ms))
 const ok = (data, msg = 'OK') => ({ success: true, data, message: msg })
 const clone = obj => JSON.parse(JSON.stringify(obj))
@@ -37,6 +41,28 @@ const clone = obj => JSON.parse(JSON.stringify(obj))
 // In-memory store — persists during browser session
 let _docs = clone([mockDocumentDetail, mockVoidedDocument])
 let _list = clone(mockDocumentList)
+
+// ---------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------
+if (!pdfMake.vfs) {
+  // pdfFonts มักมี property vfs อยู่แล้ว (หรืออาจเป็น vfs object เอง)
+  pdfMake.vfs = pdfFonts.vfs || pdfFonts
+}
+
+// ฟังก์ชันนี้จะถูกเรียกเมื่อต้องการใช้ Backend (ให้แก้ไขตาม endpoint จริง)
+async function callBackendPrint(documentId, tabKey, target, formData) {
+  // TODO: ใส่ URL จริง, headers, authentication
+  const response = await fetch(`/api/shipping-document/${documentId}/print`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tabKey, target, formData }),
+  })
+
+  if (!response.ok) throw new Error('Print failed')
+  
+  return response.blob()
+}
 
 // ---------------------------------------------------------------------------
 // API
@@ -130,17 +156,37 @@ export const shipDocumentApi = {
   async confirmShippingParticular(docId, data) { return this._confirm(docId, TabKey.SHIPPING_PARTICULAR, data) },
 
   // === Print ===
-  async printTab(docId, tabKey, target) {
-    if (USE_MOCK) {
-      await delay(800)
+  // async printTab(docId, tabKey, target) {
+  //   if (USE_MOCK) {
+  //     await delay(800)
 
-      const txt = `[Mock PDF] Doc=${docId} Tab=${tabKey} Target=${target} Time=${new Date().toISOString()}`
+  //     const txt = `[Mock PDF] Doc=${docId} Tab=${tabKey} Target=${target} Time=${new Date().toISOString()}`
 
-      console.log(`[Mock] Print: ${tabKey} → ${target}`)
+  //     console.log(`[Mock] Print: ${tabKey} → ${target}`)
       
-      return new Blob([txt], { type: 'application/pdf' })
+  //     return new Blob([txt], { type: 'application/pdf' })
+  //   }
+  //   throw new Error('API not connected')
+  // },
+
+  async printTab(documentId, tabKey, target, formData) {
+    const useBackend = false
+
+    if (useBackend) {
+      return callBackendPrint(documentId, tabKey, target, formData)
     }
-    throw new Error('API not connected')
+
+    const mapper = getMapper(tabKey)
+
+    if (!mapper) {
+      throw new Error(`No PDF mapper defined for tab: ${tabKey}`)
+    }
+
+    const docDefinition = mapper(formData, target)
+
+    console.log("docDefinition", docDefinition)
+
+    pdfMake.createPdf(docDefinition).open()
   },
 
   // === Internal mock helpers ===

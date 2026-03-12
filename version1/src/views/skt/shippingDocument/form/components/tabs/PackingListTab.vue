@@ -613,10 +613,13 @@
     </div>
 
     <TabActionBar
+      v-model:selected-target="printTarget"
       :tab-key="TabKey.PACKING_LIST"
       :is-loading="isLoading"
       :is-dirty="isDirty"
-      :notes="notes"
+      :is-printing="isPrinting"
+      :can-print="!isReadonly"
+      :print-targets="printTargets"
       @print="handlePrint"
       @save-draft="saveDraft"
       @confirm="confirm"
@@ -705,7 +708,21 @@ const {
   },
 })
 
-const { print: handlePrint } = usePrint(TabKey.PACKING_LIST)
+// const { print: handlePrint } = usePrint(TabKey.PACKING_LIST)
+
+const { isPrinting, print } = usePrint(TabKey.PACKING_LIST, () => formData.value)
+
+const printTarget = ref('buyer')
+
+const printTargets = [
+  { title: 'For Buyer', value: 'buyer' },
+  { title: 'For Customs', value: 'customs' },
+]
+
+function handlePrint(selectedTarget) {
+  console.log("selectedTarget", formData.value)
+  print(selectedTarget)
+}
 
 // ─── #1: Invoice Running Number ───────────────────────────────────────────────
 // `store.nextInvoiceNumber` — the backend-generated next sequential number
