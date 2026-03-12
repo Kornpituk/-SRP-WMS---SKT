@@ -137,13 +137,24 @@
           <VDivider class="my-2" />
           <div class="note-popup__meta">
             <span class="note-popup__date">{{ viewingNote.date }}</span>
-            <button
-              type="button"
-              class="note-popup__delete"
-              @click="deleteNote(viewingNote.id)"
-            >
-              DELETE
-            </button>
+
+            <div class="note-popup__actions">
+              <button
+                type="button"
+                class="note-popup__edit"
+                @click="startEditNote"
+              >
+                EDIT
+              </button>
+
+              <button
+                type="button"
+                class="note-popup__delete"
+                @click="deleteNote(viewingNote.id)"
+              >
+                DELETE
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -293,6 +304,7 @@ const emit = defineEmits([
   'confirm',
   'add-note',
   'delete-note',
+  'edit-note',
 ])
 
 const { permissions } = useTabPermissions(props.tabKey)
@@ -339,8 +351,37 @@ function saveNote() {
     return
   }
 
-  emit('add-note', text)
+  if (editingNote.value) {
+    emit('edit-note', {
+      id: editingNote.value.id,
+      text,
+    })
+  } else {
+    emit('add-note', text)
+  }
+
+  editingNote.value = null
   closeAddNote()
+}
+
+// ---------------------------------------------------------------------------
+// Note: Edit
+// ---------------------------------------------------------------------------
+
+const editingNote = ref(null)
+const editingNoteText = ref('')
+
+function cancelEditNote() {
+  editingNote.value = null
+  editingNoteText.value = ''
+}
+
+function startEditNote() {
+  editingNote.value = viewingNote.value
+  newNoteText.value = viewingNote.value.text
+
+  closeViewNote()
+  showAddDialog.value = true
 }
 
 // ---------------------------------------------------------------------------
@@ -518,6 +559,21 @@ function deleteNote(noteId) {
   color: #e53935;
   background: none;
   cursor: pointer;
+}
+
+.note-popup__edit {
+  padding: 0;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  margin-inline-end: 20px;
+  color: #5a5244;
+  background: none;
+  cursor: pointer;
+}
+
+.note-popup__edit:hover {
+  text-decoration: underline;
 }
 
 .note-popup__delete:hover {

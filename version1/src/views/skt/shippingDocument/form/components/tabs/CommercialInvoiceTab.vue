@@ -397,6 +397,7 @@
       @confirm="confirm"
       @add-note="handleAddNote"
       @delete-note="handleDeleteNote"
+      @edit-note="handleEditNote"
     />
   </div>
 </template>
@@ -690,7 +691,15 @@ function fmtNum(v) {
 const notes = ref([])
 
 function handleAddNote(text) {
-  notes.value.push({ id: Date.now(), text, date: new Date().toLocaleDateString('en-GB') })
+  notes.value.push({ id: Date.now(), text, date: new Date().toLocaleString('en-GB') })
+}
+
+function handleEditNote({ id, text }) {
+  const note = notes.value.find(n => n.id === id)
+
+  if (note) {
+    note.text = text
+  }
 }
 
 function handleDeleteNote(noteId) {

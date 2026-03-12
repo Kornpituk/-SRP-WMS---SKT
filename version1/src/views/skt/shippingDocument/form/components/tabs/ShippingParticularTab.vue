@@ -470,7 +470,7 @@ const { print: handlePrint } = usePrint(TabKey.SHIPPING_PARTICULAR)
 const notes = ref([])
 
 function handleAddNote(text) {
-  notes.value.push({ id: Date.now(), text, date: new Date().toLocaleDateString('en-GB') })
+  notes.value.push({ id: Date.now(), text, date: new Date().toLocaleString('en-GB') })
 }
 
 function handleDeleteNote(noteId) {

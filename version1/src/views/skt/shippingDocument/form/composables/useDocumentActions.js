@@ -52,7 +52,7 @@ export function useDocumentActions() {
   }
 
   function goBackToList() {
-    router.push({ name: 'ship-document-list' })
+    router.push({ name: 'skt-shippingDocument-shippingDocument-ShippingDocumentPage' })
   }
 
   function cleanup() {

@@ -1,19 +1,19 @@
 // CommercialInvoiceTab.test.js
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { createVuetify } from 'vuetify'
+// eslint-disable-next-line no-restricted-imports
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import { createPinia, setActivePinia } from 'pinia'
-import CommercialInvoiceTab from '../CommercialInvoiceTab.vue' // ปรับ path ให้ถูกต้อง
+import CommercialInvoiceTab from '../CommercialInvoiceTab.vue'
 
 // --- Mocks ---
 vi.mock('vue-router', () => ({
   useRoute: vi.fn(() => ({ query: { mode: 'OCEAN' } })),
 }))
 
-const mockUpdateField = vi.fn()
 const mockSaveDraft = vi.fn()
 const mockConfirm = vi.fn()
 
@@ -63,14 +63,18 @@ vi.mock('../../composables/useTabForm', () => ({
       },
     })
 
-    
+    const updateField = vi.fn((key, value) => {
+      // Mutate the ref to trigger reactivity
+      formData.value[key] = value
+    })
+
     return {
       formData,
       isDirty: ref(false),
       isLoading: ref(false),
       isReadonly: ref(false),
       tabStatus: ref('WAITING'),
-      updateField: mockUpdateField,
+      updateField,
       saveDraft: mockSaveDraft,
       confirm: mockConfirm,
     }
@@ -85,8 +89,8 @@ vi.mock('../../stores/shipDocumentStore', () => ({
   useShipDocumentStore: vi.fn(() => ({ documentId: 'doc123' })),
 }))
 
-// Stub for TabActionBar
-vi.mock('../shared/TabActionBar.vue', () => ({
+// Correct mock path for TabActionBar (relative to test file)
+vi.mock('../../shared/TabActionBar.vue', () => ({
   default: {
     name: 'TabActionBar',
     template: '<div data-testid="tab-action-bar"><button @click="$emit(\'save-draft\')">Save Draft</button></div>',
@@ -100,7 +104,6 @@ describe('CommercialInvoiceTab', () => {
   let wrapper
 
   beforeEach(() => {
-    // สร้าง Pinia instance และ set ให้ active
     const pinia = createPinia()
 
     setActivePinia(pinia)
@@ -150,8 +153,8 @@ describe('CommercialInvoiceTab', () => {
     expect(currencySelect.exists()).toBe(true)
 
     await currencySelect.vm.$emit('update:model-value', 'JPY')
-    expect(mockUpdateField).toHaveBeenCalledWith('amountCurrency', 'JPY')
 
+    expect(wrapper.vm.updateField).toHaveBeenCalledWith('amountCurrency', 'JPY')
     expect(wrapper.vm.activeCurrency).toBe('JPY')
   })
 
@@ -160,28 +163,26 @@ describe('CommercialInvoiceTab', () => {
   // ------------------------------------------------------------
   it('calculates amount when unit price changes', () => {
     wrapper.vm.handleItemUpdate(0, 15)
-    expect(mockUpdateField).toHaveBeenCalledWith('items', [
+    expect(wrapper.vm.updateField).toHaveBeenCalledWith('items', [
       expect.objectContaining({ unitPrice: 15, amount: 1500 }),
     ])
   })
 
   it('calculates CIF and insurance correctly for CIF term', async () => {
-    const formData = wrapper.vm.formData.value
-
-    formData.pricingTerm = 'CIF'
-    formData.fobValue = 800
-    formData.oceanFreight = 101  // เปลี่ยนเล็กน้อยเพื่อกระตุ้น watcher
-    formData.insurance = 0
+    wrapper.vm.updateField('pricingTerm', 'CIF')
+    wrapper.vm.updateField('fobValue', 800)
+    wrapper.vm.updateField('oceanFreight', 101)
+    wrapper.vm.updateField('insurance', 0)
 
     await wrapper.vm.$nextTick()
-    await wrapper.vm.$nextTick() // เผื่อกรณี watcher ทำงานไม่ทัน
+    await wrapper.vm.$nextTick()
 
-    expect(mockUpdateField).toHaveBeenCalledWith('insurance', 15) // (800+101)*1.1*0.0016 = 1.58 < 15
-    expect(mockUpdateField).toHaveBeenCalledWith('cifValue', 800 + 101 + 15)
+    expect(wrapper.vm.updateField).toHaveBeenCalledWith('insurance', 15) // (800+101)*1.1*0.0016 = 1.58 < 15
+    expect(wrapper.vm.updateField).toHaveBeenCalledWith('cifValue', 916) // 800 + 101 + 15 = 916
   })
 
   it('hides insurance row when pricing term is EXWORK', async () => {
-    wrapper.vm.formData.value.pricingTerm = 'EXWORK'
+    wrapper.vm.updateField('pricingTerm', 'EXWORK')
     await wrapper.vm.$nextTick()
 
     const hasInsurance = wrapper.vm.visiblePricingRows.some(row => row.port === 'INSURANCE')
@@ -195,6 +196,8 @@ describe('CommercialInvoiceTab', () => {
   it('calls saveDraft when Save Draft button is clicked', async () => {
     const saveBtn = wrapper.find('[data-testid="tab-action-bar"] button')
 
+    expect(saveBtn.exists()).toBe(true)
+
     await saveBtn.trigger('click')
     expect(mockSaveDraft).toHaveBeenCalled()
   })
@@ -202,21 +205,25 @@ describe('CommercialInvoiceTab', () => {
   // ------------------------------------------------------------
   // REQ-4 : Banking dropdown validation (filtering)
   // ------------------------------------------------------------
-  it('filters banking account options based on currency and payment method', () => {
-    const formData = wrapper.vm.formData.value
-
-    formData.amountCurrency = 'US$'
-    formData.payment = 'L/C'
+  it('filters banking account options based on currency and payment method', async () => {
+    // Case: USD + L/C → only prefix 21
+    wrapper.vm.updateField('amountCurrency', 'US$')
+    wrapper.vm.updateField('payment', 'L/C')
+    await wrapper.vm.$nextTick()
     expect(wrapper.vm.filteredAccountOptions.every(opt => opt.startsWith('21'))).toBe(true)
     expect(wrapper.vm.filteredAccountOptions).toHaveLength(2)
 
-    formData.amountCurrency = 'JPY'
-    formData.payment = 'T/T'
+    // Case: JPY + T/T → only prefix 22
+    wrapper.vm.updateField('amountCurrency', 'JPY')
+    wrapper.vm.updateField('payment', 'T/T')
+    await wrapper.vm.$nextTick()
     expect(wrapper.vm.filteredAccountOptions.every(opt => opt.startsWith('22'))).toBe(true)
     expect(wrapper.vm.filteredAccountOptions).toHaveLength(1)
 
-    formData.amountCurrency = 'US$'
-    formData.payment = 'T/T'
+    // Case: USD + T/T → prefix 21
+    wrapper.vm.updateField('amountCurrency', 'US$')
+    wrapper.vm.updateField('payment', 'T/T')
+    await wrapper.vm.$nextTick()
     expect(wrapper.vm.filteredAccountOptions.every(opt => opt.startsWith('21'))).toBe(true)
     expect(wrapper.vm.filteredAccountOptions).toHaveLength(2)
   })
@@ -225,7 +232,7 @@ describe('CommercialInvoiceTab', () => {
   // REQ-5 : Shipping Mode display
   // ------------------------------------------------------------
   it('displays shipping mode label as "{MODE} FREIGHT"', async () => {
-    wrapper.vm.formData.value.shippingMode = 'AIR'
+    wrapper.vm.updateField('shippingMode', 'AIR')
     await wrapper.vm.$nextTick()
 
     const modeDisplay = wrapper.find('[data-testid="shipping-mode-display"]')
@@ -237,15 +244,21 @@ describe('CommercialInvoiceTab', () => {
   // REQ-6 : Master data dropdowns (Term of Pricing, FOB type)
   // ------------------------------------------------------------
   it('provides term of pricing dropdown with correct master data options', () => {
-    const termSelect = wrapper.find('[data-testid="term-of-pricing-select"]')
+    const allVSelects = wrapper.findAllComponents({ name: 'VSelect' })
+    const termSelect = allVSelects.find(w => w.attributes('data-testid') === 'term-of-pricing-select')
 
+    expect(termSelect).toBeDefined()
     expect(termSelect.props('items')).toEqual(['CIF', 'FOB', 'EXWORK', 'C&F'])
   })
 
   it('provides FOB type dropdown with correct master data options', () => {
-    // FOB type select อยู่ในแถวที่ 2 (index 1) ของ .pricing-row__type-select
-    const fobTypeSelect = wrapper.findAll('.pricing-row__type-select')[1]
+    const allVSelects = wrapper.findAllComponents({ name: 'VSelect' })
+    const typeSelects = allVSelects.filter(w => w.classes().includes('pricing-row__type-select'))
 
-    expect(fobTypeSelect.props('items')).toEqual(['CIF', 'FOB', 'CFR'])
+    expect(typeSelects).toHaveLength(2) // CIF type and FOB type
+
+    const fobSelect = typeSelects[1]    // second one is FOB
+
+    expect(fobSelect.props('items')).toEqual(['CIF', 'FOB', 'CFR'])
   })
 })

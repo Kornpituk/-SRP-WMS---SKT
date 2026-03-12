@@ -233,7 +233,7 @@ function handleAddNote(text) {
   notes.value.push({
     id: Date.now(),
     text,
-    date: new Date().toLocaleDateString('en-GB'),
+    date: new Date().toLocaleString('en-GB'),
   })
 }
 

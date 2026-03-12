@@ -17,7 +17,7 @@
 -->
 <template>
   <div class="tab-page">
-    <div class="tab-content">
+    <div class="tab-content pt-6 px-4">
       <!-- Date — top right, yellow chip -->
       <div class="date-area">
         <span class="chip chip--yellow">
@@ -36,7 +36,7 @@
       </h2>
     </div>
 
-    <div class="tab-content">
+    <div class="tab-content pb-6 px-4">
       <!-- Sentence block -->
       <div class="cert-body">
         <!-- THIS IS TO CERTIFY THAT TOTAL [chip] IN [input] ' CONTAINER -->
@@ -137,7 +137,7 @@ function handleAddNote(text) {
   notes.value.push({
     id: Date.now(),
     text,
-    date: new Date().toLocaleDateString('en-GB'),
+    date: new Date().toLocaleString('en-GB'),
   })
 }
 

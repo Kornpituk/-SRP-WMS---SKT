@@ -129,6 +129,17 @@
   background: #fff8e1;
 }
 
+/* เพิ่มส่วนจัดการ warning */
+.warning-message {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border: 1px solid #ffeeba;
+  font-weight: 500;
+}
+
 /* =================================================================
    Responsive
    ================================================================= */
