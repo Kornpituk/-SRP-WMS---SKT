@@ -488,9 +488,10 @@
                   v-if="item.palletCount > 0"
                   :model-value="item.tareWeightPallet"
                   :items="TARE_PALLET_MASTER"
-                  item-title="title"
+                  item-title="value"
                   item-value="value"
                   variant="outlined"
+                  class="ptg-pallet"
                   density="compact"
                   hide-details
                   @update:model-value="(v) => handleItemUpdate(idx, 'tareWeightPallet', Number(v))"
@@ -615,9 +616,12 @@
       :tab-key="TabKey.PACKING_LIST"
       :is-loading="isLoading"
       :is-dirty="isDirty"
+      :notes="notes"
       @print="handlePrint"
       @save-draft="saveDraft"
-      @confirm="handleConfirm"
+      @confirm="confirm"
+      @add-note="handleAddNote"
+      @delete-note="handleDeleteNote"
     />
   </div>
 </template>
@@ -872,45 +876,21 @@ const noteDetailOpen = ref(false)
 const noteDetailText = ref('')
 const activeNote     = ref(null)
 
-function openNote(note) {
-  activeNote.value    = note
-  noteDetailText.value = note.text
-  noteDetailOpen.value = true
+
+function handleAddNote(text) {
+  notes.value.push({
+    id: Date.now(),
+    text,
+    date: new Date().toLocaleDateString('en-GB'),
+  })
 }
 
-function saveNote() {
-  if (!noteInput.value.trim()) return
-  const newNote = { id: Date.now(), text: noteInput.value.trim(), createdAt: new Date().toISOString() }
-
-  notes.value = [...notes.value, newNote]
-  store.savePackingListNotes(notes.value)   // persist immediately
-  noteInput.value = ''
-  noteOpen.value  = false
+function handleDeleteNote(noteId) {
+  notes.value = notes.value.filter(n => n.id !== noteId)
 }
 
-function updateNote() {
-  const idx = notes.value.findIndex(n => n.id === activeNote.value?.id)
-  if (idx !== -1) {
-    notes.value[idx] = { ...notes.value[idx], text: noteDetailText.value }
-    store.savePackingListNotes(notes.value)
-  }
-  noteDetailOpen.value = false
-}
 
-function deleteNote(id) {
-  notes.value = notes.value.filter(n => n.id !== id)
-  store.savePackingListNotes(notes.value)
-  noteDetailOpen.value = false
-}
 
-// #16: Click-outside handler — auto-save if there's content
-function handleNoteClickOutside() {
-  if (noteInput.value.trim()) {
-    saveNote()
-  } else {
-    noteOpen.value = false
-  }
-}
 
 // ─── Confirm wrapper ──────────────────────────────────────────────────────────
 function handleConfirm() {
