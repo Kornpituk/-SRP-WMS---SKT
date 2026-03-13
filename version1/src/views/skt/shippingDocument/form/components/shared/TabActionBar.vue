@@ -175,7 +175,7 @@
             :disabled="!permissions.canPrint"
             :loading="isPrinting"
             variant="elevated"
-            color="teal"
+            color="teal-lighten-2"
             rounded="lg"
             class="text-none"
             min-width="120"
@@ -196,11 +196,14 @@
           density="compact"
           min-width="200"
         >
-          <VListItem @click="$emit('print', { target: 'buyer' })">
-            <VListItemTitle>To Buyer</VListItemTitle>
-          </VListItem>
-          <VListItem @click="$emit('print', { target: 'customs' })">
-            <VListItemTitle>To Customs</VListItemTitle>
+          <VListItem
+            v-for="target in printTargets"
+            :key="target.value"
+            @click="$emit('print', { target: target.value })"
+          >
+            <VListItemTitle>
+              {{ target.label }}
+            </VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>
@@ -226,7 +229,7 @@
         :disabled="!permissions.canSave"
         :loading="isLoading && currentAction === 'save'"
         variant="elevated"
-        :color="permissions.canSave ? 'red-lighten-1' : 'grey-lighten-2'"
+        :color="permissions.canSave ? 'orange-darken-1' : 'grey-lighten-2'"
         rounded="lg"
         class="text-none"
         min-width="140"

@@ -715,12 +715,11 @@ const { isPrinting, print } = usePrint(TabKey.PACKING_LIST, () => formData.value
 const printTarget = ref('buyer')
 
 const printTargets = [
-  { title: 'For Buyer', value: 'buyer' },
-  { title: 'For Customs', value: 'customs' },
+  { label: 'For Buyer', value: 'buyer' },
+  { label: 'For Customs', value: 'customs' },
 ]
 
 function handlePrint(selectedTarget) {
-  console.log("selectedTarget", formData.value)
   print(selectedTarget)
 }
 

@@ -2,252 +2,196 @@ import { formatNumber, formatDate } from '../utils/pdfmake-utils'
 
 export default function packingDeclarationMapper(formData) {
 
-  const items = formData.items || []
-
-  const totalNet = items.reduce((s, i) => s + (i.netWeight || 0), 0)
-  const totalGross = items.reduce((s, i) => s + (i.grossWeight || 0), 0)
-
   const content = [
 
-    // TITLE
+    // DATE — right aligned
+    {
+      text: formatDate(formData.date),
+      alignment: 'right',
+      margin: [0, 0, 0, 20],
+    },
+
+    // REF NO. — left aligned
+    {
+      text: `REF.NO. ${formData.refNo || ''}`,
+      alignment: 'left',
+      margin: [0, 0, 0, 4],
+    },
+
+    // TO WHOM IT MAY CONCERN
+    {
+      text: 'TO   WHOM IT MAY CONCERN :',
+      alignment: 'left',
+      margin: [0, 0, 0, 20],
+    },
+
+    // TITLE — centered bold
     {
       text: 'PACKING DECLARATION',
       alignment: 'center',
       style: 'title',
-      margin: [0, 0, 0, 10],
+      margin: [0, 0, 0, 4],
     },
 
-    // REFERENCE
+    // SUBTITLE — centered
     {
-      columns: [
-        { width: '*', text: '' },
-
-        {
-          width: 'auto',
-          stack: [
-            { text: formatDate(formData.date), alignment: 'center', margin: [0, 0, 0, 5] },
-
-            {
-              text: `INVOICE NO : ${formData.invoiceNo || ''} (${formData.contractNo || ''})`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-
-            {
-              text: `PO NO : ${formData.poNo || ''}`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-
-            {
-              text: `PROFORMA INVOICE NO : ${formData.proformaInvoiceNo || ''}`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-          ],
-        },
-      ],
-      margin: [0, 0, 0, 10],
-    }, 
-
-    // SOLD TO / SHIP TO / PAYMENT
-    {
-      table: {
-        widths: ['30%', '30%', '40%'],
-        body: [
-          [
-            { text: 'SOLD TO', style: 'boxHeader' },
-            { text: 'SHIP TO', style: 'boxHeader' },
-            { text: 'PAYMENT', style: 'boxHeader' },
-          ],
-          [
-            buildSoldTo(formData),
-            buildShipTo(formData),
-            { text: formData.payment || '', rowSpan: 2 },
-          ],
-          [
-            {},
-            {},
-            {},
-          ],
-        ],
-      },
-
-      layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
-      },
-
-      margin: [0, 0, 0, 10],
-    },
-
-    // SHIPPING TABLE
-    {
-      table: {
-        widths: ['60%', '40%'],
-        body: [
-
-          [
-            buildPair('SHIPPED ON', formData.vessel),
-            buildPair('ON OR ABOUT', formatDate(formData.etd)),
-          ],
-
-          [
-            buildPair('FROM', formData.from),
-            buildPair('TO', formData.to),
-          ],
-
-          [
-            '',
-            buildPair('ETA', formatDate(formData.eta)),
-          ],
-
-        ],
-      },
-
-      layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
-      },
-
-      margin: [0, 0, 0, 10],
+      text: '(THERE IS NO WOOD IN THE CONTAINER)',
+      alignment: 'center',
+      margin: [0, 0, 0, 16],
     },
 
     // GOODS TABLE
     {
       table: {
-        headerRows: 3,
-        widths: ['30%', '30%', '12%', '13%', '15%'],
-
+        headerRows: 1,
+        widths: ['30%', '28%', '22%', '20%'],
         body: [
-
+          // Header row
           [
-            { text: 'MARKS & NOS', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'DESCRIPTION OF GOODS', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'PACKAGE', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'NET', style: 'tableHeader' },
-            { text: 'GROSS', style: 'tableHeader' },
+            {
+              text: 'DESCRIPTION OF GOODS\nOR ITEM NO.',
+              style: 'tableHeader',
+              alignment: 'center',
+            },
+            {
+              text: 'PACKAGE',
+              style: 'tableHeader',
+              alignment: 'center',
+            },
+            {
+              text: 'NET WEIGHT',
+              style: 'tableHeader',
+              alignment: 'center',
+            },
+            {
+              text: 'GROSS WEIGHT',
+              style: 'tableHeader',
+              alignment: 'center',
+            },
           ],
 
+          // Data row
           [
-            {},
-            {},
-            {},
-            { text: 'WEIGHT', style: 'tableHeader' },
-            { text: 'WEIGHT', style: 'tableHeader' },
-          ],
-
-          [
-            {},
-            {},
-            {},
-            { text: '(KGS)', style: 'tableHeader' },
-            { text: '(KGS)', style: 'tableHeader' },
-          ],
-
-          ...items.map(i => [
-            i.marksAndNos || '',
-            buildDescription(i),
-            buildPackageDisplay(i),
-            { text: formatNumber(i.netWeight), alignment: 'right' },
-            { text: formatNumber(i.grossWeight), alignment: 'right' },
-          ]),
-
-          [
-            { text: 'TOTAL', colSpan: 3, bold: true },
-            {},
-            {},
-            { text: formatNumber(totalNet), alignment: 'right', bold: true },
-            { text: formatNumber(totalGross), alignment: 'right', bold: true },
+            {
+              text: formData.descriptionOfGoods || '',
+              alignment: 'center',
+              margin: [4, 6, 4, 6],
+            },
+            {
+              stack: [
+                {
+                  text: formData.packageType || '',
+                  alignment: 'center',
+                  margin: [0, 4, 0, 4],
+                },
+                {
+                  text: formData.packageDimensions
+                    ? `(${formData.packageDimensions})`
+                    : '',
+                  alignment: 'center',
+                  fontSize: 9,
+                },
+              ],
+              margin: [4, 6, 4, 6],
+            },
+            {
+              stack: [
+                {
+                  text: `${formatNumber(formData.netWeight)}  ${formData.netWeightUnit || 'KGS'}`,
+                  alignment: 'center',
+                },
+                formData.totalDrums
+                  ? {
+                    text: `(TOTAL=${formData.totalDrums} DRUMS)`,
+                    alignment: 'center',
+                    fontSize: 9,
+                  }
+                  : null,
+              ].filter(Boolean),
+              margin: [4, 6, 4, 6],
+            },
+            {
+              text: `${formatNumber(formData.grossWeight)}  ${formData.grossWeightUnit || 'KGS'}`,
+              alignment: 'center',
+              margin: [4, 6, 4, 6],
+            },
           ],
         ],
       },
 
       layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===1 || i===2) return 0
-          if(i===3) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0.5
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
+        // eslint-disable-next-line sonarjs/no-all-duplicated-branches
+        hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 1 : 1),
+        vLineWidth: () => 1,
+        hLineColor: () => '#000000',
+        vLineColor: () => '#000000',
       },
+
+      margin: [0, 0, 0, 20],
     },
 
-    // SIGNATURE
+    // SHIPMENT REFERENCE BLOCK
     {
-      margin: [0, 30, 0, 0],
-      stack: [
-
-        { text: `PACKING : ${formData.packing || ''}` },
-
-        { text: `COUNTRY OF ORIGIN : ${formData.countryOfOrigin || ''}` },
-
-        { text: `MAKER NAME : ${formData.makerName || ''}` },
-
-        { text: `PACKAGING : ${formData.packaging || ''}` },
-
-      ],
-    },
-    {
-      alignment: 'right',
-      stack: [
-
+      columns: [
+        // Labels column
         {
-          text: 'SANYO KASEI (THAILAND) LTD.',
-          bold: true,
-          margin: [0, 20, 0, 20],
+          width: 120,
+          stack: [
+            { text: 'INVOICE NO.', margin: [0, 0, 0, 4] },
+            { text: 'NAME OF VESSEL', margin: [0, 0, 0, 4] },
+            { text: 'DATE OF SHIPMENT', margin: [0, 0, 0, 4] },
+            { text: 'B/L NO.', margin: [0, 0, 0, 4] },
+          ],
         },
 
+        // Values column
         {
-          canvas: [
+          width: '*',
+          stack: [
+            { text: `: ${formData.invoiceNo || ''}`, margin: [0, 0, 0, 4] },
+            { text: `: ${formData.vesselName || ''}`, margin: [0, 0, 0, 4] },
+            { text: `: ${formatDate(formData.dateOfShipment) || ''}`, margin: [0, 0, 0, 4] },
+            { text: `: ${formData.blNo || ''}`, margin: [0, 0, 0, 4] },
+          ],
+        },
+      ],
+      margin: [0, 0, 0, 60],
+    },
+
+    // SIGNATURE BLOCK — right aligned
+    {
+      columns: [
+
+        { width: '*', text: '' }, // spacer ด้านซ้าย
+
+        {
+          width: 'auto',
+          alignment: 'center',
+          margin: [0, 0, 0, 80],
+          stack: [
             {
-              type: 'line',
-              x1: 0,
-              y1: 0,
-              x2: 150,
-              y2: 0,
-              lineWidth: 1,
+              text: 'SANYO KASEI (THAILAND) LTD.',
+              bold: true,
+              margin: [0, 0, 0, 40],
+            },
+            {
+              canvas: [
+                {
+                  type: 'line',
+                  x1: 0,
+                  y1: 0,
+                  x2: 180,
+                  y2: 0,
+                  lineWidth: 1,
+                  dash: { length: 4, space: 2 },
+                },
+              ],
+              margin: [0, 0, 0, 8],
+            },
+            {
+              text: 'AUTHORISED SIGNATURE',
             },
           ],
-          margin: [0, 20, 0, 5], // ช่องเซ็นลายเซ็น
-        },
-
-        {
-          text: 'AUTHORISED SIGNATURE',
         },
 
       ],
@@ -257,106 +201,23 @@ export default function packingDeclarationMapper(formData) {
 
   return {
     pageSize: 'A4',
-    pageMargins: [40, 40, 40, 40],
+    pageMargins: [60, 60, 60, 60],
     content,
 
     styles: {
-
       title: {
-        fontSize: 16,
+        fontSize: 13,
         bold: true,
       },
-
-      boxHeader: {
-        bold: true,
-        decoration: 'underline',
-      },
-
       tableHeader: {
         bold: true,
-        alignment: 'center',
+        fontSize: 10,
       },
-
     },
 
     defaultStyle: {
       fontSize: 10,
+      lineHeight: 1.4,
     },
-
   }
-}
-
-
-function buildSoldTo(formData) {
-
-  const p = formData.payer || {}
-
-  return {
-    stack: [
-      { text: p.name, bold: true },
-      p.address,
-      p.address2,
-      `${p.city || ''} ${p.country || ''}`.trim(),
-      p.tel ? `TEL : ${p.tel}` : '',
-      p.attn ? { text: `ATTN : ${p.attn}`, bold: true } : '',
-    ].filter(Boolean),
-  }
-}
-
-
-function buildShipTo(formData) {
-
-  const c = formData.consignee || {}
-
-  return {
-    stack: [
-      { text: c.name, bold: true },
-      c.address,
-      c.address2,
-      c.address3,
-      `${c.city || ''} - ${c.country || ''}`.trim(),
-      c.tel ? `TEL : ${c.tel}` : '',
-      c.taxId ? `TAX ID : ${c.taxId}` : '',
-      c.attn ? { text: `ATTN : ${c.attn}`, bold: true } : '',
-    ].filter(Boolean),
-  }
-}
-
-
-function buildPair(label, value) {
-
-  return {
-    text: `${label} : ${value || ''}`,
-  }
-
-}
-
-
-function buildPackageDisplay(item) {
-
-  const parts = []
-
-  if (item.packageType) parts.push(item.packageType)
-
-  if (item.quantity && item.unitType) {
-
-    const pkg = item.palletCount
-      ? `${item.quantity} ${item.unitType} (${item.palletCount} PALLETS)`
-      : `${item.quantity} ${item.unitType}`
-
-    parts.push(pkg)
-  }
-
-  return parts.join('\n')
-}
-
-
-function buildDescription(item) {
-
-  return [
-    item.descriptionOfGoods,
-    item.subDescription ? `(${item.subDescription})` : '',
-  ]
-    .filter(Boolean)
-    .join('\n')
 }

@@ -321,6 +321,14 @@ export const mockDocumentDetail = {
           taxId: '198305357N',
           attn: 'MS. POOI YEE',
           email: 'poolyee@agedor.com.sg',
+          notifyParty: `AGE D\'OR PTE LTD\n 
+          25 BUKIT BATOK CRESCENT\n 
+          #06-13 THE ELITIST\n 
+          SINGAPORE 658066\n
+          TEL: +65 6776 5228\n
+          FAX: +65 6776 5229\n
+          EMAIL: [EMAIL_ADDRESS]\n
+          `,
         },
         portOfReceipt: 'LAEM CHABANG, THAILAND',
         portOfLoading: 'LAEM CHABANG, THAILAND',

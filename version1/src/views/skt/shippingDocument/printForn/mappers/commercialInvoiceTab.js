@@ -223,35 +223,43 @@ export default function commercialInvoiceMapper(formData) {
       ],
     },
     {
-      alignment: 'right',
-      stack: [
+      columns: [
+
+        { width: '*', text: '' }, // spacer ด้านซ้าย
 
         {
-          text: 'SANYO KASEI (THAILAND) LTD.',
-          bold: true,
-          margin: [0, 20, 0, 20],
-        },
-
-        {
-          canvas: [
+          width: 'auto',
+          alignment: 'center',
+          margin: [0, 0, 0, 80],
+          stack: [
             {
-              type: 'line',
-              x1: 0,
-              y1: 0,
-              x2: 150,
-              y2: 0,
-              lineWidth: 1,
+              text: 'SANYO KASEI (THAILAND) LTD.',
+              bold: true,
+              margin: [0, 0, 0, 40],
+            },
+            {
+              canvas: [
+                {
+                  type: 'line',
+                  x1: 0,
+                  y1: 0,
+                  x2: 180,
+                  y2: 0,
+                  lineWidth: 1,
+                  dash: { length: 4, space: 2 },
+                },
+              ],
+              margin: [0, 0, 0, 8],
+            },
+            {
+              text: 'AUTHORISED SIGNATURE',
             },
           ],
-          margin: [0, 20, 0, 5], // ช่องเซ็นลายเซ็น
-        },
-
-        {
-          text: 'AUTHORISED SIGNATURE',
         },
 
       ],
     },
+
 
   ]
 

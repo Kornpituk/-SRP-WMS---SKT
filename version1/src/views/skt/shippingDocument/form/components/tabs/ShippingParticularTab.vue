@@ -153,24 +153,44 @@
           NOTIFY PARTY :
         </div>
         <div class="notify-box">
-          <div>{{ formData.notifyParty?.name }}</div>
-          <div>{{ formData.notifyParty?.address }}</div>
-          <div v-if="formData.notifyParty?.address2">
+          <!--
+            <div>{{ formData.notifyParty?.name }}</div>
+            <div>{{ formData.notifyParty?.address }}</div>
+            <div v-if="formData.notifyParty?.address2">
             {{ formData.notifyParty.address2 }}
-          </div>
-          <div>{{ formData.notifyParty?.city }} {{ formData.notifyParty?.country }}</div>
-          <div v-if="formData.notifyParty?.tel">
+            </div>
+            <div>{{ formData.notifyParty?.city }} {{ formData.notifyParty?.country }}</div>
+            <div v-if="formData.notifyParty?.tel">
             TEL.: {{ formData.notifyParty.tel }}
-          </div>
-          <div v-if="formData.notifyParty?.taxId">
+            </div>
+            <div v-if="formData.notifyParty?.taxId">
             TAX ID : {{ formData.notifyParty.taxId }}
-          </div>
-          <div v-if="formData.notifyParty?.attn">
+            </div>
+            <div v-if="formData.notifyParty?.attn">
             ATTN : {{ formData.notifyParty.attn }}
-          </div>
-          <div v-if="formData.notifyParty?.email">
+            </div>
+            <div v-if="formData.notifyParty?.email">
             E-MAIL : {{ formData.notifyParty.email }}
-          </div>
+            </div> 
+          -->
+
+          <VTextarea
+            v-if="!isReadonly"
+            :model-value="formData.notifyParty.notifyParty"
+            density="compact"
+            hide-details
+            auto-grow
+            rows="1"
+            class="notify-party-input"
+            @update:model-value="v => updateField('notifyParty.notifyParty', v)"
+          />
+
+          <span
+            v-else
+            class="notify-party-text"
+          >
+            {{ formData.notifyParty?.notifyParty }}
+          </span>
         </div>
       </div>
 

@@ -8,12 +8,14 @@
 <template>
   <div>
     <!-- Top bar -->
+     
     <VToolbar
       color="white"
       flat
       density="compact"
-      class="px-2 d-flex align-center ga-3"
+      class="toolbar-container px-2"
     >
+      <!-- Left -->
       <VBtn
         icon="mdi-close"
         color="green"
@@ -21,19 +23,24 @@
         size="small"
         @click="$emit('close')"
       />
-      <VToolbarTitle class="text-center text-body-1 font-weight-bold">
+
+      <!-- Center -->
+      <VToolbarTitle class="toolbar-title text-body-1 font-weight-bold">
         Ship Document
       </VToolbarTitle>
-      <VSpacer />
-      <!-- Settings icon placeholder -->
-      <VBtn
+
+      <!-- Right -->
+      <!--
+        <VBtn
         icon="mdi-cog-outline"
         variant="text"
         size="small"
         color="green"
-      />
+        /> 
+      -->
     </VToolbar>
 
+    
     <!-- Action buttons row -->
     <div class="d-flex align-center ga-3 px-6 py-3">
       <!-- VOID button -->
@@ -96,3 +103,18 @@ defineEmits(['close', 'void', 'approve'])
 const store = useShipDocumentStore()
 const { documentPermissions: perms } = useDocumentPermissions()
 </script>
+
+<style scoped>
+.toolbar-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toolbar-title {
+  position: absolute;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+}
+</style>

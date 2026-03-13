@@ -392,6 +392,9 @@
       :is-loading="isLoading"
       :is-dirty="isDirty"
       :notes="notes"
+      :is-printing="isPrinting"
+      :can-print="!isReadonly"
+      :print-targets="printTargets"
       @print="handlePrint"
       @save-draft="saveDraft"
       @confirm="confirm"
@@ -464,7 +467,22 @@ const {
   onConfirm: data => tabApiMap[TabKey.COMMERCIAL_INVOICE].confirm(store.documentId, data),
 })
 
-const { print: handlePrint } = usePrint(TabKey.COMMERCIAL_INVOICE)
+// ---------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------
+
+const { isPrinting, print } = usePrint(TabKey.COMMERCIAL_INVOICE, () => formData.value)
+
+const printTarget = ref('buyer')
+
+const printTargets = [
+  { label: 'For Buyer', value: 'buyer' },
+  { label: 'For Customs', value: 'customs' },
+]
+
+function handlePrint(selectedTarget) {
+  print(selectedTarget)
+}
 
 // ---------------------------------------------------------------------------
 // Derived state

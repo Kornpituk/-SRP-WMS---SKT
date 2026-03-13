@@ -184,11 +184,15 @@
       :is-loading="isLoading"
       :is-dirty="isDirty"
       :notes="notes"
+      :is-printing="isPrinting"
+      :can-print="!isReadonly"
+      :print-targets="printTargets"
       @print="handlePrint"
       @save-draft="saveDraft"
       @confirm="confirm"
       @add-note="handleAddNote"
       @delete-note="handleDeleteNote"
+      @edit-note="handleEditNote"
     />
   </div>
 </template>
@@ -221,7 +225,22 @@ const {
   onConfirm: data => tabApiMap[TabKey.PACKING_DECLARATION].confirm(store.documentId, data),
 })
 
-const { print: handlePrint } = usePrint(TabKey.PACKING_DECLARATION)
+// ---------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------
+
+const { isPrinting, print } = usePrint(TabKey.PACKING_DECLARATION, () => formData.value)
+
+const printTarget = ref('buyer')
+
+const printTargets = [
+  { label: 'Product Description', value: 'productDescription' },
+  { label: 'Note', value: 'note' },
+]
+
+function handlePrint(selectedTarget) {
+  print(selectedTarget)
+}
 
 // ---------------------------------------------------------------------------
 // Notes (per-tab)
