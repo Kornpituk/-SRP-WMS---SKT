@@ -1,6 +1,6 @@
 import { formatNumber, formatDate } from '../utils/pdfmake-utils'
 
-export default function packingListMapper(formData) {
+export default function commercialInvoiceMapper(formData) {
 
   const items = formData.items || []
 
@@ -11,7 +11,7 @@ export default function packingListMapper(formData) {
 
     // TITLE
     {
-      text: 'PACKING LIST',
+      text: 'COMMERCIAL INVOICE',
       alignment: 'center',
       style: 'title',
       margin: [0, 0, 0, 10],

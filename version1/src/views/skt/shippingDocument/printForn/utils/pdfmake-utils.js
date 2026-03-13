@@ -16,10 +16,31 @@ export const formatNumber = (val, digits = 2) => {
   return (val ?? 0).toFixed(digits)
 }
 
-export const formatDate = (dateStr, locale = 'th-TH') => {
-  if (!dateStr) return ''
-  
-  return new Date(dateStr).toLocaleDateString(locale)
+export function formatDate(date) {
+  if (!date) return ''
+
+  const d = new Date(date)
+
+  const months = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    'DEC',
+  ]
+
+  const day = d.getDate()
+  const month = months[d.getMonth()]
+  const year = d.getFullYear()
+
+  return `${month} ${day}, ${year}`
 }
 
 // ฟังก์ชันอื่น ๆ ที่ใช้ร่วมกัน (เช่น สร้าง Header บริษัท)

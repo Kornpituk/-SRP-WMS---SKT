@@ -17,85 +17,60 @@ export default function packingListMapper(formData) {
       margin: [0, 0, 0, 10],
     },
 
+    // DATE
+    {
+      text: formatDate(formData.date),
+      alignment: 'right',
+      margin: [0, 0, 0, 5],
+    },
+
     // REFERENCE
     {
-      columns: [
-        { width: '*', text: '' },
-
+      alignment: 'right',
+      stack: [
         {
-          width: 'auto',
-          stack: [
-            { text: formatDate(formData.date), alignment: 'center', margin: [0, 0, 0, 5] },
-
-            {
-              text: `INVOICE NO : ${formData.invoiceNo || ''} (${formData.contractNo || ''})`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-
-            {
-              text: `PO NO : ${formData.poNo || ''}`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-
-            {
-              text: `PROFORMA INVOICE NO : ${formData.proformaInvoiceNo || ''}`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-          ],
+          text: `INVOICE NO : ${formData.invoiceNo || ''}`,
+          decoration: 'underline',
+        },
+        {
+          text: `PO NO : ${formData.poNo || ''}`,
+          decoration: 'underline',
+        },
+        {
+          text: `PROFORMA INVOICE NO : ${formData.proformaInvoiceNo || ''}`,
+          decoration: 'underline',
         },
       ],
       margin: [0, 0, 0, 10],
-    }, 
+    },
 
     // SOLD TO / SHIP TO / PAYMENT
     {
       table: {
-        widths: ['30%', '30%', '40%'],
+        widths: ['40%', '40%', '20%'],
         body: [
+
           [
             { text: 'SOLD TO', style: 'boxHeader' },
             { text: 'SHIP TO', style: 'boxHeader' },
             { text: 'PAYMENT', style: 'boxHeader' },
           ],
+
           [
             buildSoldTo(formData),
             buildShipTo(formData),
-            { text: formData.payment || '', rowSpan: 2 },
+            { text: formData.payment || '' },
           ],
-          [
-            {},
-            {},
-            {},
-          ],
+
         ],
       },
-
-      layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
-      },
-
       margin: [0, 0, 0, 10],
     },
 
     // SHIPPING TABLE
     {
       table: {
-        widths: ['60%', '40%'],
+        widths: ['50%', '50%'],
         body: [
 
           [
@@ -115,23 +90,6 @@ export default function packingListMapper(formData) {
 
         ],
       },
-
-      layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
-      },
-
       margin: [0, 0, 0, 10],
     },
 
@@ -139,16 +97,14 @@ export default function packingListMapper(formData) {
     {
       table: {
         headerRows: 3,
-        widths: ['30%', '30%', '12%', '13%', '15%'],
+        widths: ['20%', '35%', '15%', '15%', '15%'],
 
         body: [
 
           [
-            { text: 'MARKS & NOS', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'DESCRIPTION OF GOODS', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'PACKAGE', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
+            { text: 'MARKS', style: 'tableHeader', rowSpan: 3 },
+            { text: 'DESCRIPTION', style: 'tableHeader', rowSpan: 3 },
+            { text: 'PACKAGE', style: 'tableHeader', rowSpan: 3 },
 
             { text: 'NET', style: 'tableHeader' },
             { text: 'GROSS', style: 'tableHeader' },
@@ -190,20 +146,20 @@ export default function packingListMapper(formData) {
 
       layout: {
 
-        hLineWidth: function(i, node){
+        hLineWidth: function (i, node) {
 
-          if(i===0) return 1
-          if(i===1 || i===2) return 0
-          if(i===3) return 1
-          if(i===node.table.body.length) return 1
+          if (i === 0) return 1
+
+          if (i === node.table.body.length) return 1
+
+          if (i <= 3) return 0
 
           return 0.5
         },
 
-        vLineWidth: function(){
+        vLineWidth: function () {
           return 1
         },
-
       },
     },
 
@@ -229,7 +185,7 @@ export default function packingListMapper(formData) {
         {
           text: 'SANYO KASEI (THAILAND) LTD.',
           bold: true,
-          margin: [0, 20, 0, 20],
+          margin: [0, 20, 0, 40],
         },
 
         {
@@ -238,12 +194,12 @@ export default function packingListMapper(formData) {
               type: 'line',
               x1: 0,
               y1: 0,
-              x2: 150,
+              x2: 200,
               y2: 0,
               lineWidth: 1,
             },
           ],
-          margin: [0, 20, 0, 5], // ช่องเซ็นลายเซ็น
+          margin: [0, 40, 0, 5], // ช่องเซ็นลายเซ็น
         },
 
         {
@@ -326,7 +282,10 @@ function buildShipTo(formData) {
 function buildPair(label, value) {
 
   return {
-    text: `${label} : ${value || ''}`,
+    columns: [
+      { text: `${label} : `, bold: true },
+      { text: value || '' },
+    ],
   }
 
 }

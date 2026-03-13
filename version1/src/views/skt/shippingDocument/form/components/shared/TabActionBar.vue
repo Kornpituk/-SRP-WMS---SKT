@@ -221,27 +221,6 @@
         </VIcon>
         PRINT
       </VBtn>
-
-      <div class="print-section d-flex align-center ga-1">
-        <VSelect
-          v-if="printTargets && printTargets.length"
-          v-model="internalSelected"
-          :items="printTargets"
-          item-title="title"
-          item-value="value"
-          density="compact"
-          hide-details
-          style="min-width: 120px;"
-        />
-        <VBtn
-          :loading="isPrinting"
-          :disabled="!canPrint"
-          @click="$emit('print', internalSelected)"
-        >
-          พิมพ์
-        </VBtn>
-      </div>
-
       <!-- SAVE DRAFT -->
       <VBtn
         :disabled="!permissions.canSave"

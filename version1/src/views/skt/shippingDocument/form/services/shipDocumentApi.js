@@ -156,18 +156,6 @@ export const shipDocumentApi = {
   async confirmShippingParticular(docId, data) { return this._confirm(docId, TabKey.SHIPPING_PARTICULAR, data) },
 
   // === Print ===
-  // async printTab(docId, tabKey, target) {
-  //   if (USE_MOCK) {
-  //     await delay(800)
-
-  //     const txt = `[Mock PDF] Doc=${docId} Tab=${tabKey} Target=${target} Time=${new Date().toISOString()}`
-
-  //     console.log(`[Mock] Print: ${tabKey} → ${target}`)
-      
-  //     return new Blob([txt], { type: 'application/pdf' })
-  //   }
-  //   throw new Error('API not connected')
-  // },
 
   async printTab(documentId, tabKey, target, formData) {
     const useBackend = false
@@ -183,8 +171,6 @@ export const shipDocumentApi = {
     }
 
     const docDefinition = mapper(formData, target)
-
-    console.log("docDefinition", docDefinition)
 
     pdfMake.createPdf(docDefinition).open()
   },
