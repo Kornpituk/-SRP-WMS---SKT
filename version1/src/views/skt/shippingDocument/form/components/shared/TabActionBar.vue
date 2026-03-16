@@ -224,6 +224,82 @@
         </VIcon>
         PRINT
       </VBtn>
+
+      <div class="text-center">
+        <VMenu
+          v-model="menu"
+          :close-on-content-click="false"
+          location="end"
+        >
+          <template #activator="{ props }">
+            <VBtn
+              color="indigo"
+              v-bind="props"
+            >
+              Menu as Popover
+            </VBtn>
+          </template>
+
+          <VCard min-width="300">
+            <VList>
+              <VListItem
+                prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
+                subtitle="Founder of Vuetify"
+                title="John Leider"
+              >
+                <template #append>
+                  <VBtn
+                    :class="fav ? 'text-red' : ''"
+                    icon="mdi-heart"
+                    variant="text"
+                    @click="fav = !fav"
+                  />
+                </template>
+              </VListItem>
+            </VList>
+
+            <VDivider />
+
+            <VList>
+              <VListItem>
+                <VSwitch
+                  v-model="message"
+                  color="purple"
+                  label="Enable messages"
+                  hide-details
+                />
+              </VListItem>
+
+              <VListItem>
+                <VSwitch
+                  v-model="hints"
+                  color="purple"
+                  label="Enable hints"
+                  hide-details
+                />
+              </VListItem>
+            </VList>
+
+            <VCardActions>
+              <VSpacer />
+
+              <VBtn
+                variant="text"
+                @click="menu = false"
+              >
+                Cancel
+              </VBtn>
+              <VBtn
+                color="primary"
+                variant="text"
+                @click="menu = false"
+              >
+                Save
+              </VBtn>
+            </VCardActions>
+          </VCard>
+        </VMenu>
+      </div>
       <!-- SAVE DRAFT -->
       <VBtn
         :disabled="!permissions.canSave"
@@ -423,6 +499,10 @@ function deleteNote(noteId) {
 // ---------------------------------------------------------------------------
 import { computed } from 'vue'
 
+const fav = ref(true)
+const menu = ref(false)
+const message = ref(false)
+const hints = ref(true)
 
 const internalSelected = computed({
   get: () => props.selectedTarget,

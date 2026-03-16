@@ -353,151 +353,152 @@
       <!-- SECTION 3: Items Table                             -->
       <!-- ================================================ -->
       <div class="section">
-        <div class="tbl-head">
-          <div class="tbl-c tbl-c--marks">
-            MARKS &amp; NOS
-          </div>
-          <div class="tbl-c tbl-c--desc">
-            DESCRIPTION OF GOODS
-          </div>
-          <div class="tbl-c tbl-c--pkg">
-            PACKAGE
-          </div>
-          <div class="tbl-c tbl-c--wt">
-            NET WEIGHT (KGS)
-          </div>
-          <div class="tbl-c tbl-c--wt">
-            GROSS WEIGHT (KGS)
-          </div>
-        </div>
-
-        <div
-          v-for="(item, idx) in formData.items"
-          :key="item.id || idx"
-          class="tbl-body"
-        >
-          <!-- MARKS & NOS — #8: default from consignee/PO, editable -->
-          <div class="tbl-c tbl-c--marks">
-            <VTextarea
-              v-if="!isReadonly"
-              :model-value="item.marksAndNos"
-              variant="outlined"
-              density="compact"
-              hide-details
-              rows="3"
-              auto-grow
-              @update:model-value="(v) => handleItemUpdate(idx, 'marksAndNos', v)"
-            />
-            <div v-else>
-              <div
-                v-for="(line, li) in splitLines(item.marksAndNos)"
-                :key="li"
-              >
-                {{ line }}
-              </div>
+        <div class="section--item--table">
+          <div class="tbl-head">
+            <div class="tbl-c tbl-c--marks">
+              MARKS &amp; NOS
+            </div>
+            <div class="tbl-c tbl-c--desc">
+              DESCRIPTION OF GOODS
+            </div>
+            <div class="tbl-c tbl-c--pkg">
+              PACKAGE
+            </div>
+            <div class="tbl-c tbl-c--wt">
+              NET WEIGHT (KGS)
+            </div>
+            <div class="tbl-c tbl-c--wt">
+              GROSS WEIGHT (KGS)
             </div>
           </div>
 
-          <!-- Description -->
-          <div class="tbl-c tbl-c--desc">
-            <template v-if="!isReadonly">
-              <VTextField
-                :model-value="item.descriptionOfGoods"
+          <div
+            v-for="(item, idx) in formData.items"
+            :key="item.id || idx"
+            class="tbl-body"
+          >
+            <!-- MARKS & NOS — #8: default from consignee/PO, editable -->
+            <div class="tbl-c tbl-c--marks">
+              <VTextarea
+                v-if="!isReadonly"
+                :model-value="item.marksAndNos"
                 variant="outlined"
                 density="compact"
                 hide-details
-                class="tbl-field--spaced"
-                @update:model-value="(v) => handleItemUpdate(idx, 'descriptionOfGoods', v)"
+                rows="3"
+                auto-grow
+                @update:model-value="(v) => handleItemUpdate(idx, 'marksAndNos', v)"
               />
-              <VTextField
-                :model-value="item.subDescription"
-                variant="outlined"
-                density="compact"
-                hide-details
-                @update:model-value="(v) => handleItemUpdate(idx, 'subDescription', v)"
-              />
-            </template>
-            <template v-else>
-              <div>{{ item.descriptionOfGoods }}</div>
-              <div
-                v-if="item.subDescription"
-                class="text-muted"
-              >
-                ({{ item.subDescription }})
+              <div v-else>
+                <div
+                  v-for="(line, li) in splitLines(item.marksAndNos)"
+                  :key="li"
+                >
+                  {{ line }}
+                </div>
               </div>
-            </template>
-          </div>
+            </div>
 
-          <!-- Package + Tare -->
-          <div class="tbl-c tbl-c--pkg">
-            <template v-if="!isReadonly">
-              <!-- Row 1: Package type — full width -->
-              <VSelect
-                :model-value="item.packageType"
-                :items="PACKAGE_TYPES"
-                variant="outlined"
-                density="compact"
-                hide-details
-                class="pkg-type-select"
-                @update:model-value="(v) => handleItemUpdate(idx, 'packageType', v)"
-              />
-
-              <!--
-                TRUE 4-column grid — both rows have exactly 4 independent cells.
-                grid-template-columns: auto | 1fr | auto | auto
-                Row 2: [160] | [DRUM▼] | [40] | [PALLET]
-                Row 3: [Tare W.(KG)] | [2.00] | [Tare W.(KG)] | [5.00▼]
-              -->
-              <div class="pkg-tare-grid">
-                <!-- ── Row 2 ── -->
-                <span class="ptg-qty">{{ item.quantity || 0 }}</span>
-
-                <VSelect
-                  :model-value="item.unitType"
-                  :items="UNIT_TYPES"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  class="ptg-pallet"
-                  @update:model-value="(v) => handleItemUpdate(idx, 'unitType', v)"
-                />
-
+            <!-- Description -->
+            <div class="tbl-c tbl-c--desc">
+              <template v-if="!isReadonly">
                 <VTextField
-                  :model-value="item.palletCount"
-                  type="number"
+                  :model-value="item.descriptionOfGoods"
                   variant="outlined"
                   density="compact"
                   hide-details
-                  class="ptg-pallet"
-                  @update:model-value="(v) => handleItemUpdate(idx, 'palletCount', Number(v))"
+                  class="tbl-field--spaced"
+                  @update:model-value="(v) => handleItemUpdate(idx, 'descriptionOfGoods', v)"
                 />
+                <VTextField
+                  :model-value="item.subDescription"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  @update:model-value="(v) => handleItemUpdate(idx, 'subDescription', v)"
+                />
+              </template>
+              <template v-else>
+                <div>{{ item.descriptionOfGoods }}</div>
+                <div
+                  v-if="item.subDescription"
+                  class="text-muted"
+                >
+                  ({{ item.subDescription }})
+                </div>
+              </template>
+            </div>
 
-                <span class="ptg-pallet-label">PALLET</span>
-
-                <!-- ── Row 3: each cell aligns under row 2 ── -->
-                <span class="ptg-tare-text">Tare Weight (KG)</span>
-
-                <span class="ptg-tare-val">{{ fmtDec(item.tareWeightDrum) }}</span>
-
-                <span
-                  class="ptg-tare-text"
-                  :style="{ visibility: item.palletCount > 0 ? 'visible' : 'hidden' }"
-                >Tare Weight (KG)</span>
-
+            <!-- Package + Tare -->
+            <div class="tbl-c tbl-c--pkg">
+              <template v-if="!isReadonly">
+                <!-- Row 1: Package type — full width -->
                 <VSelect
-                  v-if="item.palletCount > 0"
-                  :model-value="item.tareWeightPallet"
-                  :items="TARE_PALLET_MASTER"
-                  item-title="value"
-                  item-value="value"
+                  :model-value="item.packageType"
+                  :items="PACKAGE_TYPES"
                   variant="outlined"
-                  class="ptg-pallet"
                   density="compact"
                   hide-details
-                  @update:model-value="(v) => handleItemUpdate(idx, 'tareWeightPallet', Number(v))"
+                  class="pkg-type-select"
+                  @update:model-value="(v) => handleItemUpdate(idx, 'packageType', v)"
                 />
-                <span v-else />
-              </div>
+
+                <!--
+                  TRUE 4-column grid — both rows have exactly 4 independent cells.
+                  grid-template-columns: auto | 1fr | auto | auto
+                  Row 2: [160] | [DRUM▼] | [40] | [PALLET]
+                  Row 3: [Tare W.(KG)] | [2.00] | [Tare W.(KG)] | [5.00▼]
+                -->
+                <div class="pkg-tare-grid">
+                  <!-- ── Row 2 ── -->
+                  <span class="ptg-qty">{{ item.quantity || 0 }}</span>
+
+                  <VSelect
+                    :model-value="item.unitType"
+                    :items="UNIT_TYPES"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    class="ptg-pallet"
+                    @update:model-value="(v) => handleItemUpdate(idx, 'unitType', v)"
+                  />
+
+                  <VTextField
+                    :model-value="item.palletCount"
+                    type="number"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    class="ptg-pallet"
+                    @update:model-value="(v) => handleItemUpdate(idx, 'palletCount', Number(v))"
+                  />
+
+                  <span class="ptg-pallet-label">PALLET</span>
+
+                  <!-- ── Row 3: each cell aligns under row 2 ── -->
+                  <span class="ptg-tare-text">Tare Weight (KG)</span>
+
+                  <span class="ptg-tare-val">{{ fmtDec(item.tareWeightDrum) }}</span>
+
+                  <span
+                    class="ptg-tare-text"
+                    :style="{ visibility: item.palletCount > 0 ? 'visible' : 'hidden' }"
+                  >Tare Weight (KG)</span>
+
+                  <VSelect
+                    v-if="item.palletCount > 0"
+                    :model-value="item.tareWeightPallet"
+                    :items="TARE_PALLET_MASTER"
+                    item-title="value"
+                    item-value="value"
+                    variant="outlined"
+                    class="ptg-pallet"
+                    density="compact"
+                    hide-details
+                    @update:model-value="(v) => handleItemUpdate(idx, 'tareWeightPallet', Number(v))"
+                  />
+                  <span v-else />
+                </div>
 
               <!-- Row 4: packaging summary -->
               <!--
@@ -505,92 +506,95 @@
                 {{ buildPackagingLabel(item) }}
                 </div> 
               -->
-            </template>
+              </template>
 
-            <template v-else>
-              <div v-if="item.packageType || item.package">
-                {{ item.packageType || item.package }}
-              </div>
-              <div
-                v-if="buildPackagingLabel(item)"
-                class="text-muted"
-              >
-                {{ buildPackagingLabel(item) }}
-              </div>
-            </template>
-          </div>
+              <template v-else>
+                <div v-if="item.packageType || item.package">
+                  {{ item.packageType || item.package }}
+                </div>
+                <div
+                  v-if="buildPackagingLabel(item)"
+                  class="text-muted"
+                >
+                  {{ buildPackagingLabel(item) }}
+                </div>
+              </template>
+            </div>
 
-          <!-- Net Weight -->
-          <div class="tbl-c tbl-c--wt text-right">
-            <VTextField
-              v-if="!isReadonly"
-              :model-value="item.netWeight"
-              type="number"
-              variant="outlined"
-              density="compact"
-              hide-details
-              reverse
-              @update:model-value="(v) => handleItemUpdate(idx, 'netWeight', Number(v))"
-            />
-            <span v-else>{{ fmtNum(item.netWeight) }}</span>
-          </div>
-
-          <!-- #4: Gross Weight — auto-calculated, read-only badge -->
-          <div class="tbl-c tbl-c--wt text-right">
-            <div
-              v-if="!isReadonly"
-              class="gross-weight-wrap"
-            >
+            <!-- Net Weight -->
+            <div class="tbl-c tbl-c--wt text-right">
               <VTextField
-                :model-value="item.grossWeight"
+                v-if="!isReadonly"
+                :model-value="item.netWeight"
                 type="number"
                 variant="outlined"
                 density="compact"
                 hide-details
+                style="min-width: 100px;"
                 reverse
-                bg-color="grey-lighten-4"
-                readonly
+                @update:model-value="(v) => handleItemUpdate(idx, 'netWeight', Number(v))"
               />
-              <VTooltip
-                text="Auto-calculated: Net + (Qty × Tare) + (Pallets × Tare Pallet)"
-                location="top"
-              >
-                <template #activator="{ props }">
-                  <VIcon
-                    v-bind="props"
-                    class="gross-info"
-                    size="14"
-                    color="info"
-                  >
-                    mdi-information-outline
-                  </VIcon>
-                </template>
-              </VTooltip>
+              <span v-else>{{ fmtNum(item.netWeight) }}</span>
             </div>
-            <span v-else>{{ fmtNum(item.grossWeight) }}</span>
-          </div>
-        </div>
 
-        <!-- Totals -->
-        <div class="tbl-foot">
-          <div class="tbl-c tbl-c--marks tbl-c--bold">
-            Total
+            <!-- #4: Gross Weight — auto-calculated, read-only badge -->
+            <div class="tbl-c tbl-c--wt text-right">
+              <div
+                v-if="!isReadonly"
+                class="gross-weight-wrap"
+              >
+                <VTextField
+                  :model-value="item.grossWeight"
+                  type="number"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  reverse
+                  style="min-width: 100px;"
+                  bg-color="grey-lighten-4"
+                  readonly
+                />
+                <VTooltip
+                  text="Auto-calculated: Net + (Qty × Tare) + (Pallets × Tare Pallet)"
+                  location="top"
+                >
+                  <template #activator="{ props }">
+                    <VIcon
+                      v-bind="props"
+                      class="gross-info"
+                      size="14"
+                      color="info"
+                    >
+                      mdi-information-outline
+                    </VIcon>
+                  </template>
+                </VTooltip>
+              </div>
+              <span v-else>{{ fmtNum(item.grossWeight) }}</span>
+            </div>
           </div>
-          <div class="tbl-c tbl-c--desc" />
-          <div class="tbl-c tbl-c--pkg" />
-          <div class="tbl-c tbl-c--wt tbl-c--bold text-right">
-            {{ fmtNum(totalNet) }}
-          </div>
-          <div class="tbl-c tbl-c--wt tbl-c--bold text-right">
-            {{ fmtNum(totalGross) }}
-          </div>
-        </div>
 
-        <div
-          v-if="!formData.items?.length"
-          class="tbl-empty"
-        >
-          No items
+          <!-- Totals -->
+          <div class="tbl-foot">
+            <div class="tbl-c tbl-c--marks tbl-c--bold">
+              Total
+            </div>
+            <div class="tbl-c tbl-c--desc" />
+            <div class="tbl-c tbl-c--pkg" />
+            <div class="tbl-c tbl-c--wt tbl-c--bold text-right">
+              {{ fmtNum(totalNet) }}
+            </div>
+            <div class="tbl-c tbl-c--wt tbl-c--bold text-right">
+              {{ fmtNum(totalGross) }}
+            </div>
+          </div>
+
+          <div
+            v-if="!formData.items?.length"
+            class="tbl-empty"
+          >
+            No items
+          </div>
         </div>
       </div>
 

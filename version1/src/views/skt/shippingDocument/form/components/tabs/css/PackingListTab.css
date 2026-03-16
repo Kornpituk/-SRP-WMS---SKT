@@ -47,13 +47,6 @@
    Section (shared base — same white bg for ALL including table)
    ================================================================= */
 
-  .section {
-    background: #fff;
-    border-block-end: 1px solid #e8e8e8;
-    padding-block: 24px;
-    padding-inline: 32px;
-  }
-
   .section-title {
     color: #222;
     font-size: 16px;
@@ -961,7 +954,7 @@
 }
 
 .ptg-pallet {
-  width: 115px;
+  width: 100%;
 }
 
 .ptg-pallet-label {

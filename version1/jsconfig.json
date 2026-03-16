@@ -8,7 +8,8 @@
     "themeConfig.js",
     "auto-imports.d.js",
     "componenjs.d.js",
-    "src/views/skt/settingMaster/currency/types/currency.types.js"
+    "src/views/skt/settingMaster/currency/types/currency.types.js",
+    "vue.config.js"
   ],
   "exclude": [
     "dist",
