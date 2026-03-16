@@ -13,6 +13,7 @@
 export const DocumentStatus = Object.freeze({
   ACTIVE: 'ACTIVE',
   VOID: 'VOID',
+
   // ARCHIVED: 'ARCHIVED',
   // REJECTED: 'REJECTED',
 })
@@ -22,6 +23,7 @@ export const TabStatus = Object.freeze({
   DRAFT: 'DRAFT',
   SAVED: 'SAVED',
   CONFIRMED: 'CONFIRMED',
+
   // REJECTED: 'REJECTED',
   // ARCHIVED: 'ARCHIVED',
 })
