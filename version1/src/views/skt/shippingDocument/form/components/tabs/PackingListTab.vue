@@ -609,8 +609,47 @@
         >
           <!-- #17: Only display if value exists -->
           <template v-if="formData[f.key]">
-            <span class="info-row__label">{{ f.label }}</span>
-            <span class="info-row__value">{{ formData[f.key] }}</span>
+            <span
+              v-if="f.key === 'lotNo'"
+              class="info-row__label"
+            >{{ f.label }}</span>
+            <span
+              v-else
+              class="info-row__label"
+            >{{ f.label }}</span>
+            <span
+              v-if="f.key === 'lotNo'"
+              class="info-row__value"
+            >
+              <VTextField
+                :model-value="formData.lotNo"
+                variant="outlined"
+                density="compact"
+                hide-details
+                class=""
+                style="max-width: 500px;"
+                @update:model-value="(v) => handleItemUpdate('lotNo', v)"
+              />
+            </span>
+            <span
+              v-else-if="f.key === 'hsCode'"
+              class="info-row__value"
+            >
+              <VSelect
+                :model-value="formData.hsCode"
+                :items="HS_CODE_TYPES"
+                variant="outlined"
+                density="compact"
+                hide-details
+                style="max-width: 500px;"
+                class=""
+                @update:model-value="(v) => handleItemUpdate('hsCode', v)"
+              />
+            </span>
+            <span
+              v-else
+              class="info-row__value"
+            >{{ formData[f.key] }}</span>
           </template>
         </div>
       </div>
@@ -624,6 +663,16 @@
       :is-printing="isPrinting"
       :can-print="!isReadonly"
       :print-targets="printTargets"
+      :print-config="{
+        buyer: {
+          hasDisplay: true,
+          displayFields: PRINT_DISPLAY_FIELDS.buyer
+        },
+        customs: {
+          hasDisplay: true,
+          displayFields: PRINT_DISPLAY_FIELDS.customs
+        }
+      }"
       @print="handlePrint"
       @save-draft="saveDraft"
       @confirm="confirm"
@@ -656,6 +705,7 @@ const FOOTER_FIELDS = [
   { key: 'makerName',       label: 'MAKER NAME :'        },
   { key: 'packaging',       label: 'PACKAGING :'         },
   { key: 'lotNo',           label: 'Lot No :'            },
+  { key: 'hsCode',          label: 'HS CODE :'            },
 ]
 
 // ─── #5 Master: Tare Weight per Package Type ─────────────────────────────────
@@ -684,6 +734,20 @@ const DUE_DATE_RULES = {
   'L/C': { base: 'etd', offsetDays: 30  },
   'D/P': { base: 'eta', offsetDays: 0   },
   'D/A': { base: 'eta', offsetDays: 30  },
+}
+
+// ─── #4 HS Code Types ────────────────────────────────────────────────────────
+const HS_CODE_TYPES = [
+  { title: '3906.90.20',    value: '3906.90.20' },
+  { title: '3906.90.20',    value: '3906.90.20' },
+  { title: '3906.90.20',    value: '3906.90.20' },
+  { title: '3906.90.20',    value: '3906.90.20' },
+]
+
+// ─── #7 Print Display Fields ────────────────────────────────────────────────
+const PRINT_DISPLAY_FIELDS = {
+  buyer: ['lotNo', 'productDescription', 'note'],
+  customs: ['lotNo'],
 }
 
 // ─── Store + Composables ─────────────────────────────────────────────────────

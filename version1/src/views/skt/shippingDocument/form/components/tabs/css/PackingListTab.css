@@ -356,7 +356,7 @@
 
   .info-row {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 16px;
     margin-block-end: 6px;
     min-block-size: 34px;
@@ -364,14 +364,6 @@
 
   .info-row:last-child {
     margin-block-end: 0;
-  }
-
-  .info-row__label {
-    flex: 0 0 180px;
-    color: #333;
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
   }
 
   .info-row__value {

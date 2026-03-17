@@ -165,140 +165,153 @@
     <!-- ============================================== -->
     <div class="action-bar__right">
       <!-- PRINT -->
-      <VMenu
-        v-if="showPrintOptions"
-        location="top"
-      >
-        <template #activator="{ props: menuProps }">
-          <VBtn
-            v-bind="menuProps"
-            :disabled="!permissions.canPrint"
-            :loading="isPrinting"
-            variant="elevated"
-            color="teal-lighten-2"
-            rounded="lg"
-            class="text-none"
-            min-width="120"
-          >
-            <VIcon start>
-              mdi-printer
-            </VIcon>
-            PRINT
-            <VIcon
-              end
-              size="small"
-            >
-              mdi-menu-down
-            </VIcon>
-          </VBtn>
-        </template>
-        <VList
-          density="compact"
-          min-width="200"
-        >
-          <VListItem
-            v-for="target in printTargets"
-            :key="target.value"
-            @click="$emit('print', { target: target.value })"
-          >
-            <VListItemTitle>
-              {{ target.label }}
-            </VListItemTitle>
-          </VListItem>
-        </VList>
-      </VMenu>
-
-      <VBtn
-        v-else
-        :disabled="!permissions.canPrint"
-        :loading="isPrinting"
-        variant="elevated"
-        color="teal"
-        rounded="lg"
-        class="text-none"
-        min-width="120"
-        @click="$emit('print')"
-      >
-        <VIcon start>
-          mdi-printer
-        </VIcon>
-        PRINT
-      </VBtn>
-
       <div class="text-center">
         <VMenu
+          v-if="showPrintOptions"
           v-model="menu"
           :close-on-content-click="false"
           location="end"
         >
-          <template #activator="{ props }">
+          <template #activator="{ props: menuProps }">
             <VBtn
-              color="indigo"
-              v-bind="props"
+              v-bind="menuProps"
+              :disabled="!permissions.canPrint"
+              :loading="isPrinting"
+              variant="elevated"
+              color="teal-lighten-2"
+              rounded="lg"
+              class="text-none"
+              min-width="140"
             >
-              Menu as Popover
+              <VIcon start>
+                mdi-printer
+              </VIcon>
+              PRINT
+              <VIcon
+                end
+                size="small"
+              >
+                mdi-menu-down
+              </VIcon>
             </VBtn>
           </template>
 
-          <VCard min-width="300">
-            <VList>
-              <VListItem
-                prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
-                subtitle="Founder of Vuetify"
-                title="John Leider"
-              >
-                <template #append>
-                  <VBtn
-                    :class="fav ? 'text-red' : ''"
-                    icon="mdi-heart"
-                    variant="text"
-                    @click="fav = !fav"
-                  />
-                </template>
-              </VListItem>
-            </VList>
+          <!-- MENU -->
+          <VCard min-width="320">
+            <VCardTitle class="d-flex align-center">
+              <VIcon
+                icon="mdi-printer"
+                class="mx-2"
+                color="primary"
+              />
+              Print Form {{ tabKey }}
+              <VSpacer />
+              <VBtn
+                icon="mdi-close"
+                variant="text"
+                @click="menu = false"
+              />
+            </VCardTitle>
 
             <VDivider />
 
             <VList>
               <VListItem>
-                <VSwitch
-                  v-model="message"
-                  color="purple"
-                  label="Enable messages"
-                  hide-details
-                />
-              </VListItem>
-
-              <VListItem>
-                <VSwitch
-                  v-model="hints"
-                  color="purple"
-                  label="Enable hints"
-                  hide-details
-                />
+                <VRadioGroup v-model="selectedTarget">
+                  <VRadio
+                    label="To Buyer"
+                    value="buyer"
+                  />
+                  <VRadio
+                    label="To Customs"
+                    value="customs"
+                  />
+                </VRadioGroup>
               </VListItem>
             </VList>
 
+            <VDivider />
+
             <VCardActions>
               <VSpacer />
-
               <VBtn
-                variant="text"
-                @click="menu = false"
+                color="green"
+                variant="elevated"
+                rounded="lg"
+                class="text-none my-2"
+                min-width="130"
+                @click="handleConfirm"
               >
-                Cancel
-              </VBtn>
-              <VBtn
-                color="primary"
-                variant="text"
-                @click="menu = false"
-              >
-                Save
+                CONFIRM
               </VBtn>
             </VCardActions>
           </VCard>
         </VMenu>
+
+        <VBtn
+          v-else
+          :disabled="!permissions.canPrint"
+          :loading="isPrinting"
+          variant="elevated"
+          color="teal-lighten-2"
+          rounded="lg"
+          class="text-none"
+          min-width="120"
+          @click="$emit('print')"
+        >
+          <VIcon start>
+            mdi-printer
+          </VIcon>
+          PRINT
+        </VBtn>
+
+        <!-- DISPLAY DIALOG -->
+        <VDialog
+          v-model="displayDialog"
+          width="500"
+        >
+          <VCard>
+            <VCardTitle class="d-flex align-center">
+              Would you like to display these on the form?
+              <VSpacer />
+              <VBtn
+                icon="mdi-close"
+                variant="text"
+                @click="displayDialog = false"
+              />
+            </VCardTitle>
+
+            <VCardText>
+              <VCheckbox
+                v-for="item in currentDisplayFields"
+                :key="item"
+                v-model="displaySelections"
+                style="margin: 0 100px;"
+                :label="formatLabel(item)"
+                :value="item"
+                hide-details
+              />
+            </VCardText>
+
+            <VCardActions>
+              <VSpacer />
+              <VBtn
+                variant="elevated"
+                rounded="lg"
+                class="text-none"
+                min-width="120"
+                color="cyan"
+                @click="handlePrint"
+              >
+                <VIcon
+                  icon="mdi-printer"
+                  class="mx-2"
+                  color="white"
+                /> <span class="text-white">PRINT</span>
+              </VBtn>
+            </VCardActions>
+          </VCard>
+        </VDialog>
       </div>
       <!-- SAVE DRAFT -->
       <VBtn
@@ -380,6 +393,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  printConfig: {
+    type: Object,
+    default: () => ({}),
+  },
   selectedTarget: String,
 })
 
@@ -409,11 +426,11 @@ function handleSaveDraft() {
   emit('save-draft')
 }
 
-function handleConfirm() {
-  confirmDialog.value = false
-  currentAction.value = 'confirm'
-  emit('confirm')
-}
+// function handleConfirm() {
+//   confirmDialog.value = false
+//   currentAction.value = 'confirm'
+//   emit('confirm')
+// }
 
 // ---------------------------------------------------------------------------
 // Note: Add
@@ -501,8 +518,68 @@ import { computed } from 'vue'
 
 const fav = ref(true)
 const menu = ref(false)
+const selectedTarget = ref(null) // 'buyer' | 'customs'
+
+const displayDialog = ref(false)
+const displaySelections = ref([])
+
 const message = ref(false)
 const hints = ref(true)
+
+const currentDisplayFields = computed(() => {
+  if (!selectedTarget.value) return []
+
+  return props.printConfig[selectedTarget.value]?.displayFields || []
+})
+
+// ------------------ config ------------------
+const PRINT_CONFIG = {
+  buyer: {
+    hasDisplay: true,
+    displayFields: ['lotNo', 'productDescription', 'note'],
+  },
+  customs: {
+    hasDisplay: false,
+    displayFields: [],
+  },
+}
+
+// ------------------ methods ------------------
+function handleConfirm() {
+  if (!selectedTarget.value) return
+
+  const config = props.printConfig[selectedTarget.value]
+
+  if (config?.hasDisplay) {
+    displaySelections.value = []
+    displayDialog.value = true
+  } else {
+    emit('confirm', {
+      target: selectedTarget.value,
+    })
+  }
+
+  menu.value = false
+}
+
+function handlePrint() {
+  emit('print', {
+    target: selectedTarget.value,
+    display: displaySelections.value,
+  })
+
+  displayDialog.value = false
+}
+
+function formatLabel(key) {
+  const map = {
+    lotNo: 'Lot No.',
+    productDescription: 'Product Description',
+    note: 'Note',
+  }
+  
+  return map[key] || key
+}
 
 const internalSelected = computed({
   get: () => props.selectedTarget,

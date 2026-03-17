@@ -341,13 +341,50 @@
           :key="f.key"
           class="info-row"
         >
-          <span class="info-row__label">{{ f.label }}</span>
-          <span
-            class="info-row__value"
-            :class="{ 'highlight-val': f.highlight && !isConfirmed }"
-          >
-            {{ formData[f.key] }}
-          </span>
+          <!-- #17: Only display if value exists -->
+          <template v-if="formData[f.key]">
+            <span
+              v-if="f.key === 'lotNo'"
+              class="info-row__label"
+            >{{ f.label }}</span>
+            <span
+              v-else
+              class="info-row__label"
+            >{{ f.label }}</span>
+            <span
+              v-if="f.key === 'lotNo'"
+              class="info-row__value"
+            >
+              <VTextField
+                :model-value="formData.lotNo"
+                variant="outlined"
+                density="compact"
+                hide-details
+                class=""
+                style="max-width: 500px;"
+                @update:model-value="(v) => handleItemUpdate('lotNo', v)"
+              />
+            </span>
+            <span
+              v-else-if="f.key === 'hsCode'"
+              class="info-row__value"
+            >
+              <VSelect
+                :model-value="formData.hsCode"
+                :items="HS_CODE_TYPES"
+                variant="outlined"
+                density="compact"
+                hide-details
+                style="max-width: 500px;"
+                class=""
+                @update:model-value="(v) => handleItemUpdate('hsCode', v)"
+              />
+            </span>
+            <span
+              v-else
+              class="info-row__value"
+            >{{ formData[f.key] }}</span>
+          </template>
         </div>
       </div>
 
@@ -395,6 +432,16 @@
       :is-printing="isPrinting"
       :can-print="!isReadonly"
       :print-targets="printTargets"
+      :print-config="{
+        buyer: {
+          hasDisplay: true,
+          displayFields: PRINT_DISPLAY_FIELDS.buyer
+        },
+        customs: {
+          hasDisplay: true,
+          displayFields: PRINT_DISPLAY_FIELDS.customs
+        }
+      }"
       @print="handlePrint"
       @save-draft="saveDraft"
       @confirm="confirm"
@@ -444,7 +491,23 @@ const FOOTER_FIELDS = [
   { key: 'makerName',       label: 'MAKER NAME :',         highlight: false },
   { key: 'packaging',       label: 'PACKAGING :',          highlight: true  },
   { key: 'lotNo',           label: 'Lot No :',             highlight: false },
+  { key: 'hsCode',          label: 'HS CODE :'            },
 ]
+
+
+// ─── #4 HS Code Types ────────────────────────────────────────────────────────
+const HS_CODE_TYPES = [
+  { title: '3906.90.20',    value: '3906.90.20' },
+  { title: '3906.90.21',    value: '3906.90.21' },
+  { title: '3906.90.22',    value: '3906.90.22' },
+  { title: '3906.90.23',    value: '3906.90.23' },
+]
+
+// ─── #7 Print Display Fields ────────────────────────────────────────────────
+const PRINT_DISPLAY_FIELDS = {
+  buyer: ['FOB', 'Freight', 'Insurance', 'Lot No.', 'Product Description', 'Note'],
+  customs: ['lotNo'],
+}
 
 // ---------------------------------------------------------------------------
 // Composables

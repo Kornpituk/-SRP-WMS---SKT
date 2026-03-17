@@ -88,14 +88,23 @@
 
     <!-- Action Bar -->
     <TabActionBar
-      v-model:selected-target="printTarget"
       :tab-key="TabKey.CERTIFICATE_OF_ORIGIN"
       :is-loading="isLoading"
+      :show-print-options="false"
       :is-dirty="isDirty"
       :notes="notes"
       :is-printing="isPrinting"
       :can-print="!isReadonly"
-      :print-targets="printTargets"
+      :print-config="{
+        buyer: {
+          hasDisplay: false,
+          displayFields: ''
+        },
+        customs: {
+          hasDisplay: false,
+          displayFields: ''
+        }
+      }"
       @print="handlePrint"
       @save-draft="saveDraft"
       @confirm="confirm"

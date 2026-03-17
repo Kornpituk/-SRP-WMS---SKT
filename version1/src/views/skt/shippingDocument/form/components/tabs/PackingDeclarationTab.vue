@@ -182,6 +182,7 @@
     <TabActionBar
       :tab-key="TabKey.PACKING_DECLARATION"
       :is-loading="isLoading"
+      :show-print-options="false"
       :is-dirty="isDirty"
       :notes="notes"
       :is-printing="isPrinting"

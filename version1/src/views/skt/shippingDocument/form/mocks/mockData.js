@@ -140,6 +140,7 @@ export const mockDocumentDetail = {
         makerName: 'SANYO KASEI (THAILAND) LTD.',
         packaging: '160 DRUMS (40 PALLETS)',
         lotNo: 'SN DISPERSANT 5040 : PA25060014 = 4,500 KGS, PA25080020 = 2,210 KGS',
+        hsCode: '3906.90.20',
       },
     },
 
@@ -211,6 +212,7 @@ export const mockDocumentDetail = {
         makerName: 'SANYO KASEI (THAILAND) LTD.',
         packaging: '160 DRUMS (40 PALLETS)',
         lotNo: 'SN DISPERSANT 5040 : PA25060014 = 4,500 KGS, PA25080020 = 2,210 KGS',
+        hsCode: '3906.90.20',
         bankingDetail: {
           accountNo: '21-31080051 SANYO KASEI (THAILAND) LTD.',
           bankName: 'SUMITOMO MITSUI BANKING CORPORATION Bangkok Branch',

@@ -435,6 +435,7 @@
     <TabActionBar
       :tab-key="TabKey.SHIPPING_PARTICULAR"
       :is-loading="isLoading"
+      :show-print-options="false"
       :is-dirty="isDirty"
       :notes="notes"
       @print="handlePrint"
