@@ -1,267 +1,320 @@
 import { formatNumber, formatDate } from '../utils/pdfmake-utils'
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export default function shippingParticularMapper(formData) {
 
-  const items = formData.items || []
+  const shipper       = formData.shipper        || {}
+  const consignee     = formData.consignee      || {}
+  const notifyParty   = formData.notifyParty    || {}
+  const mark          = formData.shippingMark   || {}
+  const seal          = formData.containerSealNo || {}
 
-  const totalNet = items.reduce((s, i) => s + (i.netWeight || 0), 0)
-  const totalGross = items.reduce((s, i) => s + (i.grossWeight || 0), 0)
+  // ─── helpers ────────────────────────────────────────────────────────────────
+
+  function partyStack(obj) {
+    return [
+      obj.name       ? { text: obj.name,                    bold: true }              : null,
+      obj.address    ? { text: obj.address }                                          : null,
+      obj.address2   ? { text: obj.address2 }                                         : null,
+      obj.address3   ? { text: obj.address3 }                                         : null,
+      (obj.city || obj.country)
+        ? { text: [obj.city, obj.country].filter(Boolean).join(' – ') }               : null,
+      obj.tel        ? { text: `TEL.: ${obj.tel}` }                                   : null,
+      obj.taxId      ? { text: `TAX ID : ${obj.taxId}` }                              : null,
+      obj.attn       ? { text: `ATTN : ${obj.attn}` }                                 : null,
+      obj.email      ? { text: `E-MAIL : ${obj.email}` }                              : null,
+    ].filter(Boolean)
+  }
+
+  // ─── content ────────────────────────────────────────────────────────────────
+
+  function normalizeMultiline(text) {
+    return (text || '')
+      .split('\n')
+      .map(line => ({ text: line }))
+  }
+
+  console.log("formData print", formData)
 
   const content = [
 
-    // TITLE
+    // ── TITLE in bordered box ──────────────────────────────────────────────────
     {
-      text: 'SHIPPING PARTICULAR',
-      alignment: 'center',
-      style: 'title',
-      margin: [0, 0, 0, 10],
+      table: {
+        widths: ['*'],
+        body: [[
+          {
+            text: 'SHIPPING PARTICULAR',
+            style: 'title',
+            alignment: 'center',
+            margin: [0, 6, 0, 6],
+            border: [true, true, true, true],
+          },
+        ]],
+      },
+      layout: 'noBorders',
+      margin: [60, 0, 60, 14],
     },
 
-    // REFERENCE
+    // ── BOOKING NO / B/L NO / DATE row ────────────────────────────────────────
+    {
+      table: {
+        widths: ['auto', 'auto', 'auto', '*', 'auto', 'auto'],
+        body: [[
+          { text: 'BOOKING NO.:',  border: [true, true, false, true], margin: [4, 4, 4, 4] },
+          { text: formData.bookingNo || '', border: [false, true, true, true], margin: [4, 4, 16, 4] },
+          { text: 'B/L NO.:', border: [true, true, false, true], margin: [4, 4, 4, 4] },
+          { text: formData.blNo || '', border: [false, true, true, true], margin: [4, 4, 16, 4] },
+          { text: 'DATE :', border: [true, true, false, true], margin: [4, 4, 4, 4] },
+          { text: formatDate(formData.date) || '', border: [false, true, true, true], margin: [4, 4, 8, 4] },
+        ]],
+      },
+      margin: [0, 0, 0, 12],
+    },
+
+    // ── SHIPPER ───────────────────────────────────────────────────────────────
     {
       columns: [
-        { width: '*', text: '' },
-
         {
-          width: 'auto',
+          width: '55%',
           stack: [
-            { text: formatDate(formData.date), alignment: 'center', margin: [0, 0, 0, 5] },
-
-            {
-              text: `INVOICE NO : ${formData.invoiceNo || ''} (${formData.contractNo || ''})`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-
-            {
-              text: `PO NO : ${formData.poNo || ''}`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-
-            {
-              text: `PROFORMA INVOICE NO : ${formData.proformaInvoiceNo || ''}`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
+            { text: 'SHIPPER', bold: true, decoration: 'underline', margin: [0, 0, 0, 2] },
+            ...partyStack(shipper),
           ],
+        },
+        {
+          width: '*',
+          text: [
+            'KINDLY ISSUE US, AT OUR REQUEST,\n',
+            'SHIPPING ORDER OR B/L FOR THE\n',
+            'FOLLOWING PARTICULAR:-',
+          ],
+          margin: [0, 14, 0, 0],
         },
       ],
       margin: [0, 0, 0, 10],
-    }, 
-
-    // SOLD TO / SHIP TO / PAYMENT
-    {
-      table: {
-        widths: ['30%', '30%', '40%'],
-        body: [
-          [
-            { text: 'SOLD TO', style: 'boxHeader' },
-            { text: 'SHIP TO', style: 'boxHeader' },
-            { text: 'PAYMENT', style: 'boxHeader' },
-          ],
-          [
-            buildSoldTo(formData),
-            buildShipTo(formData),
-            { text: formData.payment || '', rowSpan: 2 },
-          ],
-          [
-            {},
-            {},
-            {},
-          ],
-        ],
-      },
-
-      layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
-      },
-
-      margin: [0, 0, 0, 10],
     },
 
-    // SHIPPING TABLE
+    // ── CONSIGNEE ─────────────────────────────────────────────────────────────
     {
-      table: {
-        widths: ['60%', '40%'],
-        body: [
-
-          [
-            buildPair('SHIPPED ON', formData.vessel),
-            buildPair('ON OR ABOUT', formatDate(formData.etd)),
-          ],
-
-          [
-            buildPair('FROM', formData.from),
-            buildPair('TO', formData.to),
-          ],
-
-          [
-            '',
-            buildPair('ETA', formatDate(formData.eta)),
-          ],
-
-        ],
-      },
-
-      layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
-      },
-
-      margin: [0, 0, 0, 10],
-    },
-
-    // GOODS TABLE
-    {
-      table: {
-        headerRows: 3,
-        widths: ['30%', '30%', '12%', '13%', '15%'],
-
-        body: [
-
-          [
-            { text: 'MARKS & NOS', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'DESCRIPTION OF GOODS', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'PACKAGE', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'NET', style: 'tableHeader' },
-            { text: 'GROSS', style: 'tableHeader' },
-          ],
-
-          [
-            {},
-            {},
-            {},
-            { text: 'WEIGHT', style: 'tableHeader' },
-            { text: 'WEIGHT', style: 'tableHeader' },
-          ],
-
-          [
-            {},
-            {},
-            {},
-            { text: '(KGS)', style: 'tableHeader' },
-            { text: '(KGS)', style: 'tableHeader' },
-          ],
-
-          ...items.map(i => [
-            i.marksAndNos || '',
-            buildDescription(i),
-            buildPackageDisplay(i),
-            { text: formatNumber(i.netWeight), alignment: 'right' },
-            { text: formatNumber(i.grossWeight), alignment: 'right' },
-          ]),
-
-          [
-            { text: 'TOTAL', colSpan: 3, bold: true },
-            {},
-            {},
-            { text: formatNumber(totalNet), alignment: 'right', bold: true },
-            { text: formatNumber(totalGross), alignment: 'right', bold: true },
-          ],
-        ],
-      },
-
-      layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===1 || i===2) return 0
-          if(i===3) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0.5
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
-      },
-    },
-
-    // SIGNATURE
-    {
-      margin: [0, 30, 0, 0],
       stack: [
-
-        { text: `PACKING : ${formData.packing || ''}` },
-
-        { text: `COUNTRY OF ORIGIN : ${formData.countryOfOrigin || ''}` },
-
-        { text: `MAKER NAME : ${formData.makerName || ''}` },
-
-        { text: `PACKAGING : ${formData.packaging || ''}` },
-
+        { text: 'CONSIGNEE', bold: true, decoration: 'underline', margin: [0, 0, 0, 2] },
+        ...partyStack(consignee),
       ],
+      margin: [0, 0, 0, 10],
     },
+
+    // ── NOTIFY PARTY ──────────────────────────────────────────────────────────
+    {
+      stack: [
+        { text: 'NOTIFY PARTY', bold: true, decoration: 'underline', margin: [0, 0, 0, 2] },
+
+        // Support both free-text textarea and structured object
+        ...(
+          typeof notifyParty.notifyParty === 'string'
+            ? notifyParty.notifyParty
+              .split('\n')
+              .filter(line => line.trim() !== '')
+              .map(line => ({
+                text: line.trim(),
+                margin: [0, 0, 0, 0], // 👈 สำคัญ
+              }))
+            : partyStack(notifyParty)
+        ),
+      ],
+      margin: [0, 0, 0, 6],
+    },
+
+    // ── PORT OF LOADING ───────────────────────────────────────────────────────
     {
       columns: [
+        { width: 100, text: 'PORT OF LOADING:', bold: true },
+        { width: '*',  text: formData.portOfLoading || '' },
+      ],
+      margin: [0, 0, 0, 10],
+    },
 
-        { width: '*', text: '' }, // spacer ด้านซ้าย
-
+    // ── TRUCK / CARRIER + ETD / ETA ───────────────────────────────────────────
+    {
+      columns: [
         {
-          width: 'auto',
-          alignment: 'center',
-          margin: [0, 0, 0, 80],
+          width: '55%',
           stack: [
             {
-              text: 'SANYO KASEI (THAILAND) LTD.',
-              bold: true,
-              margin: [0, 0, 0, 40],
-            },
-            {
-              canvas: [
-                {
-                  type: 'line',
-                  x1: 0,
-                  y1: 0,
-                  x2: 180,
-                  y2: 0,
-                  lineWidth: 1,
-                  dash: { length: 4, space: 2 },
-                },
+              columns: [
+                { width: 60, text: 'TRUCK :', bold: true },
+                { width: '*', text: formData.feeder || '' },
               ],
-              margin: [0, 0, 0, 8],
+              margin: [0, 0, 0, 2],
             },
             {
-              text: 'AUTHORISED SIGNATURE',
+              columns: [
+                { width: 60, text: 'CARRIER :', bold: true },
+                { width: '*', text: formData.vessel || '' },
+              ],
             },
           ],
         },
-
+        {
+          width: '*',
+          stack: [
+            {
+              columns: [
+                { width: 30, text: 'ETD :', bold: true },
+                { width: '*', text: formatDate(formData.etd) || '' },
+              ],
+              margin: [0, 0, 0, 2],
+            },
+            {
+              columns: [
+                { width: 30, text: 'ETA :', bold: true },
+                { width: '*', text: formatDate(formData.eta) || '' },
+              ],
+            },
+          ],
+        },
       ],
+      margin: [0, 0, 0, 10],
     },
 
+    // ── PORT / PORT OF DELIVERY ───────────────────────────────────────────────
+    {
+      stack: [
+        {
+          columns: [
+            { width: 100, text: 'PORT :', bold: true },
+            { width: '*',  text: formData.portOfDischarge || '' },
+          ],
+          margin: [0, 0, 0, 2],
+        },
+        {
+          columns: [
+            { width: 100, text: 'PORT OF DELIVERY :', bold: true },
+            { width: '*',  text: [formData.portOfDelivery, formData.deliveryType || formData.containerType].filter(Boolean).join('   ') },
+          ],
+        },
+      ],
+      margin: [0, 0, 0, 14],
+    },
+
+    // ── SHIPPING MARK ─────────────────────────────────────────────────────────
+    {
+      columns: [
+        // Left: label + mark lines
+        {
+          width: '35%',
+          stack: [
+            { text: 'SHIPPING MARK :', bold: true, decoration: 'underline', margin: [0, 0, 0, 6] },
+            ...(mark.marks || []).map(m => ({ text: m, margin: [0, 0, 0, 2] })),
+          ],
+        },
+
+        // Right: detail block
+        {
+          width: '*',
+          stack: [
+
+            // Row 1: package desc (header) | N.W. | G.W. | M3 (underlined headers)
+            {
+              columns: [
+                { width: '*',  text: mark.packageDescription || '', margin: [0, 0, 0, 2] },
+                { width: 'auto', text: 'N.W.', bold: false, decoration: 'underline', margin: [8, 0, 8, 2] },
+                { width: 'auto', text: 'G.W.', bold: false, decoration: 'underline', margin: [8, 0, 8, 2] },
+                { width: 'auto', text: 'M3',   bold: false, decoration: 'underline', margin: [8, 0, 0, 2] },
+              ],
+              margin: [0, 0, 0, 4],
+            },
+
+            // Row 2: FCL CONTAINER value | N.W. value | G.W. value | M3 value
+            {
+              columns: [
+                {
+                  width: '*',
+                  text: [
+                    { text: 'FCL CONTAINER :' },
+                    { text: mark.fclContainer  },
+                  ],
+                  margin: [0, 0, 0, 2],
+                },
+                { width: 'auto', text: formatNumber(mark.netWeight),   alignment: 'right', margin: [8, 0, 8, 2] },
+                { width: 'auto', text: formatNumber(mark.grossWeight),  alignment: 'right', margin: [8, 0, 8, 2] },
+                { width: 'auto', text: formatNumber(mark.cbm, 2),       alignment: 'right', margin: [8, 0, 0, 2] },
+              ],
+              margin: [0, 0, 0, 4],
+            },
+
+            // Product description
+            { text: mark.productDescription || '', margin: [0, 0, 0, 4] },
+
+            // Extra note (dash or text)
+            { text: mark.extraNote || '-', margin: [0, 0, 0, 4] },
+
+            // HS CODE (colored)
+            {
+              text: [
+                { text: 'HS CODE : ' },
+                { text: mark.hsCode },
+              ],
+              margin: [0, 0, 0, 6],
+            },
+
+            // COUNTRY OF ORIGIN
+            {
+              columns: [
+                { width: 'auto', text: 'COUNTRY OF ORIGIN :', bold: true, margin: [0, 0, 8, 4] },
+                { width: '*',    text: mark.countryOfOrigin || 'THAILAND', margin: [0, 0, 0, 4] },
+              ],
+            },
+
+            // Pallet note
+            { text: mark.palletNote || '', margin: [0, 4, 0, 0] },
+          ],
+        },
+      ],
+      margin: [0, 0, 0, 14],
+    },
+
+    // ── CONTAINER & SEAL NO. ──────────────────────────────────────────────────
+    {
+      stack: [
+        { text: 'CONTAINER & SEAL NO.:', bold: true, decoration: 'underline', margin: [0, 0, 0, 6] },
+
+        // MARK: FREIGHT PREPAID  |  SURRENDER B/L (boxed)
+        {
+          columns: [
+            {
+              width: '*',
+              text: [
+                { text: 'MARK', decoration: 'underline' },
+                { text: ' : ' },
+                { text: seal.freightTerms || 'FREIGHT PREPAID' },
+              ],
+              margin: [0, 0, 0, 0],
+            },
+            {
+              width: 'auto',
+              table: {
+                body: [[
+                  {
+                    text: seal.blType || 'SURRENDER B/L',
+                    margin: [8, 4, 8, 4],
+                    border: [true, true, true, true],
+                  },
+                ]],
+              },
+              layout: {
+                hLineWidth: () => 1,
+                vLineWidth: () => 1,
+              },
+            },
+          ],
+        },
+      ],
+    },
 
   ]
+
+  // ─── document definition ──────────────────────────────────────────────────
 
   return {
     pageSize: 'A4',
@@ -269,102 +322,16 @@ export default function shippingParticularMapper(formData) {
     content,
 
     styles: {
-
       title: {
-        fontSize: 16,
+        fontSize: 14,
         bold: true,
       },
-
-      boxHeader: {
-        bold: true,
-        decoration: 'underline',
-      },
-
-      tableHeader: {
-        bold: true,
-        alignment: 'center',
-      },
-
     },
 
     defaultStyle: {
-      fontSize: 10,
+      font: 'Arial',
+      fontSize: 9.5,
+      lineHeight: 1.1,
     },
-
   }
-}
-
-
-function buildSoldTo(formData) {
-
-  const p = formData.payer || {}
-
-  return {
-    stack: [
-      { text: p.name, bold: true },
-      p.address,
-      p.address2,
-      `${p.city || ''} ${p.country || ''}`.trim(),
-      p.tel ? `TEL : ${p.tel}` : '',
-      p.attn ? { text: `ATTN : ${p.attn}`, bold: true } : '',
-    ].filter(Boolean),
-  }
-}
-
-
-function buildShipTo(formData) {
-
-  const c = formData.consignee || {}
-
-  return {
-    stack: [
-      { text: c.name, bold: true },
-      c.address,
-      c.address2,
-      c.address3,
-      `${c.city || ''} - ${c.country || ''}`.trim(),
-      c.tel ? `TEL : ${c.tel}` : '',
-      c.taxId ? `TAX ID : ${c.taxId}` : '',
-      c.attn ? { text: `ATTN : ${c.attn}`, bold: true } : '',
-    ].filter(Boolean),
-  }
-}
-
-
-function buildPair(label, value) {
-
-  return {
-    text: `${label} : ${value || ''}`,
-  }
-
-}
-
-
-function buildPackageDisplay(item) {
-
-  const parts = []
-
-  if (item.packageType) parts.push(item.packageType)
-
-  if (item.quantity && item.unitType) {
-
-    const pkg = item.palletCount
-      ? `${item.quantity} ${item.unitType} (${item.palletCount} PALLETS)`
-      : `${item.quantity} ${item.unitType}`
-
-    parts.push(pkg)
-  }
-
-  return parts.join('\n')
-}
-
-
-function buildDescription(item) {
-
-  return [
-    item.descriptionOfGoods,
-    item.subDescription ? `(${item.subDescription})` : '',
-  ]
-    .filter(Boolean)
-    .join('\n')
 }

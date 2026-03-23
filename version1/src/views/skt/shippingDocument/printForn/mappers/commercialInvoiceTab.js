@@ -1,265 +1,320 @@
 import { formatNumber, formatDate } from '../utils/pdfmake-utils'
 
-export default function commercialInvoiceMapper(formData) {
+/**
+ * commercialInvoiceMapper
+ *
+ * @param {object} formData
+ * @param {object} options
+ * @param {string} options.shippMode     - 'ocean' | 'air' | 'truck' | 'courier'
+ * @param {string} options.target        - 'buyer' | 'customs'
+ * @param {string[]} options.displayFields
+ */
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export default function commercialInvoiceMapper(formData, options = {}) {
 
-  const items = formData.items || []
+  const {
+    shippMode     = 'ocean',
+    target        = 'buyer',
+    displayFields = [],
+  } = options
 
-  const totalNet = items.reduce((s, i) => s + (i.netWeight || 0), 0)
-  const totalGross = items.reduce((s, i) => s + (i.grossWeight || 0), 0)
+  const items      = formData.items || []
+  const totalQty   = items.reduce((s, i) => s + (i.quantity   || 0), 0)
+  const totalAmount = items.reduce((s, i) => s + (i.amount    || 0), 0)
+
+  const currency = formData.amountCurrency || 'US$'
+
+  // ─── helpers ──────────────────────────────────────────────────────────────
+
+  function show(field) {
+    if (target === 'buyer') return displayFields.includes(field)
+    if (field === 'lotNo')  return displayFields.includes('lotNo')
+    
+    return true
+  }
+
+  function hasValue(field) {
+    return !!formData[field]
+  }
+
+  // ─── Shipping table label ตาม mode ────────────────────────────────────────
+  function buildShippingTable() {
+    const noVLine = {
+      hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 1 : 0,
+      vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length) ? 1 : 0,
+    }
+
+    let label1, label2
+    if (shippMode === 'truck') {
+      label1 = 'TRUCK'; label2 = 'CARRIER'
+    } else if (shippMode === 'courier') {
+      label1 = 'COURIER'; label2 = 'NO'
+    } else if (shippMode === 'air') {
+      label1 = 'FLIGHT'; label2 = 'CARRIER'
+    } else {
+      label1 = 'FEEDER'; label2 = 'VESSEL'
+    }
+
+    return {
+      table: {
+        widths: ['35%', '35%', '30%'],
+        body: [
+          [
+            buildPair(label1, formData.feeder),
+            buildPair(label2, formData.vessel),
+            buildPair('ETD', formatDate(formData.etd)),
+          ],
+          [
+            buildPair('FROM', formData.from),
+            buildPair('TO', formData.to),
+            buildPair('ETA', formatDate(formData.eta)),
+          ],
+        ],
+      },
+      layout: noVLine,
+      margin: [0, 0, 0, 10],
+    }
+  }
+
+  // ─── Pricing rows (CIF / FOB / FREIGHT / INSURANCE) ───────────────────────
+  function buildPricingRows() {
+    const rows = []
+    const term = formData.pricingTerm || 'CIF'
+    const modeLabel = `${shippMode.toUpperCase()} FREIGHT`
+
+    const addRow = (label, value) => {
+      rows.push({
+        columns: [
+          { width: '*',    text: '' },
+          { width: 160,    text: label },
+          { width: 40,     text: currency,                  alignment: 'right' },
+          { width: 80,     text: formatNumber(value || 0),  alignment: 'right' },
+        ],
+        margin: [0, 0, 0, 2],
+      })
+    }
+
+    // CIF — แสดงเสมอ
+    addRow(
+      `${formData.cifType || 'CIF'} ${formData.cifPort || ''}`,
+      formData.cifValue,
+    )
+
+    // FOB / FREIGHT / INSURANCE ตาม displayFields (buyer) หรือเสมอ (customs)
+    if (show('FOB')) {
+      addRow(
+        `${formData.fobType || 'FOB'} ${formData.fobPort || ''}`,
+        formData.fobValue,
+      )
+    }
+
+    if (show('Freight')) {
+      addRow(modeLabel, formData.oceanFreight)
+    }
+
+    if (show('Insurance') && term !== 'EXWORK') {
+      addRow('INSURANCE', formData.insurance)
+    }
+
+    return rows
+  }
+
+  // ─── GOODS TABLE body rows ─────────────────────────────────────────────────
+  const goodsBody = [
+    // Header row 1
+    [
+      { text: 'MARKS & NOS',          style: 'tableHeader', rowSpan: 2, alignment: 'center', margin: [0, 6, 0, 0] },
+      { text: 'DESCRIPTION OF GOODS', style: 'tableHeader', rowSpan: 2, alignment: 'center', margin: [0, 6, 0, 0] },
+      { text: `QUANTITY\n(KGS)`,       style: 'tableHeader', alignment: 'center' },
+      { text: `UNIT PRICE\n(${currency}/KGS)`, style: 'tableHeader', alignment: 'center' },
+      { text: `AMOUNT\n(${currency})`, style: 'tableHeader', alignment: 'center' },
+    ],
+    [ {}, {}, {}, {}, {} ],
+
+    // Data rows
+    ...items.map(item => [
+      buildMarksAndNos(item),
+      buildDescription(item, show),
+      { text: formatNumber(item.quantity),  alignment: 'right' },
+      { text: formatNumber(item.unitPrice), alignment: 'right' },
+      { text: formatNumber(item.amount),    alignment: 'right' },
+    ]),
+
+    // Total row
+    [
+      { text: 'TOTAL', bold: true, colSpan: 2 },
+      {},
+      {
+        alignment: 'right',
+        stack: [
+          { text: formatNumber(totalQty), bold: true },
+          formData.totalDescription
+            ? { text: `(${formData.totalDescription})`, fontSize: 8 }
+            : null,
+        ].filter(Boolean),
+      },
+      { text: '' },
+      { text: formatNumber(totalAmount), alignment: 'right', bold: true },
+    ],
+  ]
+
+  // ─── FOOTER fields ─────────────────────────────────────────────────────────
+  const footerItems = [
+    hasValue('packing')
+      ? buildFooterRow('PACKING :', formData.packing)          : null,
+    hasValue('packaging')
+      ? buildFooterRow('PACKAGING :', formData.packaging)      : null,
+    hasValue('countryOfOrigin')
+      ? buildFooterRow('COUNTRY OF ORIGIN :', formData.countryOfOrigin) : null,
+    hasValue('makerName')
+      ? buildFooterRow('MAKER NAME :', formData.makerName)     : null,
+
+    // LOT NO — แสดงตาม checkbox
+    show('lotNo') && hasValue('lotNo')
+      ? buildFooterRow('LOT NO. :', formData.lotNo, true)      : null,
+
+    // HS CODE — ซ่อนถ้าไม่มีข้อมูล
+    hasValue('hsCode')
+      ? buildFooterRow('HS CODE :', formData.hsCode, true)     : null,
+
+    // Note — แสดงตาม checkbox
+    show('Note') && hasValue('note')
+      ? { text: `NOTE : ${formData.note}`, italics: true, margin: [0, 2, 0, 0] } : null,
+  ].filter(Boolean)
+
+  // ─── BANKING DETAIL ────────────────────────────────────────────────────────
+  const banking = formData.bankingDetail || {}
+
+  const bankingItems = [
+    { columns: [ { width: 80, text: 'Account no. :' }, { width: '*', text: banking.accountNo || '' } ], margin: [0, 0, 0, 2] },
+    { columns: [ { width: 80, text: 'Bank name :' },   { width: '*', text: banking.bankName  || '' } ], margin: [0, 0, 0, 2] },
+    { columns: [ { width: 80, text: 'Address :' },     { width: '*', text: banking.address   || '' } ], margin: [0, 0, 0, 2] },
+    { columns: [ { width: 80, text: 'Swift Code :' },  { width: '*', text: banking.swiftCode || '' } ], margin: [0, 0, 0, 2] },
+  ]
+
+  // ─── CONTENT ───────────────────────────────────────────────────────────────
 
   const content = [
 
     // TITLE
-    {
-      text: 'COMMERCIAL INVOICE',
-      alignment: 'center',
-      style: 'title',
-      margin: [0, 0, 0, 10],
-    },
+    { text: 'COMMERCIAL INVOICE', style: 'title', alignment: 'center', margin: [0, 0, 0, 10] },
 
-    // REFERENCE
+    // REFERENCE — right aligned
     {
       columns: [
         { width: '*', text: '' },
-
         {
           width: 'auto',
           stack: [
-            { text: formatDate(formData.date), alignment: 'center', margin: [0, 0, 0, 5] },
-
-            {
-              text: `INVOICE NO : ${formData.invoiceNo || ''} (${formData.contractNo || ''})`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-
-            {
-              text: `PO NO : ${formData.poNo || ''}`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-
-            {
-              text: `PROFORMA INVOICE NO : ${formData.proformaInvoiceNo || ''}`,
-              decoration: 'underline',
-              alignment: 'left',
-            },
-          ],
+            { text: formatDate(formData.date), alignment: 'left', margin: [0, 0, 0, 4] },
+            { text: `INVOICE NO. : ${formData.invoiceNo || ''}${formData.contractNo ? ` (${formData.contractNo})` : ''}`, decoration: 'underline' },
+            { text: `PO NO. : ${formData.poNo || ''}`, decoration: 'underline', margin: [0, 2, 0, 2] },
+            hasValue('proformaInvoiceNo')
+              ? { text: `PROFORMA INVOICE NO. : ${formData.proformaInvoiceNo}`, decoration: 'underline' }
+              : null,
+          ].filter(Boolean),
         },
       ],
-      margin: [0, 0, 0, 10],
-    }, 
+      margin: [0, 0, 0, 14],
+    },
 
-    // SOLD TO / SHIP TO / PAYMENT
+    // PAYER | CONSIGNEE | PAYMENT + DUE DATE
     {
       table: {
-        widths: ['30%', '30%', '40%'],
+        widths: ['30%', '35%', '35%'],
         body: [
           [
-            { text: 'SOLD TO', style: 'boxHeader' },
-            { text: 'SHIP TO', style: 'boxHeader' },
-            { text: 'PAYMENT', style: 'boxHeader' },
+            { text: 'PAYER',     style: 'boxHeader' },
+            { text: 'CONSIGNEE', style: 'boxHeader' },
+            { text: 'PAYMENT',   style: 'boxHeader' },
           ],
           [
             buildSoldTo(formData),
             buildShipTo(formData),
-            { text: formData.payment || '', rowSpan: 2 },
+            {
+              rowSpan: 2,
+              stack: [
+                { text: formData.payment || '' },
+                formData.dueDate
+                  ? {
+                    stack: [
+                      { text: 'DUE DATE', style: 'boxHeader', margin: [0, 8, 0, 2] },
+                      { text: formData.dueDate },
+                    ],
+                  }
+                  : null,
+              ].filter(Boolean),
+            },
           ],
-          [
-            {},
-            {},
-            {},
-          ],
+          [ {}, {}, {} ],
         ],
       },
-
       layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
+        hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 1 : 0,
+        vLineWidth: () => 1,
       },
-
       margin: [0, 0, 0, 10],
     },
 
     // SHIPPING TABLE
-    {
-      table: {
-        widths: ['60%', '40%'],
-        body: [
-
-          [
-            buildPair('SHIPPED ON', formData.vessel),
-            buildPair('ON OR ABOUT', formatDate(formData.etd)),
-          ],
-
-          [
-            buildPair('FROM', formData.from),
-            buildPair('TO', formData.to),
-          ],
-
-          [
-            '',
-            buildPair('ETA', formatDate(formData.eta)),
-          ],
-
-        ],
-      },
-
-      layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===node.table.body.length) return 1
-
-          return 0
-        },
-
-        vLineWidth: function(){
-          return 1
-        },
-
-      },
-
-      margin: [0, 0, 0, 10],
-    },
+    buildShippingTable(),
 
     // GOODS TABLE
     {
       table: {
-        headerRows: 3,
-        widths: ['30%', '30%', '12%', '13%', '15%'],
-
-        body: [
-
-          [
-            { text: 'MARKS & NOS', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'DESCRIPTION OF GOODS', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'PACKAGE', style: 'tableHeader', rowSpan: 3, alignment: 'center', margin: [0, 12, 0, 0] },
-
-            { text: 'NET', style: 'tableHeader' },
-            { text: 'GROSS', style: 'tableHeader' },
-          ],
-
-          [
-            {},
-            {},
-            {},
-            { text: 'WEIGHT', style: 'tableHeader' },
-            { text: 'WEIGHT', style: 'tableHeader' },
-          ],
-
-          [
-            {},
-            {},
-            {},
-            { text: '(KGS)', style: 'tableHeader' },
-            { text: '(KGS)', style: 'tableHeader' },
-          ],
-
-          ...items.map(i => [
-            i.marksAndNos || '',
-            buildDescription(i),
-            buildPackageDisplay(i),
-            { text: formatNumber(i.netWeight), alignment: 'right' },
-            { text: formatNumber(i.grossWeight), alignment: 'right' },
-          ]),
-
-          [
-            { text: 'TOTAL', colSpan: 3, bold: true },
-            {},
-            {},
-            { text: formatNumber(totalNet), alignment: 'right', bold: true },
-            { text: formatNumber(totalGross), alignment: 'right', bold: true },
-          ],
-        ],
+        headerRows: 2,
+        widths: ['22%', '28%', '14%', '16%', '20%'],
+        body: goodsBody,
       },
-
       layout: {
-
-        hLineWidth: function(i, node){
-
-          if(i===0) return 1
-          if(i===1 || i===2) return 0
-          if(i===3) return 1
-          if(i===node.table.body.length) return 1
-
+        hLineWidth: (i, node) => {
+          if (i === 0 || i === 1) return 1
+          if (i === node.table.body.length) return 1
+          
           return 0.5
         },
-
-        vLineWidth: function(){
-          return 1
-        },
-
+        vLineWidth: () => 1,
       },
+      margin: [0, 0, 0, 6],
+    },
+
+    // PRICING ROWS (CIF / FOB / FREIGHT / INSURANCE)
+    ...buildPricingRows(),
+
+    // FOOTER
+    { stack: footerItems, margin: [0, 10, 0, 0] },
+
+    // BANK DETAILS
+    {
+      stack: [
+        { text: 'BANK DETAILS', style: 'boxHeader', margin: [0, 10, 0, 6] },
+        ...bankingItems,
+      ],
+      margin: [0, 0, 0, 0],
     },
 
     // SIGNATURE
     {
-      margin: [0, 30, 0, 0],
-      stack: [
-
-        { text: `PACKING : ${formData.packing || ''}` },
-
-        { text: `COUNTRY OF ORIGIN : ${formData.countryOfOrigin || ''}` },
-
-        { text: `MAKER NAME : ${formData.makerName || ''}` },
-
-        { text: `PACKAGING : ${formData.packaging || ''}` },
-
-      ],
-    },
-    {
       columns: [
-
-        { width: '*', text: '' }, // spacer ด้านซ้าย
-
+        { width: '*', text: '' },
         {
           width: 'auto',
           alignment: 'center',
-          margin: [0, 0, 0, 80],
+          margin: [0, 20, 0, 0],
           stack: [
+            { text: 'SANYO KASEI (THAILAND) LTD.', bold: true, margin: [0, 0, 0, 30] },
             {
-              text: 'SANYO KASEI (THAILAND) LTD.',
-              bold: true,
-              margin: [0, 0, 0, 40],
+              canvas: [{
+                type: 'line', x1: 0, y1: 0, x2: 180, y2: 0,
+                lineWidth: 1, dash: { length: 4, space: 2 },
+              }],
+              margin: [0, 0, 0, 6],
             },
-            {
-              canvas: [
-                {
-                  type: 'line',
-                  x1: 0,
-                  y1: 0,
-                  x2: 180,
-                  y2: 0,
-                  lineWidth: 1,
-                  dash: { length: 4, space: 2 },
-                },
-              ],
-              margin: [0, 0, 0, 8],
-            },
-            {
-              text: 'AUTHORISED SIGNATURE',
-            },
+            { text: 'AUTHORISED SIGNATURE' },
           ],
         },
-
       ],
     },
-
 
   ]
 
@@ -267,104 +322,95 @@ export default function commercialInvoiceMapper(formData) {
     pageSize: 'A4',
     pageMargins: [40, 40, 40, 40],
     content,
-
     styles: {
-
-      title: {
-        fontSize: 16,
-        bold: true,
-      },
-
-      boxHeader: {
-        bold: true,
-        decoration: 'underline',
-      },
-
-      tableHeader: {
-        bold: true,
-        alignment: 'center',
-      },
-
+      title: { fontSize: 10, bold: true },
+      boxHeader: { bold: true, decoration: 'underline' },
+      tableHeader: { bold: true, alignment: 'center', fontSize: 9 },
+      textSub: { fontSize: 5 },
     },
-
     defaultStyle: {
-      fontSize: 10,
+      font: 'Arial',
+      fontSize: 8,
+      lineHeight: 1.3,
     },
-
   }
 }
 
+// ─── Shared helpers ────────────────────────────────────────────────────────────
 
 function buildSoldTo(formData) {
-
   const p = formData.payer || {}
-
+  
   return {
     stack: [
-      { text: p.name, bold: true },
-      p.address,
-      p.address2,
-      `${p.city || ''} ${p.country || ''}`.trim(),
-      p.tel ? `TEL : ${p.tel}` : '',
-      p.attn ? { text: `ATTN : ${p.attn}`, bold: true } : '',
+      p.name     ? { text: p.name, bold: true }               : null,
+      p.address  || null,
+      p.address2 || null,
+      (p.city || p.country) ? `${p.city || ''} ${p.country || ''}`.trim() : null,
+      p.tel  ? `TEL.: ${p.tel}`                               : null,
+      p.attn ? { text: `ATTN : ${p.attn}`, bold: true }       : null,
     ].filter(Boolean),
   }
 }
-
 
 function buildShipTo(formData) {
-
   const c = formData.consignee || {}
-
+  
   return {
     stack: [
-      { text: c.name, bold: true },
-      c.address,
-      c.address2,
-      c.address3,
-      `${c.city || ''} - ${c.country || ''}`.trim(),
-      c.tel ? `TEL : ${c.tel}` : '',
-      c.taxId ? `TAX ID : ${c.taxId}` : '',
-      c.attn ? { text: `ATTN : ${c.attn}`, bold: true } : '',
+      c.name     ? { text: c.name, bold: true }               : null,
+      c.address  || null,
+      c.address2 || null,
+      c.address3 || null,
+      (c.city || c.country) ? `${c.city || ''} – ${c.country || ''}`.trim() : null,
+      c.tel   ? `TEL.: ${c.tel}`                              : null,
+      c.taxId ? `TAX ID : ${c.taxId}`                        : null,
+      c.attn  ? { text: `ATTN : ${c.attn}`, bold: true }      : null,
     ].filter(Boolean),
   }
 }
 
-
 function buildPair(label, value) {
+  return { text: `${label} : ${value || ''}` }
+}
+
+function buildMarksAndNos(item) {
+  const lines = (item.marksAndNos || '').split('\n').filter(Boolean)
+  
+  return lines.length > 1
+    ? { stack: lines.map(l => ({ text: l })) }
+    : { text: item.marksAndNos || '' }
+}
+
+function buildDescription(item, show) {
+  const showSub = show ? show('productDescription') : true
 
   return {
-    text: `${label} : ${value || ''}`,
+    text: [
+      { text: item.descriptionOfGoods || '' },
+
+      showSub && item.subDescription
+        ? {
+          text: `\n(${item.subDescription})`,
+          fontSize: 5,        // 👈 ลดขนาดตรงนี้
+          color: '#666666',   // (optional) ทำให้ดูเป็น sub
+        }
+        : '',
+    ],
   }
-
 }
 
-
-function buildPackageDisplay(item) {
-
-  const parts = []
-
-  if (item.packageType) parts.push(item.packageType)
-
-  if (item.quantity && item.unitType) {
-
-    const pkg = item.palletCount
-      ? `${item.quantity} ${item.unitType} (${item.palletCount} PALLETS)`
-      : `${item.quantity} ${item.unitType}`
-
-    parts.push(pkg)
+function buildFooterRow(label, value, highlight = false) {
+  return {
+    columns: [
+      { width: 120, text: label },
+      { width: '*',  text: value },
+    ],
+    margin: [0, 1, 0, 1],
   }
-
-  return parts.join('\n')
 }
 
-
-function buildDescription(item) {
-
-  return [
-    item.descriptionOfGoods,
-    item.subDescription ? `(${item.subDescription})` : '',
-  ]
-    .filter(Boolean)
-    .join('\n')
-}
+// function formatNumber(v) {
+//   if (v == null || v === '') return ''
+//   return Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+// }

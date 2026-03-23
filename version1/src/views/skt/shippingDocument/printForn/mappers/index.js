@@ -6,11 +6,11 @@ import shippingParticularMapper from './shippingParticularTab'
 
 
 const mappers = {
-  packingList: packingListMapper,
-  commercialInvoice: commercialInvoiceMapper,
-  certificateOfOrigin: certificateOfOriginMapper,
-  packingDeclaration: packingDeclarationMapper,
-  shippingParticular: shippingParticularMapper,
+  'PACKING LIST': packingListMapper,
+  'COMMERCIAL INVOICE': commercialInvoiceMapper,
+  'CERTIFICATE OF ORIGIN': certificateOfOriginMapper,
+  'PACKING DECLARATION': packingDeclarationMapper,
+  'SHIPPING PARTICULAR': shippingParticularMapper,
 }
 
 export function getMapper(tabKey) {

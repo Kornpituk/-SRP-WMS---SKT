@@ -30,11 +30,11 @@ export const TabStatus = Object.freeze({
 
 /** Unique key per tab — used everywhere as registry key */
 export const TabKey = Object.freeze({
-  PACKING_LIST: 'packingList',
-  COMMERCIAL_INVOICE: 'commercialInvoice',
-  CERTIFICATE_OF_ORIGIN: 'certificateOfOrigin',
-  PACKING_DECLARATION: 'packingDeclaration',
-  SHIPPING_PARTICULAR: 'shippingParticular',
+  PACKING_LIST: 'PACKING LIST',
+  COMMERCIAL_INVOICE: 'COMMERCIAL INVOICE',
+  CERTIFICATE_OF_ORIGIN: 'CERTIFICATE OF ORIGIN',
+  PACKING_DECLARATION: 'PACKING DECLARATION',
+  SHIPPING_PARTICULAR: 'SHIPPING PARTICULAR',
 })
 
 // ---------------------------------------------------------------------------

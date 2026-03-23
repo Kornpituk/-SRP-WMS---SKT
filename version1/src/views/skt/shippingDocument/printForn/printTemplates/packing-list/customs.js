@@ -9,7 +9,7 @@ export default async function customsTemplate(data) {
 
   return {
     pageSize: 'A4',
-    pageMargins: [40, 60, 40, 60],
+    pageMargins: [59.52, 70.86, 36.85, 70.86],
     content: [
       ...baseContent(data),  // ใช้ base layout
       // ตารางสินค้า (customs ต้องการแสดงข้อมูลบางอย่างเพิ่มเติม?)

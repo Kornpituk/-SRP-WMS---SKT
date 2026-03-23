@@ -157,7 +157,7 @@ export const shipDocumentApi = {
 
   // === Print ===
 
-  async printTab(documentId, tabKey, target, formData) {
+  async printTab(documentId, tabKey, shippMode,  target, displayFields, formData) {
     const useBackend = false
 
     if (useBackend) {
@@ -170,7 +170,13 @@ export const shipDocumentApi = {
       throw new Error(`No PDF mapper defined for tab: ${tabKey}`)
     }
 
-    const docDefinition = mapper(formData, target)
+    // ── ส่ง options ครบ: target + displayFields + mode (จาก formData) ──
+    const docDefinition = mapper(formData, {
+      target,
+      shippMode,                              // 'buyer' | 'customs'
+      displayFields: displayFields ?? [],  // ['lotNo', 'note', ...]
+      tabKey: formData.mode ?? 'ocean',    // mode สำหรับ shipping table layout
+    })
 
     pdfMake.createPdf(docDefinition).open()
   },

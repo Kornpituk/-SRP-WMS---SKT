@@ -134,6 +134,7 @@ export default function certificateOfOriginMapper(formData) {
     },
 
     defaultStyle: {
+      font: 'Arial',
       fontSize: 10,
       lineHeight: 1.4,
     },

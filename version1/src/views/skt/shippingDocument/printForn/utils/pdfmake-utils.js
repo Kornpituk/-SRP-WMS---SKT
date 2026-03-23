@@ -1,14 +1,20 @@
 import pdfMake from 'pdfmake/build/pdfmake'
-import pdfFonts from 'pdfmake/build/vfs_fonts'
+import vfs from '@/assets/vfs_fonts'
 
-pdfMake.vfs = pdfFonts.vfs
+pdfMake.vfs = vfs
 
 pdfMake.fonts = {
-  Roboto: {
-    normal: 'Roboto-Regular.ttf',
-    bold: 'Roboto-Medium.ttf',
-    italics: 'Roboto-Italic.ttf',
-    bolditalics: 'Roboto-MediumItalic.ttf',
+  // Roboto: {
+  //   normal: 'Roboto-Regular.ttf',
+  //   bold: 'Roboto-Medium.ttf',
+  //   italics: 'Roboto-Italic.ttf',
+  //   bolditalics: 'Roboto-MediumItalic.ttf',
+  // },
+  Arial: {
+    normal: 'ARIAL.TTF',
+    bold: 'ARIALBD.TTF',
+    italics: 'ARIALI.TTF',
+    bolditalics: 'ARIALBI.TTF',
   },
 }
 

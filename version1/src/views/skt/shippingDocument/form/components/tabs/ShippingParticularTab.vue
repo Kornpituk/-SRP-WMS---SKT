@@ -482,7 +482,12 @@ const {
   onConfirm: data => tabApiMap[TabKey.SHIPPING_PARTICULAR].confirm(store.documentId, data),
 })
 
-const { print: handlePrint } = usePrint(TabKey.SHIPPING_PARTICULAR)
+const { isPrinting, print } = usePrint(TabKey.SHIPPING_PARTICULAR, () => formData.value)
+
+
+function handlePrint(selectedTarget) {
+  print(selectedTarget)
+}
 
 // ---------------------------------------------------------------------------
 // Notes

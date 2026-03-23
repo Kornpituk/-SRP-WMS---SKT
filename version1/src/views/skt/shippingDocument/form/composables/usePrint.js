@@ -11,27 +11,36 @@ export function usePrint(tabKey, getFormData) {
   const showPrintDialog = ref(false)
   const printTarget = ref('buyer') // ค่าเริ่มต้น
 
-  async function print(target = printTarget.value) {
-    if (!permissions.value.canPrint) return
+  async function print(target, display, shippMode) {
+    
+    console.log("tabKey", tabKey)
+    console.log("target", target)
+    console.log("display", display)
+    console.log("shippMode", shippMode)
+
+    // if (!permissions.value?.canPrint) return
 
     isPrinting.value = true
 
     try {
+      const rawDisplay = toRaw(display) ?? []  // ← แปลง Proxy → Array ธรรมดา
+
       const formData = getFormData ? getFormData() : {}
 
-      console.log("formData", formData)
-
-      const blob = await shipDocumentApi.printTab(
+      console.log("getFormData", formData)
+      await shipDocumentApi.printTab(
         store.documentId,
         tabKey,
+        shippMode,
         target,
+        rawDisplay,
         formData,
       )
 
-      const url = URL.createObjectURL(blob)
+      // const url = URL.createObjectURL(blob)
 
-      window.open(url, '_blank')
-      setTimeout(() => URL.revokeObjectURL(url), 60000)
+      // window.open(url, '_blank')
+      // setTimeout(() => URL.revokeObjectURL(url), 60000)
 
     } catch (err) {
       console.error(`[usePrint] ${tabKey}:`, err)

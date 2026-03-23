@@ -462,6 +462,12 @@ import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
 import TabActionBar from '../shared/TabActionBar.vue'
 
+const route = useRoute()
+
+// อ่าน ?mode=ocean จาก URL  ← แทน props.tabKey ที่ไม่มีค่า
+const shippMode = computed(() => route.query.mode || 'ocean')
+
+
 // ---------------------------------------------------------------------------
 // Master Data constants
 // ---------------------------------------------------------------------------
@@ -513,8 +519,7 @@ const PRINT_DISPLAY_FIELDS = {
 // Composables
 // ---------------------------------------------------------------------------
 
-const store = useShipDocumentStore()
-const route = useRoute()                                       // ✅ FIX: ใช้งานได้แล้ว
+const store = useShipDocumentStore()                       // ✅ FIX: ใช้งานได้แล้ว
 
 const {
   formData,
@@ -543,8 +548,12 @@ const printTargets = [
   { label: 'For Customs', value: 'customs' },
 ]
 
-function handlePrint(selectedTarget) {
-  print(selectedTarget)
+function handlePrint(payload) {
+  print(
+    payload.target,
+    payload.display,
+    shippMode.value,
+  )
 }
 
 // ---------------------------------------------------------------------------

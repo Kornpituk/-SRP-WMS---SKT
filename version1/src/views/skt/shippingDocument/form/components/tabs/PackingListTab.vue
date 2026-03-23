@@ -691,6 +691,12 @@ import { usePrint } from '../../composables/usePrint'
 import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
 import TabActionBar from '../shared/TabActionBar.vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// อ่าน ?mode=ocean จาก URL  ← แทน props.tabKey ที่ไม่มีค่า
+const shippMode = computed(() => route.query.mode || 'ocean')
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -787,8 +793,12 @@ const printTargets = [
   { label: 'For Customs', value: 'customs' },
 ]
 
-function handlePrint(selectedTarget) {
-  print(selectedTarget)
+function handlePrint(payload) {
+  print(
+    payload.target,
+    payload.display,
+    shippMode.value,
+  )
 }
 
 // ─── #1: Invoice Running Number ───────────────────────────────────────────────

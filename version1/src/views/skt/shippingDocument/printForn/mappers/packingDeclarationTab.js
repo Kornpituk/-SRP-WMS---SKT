@@ -216,6 +216,7 @@ export default function packingDeclarationMapper(formData) {
     },
 
     defaultStyle: {
+      font: 'Arial',
       fontSize: 10,
       lineHeight: 1.4,
     },
