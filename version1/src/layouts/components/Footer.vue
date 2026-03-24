@@ -7,11 +7,7 @@ const openInNewTab = () => {
   window.open("https://github.com/Kornpituk/Update-WMS-WebApp/tree/main", "_blank")
 }
 
-const versionWMSConfig = ref('')
-
-watchEffect(() => {
-  versionWMSConfig.value = localStorage.getItem('versionWMS')
-})
+const versionWMSConfig = ref(process.env.VITE_APP_VERSION)
 </script>
 
 

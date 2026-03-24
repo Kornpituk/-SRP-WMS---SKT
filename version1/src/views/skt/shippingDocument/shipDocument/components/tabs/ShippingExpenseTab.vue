@@ -90,8 +90,18 @@ import { ref, reactive } from 'vue'
 import { useShippingExpense } from '../../composables/useShippingExpense'
 import ShippingExpenseFilter from '../filters/ShippingExpenseFilter.vue'
 import ShippingExpenseTable  from '../tables/ShippingExpenseTable.vue'
+import { ShippingDocStatus } from '../../constants/shippingDocument.constants'
 
-defineEmits(['close'])
+// ─── Props ────────────────────────────────────────────────────
+const props = defineProps({
+  mode: {
+    type: String,
+    default: 'list',
+    validator: v => ['list', 'void'].includes(v),
+  },
+})
+
+const emit = defineEmits(['close', 'create'])
 
 // ─── Filter toggle ────────────────────────────────────────────
 const filterVisible = ref(true)
@@ -143,7 +153,7 @@ const {
   filters, pagination, sortBy,
   handleSearch, handleClear,
   handleUpdateOptions,
-} = useShippingExpense()
+} = useShippingExpense(props.mode)
 
 // ─── Toast ────────────────────────────────────────────────────
 const snackbar = reactive({ show: false, message: '', color: 'primary', icon: 'mdi-information' })
@@ -153,9 +163,21 @@ function showToast(message, color = 'primary', icon = 'mdi-information') {
 }
 
 function handleAction(item) {
-  const invoice = item.raw?.invoiceInSAP ?? item.invoiceInSAP
+  const raw = item.raw ?? item
+  const status = raw.status
 
-  showToast(`Opening expense: ${invoice}`, 'primary', 'mdi-cash-multiple')
+  // WAITING = CREATE → เปิด dialog เลือก shipping mode ที่ parent
+  if (status === ShippingDocStatus.WAITING) {
+    emit('create', item)
+
+    return
+  }
+
+  // อื่นๆ = ACTION → ไปหน้า form ตรง
+  const invoice = raw.invoiceInSAP
+
+  window.location.href = `/skt/shippingDocument/formShippingExpense/${invoice}`
+  showToast(`Opening detail: ${invoice}`, 'primary', 'mdi-file-eye-outline')
 }
 
 function handleExport() {

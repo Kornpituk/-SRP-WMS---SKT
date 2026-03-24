@@ -8,6 +8,9 @@ import { defineConfig } from 'vite'
 import Pages from 'vite-plugin-pages'
 import Layouts from 'vite-plugin-vue-layouts'
 import vuetify from 'vite-plugin-vuetify'
+import pkg from './package.json'
+
+const buildDate = new Date().toLocaleDateString('en-GB')
 
 // @ts-expect-error Known error: https://github.com/sxzz/unplugin-vue-macros/issues/257#issuecomment-1410752890
 import DefineOptions from 'unplugin-vue-define-options/vite'
@@ -80,6 +83,8 @@ export default defineConfig({
   ],
   define: { 'process.env': {
     VITE_API_URL: "https://sktdevwebapi.easetrackwms.com",
+    VITE_APP_VERSION: JSON.stringify(pkg.version),
+    VITE_BUILD_DATE: JSON.stringify(buildDate),
   } },
   resolve: {
     alias: {

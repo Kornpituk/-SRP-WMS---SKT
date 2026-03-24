@@ -1,0 +1,430 @@
+/**
+ * Stylelint: stylelint-config-standard + stylelint-order (grouped)
+ * Order: Position → Box Model → Typography → Visual
+ */
+
+/* =================================================================
+   Layout
+   ================================================================= */
+
+.tab-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #f5f5f5;
+}
+
+.tab-content {
+  flex: 1;
+  padding: 0;
+}
+
+/* =================================================================
+   Section
+   ================================================================= */
+
+.section {
+  padding: 24px 32px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fff;
+}
+
+.section-title {
+  margin-bottom: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  color: #222;
+}
+
+/* =================================================================
+   Booking row
+   ================================================================= */
+
+.book-grid {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.book-cell {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+}
+
+.book-cell--date {
+  flex: 0 0 auto;
+}
+
+.book-cell__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+.book-cell__text {
+  font-size: 14px;
+  color: #333;
+}
+
+/* =================================================================
+   Shipper grid (2 columns)
+   ================================================================= */
+
+.shipper-grid {
+  display: flex;
+  gap: 40px;
+}
+
+.shipper-grid__left {
+  flex: 1;
+}
+
+.shipper-grid__right {
+  flex: 0 0 300px;
+  padding-top: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #333;
+}
+
+/* =================================================================
+   Party text blocks (shared)
+   ================================================================= */
+
+.party-label {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+}
+
+.party-text {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #333;
+}
+
+.party-text--indent {
+  padding-left: 20px;
+}
+
+/* =================================================================
+   Notify Party (bordered box)
+   ================================================================= */
+
+.notify-box {
+  max-width: 420px;
+  padding: 16px 20px;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* =================================================================
+   Info lines (PORT OF RECEIPT etc.)
+   ================================================================= */
+
+.info-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 32px;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: #333;
+}
+
+.info-line:last-child {
+  margin-bottom: 0;
+}
+
+.info-line__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+.info-line__extra {
+  margin-left: 60px;
+  font-weight: 700;
+}
+
+/* =================================================================
+   Shipping rows (FEEDER/VESSEL + ETD/ETA)
+   ================================================================= */
+
+.ship-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ship-row--spaced {
+  margin-top: 10px;
+}
+
+.ship-row__main {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.ship-row__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+.ship-row__mid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ship-row__select {
+  width: 100px;
+}
+
+.ship-row__end {
+  flex-shrink: 0;
+}
+
+/* =================================================================
+   Shipping Mark (complex grid)
+   ================================================================= */
+
+.mark-label {
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+}
+
+.mark-grid {
+  display: flex;
+  gap: 32px;
+}
+
+.mark-grid__left {
+  flex: 0 0 160px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #333;
+}
+
+.mark-grid__right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Mark detail rows */
+
+.mark-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mark-detail-row__pkg {
+  display: flex;
+  flex: 0 0 280px;
+  align-items: center;
+  gap: 8px;
+}
+
+.mark-detail-row__header {
+  flex: 0 0 100px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  color: #555;
+}
+
+.mark-detail-row__val {
+  flex: 0 0 100px;
+  text-align: center;
+}
+
+.mark-detail-row__fcl-label {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #555;
+}
+
+.mark-detail-row__fcl-input {
+  width: 100px;
+}
+
+/* Mark misc lines */
+
+.mark-line {
+  margin-bottom: 10px;
+}
+
+.mark-extra-input {
+  max-width: 280px;
+}
+
+.mark-hs-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mark-hs-row__label {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #555;
+}
+
+.mark-hs-row__select {
+  width: 160px;
+}
+
+.mark-info {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #333;
+}
+
+.mark-text {
+  line-height: 1.8;
+}
+
+/* =================================================================
+   Container & Seal No.
+   ================================================================= */
+
+.seal-label {
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+}
+
+.seal-grid {
+  display: flex;
+  gap: 16px;
+}
+
+.seal-cell {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+}
+
+.seal-cell__label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #333;
+}
+
+/* =================================================================
+   Chip (yellow highlight)
+   ================================================================= */
+
+.chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}
+
+.chip--yellow {
+  border: 1px solid #f5deb3;
+  background: #fff8e1;
+}
+
+/* =================================================================
+   Responsive — Tablet (≤ 960px)
+   ================================================================= */
+
+@media (max-width: 960px) {
+  .section {
+    padding: 16px 20px;
+  }
+
+  .book-grid {
+    flex-wrap: wrap;
+  }
+
+  .book-cell {
+    flex: 1 1 45%;
+  }
+
+  .shipper-grid {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .shipper-grid__right {
+    flex: none;
+  }
+
+  .ship-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .mark-grid {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mark-grid__left {
+    flex: none;
+  }
+
+  .mark-detail-row {
+    flex-wrap: wrap;
+  }
+
+  .seal-grid {
+    flex-direction: column;
+  }
+}
+
+/* =================================================================
+   Responsive — Mobile (≤ 600px)
+   ================================================================= */
+
+@media (max-width: 600px) {
+  .book-cell {
+    flex: 1 1 100%;
+  }
+
+  .info-line {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mark-detail-row__pkg {
+    flex: 1 1 100%;
+  }
+}

@@ -37,10 +37,14 @@ const errors = ref({
 
 localStorage.setItem('versionWMS', '1.3.25.1')
 
+
 // localStorage.setItem('srp-theme-config', 'primary')
 
-const versionWMSConfig = ref('')
+const versionWMSConfig = process.env.VITE_APP_VERSION
+const buildDateConfig = process.env.VITE_BUILD_DATE
 
+console.log('versionWMS', versionWMSConfig)
+console.log('buildDate', buildDateConfig)
 
 
 const refVForm = ref()
@@ -58,7 +62,6 @@ const savedUsernames = ref(JSON.parse(localStorage.getItem('usernames')) || []) 
 
 
 watchEffect(() => {
-  versionWMSConfig.value = localStorage.getItem('versionWMS')
   if(localStorage.getItem('rememberMe')){
     username.value = localStorage.getItem('rememberMeUserName')
   } else if(!localStorage.getItem('rememberMe')){
@@ -288,7 +291,7 @@ function removeUsername(index) {
           </h5>
         </VCardText>
         <VCardSubtitle class="d-flex justify-center">
-          Version {{ versionWMSConfig }}
+          Version {{ versionWMSConfig }} 
         </VCardSubtitle>
 
         <VCardText>

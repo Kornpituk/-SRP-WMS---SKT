@@ -107,6 +107,7 @@ import { useShippingDocList } from '../../composables/useShippingDocList'
 import ShippingDocFilter from '../filters/ShippingDocFilter.vue'
 import ShippingDocTable  from '../tables/ShippingDocTable.vue'
 import VoidConfirmDialog    from '@/views/skt/compoentn/dialog/voidConfirmDialog.vue'
+import { ShippingDocStatus } from '../../constants/shippingDocument.constants'
 
 // ─── Props ────────────────────────────────────────────────────
 const props = defineProps({
@@ -117,7 +118,7 @@ const props = defineProps({
   },
 })
 
-defineEmits(['close'])
+const emit = defineEmits(['close', 'create'])
 
 // ─── Filter toggle ────────────────────────────────────────────
 const filterVisible = ref(true)
@@ -245,8 +246,20 @@ function showToast(message, color = 'primary', icon = 'mdi-information') {
 }
 
 function handleAction(item) {
-  const invoice = item.raw?.invoiceInSAP ?? item.invoiceInSAP
+  const raw = item.raw ?? item
+  const status = raw.status
 
+  // WAITING = CREATE → เปิด dialog เลือก shipping mode ที่ parent
+  if (status === ShippingDocStatus.WAITING) {
+    emit('create', item)
+
+    return
+  }
+
+  // อื่นๆ = ACTION → ไปหน้า form ตรง
+  const invoice = raw.invoiceInSAP
+
+  window.location.href = `/skt/shippingDocument/form/${invoice}`
   showToast(`Opening detail: ${invoice}`, 'primary', 'mdi-file-eye-outline')
 }
 

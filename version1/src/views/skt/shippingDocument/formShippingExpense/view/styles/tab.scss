@@ -1,0 +1,140 @@
+// ── Header info grid ──────────────────────────────────────────────────────────
+.info-row {
+  display: flex;
+  align-items: baseline;
+  min-height: 32px;
+  gap: 8px;
+}
+
+.info-label {
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 158px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.info-value {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+// ── Expense detail grid ───────────────────────────────────────────────────────
+.left-col {
+}
+
+.expense-row {
+  display: flex;
+  align-items: center;
+  min-height: 54px;
+  gap: 10px;
+}
+
+// Label — ยาวพอครอบ "Customs Over Time :"
+.exp-label {
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 172px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+// Vendor column
+.exp-vendor {
+  width: 155px;
+  min-width: 155px;
+  flex-shrink: 0;
+
+  // Sale Person — ไม่มี price, span เต็ม
+  &--full {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+}
+
+// Price column
+.exp-price {
+  width: 145px;
+  min-width: 145px;
+  flex-shrink: 0;
+}
+
+// "Baht" label
+.exp-unit {
+  width: 40px;
+  min-width: 40px;
+  font-size: 14px;
+  flex-shrink: 0;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+// Remark — span ที่เหลือ
+.exp-remark {
+  flex: 1;
+  min-width: 0;
+}
+
+// View-mode numeric values
+.price-val {
+  display: block;
+  text-align: right;
+  font-size: 14px;
+  padding-right: 4px;
+  color: rgba(0, 0, 0, 0.87);
+
+  &--bold {
+    font-weight: 600;
+  }
+}
+
+// Formula note (right-aligned, above Total)
+.cost-note {
+  margin: 2px 0 4px;
+  text-align: right;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  padding-right: 50px; // align กับ edge ของ exp-price
+}
+
+.expense-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 16px;
+  min-height: 40px; /* รักษาความสูงตอนเป็น View mode */
+}
+
+.exp-label {
+  flex: 0 0 140px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #000;
+}
+
+.exp-vendor {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.exp-full-width {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.exp-price {
+  flex: 0 0 160px;
+}
+
+.exp-unit {
+  flex: 0 0 32px;
+  font-size: 14px;
+  color: #000;
+}
+
+.read-only-text {
+  font-size: 14px;
+  color: #333;
+}
