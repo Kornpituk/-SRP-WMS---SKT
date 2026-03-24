@@ -34,6 +34,10 @@ export default function packingListMapper(formData, options = {}) {
     // customs
     if (field === 'lotNo') return displayFields.includes('lotNo')
     
+    // 👇 เพิ่มบรรทัดนี้: ถ้าไม่ใช่ buyer (เป็น customs) ไม่ต้องแสดง note 
+    // eslint-disable-next-line sonarjs/prefer-single-boolean-return
+    if (field === 'note') return false 
+    
     return true // field อื่น ๆ แสดงเสมอ
   }
 
@@ -172,9 +176,9 @@ export default function packingListMapper(formData, options = {}) {
       : null,
 
     // ── #rule: note → buyer checkbox / customs always ──
-    show('note') && hasValue('note')
-      ? { text: `NOTE : ${formData.note}`, italics: true, margin: [0, 2, 0, 0] }
-      : null,
+    // show('note') && hasValue('note')
+    //   ? { text: `NOTE : ${formData.note}`, italics: true, margin: [0, 2, 0, 0] }
+    //   : null,
 
   ].filter(Boolean)
 
@@ -295,19 +299,35 @@ export default function packingListMapper(formData, options = {}) {
     // SIGNATURE
     {
       columns: [
-        { width: '*', text: '' },
+        // ── ซ้าย: NOTE (แสดงตาม displayFields) ──
+        {
+          width: '*',
+          stack: [
+            show('note') && hasValue('note')
+              ? {
+                stack: [
+                  { text: 'NOTE :', bold: true },
+                  { text: formData.note, italics: true },
+                ],
+                margin: [0, 10, 0, 0], // 👈 คุม spacing ที่ block แทน
+              }
+              : null,
+          ],
+        },
+ 
+        // ── ขวา: SIGNATURE ──
         {
           width: 'auto',
           alignment: 'center',
-          margin: [0, 30, 0, 0],
+          margin: [0, 20, 0, 0],
           stack: [
-            { text: 'SANYO KASEI (THAILAND) LTD.', bold: true, margin: [0, 0, 0, 40] },
+            { text: 'SANYO KASEI (THAILAND) LTD.', bold: true, margin: [0, 0, 0, 30] },
             {
               canvas: [{
                 type: 'line', x1: 0, y1: 0, x2: 180, y2: 0,
                 lineWidth: 1, dash: { length: 4, space: 2 },
               }],
-              margin: [0, 0, 0, 8],
+              margin: [0, 0, 0, 6],
             },
             { text: 'AUTHORISED SIGNATURE' },
           ],

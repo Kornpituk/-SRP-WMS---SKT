@@ -28,6 +28,7 @@ export function usePrint(tabKey, getFormData) {
       const formData = getFormData ? getFormData() : {}
 
       console.log("getFormData", formData)
+      
       await shipDocumentApi.printTab(
         store.documentId,
         tabKey,

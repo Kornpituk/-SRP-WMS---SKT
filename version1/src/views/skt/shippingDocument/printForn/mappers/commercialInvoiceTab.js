@@ -27,10 +27,18 @@ export default function commercialInvoiceMapper(formData, options = {}) {
   // ─── helpers ──────────────────────────────────────────────────────────────
 
   function show(field) {
-    if (target === 'buyer') return displayFields.includes(field)
-    if (field === 'lotNo')  return displayFields.includes('lotNo')
+    if (target === 'buyer') {
+      return displayFields.includes(field)
+    }
+
+    // customs
+    if (field === 'lotNo') return displayFields.includes('lotNo')
     
-    return true
+    // 👇 เพิ่มบรรทัดนี้: ถ้าไม่ใช่ buyer (เป็น customs) ไม่ต้องแสดง note 
+    // eslint-disable-next-line sonarjs/prefer-single-boolean-return
+    if (field === 'note') return false 
+    
+    return true // field อื่น ๆ แสดงเสมอ
   }
 
   function hasValue(field) {
@@ -122,14 +130,23 @@ export default function commercialInvoiceMapper(formData, options = {}) {
   // ─── GOODS TABLE body rows ─────────────────────────────────────────────────
   const goodsBody = [
     // Header row 1
+    // Header row 1
     [
-      { text: 'MARKS & NOS',          style: 'tableHeader', rowSpan: 2, alignment: 'center', margin: [0, 6, 0, 0] },
+      { text: 'MARKS & NOS', style: 'tableHeader', rowSpan: 2, alignment: 'center', margin: [0, 6, 0, 0] },
       { text: 'DESCRIPTION OF GOODS', style: 'tableHeader', rowSpan: 2, alignment: 'center', margin: [0, 6, 0, 0] },
-      { text: `QUANTITY\n(KGS)`,       style: 'tableHeader', alignment: 'center' },
-      { text: `UNIT PRICE\n(${currency}/KGS)`, style: 'tableHeader', alignment: 'center' },
-      { text: `AMOUNT\n(${currency})`, style: 'tableHeader', alignment: 'center' },
+      { text: `QUANTITY`, style: 'tableHeader', alignment: 'center' },
+      { text: `UNIT PRICE`, style: 'tableHeader', alignment: 'center' },
+      { text: `AMOUNT`, style: 'tableHeader', alignment: 'center' },
     ],
-    [ {}, {}, {}, {}, {} ],
+
+    // Header row 2 (ต้องมี content จริง)
+    [
+      {},
+      {},
+      { text: '(KGS)', style: 'tableHeader', alignment: 'center' },
+      { text: `(${currency}/KGS)`, style: 'tableHeader', alignment: 'center' },
+      { text: `(${currency})`, style: 'tableHeader', alignment: 'center' },
+    ],
 
     // Data rows
     ...items.map(item => [
@@ -178,7 +195,7 @@ export default function commercialInvoiceMapper(formData, options = {}) {
       ? buildFooterRow('HS CODE :', formData.hsCode, true)     : null,
 
     // Note — แสดงตาม checkbox
-    show('Note') && hasValue('note')
+    show('Note') && hasValue('note') && target === 'buyer'
       ? { text: `NOTE : ${formData.note}`, italics: true, margin: [0, 2, 0, 0] } : null,
   ].filter(Boolean)
 
@@ -268,12 +285,23 @@ export default function commercialInvoiceMapper(formData, options = {}) {
       },
       layout: {
         hLineWidth: (i, node) => {
-          if (i === 0 || i === 1) return 1
+          if (i === 0) return 1           // top
+          if (i === 2) return 1           // หลัง header
           if (i === node.table.body.length) return 1
           
           return 0.5
         },
-        vLineWidth: () => 1,
+
+        vLineWidth: (i, node) => {
+          return 1
+        },
+
+        // 👇 คุมเส้นแนวนอนระหว่าง header row 1 กับ 2
+        hLineColor: (i, node) => {
+          if (i === 1) return 'white'     // 👈 ซ่อนเส้นกลาง header
+          
+          return 'black'
+        },
       },
       margin: [0, 0, 0, 6],
     },
@@ -296,7 +324,23 @@ export default function commercialInvoiceMapper(formData, options = {}) {
     // SIGNATURE
     {
       columns: [
-        { width: '*', text: '' },
+        // ── ซ้าย: NOTE (แสดงตาม displayFields) ──
+        {
+          width: '*',
+          stack: [
+            show('Note') && hasValue('note') && target === 'buyer'
+              ? {
+                stack: [
+                  { text: 'NOTE :', bold: true, margin: [0, 0, 0, 4] },
+                  { text: formData.note, italics: true },
+                ],
+                margin: [0, 20, 0, 0],
+              }
+              : { text: '' },
+          ],
+        },
+ 
+        // ── ขวา: SIGNATURE ──
         {
           width: 'auto',
           alignment: 'center',
@@ -308,7 +352,7 @@ export default function commercialInvoiceMapper(formData, options = {}) {
                 type: 'line', x1: 0, y1: 0, x2: 180, y2: 0,
                 lineWidth: 1, dash: { length: 4, space: 2 },
               }],
-              margin: [0, 0, 0, 6],
+              margin: [20, 0, 0, 6],
             },
             { text: 'AUTHORISED SIGNATURE' },
           ],

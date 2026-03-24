@@ -660,6 +660,7 @@
       :tab-key="TabKey.PACKING_LIST"
       :is-loading="isLoading"
       :is-dirty="isDirty"
+      :notes="notes"
       :is-printing="isPrinting"
       :can-print="!isReadonly"
       :print-targets="printTargets"
@@ -784,7 +785,13 @@ const {
 
 // const { print: handlePrint } = usePrint(TabKey.PACKING_LIST)
 
-const { isPrinting, print } = usePrint(TabKey.PACKING_LIST, () => formData.value)
+const { isPrinting, print } = usePrint(
+  TabKey.PACKING_LIST,
+  () => ({
+    ...formData.value,
+    note: notes.value[0]?.text ?? '',  // ← merge note ตรงนี้
+  }),
+)
 
 const printTarget = ref('buyer')
 
@@ -964,33 +971,34 @@ const totalGross = computed(() => (formData.value.items || []).reduce((s, i) => 
 
 // ─── #15 #16 Notes ───────────────────────────────────────────────────────────
 // Notes are always editable even after Confirm (stored separately from formData)
-const notes          = ref(store.packingListNotes || [])
-const noteOpen       = ref(false)
-const noteInput      = ref('')
-const noteDetailOpen = ref(false)
-const noteDetailText = ref('')
-const activeNote     = ref(null)
-
-
+// ── note เก็บแค่ 1 อัน ──────────────────────────────────────────────────
+const notes = ref(
+  store.commercialInvoiceNote ? [store.commercialInvoiceNote] : [],
+)
+ 
+// เพิ่ม note ได้แค่ครั้งเดียว (ถ้ามีแล้วให้ replace)
 function handleAddNote(text) {
-  notes.value.push({
+  const note = {
     id: Date.now(),
     text,
     date: new Date().toLocaleString('en-GB'),
-  })
+  }
+
+  notes.value = [note]               // ← replace ไม่ใช่ push
 }
-
+ 
+// แก้ไข note
 function handleEditNote({ id, text }) {
-  const note = notes.value.find(n => n.id === id)
-
-  if (note) {
-    note.text = text
+  if (notes.value[0]?.id === id) {
+    notes.value[0].text = text
   }
 }
-
+ 
+// ลบ note
 function handleDeleteNote(noteId) {
   notes.value = notes.value.filter(n => n.id !== noteId)
 }
+ 
 
 
 // ─── Confirm wrapper ──────────────────────────────────────────────────────────

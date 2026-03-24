@@ -500,7 +500,6 @@ const FOOTER_FIELDS = [
   { key: 'hsCode',          label: 'HS CODE :'            },
 ]
 
-
 // ─── #4 HS Code Types ────────────────────────────────────────────────────────
 const HS_CODE_TYPES = [
   { title: '3906.90.20',    value: '3906.90.20' },
@@ -539,7 +538,13 @@ const {
 // Print
 // ---------------------------------------------------------------------------
 
-const { isPrinting, print } = usePrint(TabKey.COMMERCIAL_INVOICE, () => formData.value)
+const { isPrinting, print } = usePrint(
+  TabKey.COMMERCIAL_INVOICE,
+  () => ({
+    ...formData.value,
+    note: notes.value[0]?.text ?? '',  // ← merge note ตรงนี้
+  }),
+)
 
 const printTarget = ref('buyer')
 
@@ -778,20 +783,30 @@ function fmtNum(v) {
 // Notes
 // ---------------------------------------------------------------------------
 
-const notes = ref([])
-
+// ── note เก็บแค่ 1 อัน ──────────────────────────────────────────────────
+const notes = ref(
+  store.commercialInvoiceNote ? [store.commercialInvoiceNote] : [],
+)
+ 
+// เพิ่ม note ได้แค่ครั้งเดียว (ถ้ามีแล้วให้ replace)
 function handleAddNote(text) {
-  notes.value.push({ id: Date.now(), text, date: new Date().toLocaleString('en-GB') })
+  const note = {
+    id: Date.now(),
+    text,
+    date: new Date().toLocaleString('en-GB'),
+  }
+
+  notes.value = [note]               // ← replace ไม่ใช่ push
 }
-
+ 
+// แก้ไข note
 function handleEditNote({ id, text }) {
-  const note = notes.value.find(n => n.id === id)
-
-  if (note) {
-    note.text = text
+  if (notes.value[0]?.id === id) {
+    notes.value[0].text = text
   }
 }
-
+ 
+// ลบ note
 function handleDeleteNote(noteId) {
   notes.value = notes.value.filter(n => n.id !== noteId)
 }

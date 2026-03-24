@@ -25,14 +25,14 @@
     <!-- ============================================== -->
     <!-- LEFT: Notes area                                -->
     <!-- ============================================== -->
+    <!-- แทนที่ส่วน LEFT: Notes area ใน TabActionBar.vue -->
+
     <div class="action-bar__left">
-      <!-- Saved notes display -->
+      <!-- ── มี note แล้ว → แสดง chip (คลิกดู/แก้/ลบ) ── -->
       <template v-if="notes?.length">
         <div
-          v-for="note in notes"
-          :key="note.id"
           class="note-chip"
-          @click="openViewNote(note)"
+          @click="openViewNote(notes[0])"
         >
           <VIcon
             size="18"
@@ -41,12 +41,13 @@
           >
             mdi-check-circle
           </VIcon>
-          <span class="note-chip__text">{{ note.text }}</span>
+          <span class="note-chip__text">{{ notes[0].text }}</span>
         </div>
       </template>
 
-      <!-- Add note button -->
+      <!-- ── ยังไม่มี note → แสดงปุ่ม Add ── -->
       <button
+        v-if="!notes?.length"
         type="button"
         class="add-note-btn"
         @click="openAddNote"
@@ -60,14 +61,14 @@
         <span class="add-note-btn__text">Click To Add Note</span>
       </button>
 
-      <!-- Add Note Popup -->
+      <!-- ── Add / Edit Note Popup ── -->
       <div
         v-if="showAddDialog"
         v-click-outside="closeAddNote"
         class="note-popup"
       >
         <div class="note-popup__header">
-          <span class="note-popup__title">Add Note</span>
+          <span class="note-popup__title">{{ editingNote ? 'Edit Note' : 'Add Note' }}</span>
           <button
             type="button"
             class="note-popup__close"
@@ -78,23 +79,22 @@
             </VIcon>
           </button>
         </div>
-
         <div class="note-popup__body">
           <VTextarea
             v-model="newNoteText"
             variant="outlined"
             density="compact"
-            hide-details
+            counter
             rows="3"
             placeholder="Enter Notes"
             auto-grow
+            :rules="rules"
             @keydown.enter.prevent="saveNote"
           />
           <p class="note-popup__hint">
             Press Enter to save, click outside to close
           </p>
         </div>
-
         <div class="note-popup__footer">
           <VBtn
             color="green"
@@ -111,7 +111,7 @@
         </div>
       </div>
 
-      <!-- View Note Popup -->
+      <!-- ── View Note Popup ── -->
       <div
         v-if="viewingNote"
         v-click-outside="closeViewNote"
@@ -129,7 +129,6 @@
             </VIcon>
           </button>
         </div>
-
         <div class="note-popup__body">
           <p class="note-popup__content">
             {{ viewingNote.text }}
@@ -137,7 +136,6 @@
           <VDivider class="my-2" />
           <div class="note-popup__meta">
             <span class="note-popup__date">{{ viewingNote.date }}</span>
-
             <div class="note-popup__actions">
               <button
                 type="button"
@@ -146,7 +144,6 @@
               >
                 EDIT
               </button>
-
               <button
                 type="button"
                 class="note-popup__delete"
@@ -431,6 +428,8 @@ function handleSaveDraft() {
 //   currentAction.value = 'confirm'
 //   emit('confirm')
 // }
+
+const rules = [v => v.length <= 150 || 'Max 150 characters']
 
 // ---------------------------------------------------------------------------
 // Note: Add
