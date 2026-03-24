@@ -1,6 +1,14 @@
 export const fields = [
   {
-    key: 'abb',
+    key: 'forwarderId',
+    label: 'No.',
+    type: 'text',
+    required: true,
+    width: '80px',
+    searchable: true,
+  },
+  {
+    key: 'ABB',
     label: 'ABB',
     type: 'text',
     required: true,

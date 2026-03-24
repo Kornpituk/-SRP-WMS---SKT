@@ -43,9 +43,11 @@
       <!-- ─── thead ──────────────────────────── -->
       <thead>
         <tr>
-          <th class="col-no text-center">
+          <!--
+            <th class="col-no text-center">
             No.
-          </th>
+            </th> 
+          -->
           <th
             v-for="field in tableFields"
             :key="field.key"
@@ -103,9 +105,11 @@
             :class="{ 'row-editing': editingInlineId === item.id }"
           >
             <!-- No. — แสดงเลข global ตาม offset หน้าปัจจุบัน -->
-            <td class="col-no">
+            <!--
+              <td class="col-no">
               {{ (currentPage - 1) * itemsPerPage + index + 1 }}.
-            </td>
+              </td> 
+            -->
 
             <!-- Data cells -->
             <template
