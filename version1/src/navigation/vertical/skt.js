@@ -77,7 +77,7 @@ export const MENU_LIST = [
         ],
       },
       { title: 'shippingDocument', to: 'skt-shippingDocument-shippingDocument-ShippingDocumentPage' },
-      { title: 'User Profile', to: { name: 'pages-user-profile-tab', params: { tab: 'profile' } } },
+      { title: 'Export Expenses Record', to: 'skt-shippingDocument-exportExpensesRecord-exportExpensesRecord' },
     ],
   },
 ]
