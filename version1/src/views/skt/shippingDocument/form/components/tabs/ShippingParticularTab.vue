@@ -438,17 +438,29 @@
       :show-print-options="false"
       :is-dirty="isDirty"
       :notes="notes"
+      :print-targets="printTargets"
+      :print-config="{
+        buyer: {
+          hasDisplay: false,
+          displayFields: []
+        },
+        customs: {
+          hasDisplay: false,
+          displayFields: []
+        }
+      }"
       @print="handlePrint"
       @save-draft="saveDraft"
       @confirm="confirm"
       @add-note="handleAddNote"
       @delete-note="handleDeleteNote"
+      @edit-note="handleEditNote"
     />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { TabKey } from '../../types/shipDocument'
 import { useTabForm } from '../../composables/useTabForm'
 import { usePrint } from '../../composables/usePrint'
@@ -482,23 +494,44 @@ const {
   onConfirm: data => tabApiMap[TabKey.SHIPPING_PARTICULAR].confirm(store.documentId, data),
 })
 
-const { isPrinting, print } = usePrint(TabKey.SHIPPING_PARTICULAR, () => formData.value)
-
-
-function handlePrint(selectedTarget) {
-  print(selectedTarget)
+// ── usePrint ────────────────────────────────────────────────────────────────
+const { isPrinting, print } = usePrint(
+  TabKey.SHIPPING_PARTICULAR,
+  () => ({
+    ...formData.value,
+    note: notes.value[0]?.text ?? '',
+  }),
+)
+ 
+function handlePrint(payload) {
+  print(
+    payload?.target  ?? 'buyer',
+    payload?.display ?? [],
+    shippMode.value,             // ← 'ocean' | 'air' | 'truck' | 'courier'
+  )
 }
+
+ 
+import { useRoute } from 'vue-router'
+ 
+const route     = useRoute()
+const shippMode = computed(() => route.query.mode || 'ocean')
+ 
 
 // ---------------------------------------------------------------------------
 // Notes
 // ---------------------------------------------------------------------------
-
+// ── note 1 อัน ─────────────────────────────────────────────────────────────
 const notes = ref([])
-
+ 
 function handleAddNote(text) {
-  notes.value.push({ id: Date.now(), text, date: new Date().toLocaleString('en-GB') })
+  notes.value = [{ id: Date.now(), text, date: new Date().toLocaleString('en-GB') }]
 }
-
+ 
+function handleEditNote({ id, text }) {
+  if (notes.value[0]?.id === id) notes.value[0].text = text
+}
+ 
 function handleDeleteNote(noteId) {
   notes.value = notes.value.filter(n => n.id !== noteId)
 }
