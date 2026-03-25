@@ -7,9 +7,12 @@ import { useTabForm }             from '../composables/useTabForm'
 import { usePermissions }         from '../composables/usePermissions'
 import { TabKey }                 from '../types/shipDocument'
 import DocumentHeader from "@/views/skt/shippingDocument/form/components/shared/DocumentHeader.vue"
+import GenericFilterBar from "@/views/skt/components/filterBar/Genericfilterbar.vue"
+import { useRouter } from 'vue-router'
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 const store = useShippingDocumentStore()
+const router = useRouter()
 const { document: doc, masterData } = storeToRefs(store)
 
 // ─── Permissions & Status Logic ───────────────────────────────────────────────
@@ -106,6 +109,10 @@ const updateSubField = (field, subKey, value) => {
   })
 }
 
+const handleBack = () => {
+  router.back()
+}
+
 const toPrice = val => (val !== '' && val != null ? Number(val) : null)
 </script>
 
@@ -140,11 +147,25 @@ const toPrice = val => (val !== '' && val != null ? Number(val) : null)
     </VAlert>
 
     <div v-else>
-      <DocumentHeader @close="goBackToList" />
+      <!-- <DocumentHeader @close="goBackToList" /> -->
+
+      <!--
+        ── GenericFilterBar ใช้แทน DocumentHeader ──────────────────────
+        :show-actions="false"  → ซ่อน filter body + Search/Reset/Export
+        :filter-config="[]"    → ไม่มี field ใดเลย
+        #actions slot          → ใส่ปุ่ม Back + Save Draft / Confirm
+      -->
+
+      <GenericFilterBar
+        title="Ship Document"
+        @back="handleBack"
+      />
+
+      
       
       <div
         v-if="isEditable"
-        class="d-flex gap-3 my-5"
+        class="d-flex gap-3 my-5" 
       >
         <VBtn
           color="warning"
@@ -430,6 +451,13 @@ const toPrice = val => (val !== '' && val != null ? Number(val) : null)
                   class="exp-unit"
                 >Baht</span>
               </div>
+              <div class="expense-row">
+                <span class="exp-label">Storage :</span>
+                <div class="exp-vendor" />
+                <div class="exp-price">
+                  <span class="text-caption text-grey-darken-5">นำค่าใช้จ่ายรวม หารด้วย Qty.</span>
+                </div>
+              </div>
             </VCol>
 
             <VCol
@@ -637,12 +665,7 @@ const toPrice = val => (val !== '' && val != null ? Number(val) : null)
                 >Baht</span>
               </div>
 
-              <div
-                v-if="isEditable"
-                class="d-flex justify-end p-10 m-2"
-              >
-                <span class="text-caption text-grey-darken-1">นำค่าใช้จ่ายรวม หารด้วย Qty.</span>
-              </div>
+              <div class="my-4" />
 
               <div class="expense-row">
                 <span class="exp-label font-weight-bold">Cost Per Unit :</span>

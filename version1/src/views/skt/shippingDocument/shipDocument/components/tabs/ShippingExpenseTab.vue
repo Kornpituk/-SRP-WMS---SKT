@@ -93,7 +93,7 @@ import ShippingExpenseTable  from '../tables/ShippingExpenseTable.vue'
 import { ShippingDocStatus, SHIPPING_EXPENSE_HEADERS, PAGE_SIZE_OPTIONS } from '../../constants/shippingDocument.constants'
 import { exportToExcel } from '../../../utilities/exportExcel'
 import { mapTableToExcel } from '../../../mappers/shippingDocExcel.mapper'
-
+import { useRouter } from 'vue-router'
 
 // ─── Props ────────────────────────────────────────────────────
 const props = defineProps({
@@ -104,7 +104,12 @@ const props = defineProps({
   },
 })
 
+
 const emit = defineEmits(['close', 'create'])
+
+
+const router = useRouter()
+
 
 // ─── Filter toggle ────────────────────────────────────────────
 const filterVisible = ref(true)
@@ -179,7 +184,10 @@ function handleAction(item) {
   // อื่นๆ = ACTION → ไปหน้า form ตรง
   const invoice = raw.invoiceInSAP
 
-  window.location.href = `/skt/shippingDocument/formShippingExpense/${invoice}`
+  // router.push(`/skt/shippingDocument/formShippingExpense/${invoice}`)
+  router.push({
+    path: `/skt/shippingDocument/formShippingExpense/${invoice}`,
+  })
   showToast(`Opening detail: ${invoice}`, 'primary', 'mdi-file-eye-outline')
 }
 

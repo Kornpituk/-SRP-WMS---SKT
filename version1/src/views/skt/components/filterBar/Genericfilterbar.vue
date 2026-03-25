@@ -1,12 +1,23 @@
+<!--
+  ============================================================
+  SearchFilterBar.vue
+  ============================================================
+  ใช้ได้ 2 แบบ ไฟล์เดียว:
+
+  แบบที่ 1 — ไม่ส่ง filters  →  title bar อย่างเดียว กดไม่ได้
+  <SearchFilterBar />
+
+  แบบที่ 2 — ส่ง filters  →  กด toggle expand/collapse ได้ปกติ
+  <SearchFilterBar
+  v-model:filters="filters"
+  :loading="tableState.loading"
+  @search="handleSearch"
+  @reset="handleReset"
+  @export="handleExport"
+  />
+  ============================================================
+-->
 <template>
-  <!--
-    ============================================================
-    SearchFilterBar.vue
-    Collapsible filter panel.
-    ETD = single field, click to open a date-range menu (From→To).
-    Displays as "DD/MM/YYYY - DD/MM/YYYY" when both dates selected.
-    ============================================================ 
-  -->
   <VCard
     class="filter-card mb-4"
     elevation="1"
@@ -15,34 +26,43 @@
     <!-- ── Header ───────────────────────────────────────────────── -->
     <VCardTitle
       class="filter-header"
-      @click="toggleExpand"
+      :class="{ 'filter-header--clickable': hasFilters }"
+      @click="hasFilters && toggleExpand()"
     >
       <div class="header-left">
         <VIcon
           size="18"
           color="#1976d2"
           class="m-2"
+          @click="emit('back')"
         >
           ri-close-fill
         </VIcon>
       </div>
-      <span class="header-title">Export Expenses Record</span>
+
+      <span class="header-title">{{ title }}</span>
+
+      <!-- ปุ่ม chevron แสดงเฉพาะเมื่อมี filters -->
       <VBtn
         :icon="isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
         variant="text"
         size="small"
         density="compact"
+        :disabled="!hasFilters"
         color="grey-darken-1"
         aria-label="Toggle filters"
         @click.stop="toggleExpand"
       />
     </VCardTitle>
 
-    <VDivider v-if="isExpanded" />
+    <VDivider v-if="hasFilters && isExpanded" />
 
     <!-- ── Collapsible Body ──────────────────────────────────────── -->
     <VExpandTransition>
-      <div v-show="isExpanded">
+      <div
+        v-if="hasFilters"
+        v-show="isExpanded"
+      >
         <VCardText class="filter-body">
           <!-- Row 1: Sale Order No. | PO No. | Invoice In SAP -->
           <VRow dense>
@@ -152,12 +172,11 @@
             </VCol>
           </VRow>
 
-          <!-- Row 3: ETD range (single field) | Sale Order No. | Invoice | Item | Actions -->
+          <!-- Row 3: Item | ETD | Actions -->
           <VRow
             dense
             class="mt-2"
           >
-            <!-- Item -->
             <VCol
               cols="12"
               sm="6"
@@ -175,26 +194,91 @@
               />
             </VCol>
 
-            <!-- ── ETD Range — single text field + popover menu ─── -->
+            <!-- ETD Range -->
             <VCol
               cols="12"
               sm="6"
               md="4"
             >
-              <AppDateTimePicker
-                v-model="menuProps"
-                :model-value="etdDisplayValue"
-                label="ETD"
-                placeholder="DD/MM/YYYY - DD/MM/YYYY"
-                :config="{ mode: 'range' }"
-                prepend-inner-icon="mdi-calendar-range"
-                density="compact"
-                clearable
-                style="font-size: 12px;"
-                @click:clear="clearEtd"
-              />
+              <VMenu
+                v-model="etdMenuOpen"
+                :close-on-content-click="false"
+                min-width="auto"
+              >
+                <template #activator="{ props: menuActivator }">
+                  <VTextField
+                    v-bind="menuActivator"
+                    :model-value="etdDisplayValue"
+                    label="ETD"
+                    placeholder="DD/MM/YYYY - DD/MM/YYYY"
+                    density="compact"
+                    variant="outlined"
+                    clearable
+                    readonly
+                    prepend-inner-icon="mdi-calendar-range"
+                    hide-details="auto"
+                    class="etd-trigger-field"
+                    @click:clear.stop="clearEtd"
+                  />
+                </template>
+
+                <VCard
+                  class="etd-menu-card"
+                  elevation="4"
+                >
+                  <div class="calendar-nav">
+                    <VBtn
+                      icon="mdi-chevron-left"
+                      variant="text"
+                      size="small"
+                      density="compact"
+                      @click="prevMonth"
+                    />
+                    <span class="calendar-month-label">{{ displayMonthLabel }}</span>
+                    <VBtn
+                      icon="mdi-chevron-right"
+                      variant="text"
+                      size="small"
+                      density="compact"
+                      @click="nextMonth"
+                    />
+                  </div>
+
+                  <VDatePicker
+                    v-model="etdRangeModel"
+                    multiple="range"
+                    :view-date="calendarViewDate"
+                    hide-header
+                    show-adjacent-months
+                    elevation="0"
+                    class="etd-date-picker"
+                  />
+
+                  <VDivider />
+                  <div class="etd-menu-actions d-flex align-center">
+                    <span class="etd-hint-text">เลือกวันเริ่มต้นและสิ้นสุด</span>
+                    <VSpacer />
+                    <VBtn
+                      variant="text"
+                      size="small"
+                      @click="clearEtd"
+                    >
+                      ล้าง
+                    </VBtn>
+                    <VBtn
+                      color="primary"
+                      variant="flat"
+                      size="small"
+                      class="ms-1"
+                      @click="confirmEtd"
+                    >
+                      ตกลง
+                    </VBtn>
+                  </div>
+                </VCard>
+              </VMenu>
             </VCol>
-            
+
             <!-- Action Buttons -->
             <VCol
               cols="12"
@@ -247,11 +331,27 @@ import { ref, computed, watch } from 'vue'
 // Props & Emits
 // ─────────────────────────────────────────────────────────────────────────────
 const props = defineProps({
-  filters: { type: Object, required: true },
-  loading: { type: Boolean, default: false },
+  /** ไม่ส่งมา (null) = title-only, กด toggle ไม่ได้ */
+  filters: {
+    type: Object,
+    default: null,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  title: {
+    type: String,
+    default: '',
+  },
 })
 
-const emit = defineEmits(['update:filters', 'search', 'reset', 'export'])
+const emit = defineEmits(['update:filters', 'search', 'reset', 'export', 'back'])
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ตรวจว่ามี filters ส่งมาหรือเปล่า — ใช้ควบคุมพฤติกรรมทั้งหมด
+// ─────────────────────────────────────────────────────────────────────────────
+const hasFilters = computed(() => props.filters !== null)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Panel expand state
@@ -265,37 +365,22 @@ function toggleExpand() {
 // ─────────────────────────────────────────────────────────────────────────────
 // Local filter state
 // ─────────────────────────────────────────────────────────────────────────────
-const localFilters = ref({ ...props.filters })
+const localFilters = ref({ ...(props.filters ?? {}) })
 
-// Sync outward
 watch(localFilters, val => emit('update:filters', { ...val }), { deep: true })
-
-// Sync inward (e.g. after parent calls reset)
-watch(() => props.filters, val => { localFilters.value = { ...val } }, { deep: true })
+watch(() => props.filters, val => { if (val) localFilters.value = { ...val } }, { deep: true })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ETD Date Range — single field logic
+// ETD Date Range
 // ─────────────────────────────────────────────────────────────────────────────
-
-/** Controls popover visibility */
 const etdMenuOpen = ref(false)
-
-/**
- * The Date array bound to v-date-picker (multiple="range").
- * Vuetify fills in all intermediate dates; we only care about
- * index 0 (start) and last index (end) when the user confirms.
- */
 const etdRangeModel = ref([])
-
-/** Which month the calendar is showing */
 const calendarViewDate = ref(new Date())
 
-/** Formatted label shown in the nav header */
 const displayMonthLabel = computed(() =>
   calendarViewDate.value.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }),
 )
 
-/** Text shown in the trigger field */
 const etdDisplayValue = computed(() => {
   const { etdFrom, etdTo } = localFilters.value
   if (!etdFrom && !etdTo) return ''
@@ -303,12 +388,12 @@ const etdDisplayValue = computed(() => {
   const fmt = iso => {
     if (!iso) return ''
     const [y, m, d] = iso.split('-')
-    
+
     return `${d}/${m}/${y}`
   }
 
   if (etdFrom && etdTo) return `${fmt(etdFrom)} - ${fmt(etdTo)}`
-  
+
   return fmt(etdFrom) || fmt(etdTo)
 })
 
@@ -326,25 +411,14 @@ function nextMonth() {
   calendarViewDate.value = d
 }
 
-/**
- * Convert a Date object → "YYYY-MM-DD" string for the filter model.
- */
 function toIso(date) {
   const d = new Date(date)
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  
-  return `${y}-${m}-${day}`
+
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-/**
- * User clicked OK — extract start/end from the range array and
- * write into localFilters, then close the menu.
- */
 function confirmEtd() {
   if (etdRangeModel.value.length >= 2) {
-    // Sort ascending in case user picked end before start
     const sorted = [...etdRangeModel.value].sort((a, b) => new Date(a) - new Date(b))
 
     localFilters.value = {
@@ -356,25 +430,15 @@ function confirmEtd() {
   etdMenuOpen.value = false
 }
 
-/**
- * Clear button — wipe the range selection and filter values.
- */
 function clearEtd() {
   etdRangeModel.value = []
-  localFilters.value = {
-    ...localFilters.value,
-    etdFrom: null,
-    etdTo: null,
-  }
+  localFilters.value = { ...localFilters.value, etdFrom: null, etdTo: null }
   etdMenuOpen.value = false
 }
 
-// If parent resets etd externally, clear the picker model too
 watch(
-  () => [props.filters.etdFrom, props.filters.etdTo],
-  ([from, to]) => {
-    if (!from && !to) etdRangeModel.value = []
-  },
+  () => [props.filters?.etdFrom, props.filters?.etdTo],
+  ([from, to]) => { if (!from && !to) etdRangeModel.value = [] },
 )
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -386,6 +450,4 @@ function handleReset() {
 }
 </script>
 
-<style src="./SearchFilterBar.css">
-
-</style>
+<style src="./Genericfilterbar.css" />

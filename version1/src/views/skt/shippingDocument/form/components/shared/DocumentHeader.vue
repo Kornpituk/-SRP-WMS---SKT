@@ -8,7 +8,6 @@
 <template>
   <div>
     <!-- Top bar -->
-     
     <VToolbar
       color="white"
       flat

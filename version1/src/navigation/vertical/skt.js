@@ -76,8 +76,11 @@ export const MENU_LIST = [
           { title: 'Sale Person', to: 'skt-settingMaster-salePerson' },
         ],
       },
-      { title: 'shippingDocument', to: 'skt-shippingDocument-shippingDocument-ShippingDocumentPage' },
-      { title: 'Export Expenses Record', to: 'skt-shippingDocument-exportExpensesRecord-exportExpensesRecord' },
+      { title: 'Shipping Document', to: 'skt-shippingDocument-shippingDocument-ShippingDocumentPage' },
+      { 
+        title: 'Export Expenses Record', 
+        to: 'skt-shippingDocument-exportExpensesRecord-exportExpensesRecord', 
+      },
     ],
   },
 ]

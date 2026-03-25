@@ -24,6 +24,7 @@ export function mapTableToExcel(items, headers, pagination) {
     headers
       .filter(h => h.exportable !== false)
       .filter(h => h.key !== 'actions') // ✅ ตัดตรงนี้
+      .filter(h => h.key !== 'no') // ✅ ตัดตรงนี้
       .forEach(h => {
         // handle No. column (special case)
         if (h.key === 'no') {

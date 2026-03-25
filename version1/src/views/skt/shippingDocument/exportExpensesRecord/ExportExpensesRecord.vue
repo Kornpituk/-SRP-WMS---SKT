@@ -20,6 +20,7 @@
       :loading="tableState.loading"
       @search="handleSearch"
       @reset="handleReset"
+      @export="handleExport"
     />
 
     <!-- 2. Data Table -->
@@ -39,8 +40,16 @@ import { reactive } from 'vue'
 import SearchFilterBar from './components/SearchFilterBar.vue'
 import ExpensesDataTable from './components/ExpensesDataTable.vue'
 import { useExpensesService } from './composables/useExpensesService'
+import { exportToExcel } from '@/views/skt/shippingDocument/utilities/exportExcel'
+import { mapTableToExcel } from '@/views/skt/shippingDocument/mappers/shippingDocExcel.mapper'
+import { headers } from './constants/ExportExpensesRecord'
 
 const { fetchExpenses } = useExpensesService()
+
+function showToast(message, color = 'primary', icon = 'mdi-information') {
+  Object.assign(snackbar, { show: true, message, color, icon })
+}
+
 
 // ── Filter form state ──────────────────────────────────────────────────────
 const filters = reactive({
@@ -114,6 +123,23 @@ function handleReset() {
   })
   tableState.page = 1
   loadData()
+}
+
+function handleExport() {
+  if (!tableState.items.length) {
+    showToast('No data to export', 'warning', 'mdi-alert-circle-outline')
+    
+    return
+  }
+
+  const mapped = mapTableToExcel(tableState.items, headers, tableState)
+
+  exportToExcel(
+    mapped,
+    `Export Expenses Record Page ${tableState.page}.xlsx`,
+  )
+
+  showToast('Export success', 'success', 'mdi-check-circle-outline')
 }
 </script>
 

@@ -3,5 +3,7 @@ import ExportExpensesRecordView from '@/views/skt/shippingDocument/exportExpense
 </script>
 
 <template>
-  <ExportExpensesRecordView />
+  <div>
+    <ExportExpensesRecordView />
+  </div>
 </template>
