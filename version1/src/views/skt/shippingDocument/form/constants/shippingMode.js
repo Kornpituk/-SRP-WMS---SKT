@@ -43,6 +43,12 @@ const COURIER_TABS = [
   TabKey.COMMERCIAL_INVOICE,
 ]
 
+const TRUCK_TABS = [
+  TabKey.PACKING_LIST,
+  TabKey.COMMERCIAL_INVOICE,
+  TabKey.SHIPPING_PARTICULAR,
+]
+
 /**
  * Get visible tab keys based on shipping mode.
  * @param {string} mode — ShippingMode value
@@ -51,6 +57,9 @@ const COURIER_TABS = [
 export function getVisibleTabs(mode) {
   if (mode === ShippingMode.COURIER) {
     return COURIER_TABS
+  }
+  if (mode === ShippingMode.TRUCK) {
+    return TRUCK_TABS
   }
 
   return ALL_TABS

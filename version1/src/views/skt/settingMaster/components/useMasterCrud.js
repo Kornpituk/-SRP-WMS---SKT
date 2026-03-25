@@ -236,7 +236,7 @@ export function useMasterCrud (props, emit) {
 
     saving.value = true
     try {
-      await props.service.create({ ...createForm })
+      await props.service.save({ ...createForm })
       showNotification(`${props.title} created successfully`)
       closeCreateDialog()
       await loadData()
@@ -260,7 +260,7 @@ export function useMasterCrud (props, emit) {
   async function saveInline (item) {
     saving.value = true
     try {
-      await props.service.update(item.id, { ...inlineForm })
+      await props.service.save(item.id, { ...inlineForm })
       showNotification(`${props.title} updated successfully`)
       editingInlineId.value = null
       await loadData()

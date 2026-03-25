@@ -35,5 +35,12 @@ let mockData = [
   },
 ]
 
+export const forwarderService = createCrudService({
+  resourceName: 'forwarderName',
+  idField: 'forwarderId',
+  mockData,
+  useMock: false, // สลับใช้ API จริงได้ทันที
+})
+
 // ← เปลี่ยน false = ใช้ API จริง
-export const forwarderService = createCrudService('term-of-payment', mockData, true)
+// export const forwarderService = createCrudService('term-of-payment', mockData, true)

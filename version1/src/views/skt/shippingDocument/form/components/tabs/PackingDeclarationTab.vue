@@ -188,6 +188,16 @@
       :is-printing="isPrinting"
       :can-print="!isReadonly"
       :print-targets="printTargets"
+      :print-config="{
+        buyer: {
+          hasDisplay: false,
+          displayFields: PRINT_DISPLAY_FIELDS.buyer
+        },
+        customs: {
+          hasDisplay: false,
+          displayFields: PRINT_DISPLAY_FIELDS.customs
+        }
+      }"
       @print="handlePrint"
       @save-draft="saveDraft"
       @confirm="confirm"
@@ -226,11 +236,23 @@ const {
   onConfirm: data => tabApiMap[TabKey.PACKING_DECLARATION].confirm(store.documentId, data),
 })
 
+import { useRoute } from 'vue-router'
+ 
+const route    = useRoute()
+const shippMode = computed(() => route.query.mode || 'ocean')
+
 // ---------------------------------------------------------------------------
 // Print
 // ---------------------------------------------------------------------------
 
-const { isPrinting, print } = usePrint(TabKey.PACKING_DECLARATION, () => formData.value)
+// ── usePrint — merge note เข้า getFormData ────────────────────────────────
+const { isPrinting, print } = usePrint(
+  TabKey.PACKING_DECLARATION,
+  () => ({
+    ...formData.value,
+    note: notes.value[0]?.text ?? '',
+  }),
+)
 
 const printTarget = ref('buyer')
 
@@ -239,26 +261,39 @@ const printTargets = [
   { label: 'Note', value: 'note' },
 ]
 
-function handlePrint(selectedTarget) {
-  print(selectedTarget)
+// ── handlePrint รับ payload จาก TabActionBar ──────────────────────────────
+function handlePrint(payload) {
+  // ── guard: payload อาจเป็น undefined เมื่อ showPrintOptions=false ──
+  print(
+    payload?.target  ?? 'buyer',
+    payload?.display ?? [],
+    shippMode.value,
+  )
 }
 
 // ---------------------------------------------------------------------------
 // Notes (per-tab)
 // ---------------------------------------------------------------------------
 
+// ── note 1 อัน ────────────────────────────────────────────────────────────
 const notes = ref([])
-
+ 
 function handleAddNote(text) {
-  notes.value.push({
-    id: Date.now(),
-    text,
-    date: new Date().toLocaleString('en-GB'),
-  })
+  notes.value = [{ id: Date.now(), text, date: new Date().toLocaleString('en-GB') }]
 }
-
+ 
+function handleEditNote({ id, text }) {
+  if (notes.value[0]?.id === id) notes.value[0].text = text
+}
+ 
 function handleDeleteNote(noteId) {
   notes.value = notes.value.filter(n => n.id !== noteId)
+}
+
+// ─── #7 Print Display Fields ────────────────────────────────────────────────
+const PRINT_DISPLAY_FIELDS = {
+  buyer: ['FOB', 'Freight', 'Insurance', 'Lot No.', 'Product Description', 'Note'],
+  customs: ['lotNo'],
 }
 
 // ---------------------------------------------------------------------------
