@@ -3,7 +3,7 @@
     title="Forwarder"
     :fields="fields"
     :service="forwarderService"
-    delete-name-key="id"
+    delete-name-key="forwarderId"
   />
 </template>
 

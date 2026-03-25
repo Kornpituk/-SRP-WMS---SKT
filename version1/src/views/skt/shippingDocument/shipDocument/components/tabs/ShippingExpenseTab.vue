@@ -90,7 +90,10 @@ import { ref, reactive } from 'vue'
 import { useShippingExpense } from '../../composables/useShippingExpense'
 import ShippingExpenseFilter from '../filters/ShippingExpenseFilter.vue'
 import ShippingExpenseTable  from '../tables/ShippingExpenseTable.vue'
-import { ShippingDocStatus } from '../../constants/shippingDocument.constants'
+import { ShippingDocStatus, SHIPPING_EXPENSE_HEADERS, PAGE_SIZE_OPTIONS } from '../../constants/shippingDocument.constants'
+import { exportToExcel } from '../../../utilities/exportExcel'
+import { mapTableToExcel } from '../../../mappers/shippingDocExcel.mapper'
+
 
 // ─── Props ────────────────────────────────────────────────────
 const props = defineProps({
@@ -180,7 +183,22 @@ function handleAction(item) {
   showToast(`Opening detail: ${invoice}`, 'primary', 'mdi-file-eye-outline')
 }
 
+// ─── Export Excel ────────────────────────────────────────
+
 function handleExport() {
-  showToast('Exporting to Excel...', '', 'mdi-microsoft-excel')
+  if (!items.value.length) {
+    showToast('No data to export', 'warning', 'mdi-alert-circle-outline')
+    
+    return
+  }
+
+  const mapped = mapTableToExcel(items.value, SHIPPING_EXPENSE_HEADERS, pagination)
+
+  exportToExcel(
+    mapped,
+    `Shipping Expense Page ${pagination.page}.xlsx`,
+  )
+
+  showToast('Export success', 'success', 'mdi-check-circle-outline')
 }
 </script>

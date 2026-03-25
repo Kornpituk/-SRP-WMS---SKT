@@ -30,6 +30,7 @@
     "crypto-js": "^4.2.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "file-saver": "^2.0.5",
+    "file-server": "^2.2.1",
     "js-cookie": "^3.0.5",
     "jsbarcode": "3",
     "jwt-decode": "3.1.2",
@@ -61,7 +62,8 @@
     "vue3-pdf-app": "^1.0.3",
     "vue3-perfect-scrollbar": "1.6.1",
     "vuetify": "3.2.1",
-    "webfontloader": "1.6.28"
+    "webfontloader": "1.6.28",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@antfu/eslint-config-vue": "0.39.1",

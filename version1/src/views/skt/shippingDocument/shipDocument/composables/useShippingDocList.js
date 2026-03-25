@@ -9,7 +9,7 @@ const createDefaultFilters = () => ({
   consignee: '',
   item: '',
   shippingMode: '',
-  etdRange: '',
+  etdRange: '', 
 })
 
 /**

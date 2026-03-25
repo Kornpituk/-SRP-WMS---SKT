@@ -85,7 +85,6 @@
       @cancel="handleVoidCancel"
     />
 
-
     <!-- ── Toast ─────────────────────────────────────────── -->
     <VSnackbar
       v-model="snackbar.show"
@@ -107,7 +106,9 @@ import { useShippingDocList } from '../../composables/useShippingDocList'
 import ShippingDocFilter from '../filters/ShippingDocFilter.vue'
 import ShippingDocTable  from '../tables/ShippingDocTable.vue'
 import VoidConfirmDialog    from '@/views/skt/compoentn/dialog/voidConfirmDialog.vue'
-import { ShippingDocStatus } from '../../constants/shippingDocument.constants'
+import { ShippingDocStatus, SHIPPING_DOC_HEADERS, PAGE_SIZE_OPTIONS } from '../../constants/shippingDocument.constants'
+import { exportToExcel } from '../../../utilities/exportExcel'
+import { mapTableToExcel } from '../../../mappers/shippingDocExcel.mapper'
 
 // ─── Props ────────────────────────────────────────────────────
 const props = defineProps({
@@ -238,6 +239,7 @@ function handleVoidCancel() {
   voidDialog.item = null
 }
 
+
 // ─── Toast ────────────────────────────────────────────────────
 const snackbar = reactive({ show: false, message: '', color: 'primary', icon: 'mdi-information' })
 
@@ -256,7 +258,7 @@ function handleAction(item) {
     return
   }
 
-  // อื่นๆ = ACTION → ไปหน้า form ตรง
+  // ─── Action ────────────────────────────────────────
   const invoice = raw.invoiceInSAP
 
   window.location.href = `/skt/shippingDocument/form/${invoice}`
@@ -269,7 +271,23 @@ function handleVoid(item) {
   showToast(`Voiding: ${invoice}`, 'error', 'mdi-file-cancel-outline')
 }
 
+
+// ─── Export Excel ────────────────────────────────────────
+
 function handleExport() {
-  showToast('Exporting to Excel...', '', 'mdi-microsoft-excel')
+  if (!items.value.length) {
+    showToast('No data to export', 'warning', 'mdi-alert-circle-outline')
+    
+    return
+  }
+
+  const mapped = mapTableToExcel(items.value, SHIPPING_DOC_HEADERS, pagination)
+
+  exportToExcel(
+    mapped,
+    `${filterTitle.value} Page ${pagination.page}.xlsx`,
+  )
+
+  showToast('Export success', 'success', 'mdi-check-circle-outline')
 }
 </script>

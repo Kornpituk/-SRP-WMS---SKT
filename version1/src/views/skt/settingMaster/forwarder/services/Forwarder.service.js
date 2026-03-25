@@ -36,7 +36,7 @@ let mockData = [
 ]
 
 export const forwarderService = createCrudService({
-  resourceName: 'forwarderName',
+  resourceName: 'Forwarder',
   idField: 'forwarderId',
   mockData,
   useMock: false, // สลับใช้ API จริงได้ทันที
