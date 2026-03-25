@@ -114,10 +114,13 @@
         cols="12"
         sm="4"
       >
-        <VTextField
+        <AppDateTimePicker
           v-model="local.etdRange"
+          :model-value="etdDisplayValue"
           label="ETD dd/mm/yyyy - dd/mm/yyyy"
           density="compact"
+          :config="{ mode: 'range' }"
+
           variant="outlined"
           hide-details
           clearable

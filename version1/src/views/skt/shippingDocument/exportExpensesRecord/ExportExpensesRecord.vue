@@ -23,7 +23,7 @@
       @export="handleExport"
     />
 
-    <!-- 2. Data Table -->
+    <!-- 2. Data Table --> 
     <ExpensesDataTable
       v-model:page="tableState.page"
       v-model:items-per-page="tableState.itemsPerPage"
@@ -76,6 +76,10 @@ const tableState = reactive({
 // ── Core data loader ───────────────────────────────────────────────────────
 async function loadData() {
   tableState.loading = true
+  tableState.items = [] // ✅ เคลียร์ก่อน → skeleton ชัดขึ้น
+
+  // ✅ บังคับให้ Vue render skeleton ก่อน
+  await nextTick()
   try {
     const { data, total } = await fetchExpenses({
       ...filters,

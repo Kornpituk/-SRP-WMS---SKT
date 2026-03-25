@@ -65,11 +65,13 @@
         cols="12"
         sm="4"
       >
-        <VTextField
+        <AppDateTimePicker
           v-model="local.etdRange"
           label="ETD dd/mm/yyyy - dd/mm/yyyy"
           density="compact"
           variant="outlined"
+          :config="{ mode: 'range' }"
+
           hide-details
           clearable
           prepend-inner-icon="mdi-calendar-range"

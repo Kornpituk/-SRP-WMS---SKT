@@ -182,7 +182,7 @@
               md="4"
             >
               <AppDateTimePicker
-                v-model="menuProps"
+                v-model="menPurops"
                 :model-value="etdDisplayValue"
                 label="ETD"
                 placeholder="DD/MM/YYYY - DD/MM/YYYY"
@@ -202,18 +202,7 @@
               class="d-flex flex-column flex-sm-row align-stretch justify-end gap-2"
             >
               <VBtn
-                color="grey-lighten-1"
-                variant="outlined"
-                prepend-icon="mdi-refresh"
-                :disabled="loading"
-                class="flex-grow-1 reset-btn"
-                @click="handleReset"
-              >
-                Reset
-              </VBtn>
-
-              <VBtn
-                color="success"
+                color="primary"
                 variant="flat"
                 prepend-icon="mdi-magnify"
                 :loading="loading"
@@ -222,6 +211,19 @@
               >
                 Search
               </VBtn>
+
+              <VBtn
+                color="red"
+                variant="flat"
+                prepend-icon="mdi-refresh"
+                :disabled="loading"
+                class="flex-grow-1 reset-btn"
+                @click="handleReset"
+              >
+                Reset
+              </VBtn>
+
+              
 
               <VBtn
                 color="warning"
