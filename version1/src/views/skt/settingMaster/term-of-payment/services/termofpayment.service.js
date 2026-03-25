@@ -6,7 +6,18 @@ const mockData = [
 ]
 
 // ← เปลี่ยน false = ใช้ API จริง
-export const termOfPaymentService = createCrudService('term-of-payment', mockData, true)
+export const termOfPaymentService = createCrudService({
+  resourceName: 'term-of-payment',
+  idField: 'termOfPaymentId',
+  mockData,
+  useMock: false,
+  map: {
+    id: 'termOfPaymentId',
+    abb: 'abb',
+    termOfPaymentName: 'termOfPaymentName',
+    startDate: 'startDate',
+    days: 'days',
+  },
+})
 
 //                                                      ↑ endpoint        ↑ mock data  ↑ USE_MOCK
-

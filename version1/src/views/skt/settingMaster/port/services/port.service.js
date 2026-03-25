@@ -52,7 +52,20 @@ const mockData = [
 ]
 
 // ← เปลี่ยน false = ใช้ API จริง
-export const ProtService = createCrudService('term-of-payment', mockData, true)
+export const ProtService = createCrudService(
+  {
+    resourceName: 'port',
+    idField: 'portId',
+    mockData,
+    useMock: false,
+    map: {
+      id: 'portId',
+      abb: 'abb',
+      port: 'portName',
+      country: 'country',
+    },
+  },
+)
 
 //                                                      ↑ endpoint        ↑ mock data  ↑ USE_MOCK
 

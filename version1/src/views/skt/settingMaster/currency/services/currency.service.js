@@ -17,7 +17,19 @@ const mockData = [
 ]
 
 // ← เปลี่ยน false = ใช้ API จริง
-export const currencyService = createCrudService('currency', mockData, true)
+export const currencyService = createCrudService(
+  {
+    resourceName: 'currency',
+    idField: 'currencyId',
+    mockData,
+    useMock: false,
+    map: {
+      id: 'currencyId',
+      abb: 'abb',
+      currencyName: 'currencyName',
+    },
+  },
+)
 
 //                                                      ↑ endpoint        ↑ mock data  ↑ USE_MOCK
 

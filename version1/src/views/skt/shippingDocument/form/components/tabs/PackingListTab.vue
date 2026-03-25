@@ -452,17 +452,15 @@
                 <div class="pkg-tare-grid">
                   <!-- ── Row 2 ── -->
                   <span class="ptg-qty">{{ item.quantity || 0 }}</span>
+                  <span class="ptg-pallet-label">{{ item.unitType }}</span>
 
-                  <VSelect
-                    :model-value="item.unitType"
-                    :items="UNIT_TYPES"
-                    variant="outlined"
-                    density="compact"
-                    hide-details
-                    class="ptg-pallet"
-                    @update:model-value="(v) => handleItemUpdate(idx, 'unitType', v)"
-                  />
 
+                  <span class="ptg-tare-text">Tare Weight (KG)</span>
+                  <span class="ptg-tare-val">{{ fmtDec(item.tareWeightDrum) }}</span>
+
+                 
+
+                  <!-- ── Row 3: each cell aligns under row 2 ── -->
                   <VTextField
                     :model-value="item.palletCount"
                     type="number"
@@ -472,14 +470,9 @@
                     class="ptg-pallet"
                     @update:model-value="(v) => handleItemUpdate(idx, 'palletCount', Number(v))"
                   />
-
                   <span class="ptg-pallet-label">PALLET</span>
-
-                  <!-- ── Row 3: each cell aligns under row 2 ── -->
-                  <span class="ptg-tare-text">Tare Weight (KG)</span>
-
-                  <span class="ptg-tare-val">{{ fmtDec(item.tareWeightDrum) }}</span>
-
+                  
+                  
                   <span
                     class="ptg-tare-text"
                     :style="{ visibility: item.palletCount > 0 ? 'visible' : 'hidden' }"

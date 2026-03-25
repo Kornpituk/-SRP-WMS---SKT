@@ -76,4 +76,18 @@ let mockData = [
 ]
 
 // ← เปลี่ยน false = ใช้ API จริง
-export const hsCodeNoService = createCrudService('hs-code-no', mockData, true)
+export const hsCodeNoService = createCrudService(
+  {
+    resourceName: 'hs-code-no',
+    idField: 'hsCodeNoId',
+    mockData,
+    useMock: false,
+    map: {
+      id: 'hsCodeNoId',
+      hsCodeNo: 'hsCodeNo',
+      itemCode: 'itemCode',
+      itemName: 'itemName',
+      country: 'country',
+    },
+  },
+)

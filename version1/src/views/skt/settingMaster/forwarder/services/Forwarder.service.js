@@ -40,6 +40,12 @@ export const forwarderService = createCrudService({
   idField: 'forwarderId',
   mockData,
   useMock: false, // สลับใช้ API จริงได้ทันที
+  map: {
+    id: 'forwarderId',
+    code: 'ABB',
+    name: 'forwarderName',
+    address: 'address',
+  },
 })
 
 // ← เปลี่ยน false = ใช้ API จริง
