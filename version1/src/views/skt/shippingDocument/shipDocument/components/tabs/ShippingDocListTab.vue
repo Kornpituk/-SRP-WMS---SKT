@@ -108,7 +108,9 @@ import ShippingDocTable  from '../tables/ShippingDocTable.vue'
 import VoidConfirmDialog    from '@/views/skt/components/dialog/voidConfirmDialog.vue'
 import { ShippingDocStatus, SHIPPING_DOC_HEADERS, PAGE_SIZE_OPTIONS } from '../../constants/shippingDocument.constants'
 import { exportToExcel } from '../../../utilities/exportExcel'
-import { mapTableToExcel } from '../../../mappers/shippingDocExcel.mapper'
+import { mapTableToExcel, exportToExcelWithHeader } from '../../../mappers/shippingDocExcel.mapper'
+
+import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 // ─── Props ────────────────────────────────────────────────────
 const props = defineProps({
@@ -120,6 +122,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'create'])
+const itemStore = useItemStore()
 
 // ─── Filter toggle ────────────────────────────────────────────
 const filterVisible = ref(true)
@@ -273,6 +276,7 @@ function handleVoid(item) {
 
 
 // ─── Export Excel ────────────────────────────────────────
+const NameDepartment = ref(itemStore.getItemDetails('UserDataCookies').departmentName)
 
 function handleExport() {
   if (!items.value.length) {
@@ -281,12 +285,19 @@ function handleExport() {
     return
   }
 
-  const mapped = mapTableToExcel(items.value, SHIPPING_DOC_HEADERS, pagination)
-
-  exportToExcel(
-    mapped,
-    `${filterTitle.value} Page ${pagination.page}.xlsx`,
+  // ✅ destructure rows + alignMap ออกมา
+  const { rows, alignMap, colWidths, numberFormatMap } = mapTableToExcel(
+    items.value,
+    SHIPPING_DOC_HEADERS,
+    pagination,
   )
+
+  exportToExcelWithHeader(rows, `${filterTitle.value} Page ${pagination.page}.xlsx`, {
+    department: NameDepartment.value,
+    alignMap,
+    colWidths,   // ✅ เพิ่มบรรทัดนี้
+    numberFormatMap,
+  })
 
   showToast('Export success', 'success', 'mdi-check-circle-outline')
 }

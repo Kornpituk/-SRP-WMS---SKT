@@ -16,7 +16,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'startDate',
+    key: 'startDateLabel',
     label: 'Start Date',
     type: 'select',
     required: true,

@@ -260,7 +260,8 @@ export function useMasterCrud (props, emit) {
   async function saveInline (item) {
     saving.value = true
     try {
-      await props.service.save(item.id, { ...inlineForm })
+      console.log("Edite", item)
+      await props.service.save({ id: item.id, ...inlineForm })
       showNotification(`${props.title} updated successfully`)
       editingInlineId.value = null
       await loadData()

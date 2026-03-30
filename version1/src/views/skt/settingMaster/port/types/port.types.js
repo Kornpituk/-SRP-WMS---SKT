@@ -8,7 +8,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'port',
+    key: 'portName',
     label: 'Port',
     type: 'text',
     required: true,

@@ -44,7 +44,6 @@ export const forwarderService = createCrudService({
     id: 'forwarderId',
     code: 'ABB',
     name: 'forwarderName',
-    address: 'address',
   },
 })
 

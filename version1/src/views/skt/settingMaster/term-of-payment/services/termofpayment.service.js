@@ -7,16 +7,14 @@ const mockData = [
 
 // ← เปลี่ยน false = ใช้ API จริง
 export const termOfPaymentService = createCrudService({
-  resourceName: 'term-of-payment',
+  resourceName: 'TermOfPayment',
   idField: 'termOfPaymentId',
   mockData,
   useMock: false,
   map: {
     id: 'termOfPaymentId',
-    abb: 'abb',
-    termOfPaymentName: 'termOfPaymentName',
-    startDate: 'startDate',
-    days: 'days',
+    code: 'abb',
+    name: 'termOfPaymentName',
   },
 })
 

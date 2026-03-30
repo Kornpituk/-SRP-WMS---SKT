@@ -54,15 +54,14 @@ const mockData = [
 // ← เปลี่ยน false = ใช้ API จริง
 export const ProtService = createCrudService(
   {
-    resourceName: 'port',
+    resourceName: 'Port',
     idField: 'portId',
     mockData,
     useMock: false,
     map: {
       id: 'portId',
-      abb: 'abb',
-      port: 'portName',
-      country: 'country',
+      code: 'abb',
+      name: 'portName',
     },
   },
 )

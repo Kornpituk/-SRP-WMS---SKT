@@ -200,7 +200,14 @@ const visibleHeaders  = SHIPPING_DOC_HEADERS.filter(h => h.key !== 'no')
 const headers         = SHIPPING_DOC_HEADERS
 const pageSizeOptions = PAGE_SIZE_OPTIONS.map(v => ({ value: v, title: String(v) }))
 
-const formatNumber = val => val != null ? Number(val).toLocaleString() : '-'
+const formatNumber = val => {
+  if (val == null || val === '') return '-'
+
+  return Number(val).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
 
 const SKELETON_WIDTHS = {
   status: '64px', invoiceInSAP: '88px', invoice: '96px',

@@ -9,6 +9,7 @@ import { TabKey }                 from '../types/shipDocument'
 import DocumentHeader from "@/views/skt/shippingDocument/form/components/shared/DocumentHeader.vue"
 import GenericFilterBar from "@/views/skt/components/filterBar/Genericfilterbar.vue"
 import { useRouter } from 'vue-router'
+import { mockFtaFormOptions, mockShippingModeOptions } from '../mock/mockData'
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 const store = useShippingDocumentStore()
@@ -506,13 +507,17 @@ const toPrice = val => (val !== '' && val != null ? Number(val) : null)
               <div class="expense-row">
                 <span class="exp-label">FTA Form :</span>
                 <div class="exp-vendor">
-                  <VTextField
+                  <VSelect
                     v-if="isEditable"
                     :model-value="formData?.ftaForm?.vendor"
-                    placeholder="Enter Remark"
+                    :items="mockFtaFormOptions"
+                    placeholder="Select FTA Form"
                     density="compact"
+                    item-title="label"
+                    item-value="value"
                     variant="outlined"
                     hide-details="auto"
+                    clearable
                     @update:model-value="val => updateSubField('ftaForm', 'vendor', val)"
                   />
                   <span
@@ -545,13 +550,17 @@ const toPrice = val => (val !== '' && val != null ? Number(val) : null)
               <div class="expense-row">
                 <span class="exp-label">Shipping :</span>
                 <div class="exp-vendor">
-                  <VTextField
+                  <VSelect
                     v-if="isEditable"
                     :model-value="formData?.shipping?.vendor"
-                    placeholder="Enter Remark"
+                    :items="mockShippingModeOptions"
+                    item-title="label"
+                    item-value="value"
+                    placeholder="Select Shipping"
                     density="compact"
                     variant="outlined"
                     hide-details="auto"
+                    clearable
                     @update:model-value="val => updateSubField('shipping', 'vendor', val)"
                   />
                   <span

@@ -28,6 +28,7 @@
     "chart.js": "4.3.0",
     "cookie-es": "^1.2.2",
     "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.20",
     "eslint-import-resolver-alias": "^1.1.2",
     "file-saver": "^2.0.5",
     "file-server": "^2.2.1",
@@ -63,7 +64,8 @@
     "vue3-perfect-scrollbar": "1.6.1",
     "vuetify": "3.2.1",
     "webfontloader": "1.6.28",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
     "@antfu/eslint-config-vue": "0.39.1",

@@ -17,14 +17,14 @@ const mockData = [
 // ← เปลี่ยน false = ใช้ API จริง
 export const termofpricingService = createCrudService(
   {
-    resourceName: 'term-of-pricing',
+    resourceName: 'TermOfPricing',
     idField: 'termOfPricingId',
     mockData,
     useMock: false,
     map: {
       id: 'termOfPricingId',
-      abb: 'abb',
-      termOfPricingName: 'termOfPricingName',
+      code: 'abb',
+      name: 'termOfPricingName',
     },
   },
 )

@@ -73,14 +73,14 @@ const mockData = [
 // ← เปลี่ยน false = ใช้ API จริง
 export const containerTypeService = createCrudService(
   {
-    resourceName: 'container-type',
+    resourceName: 'ContainerType',
     idField: 'containerTypeId',
     mockData,
     useMock: false,
     map: {
       id: 'containerTypeId',
-      abb: 'abb',
-      containerTypeName: 'containerTypeName',
+      code: 'abb',
+      name: 'containerTypeName',
     },
   },
 )

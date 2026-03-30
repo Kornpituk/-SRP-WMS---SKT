@@ -92,7 +92,7 @@ import ShippingExpenseFilter from '../filters/ShippingExpenseFilter.vue'
 import ShippingExpenseTable  from '../tables/ShippingExpenseTable.vue'
 import { ShippingDocStatus, SHIPPING_EXPENSE_HEADERS, PAGE_SIZE_OPTIONS } from '../../constants/shippingDocument.constants'
 import { exportToExcel } from '../../../utilities/exportExcel'
-import { mapTableToExcel } from '../../../mappers/shippingDocExcel.mapper'
+import { mapTableToExcel, exportToExcelWithHeader } from '../../../mappers/shippingDocExcel.mapper'
 import { useRouter } from 'vue-router'
 
 // ─── Props ────────────────────────────────────────────────────
@@ -200,11 +200,21 @@ function handleExport() {
     return
   }
 
-  const mapped = mapTableToExcel(items.value, SHIPPING_EXPENSE_HEADERS, pagination)
+  const { rows, alignMap } = mapTableToExcel(
+    items.value,
+    SHIPPING_EXPENSE_HEADERS,
+    pagination,
+  )
 
-  exportToExcel(
-    mapped,
+  exportToExcelWithHeader(
+    rows,
     `Shipping Expense Page ${pagination.page}.xlsx`,
+    {
+      company: 'Sanyo Kasei (Thailand)',
+      title: 'List of Shipping Expense',
+      department: '-',
+      alignMap,
+    },
   )
 
   showToast('Export success', 'success', 'mdi-check-circle-outline')
