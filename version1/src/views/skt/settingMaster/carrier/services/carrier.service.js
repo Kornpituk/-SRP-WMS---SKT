@@ -24,4 +24,16 @@ let mockData = [
 ]
 
 // ← เปลี่ยน false = ใช้ API จริง
-export const carrierService = createCrudService('carrier', mockData, true)
+export const carrierService = createCrudService(
+  {
+    resourceName: 'Carrier',
+    idField: 'carrierId',
+    mockData,
+    useMock: false,
+    map: {
+      id: 'carrierId',
+      abb: 'abb',
+      carrierName: 'carrierName',
+    },
+  },
+)

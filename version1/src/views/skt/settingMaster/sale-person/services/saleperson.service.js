@@ -16,15 +16,14 @@ let mockData = [
 // ← เปลี่ยน false = ใช้ API จริง
 export const salepersonService = createCrudService(
   {
-    resourceName: 'sale-person',
+    resourceName: 'SalePerson',
     idField: 'salePersonId',
     mockData,
     useMock: false,
     map: {
       id: 'salePersonId',
-      displayName: 'displayName',
-      firstName: 'firstName',
-      lastName: 'lastName',
+      code: 'displayName',
+      name: 'displayName',
     },
   },
 )

@@ -69,6 +69,8 @@
     <MasterTable
       :table-fields="tableFields"
       :items="items"
+      :sort-field="sortField"
+      :sort-direction="sortDirection"
       :editing-inline-id="editingInlineId"
       :inline-form="inlineForm"
       :loading="loading"
@@ -85,6 +87,7 @@
       @inline-update="(key, val) => (inlineForm[key] = val)"
       @update:page="goToPage"
       @update:per-page="changePerPage"
+      @sort="handleSort"
     />
 
     <!-- ⑤ Create Dialog ──────────────────────────── -->
@@ -203,6 +206,9 @@ const {
   openDeleteDialog,
   closeDeleteDialog,
   confirmDelete,
+  sortField,
+  sortDirection,
+  handleSort,
 } = useMasterCrud(props, emit)
 </script>
 

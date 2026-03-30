@@ -65,11 +65,28 @@ export function createCrudService({ resourceName, map, useMock = true, mockData 
   }
 
   return {
-    getList: async () => {
+    getList: async (params = {}) => {
       if (useMock) return transformFromApi(mockData)
-      const r = await axiosIns.get(`${baseUrl}/Get${resourceName}Active`, h())
-      
-      return transformFromApi(r.data)
+
+      // แปลง field name จาก UI → API (เช่น sortField อาจเป็นชื่อ UI)
+      const query = { ...params }
+      if (query.sortField && map[query.sortField]) {
+        query.sortField = map[query.sortField]
+      }
+
+      const r = await axiosIns.get(`${baseUrl}/Get${resourceName}Active`, {
+        ...h(),
+        params: query,   // axios จะ serialize เป็น ?abb=xxx&page=1&...
+      })
+
+      const result = r.data
+
+      // ถ้า API คืน { data, total } → คืนตรงๆ
+      if (result && !Array.isArray(result) && Array.isArray(result.data)) {
+        return { data: transformFromApi(result.data), total: result.total }
+      }
+
+      return transformFromApi(result)
     },
 
     save: async payload => {

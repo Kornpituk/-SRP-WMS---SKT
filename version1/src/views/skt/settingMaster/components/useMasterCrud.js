@@ -81,6 +81,27 @@ export function useMasterCrud (props, emit) {
   const searchParams = reactive({})
 
   // ─────────────────────────────────────────────
+  // sorting
+  // ─────────────────────────────────────────────
+  // เพิ่มใน CORE STATE section
+  const sortField     = ref('')
+  const sortDirection = ref('')   // 'asc' | 'desc' | ''
+
+  // เพิ่ม handleSort
+  function handleSort (fieldKey) {
+    if (sortField.value === fieldKey) {
+    // toggle: asc → desc → clear
+      if (sortDirection.value === 'asc')       sortDirection.value = 'desc'
+      else if (sortDirection.value === 'desc') { sortField.value = ''; sortDirection.value = '' }
+    } else {
+      sortField.value     = fieldKey
+      sortDirection.value = 'asc'
+    }
+    currentPage.value = 1
+    loadData()
+  }
+
+  // ─────────────────────────────────────────────
   // CREATE DIALOG STATE
   // ─────────────────────────────────────────────
 
@@ -146,13 +167,22 @@ export function useMasterCrud (props, emit) {
   // LOAD DATA  (รองรับ client-side + server-side pagination)
   // ─────────────────────────────────────────────
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   async function loadData () {
     loading.value = true
     try {
+      // รวม search params ที่ไม่ว่าง
+      const filters = {}
+      for (const [k, v] of Object.entries(searchParams)) {
+        if (v !== '' && v !== null && v !== undefined) filters[k] = v
+      }
+
       const params = {
-        ...searchParams,
+        ...filters,
         page: currentPage.value,
         perPage: itemsPerPage.value,
+        sortField: sortField.value || undefined,
+        sortDirection: sortDirection.value || undefined,
       }
 
       const res = await props.service.getList(params)
@@ -165,13 +195,38 @@ export function useMasterCrud (props, emit) {
 
       // ── Client-side: [] (mock returns full array) ──
       else {
-        const all        = Array.isArray(res) ? res : []
+        let all        = Array.isArray(res) ? res : []
+
+        // client-side filter
+        for (const [k, v] of Object.entries(filters)) {
+          if (v) {
+            all = all.filter(item =>
+              String(item[k] ?? '').toLowerCase().includes(String(v).toLowerCase()),
+            )
+          }
+        }
+
+        // client-side sort
+        if (sortField.value) {
+          all = [...all].sort((a, b) => {
+            const va = a[sortField.value] ?? ''
+            const vb = b[sortField.value] ?? ''
+            let cmp = 0
+            if (typeof va === 'number' && typeof vb === 'number') {
+              cmp = va - vb
+            } else {
+              cmp = String(va).localeCompare(String(vb))
+            }
+            
+            return sortDirection.value === 'desc' ? -cmp : cmp
+          })
+        }
 
         totalItems.value = all.length
 
-        const start   = (currentPage.value - 1) * itemsPerPage.value
+        const start = (currentPage.value - 1) * itemsPerPage.value
 
-        items.value   = all.slice(start, start + itemsPerPage.value)
+        items.value = all.slice(start, start + itemsPerPage.value)
       }
 
     } catch (err) {
@@ -373,7 +428,10 @@ export function useMasterCrud (props, emit) {
 
     // misc
     snackbar,
+    sortField,
+    sortDirection,
     requiredRule,
     loadData,
+    handleSort,
   }
 }

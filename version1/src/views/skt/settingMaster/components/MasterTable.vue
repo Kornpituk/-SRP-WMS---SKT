@@ -50,8 +50,25 @@
             v-for="field in tableFields"
             :key="field.key"
             :style="field.width ? { width: field.width } : {}"
+            class="sortable-th"
+            @click="emit('sort', field.key)"
           >
-            {{ field.label }}
+            <div class="th-content">
+              <span>{{ field.label }}</span>
+              <span class="sort-icon">
+                <template v-if="sortField === field.key">
+                  <VIcon size="14">
+                    {{ sortDirection === 'asc' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}
+                  </VIcon>
+                </template>
+                <template v-else>
+                  <VIcon
+                    size="14"
+                    class="sort-idle"
+                  >mdi-swap-vertical</VIcon>
+                </template>
+              </span>
+            </div>
           </th>
           <th class="col-action text-center">
             Action
@@ -317,6 +334,8 @@ const props = defineProps({
   itemsPerPage: { type: Number,         default: 10 },
   perPageOptions: { type: Array,          default: () => [10, 25, 50, 100] },
   paginationInfo: { type: String,         default: '' },
+  sortField: { type: String, default: '' },
+  sortDirection: { type: String, default: '' },
 })
 
 // ─── Emits ────────────────────────────────────
@@ -327,6 +346,7 @@ const emit = defineEmits([
   'inline-update',
   'update:page',      // (page: number)
   'update:per-page',  // (perPage: number)
+  'sort',
 ])
 
 // ─── Visible page buttons (max 7 buttons) ─────

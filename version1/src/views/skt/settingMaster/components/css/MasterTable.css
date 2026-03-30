@@ -229,3 +229,22 @@
   color: #9e9e9e;
   min-width: 24px;
 }
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+}
+.sortable-th:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+.th-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sort-idle {
+  opacity: 0.3;
+}
+.sortable-th:hover .sort-idle {
+  opacity: 0.6;
+}
