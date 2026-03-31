@@ -23,8 +23,8 @@ export const termofpricingService = createCrudService(
     useMock: false,
     map: {
       id: 'termOfPricingId',
-      code: 'abb',
-      name: 'termOfPricingName',
+      pricingCode: 'pricingCode',
+      pricingName: 'pricingName',
     },
   },
 )

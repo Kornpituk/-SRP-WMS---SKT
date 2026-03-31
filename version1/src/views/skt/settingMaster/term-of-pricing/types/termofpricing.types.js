@@ -1,6 +1,6 @@
 export const fields = [
   {
-    key: 'abb',
+    key: 'pricingCode',
     label: 'ABB',
     type: 'text',
     required: true,
@@ -8,7 +8,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'termOfPricingName',
+    key: 'pricingName',
     label: 'Term Of Pricing Name',
     type: 'text',
     required: true,

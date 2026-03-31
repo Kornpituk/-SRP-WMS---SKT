@@ -1,6 +1,6 @@
 export const fields = [
   {
-    key: 'abb',
+    key: 'ABB',
     label: 'ABB',
     type: 'text',
     required: true,
@@ -16,11 +16,11 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'country',
+    key: 'countryName',
     label: 'Country',
     type: 'text',
     required: true,
     width: '200px',
-    searchable: true,
+    searchable: false,
   },
 ]

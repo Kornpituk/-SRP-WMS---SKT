@@ -29,7 +29,7 @@ export const fields = [
     type: 'textarea',
     required: true,
     width: '300px',
-    searchable: true,
+    searchable: false,
   },
   {
     key: 'contactName',

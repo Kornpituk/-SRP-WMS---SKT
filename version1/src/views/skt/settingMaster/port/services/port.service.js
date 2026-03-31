@@ -60,11 +60,11 @@ export const ProtService = createCrudService(
     useMock: false,
     map: {
       id: 'portId',
-      code: 'abb',
-      name: 'portName',
+      portCode: 'portCode',
+      portName: 'portName',
+      country: 'country',
     },
   },
 )
 
 //                                                      ↑ endpoint        ↑ mock data  ↑ USE_MOCK
-

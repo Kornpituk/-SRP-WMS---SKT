@@ -1,4 +1,3 @@
-// serviceUtils.js
 import axiosIns from '@axios'
 import { urlApi } from '@/api'
 
@@ -9,58 +8,96 @@ export const getHeaders = () => ({
 
 const h = () => ({ headers: getHeaders() })
 
+function normalizeListResult(result, transformFromApi) {
+  if (Array.isArray(result)) {
+    return {
+      data: transformFromApi(result),
+      total: result.length,
+    }
+  }
+
+  if (!result || Array.isArray(result)) return null
+
+  if (Array.isArray(result.data)) {
+    return {
+      data: transformFromApi(result.data),
+      total: result.total ?? result.count ?? result.totalCount ?? result.data.length,
+    }
+  }
+
+  if (Array.isArray(result.items)) {
+    return {
+      data: transformFromApi(result.items),
+      total: result.total ?? result.count ?? result.totalCount ?? result.items.length,
+    }
+  }
+
+  if (Array.isArray(result.result)) {
+    return {
+      data: transformFromApi(result.result),
+      total: result.total ?? result.count ?? result.totalCount ?? result.result.length,
+    }
+  }
+
+  if (result.data && Array.isArray(result.data.data)) {
+    return {
+      data: transformFromApi(result.data.data),
+      total: result.data.total ?? result.total ?? result.data.count ?? result.data.totalCount ?? result.data.data.length,
+    }
+  }
+
+  if (result.result && Array.isArray(result.result.data)) {
+    return {
+      data: transformFromApi(result.result.data),
+      total: result.result.total ?? result.total ?? result.result.count ?? result.result.totalCount ?? result.result.data.length,
+    }
+  }
+
+  return null
+}
+
 /**
  * @param {Object} config
- * @param {string} config.resourceName - เช่น 'Forwarder'
- * @param {Object} config.map - แผนผังการแปลงชื่อ Field { uiField: 'apiField' }
+ * @param {string} config.resourceName
+ * @param {Object} config.map - UI field -> API field
+ * @param {boolean} [config.useMock=true]
+ * @param {Array} [config.mockData=[]]
  */
 export function createCrudService({ resourceName, map, useMock = true, mockData = [] }) {
   const baseUrl = `${urlApi.value}/api/Mst${resourceName}`
-  
-  // หาชื่อ Primary Key จาก map (สมมติว่าเรา map 'id' ไว้เสมอ)
-  const apiKey = map.id 
+  const apiKey = map.id
 
-  // --- Helper: แปลง Data จาก API -> UI ---
   const transformFromApi = data => {
     if (!data) return data
     if (Array.isArray(data)) return data.map(transformFromApi)
-    
+
     const transformed = {}
-    for (const [uiKey, apiKey] of Object.entries(map)) {
-      transformed[uiKey] = data[apiKey]
+    for (const [uiKey, apiField] of Object.entries(map)) {
+      transformed[uiKey] = data[apiField]
     }
 
-    // เก็บกวาด field อื่นๆ ที่ไม่ได้ map (ถ้าจำเป็น)
     return { ...data, ...transformed }
   }
 
-  // --- Helper: แปลง Data จาก UI -> API (ตอน Save) ---
-  // --- Helper: แปลง Data จาก UI -> API (ตอน Save) ---
   const transformToApi = payload => {
-    // 1. Copy ข้อมูลทั้งหมดมาก่อน (ฟิลด์เดิมอย่าง contactName, isActive จะมาครบ)
-    const apiPayload = { ...payload } 
+    const apiPayload = { ...payload }
 
-    // 2. แปลงชื่อฟิลด์ UI ให้กลับไปเป็นชื่อ API
-    for (const [uiKey, apiKey] of Object.entries(map)) {
+    for (const [uiKey, apiField] of Object.entries(map)) {
       if (apiPayload[uiKey] !== undefined) {
-        apiPayload[apiKey] = apiPayload[uiKey] // อัปเดตค่าให้ฟิลด์ API
-        delete apiPayload[uiKey] // ลบฟิลด์ UI ทิ้ง จะได้ไม่ส่งขยะไปให้ Backend
+        apiPayload[apiField] = apiPayload[uiKey]
+        if (uiKey !== apiField) delete apiPayload[uiKey]
       }
     }
 
-    // 3. จัดการ Default Values สำหรับ .NET API (เช่น ตอน Create)
-    const pkField = map.id // หาชื่อ Primary Key เช่น 'forwarderId'
-    
-    // ถ้าเป็นการเพิ่มข้อมูลใหม่ (ไม่มี id) บังคับให้ Primary Key = 0 เสมอ
+    const pkField = map.id
     if (!apiPayload[pkField]) {
       apiPayload[pkField] = 0
     }
 
-    // ถ้าไม่มีการระบุสถานะ ให้ Default เป็น true
     if (apiPayload.isActive === undefined) {
       apiPayload.isActive = true
     }
-    
+
     return apiPayload
   }
 
@@ -68,42 +105,37 @@ export function createCrudService({ resourceName, map, useMock = true, mockData 
     getList: async (params = {}) => {
       if (useMock) return transformFromApi(mockData)
 
-      // แปลง field name จาก UI → API (เช่น sortField อาจเป็นชื่อ UI)
       const query = { ...params }
       if (query.sortField && map[query.sortField]) {
         query.sortField = map[query.sortField]
       }
 
-      const r = await axiosIns.get(`${baseUrl}/Get${resourceName}Active`, {
+      const response = await axiosIns.get(`${baseUrl}/Get${resourceName}Active`, {
         ...h(),
-        params: query,   // axios จะ serialize เป็น ?abb=xxx&page=1&...
+        params: query,
       })
 
-      const result = r.data
+      const normalized = normalizeListResult(response.data, transformFromApi)
+      if (normalized) return normalized
 
-      // ถ้า API คืน { data, total } → คืนตรงๆ
-      if (result && !Array.isArray(result) && Array.isArray(result.data)) {
-        return { data: transformFromApi(result.data), total: result.total }
-      }
-
-      return transformFromApi(result)
+      return transformFromApi(response.data)
     },
 
     save: async payload => {
       const apiPayload = transformToApi(payload)
       if (useMock) return payload
-      const r = await axiosIns.post(`${baseUrl}/Save${resourceName}`, apiPayload, h())
-      
-      return transformFromApi(r.data)
+
+      const response = await axiosIns.post(`${baseUrl}/Save${resourceName}`, apiPayload, h())
+
+      return transformFromApi(response.data)
     },
 
     delete: async id => {
       if (useMock) return { success: true }
 
-      // ส่ง payload { forwarderId: 1 } ตามที่ API ต้องการ
-      const r = await axiosIns.post(`${baseUrl}/Delete${resourceName}`, { [apiKey]: id }, h())
-      
-      return r.data
+      const response = await axiosIns.post(`${baseUrl}/Delete${resourceName}`, { [apiKey]: id }, h())
+
+      return response.data
     },
   }
 }
