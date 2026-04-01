@@ -64,7 +64,7 @@ let mockData = [
 // ← เปลี่ยน false = ใช้ API จริง
 export const bankaccountnoService = createCrudService(
   {
-    resourceName: 'BankAccountNo',
+    resourceName: 'BankAccount',
     idField: 'bankAccountNoId',
     mockData,
     useMock: false,

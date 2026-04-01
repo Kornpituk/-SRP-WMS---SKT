@@ -8,11 +8,12 @@ export const getHeaders = () => ({
 
 const h = () => ({ headers: getHeaders() })
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function normalizeListResult(result, transformFromApi) {
   if (Array.isArray(result)) {
     return {
       data: transformFromApi(result),
-      total: result.length,
+      total: result.totalCount || result.totalRows,
     }
   }
 
@@ -21,35 +22,35 @@ function normalizeListResult(result, transformFromApi) {
   if (Array.isArray(result.data)) {
     return {
       data: transformFromApi(result.data),
-      total: result.total ?? result.count ?? result.totalCount ?? result.data.length,
+      total: result.totalRows ?? result.totalCount,
     }
   }
 
   if (Array.isArray(result.items)) {
     return {
       data: transformFromApi(result.items),
-      total: result.total ?? result.count ?? result.totalCount ?? result.items.length,
+      total: result.totalRows ?? result.totalCount,
     }
   }
 
   if (Array.isArray(result.result)) {
     return {
       data: transformFromApi(result.result),
-      total: result.total ?? result.count ?? result.totalCount ?? result.result.length,
+      total: result.totalRows ?? result.totalCount,
     }
   }
 
   if (result.data && Array.isArray(result.data.data)) {
     return {
       data: transformFromApi(result.data.data),
-      total: result.data.total ?? result.total ?? result.data.count ?? result.data.totalCount ?? result.data.data.length,
+      total: result.totalRows ?? result.totalCount,
     }
   }
 
   if (result.result && Array.isArray(result.result.data)) {
     return {
       data: transformFromApi(result.result.data),
-      total: result.result.total ?? result.total ?? result.result.count ?? result.result.totalCount ?? result.result.data.length,
+      total: result.totalRows ?? result.totalCount,
     }
   }
 
@@ -75,6 +76,8 @@ export function createCrudService({ resourceName, map, useMock = true, mockData 
     for (const [uiKey, apiField] of Object.entries(map)) {
       transformed[uiKey] = data[apiField]
     }
+
+    
 
     return { ...data, ...transformed }
   }
@@ -115,8 +118,13 @@ export function createCrudService({ resourceName, map, useMock = true, mockData 
         params: query,
       })
 
+      
       const normalized = normalizeListResult(response.data, transformFromApi)
+
+      console.log("response", normalized)
       if (normalized) return normalized
+
+      
 
       return transformFromApi(response.data)
     },

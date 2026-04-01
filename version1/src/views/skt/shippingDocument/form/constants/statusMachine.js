@@ -13,26 +13,27 @@ const transitions = [
     from: TabStatus.DRAFT,
     action: 'SAVE_DRAFT',
     to: TabStatus.SAVED,
-    guard: (ctx) => ctx.documentStatus !== DocumentStatus.VOID,
+    guard: ctx => ctx.documentStatus !== DocumentStatus.VOID,
   },
   {
     from: TabStatus.SAVED,
     action: 'SAVE_DRAFT',
     to: TabStatus.SAVED,
-    guard: (ctx) => ctx.documentStatus !== DocumentStatus.VOID,
+    guard: ctx => ctx.documentStatus !== DocumentStatus.VOID,
   },
   {
     from: TabStatus.SAVED,
     action: 'CONFIRM',
     to: TabStatus.CONFIRMED,
-    guard: (ctx) => ctx.documentStatus !== DocumentStatus.VOID,
+    guard: ctx => ctx.documentStatus !== DocumentStatus.VOID,
   },
   {
     from: TabStatus.DRAFT,
     action: 'CONFIRM',
     to: TabStatus.CONFIRMED,
-    guard: (ctx) => ctx.documentStatus !== DocumentStatus.VOID,
+    guard: ctx => ctx.documentStatus !== DocumentStatus.VOID,
   },
+
   // Future:
   // { from: TabStatus.CONFIRMED, action: 'REOPEN', to: TabStatus.SAVED,
   //   guard: (ctx) => ctx.userRole === 'ADMIN' },
@@ -45,10 +46,10 @@ const transitions = [
  */
 export function canTransition(action, context) {
   return transitions.some(
-    (t) =>
+    t =>
       t.from === context.currentTabStatus &&
       t.action === action &&
-      (!t.guard || t.guard(context))
+      (!t.guard || t.guard(context)),
   )
 }
 
@@ -59,11 +60,12 @@ export function canTransition(action, context) {
  */
 export function transition(action, context) {
   const rule = transitions.find(
-    (t) =>
+    t =>
       t.from === context.currentTabStatus &&
       t.action === action &&
-      (!t.guard || t.guard(context))
+      (!t.guard || t.guard(context)),
   )
+  
   return rule?.to ?? null
 }
 
@@ -74,10 +76,10 @@ export function transition(action, context) {
 export function getAllowedActions(context) {
   return transitions
     .filter(
-      (t) =>
-        t.from === context.currentTabStatus && (!t.guard || t.guard(context))
+      t =>
+        t.from === context.currentTabStatus && (!t.guard || t.guard(context)),
     )
-    .map((t) => t.action)
+    .map(t => t.action)
 }
 
 /**
@@ -87,5 +89,6 @@ export function getAllowedActions(context) {
  */
 export function isTerminalStatus(status, documentStatus) {
   if (documentStatus === DocumentStatus.VOID) return true
+  
   return status === TabStatus.CONFIRMED
 }

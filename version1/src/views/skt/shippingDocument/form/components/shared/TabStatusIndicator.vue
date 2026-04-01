@@ -1,12 +1,18 @@
-<!-- ============================================================
+<!--
+  ============================================================
   TabStatusIndicator.vue
   ● CONFIRMED = green check (mdi-check-circle)
   ● SAVED     = orange circle (mdi-circle-half-full)  
   ● DRAFT     = grey outline (mdi-circle-outline)
   ● VOID override = red lock
-============================================================ -->
+  ============================================================ 
+-->
 <template>
-  <v-icon :color="display.color" :icon="display.icon" size="20" />
+  <VIcon
+    :color="display.color"
+    :icon="display.icon"
+    size="20"
+  />
 </template>
 
 <script setup>
@@ -28,6 +34,7 @@ const statusMap = {
 
 const display = computed(() => {
   if (store.isVoided) return { color: 'red', icon: 'mdi-lock' }
+  
   return statusMap[props.status] ?? { color: 'grey', icon: 'mdi-circle-outline' }
 })
 </script>

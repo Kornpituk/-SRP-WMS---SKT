@@ -32,7 +32,7 @@ export const carrierService = createCrudService(
     useMock: false,
     map: {
       id: 'carrierId',
-      abb: 'abb',
+      abb: 'carrierCode',
       carrierName: 'carrierName',
     },
   },

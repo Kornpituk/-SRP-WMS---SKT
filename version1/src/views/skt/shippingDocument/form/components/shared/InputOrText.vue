@@ -1,11 +1,13 @@
-<!-- ============================================================
+<!--
+  ============================================================
   InputOrText.vue
   Shows v-text-field in edit mode, plain text (or highlight chip) in readonly
   Used to easily toggle between edit/view modes across all tabs
-============================================================ -->
+  ============================================================ 
+-->
 <template>
   <div>
-    <v-text-field
+    <VTextField
       v-if="!readonly"
       :model-value="value"
       :type="type"
@@ -15,7 +17,14 @@
       @update:model-value="(v) => $emit('input', v)"
     />
     <template v-else>
-      <v-chip v-if="highlight && value" color="amber-lighten-4" variant="flat" size="small">{{ value }}</v-chip>
+      <VChip
+        v-if="highlight && value"
+        color="amber-lighten-4"
+        variant="flat"
+        size="small"
+      >
+        {{ value }}
+      </VChip>
       <span v-else>{{ value || '—' }}</span>
     </template>
   </div>

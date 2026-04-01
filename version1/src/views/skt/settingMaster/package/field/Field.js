@@ -8,7 +8,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'package',
+    key: 'packageType',
     label: 'Package',
     type: 'text',
     required: true,

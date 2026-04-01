@@ -100,10 +100,13 @@
         <VBtn
           color="amber"
           style="color: #fff !important;"
-          prepend-icon="mdi-microsoft-excel"
           @click="$emit('export')"
         >
-          Export
+          <VIcon
+            size="25"
+            color="primary"
+            icon="mdi-microsoft-excel"
+          />Export
         </VBtn>
       </VCol>
     </VRow>

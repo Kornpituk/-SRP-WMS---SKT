@@ -1,11 +1,16 @@
-<!-- ============================================================
+<!--
+  ============================================================
   FieldRow.vue
   Renders: "LABEL :" followed by value (input or text)
   Matches the label-value pattern used throughout all tabs
-============================================================ -->
+  ============================================================ 
+-->
 <template>
   <div class="field-row">
-    <div v-if="label" class="field-row__label text-caption font-weight-bold text-grey-darken-2">
+    <div
+      v-if="label"
+      class="field-row__label text-caption font-weight-bold text-grey-darken-2"
+    >
       {{ label }}
     </div>
     <div class="field-row__value">

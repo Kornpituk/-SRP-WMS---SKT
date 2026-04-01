@@ -24,8 +24,8 @@
             v-bind="tp"
             :icon="filterVisible ? 'mdi-tune' : 'mdi-tune'"
             :color="filterVisible ? 'default' : 'primary'"
-            :variant="filterVisible ? 'text' : 'tonal'"
-            size="x-small"
+            :variant="filterVisible ? 'text' : 'flat'"
+            size="small"
             density="compact"
             @click="filterVisible = !filterVisible"
           />

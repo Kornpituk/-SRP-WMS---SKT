@@ -41,7 +41,10 @@
 
     
     <!-- Action buttons row -->
-    <div v-if="store.isVoided" class="d-flex align-center ga-3 px-6 py-3">
+    <div
+      v-if="store.isVoided"
+      class="d-flex align-center ga-3 px-6 py-3"
+    >
       <!-- VOID button -->
       <VBtn
         v-if="perms.canVoid"

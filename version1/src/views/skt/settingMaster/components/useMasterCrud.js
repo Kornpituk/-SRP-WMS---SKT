@@ -187,10 +187,12 @@ export function useMasterCrud (props, emit) {
 
       const res = await props.service.getList(params)
 
+      console.log("res", res)
+
       // ── Server-side: { data: [], total: N } ──
       if (res && !Array.isArray(res) && Array.isArray(res.data)) {
         items.value      = res.data
-        totalItems.value = res.total ?? res.data.length
+        totalItems.value = res.total || res.totalRows || res.totalCount
       }
 
       // ── Client-side: [] (mock returns full array) ──
