@@ -23,9 +23,12 @@
       icon
       variant="tonal"
       :loading="loading"
-      @click="emit('refresh')"
+      @click="handleRefresh"
     >
-      <VIcon color="primary">
+      <VIcon
+        color="primary"
+        :class="{ 'spin': loading }"
+      >
         mdi-refresh-circle
       </VIcon>
     </VBtn>
@@ -50,6 +53,18 @@ const emit = defineEmits([
   'create',   // กดปุ่ม CREATE
   'refresh',  // กดปุ่ม Refresh
 ])
+
+const loading = ref(false)
+
+const handleRefresh = async () => {
+  loading.value = true
+  emit('refresh')
+
+  // mock delay (หรือรอ API จริง)
+  setTimeout(() => {
+    loading.value = false
+  }, 500)
+}
 </script>
 
 <style scoped>
@@ -73,5 +88,19 @@ const emit = defineEmits([
   /* stylelint-disable-next-line order/properties-order */
   font-size: 13px !important;
   letter-spacing: 0.5px;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  /* stylelint-disable-next-line rule-empty-line-before */
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

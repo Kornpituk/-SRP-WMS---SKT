@@ -1,46 +1,11 @@
-<!--
-  MasterTable.vue
-  ─────────────────────────────────────────────────────────────────
-  ตารางข้อมูล + Pagination footer
-  ─────────────────────────────────────────────────────────────────
-  Props:
-  tableFields      FieldConfig[]   คอลัมน์ที่แสดง
-  items            any[]           ข้อมูลแถว (หน้าปัจจุบัน)
-  loading          boolean
-  saving           boolean
-  editingInlineId  string|number   id แถวที่กำลัง edit
-  inlineForm       object          ค่าใน inline edit
-
-  currentPage      number          หน้าปัจจุบัน
-  totalPages       number          หน้าทั้งหมด
-  totalItems       number          จำนวน record ทั้งหมด
-  itemsPerPage     number          rows/page ที่เลือก
-  perPageOptions   number[]        ตัวเลือก rows/page [10,25,50,100]
-  paginationInfo   string          "Showing X – Y of Z entries"
-
-  Emits:
-  edit              (item)
-  save              (item)
-  delete            (item)
-  inline-update     (fieldKey, value)
-  update:page       (page)       → เปลี่ยนหน้า
-  update:per-page   (perPage)    → เปลี่ยน rows/page
-  ─────────────────────────────────────────────────────────────────
--->
 <template>
   <div class="table-wrapper">
-    <!--
-      ════════════════════════════════════════
-      DATA TABLE
-      ════════════════════════════════════════ 
-    -->
     <VTable
       density="compact"
       class="master-table"
       hover
       fixed-header
     >
-      <!-- ─── thead ──────────────────────────── -->
       <thead>
         <tr>
           <th class="col-no text-center">
@@ -49,12 +14,12 @@
           <th
             v-for="field in tableFields"
             :key="field.key"
-            :style="field.width ? { width: field.width } : {}"
+            :style="getColumnStyle(field)"
             class="sortable-th"
             @click="emit('sort', field.key)"
           >
             <div class="th-content">
-              <span>{{ field.label }}</span>
+              <span class="th-label">{{ field.label }}</span>
               <span class="sort-icon">
                 <template v-if="sortField === field.key">
                   <VIcon size="14">
@@ -65,10 +30,21 @@
                   <VIcon
                     size="14"
                     class="sort-idle"
-                  >mdi-swap-vertical</VIcon>
+                  >
+                    mdi-swap-vertical
+                  </VIcon>
                 </template>
               </span>
             </div>
+
+            <button
+              type="button"
+              class="column-resizer"
+              :aria-label="`Resize ${field.label} column`"
+              @click.stop
+              @dblclick.stop.prevent="autoFitColumn(field)"
+              @pointerdown.stop.prevent="startResize($event, field)"
+            />
           </th>
           <th class="col-action text-center">
             Action
@@ -76,9 +52,7 @@
         </tr>
       </thead>
 
-      <!-- ─── tbody ──────────────────────────── -->
       <tbody>
-        <!-- Empty state -->
         <tr v-if="!loading && items.length === 0">
           <td
             :colspan="tableFields.length + 2"
@@ -96,7 +70,6 @@
           </td>
         </tr>
 
-        <!-- Loading skeleton -->
         <tr
           v-for="n in itemsPerPage"
           v-else-if="loading"
@@ -111,7 +84,6 @@
           </td>
         </tr>
 
-        <!-- Data rows -->
         <template v-else>
           <tr
             v-for="(item, index) in items"
@@ -119,20 +91,15 @@
             class="data-row"
             :class="{ 'row-editing': editingInlineId === item.id }"
           >
-            <!-- No. — แสดงเลข global ตาม offset หน้าปัจจุบัน -->
-            
             <td class="col-no">
               {{ (currentPage - 1) * itemsPerPage + index + 1 }}.
-            </td> 
-           
+            </td>
 
-            <!-- Data cells -->
             <template
               v-for="field in tableFields"
               :key="field.key"
             >
-              <td :style="field.width ? { minWidth: field.width } : {}">
-                <!-- Inline edit mode -->
+              <td :style="getColumnStyle(field)">
                 <template v-if="editingInlineId === item.id">
                   <VTextField
                     v-if="field.type !== 'select'"
@@ -157,17 +124,16 @@
                   />
                 </template>
 
-                <!-- Read mode -->
                 <span
                   v-else
                   class="cell-text"
-                >{{ item[field.key] }}</span>
+                >
+                  {{ item[field.key] }}
+                </span>
               </td>
             </template>
 
-            <!-- Action column -->
             <td class="col-action">
-              <!-- Editing: SAVE + DELETE -->
               <template v-if="editingInlineId === item.id">
                 <VBtn
                   size="small"
@@ -187,7 +153,6 @@
                   DELETE
                 </VBtn>
               </template>
-              <!-- Normal: EDIT + DELETE -->
               <template v-else>
                 <VBtn
                   size="small"
@@ -212,18 +177,19 @@
       </tbody>
     </VTable>
 
-    <!--
-      ════════════════════════════════════════
-      PAGINATION FOOTER
-      ════════════════════════════════════════ 
-    -->
     <div class="pagination-footer">
-      <!-- ── ซ้าย: info + rows/page ────────── -->
       <div class="pagination-left">
         <span class="pagination-info">{{ paginationInfo }}</span>
+        <VBtn
+          variant="text"
+          size="small"
+          class="reset-widths-btn"
+          @click="resetColumnWidths"
+        >
+          Reset widths
+        </VBtn>
       </div>
 
-      <!-- ── ขวา: page navigation ──────────── -->
       <div class="pagination-right">
         <div class="per-page-wrap">
           <span class="per-page-label">Rows per page</span>
@@ -237,7 +203,7 @@
             @update:model-value="emit('update:per-page', $event)"
           />
         </div>
-        <!-- ปุ่ม First -->
+
         <VBtn
           icon
           variant="text"
@@ -251,7 +217,6 @@
           </VIcon>
         </VBtn>
 
-        <!-- ปุ่ม Prev -->
         <VBtn
           icon
           variant="text"
@@ -265,14 +230,13 @@
           </VIcon>
         </VBtn>
 
-        <!-- Page numbers -->
         <div class="page-numbers">
           <button
             v-for="p in visiblePages"
             :key="p"
             class="page-btn"
             :class="{
-              'page-btn--active' : p === currentPage,
+              'page-btn--active': p === currentPage,
               'page-btn--ellipsis': p === '…',
             }"
             :disabled="p === '…' || loading"
@@ -282,7 +246,6 @@
           </button>
         </div>
 
-        <!-- ปุ่ม Next -->
         <VBtn
           icon
           variant="text"
@@ -296,7 +259,6 @@
           </VIcon>
         </VBtn>
 
-        <!-- ปุ่ม Last -->
         <VBtn
           icon
           variant="text"
@@ -311,73 +273,249 @@
         </VBtn>
       </div>
     </div>
-    <!-- end pagination footer -->
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, reactive, watch } from 'vue'
 
-// ─── Props ────────────────────────────────────
 const props = defineProps({
-  tableFields: { type: Array,          required: true },
-  items: { type: Array,          default: () => [] },
-  loading: { type: Boolean,        default: false },
-  saving: { type: Boolean,        default: false },
+  tableFields: { type: Array, required: true },
+  items: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
+  saving: { type: Boolean, default: false },
   editingInlineId: { type: [String, Number], default: null },
-  inlineForm: { type: Object,         default: () => ({}) },
-
-  // pagination
-  currentPage: { type: Number,         default: 1 },
-  totalPages: { type: Number,         default: 1 },
-  totalItems: { type: Number,         default: 0 },
-  itemsPerPage: { type: Number,         default: 10 },
-  perPageOptions: { type: Array,          default: () => [10, 25, 50, 100] },
-  paginationInfo: { type: String,         default: '' },
+  inlineForm: { type: Object, default: () => ({}) },
+  currentPage: { type: Number, default: 1 },
+  totalPages: { type: Number, default: 1 },
+  totalItems: { type: Number, default: 0 },
+  itemsPerPage: { type: Number, default: 10 },
+  perPageOptions: { type: Array, default: () => [10, 25, 50, 100] },
+  paginationInfo: { type: String, default: '' },
   sortField: { type: String, default: '' },
   sortDirection: { type: String, default: '' },
 })
 
-// ─── Emits ────────────────────────────────────
 const emit = defineEmits([
   'edit',
   'save',
   'delete',
   'inline-update',
-  'update:page',      // (page: number)
-  'update:per-page',  // (perPage: number)
+  'update:page',
+  'update:per-page',
   'sort',
 ])
 
-// ─── Visible page buttons (max 7 buttons) ─────
-/**
- * สร้างปุ่มหน้าที่แสดง เช่น  [1] [2] [3] … [8] [9] [10]
- * หรือ  [1] … [4] [5] [6] … [10]
- * แทน '…' เมื่อหน้าเยอะ
- */
+const STORAGE_PREFIX = 'setting-master:column-widths'
+const DEFAULT_MIN_WIDTH = 120
+const COLUMN_HORIZONTAL_PADDING = 30
+const SORT_ICON_SPACE = 24
+const RESIZER_SPACE = 16
+
+const columnWidths = reactive({})
+
+const resizeState = reactive({
+  activeKey: '',
+  startX: 0,
+  startWidth: 0,
+})
+
+const storageKey = computed(() => {
+  const path = typeof window !== 'undefined' ? window.location.pathname : 'unknown-path'
+  const fieldSignature = props.tableFields.map(field => field.key).join('|')
+
+  return `${STORAGE_PREFIX}:${path}:${fieldSignature}`
+})
+
 const visiblePages = computed(() => {
-  const total   = props.totalPages
+  const total = props.totalPages
   const current = props.currentPage
   if (total <= 7) {
     return Array.from({ length: total }, (_, i) => i + 1)
   }
 
-  const pages = []
-
-  pages.push(1)
+  const pages = [1]
 
   if (current > 3) pages.push('…')
 
-  const start = Math.max(2,        current - 1)
-  const end   = Math.min(total - 1, current + 1)
+  const start = Math.max(2, current - 1)
+  const end = Math.min(total - 1, current + 1)
 
   for (let i = start; i <= end; i++) pages.push(i)
 
   if (current < total - 2) pages.push('…')
 
   pages.push(total)
-  
+
   return pages
+})
+
+function parseWidth(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string') {
+    const parsed = Number.parseFloat(value)
+    if (Number.isFinite(parsed)) return parsed
+  }
+
+  return null
+}
+
+function getMinWidth(field) {
+  return Math.max(field.minWidth ?? DEFAULT_MIN_WIDTH, 72)
+}
+
+function getInitialWidth(field) {
+  const configured = parseWidth(field.width)
+  if (configured) return Math.max(configured, getMinWidth(field))
+
+  const estimated = String(field.label ?? '').length * 9 + 56
+
+  return Math.max(estimated, getMinWidth(field))
+}
+
+function syncColumnWidths() {
+  const activeKeys = new Set(props.tableFields.map(field => field.key))
+
+  props.tableFields.forEach(field => {
+    if (!Number.isFinite(columnWidths[field.key])) {
+      columnWidths[field.key] = getInitialWidth(field)
+    }
+  })
+
+  Object.keys(columnWidths).forEach(key => {
+    if (!activeKeys.has(key)) delete columnWidths[key]
+  })
+}
+
+function restoreColumnWidths() {
+  if (typeof window === 'undefined') return
+
+  syncColumnWidths()
+
+  try {
+    const raw = window.localStorage.getItem(storageKey.value)
+    if (!raw) return
+
+    const saved = JSON.parse(raw)
+    if (!saved || typeof saved !== 'object') return
+
+    props.tableFields.forEach(field => {
+      const width = parseWidth(saved[field.key])
+      if (width) {
+        columnWidths[field.key] = Math.max(width, getMinWidth(field))
+      }
+    })
+  } catch (error) {
+    console.warn('[MasterTable] failed to restore column widths', error)
+  }
+}
+
+function persistColumnWidths() {
+  if (typeof window === 'undefined' || !props.tableFields.length) return
+
+  const payload = props.tableFields.reduce((acc, field) => {
+    acc[field.key] = columnWidths[field.key] ?? getInitialWidth(field)
+
+    return acc
+  }, {})
+
+  window.localStorage.setItem(storageKey.value, JSON.stringify(payload))
+}
+
+function clearPersistedWidths() {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(storageKey.value)
+}
+
+function getColumnStyle(field) {
+  const width = columnWidths[field.key] ?? getInitialWidth(field)
+  const value = `${width}px`
+
+  return {
+    width: value,
+    minWidth: value,
+    maxWidth: value,
+  }
+}
+
+function measureTextWidth(text, font = '600 12px "Segoe UI", sans-serif') {
+  if (typeof document === 'undefined') return String(text ?? '').length * 9
+
+  const canvas = measureTextWidth.canvas || (measureTextWidth.canvas = document.createElement('canvas'))
+  const context = canvas.getContext('2d')
+  if (!context) return String(text ?? '').length * 9
+
+  context.font = font
+
+  return context.measureText(String(text ?? '')).width
+}
+
+function autoFitColumn(field) {
+  const headerWidth = measureTextWidth(field.label ?? '') + COLUMN_HORIZONTAL_PADDING + SORT_ICON_SPACE + RESIZER_SPACE
+
+  const rowWidth = props.items.reduce((maxWidth, item) => {
+    const rawValue = item?.[field.key]
+    const displayValue = rawValue === null || rawValue === undefined ? '' : String(rawValue)
+    const measuredWidth = measureTextWidth(displayValue, '400 13px "Segoe UI", sans-serif') + COLUMN_HORIZONTAL_PADDING
+
+    return Math.max(maxWidth, measuredWidth)
+  }, 0)
+
+  columnWidths[field.key] = Math.ceil(Math.max(headerWidth, rowWidth, getMinWidth(field)))
+  persistColumnWidths()
+}
+
+function resetColumnWidths() {
+  props.tableFields.forEach(field => {
+    columnWidths[field.key] = getInitialWidth(field)
+  })
+
+  clearPersistedWidths()
+}
+
+function handlePointerMove(event) {
+  if (!resizeState.activeKey) return
+
+  const field = props.tableFields.find(item => item.key === resizeState.activeKey)
+  if (!field) return
+
+  const nextWidth = resizeState.startWidth + (event.clientX - resizeState.startX)
+
+  columnWidths[resizeState.activeKey] = Math.max(nextWidth, getMinWidth(field))
+}
+
+function stopResize() {
+  if (!resizeState.activeKey) return
+
+  resizeState.activeKey = ''
+  document.body.classList.remove('master-table-resizing')
+  window.removeEventListener('pointermove', handlePointerMove)
+  window.removeEventListener('pointerup', stopResize)
+  window.removeEventListener('pointercancel', stopResize)
+  persistColumnWidths()
+}
+
+function startResize(event, field) {
+  resizeState.activeKey = field.key
+  resizeState.startX = event.clientX
+  resizeState.startWidth = columnWidths[field.key] ?? getInitialWidth(field)
+
+  document.body.classList.add('master-table-resizing')
+  window.addEventListener('pointermove', handlePointerMove)
+  window.addEventListener('pointerup', stopResize)
+  window.addEventListener('pointercancel', stopResize)
+}
+
+watch(
+  () => props.tableFields.map(field => `${field.key}:${field.width ?? ''}:${field.minWidth ?? ''}`).join('|'),
+  () => {
+    restoreColumnWidths()
+  },
+  { immediate: true },
+)
+
+onBeforeUnmount(() => {
+  stopResize()
 })
 </script>
 

@@ -139,7 +139,7 @@ export function useMasterCrud (props, emit) {
   // SNACKBAR
   // ─────────────────────────────────────────────
 
-  const snackbar = reactive({ show: false, message: '', color: 'success' })
+  const snackbar = reactive({ show: false, message: '', color: 'primary', variant: 'tonal' })
 
   // ─────────────────────────────────────────────
   // HELPERS
@@ -155,10 +155,11 @@ export function useMasterCrud (props, emit) {
     return form
   }
 
-  function showNotification (message, color = 'success') {
+  function showNotification (message, color) {
     snackbar.message = message
-    snackbar.color   = color
+    snackbar.color   = color ?? "primary"
     snackbar.show    = true
+    snackbar.variant = 'tonal'
   }
 
   const requiredRule = v => !!v || 'This field is required'
@@ -187,7 +188,6 @@ export function useMasterCrud (props, emit) {
 
       const res = await props.service.getList(params)
 
-      console.log("res", res)
 
       // ── Server-side: { data: [], total: N } ──
       if (res && !Array.isArray(res) && Array.isArray(res.data)) {
@@ -231,6 +231,8 @@ export function useMasterCrud (props, emit) {
         items.value = all.slice(start, start + itemsPerPage.value)
       }
 
+      
+
     } catch (err) {
       showNotification('Failed to load data', 'error')
       console.error('[useMasterCrud] loadData error', err)
@@ -266,12 +268,14 @@ export function useMasterCrud (props, emit) {
   async function handleSearch () {
     currentPage.value = 1   // search ใหม่ → reset หน้า 1
     await loadData()
+    showNotification(`${props.title} loaded successfully`, "primary")
   }
 
   function handleClear () {
     searchFields.value.forEach(f => { searchParams[f.key] = '' })
     currentPage.value = 1
     loadData()
+    showNotification(`${props.title} cleared`, "yellow-lighten-1")
   }
 
   // ─────────────────────────────────────────────

@@ -28,6 +28,7 @@
           size="small"
           class="dialog-close"
           @click="emit('close')"
+          color="grey-"
         >
           <VIcon>mdi-close</VIcon>
         </VBtn>
@@ -102,8 +103,9 @@
       <VCardActions class="dialog-footer">
         <VSpacer />
         <VBtn
-          color="success"
+          color="primary"
           class="save-btn"
+          variant="flat"
           :loading="saving"
           @click="handleSave"
         >

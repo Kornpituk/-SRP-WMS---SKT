@@ -7,7 +7,7 @@
   ─────────────────────────────────────────────────────────────────
 -->
 <template>
-  <VExpandTransition>
+  <Transition name="search-panel">
     <div
       v-if="visible"
       class="search-bar"
@@ -68,7 +68,7 @@
         </VBtn>
       </div>
     </div>
-  </VExpandTransition>
+  </Transition>
 </template>
 
 <script setup>

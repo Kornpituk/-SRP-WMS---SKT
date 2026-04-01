@@ -1,6 +1,3 @@
-/* ════════════════════════════════════════
-   TABLE WRAPPER
-════════════════════════════════════════ */
 .table-wrapper {
   display: flex;
   flex-direction: column;
@@ -9,19 +6,28 @@
   background: #ffffff;
   border-radius: 4px;
   margin: 0 16px 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
 }
 
-/* ════════════════════════════════════════
-   MASTER TABLE
-════════════════════════════════════════ */
 .master-table {
   flex: 1;
   overflow: auto;
   font-size: 13px;
 }
 
+.master-table :deep(.v-table__wrapper) {
+  overflow: auto;
+}
+
+.master-table :deep(table) {
+  width: max-content;
+  min-width: 100%;
+  table-layout: fixed;
+}
+
 .master-table :deep(thead tr th) {
+  position: relative;
+  overflow: hidden;
   background: #fafafa !important;
   font-size: 12px !important;
   font-weight: 600 !important;
@@ -32,6 +38,7 @@
 }
 
 .master-table :deep(tbody tr td) {
+  overflow: hidden;
   padding: 8px 14px !important;
   border-bottom: 1px solid #f0f0f0;
   color: #424242;
@@ -47,21 +54,25 @@
 }
 
 .cell-text {
+  display: block;
+  width: 100%;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 300px;
-  display: block;
 }
 
-/* ── Columns ── */
 .col-no {
   width: 52px;
+  min-width: 52px;
+  max-width: 52px;
   text-align: center;
 }
 
 .col-action {
   width: 200px;
+  min-width: 200px;
+  max-width: 200px;
   text-align: center;
   position: sticky;
   right: 0;
@@ -73,7 +84,6 @@
   background: #f9fbe7 !important;
 }
 
-/* ── Action buttons ── */
 .btn-action {
   height: 28px !important;
   min-width: 64px !important;
@@ -84,12 +94,10 @@
   margin: 0 2px;
 }
 
-/* ── Inline inputs ── */
 .inline-input {
   min-width: 100px;
 }
 
-/* ── Skeleton ── */
 .skeleton-cell {
   padding: 10px 14px !important;
 }
@@ -106,12 +114,12 @@
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }
 }
 
-/* ── Empty state ── */
 .empty-cell {
   padding: 40px !important;
   text-align: center;
@@ -126,9 +134,6 @@
   font-size: 13px;
 }
 
-/* ════════════════════════════════════════
-   PAGINATION FOOTER
-════════════════════════════════════════ */
 .pagination-footer {
   display: flex;
   align-items: center;
@@ -141,7 +146,6 @@
   flex-wrap: wrap;
 }
 
-/* ── ซ้าย ── */
 .pagination-left {
   display: flex;
   align-items: center;
@@ -153,6 +157,15 @@
   font-size: 12.5px;
   color: #757575;
   white-space: nowrap;
+}
+
+.reset-widths-btn {
+  min-width: auto !important;
+  padding-inline: 8px !important;
+  color: #546e7a !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
 }
 
 .per-page-wrap {
@@ -172,7 +185,6 @@
   font-size: 12px !important;
 }
 
-/* ── ขวา: page navigation ── */
 .pagination-right {
   display: flex;
   align-items: center;
@@ -189,7 +201,6 @@
   opacity: 0.35;
 }
 
-/* Page number buttons */
 .page-numbers {
   display: flex;
   align-items: center;
@@ -234,17 +245,61 @@
   cursor: pointer;
   user-select: none;
 }
+
 .sortable-th:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgb(0 0 0 / 4%);
 }
+
 .th-content {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 4px;
+  padding-inline-end: 10px;
+  overflow: hidden;
 }
+
+.th-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .sort-idle {
   opacity: 0.3;
 }
+
 .sortable-th:hover .sort-idle {
   opacity: 0.6;
+}
+
+.column-resizer {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 14px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.column-resizer::before {
+  content: '';
+  position: absolute;
+  inset-block: 10px;
+  inset-inline-start: 6px;
+  width: 2px;
+  border-radius: 999px;
+  background: rgb(117 117 117 / 0%);
+  transition: background-color 160ms ease;
+}
+
+.sortable-th:hover .column-resizer::before,
+.column-resizer:hover::before {
+  background: rgb(117 117 117 / 35%);
+}
+
+.column-resizer:active::before {
+  background: rgb(46 125 50 / 65%);
 }
