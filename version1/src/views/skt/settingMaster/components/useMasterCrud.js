@@ -344,7 +344,7 @@ export function useMasterCrud (props, emit) {
   }
 
   function closeDeleteDialog () {
-    deleteTarget.value     = null
+    deleteTarget.value     = null 
     showDeleteDialog.value = false
   }
 
