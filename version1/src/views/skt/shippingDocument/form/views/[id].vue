@@ -1,6 +1,5 @@
 <template>
   <div class="ship-document-detail">
-    <!-- Loading -->
     <div
       v-if="store.isLoading"
       class="d-flex justify-center align-center pa-16"
@@ -12,7 +11,6 @@
       />
     </div>
 
-    <!-- Error -->
     <VAlert
       v-else-if="fetchError"
       type="error"
@@ -30,12 +28,11 @@
       </template>
     </VAlert>
 
-    <!-- Document loaded -->
     <template v-else>
       <DocumentHeader
         @close="goBackToList"
-        @void="showVoidDialog = true"
-        @approve="handleApprove"
+        @void="openActionDialog('void')"
+        @approve="openActionDialog('approve')"
       />
 
       <VAlert
@@ -46,11 +43,20 @@
         class="mx-4 mt-4"
         icon="mdi-cancel"
       >
-        This document has been voided. All tabs are read-only. Only printing is
-        available.
+        This document has been voided. All tabs are read-only. Only printing is available.
       </VAlert>
 
-      <!-- Tab bar -->
+      <VAlert
+        v-else-if="store.isApproved"
+        type="success"
+        variant="tonal"
+        density="compact"
+        class="mx-4 mt-4"
+        icon="mdi-check-decagram"
+      >
+        This document has been approved. APPROVE and VOID can no longer be used.
+      </VAlert>
+
       <VTabs
         v-model="store.activeTabKey"
         color="primary"
@@ -71,7 +77,6 @@
       </VTabs>
       <VDivider />
 
-      <!-- Tab content -->
       <VWindow
         v-model="store.activeTabKey"
         class="flex-grow-1 overflow-y-auto"
@@ -88,36 +93,57 @@
       </VWindow>
     </template>
 
-    <!-- Void dialog -->
     <VDialog
-      v-model="showVoidDialog"
-      max-width="420"
+      v-model="actionDialog.open"
+      max-width="520"
       persistent
     >
       <VCard>
-        <VCardTitle class="text-h6 text-red">
-          Void Document
+        <VCardTitle
+          class="text-h6"
+          :class="actionDialog.action === 'void' ? 'text-red' : 'text-green'"
+        >
+          {{ dialogConfig.title }}
         </VCardTitle>
         <VCardText>
-          This cannot be undone. All tabs become read-only. Continue?
+          <div class="mb-3">
+            {{ dialogConfig.message }}
+          </div>
+
+          <div v-if="incompleteTabs.length > 0">
+            <div class="text-subtitle-2 mb-2">
+              Tabs not confirmed:
+            </div>
+            <VList
+              density="compact"
+              class="border rounded"
+            >
+              <VListItem
+                v-for="tab in incompleteTabs"
+                :key="tab.key"
+              >
+                <VListItemTitle>{{ tab.label }}</VListItemTitle>
+                <VListItemSubtitle>Status: {{ tab.status }}</VListItemSubtitle>
+              </VListItem>
+            </VList>
+          </div>
         </VCardText>
         <VCardActions>
           <VSpacer />
           <VBtn
             variant="text"
-            @click="showVoidDialog = false"
+            :disabled="actionDialog.loading"
+            @click="closeActionDialog"
           >
             Cancel
           </VBtn>
           <VBtn
-            color="red"
+            :color="dialogConfig.buttonColor"
             variant="elevated"
-            @click="
-              showVoidDialog = false;
-              voidDocument();
-            "
+            :loading="actionDialog.loading"
+            @click="handleConfirmAction"
           >
-            Yes, Void
+            {{ dialogConfig.buttonText }}
           </VBtn>
         </VCardActions>
       </VCard>
@@ -126,45 +152,52 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, markRaw } from "vue"
+import { computed, ref, onMounted, onBeforeUnmount, markRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useShipDocumentStore } from "../stores/shipDocumentStore"
-import { useDocumentActions } from "../composables/useDocumentActions"
-import { useUnsavedChangesGuard } from "../composables/useUnsavedChangesGuard"
-import { getOrderedTabs } from "../constants/tabRegistry"
-import { TabKey } from "../types/shipDocument"
+import { useShipDocumentStore } from '../stores/shipDocumentStore'
+import { useDocumentActions } from '../composables/useDocumentActions'
+import { useUnsavedChangesGuard } from '../composables/useUnsavedChangesGuard'
+import { getOrderedTabs } from '../constants/tabRegistry'
+import { DocumentStatus, TabKey, TabStatus } from '../types/shipDocument'
 
-import DocumentHeader from "../components/shared/DocumentHeader.vue"
-import TabStatusIndicator from "../components/shared/TabStatusIndicator.vue"
-import PackingListTab from "../components/tabs/PackingListTab.vue"
-import CommercialInvoiceTab from "../components/tabs/CommercialInvoiceTab.vue"
-import CertificateOfOriginTab from "../components/tabs/CertificateOfOriginTab.vue"
-import PackingDeclarationTab from "../components/tabs/PackingDeclarationTab.vue"
-import ShippingParticularTab from "../components/tabs/ShippingParticularTab.vue"
+import DocumentHeader from '../components/shared/DocumentHeader.vue'
+import TabStatusIndicator from '../components/shared/TabStatusIndicator.vue'
+import PackingListTab from '../components/tabs/PackingListTab.vue'
+import CommercialInvoiceTab from '../components/tabs/CommercialInvoiceTab.vue'
+import CertificateOfOriginTab from '../components/tabs/CertificateOfOriginTab.vue'
+import PackingDeclarationTab from '../components/tabs/PackingDeclarationTab.vue'
+import ShippingParticularTab from '../components/tabs/ShippingParticularTab.vue'
 import { shipDocumentApi } from '../services/shipDocumentApi'
 import { getVisibleTabs } from '../constants/shippingMode'
 
 const route = useRoute()
-const router = useRouter()   // ← เพิ่มบรรทัดนี้
+const router = useRouter()
 const store = useShipDocumentStore()
 
-const { fetchDocument, voidDocument, goBackToList, cleanup, fetchError } =
+const { fetchDocument, voidDocument, approveDocument, goBackToList, cleanup, fetchError } =
   useDocumentActions()
 
 useUnsavedChangesGuard()
 
 const orderedTabs = getOrderedTabs()
 
-// ← เพิ่มตรงนี้
-const shippingMode = computed(() => {
-  return route.query.mode || 'ocean'
-})
+const shippingMode = computed(() => route.query.mode || 'ocean')
 
 const visibleTabs = computed(() => {
   const allowedKeys = getVisibleTabs(shippingMode.value)
 
   return orderedTabs.filter(tab => allowedKeys.includes(tab.key))
 })
+
+const incompleteTabs = computed(() =>
+  visibleTabs.value
+    .filter(tab => store.tabs[tab.key].status !== TabStatus.CONFIRMED)
+    .map(tab => ({
+      key: tab.key,
+      label: tab.label,
+      status: store.tabs[tab.key].status,
+    })),
+)
 
 const tabComponents = {
   [TabKey.PACKING_LIST]: markRaw(PackingListTab),
@@ -174,10 +207,90 @@ const tabComponents = {
   [TabKey.SHIPPING_PARTICULAR]: markRaw(ShippingParticularTab),
 }
 
-const showVoidDialog = ref(false)
+const actionDialog = ref({
+  open: false,
+  action: null,
+  loading: false,
+})
 
-function handleApprove() {
-  console.log("Approve document — TODO")
+const dialogConfig = computed(() => {
+  const isVoidAction = actionDialog.value.action === 'void'
+  const hasIncompleteTabs = incompleteTabs.value.length > 0
+
+  if (isVoidAction) {
+    return {
+      title: 'Void Document',
+      message: hasIncompleteTabs
+        ? 'Some tabs are not confirmed yet. If you continue, the document will still be voided and all tabs will become read-only.'
+        : 'This cannot be undone. All tabs become read-only. Continue?',
+      buttonText: 'Yes, Void',
+      buttonColor: 'red',
+    }
+  }
+
+  return {
+    title: 'Approve Document',
+    message: hasIncompleteTabs
+      ? 'Some tabs are not confirmed yet. Review the list below before continuing with approval.'
+      : 'Approve this document?',
+    buttonText: 'Approve',
+    buttonColor: 'green',
+  }
+})
+
+function openActionDialog(action) {
+  if (store.documentStatus !== DocumentStatus.ACTIVE) return
+
+  const needsConfirmation = action === 'void' || incompleteTabs.value.length > 0
+
+  if (!needsConfirmation && action === 'approve') {
+    actionDialog.value = {
+      open: false,
+      action,
+      loading: false,
+    }
+    handleConfirmAction()
+
+    return
+  }
+
+  actionDialog.value = {
+    open: true,
+    action,
+    loading: false,
+  }
+}
+
+function closeActionDialog() {
+  actionDialog.value = {
+    open: false,
+    action: null,
+    loading: false,
+  }
+}
+
+async function handleConfirmAction() {
+  const action = actionDialog.value.action ?? 'approve'
+
+  actionDialog.value = {
+    ...actionDialog.value,
+    loading: true,
+  }
+
+  const success = action === 'void'
+    ? await voidDocument()
+    : await approveDocument()
+
+  if (success) {
+    closeActionDialog()
+
+    return
+  }
+
+  actionDialog.value = {
+    ...actionDialog.value,
+    loading: false,
+  }
 }
 
 async function retry() {
@@ -190,14 +303,12 @@ onMounted(async () => {
   const sourceId = route.query.sourceId
 
   if (id === 'create') {
-    // CREATE flow — สร้าง document ใหม่ก่อน แล้วโหลด
     try {
       const res = await shipDocumentApi.createDocument(mode, sourceId)
 
       if (res.success) {
         store.loadDocument(res.data)
 
-        // เปลี่ยน URL จาก /create เป็น /doc-xxx (ไม่ให้ refresh แล้ว create ซ้ำ)
         router.replace({
           path: `/skt/shippingDocument/form/${res.data.id}`,
           query: { mode },
@@ -209,7 +320,6 @@ onMounted(async () => {
     }
   }
   else {
-    // EDIT flow — โหลด document เดิม
     await fetchDocument(id)
   }
 })
@@ -221,7 +331,6 @@ onBeforeUnmount(() => cleanup())
 .ship-document-detail {
   display: flex;
   flex-direction: column;
-  /* stylelint-disable-next-line order/properties-order */
   background: #f5f5f5;
 }
 </style>

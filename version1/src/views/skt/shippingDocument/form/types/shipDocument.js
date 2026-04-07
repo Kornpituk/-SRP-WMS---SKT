@@ -12,6 +12,7 @@
 /** Document-level status */
 export const DocumentStatus = Object.freeze({
   ACTIVE: 'ACTIVE',
+  APPROVED: 'APPROVED',
   VOID: 'VOID',
 
   // ARCHIVED: 'ARCHIVED',
@@ -61,6 +62,7 @@ export const TabKey = Object.freeze({
  * @property {boolean} canVoid
  * @property {boolean} canEdit
  * @property {boolean} canPrint
+ * @property {boolean} isLocked
  */
 
 /**

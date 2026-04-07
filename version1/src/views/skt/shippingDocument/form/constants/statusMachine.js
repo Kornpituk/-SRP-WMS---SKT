@@ -13,25 +13,25 @@ const transitions = [
     from: TabStatus.DRAFT,
     action: 'SAVE_DRAFT',
     to: TabStatus.SAVED,
-    guard: ctx => ctx.documentStatus !== DocumentStatus.VOID,
+    guard: ctx => ![DocumentStatus.VOID, DocumentStatus.APPROVED].includes(ctx.documentStatus),
   },
   {
     from: TabStatus.SAVED,
     action: 'SAVE_DRAFT',
     to: TabStatus.SAVED,
-    guard: ctx => ctx.documentStatus !== DocumentStatus.VOID,
+    guard: ctx => ![DocumentStatus.VOID, DocumentStatus.APPROVED].includes(ctx.documentStatus),
   },
   {
     from: TabStatus.SAVED,
     action: 'CONFIRM',
     to: TabStatus.CONFIRMED,
-    guard: ctx => ctx.documentStatus !== DocumentStatus.VOID,
+    guard: ctx => ![DocumentStatus.VOID, DocumentStatus.APPROVED].includes(ctx.documentStatus),
   },
   {
     from: TabStatus.DRAFT,
     action: 'CONFIRM',
     to: TabStatus.CONFIRMED,
-    guard: ctx => ctx.documentStatus !== DocumentStatus.VOID,
+    guard: ctx => ![DocumentStatus.VOID, DocumentStatus.APPROVED].includes(ctx.documentStatus),
   },
 
   // Future:
@@ -88,7 +88,7 @@ export function getAllowedActions(context) {
  * @returns {boolean}
  */
 export function isTerminalStatus(status, documentStatus) {
-  if (documentStatus === DocumentStatus.VOID) return true
+  if ([DocumentStatus.VOID, DocumentStatus.APPROVED].includes(documentStatus)) return true
   
   return status === TabStatus.CONFIRMED
 }

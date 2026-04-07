@@ -12,6 +12,7 @@ const tabMap = {
 
 const docMap = {
   [DocumentStatus.ACTIVE]: { color: 'green', icon: 'mdi-check-circle', text: 'Active' },
+  [DocumentStatus.APPROVED]: { color: 'blue', icon: 'mdi-check-decagram', text: 'Approved' },
   [DocumentStatus.VOID]: { color: 'red', icon: 'mdi-cancel', text: 'Void' },
 }
 

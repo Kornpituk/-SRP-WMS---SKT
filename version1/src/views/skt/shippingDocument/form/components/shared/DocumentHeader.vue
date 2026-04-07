@@ -41,54 +41,29 @@
 
     
     <!-- Action buttons row -->
-    <div
-      v-if="store.isVoided"
-      class="d-flex align-center ga-3 px-6 py-3"
-    >
+    <div class="d-flex align-center ga-3 px-6 py-3">
       <!-- VOID button -->
       <VBtn
-        v-if="perms.canVoid"
         variant="elevated"
-        color="red"
+        :color="perms.canVoid ? 'red' : 'grey-lighten-1'"
         size="small"
         rounded="lg"
         min-width="100"
+        :disabled="!perms.canVoid"
         @click="$emit('void')"
-      >
-        VOID
-      </VBtn>
-      <VBtn
-        v-else
-        variant="elevated"
-        color="grey-lighten-1"
-        size="small"
-        rounded="lg"
-        min-width="100"
-        disabled
       >
         VOID
       </VBtn>
 
       <!-- APPROVE button -->
       <VBtn
-        v-if="perms.canApprove && store.allTabsConfirmed"
         variant="elevated"
-        color="green"
+        :color="perms.canApprove ? 'green' : 'grey-lighten-1'"
         size="small"
         rounded="lg"
         min-width="100"
+        :disabled="!perms.canApprove"
         @click="$emit('approve')"
-      >
-        APPROVE
-      </VBtn>
-      <VBtn
-        v-else
-        variant="elevated"
-        color="grey-lighten-1"
-        size="small"
-        rounded="lg"
-        min-width="100"
-        disabled
       >
         APPROVE
       </VBtn>
@@ -97,12 +72,10 @@
 </template>
 
 <script setup>
-import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { useDocumentPermissions } from '../../composables/usePermissions'
 
 defineEmits(['close', 'void', 'approve'])
 
-const store = useShipDocumentStore()
 const { documentPermissions: perms } = useDocumentPermissions()
 </script>
 

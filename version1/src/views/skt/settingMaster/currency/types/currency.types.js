@@ -1,6 +1,6 @@
 export const fields = [
   {
-    key: 'ABB',
+    key: 'currencyCode',
     label: 'ABB',
     type: 'text',
     required: true,

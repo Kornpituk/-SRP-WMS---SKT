@@ -22,8 +22,8 @@ export const salepersonService = createCrudService(
     useMock: false,
     map: {
       id: 'salePersonId',
-      code: 'displayName',
-      name: 'displayName',
+      code: 'salePersonCode',
+      name: 'salePersonName',
     },
   },
 )

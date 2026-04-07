@@ -141,6 +141,21 @@ export const shipDocumentApi = {
     throw new Error('API not connected')
   },
 
+  async approveDocument(id) {
+    if (USE_MOCK) {
+      await delay(300)
+
+      const doc = _docs.find(d => d.id === id)
+      if (doc) doc.status = 'APPROVED'
+      const li = _list.find(d => d.id === id)
+      if (li) li.status = 'APPROVED'
+      console.log(`[Mock] Approved: ${id}`)
+
+      return ok(null, 'Approved')
+    }
+    throw new Error('API not connected')
+  },
+
   // === Save Draft ===
   async savePackingList(docId, data) { return this._save(docId, TabKey.PACKING_LIST, data) },
   async saveCommercialInvoice(docId, data) { return this._save(docId, TabKey.COMMERCIAL_INVOICE, data) },

@@ -51,6 +51,20 @@ export function useDocumentActions() {
     }
   }
 
+  async function approveDocument() {
+    if (!documentPermissions.value.canApprove) return false
+    try {
+      await shipDocumentApi.approveDocument(store.documentId)
+      store.approveDocument()
+
+      return true
+    } catch (err) {
+      console.error('[useDocumentActions] approveDocument:', err)
+
+      return false
+    }
+  }
+
   function goBackToList() {
     router.push({ name: 'skt-shippingDocument-shippingDocument-ShippingDocumentPage' })
   }
@@ -59,5 +73,5 @@ export function useDocumentActions() {
     store.$reset()
   }
 
-  return { fetchDocument, voidDocument, goBackToList, cleanup, fetchError, documentPermissions }
+  return { fetchDocument, voidDocument, approveDocument, goBackToList, cleanup, fetchError, documentPermissions }
 }

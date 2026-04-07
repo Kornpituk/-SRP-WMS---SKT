@@ -237,7 +237,7 @@
                 rounded="lg"
                 class="text-none my-2"
                 min-width="130"
-                @click="handleConfirm"
+                @click="handlePrintMenuConfirm"
               >
                 CONFIRM
               </VBtn>
@@ -363,7 +363,7 @@
           <VBtn
             color="green"
             variant="elevated"
-            @click="handleConfirm"
+            @click="handleTabConfirm"
           >
             Yes, Confirm
           </VBtn>
@@ -374,7 +374,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useTabPermissions } from '../../composables/usePermissions'
 
 const props = defineProps({
@@ -423,11 +423,11 @@ function handleSaveDraft() {
   emit('save-draft')
 }
 
-// function handleConfirm() {
-//   confirmDialog.value = false
-//   currentAction.value = 'confirm'
-//   emit('confirm')
-// }
+function handleTabConfirm() {
+  confirmDialog.value = false
+  currentAction.value = 'confirm'
+  emit('confirm')
+}
 
 const rules = [v => v.length <= 150 || 'Max 150 characters']
 
@@ -513,7 +513,6 @@ function deleteNote(noteId) {
 // ---------------------------------------------------------------------------
 // Print
 // ---------------------------------------------------------------------------
-import { computed } from 'vue'
 
 const fav = ref(true)
 const menu = ref(false)
@@ -544,7 +543,7 @@ const PRINT_CONFIG = {
 }
 
 // ------------------ methods ------------------
-function handleConfirm() {
+function handlePrintMenuConfirm() {
   if (!selectedTarget.value) return
 
   const config = props.printConfig[selectedTarget.value]

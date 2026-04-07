@@ -15,12 +15,14 @@ export function useDocumentPermissions() {
 
   const documentPermissions = computed(() => {
     const isVoid = documentStatus.value === DocumentStatus.VOID
+    const isLocked = isVoid || documentStatus.value === DocumentStatus.APPROVED
     
     return {
-      canApprove: !isVoid,
-      canVoid: !isVoid,
+      canApprove: !isLocked,
+      canVoid: !isLocked,
       canEdit: !isVoid,
       canPrint: true,
+      isLocked,
     }
   })
 
@@ -36,8 +38,8 @@ export function useTabPermissions(tabKey) {
     const tabState = tabs.value[key]
     const docStatus = documentStatus.value
 
-    // Priority 1: Document VOID overrides everything
-    if (docStatus === DocumentStatus.VOID) {
+    // Priority 1: terminal document states override everything
+    if (docStatus === DocumentStatus.VOID || docStatus === DocumentStatus.APPROVED) {
       return { canView: true, canEdit: false, canSave: false, canConfirm: false, canPrint: true, canVoid: false }
     }
 

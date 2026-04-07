@@ -25,7 +25,7 @@ export const currencyService = createCrudService(
     useMock: false,
     map: {
       id: 'currencyId',
-      code: 'abb',
+      code: 'currencyCode',
       name: 'currencyName',
     },
   },

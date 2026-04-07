@@ -30,6 +30,8 @@ export const useShipDocumentStore = defineStore('shipDocument', () => {
 
   // -- Getters --
   const isVoided = computed(() => documentStatus.value === DocumentStatus.VOID)
+  const isApproved = computed(() => documentStatus.value === DocumentStatus.APPROVED)
+  const isActionLocked = computed(() => isVoided.value || isApproved.value)
   const getTab = computed(() => key => tabs.value[key])
   const activeTab = computed(() => tabs.value[activeTabKey.value])
   const hasUnsavedChanges = computed(() => Object.values(tabs.value).some(t => t.isDirty))
@@ -122,6 +124,10 @@ export const useShipDocumentStore = defineStore('shipDocument', () => {
     documentStatus.value = DocumentStatus.VOID
   }
 
+  function approveDocument() {
+    documentStatus.value = DocumentStatus.APPROVED
+  }
+
   function setActiveTab(tabKey) {
     activeTabKey.value = tabKey
   }
@@ -142,8 +148,8 @@ export const useShipDocumentStore = defineStore('shipDocument', () => {
 
   return {
     documentId, documentNo, documentStatus, createdAt, updatedAt, createdBy, isLoading, activeTabKey, tabs,
-    isVoided, getTab, activeTab, hasUnsavedChanges, tabStatusSummary, confirmedTabCount, allTabsConfirmed,
+    isVoided, isApproved, isActionLocked, getTab, activeTab, hasUnsavedChanges, tabStatusSummary, confirmedTabCount, allTabsConfirmed,
     loadDocument, updateTabData, setTabLoading, setTabErrors, clearTabErrors,
-    executeTransition, canExecute, getAvailableActions, voidDocument, setActiveTab, $reset,
+    executeTransition, canExecute, getAvailableActions, voidDocument, approveDocument, setActiveTab, $reset,
   }
 })
