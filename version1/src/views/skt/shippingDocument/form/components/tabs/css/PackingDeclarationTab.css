@@ -169,6 +169,14 @@
   flex: 0 0 340px;
 }
 
+.ref-row__input--highlight :deep(.v-field) {
+  background: #fff8e1;
+}
+
+.ref-row__input--highlight :deep(.v-field__outline) {
+  color: #f5deb3;
+}
+
 /* =================================================================
    Chip (yellow highlight)
    ================================================================= */

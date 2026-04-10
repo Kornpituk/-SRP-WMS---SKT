@@ -113,10 +113,14 @@ export const mockDocumentDetail = {
         dueDate: '2025-01-04',
         feeder: 'KMTC BANGKOK V.2511N',
         vessel: 'KMTC BANGKOK V.2511N',
+        mawbNo: 'CKCOLCH0047440',
+        hawbNo: 'CKCOLCH0047441',
         from: 'LAEM CHABANG, THAILAND',
         to: 'HCM CITY, VIETNAM',
         etd: '2025-09-25',
+        etdTime: '23:30',
         eta: '2025-09-27',
+        etaTime: '06:55',
         items: [
           {
             id: uid(),
@@ -184,10 +188,14 @@ export const mockDocumentDetail = {
         dueDate: '2025-01-04',
         feeder: 'KMTC BANGKOK V.2511N',
         vessel: 'KMTC BANGKOK V.2511N',
+        mawbNo: 'CKCOLCH0047440',
+        hawbNo: 'CKCOLCH0047441',
         from: 'LAEM CHABANG, THAILAND',
         to: 'HCM CITY, VIETNAM',
         etd: '2025-09-25',
+        etdTime: '23:30',
         eta: '2025-09-27',
+        etaTime: '06:55',
         items: [
           {
             id: uid(),
@@ -273,6 +281,8 @@ export const mockDocumentDetail = {
         vesselName: 'KMTC TOKYO V.2511N',
         dateOfShipment: '2025-09-02',
         blNo: 'CKCOLCH0047440',
+        mawbNo: 'CKCOLCH0047440',
+        hawbNo: 'CKCOLCH0047441',
         declaration: 'THERE IS NO WOOD IN THE CONTAINER',
       },
     },
@@ -313,6 +323,10 @@ export const mockDocumentDetail = {
           attn: 'MS. TRANG',
           email: 'huong.dao@csplegal.com',
         },
+        consigneeNote: `**ขอ B/L ฉบับจริงค่ะ
+**บวกค่า Switch B/L
+** Pls show delivery agent address , Tel. No.
+Fax No. on B/L`,
         notifyParty: {
           name: 'AGE D\'OR PTE LTD',
           address: '25 BUKIT BATOK CRESCENT',
@@ -356,8 +370,8 @@ export const mockDocumentDetail = {
         },
         containerSealNo: {
           mark: '',
-          freightTerms: 'FREIGHT PREPAID',
-          blType: 'SURRENDER B/L',
+          freightTerms: 'Freight Prepaid',
+          blType: 'Surrendered B/L',
         },
       },
     },

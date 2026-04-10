@@ -261,92 +261,231 @@
       <!-- SECTION: Shipping                                  -->
       <!-- ================================================ -->
       <div class="section">
-        <div class="ship-grid">
-          <div class="ship-cell ship-cell--wide">
-            <span class="ship-label">Feeder :</span>
-            <VTextField
-              v-if="!isReadonly"
-              :model-value="formData.feeder"
-              variant="outlined"
-              density="compact"
-              hide-details
-              @update:model-value="(v) => updateField('feeder', v)"
-            />
-            <span v-else>{{ formData.feeder }}</span>
+        <template v-if="isAirMode">
+          <div class="air-ship-layout">
+            <div class="air-ship-layout__left">
+              <div class="air-ship-flight">
+                <span class="ship-label">Fight :</span>
+                <div class="air-ship-flight__body">
+                  <VTextField
+                    v-if="!isReadonly"
+                    :model-value="formData.feeder"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    @update:model-value="(v) => updateField('feeder', v)"
+                  />
+                  <span v-else>{{ formData.feeder }}</span>
+
+                  <div class="air-ship-subfield">
+                    <span class="air-ship-subfield__label">MAWB NO.</span>
+                    <VTextField
+                      v-if="!isReadonly"
+                      :model-value="formData.mawbNo"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      @update:model-value="(v) => updateField('mawbNo', v)"
+                    />
+                    <span v-else>{{ formData.mawbNo }}</span>
+                  </div>
+
+                  <div class="air-ship-subfield">
+                    <span class="air-ship-subfield__label">HAWB NO.</span>
+                    <VTextField
+                      v-if="!isReadonly"
+                      :model-value="formData.hawbNo"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      @update:model-value="(v) => updateField('hawbNo', v)"
+                    />
+                    <span v-else>{{ formData.hawbNo }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="air-ship-route">
+                <div class="ship-cell ship-cell--wide">
+                  <span class="ship-label">From :</span>
+                  <VAutocomplete
+                    v-if="!isReadonly"
+                    :model-value="formData.from"
+                    :items="PORT_OPTIONS"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    @update:model-value="(v) => updateField('from', v)"
+                  />
+                  <span v-else>{{ formData.from }}</span>
+                </div>
+                <div class="ship-cell ship-cell--wide">
+                  <span class="ship-label">To :</span>
+                  <VAutocomplete
+                    v-if="!isReadonly"
+                    :model-value="formData.to"
+                    :items="PORT_OPTIONS"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    @update:model-value="(v) => updateField('to', v)"
+                  />
+                  <span v-else>{{ formData.to }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="air-ship-layout__right">
+              <div class="air-ship-time">
+                <span class="ship-label">ETD :</span>
+                <div class="ship-datetime">
+                  <VTextField
+                    v-if="!isReadonly"
+                    :model-value="formData.etd"
+                    type="date"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    prepend-inner-icon="mdi-calendar"
+                    @update:model-value="(v) => handleEtdChange(v)"
+                  />
+                  <VTextField
+                    v-if="!isReadonly"
+                    :model-value="formData.etdTime"
+                    type="time"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    prepend-inner-icon="mdi-clock-outline"
+                    @update:model-value="(v) => updateField('etdTime', v)"
+                  />
+                  <template v-else>
+                    <span>{{ formData.etd }}</span>
+                    <span>{{ formatTimeDisplay(formData.etdTime) }}</span>
+                  </template>
+                </div>
+              </div>
+
+              <div class="air-ship-time air-ship-time--spaced">
+                <span class="ship-label">ETA:</span>
+                <div class="ship-datetime">
+                  <VTextField
+                    v-if="!isReadonly"
+                    :model-value="formData.eta"
+                    type="date"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    prepend-inner-icon="mdi-calendar"
+                    @update:model-value="(v) => handleEtaChange(v)"
+                  />
+                  <VTextField
+                    v-if="!isReadonly"
+                    :model-value="formData.etaTime"
+                    type="time"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    prepend-inner-icon="mdi-clock-outline"
+                    @update:model-value="(v) => updateField('etaTime', v)"
+                  />
+                  <template v-else>
+                    <span>{{ formData.eta }}</span>
+                    <span>{{ formatTimeDisplay(formData.etaTime) }}</span>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="ship-grid">
+            <div class="ship-cell ship-cell--wide">
+              <span class="ship-label">{{ primaryShipLabel }}</span>
+              <VTextField
+                v-if="!isReadonly"
+                :model-value="formData.feeder"
+                variant="outlined"
+                density="compact"
+                hide-details
+                @update:model-value="(v) => updateField('feeder', v)"
+              />
+              <span v-else>{{ formData.feeder }}</span>
+            </div>
+
+            <div class="ship-cell ship-cell--wide">
+              <span class="ship-label">{{ secondaryShipLabel }}</span>
+              <VTextField
+                v-if="!isReadonly"
+                :model-value="formData.vessel"
+                variant="outlined"
+                density="compact"
+                hide-details
+                @update:model-value="(v) => handleVesselChange(v)"
+              />
+              <span v-else>{{ formData.vessel }}</span>
+            </div>
+
+            <div class="ship-cell ship-cell--narrow">
+              <span class="ship-label">ETD :</span>
+              <VTextField
+                v-if="!isReadonly"
+                :model-value="formData.etd"
+                type="date"
+                variant="outlined"
+                density="compact"
+                hide-details
+                prepend-inner-icon="mdi-calendar"
+                @update:model-value="(v) => handleEtdChange(v)"
+              />
+              <span v-else>{{ formData.etd }}</span>
+            </div>
           </div>
 
-          <!-- #9: Vessel — syncs to Shipping Particular tab -->
-          <div class="ship-cell ship-cell--wide">
-            <span class="ship-label">Vessel :</span>
-            <VTextField
-              v-if="!isReadonly"
-              :model-value="formData.vessel"
-              variant="outlined"
-              density="compact"
-              hide-details
-              @update:model-value="(v) => handleVesselChange(v)"
-            />
-            <span v-else>{{ formData.vessel }}</span>
+          <div class="ship-grid ship-grid--spaced">
+            <div class="ship-cell ship-cell--wide">
+              <span class="ship-label">From :</span>
+              <VAutocomplete
+                v-if="!isReadonly"
+                :model-value="formData.from"
+                :items="PORT_OPTIONS"
+                variant="outlined"
+                density="compact"
+                hide-details
+                @update:model-value="(v) => updateField('from', v)"
+              />
+              <span v-else>{{ formData.from }}</span>
+            </div>
+            <div class="ship-cell ship-cell--wide">
+              <span class="ship-label">To :</span>
+              <VAutocomplete
+                v-if="!isReadonly"
+                :model-value="formData.to"
+                :items="PORT_OPTIONS"
+                variant="outlined"
+                density="compact"
+                hide-details
+                @update:model-value="(v) => updateField('to', v)"
+              />
+              <span v-else>{{ formData.to }}</span>
+            </div>
+            <div class="ship-cell ship-cell--narrow">
+              <span class="ship-label">ETA:</span>
+              <VTextField
+                v-if="!isReadonly"
+                :model-value="formData.eta"
+                type="date"
+                variant="outlined"
+                density="compact"
+                hide-details
+                prepend-inner-icon="mdi-calendar"
+                @update:model-value="(v) => handleEtaChange(v)"
+              />
+              <span v-else>{{ formData.eta }}</span>
+            </div>
           </div>
-
-          <div class="ship-cell ship-cell--narrow">
-            <span class="ship-label">ETD :</span>
-            <VTextField
-              v-if="!isReadonly"
-              :model-value="formData.etd"
-              type="date"
-              variant="outlined"
-              density="compact"
-              hide-details
-              prepend-inner-icon="mdi-calendar"
-              @update:model-value="(v) => handleEtdChange(v)"
-            />
-            <span v-else>{{ formData.etd }}</span>
-          </div>
-        </div>
-
-        <div class="ship-grid ship-grid--spaced">
-          <div class="ship-cell ship-cell--wide">
-            <span class="ship-label">From :</span>
-            <VAutocomplete
-              v-if="!isReadonly"
-              :model-value="formData.from"
-              :items="PORT_OPTIONS"
-              variant="outlined"
-              density="compact"
-              hide-details
-              @update:model-value="(v) => updateField('from', v)"
-            />
-            <span v-else>{{ formData.from }}</span>
-          </div>
-          <div class="ship-cell ship-cell--wide">
-            <span class="ship-label">To :</span>
-            <VAutocomplete
-              v-if="!isReadonly"
-              :model-value="formData.to"
-              :items="PORT_OPTIONS"
-              variant="outlined"
-              density="compact"
-              hide-details
-              @update:model-value="(v) => updateField('to', v)"
-            />
-            <span v-else>{{ formData.to }}</span>
-          </div>
-          <div class="ship-cell ship-cell--narrow">
-            <span class="ship-label">ETA:</span>
-            <VTextField
-              v-if="!isReadonly"
-              :model-value="formData.eta"
-              type="date"
-              variant="outlined"
-              density="compact"
-              hide-details
-              prepend-inner-icon="mdi-calendar"
-              @update:model-value="(v) => handleEtaChange(v)"
-            />
-            <span v-else>{{ formData.eta }}</span>
-          </div>
-        </div>
+        </template>
       </div>
 
       <!-- ================================================ -->
@@ -691,6 +830,10 @@ const route = useRoute()
 
 // อ่าน ?mode=ocean จาก URL  ← แทน props.tabKey ที่ไม่มีค่า
 const shippMode = computed(() => route.query.mode || 'ocean')
+const isAirMode = computed(() => shippMode.value === 'air')
+const isCourierMode = computed(() => shippMode.value === 'courier')
+const primaryShipLabel = computed(() => (isCourierMode.value ? 'Courier :' : 'Feeder :'))
+const secondaryShipLabel = computed(() => (isCourierMode.value ? 'AWB No. :' : 'Vessel :'))
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -1038,6 +1181,19 @@ function fmtNum(v) {
 
 function fmtDec(v) {
   return v != null ? Number(v).toFixed(2) : '0.00'
+}
+
+function formatTimeDisplay(value) {
+  if (!value) return ''
+
+  const [hours, minutes] = String(value).split(':')
+  if (hours == null || minutes == null) return value
+
+  const hourNum = Number(hours)
+  const suffix = hourNum >= 12 ? 'PM' : 'AM'
+  const normalized = ((hourNum + 11) % 12) + 1
+
+  return `${String(normalized).padStart(2, '0')}:${minutes} ${suffix}`
 }
 
 function truncate(str, len) {

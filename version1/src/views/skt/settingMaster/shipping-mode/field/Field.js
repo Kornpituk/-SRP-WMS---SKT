@@ -1,6 +1,6 @@
 export const fields = [
   {
-    key: 'modeAbb',
+    key: 'shippingModeAbb',
     label: 'ABB',
     type: 'text',
     required: true,
@@ -8,7 +8,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'modeName',
+    key: 'shippingModeName',
     label: 'Shipping Mode Name',
     type: 'text',
     required: true,

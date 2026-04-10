@@ -91,7 +91,7 @@ export default function packingListMapper(formData, options = {}) {
     
     if (shippMode === 'truck' || shippMode === 'courier') {
       label = shippMode === 'truck' ? 'TRUCK' : 'COURIER'
-      label2 = shippMode === 'truck' ? 'CARRIER' : 'NO'
+      label2 = shippMode === 'truck' ? 'CARRIER' : 'AWB NO.'
     } else{
       label = shippMode === 'ocean' ? 'FEEDER' : 'FIGHT'
       label2 = shippMode === 'ocean' ? 'VESSEL' : 'CARRIER'

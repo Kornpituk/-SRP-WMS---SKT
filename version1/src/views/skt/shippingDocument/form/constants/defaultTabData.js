@@ -13,7 +13,7 @@ export function createDefaultPackingList() {
     date: '', invoiceNo: '', contractNo: '', poNo: '', proformaInvoiceNo: '',
     payer: emptyParty(), consignee: emptyParty(),
     payment: '', dueDate: '',
-    feeder: '', vessel: '', from: '', to: '', etd: '', eta: '',
+    feeder: '', vessel: '', mawbNo: '', hawbNo: '', from: '', to: '', etd: '', etdTime: '', eta: '', etaTime: '',
     items: [],
     packing: '', countryOfOrigin: '', makerName: '', packaging: '', lotNo: '',
   }
@@ -24,7 +24,7 @@ export function createDefaultCommercialInvoice() {
     date: '', invoiceNo: '', contractNo: '', poNo: '', proformaInvoiceNo: '',
     payer: emptyParty(), consignee: emptyParty(),
     payment: '', dueDate: '',
-    feeder: '', vessel: '', from: '', to: '', etd: '', eta: '',
+    feeder: '', vessel: '', mawbNo: '', hawbNo: '', from: '', to: '', etd: '', etdTime: '', eta: '', etaTime: '',
     items: [],
     cifValue: 0, cifPort: '', fobValue: 0, fobPort: '',
     oceanFreight: 0, insurance: 0,
@@ -47,7 +47,7 @@ export function createDefaultPackingDeclaration() {
     packageType: '', packageDimensions: '',
     netWeight: 0, netWeightUnit: 'KGS', totalDrums: 0,
     grossWeight: 0, grossWeightUnit: 'KGS',
-    invoiceNo: '', vesselName: '', dateOfShipment: '', blNo: '',
+    invoiceNo: '', vesselName: '', dateOfShipment: '', blNo: '', mawbNo: '', hawbNo: '',
     declaration: 'THERE IS NO WOOD IN THE CONTAINER',
   }
 }
@@ -56,6 +56,7 @@ export function createDefaultShippingParticular() {
   return {
     bookingNo: '', blNo: '', date: '',
     shipper: emptyParty(), consignee: emptyParty(), notifyParty: emptyParty(),
+    consigneeNote: '',
     portOfReceipt: '', portOfLoading: '', feeder: '', vessel: '',
     etd: '', eta: '', containerType: '',
     portOfDischarge: '', portOfDelivery: '', deliveryType: '',

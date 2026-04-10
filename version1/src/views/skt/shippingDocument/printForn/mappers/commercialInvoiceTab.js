@@ -56,7 +56,7 @@ export default function commercialInvoiceMapper(formData, options = {}) {
     if (shippMode === 'truck') {
       label1 = 'TRUCK'; label2 = 'CARRIER'
     } else if (shippMode === 'courier') {
-      label1 = 'COURIER'; label2 = 'NO'
+      label1 = 'COURIER'; label2 = 'AWB NO.'
     } else if (shippMode === 'air') {
       label1 = 'FLIGHT'; label2 = 'CARRIER'
     } else {
@@ -88,7 +88,12 @@ export default function commercialInvoiceMapper(formData, options = {}) {
   function buildPricingRows() {
     const rows = []
     const term = formData.pricingTerm || 'CIF'
-    const modeLabel = `${shippMode.toUpperCase()} FREIGHT`
+
+    const normalizedMode = String(shippMode).toLowerCase()
+    let modeLabel = `${shippMode.toUpperCase()} FREIGHT`
+
+    if (['air', 'courier'].includes(normalizedMode)) modeLabel = 'AIR FREIGHT'
+    if (normalizedMode === 'truck') modeLabel = 'INLAND FREIGHT'
 
     const addRow = (label, value) => {
       rows.push({

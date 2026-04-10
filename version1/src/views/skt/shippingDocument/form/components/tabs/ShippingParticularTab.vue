@@ -1,5 +1,5 @@
 <!--
-  ShippingParticularTab.vue — Vue 3 + Vuetify 3 + Composition API
+  ShippingParticularTab.vue - Vue 3 + Vuetify 3 + Composition API
   Stylelint: stylelint-config-standard + stylelint-order
 
   Figma analysis (Shipping_Document_30_.png):
@@ -11,7 +11,7 @@
   - M3 (text field: 0.00)
   - "-" field under product desc
   - HS CODE (dropdown: 3906.90.20)
-  - CONTAINER & SEAL: MARK, FREIGHT PREPAID, SURRENDER B/L
+  - CONTAINER & SEAL: freight term, B/L type
 
   YELLOW CHIPS (display):
   - ETD, ETA dates
@@ -28,18 +28,12 @@
 <template>
   <div class="tab-page">
     <div class="tab-content">
-      <!-- ================================================ -->
-      <!-- Title                                              -->
-      <!-- ================================================ -->
       <div class="section">
         <h2 class="section-title">
           SHIPPING PARTICULAR
         </h2>
       </div>
 
-      <!-- ================================================ -->
-      <!-- BOOKING NO / B/L NO / DATE                        -->
-      <!-- ================================================ -->
       <div class="section">
         <div class="book-grid">
           <div class="book-cell">
@@ -73,9 +67,6 @@
         </div>
       </div>
 
-      <!-- ================================================ -->
-      <!-- SHIPPER (text) + "KINDLY ISSUE US..." (text)      -->
-      <!-- ================================================ -->
       <div class="section">
         <div class="shipper-grid">
           <div class="shipper-grid__left">
@@ -108,72 +99,69 @@
         </div>
       </div>
 
-      <!-- ================================================ -->
-      <!-- CONSIGNEE (text)                                   -->
-      <!-- ================================================ -->
       <div class="section">
-        <div class="party-label">
-          CONSIGNEE. :
-        </div>
-        <div class="party-text party-text--indent">
-          <div>{{ formData.consignee?.name }}</div>
-          <div>{{ formData.consignee?.address }}</div>
-          <div v-if="formData.consignee?.address2">
-            {{ formData.consignee.address2 }}
+        <div class="consignee-grid">
+          <div class="consignee-grid__left">
+            <div class="party-label">
+              CONSIGNEE. :
+            </div>
+            <div class="party-text party-text--indent">
+              <div>{{ formData.consignee?.name }}</div>
+              <div>{{ formData.consignee?.address }}</div>
+              <div v-if="formData.consignee?.address2">
+                {{ formData.consignee.address2 }}
+              </div>
+              <div v-if="formData.consignee?.address3">
+                {{ formData.consignee.address3 }}
+              </div>
+              <div>
+                {{ formData.consignee?.city }}
+                <template v-if="formData.consignee?.country">
+                  - {{ formData.consignee.country }}
+                </template>
+              </div>
+              <div v-if="formData.consignee?.tel">
+                TEL.: {{ formData.consignee.tel }}
+              </div>
+              <div v-if="formData.consignee?.taxId">
+                TAX ID : {{ formData.consignee.taxId }}
+              </div>
+              <div v-if="formData.consignee?.attn">
+                ATTN : {{ formData.consignee.attn }}
+              </div>
+              <div v-if="formData.consignee?.email">
+                Email : {{ formData.consignee.email }}
+              </div>
+            </div>
           </div>
-          <div v-if="formData.consignee?.address3">
-            {{ formData.consignee.address3 }}
-          </div>
-          <div>
-            {{ formData.consignee?.city }}
-            <template v-if="formData.consignee?.country">
-              – {{ formData.consignee.country }}
-            </template>
-          </div>
-          <div v-if="formData.consignee?.tel">
-            TEL.: {{ formData.consignee.tel }}
-          </div>
-          <div v-if="formData.consignee?.taxId">
-            TAX ID : {{ formData.consignee.taxId }}
-          </div>
-          <div v-if="formData.consignee?.attn">
-            ATTN : {{ formData.consignee.attn }}
-          </div>
-          <div v-if="formData.consignee?.email">
-            Email : {{ formData.consignee.email }}
+
+          <div class="consignee-grid__right">
+            <VTextarea
+              v-if="!isReadonly"
+              :model-value="formData.consigneeNote"
+              variant="outlined"
+              density="compact"
+              hide-details
+              rows="5"
+              no-resize
+              class="consignee-note-input"
+              @update:model-value="(v) => updateField('consigneeNote', v)"
+            />
+            <div
+              v-else
+              class="consignee-note-display"
+            >
+              {{ formData.consigneeNote }}
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- ================================================ -->
-      <!-- NOTIFY PARTY (bordered box, text)                  -->
-      <!-- ================================================ -->
       <div class="section">
         <div class="party-label">
           NOTIFY PARTY :
         </div>
         <div class="notify-box">
-          <!--
-            <div>{{ formData.notifyParty?.name }}</div>
-            <div>{{ formData.notifyParty?.address }}</div>
-            <div v-if="formData.notifyParty?.address2">
-            {{ formData.notifyParty.address2 }}
-            </div>
-            <div>{{ formData.notifyParty?.city }} {{ formData.notifyParty?.country }}</div>
-            <div v-if="formData.notifyParty?.tel">
-            TEL.: {{ formData.notifyParty.tel }}
-            </div>
-            <div v-if="formData.notifyParty?.taxId">
-            TAX ID : {{ formData.notifyParty.taxId }}
-            </div>
-            <div v-if="formData.notifyParty?.attn">
-            ATTN : {{ formData.notifyParty.attn }}
-            </div>
-            <div v-if="formData.notifyParty?.email">
-            E-MAIL : {{ formData.notifyParty.email }}
-            </div> 
-          -->
-
           <VTextarea
             v-if="!isReadonly"
             :model-value="formData.notifyParty.notifyParty"
@@ -194,9 +182,6 @@
         </div>
       </div>
 
-      <!-- ================================================ -->
-      <!-- PORT OF RECEIPT / PORT OF LOADING (text)           -->
-      <!-- ================================================ -->
       <div class="section">
         <div class="info-line">
           <span class="info-line__label">PORT OF RECEIPT :</span>
@@ -208,11 +193,7 @@
         </div>
       </div>
 
-      <!-- ================================================ -->
-      <!-- FEEDER / VESSEL / Container Type / ETD / ETA       -->
-      <!-- ================================================ -->
       <div class="section">
-        <!-- Row 1: FEEDER (text) + ETD (yellow chip) -->
         <div class="ship-row">
           <div class="ship-row__main">
             <span class="ship-row__label">FEEDER :</span>
@@ -223,7 +204,6 @@
           </div>
         </div>
 
-        <!-- Row 2: VESSEL (text) + Container Type (dropdown) + ETA (yellow chip) -->
         <div class="ship-row ship-row--spaced">
           <div class="ship-row__main">
             <span class="ship-row__label">VESSEL :</span>
@@ -249,9 +229,6 @@
         </div>
       </div>
 
-      <!-- ================================================ -->
-      <!-- PORT / PORT OF DELIVERY (text)                     -->
-      <!-- ================================================ -->
       <div class="section">
         <div class="info-line">
           <span class="info-line__label">PORT :</span>
@@ -264,16 +241,12 @@
         </div>
       </div>
 
-      <!-- ================================================ -->
-      <!-- SHIPPING MARK (complex grid)                       -->
-      <!-- ================================================ -->
       <div class="section">
         <div class="mark-label">
           SHIPPING MARK :
         </div>
 
         <div class="mark-grid">
-          <!-- Left: Mark text lines -->
           <div class="mark-grid__left">
             <div
               v-for="(m, i) in (formData.shippingMark?.marks || [])"
@@ -284,9 +257,7 @@
             </div>
           </div>
 
-          <!-- Right: Detail grid -->
           <div class="mark-grid__right">
-            <!-- Row 1: Package desc (chip) | N.W. | G.W. | M3 headers -->
             <div class="mark-detail-row">
               <div class="mark-detail-row__pkg">
                 <span class="chip chip--yellow">{{ formData.shippingMark?.packageDescription }}</span>
@@ -302,7 +273,6 @@
               </div>
             </div>
 
-            <!-- Row 2: FCL CONTAINER (input) | values (chips) | M3 (input) -->
             <div class="mark-detail-row">
               <div class="mark-detail-row__pkg">
                 <span class="mark-detail-row__fcl-label">FCL CONTAINER :</span>
@@ -337,12 +307,10 @@
               </div>
             </div>
 
-            <!-- Product description (chip) -->
             <div class="mark-line">
               <span class="chip chip--yellow">{{ formData.shippingMark?.productDescription }}</span>
             </div>
 
-            <!-- Extra field (dash or text, INPUT) -->
             <div class="mark-line">
               <VTextField
                 v-if="!isReadonly"
@@ -356,7 +324,6 @@
               <span v-else>{{ formData.shippingMark?.extraNote || '-' }}</span>
             </div>
 
-            <!-- HS CODE (dropdown) -->
             <div class="mark-hs-row">
               <span class="mark-hs-row__label">HS CODE :</span>
               <VSelect
@@ -372,12 +339,10 @@
               <span v-else>{{ formData.shippingMark?.hsCode }}</span>
             </div>
 
-            <!-- Country of Origin (text) -->
             <div class="mark-info">
               COUNTRY OF ORIGIN : {{ formData.shippingMark?.countryOfOrigin || 'THAILAND' }}
             </div>
 
-            <!-- Pallet note (text) -->
             <div class="mark-info">
               {{ formData.shippingMark?.palletNote }}
             </div>
@@ -385,9 +350,6 @@
         </div>
       </div>
 
-      <!-- ================================================ -->
-      <!-- CONTAINER & SEAL NO.                               -->
-      <!-- ================================================ -->
       <div class="section">
         <div class="seal-label">
           CONTAINER & SEAL NO.:
@@ -395,34 +357,27 @@
         <div class="seal-grid">
           <div class="seal-cell">
             <span class="seal-cell__label">MARK :</span>
-            <VTextField
-              v-if="!isReadonly"
-              :model-value="formData.containerSealNo?.mark"
-              variant="outlined"
-              density="compact"
-              hide-details
-              @update:model-value="(v) => updateSeal('mark', v)"
-            />
-            <span v-else>{{ formData.containerSealNo?.mark }}</span>
-          </div>
-          <div class="seal-cell">
-            <VTextField
+            <VSelect
               v-if="!isReadonly"
               :model-value="formData.containerSealNo?.freightTerms"
+              :items="FREIGHT_TERM_OPTIONS"
               variant="outlined"
               density="compact"
               hide-details
+              placeholder="Shipping payment term"
               @update:model-value="(v) => updateSeal('freightTerms', v)"
             />
             <span v-else>{{ formData.containerSealNo?.freightTerms }}</span>
           </div>
           <div class="seal-cell">
-            <VTextField
+            <VSelect
               v-if="!isReadonly"
               :model-value="formData.containerSealNo?.blType"
+              :items="BL_TYPE_OPTIONS"
               variant="outlined"
               density="compact"
               hide-details
+              placeholder="Type of B/L"
               @update:model-value="(v) => updateSeal('blType', v)"
             />
             <span v-else>{{ formData.containerSealNo?.blType }}</span>
@@ -431,7 +386,6 @@
       </div>
     </div>
 
-    <!-- Action Bar -->
     <TabActionBar
       :tab-key="TabKey.SHIPPING_PARTICULAR"
       :is-loading="isLoading"
@@ -461,6 +415,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { TabKey } from '../../types/shipDocument'
 import { useTabForm } from '../../composables/useTabForm'
 import { usePrint } from '../../composables/usePrint'
@@ -468,16 +423,10 @@ import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
 import TabActionBar from '../shared/TabActionBar.vue'
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const CONTAINER_TYPES = ['CY', 'CFS', 'FCL', 'LCL']
 const HS_CODES = ['3906.90.20', '3906.90.90']
-
-// ---------------------------------------------------------------------------
-// Composables
-// ---------------------------------------------------------------------------
+const FREIGHT_TERM_OPTIONS = ['Freight Collect', 'Freight Collect in Japan', 'Freight Prepaid']
+const BL_TYPE_OPTIONS = ['Original B/L', 'Surrendered B/L', 'Sea Waybill', 'Truck Waybill', 'Air Waybill']
 
 const store = useShipDocumentStore()
 
@@ -494,51 +443,43 @@ const {
   onConfirm: data => tabApiMap[TabKey.SHIPPING_PARTICULAR].confirm(store.documentId, data),
 })
 
-// ── usePrint ────────────────────────────────────────────────────────────────
-const { isPrinting, print } = usePrint(
+const notes = ref([])
+
+const { print } = usePrint(
   TabKey.SHIPPING_PARTICULAR,
   () => ({
     ...formData.value,
     note: notes.value[0]?.text ?? '',
   }),
 )
- 
+
+const printTargets = [
+  { label: 'For Buyer', value: 'buyer' },
+  { label: 'For Customs', value: 'customs' },
+]
+
+const route = useRoute()
+const shippMode = computed(() => route.query.mode || 'ocean')
+
 function handlePrint(payload) {
   print(
-    payload?.target  ?? 'buyer',
+    payload?.target ?? 'buyer',
     payload?.display ?? [],
-    shippMode.value,             // ← 'ocean' | 'air' | 'truck' | 'courier'
+    shippMode.value,
   )
 }
 
- 
-import { useRoute } from 'vue-router'
- 
-const route     = useRoute()
-const shippMode = computed(() => route.query.mode || 'ocean')
- 
-
-// ---------------------------------------------------------------------------
-// Notes
-// ---------------------------------------------------------------------------
-// ── note 1 อัน ─────────────────────────────────────────────────────────────
-const notes = ref([])
- 
 function handleAddNote(text) {
   notes.value = [{ id: Date.now(), text, date: new Date().toLocaleString('en-GB') }]
 }
- 
+
 function handleEditNote({ id, text }) {
   if (notes.value[0]?.id === id) notes.value[0].text = text
 }
- 
+
 function handleDeleteNote(noteId) {
   notes.value = notes.value.filter(n => n.id !== noteId)
 }
-
-// ---------------------------------------------------------------------------
-// Nested object update helpers
-// ---------------------------------------------------------------------------
 
 function updateMark(field, value) {
   updateField('shippingMark', { ...formData.value.shippingMark, [field]: value })
@@ -547,10 +488,6 @@ function updateMark(field, value) {
 function updateSeal(field, value) {
   updateField('containerSealNo', { ...formData.value.containerSealNo, [field]: value })
 }
-
-// ---------------------------------------------------------------------------
-// Format
-// ---------------------------------------------------------------------------
 
 function fmtNum(v) {
   return v != null

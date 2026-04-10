@@ -108,9 +108,26 @@ export default function shippingParticularMapper(formData, options = {}) {
 
     // CONSIGNEE
     {
-      stack: [
-        { text: 'CONSIGNEE', bold: true, decoration: 'underline', margin: [0, 0, 0, 2] },
-        ...partyStack(consignee),
+      columns: [
+        {
+          width: '55%',
+          stack: [
+            { text: 'CONSIGNEE', bold: true, decoration: 'underline', margin: [0, 0, 0, 2] },
+            ...partyStack(consignee),
+          ],
+        },
+        {
+          width: '*',
+          table: {
+            widths: ['*'],
+            body: [[{
+              text: formData.consigneeNote || '',
+              margin: [10, 10, 10, 10],
+              border: [true, true, true, true],
+            }]],
+          },
+          layout: { hLineWidth: () => 1, vLineWidth: () => 1 },
+        },
       ],
       margin: [0, 0, 0, 10],
     },
@@ -266,16 +283,16 @@ export default function shippingParticularMapper(formData, options = {}) {
             {
               width: '*',
               text: [
-                { text: 'MARK', decoration: 'underline' },
+                { text: 'FREIGHT TERM', decoration: 'underline' },
                 { text: ' : ' },
-                { text: seal.freightTerms || 'FREIGHT PREPAID' },
+                { text: seal.freightTerms || 'Freight Prepaid' },
               ],
             },
             {
               width: 'auto',
               table: {
                 body: [[{
-                  text: seal.blType || 'SURRENDER B/L',
+                  text: seal.blType || 'Surrendered B/L',
                   margin: [8, 4, 8, 4],
                   border: [true, true, true, true],
                 }]],

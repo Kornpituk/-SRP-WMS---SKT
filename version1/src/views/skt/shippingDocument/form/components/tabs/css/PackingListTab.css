@@ -177,6 +177,20 @@
     margin-block-start: 12px;
   }
 
+  .air-ship-layout {
+    display: flex;
+    gap: 48px;
+  }
+
+  .air-ship-layout__left {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .air-ship-layout__right {
+    flex: 0 0 260px;
+  }
+
   .ship-cell {
     display: flex;
     align-items: center;
@@ -191,12 +205,63 @@
     flex: 0 0 200px;
   }
 
+  .ship-cell--date {
+    flex: 0 0 220px;
+    align-items: flex-start;
+  }
+
   .ship-label {
     flex-shrink: 0;
     color: #333;
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
+  }
+
+  .ship-datetime {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+    min-inline-size: 0;
+  }
+
+  .air-ship-flight {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .air-ship-flight__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    min-inline-size: 0;
+  }
+
+  .air-ship-subfield {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-inline-size: 340px;
+  }
+
+  .air-ship-subfield__label {
+    flex: 0 0 72px;
+    color: #333;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .air-ship-route {
+    display: flex;
+    gap: 24px;
+    margin-block-start: 16px;
+  }
+
+  .air-ship-time--spaced {
+    margin-block-start: 16px;
   }
 
   /* =================================================================
@@ -413,8 +478,19 @@
       flex-wrap: wrap;
     }
 
+    .air-ship-layout,
+    .air-ship-route {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .air-ship-layout__right {
+      flex: 1 1 100%;
+    }
+
     .ship-cell--wide,
-    .ship-cell--narrow {
+    .ship-cell--narrow,
+    .ship-cell--date {
       flex: 1 1 100%;
     }
 

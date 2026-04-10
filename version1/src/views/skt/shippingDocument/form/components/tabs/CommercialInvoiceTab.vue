@@ -106,34 +106,85 @@
 
       <!-- SECTION 3: Shipping -->
       <div class="section">
-        <div class="ship-grid">
-          <div class="ship-cell ship-cell--wide">
-            <span class="ship-label">Feeder :</span>
-            <span class="ship-value">{{ formData.feeder }}</span>
+        <template v-if="isAirMode">
+          <div class="air-ship-layout">
+            <div class="air-ship-layout__left">
+              <div class="air-ship-flight">
+                <span class="ship-label">Fight :</span>
+                <div class="air-ship-flight__body">
+                  <span class="ship-value">{{ formData.feeder }}</span>
+                  <div class="air-ship-subfield">
+                    <span class="air-ship-subfield__label">MAWB NO.</span>
+                    <span class="ship-value">{{ formData.mawbNo }}</span>
+                  </div>
+                  <div class="air-ship-subfield">
+                    <span class="air-ship-subfield__label">HAWB NO.</span>
+                    <span class="ship-value">{{ formData.hawbNo }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="air-ship-route">
+                <div class="ship-cell ship-cell--wide">
+                  <span class="ship-label">From :</span>
+                  <span class="ship-value">{{ formData.from }}</span>
+                </div>
+                <div class="ship-cell ship-cell--wide">
+                  <span class="ship-label">To :</span>
+                  <span class="ship-value">{{ formData.to }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="air-ship-layout__right">
+              <div class="air-ship-time">
+                <span class="ship-label">ETD :</span>
+                <div class="ship-datetime">
+                  <span class="ship-value">{{ formData.etd }}</span>
+                  <span class="ship-value">{{ formatTimeDisplay(formData.etdTime) }}</span>
+                </div>
+              </div>
+              <div class="air-ship-time air-ship-time--spaced">
+                <span class="ship-label">ETA:</span>
+                <div class="ship-datetime">
+                  <span class="ship-value">{{ formData.eta }}</span>
+                  <span class="ship-value">{{ formatTimeDisplay(formData.etaTime) }}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="ship-cell ship-cell--wide">
-            <span class="ship-label">Vessel :</span>
-            <span class="ship-value">{{ formData.vessel }}</span>
+        </template>
+
+        <template v-else>
+          <div class="ship-grid">
+            <div class="ship-cell ship-cell--wide">
+              <span class="ship-label">{{ primaryShipLabel }}</span>
+              <span class="ship-value">{{ formData.feeder }}</span>
+            </div>
+            <div class="ship-cell ship-cell--wide">
+              <span class="ship-label">{{ secondaryShipLabel }}</span>
+              <span class="ship-value">{{ formData.vessel }}</span>
+            </div>
+            <div class="ship-cell ship-cell--narrow">
+              <span class="ship-label">ETD :</span>
+              <span class="ship-value">{{ formData.etd }}</span>
+            </div>
           </div>
-          <div class="ship-cell ship-cell--narrow">
-            <span class="ship-label">ETD :</span>
-            <span class="ship-value">{{ formData.etd }}</span>
+          <div class="ship-grid ship-grid--spaced">
+            <div class="ship-cell ship-cell--wide">
+              <span class="ship-label">From :</span>
+              <span class="ship-value">{{ formData.from }}</span>
+            </div>
+            <div class="ship-cell ship-cell--wide">
+              <span class="ship-label">To :</span>
+              <span class="ship-value">{{ formData.to }}</span>
+            </div>
+            <div class="ship-cell ship-cell--narrow">
+              <span class="ship-label">ETA:</span>
+              <span class="ship-value">{{ formData.eta }}</span>
+            </div>
           </div>
-        </div>
-        <div class="ship-grid ship-grid--spaced">
-          <div class="ship-cell ship-cell--wide">
-            <span class="ship-label">From :</span>
-            <span class="ship-value">{{ formData.from }}</span>
-          </div>
-          <div class="ship-cell ship-cell--wide">
-            <span class="ship-label">To :</span>
-            <span class="ship-value">{{ formData.to }}</span>
-          </div>
-          <div class="ship-cell ship-cell--narrow">
-            <span class="ship-label">ETA:</span>
-            <span class="ship-value">{{ formData.eta }}</span>
-          </div>
-        </div>
+        </template>
 
         <!-- REQ-5: Shipping Mode display -->
         <div
@@ -466,6 +517,10 @@ const route = useRoute()
 
 // อ่าน ?mode=ocean จาก URL  ← แทน props.tabKey ที่ไม่มีค่า
 const shippMode = computed(() => route.query.mode || 'ocean')
+const isAirMode = computed(() => shippMode.value === 'air')
+const isCourierMode = computed(() => shippMode.value === 'courier')
+const primaryShipLabel = computed(() => (isCourierMode.value ? 'Courier :' : 'Feeder :'))
+const secondaryShipLabel = computed(() => (isCourierMode.value ? 'AWB No. :' : 'Vessel :'))
 
 
 // ---------------------------------------------------------------------------
@@ -574,8 +629,15 @@ const isConfirmed = computed(() => tabStatus.value === TabStatus.CONFIRMED)
 /** REQ-5: "{MODE} FREIGHT" display label */
 const shippingModeLabel = computed(() => {
   const mode = formData.value.shippingMode
-  
-  return mode ? `${String(mode).toUpperCase()} FREIGHT` : ''
+
+  if (!mode) return ''
+
+  const upperMode = String(mode).toUpperCase()
+
+  if (upperMode === 'AIR') return 'AIR FREIGHT'
+  if (upperMode === 'TRUCK') return 'INLAND FREIGHT'
+
+  return `${upperMode} FREIGHT`
 })
 
 /**
@@ -622,7 +684,14 @@ const autoInsurance = computed(() => {
 })
 
 /** REQ-5: Shipping mode from route query (used in ocean freight row label) */
-const modeFreight = computed(() => route.query?.mode || 'OCEAN')
+const modeFreight = computed(() => {
+  const mode = String(route.query?.mode || 'OCEAN').toUpperCase()
+
+  if (mode === 'AIR' || mode === 'COURIER') return 'AIR FREIGHT'
+  if (mode === 'TRUCK') return 'INLAND FREIGHT'
+
+  return `${mode} FREIGHT`
+})
 
 /** REQ-2: Pricing rows — insurance row hidden when EXWORK */
 const visiblePricingRows = computed(() => {
@@ -648,7 +717,7 @@ const visiblePricingRows = computed(() => {
       typeKey: '',
       hasType: false,
       defaultType: '',
-      port: `${modeFreight.value.toUpperCase()} FREIGHT`,
+      port: modeFreight.value,
       editable: true,
     },
   ]
@@ -777,6 +846,19 @@ function fmtNum(v) {
   return v != null
     ? Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : '0.00'
+}
+
+function formatTimeDisplay(value) {
+  if (!value) return ''
+
+  const [hours, minutes] = String(value).split(':')
+  if (hours == null || minutes == null) return value
+
+  const hourNum = Number(hours)
+  const suffix = hourNum >= 12 ? 'PM' : 'AM'
+  const normalized = ((hourNum + 11) % 12) + 1
+
+  return `${String(normalized).padStart(2, '0')}:${minutes} ${suffix}`
 }
 
 // ---------------------------------------------------------------------------

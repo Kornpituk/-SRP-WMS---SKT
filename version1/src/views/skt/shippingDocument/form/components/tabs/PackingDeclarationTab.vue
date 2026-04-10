@@ -144,13 +144,15 @@
           </span>
         </div>
 
-        <!-- NAME OF VESSEL — yellow chip (display) -->
-        <div class="ref-row">
-          <span class="ref-row__label">NAME OF VESSEL :</span>
-          <span class="chip chip--yellow">
-            {{ formData.vesselName }}
-          </span>
-        </div>
+        <template v-if="!isAirMode">
+          <!-- NAME OF VESSEL — yellow chip (display) -->
+          <div class="ref-row">
+            <span class="ref-row__label">NAME OF VESSEL :</span>
+            <span class="chip chip--yellow">
+              {{ formData.vesselName }}
+            </span>
+          </div>
+        </template>
 
         <!-- DATE OF SHIPMENT — yellow chip (display) -->
         <div class="ref-row">
@@ -160,21 +162,63 @@
           </span>
         </div>
 
-        <!-- B/L NO — INPUT (no yellow, outlined field) -->
-        <div class="ref-row">
-          <span class="ref-row__label">B/L NO. :</span>
-          <div class="ref-row__input">
-            <VTextField
-              v-if="!isReadonly"
-              :model-value="formData.blNo"
-              variant="outlined"
-              density="compact"
-              hide-details
-              @update:model-value="(v) => updateField('blNo', v)"
-            />
-            <span v-else>{{ formData.blNo }}</span>
+        <template v-if="isAirMode">
+          <div class="ref-row">
+            <span class="ref-row__label">MAWB NO. :</span>
+            <div class="ref-row__input">
+              <VTextField
+                v-if="!isReadonly"
+                :model-value="formData.mawbNo"
+                variant="outlined"
+                density="compact"
+                hide-details
+                class="ref-row__input--highlight"
+                @update:model-value="(v) => updateField('mawbNo', v)"
+              />
+              <span
+                v-else
+                class="chip chip--yellow"
+              >{{ formData.mawbNo }}</span>
+            </div>
           </div>
-        </div>
+
+          <div class="ref-row">
+            <span class="ref-row__label">HAWB NO. :</span>
+            <div class="ref-row__input">
+              <VTextField
+                v-if="!isReadonly"
+                :model-value="formData.hawbNo"
+                variant="outlined"
+                density="compact"
+                hide-details
+                class="ref-row__input--highlight"
+                @update:model-value="(v) => updateField('hawbNo', v)"
+              />
+              <span
+                v-else
+                class="chip chip--yellow"
+              >{{ formData.hawbNo }}</span>
+            </div>
+          </div>
+        </template>
+
+        <template v-else>
+          <!-- B/L NO — INPUT (no yellow, outlined field) -->
+          <div class="ref-row">
+            <span class="ref-row__label">B/L NO. :</span>
+            <div class="ref-row__input">
+              <VTextField
+                v-if="!isReadonly"
+                :model-value="formData.blNo"
+                variant="outlined"
+                density="compact"
+                hide-details
+                @update:model-value="(v) => updateField('blNo', v)"
+              />
+              <span v-else>{{ formData.blNo }}</span>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
 
@@ -240,6 +284,7 @@ import { useRoute } from 'vue-router'
  
 const route    = useRoute()
 const shippMode = computed(() => route.query.mode || 'ocean')
+const isAirMode = computed(() => shippMode.value === 'air')
 
 // ---------------------------------------------------------------------------
 // Print

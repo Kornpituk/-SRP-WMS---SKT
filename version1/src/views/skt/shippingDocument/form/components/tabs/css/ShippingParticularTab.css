@@ -81,7 +81,17 @@
   gap: 40px;
 }
 
+.consignee-grid {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
 .shipper-grid__left {
+  flex: 1;
+}
+
+.consignee-grid__left {
   flex: 1;
 }
 
@@ -91,6 +101,10 @@
   font-size: 14px;
   line-height: 1.7;
   color: #333;
+}
+
+.consignee-grid__right {
+  flex: 0 0 360px;
 }
 
 /* =================================================================
@@ -112,6 +126,23 @@
 
 .party-text--indent {
   padding-left: 20px;
+}
+
+.consignee-note-input .v-field__input {
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+.consignee-note-display {
+  min-height: 120px;
+  padding: 16px 20px;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  border: 1px solid #bdbdbd;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #333;
 }
 
 /* =================================================================
@@ -333,6 +364,7 @@
   flex: 1;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .seal-cell__label {
@@ -383,8 +415,18 @@
     gap: 16px;
   }
 
+  .consignee-grid {
+    flex-direction: column;
+    gap: 16px;
+  }
+
   .shipper-grid__right {
     flex: none;
+  }
+
+  .consignee-grid__right {
+    flex: none;
+    width: 100%;
   }
 
   .ship-row {
