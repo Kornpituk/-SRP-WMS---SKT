@@ -8,13 +8,35 @@ function emptyParty() {
   return { name: '', address: '', address2: '', address3: '', city: '', country: '', tel: '', taxId: '', attn: '', email: '' }
 }
 
+function emptyItem() {
+  return {
+    marksAndNos: '',
+    descriptionOfGoods: '',
+    subDescription: '',
+    isSample: false,
+    sampleDescription: '',
+    package: '',
+    packageDetail: '',
+    packageType: '',
+    quantity: 0,
+    unitType: 'DRUM',
+    palletCount: 0,
+    tareWeightDrum: 0,
+    tareWeightPallet: 0,
+    netWeight: 0,
+    grossWeight: 0,
+    unitPrice: 0,
+    amount: 0,
+  }
+}
+
 export function createDefaultPackingList() {
   return {
     date: '', invoiceNo: '', contractNo: '', poNo: '', proformaInvoiceNo: '',
     payer: emptyParty(), consignee: emptyParty(),
     payment: '', dueDate: '',
     feeder: '', vessel: '', mawbNo: '', hawbNo: '', from: '', to: '', etd: '', etdTime: '', eta: '', etaTime: '',
-    items: [],
+    items: [emptyItem()],
     packing: '', countryOfOrigin: '', makerName: '', packaging: '', lotNo: '',
   }
 }

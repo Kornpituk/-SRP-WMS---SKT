@@ -249,7 +249,7 @@
         <div class="mark-grid">
           <div class="mark-grid__left">
             <div
-              v-for="(m, i) in (formData.shippingMark?.marks || [])"
+              v-for="(m, i) in shippingMarks"
               :key="i"
               class="mark-text"
             >
@@ -260,7 +260,7 @@
           <div class="mark-grid__right">
             <div class="mark-detail-row">
               <div class="mark-detail-row__pkg">
-                <span class="chip chip--yellow">{{ formData.shippingMark?.packageDescription }}</span>
+                <span class="chip chip--yellow">{{ shippingPackageDescription }}</span>
               </div>
               <div class="mark-detail-row__header">
                 N.W.
@@ -288,10 +288,10 @@
                 <span v-else>{{ formData.shippingMark?.fclContainer }}</span>
               </div>
               <div class="mark-detail-row__val">
-                <span class="chip chip--yellow">{{ fmtNum(formData.shippingMark?.netWeight) }}</span>
+                <span class="chip chip--yellow">{{ fmtNum(shippingNetWeight) }}</span>
               </div>
               <div class="mark-detail-row__val">
-                <span class="chip chip--yellow">{{ fmtNum(formData.shippingMark?.grossWeight) }}</span>
+                <span class="chip chip--yellow">{{ fmtNum(shippingGrossWeight) }}</span>
               </div>
               <div class="mark-detail-row__val">
                 <VTextField
@@ -307,8 +307,12 @@
               </div>
             </div>
 
-            <div class="mark-line">
-              <span class="chip chip--yellow">{{ formData.shippingMark?.productDescription }}</span>
+            <div
+              v-for="(description, idx) in shippingProductDescriptions"
+              :key="idx"
+              class="mark-line"
+            >
+              <span class="chip chip--yellow">{{ description }}</span>
             </div>
 
             <div class="mark-line">
@@ -421,6 +425,13 @@ import { useTabForm } from '../../composables/useTabForm'
 import { usePrint } from '../../composables/usePrint'
 import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
+import {
+  buildFirstMarks,
+  buildPackagingSummary,
+  buildShippingProductDescriptions,
+  buildTotalGross,
+  buildTotalNet,
+} from '../../utils/packingDerived'
 import TabActionBar from '../shared/TabActionBar.vue'
 
 const CONTAINER_TYPES = ['CY', 'CFS', 'FCL', 'LCL']
@@ -460,6 +471,29 @@ const printTargets = [
 
 const route = useRoute()
 const shippMode = computed(() => route.query.mode || 'ocean')
+const packingListData = computed(() => store.tabs[TabKey.PACKING_LIST]?.data || {})
+const packingListItems = computed(() => packingListData.value.items || [])
+
+const shippingMarks = computed(() => {
+  const marks = buildFirstMarks(packingListItems.value)
+
+  return marks.length ? marks : (formData.value.shippingMark?.marks || [])
+})
+
+const shippingPackageDescription = computed(() =>
+  buildPackagingSummary(packingListItems.value) || formData.value.shippingMark?.packageDescription,
+)
+
+const shippingProductDescriptions = computed(() => {
+  const descriptions = buildShippingProductDescriptions(packingListItems.value)
+
+  return descriptions.length
+    ? descriptions
+    : [formData.value.shippingMark?.productDescription].filter(Boolean)
+})
+
+const shippingNetWeight = computed(() => buildTotalNet(packingListItems.value) || formData.value.shippingMark?.netWeight)
+const shippingGrossWeight = computed(() => buildTotalGross(packingListItems.value) || formData.value.shippingMark?.grossWeight)
 
 function handlePrint(payload) {
   print(

@@ -89,21 +89,25 @@
           </div>
         </div>
 
-        <!-- Body row -->
-        <div class="tbl-body">
+        <!-- Body rows -->
+        <div
+          v-for="(item, idx) in declarationItems"
+          :key="item.id ?? idx"
+          class="tbl-body"
+        >
           <!-- Description — plain text -->
           <div class="tbl-c tbl-c--desc">
-            {{ formData.descriptionOfGoods }}
+            {{ item.descriptionOfGoods || formData.descriptionOfGoods }}
           </div>
 
           <!-- Package — DRUM chip (display) + Dimensions (INPUT) -->
           <div class="tbl-c tbl-c--pkg">
             <span class="chip chip--yellow pkg-chip">
-              {{ formData.packageType }}
+              {{ item.unitType || formData.packageType }}
             </span>
             <VTextField
               v-if="!isReadonly"
-              :model-value="formData.packageDimensions"
+              :model-value="item.packageDimensions || formData.packageDimensions"
               variant="outlined"
               density="compact"
               hide-details
@@ -117,16 +121,16 @@
           <!-- Net Weight — yellow chip (display) -->
           <div class="tbl-c tbl-c--net text-right">
             <span class="chip chip--yellow">
-              {{ fmtNum(formData.netWeight) }} {{ formData.netWeightUnit }}
+              {{ fmtNum(item.netWeight || formData.netWeight) }} {{ formData.netWeightUnit }}
               <br>
-              (TOTAL = {{ formData.totalDrums }} DRUMS)
+              (TOTAL = {{ item.quantity || formData.totalDrums }} {{ pluralUnit(item.unitType || formData.packageType, item.quantity || formData.totalDrums) }})
             </span>
           </div>
 
           <!-- Gross Weight — yellow chip (display) -->
           <div class="tbl-c tbl-c--gross text-right">
             <span class="chip chip--yellow">
-              {{ fmtNum(formData.grossWeight) }} {{ formData.grossWeightUnit }}
+              {{ fmtNum(item.grossWeight || formData.grossWeight) }} {{ formData.grossWeightUnit }}
             </span>
           </div>
         </div>
@@ -253,12 +257,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { TabKey } from '../../types/shipDocument'
 import { useTabForm } from '../../composables/useTabForm'
 import { usePrint } from '../../composables/usePrint'
 import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
+import { getPackingItems } from '../../utils/packingDerived'
 import TabActionBar from '../shared/TabActionBar.vue'
 
 // ---------------------------------------------------------------------------
@@ -279,12 +285,27 @@ const {
   onSaveDraft: data => tabApiMap[TabKey.PACKING_DECLARATION].save(store.documentId, data),
   onConfirm: data => tabApiMap[TabKey.PACKING_DECLARATION].confirm(store.documentId, data),
 })
-
-import { useRoute } from 'vue-router'
  
 const route    = useRoute()
 const shippMode = computed(() => route.query.mode || 'ocean')
 const isAirMode = computed(() => shippMode.value === 'air')
+const packingListData = computed(() => store.tabs[TabKey.PACKING_LIST]?.data || {})
+
+const declarationItems = computed(() => {
+  const items = getPackingItems(packingListData.value).filter(item => !item.isSample)
+
+  return items.length
+    ? items
+    : [{
+      descriptionOfGoods: formData.value.descriptionOfGoods,
+      packageType: formData.value.packageType,
+      packageDimensions: formData.value.packageDimensions,
+      quantity: formData.value.totalDrums,
+      unitType: formData.value.packageType,
+      netWeight: formData.value.netWeight,
+      grossWeight: formData.value.grossWeight,
+    }]
+})
 
 // ---------------------------------------------------------------------------
 // Print
@@ -349,6 +370,14 @@ function fmtNum(v) {
   return v != null
     ? Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : '0.00'
+}
+
+function pluralUnit(unit, qty) {
+  const normalized = String(unit || '').trim().toUpperCase()
+  if (!normalized) return ''
+  if (Number(qty) === 1 || normalized.endsWith('S')) return normalized
+
+  return `${normalized}S`
 }
 </script>
 

@@ -556,6 +556,25 @@
                   hide-details
                   @update:model-value="(v) => handleItemUpdate(idx, 'subDescription', v)"
                 />
+                <VCheckbox
+                  :model-value="!!item.isSample"
+                  label="SAMPLE"
+                  density="compact"
+                  hide-details
+                  class="sample-checkbox"
+                  @update:model-value="(v) => handleItemUpdate(idx, 'isSample', v)"
+                />
+                <VTextarea
+                  v-if="item.isSample"
+                  :model-value="item.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  rows="4"
+                  auto-grow
+                  class="sample-description"
+                  @update:model-value="(v) => handleItemUpdate(idx, 'sampleDescription', v)"
+                />
               </template>
               <template v-else>
                 <div>{{ item.descriptionOfGoods }}</div>
@@ -564,6 +583,17 @@
                   class="text-muted"
                 >
                   ({{ item.subDescription }})
+                </div>
+                <div
+                  v-if="item.isSample"
+                  class="sample-text"
+                >
+                  <div
+                    v-for="(line, li) in splitLines(item.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION)"
+                    :key="li"
+                  >
+                    {{ line }}
+                  </div>
                 </div>
               </template>
             </div>
@@ -590,7 +620,15 @@
                 -->
                 <div class="pkg-tare-grid">
                   <!-- ── Row 2 ── -->
-                  <span class="ptg-qty">{{ item.quantity || 0 }}</span>
+                  <VTextField
+                    :model-value="item.quantity"
+                    type="number"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    class="ptg-qty"
+                    @update:model-value="(v) => handleItemUpdate(idx, 'quantity', Number(v))"
+                  />
                   <span class="ptg-pallet-label">{{ item.unitType }}</span>
 
 
@@ -704,6 +742,26 @@
               </div>
               <span v-else>{{ fmtNum(item.grossWeight) }}</span>
             </div>
+            <div
+              v-if="!isReadonly"
+              class="tbl-c tbl-c--actions"
+            >
+              <VBtn
+                icon="mdi-plus"
+                size="x-small"
+                variant="text"
+                color="success"
+                @click="addItemAfter(idx)"
+              />
+              <VBtn
+                icon="mdi-delete-outline"
+                size="x-small"
+                variant="text"
+                color="error"
+                :disabled="formData.items.length <= 1"
+                @click="removeItem(idx)"
+              />
+            </div>
           </div>
 
           <!-- Totals -->
@@ -719,6 +777,10 @@
             <div class="tbl-c tbl-c--wt tbl-c--bold text-right">
               {{ fmtNum(totalGross) }}
             </div>
+            <div
+              v-if="!isReadonly"
+              class="tbl-c tbl-c--actions"
+            />
           </div>
 
           <div
@@ -760,7 +822,7 @@
                 hide-details
                 class=""
                 style="max-width: 500px;"
-                @update:model-value="(v) => handleItemUpdate('lotNo', v)"
+                @update:model-value="(v) => updateField('lotNo', v)"
               />
             </span>
             <span
@@ -775,7 +837,7 @@
                 hide-details
                 style="max-width: 500px;"
                 class=""
-                @update:model-value="(v) => handleItemUpdate('hsCode', v)"
+                @update:model-value="(v) => updateField('hsCode', v)"
               />
             </span>
             <span
@@ -823,6 +885,14 @@ import { useTabForm } from '../../composables/useTabForm'
 import { usePrint } from '../../composables/usePrint'
 import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
+import {
+  DEFAULT_SAMPLE_DESCRIPTION,
+  buildItemPackageSummary,
+  buildPackingNames,
+  buildPackagingSummary,
+  buildTotalGross,
+  buildTotalNet,
+} from '../../utils/packingDerived'
 import TabActionBar from '../shared/TabActionBar.vue'
 import { useRoute } from 'vue-router'
 
@@ -839,8 +909,8 @@ const secondaryShipLabel = computed(() => (isCourierMode.value ? 'AWB No. :' : '
 
 const PAYMENT_OPTIONS = ['T/T in advance', 'L/C', 'D/P', 'D/A']
 const PORT_OPTIONS    = ['LAEM CHABANG, THAILAND', 'HCM CITY, VIETNAM', 'HAIPHONG, VIETNAM', 'BANGKOK, THAILAND']
-const PACKAGE_TYPES   = ['250KG PLASTIC DRUM', '200KG PLASTIC DRUM', '1000KG IBC TANK', '25KG BAG']
-const UNIT_TYPES      = ['DRUM', 'CARTON', 'BAG']
+const PACKAGE_TYPES   = ['250KG PLASTIC DRUM', '200KG PLASTIC DRUM', '1000KG IBC TANK', '25KG BAG', 'BOTTLE']
+const UNIT_TYPES      = ['DRUM', 'CARTON', 'BAG', 'BOTTLE']
 
 const FOOTER_FIELDS = [
   { key: 'packing',         label: 'PACKING :'           },
@@ -858,6 +928,7 @@ const TARE_WEIGHT_BY_PACKAGE = {
   '200KG PLASTIC DRUM': 1.80,
   '1000KG IBC TANK': 5.00,
   '25KG BAG': 0.50,
+  BOTTLE: 0.10,
 }
 
 // ─── #6 Master: Tare Weight options for Pallets ──────────────────────────────
@@ -1039,14 +1110,7 @@ function calcGrossWeight(item) {
 // ─── #7: PACKAGING label builder ─────────────────────────────────────────────
 // e.g. "160 DRUMS (40 PALLETS)" or "160 DRUMS"
 function buildPackagingLabel(item) {
-  const qty     = item.quantity    || 0
-  const pallets = item.palletCount || 0
-  const unit    = item.unitType    || item.packageType || ''
-  if (!qty) return ''
-  
-  return pallets > 0
-    ? `${qty} ${unit} (${pallets} PALLETS)`
-    : `${qty} ${unit}`
+  return buildItemPackageSummary(item)
 }
 
 // ─── #8 Default MARKS & NOS from consignee/PO ────────────────────────────────
@@ -1059,51 +1123,101 @@ function buildDefaultMarks() {
   return parts.join('\n')
 }
 
+function applyPackageDefaults(item, packageType) {
+  item.tareWeightDrum = TARE_WEIGHT_BY_PACKAGE[packageType] ?? 0
+
+  if (!item.unitType || packageType === 'BOTTLE') {
+    item.unitType = packageType === 'BOTTLE' ? 'BOTTLE' : 'DRUM'
+  }
+}
+
+function applyItemSideEffects(item, field, value) {
+  if (field === 'packageType') applyPackageDefaults(item, value)
+  if (field === 'isSample' && value && !item.sampleDescription) item.sampleDescription = DEFAULT_SAMPLE_DESCRIPTION
+  if (field === 'palletCount' && Number(value) === 0) item.tareWeightPallet = 0
+}
+
+function shouldRecalculateGross(field) {
+  return ['netWeight', 'quantity', 'tareWeightDrum', 'palletCount', 'tareWeightPallet', 'packageType'].includes(field)
+}
+
+function shouldSyncSummaries(field) {
+  return ['quantity', 'unitType', 'palletCount', 'packageType'].includes(field)
+}
+
+function applyMarksState(item, field, value) {
+  if (field !== 'marksAndNos') return
+  if (!value && !item.marksNosManuallySet) item.marksAndNos = buildDefaultMarks()
+
+  item.marksNosManuallySet = true
+}
+
 // ─── Item Update handler (central) ───────────────────────────────────────────
 function handleItemUpdate(index, field, value) {
   const items = [...(formData.value.items || [])]
 
   items[index] = { ...items[index], [field]: value }
-
-  // #5: Auto-fill Tare Weight from master when packageType changes
-  if (field === 'packageType') {
-    items[index].tareWeightDrum = TARE_WEIGHT_BY_PACKAGE[value] ?? 0
-  }
-
-  // #6: Reset tare pallet when palletCount goes to 0
-  if (field === 'palletCount' && Number(value) === 0) {
-    items[index].tareWeightPallet = 0
-  }
+  applyItemSideEffects(items[index], field, value)
 
   // #4: Recalculate Gross Weight
-  const recalcFields = ['netWeight', 'quantity', 'tareWeightDrum', 'palletCount', 'tareWeightPallet']
-  if (recalcFields.includes(field) || field === 'packageType') {
+  if (shouldRecalculateGross(field)) {
     items[index].grossWeight = calcGrossWeight(items[index])
   }
 
-  // #7: Auto-update PACKAGING footer field
-  // We update the last item's packaging as summary (or you can combine all items)
-  if (['quantity', 'unitType', 'palletCount', 'packageType'].includes(field)) {
-    // Update PACKAGING field based on all items combined
-    const packagingLines = items.map(buildPackagingLabel).filter(Boolean).join(', ')
-
-    updateField('packaging', packagingLines)
-  }
+  // #7: Auto-update total packing summaries from all items.
+  if (shouldSyncSummaries(field)) syncPackingSummaries(items)
 
   // #8: Set default MARKS & NOS on first edit if blank
-  if (field === 'marksAndNos' && !value && !items[index].marksNosManuallySet) {
-    items[index].marksAndNos = buildDefaultMarks()
-  }
-  if (field === 'marksAndNos') {
-    items[index].marksNosManuallySet = true
-  }
+  applyMarksState(items[index], field, value)
 
   updateField('items', items)
 }
 
 // ─── Totals ───────────────────────────────────────────────────────────────────
-const totalNet   = computed(() => (formData.value.items || []).reduce((s, i) => s + (i.netWeight   || 0), 0))
-const totalGross = computed(() => (formData.value.items || []).reduce((s, i) => s + (i.grossWeight || 0), 0))
+const totalNet   = computed(() => buildTotalNet(formData.value.items || []))
+const totalGross = computed(() => buildTotalGross(formData.value.items || []))
+
+function createBlankItem() {
+  return {
+    id: `item-${Date.now()}`,
+    marksAndNos: buildDefaultMarks(),
+    descriptionOfGoods: '',
+    subDescription: '',
+    isSample: false,
+    sampleDescription: '',
+    packageType: '250KG PLASTIC DRUM',
+    quantity: 0,
+    unitType: 'DRUM',
+    palletCount: 0,
+    tareWeightDrum: 2,
+    tareWeightPallet: 0,
+    netWeight: 0,
+    grossWeight: 0,
+    unitPrice: 0,
+  }
+}
+
+function syncPackingSummaries(items) {
+  updateField('packing', buildPackingNames(items))
+  updateField('packaging', buildPackagingSummary(items))
+}
+
+function addItemAfter(index) {
+  const items = [...(formData.value.items || [])]
+
+  items.splice(index + 1, 0, createBlankItem())
+  updateField('items', items)
+  syncPackingSummaries(items)
+}
+
+function removeItem(index) {
+  const items = [...(formData.value.items || [])]
+  if (items.length <= 1) return
+
+  items.splice(index, 1)
+  updateField('items', items)
+  syncPackingSummaries(items)
+}
 
 // ─── #15 #16 Notes ───────────────────────────────────────────────────────────
 // Notes are always editable even after Confirm (stored separately from formData)

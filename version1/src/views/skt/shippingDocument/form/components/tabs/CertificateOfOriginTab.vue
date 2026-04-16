@@ -43,7 +43,7 @@
         <div class="cert-sentence">
           <span>THIS IS TO CERTIFY THAT TOTAL</span>
           <span class="chip chip--yellow">
-            {{ formData.totalWeight }}
+            {{ certificateGoodsText || formData.totalWeight }}
           </span>
           <span>IN</span>
           <span class="cert-sentence__input">
@@ -62,7 +62,10 @@
         </div>
 
         <!-- OF [product] -->
-        <p class="cert-line">
+        <p
+          v-if="!certificateGoodsText"
+          class="cert-line"
+        >
           OF {{ formData.productName }}
         </p>
 
@@ -116,12 +119,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { TabKey } from '../../types/shipDocument'
 import { useTabForm } from '../../composables/useTabForm'
 import { usePrint } from '../../composables/usePrint'
 import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
+import { buildCertificateGoodsText } from '../../utils/packingDerived'
 import TabActionBar from '../shared/TabActionBar.vue'
 
 const store = useShipDocumentStore()
@@ -141,12 +145,8 @@ const {
 
 const { isPrinting, print } = usePrint(TabKey.CERTIFICATE_OF_ORIGIN, () => formData.value)
 
-const printTarget = ref('productDescription')
-
-const printTargets = [
-  { label: 'Product Description', value: 'productDescription' },
-  { label: 'Note', value: 'note' },
-]
+const packingListData = computed(() => store.tabs[TabKey.PACKING_LIST]?.data || {})
+const certificateGoodsText = computed(() => buildCertificateGoodsText(packingListData.value.items || []))
 
 function handlePrint(selectedTarget) {
   print(selectedTarget)
@@ -168,6 +168,11 @@ function handleAddNote(text) {
 
 function handleDeleteNote(noteId) {
   notes.value = notes.value.filter(n => n.id !== noteId)
+}
+
+function handleEditNote({ id, text }) {
+  const note = notes.value.find(n => n.id === id)
+  if (note) note.text = text
 }
 </script>
 

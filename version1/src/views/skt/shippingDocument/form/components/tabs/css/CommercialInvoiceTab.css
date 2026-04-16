@@ -318,6 +318,13 @@
   flex: 0 0 16%;
 }
 
+.sample-desc {
+  margin-top: 8px;
+  color: #333;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .tbl-c--amt {
   flex: 0 0 16%;
 }

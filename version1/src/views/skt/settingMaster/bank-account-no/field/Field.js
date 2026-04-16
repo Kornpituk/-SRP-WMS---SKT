@@ -8,7 +8,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'bankName',
+    key: 'bankAccountName',
     label: 'Bank Name',
     type: 'text',
     required: true,

@@ -102,25 +102,25 @@
               <td :style="getColumnStyle(field)">
                 <template v-if="editingInlineId === item.id">
                   <VTextField
-                    v-if="field.type !== 'select'"
-                    :model-value="inlineForm[field.key]"
+                    v-if="getEditorType(field) !== 'select'"
+                    :model-value="inlineForm[getEditorKey(field)]"
                     variant="outlined"
                     density="compact"
                     hide-details
                     class="inline-input"
-                    @update:model-value="emit('inline-update', field.key, $event)"
+                    @update:model-value="emit('inline-update', getEditorKey(field), $event)"
                   />
                   <VSelect
                     v-else
-                    :model-value="inlineForm[field.key]"
-                    :items="field.options ?? []"
+                    :model-value="inlineForm[getEditorKey(field)]"
+                    :items="field.editOptions ?? field.options ?? []"
                     item-title="label"
                     item-value="value"
                     variant="outlined"
                     density="compact"
                     hide-details
                     class="inline-input"
-                    @update:model-value="emit('inline-update', field.key, $event)"
+                    @update:model-value="emit('inline-update', getEditorKey(field), $event)"
                   />
                 </template>
 
@@ -436,6 +436,14 @@ function getColumnStyle(field) {
     minWidth: value,
     maxWidth: value,
   }
+}
+
+function getEditorKey(field) {
+  return field.editKey || field.key
+}
+
+function getEditorType(field) {
+  return field.editType || field.type
 }
 
 function measureTextWidth(text, font = '600 12px "Segoe UI", sans-serif') {

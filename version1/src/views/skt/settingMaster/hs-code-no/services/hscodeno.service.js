@@ -83,7 +83,7 @@ export const hsCodeNoService = createCrudService(
     mockData,
     useMock: false,
     map: {
-      id: 'hsCodeNo',
+      id: 'hsCodeId',
       code: 'itemCode',
       name: 'itemName',
     },

@@ -24,7 +24,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'country',
+    key: 'countryName',
     label: 'Country',
     type: 'text',
     required: true,

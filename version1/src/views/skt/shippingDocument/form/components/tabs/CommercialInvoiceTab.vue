@@ -245,7 +245,7 @@
         </div>
 
         <div
-          v-for="(item, idx) in formData.items"
+          v-for="(item, idx) in invoiceItems"
           :key="item.id ?? idx"
           class="tbl-body"
         >
@@ -261,6 +261,17 @@
             <div>{{ item.descriptionOfGoods }}</div>
             <div class="text-muted">
               ({{ item.subDescription }})
+            </div>
+            <div
+              v-if="item.isSample"
+              class="sample-desc"
+            >
+              <div
+                v-for="(line, si) in splitLines(item.sampleDescription)"
+                :key="si"
+              >
+                {{ line }}
+              </div>
             </div>
           </div>
           <div class="tbl-c tbl-c--qty text-right">
@@ -280,12 +291,12 @@
             <span v-else>{{ fmtNum(item.unitPrice) }}</span>
           </div>
           <div class="tbl-c tbl-c--amt text-right">
-            {{ fmtNum(item.amount) }}
+            {{ item.amountText || fmtNum(item.amount) }}
           </div>
         </div>
 
         <div
-          v-if="!formData.items?.length"
+          v-if="!invoiceItems.length"
           class="tbl-empty"
         >
           No items
@@ -299,10 +310,10 @@
           <div class="tbl-c tbl-c--qty text-right">
             <div>{{ fmtNum(totalQty) }}</div>
             <div
-              v-if="formData.totalDescription"
+              v-if="derivedPackaging"
               :class="{ 'highlight-val': !isConfirmed }"
             >
-              ({{ formData.totalDescription }})
+              ({{ derivedPackaging }})
             </div>
           </div>
           <div class="tbl-c tbl-c--price" />
@@ -393,7 +404,7 @@
           class="info-row"
         >
           <!-- #17: Only display if value exists -->
-          <template v-if="formData[f.key]">
+          <template v-if="footerValue(f.key)">
             <span
               v-if="f.key === 'lotNo'"
               class="info-row__label"
@@ -413,7 +424,7 @@
                 hide-details
                 class=""
                 style="max-width: 500px;"
-                @update:model-value="(v) => handleItemUpdate('lotNo', v)"
+                @update:model-value="(v) => updateField('lotNo', v)"
               />
             </span>
             <span
@@ -428,13 +439,13 @@
                 hide-details
                 style="max-width: 500px;"
                 class=""
-                @update:model-value="(v) => handleItemUpdate('hsCode', v)"
+                @update:model-value="(v) => updateField('hsCode', v)"
               />
             </span>
             <span
               v-else
               class="info-row__value"
-            >{{ formData[f.key] }}</span>
+            >{{ footerValue(f.key) }}</span>
           </template>
         </div>
       </div>
@@ -511,6 +522,12 @@ import { useTabForm } from '../../composables/useTabForm'
 import { usePrint } from '../../composables/usePrint'
 import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
+import {
+  buildCommercialInvoiceRows,
+  buildCommercialTotalAmount,
+  buildPackagingSummary,
+  buildPackingNames,
+} from '../../utils/packingDerived'
 import TabActionBar from '../shared/TabActionBar.vue'
 
 const route = useRoute()
@@ -626,6 +643,26 @@ const activeCurrency = computed(() => formData.value.amountCurrency || DEFAULT_C
 /** REQ-1: confirmed state controls yellow highlight visibility */
 const isConfirmed = computed(() => tabStatus.value === TabStatus.CONFIRMED)
 
+const packingListData = computed(() => store.tabs[TabKey.PACKING_LIST]?.data || {})
+const packingListItems = computed(() => packingListData.value.items || [])
+
+const invoiceItems = computed(() => {
+  const formItems = formData.value.items || []
+
+  const sourceItems = packingListItems.value.length
+    ? packingListItems.value.map((item, idx) => ({
+      ...item,
+      unitPrice: formItems[idx]?.unitPrice ?? item.unitPrice,
+      amount: formItems[idx]?.amount ?? item.amount,
+    }))
+    : formItems
+
+  return buildCommercialInvoiceRows(sourceItems)
+})
+
+const derivedPacking = computed(() => buildPackingNames(packingListItems.value) || formData.value.packing)
+const derivedPackaging = computed(() => buildPackagingSummary(packingListItems.value) || formData.value.totalDescription || formData.value.packaging)
+
 /** REQ-5: "{MODE} FREIGHT" display label */
 const shippingModeLabel = computed(() => {
   const mode = formData.value.shippingMode
@@ -666,12 +703,12 @@ const filteredAccountOptions = computed(() => {
 
 /** REQ-2: Total quantity (read-only, from PL) */
 const totalQty = computed(() =>
-  (formData.value.items || []).reduce((s, i) => s + (i.quantity || 0), 0),
+  invoiceItems.value.reduce((s, i) => s + (i.quantity || 0), 0),
 )
 
 /** REQ-2: Total amount */
 const totalAmount = computed(() =>
-  (formData.value.items || []).reduce((s, i) => s + (i.amount || 0), 0),
+  buildCommercialTotalAmount(invoiceItems.value),
 )
 
 /** REQ-2: Auto-calculated insurance. null when EXWORK. */
@@ -804,10 +841,12 @@ function handleCurrencyChange(currency) {
 /** REQ-2: unitPrice change → recalculate amount = qty × unitPrice */
 function handleItemUpdate(index, unitPrice) {
   const items = [...(formData.value.items || [])]
-  const item  = { ...items[index] }
+  const item  = { ...(items[index] || {}) }
+  const quantity = invoiceItems.value[index]?.quantity || item.quantity || 0
 
   item.unitPrice = unitPrice
-  item.amount    = (item.quantity || 0) * unitPrice
+  item.quantity = quantity
+  item.amount    = quantity * unitPrice
 
   items[index] = item
   updateField('items', items)
@@ -832,6 +871,13 @@ function updateBanking(field, value) {
     ...formData.value.bankingDetail,
     [field]: value,
   })
+}
+
+function footerValue(key) {
+  if (key === 'packing') return derivedPacking.value
+  if (key === 'packaging') return derivedPackaging.value
+
+  return formData.value[key]
 }
 
 // ---------------------------------------------------------------------------

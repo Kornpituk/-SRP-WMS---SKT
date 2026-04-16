@@ -327,7 +327,14 @@
   }
 
   .tbl-c--wt {
-    flex: 0 0 17%;
+    flex: 0 0 15%;
+  }
+
+  .tbl-c--actions {
+    display: flex;
+    flex: 0 0 4%;
+    justify-content: center;
+    gap: 4px;
   }
 
   .tbl-c--bold {
@@ -336,6 +343,22 @@
 
   .tbl-field--spaced {
     margin-block-end: 8px;
+  }
+
+  .sample-checkbox {
+    margin-block-start: 6px;
+  }
+
+  .sample-description {
+    margin-block-start: 6px;
+  }
+
+  .sample-text {
+    margin-block-start: 6px;
+    color: #555;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-line;
   }
 
   /* =================================================================
@@ -362,6 +385,16 @@
     min-inline-size: 50px;
     padding-block: 6px;
     padding-inline: 12px;
+  }
+
+  .pkg-row__qty :deep(.v-field) {
+    min-block-size: 32px;
+  }
+
+  .pkg-row__qty :deep(input) {
+    padding-block: 2px;
+    min-block-size: 32px;
+    text-align: center;
   }
 
   .pkg-row__unit {

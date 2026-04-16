@@ -1,30 +1,43 @@
 import { createCrudService } from '@/views/skt/settingMaster/services/serviceUtils'
 
 let mockData = [
-  { id: 1, packageName: "250 KGS PLASTIC DRUM", package: "Drum", tareWeight: "2.00 KGS" },
-  { id: 2, packageName: "PLASTIC Pallet", package: "Pallet", tareWeight: "5.00 KGS" },
-  { id: 3, packageName: "Cardboard Box", package: "Box", tareWeight: "0.50 KGS" },
-  { id: 4, packageName: "Wooden Pallet", package: "Pallet", tareWeight: "15.00 KGS" },
-  { id: 5, packageName: "Steel Drum 200 L", package: "Drum", tareWeight: "20.00 KGS" },
-  { id: 6, packageName: "IBC Tank 1000L", package: "Tank", tareWeight: "60.00 KGS" },
-  { id: 7, packageName: "Plastic Bag 25KG", package: "Bag", tareWeight: "0.10 KGS" },
-  { id: 8, packageName: "Wooden Crate", package: "Crate", tareWeight: "25.00 KGS" },
-  { id: 9, packageName: "Cardboard Pallet", package: "Pallet", tareWeight: "3.00 KGS" },
-  { id: 10, packageName: "Jerry Can 20L", package: "Jerrycan", tareWeight: "1.50 KGS" },
+  { id: 1, packageName: '250 KGS PLASTIC DRUM', packageType: 'Drum', tareWeight: 2 },
+  { id: 2, packageName: 'PLASTIC Pallet', packageType: 'Pallet', tareWeight: 5 },
+  { id: 3, packageName: 'Cardboard Box', packageType: 'Box', tareWeight: 0.5 },
+  { id: 4, packageName: 'Wooden Pallet', packageType: 'Pallet', tareWeight: 15 },
+  { id: 5, packageName: 'Steel Drum 200 L', packageType: 'Drum', tareWeight: 20 },
+  { id: 6, packageName: 'IBC Tank 1000L', packageType: 'Tank', tareWeight: 60 },
+  { id: 7, packageName: 'Plastic Bag 25KG', packageType: 'Bag', tareWeight: 0.1 },
+  { id: 8, packageName: 'Wooden Crate', packageType: 'Crate', tareWeight: 25 },
+  { id: 9, packageName: 'Cardboard Pallet', packageType: 'Pallet', tareWeight: 3 },
+  { id: 10, packageName: 'Jerry Can 20L', packageType: 'Jerrycan', tareWeight: 1.5 },
 ]
 
-// ← เปลี่ยน false = ใช้ API จริง
-export const packageService = createCrudService(
-  {
-    resourceName: 'package',
-    idField: 'packageId',
-    mockData,
-    useMock: false,
-    map: {
-      id: 'packageId',
-      packageName: 'packageName',
-      package: 'package',
-      tareWeight: 'tareWeight',
-    },
+const normalizeTareWeight = value => {
+  if (value === '' || value === null || value === undefined) return null
+
+  const parsed = Number.parseFloat(value)
+
+  return Number.isFinite(parsed) ? parsed : value
+}
+
+const basePackageService = createCrudService({
+  resourceName: 'package',
+  idField: 'packageId',
+  mockData,
+  useMock: false,
+  map: {
+    id: 'packageId',
+    packageName: 'packageName',
+    packageType: 'packageType',
+    tareWeight: 'tareWeight',
   },
-)
+})
+
+export const packageService = {
+  ...basePackageService,
+  save: payload => basePackageService.save({
+    ...payload,
+    tareWeight: normalizeTareWeight(payload.tareWeight),
+  }),
+}

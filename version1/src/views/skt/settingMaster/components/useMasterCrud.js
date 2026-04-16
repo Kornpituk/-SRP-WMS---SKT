@@ -283,6 +283,7 @@ export function useMasterCrud (props, emit) {
   // ─────────────────────────────────────────────
 
   function openCreateDialog () {
+    Object.keys(createForm).forEach(key => { delete createForm[key] })
     Object.assign(createForm, buildEmptyForm())
     showCreateDialog.value = true
   }
@@ -297,7 +298,15 @@ export function useMasterCrud (props, emit) {
 
     saving.value = true
     try {
-      await props.service.save({ ...createForm })
+      const payload = props.fields
+        .filter(f => !f.hideInForm)
+        .reduce((acc, field) => {
+          acc[field.key] = createForm[field.key]
+
+          return acc
+        }, {})
+
+      await props.service.save(payload)
       showNotification(`${props.title} created successfully`)
       closeCreateDialog()
       await loadData()

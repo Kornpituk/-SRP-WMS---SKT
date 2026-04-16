@@ -1,5 +1,12 @@
 export const fields = [
   {
+    key: 'termOfPaymentId',
+    type: 'text',
+    hideInTable: true,
+    hideInForm: true,
+    searchable: false,
+  },
+  {
     key: 'abb',
     label: 'ABB',
     type: 'text',
@@ -16,26 +23,31 @@ export const fields = [
     searchable: true,
   },
   {
-    // ตาราง → แสดง label เช่น "B/L Date", "INVOICE_DATE"
     key: 'startDateLabel',
     label: 'Start Date',
     type: 'text',
     width: '150px',
     searchable: false,
-    hideInForm: true,     // ← ไม่แสดงใน Create/Edit form
+    hideInForm: true,
+    editKey: 'startDateType',
+    editType: 'select',
+    editOptions: [
+      { label: 'B/L Date', value: 'BL_DATE' },
+      { label: 'End Month', value: 'END_MONTH' },
+      { label: 'No Due Date', value: 'NO_DUE_DATE' },
+    ],
   },
   {
-    // form → ส่ง startDateType เช่น "BL_DATE", "INVOICE_DATE"
     key: 'startDateType',
     label: 'Start Date',
     type: 'select',
     required: true,
     searchable: false,
-    hideInTable: true,    // ← ไม่แสดงในตาราง
+    hideInTable: true,
     options: [
-      { label: 'Invoice Date',  value: 'INVOICE_DATE' },
-      { label: 'B/L Date',      value: 'BL_DATE' },
-      { label: 'End of Month',  value: 'END_MONTH' },
+      { label: 'B/L Date', value: 'BL_DATE' },
+      { label: 'End Month', value: 'END_MONTH' },
+      { label: 'No Due Date', value: 'NO_DUE_DATE' },
     ],
   },
   {

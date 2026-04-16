@@ -1,16 +1,3 @@
-/* stylelint-disable liberty/use-logical-spec */
-/* stylelint-disable order/properties-order */
-<!--
-  MasterCreateDialog.vue
-  ─────────────────────────────────────────────────────────────────
-  Dialog สำหรับ Create record
-  • width 500px
-  • Form auto-generate จาก fields prop
-  • รองรับ text / number / textarea / select
-  • ปุ่ม SAVE ด้านล่างขวา
-  • expose validate() ออกให้ parent เรียกได้
-  ─────────────────────────────────────────────────────────────────
--->
 <template>
   <VDialog
     :model-value="modelValue"
@@ -19,7 +6,6 @@
     @update:model-value="emit('update:modelValue', $event)"
   >
     <VCard class="dialog-card">
-      <!-- ─── Header ──────────────────────────── -->
       <VCardTitle class="dialog-title">
         {{ title }}
         <VBtn
@@ -28,7 +14,6 @@
           size="small"
           class="dialog-close"
           @click="emit('close')"
-          color="grey-"
         >
           <VIcon>mdi-close</VIcon>
         </VBtn>
@@ -36,14 +21,13 @@
 
       <VDivider />
 
-      <!-- ─── Dynamic Form ─────────────────────── -->
       <VCardText class="dialog-body">
         <VForm
           ref="formRef"
           @submit.prevent="emit('save')"
         >
           <div
-            v-for="field in fields"
+            v-for="field in visibleFields"
             :key="field.key"
             class="form-group"
           >
@@ -52,10 +36,11 @@
               <span
                 v-if="field.required"
                 class="required-star"
-              >*</span>
+              >
+                *
+              </span>
             </label>
 
-            <!-- Text / Number -->
             <VTextField
               v-if="field.type === 'text' || field.type === 'number'"
               :model-value="formData[field.key]"
@@ -68,7 +53,6 @@
               @update:model-value="onFieldUpdate(field.key, $event)"
             />
 
-            <!-- Textarea -->
             <VTextarea
               v-else-if="field.type === 'textarea'"
               :model-value="formData[field.key]"
@@ -81,7 +65,6 @@
               @update:model-value="onFieldUpdate(field.key, $event)"
             />
 
-            <!-- Select -->
             <VSelect
               v-else-if="field.type === 'select'"
               :model-value="formData[field.key]"
@@ -99,7 +82,6 @@
         </VForm>
       </VCardText>
 
-      <!-- ─── Footer ──────────────────────────── -->
       <VCardActions class="dialog-footer">
         <VSpacer />
         <VBtn
@@ -117,32 +99,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-// ─── Props ────────────────────────────────────
-defineProps({
-  /** v-model: เปิด/ปิด dialog */
+const props = defineProps({
   modelValue: {
     type: Boolean,
     required: true,
   },
-
-  /** ชื่อ entity เช่น "Forwarder" */
   title: {
     type: String,
     required: true,
   },
-
-  /** FieldConfig[] ทุก field (รวม hideInTable) */
   fields: {
     type: Array,
     required: true,
   },
-
-  /**
-   * Object ค่าใน form  { [fieldKey]: value }
-   * ส่งมาจาก parent (reactive object จาก useMasterCrud)
-   */
   formData: {
     type: Object,
     required: true,
@@ -153,38 +124,26 @@ defineProps({
   },
 })
 
-// ─── Emits ────────────────────────────────────
 const emit = defineEmits([
-  'update:modelValue',   // v-model open/close
-  'close',               // กดปุ่ม ✕
-  'save',                // กดปุ่ม SAVE (หลังผ่าน validate)
-  'field-update',        // (key, value) อัปเดต formData ใน parent
+  'update:modelValue',
+  'close',
+  'save',
+  'field-update',
 ])
 
-// ─── Local refs ───────────────────────────────
 const formRef = ref(null)
-
-// ─── Rules ────────────────────────────────────
+const visibleFields = computed(() => props.fields.filter(field => !field.hideInForm))
 const requiredRule = v => !!v || 'This field is required'
 
-// ─── Methods ──────────────────────────────────
-
-/** อัปเดต field เดี่ยว */
-function onFieldUpdate (key, val) {
-  // eslint-disable-next-line vue/custom-event-name-casing
+function onFieldUpdate(key, val) {
   emit('field-update', key, val)
 }
 
-/** Validate แล้ว emit save */
-async function handleSave () {
+async function handleSave() {
   const { valid } = await formRef.value?.validate() ?? { valid: true }
   if (valid) emit('save')
 }
 
-/**
- * expose validate ออกให้ parent เรียกได้โดยตรงถ้าต้องการ
- * เช่น  createDialogRef.value.validate()
- */
 defineExpose({
   validate: () => formRef.value?.validate(),
   reset: () => formRef.value?.reset(),
@@ -214,7 +173,6 @@ defineExpose({
   max-block-size: 60vh;
   padding-block: 20px !important;
   padding-inline: 24px !important;
-  /* stylelint-disable-next-line order/properties-order */
   overflow-y: auto;
 }
 
@@ -226,7 +184,6 @@ defineExpose({
   display: block;
   font-size: 12.5px;
   font-weight: 500;
-  /* stylelint-disable-next-line order/properties-order */
   color: #424242;
   margin-block-end: 4px;
 }
@@ -239,16 +196,13 @@ defineExpose({
 .dialog-footer {
   padding-block: 12px 16px !important;
   padding-inline: 20px !important;
-  /* stylelint-disable-next-line order/properties-order */
   border-block-start: 1px solid #e0e0e0;
 }
 
 .save-btn {
   min-inline-size: 90px !important;
-  /* stylelint-disable-next-line order/properties-order */
   block-size: 38px !important;
   font-weight: 700 !important;
-  /* stylelint-disable-next-line order/properties-order */
   border-radius: 8px !important;
 }
 </style>

@@ -18,7 +18,7 @@ export const fields = [
   {
     key: 'tareWeight',
     label: 'Tare Weight',
-    type: 'text',
+    type: 'number',
     required: true,
     width: '150px',
     searchable: true,
