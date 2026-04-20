@@ -64,9 +64,9 @@ function normalizeListResult(result, transformFromApi) {
  * @param {boolean} [config.useMock=true]
  * @param {Array} [config.mockData=[]]
  */
-export function createCrudService({ resourceName, map, useMock = true, mockData = [] }) {
+export function createCrudService({ resourceName, map, idField, useMock = true, mockData = [] }) {
   const baseUrl = `${urlApi.value}/api/Mst${resourceName}`
-  const apiKey = map.id
+  const apiKey = map.id || idField || 'id'
 
   const transformFromApi = data => {
     if (!data) return data
@@ -74,7 +74,16 @@ export function createCrudService({ resourceName, map, useMock = true, mockData 
 
     const transformed = {}
     for (const [uiKey, apiField] of Object.entries(map)) {
-      transformed[uiKey] = data[apiField]
+      const apiValue = data[apiField]
+      const fallbackValue = uiKey === 'id' && idField
+        ? data[idField]
+        : data[uiKey]
+
+      if (apiValue !== undefined) {
+        transformed[uiKey] = apiValue
+      } else if (fallbackValue !== undefined) {
+        transformed[uiKey] = fallbackValue
+      }
     }
 
     
@@ -92,7 +101,11 @@ export function createCrudService({ resourceName, map, useMock = true, mockData 
       }
     }
 
-    const pkField = map.id
+    const pkField = map.id || idField || 'id'
+    if (pkField !== 'id' && apiPayload[pkField] === undefined && apiPayload.id !== undefined) {
+      apiPayload[pkField] = apiPayload.id
+    }
+
     if (!apiPayload[pkField]) {
       apiPayload[pkField] = 0
     }

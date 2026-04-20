@@ -143,7 +143,10 @@ const {
   onConfirm: data => tabApiMap[TabKey.CERTIFICATE_OF_ORIGIN].confirm(store.documentId, data),
 })
 
-const { isPrinting, print } = usePrint(TabKey.CERTIFICATE_OF_ORIGIN, () => formData.value)
+const { isPrinting, print } = usePrint(TabKey.CERTIFICATE_OF_ORIGIN, () => ({
+  ...formData.value,
+  packingItems: store.tabs[TabKey.PACKING_LIST]?.data?.items || [],
+}))
 
 const packingListData = computed(() => store.tabs[TabKey.PACKING_LIST]?.data || {})
 const certificateGoodsText = computed(() => buildCertificateGoodsText(packingListData.value.items || []))

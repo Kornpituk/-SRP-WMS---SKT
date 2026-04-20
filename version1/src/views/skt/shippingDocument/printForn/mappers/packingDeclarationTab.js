@@ -1,4 +1,5 @@
 import { formatNumber, formatDate } from '../utils/pdfmake-utils'
+import { getPackingItems } from '../../form/utils/packingDerived'
 
 /**
  * packingDeclarationMapper
@@ -17,6 +18,50 @@ export default function packingDeclarationMapper(formData, options = {}) {
     target        = 'buyer',
     displayFields = [],
   } = options
+
+  const declarationItems = getPackingItems({ items: formData.packingItems || formData.items || [] }).filter(item => !item.isSample)
+
+  const goodsRows = (declarationItems.length ? declarationItems : [{
+    descriptionOfGoods: formData.descriptionOfGoods,
+    packageType: formData.packageType,
+    packageDimensions: formData.packageDimensions,
+    quantity: formData.totalDrums,
+    unitType: formData.packageType,
+    netWeight: formData.netWeight,
+    grossWeight: formData.grossWeight,
+  }]).map(item => [
+    {
+      text: item.descriptionOfGoods || '',
+      alignment: 'center',
+      margin: [4, 6, 4, 6],
+    },
+    {
+      stack: [
+        { text: item.unitType || item.packageType || '', alignment: 'center', margin: [0, 4, 0, 4] },
+        (item.packageDimensions || formData.packageDimensions)
+          ? { text: `(${item.packageDimensions || formData.packageDimensions})`, alignment: 'center', fontSize: 9 }
+          : null,
+      ].filter(Boolean),
+      margin: [4, 6, 4, 6],
+    },
+    {
+      stack: [
+        {
+          text: `${formatNumber(item.netWeight)}  ${formData.netWeightUnit || 'KGS'}`,
+          alignment: 'center',
+        },
+        item.quantity
+          ? { text: `(TOTAL=${item.quantity} ${pluralUnit(item.unitType || item.packageType, item.quantity)})`, alignment: 'center', fontSize: 9 }
+          : null,
+      ].filter(Boolean),
+      margin: [4, 6, 4, 6],
+    },
+    {
+      text: `${formatNumber(item.grossWeight)}  ${formData.grossWeightUnit || 'KGS'}`,
+      alignment: 'center',
+      margin: [4, 6, 4, 6],
+    },
+  ])
 
   // ─── label ตาม shippMode ──────────────────────────────────────────────────
   const vesselLabel = (() => {
@@ -92,39 +137,7 @@ export default function packingDeclarationMapper(formData, options = {}) {
             { text: 'NET WEIGHT',   style: 'tableHeader', alignment: 'center' },
             { text: 'GROSS WEIGHT', style: 'tableHeader', alignment: 'center' },
           ],
-          [
-            {
-              text: formData.descriptionOfGoods || '',
-              alignment: 'center',
-              margin: [4, 6, 4, 6],
-            },
-            {
-              stack: [
-                { text: formData.packageType || '', alignment: 'center', margin: [0, 4, 0, 4] },
-                formData.packageDimensions
-                  ? { text: `(${formData.packageDimensions})`, alignment: 'center', fontSize: 9 }
-                  : null,
-              ].filter(Boolean),
-              margin: [4, 6, 4, 6],
-            },
-            {
-              stack: [
-                {
-                  text: `${formatNumber(formData.netWeight)}  ${formData.netWeightUnit || 'KGS'}`,
-                  alignment: 'center',
-                },
-                formData.totalDrums
-                  ? { text: `(TOTAL=${formData.totalDrums} DRUMS)`, alignment: 'center', fontSize: 9 }
-                  : null,
-              ].filter(Boolean),
-              margin: [4, 6, 4, 6],
-            },
-            {
-              text: `${formatNumber(formData.grossWeight)}  ${formData.grossWeightUnit || 'KGS'}`,
-              alignment: 'center',
-              margin: [4, 6, 4, 6],
-            },
-          ],
+          ...goodsRows,
         ],
       },
       layout: {
@@ -137,7 +150,29 @@ export default function packingDeclarationMapper(formData, options = {}) {
     },
 
     // SHIPMENT REFERENCE BLOCK
-    {
+    shippMode === 'air' ? {
+      columns: [
+        {
+          width: 140,
+          stack: [
+            { text: 'INVOICE NO.',      margin: [0, 0, 0, 4] },
+            { text: 'DATE OF SHIPMENT', margin: [0, 0, 0, 4] },
+            { text: 'MAWB NO.',         margin: [0, 0, 0, 4] },
+            { text: 'HAWB NO.',         margin: [0, 0, 0, 4] },
+          ],
+        },
+        {
+          width: '*',
+          stack: [
+            { text: `: ${formData.invoiceNo || ''}`,                  margin: [0, 0, 0, 4] },
+            { text: `: ${formatDate(formData.dateOfShipment) || ''}`, margin: [0, 0, 0, 4] },
+            { text: `: ${formData.mawbNo || ''}`,                     margin: [0, 0, 0, 4] },
+            { text: `: ${formData.hawbNo || ''}`,                     margin: [0, 0, 0, 4] },
+          ],
+        },
+      ],
+      margin: [0, 0, 0, 40],
+    } : {
       columns: [
         {
           width: 140,
@@ -211,4 +246,12 @@ export default function packingDeclarationMapper(formData, options = {}) {
       lineHeight: 1.4,
     },
   }
+}
+
+function pluralUnit(unit, qty) {
+  const normalized = String(unit || '').trim().toUpperCase()
+  if (!normalized) return ''
+  if (Number(qty) === 1 || normalized.endsWith('S')) return normalized
+
+  return `${normalized}S`
 }

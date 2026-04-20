@@ -1,6 +1,8 @@
 import { formatDate } from '../utils/pdfmake-utils'
+import { buildCertificateGoodsText } from '../../form/utils/packingDerived'
 
 export default function certificateOfOriginMapper(formData) {
+  const certificateGoodsText = buildCertificateGoodsText(formData.packingItems || formData.items || [])
 
   const content = [
 
@@ -30,7 +32,7 @@ export default function certificateOfOriginMapper(formData) {
     {
       text: [
         'THIS IS TO CERTIFY THAT TOTAL ',
-        { text: formData.totalWeight || '', decoration: 'underline' },
+        { text: certificateGoodsText || formData.totalWeight || '', decoration: 'underline' },
         ' IN ',
         { text: formData.containerCount || '', decoration: 'underline' },
         "\x27 CONTAINER",
@@ -39,7 +41,7 @@ export default function certificateOfOriginMapper(formData) {
     },
 
     // OF [productName]
-    {
+    certificateGoodsText ? null : {
       text: `OF ${formData.productName || ''}`,
       margin: [0, 0, 0, 4],
     },
@@ -119,7 +121,7 @@ export default function certificateOfOriginMapper(formData) {
       ],
     },
 
-  ]
+  ].filter(Boolean)
 
   return {
     pageSize: 'A4',

@@ -1,4 +1,9 @@
 import { formatNumber, formatDate } from '../utils/pdfmake-utils'
+import {
+  buildCommercialInvoiceRows,
+  buildPackagingSummary,
+  buildPackingNames,
+} from '../../form/utils/packingDerived'
 
 /**
  * commercialInvoiceMapper
@@ -18,9 +23,22 @@ export default function commercialInvoiceMapper(formData, options = {}) {
     displayFields = [],
   } = options
 
-  const items      = formData.items || []
+  const formItems = formData.items || []
+  const packingItems = formData.packingItems || []
+
+  const sourceItems = packingItems.length
+    ? packingItems.map((item, idx) => ({
+      ...item,
+      unitPrice: formItems[idx]?.unitPrice ?? item.unitPrice,
+      amount: formItems[idx]?.amount ?? item.amount,
+    }))
+    : formItems
+
+  const items      = buildCommercialInvoiceRows(sourceItems)
   const totalQty   = items.reduce((s, i) => s + (i.quantity   || 0), 0)
   const totalAmount = items.reduce((s, i) => s + (i.amount    || 0), 0)
+  const packingSummary = buildPackingNames(packingItems) || formData.packing
+  const packagingSummary = buildPackagingSummary(packingItems) || formData.totalDescription || formData.packaging
 
   const currency = formData.amountCurrency || 'US$'
 
@@ -159,7 +177,7 @@ export default function commercialInvoiceMapper(formData, options = {}) {
       buildDescription(item, show),
       { text: formatNumber(item.quantity),  alignment: 'right' },
       { text: formatNumber(item.unitPrice), alignment: 'right' },
-      { text: formatNumber(item.amount),    alignment: 'right' },
+      { text: item.amountText || formatNumber(item.amount), alignment: 'right' },
     ]),
 
     // Total row
@@ -170,8 +188,8 @@ export default function commercialInvoiceMapper(formData, options = {}) {
         alignment: 'right',
         stack: [
           { text: formatNumber(totalQty), bold: true },
-          formData.totalDescription
-            ? { text: `(${formData.totalDescription})`, fontSize: 8 }
+          packagingSummary
+            ? { text: `(${packagingSummary})`, fontSize: 8 }
             : null,
         ].filter(Boolean),
       },
@@ -182,10 +200,10 @@ export default function commercialInvoiceMapper(formData, options = {}) {
 
   // ─── FOOTER fields ─────────────────────────────────────────────────────────
   const footerItems = [
-    hasValue('packing')
-      ? buildFooterRow('PACKING :', formData.packing)          : null,
-    hasValue('packaging')
-      ? buildFooterRow('PACKAGING :', formData.packaging)      : null,
+    packingSummary
+      ? buildFooterRow('PACKING :', packingSummary)          : null,
+    packagingSummary
+      ? buildFooterRow('PACKAGING :', packagingSummary)      : null,
     hasValue('countryOfOrigin')
       ? buildFooterRow('COUNTRY OF ORIGIN :', formData.countryOfOrigin) : null,
     hasValue('makerName')
@@ -434,6 +452,14 @@ function buildMarksAndNos(item) {
 function buildDescription(item, show) {
   const showSub = show ? show('productDescription') : true
 
+  const sampleText = item.isSample && item.sampleDescription
+    ? {
+      text: `\n${item.sampleDescription}`,
+      fontSize: 5,
+      color: '#333333',
+    }
+    : ''
+
   return {
     text: [
       { text: item.descriptionOfGoods || '' },
@@ -445,6 +471,7 @@ function buildDescription(item, show) {
           color: '#666666',   // (optional) ทำให้ดูเป็น sub
         }
         : '',
+      sampleText,
     ],
   }
 }

@@ -10,10 +10,14 @@ export const fields = [
   {
     key: 'packageType',
     label: 'Package',
-    type: 'text',
+    type: 'select',
     required: true,
     width: '150px',
     searchable: true,
+    options: [
+      { label: 'Drum', value: 'Drum' },
+      { label: 'Pallet', value: 'Pallet' },
+    ],
   },
   {
     key: 'tareWeight',

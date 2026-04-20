@@ -1,4 +1,11 @@
 import { formatNumber, formatDate } from '../utils/pdfmake-utils'
+import {
+  buildFirstMarks,
+  buildPackagingSummary,
+  buildShippingProductDescriptions,
+  buildTotalGross,
+  buildTotalNet,
+} from '../../form/utils/packingDerived'
 
 /**
  * shippingParticularMapper
@@ -33,6 +40,18 @@ export default function shippingParticularMapper(formData, options = {}) {
   const notifyParty = formData.notifyParty     || {}
   const mark        = formData.shippingMark    || {}
   const seal        = formData.containerSealNo || {}
+  const packingItems = formData.packingItems || formData.items || []
+  const derivedMarks = buildFirstMarks(packingItems)
+  const derivedProductDescriptions = buildShippingProductDescriptions(packingItems)
+  const shippingMarks = derivedMarks.length ? derivedMarks : (mark.marks || [])
+  const packageDescription = buildPackagingSummary(packingItems) || mark.packageDescription || ''
+
+  const productDescriptions = derivedProductDescriptions.length
+    ? derivedProductDescriptions
+    : [mark.productDescription].filter(Boolean)
+
+  const netWeight = buildTotalNet(packingItems) || mark.netWeight
+  const grossWeight = buildTotalGross(packingItems) || mark.grossWeight
 
   // ─── helpers ──────────────────────────────────────────────────────────────
 
@@ -227,7 +246,7 @@ export default function shippingParticularMapper(formData, options = {}) {
           width: '35%',
           stack: [
             { text: 'SHIPPING MARK :', bold: true, decoration: 'underline', margin: [0, 0, 0, 6] },
-            ...(mark.marks || []).map(m => ({ text: m, margin: [0, 0, 0, 2] })),
+            ...shippingMarks.map(m => ({ text: m, margin: [0, 0, 0, 2] })),
           ],
         },
         {
@@ -235,7 +254,7 @@ export default function shippingParticularMapper(formData, options = {}) {
           stack: [
             {
               columns: [
-                { width: '*',    text: mark.packageDescription || '', margin: [0, 0, 0, 2] },
+                { width: '*',    text: packageDescription, margin: [0, 0, 0, 2] },
                 { width: 'auto', text: 'N.W.', decoration: 'underline', margin: [8, 0, 8, 2] },
                 { width: 'auto', text: 'G.W.', decoration: 'underline', margin: [8, 0, 8, 2] },
                 { width: 'auto', text: 'M3',   decoration: 'underline', margin: [8, 0, 0, 2] },
@@ -249,13 +268,13 @@ export default function shippingParticularMapper(formData, options = {}) {
                   text: [{ text: 'FCL CONTAINER :' }, { text: `  ${mark.fclContainer || ''}` }],
                   margin: [0, 0, 0, 2],
                 },
-                { width: 'auto', text: formatNumber(mark.netWeight),  alignment: 'right', margin: [8, 0, 8, 2] },
-                { width: 'auto', text: formatNumber(mark.grossWeight), alignment: 'right', margin: [8, 0, 8, 2] },
+                { width: 'auto', text: formatNumber(netWeight),  alignment: 'right', margin: [8, 0, 8, 2] },
+                { width: 'auto', text: formatNumber(grossWeight), alignment: 'right', margin: [8, 0, 8, 2] },
                 { width: 'auto', text: formatNumber(mark.cbm),         alignment: 'right', margin: [8, 0, 0, 2] },
               ],
               margin: [0, 0, 0, 4],
             },
-            { text: mark.productDescription || '', margin: [0, 0, 0, 4] },
+            ...productDescriptions.map(description => ({ text: description, margin: [0, 0, 0, 4] })),
             { text: mark.extraNote || '-',          margin: [0, 0, 0, 4] },
             {
               text: [{ text: 'HS CODE : ' }, { text: mark.hsCode || '' }],

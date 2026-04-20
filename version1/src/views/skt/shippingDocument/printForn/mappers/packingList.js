@@ -1,4 +1,9 @@
 import { formatNumber, formatDate } from '../utils/pdfmake-utils'
+import {
+  DEFAULT_SAMPLE_DESCRIPTION,
+  buildPackingNames,
+  buildPackagingSummary,
+} from '../../form/utils/packingDerived'
 
 /**
  * packingListMapper
@@ -22,6 +27,8 @@ export default function packingListMapper(formData, options = {}) {
   const items      = formData.items || []
   const totalNet   = items.reduce((s, i) => s + (i.netWeight   || 0), 0)
   const totalGross = items.reduce((s, i) => s + (i.grossWeight || 0), 0)
+  const packingSummary = buildPackingNames(items) || formData.packing
+  const packagingSummary = buildPackagingSummary(items) || formData.packaging
 
   // ─── helper: ควรแสดง field นี้ไหม ─────────────────────────────────────────
   // buyer  → แสดงเฉพาะ field ที่ user tick checkbox
@@ -124,6 +131,10 @@ export default function packingListMapper(formData, options = {}) {
   function buildDescription(item, show) {
     const showSub = show ? show('productDescription') : true
 
+    const sampleDescription = item.isSample
+      ? `\n${item.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION}`
+      : ''
+
     //              ↑ ถ้าไม่ส่ง show เข้ามา → แสดงเสมอ (backward compat)
 
     return {
@@ -134,6 +145,7 @@ export default function packingListMapper(formData, options = {}) {
         showSub && item.subDescription
           ? `\n(${item.subDescription})`
           : '',
+        sampleDescription,
       ].join(''),
     }
   }
@@ -143,8 +155,8 @@ export default function packingListMapper(formData, options = {}) {
   // lotNo, productDescription, note → แสดงตาม show()
   const footerItems = [
 
-    hasValue('packing')
-      ? { text: `PACKING : ${formData.packing}` }
+    packingSummary
+      ? { text: `PACKING : ${packingSummary}` }
       : null,
 
     hasValue('countryOfOrigin')
@@ -155,8 +167,8 @@ export default function packingListMapper(formData, options = {}) {
       ? { text: `MAKER NAME : ${formData.makerName}` }
       : null,
 
-    hasValue('packaging')
-      ? { text: `PACKAGING : ${formData.packaging}` }
+    packagingSummary
+      ? { text: `PACKAGING : ${packagingSummary}` }
       : null,
 
     // ── #rule: lotNo → แสดงตาม checkbox ──
@@ -421,10 +433,15 @@ function buildPackageDisplay(item) {
 }
 
 function buildDescription(item) {
+  const sampleDescription = item.isSample
+    ? `\n${item.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION}`
+    : ''
+
   return {
     text: [
       item.descriptionOfGoods || '',
       item.subDescription ? `\n(${item.subDescription})` : '',
+      sampleDescription,
     ].join(''),
   }
 }

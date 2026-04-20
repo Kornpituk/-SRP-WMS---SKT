@@ -63,6 +63,7 @@ export const MENU_LIST = [
         title: 'Master Setting',
         children: [
           { title: 'Forwarder', to: 'skt-settingMaster-forwarder' },
+          { title: 'End User', to: 'skt-settingMaster-endUser' },
           { title: 'Term of Payment', to: 'skt-settingMaster-termOfPayment' },
           { title: 'Port', to: 'skt-settingMaster-port' },
           { title: 'Term of Pricing', to: 'skt-settingMaster-termOfPricing' },

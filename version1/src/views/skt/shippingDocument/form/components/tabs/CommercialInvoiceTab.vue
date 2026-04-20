@@ -614,6 +614,7 @@ const { isPrinting, print } = usePrint(
   TabKey.COMMERCIAL_INVOICE,
   () => ({
     ...formData.value,
+    packingItems: store.tabs[TabKey.PACKING_LIST]?.data?.items || [],
     note: notes.value[0]?.text ?? '',  // ← merge note ตรงนี้
   }),
 )

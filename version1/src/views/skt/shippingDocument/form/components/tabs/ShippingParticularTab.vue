@@ -460,6 +460,7 @@ const { print } = usePrint(
   TabKey.SHIPPING_PARTICULAR,
   () => ({
     ...formData.value,
+    packingItems: store.tabs[TabKey.PACKING_LIST]?.data?.items || [],
     note: notes.value[0]?.text ?? '',
   }),
 )

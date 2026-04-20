@@ -65,12 +65,15 @@ let mockData = [
 export const bankaccountnoService = createCrudService(
   {
     resourceName: 'BankAccount',
-    idField: 'bankAccountNoId',
+    idField: 'bankAccountId',
     mockData,
     useMock: false,
     map: {
-      id: 'bankAccountNoId',
-      code: 'accountNo',
+      id: 'bankAccountId',
+      accountNo: 'accountNo',
+      bankName: 'BackName',
+      address: 'address',
+      swiftCode: 'swiftCode',
     },
   },
 )
