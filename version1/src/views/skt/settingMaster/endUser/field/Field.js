@@ -8,16 +8,17 @@ export const fields = [
   //   searchable: true,
   // },
   {
-    key: 'ABB',
+    key: 'endUserAbb',
     label: 'ABB',
     type: 'text',
     required: true,
     width: '80px',
     searchable: true,
+    maxLength: 30,
   },
   {
-    key: 'forwarderName',
-    label: 'Name',
+    key: 'endUserName',
+    label: 'End User Name',
     type: 'text',
     required: true,
     width: '250px',
@@ -32,7 +33,7 @@ export const fields = [
     searchable: false,
   },
   {
-    key: 'contactName',
+    key: 'contractName',
     label: 'Contact Name',
     type: 'text',
     required: true,
@@ -40,7 +41,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'contactNo',
+    key: 'contractNo',
     label: 'Contact No.',
     type: 'text',
     required: true,
@@ -48,7 +49,7 @@ export const fields = [
     searchable: true,
   },
   {
-    key: 'contactNo',
+    key: 'taxId',
     label: 'TAX Id',
     type: 'text',
     required: true,

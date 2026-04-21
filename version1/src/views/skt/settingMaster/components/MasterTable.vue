@@ -104,11 +104,14 @@
                   <VTextField
                     v-if="getEditorType(field) !== 'select'"
                     :model-value="inlineForm[getEditorKey(field)]"
+                    :type="getTextInputType(field)"
                     variant="outlined"
                     density="compact"
+                    :maxlength="getMaxLength(field)"
+                    :counter="getCounter(field)"
                     hide-details
                     class="inline-input"
-                    @update:model-value="emit('inline-update', getEditorKey(field), $event)"
+                    @update:model-value="emitInlineUpdate(field, $event)"
                   />
                   <VSelect
                     v-else
@@ -444,6 +447,31 @@ function getEditorKey(field) {
 
 function getEditorType(field) {
   return field.editType || field.type
+}
+
+function getTextInputType(field) {
+  return getEditorType(field) === 'number' ? 'number' : 'text'
+}
+
+function getMaxLength(field) {
+  const configured = field.editMaxLength ?? field.maxLength
+
+  return Number.isFinite(Number(configured)) ? Number(configured) : undefined
+}
+
+function getCounter(field) {
+  return getMaxLength(field) ?? false
+}
+
+function limitValue(field, val) {
+  const maxLength = getMaxLength(field)
+  if (!maxLength || val === null || val === undefined) return val
+
+  return String(val).slice(0, maxLength)
+}
+
+function emitInlineUpdate(field, val) {
+  emit('inline-update', getEditorKey(field), limitValue(field, val))
 }
 
 function measureTextWidth(text, font = '600 12px "Segoe UI", sans-serif') {

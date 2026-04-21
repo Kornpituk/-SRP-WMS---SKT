@@ -85,7 +85,8 @@ export function createDefaultShippingParticular() {
     shippingMark: {
       marks: [], packageDescription: '', fclContainer: '',
       netWeight: 0, grossWeight: 0, cbm: 0,
-      productDescription: '', hsCode: '', countryOfOrigin: '', palletNote: '',
+      productDescription: '', hsCode: '', countryOfOrigin: '', palletNote: '', palletNoteExtra: '',
+      showHsCode: true, showCountryOfOrigin: true, showPalletNote: true,
     },
     containerSealNo: { mark: '', freightTerms: '', blType: '' },
   }

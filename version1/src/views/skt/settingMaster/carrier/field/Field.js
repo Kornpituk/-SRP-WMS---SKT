@@ -6,6 +6,7 @@ export const fields = [
     required: true,
     width: '100px',
     searchable: true,
+    maxLength: 30,
   },
   {
     key: 'carrierName',

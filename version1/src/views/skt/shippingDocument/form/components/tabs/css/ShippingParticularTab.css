@@ -333,10 +333,26 @@
   width: 160px;
 }
 
+.mark-display-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
 .mark-info {
   margin-bottom: 6px;
   font-size: 13px;
   color: #333;
+}
+
+.mark-info__extra {
+  margin-top: 6px;
+}
+
+.mark-pallet-extra-input {
+  max-width: 320px;
+  margin-top: 6px;
 }
 
 .mark-text {

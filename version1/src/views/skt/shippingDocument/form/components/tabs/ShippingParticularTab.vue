@@ -328,7 +328,37 @@
               <span v-else>{{ formData.shippingMark?.extraNote || '-' }}</span>
             </div>
 
-            <div class="mark-hs-row">
+            <div class="mark-display-options">
+              <VCheckbox
+                :model-value="isMarkFieldVisible('showHsCode')"
+                density="compact"
+                hide-details
+                label="HS CODE"
+                :readonly="isReadonly"
+                @update:model-value="(v) => updateMark('showHsCode', v)"
+              />
+              <VCheckbox
+                :model-value="isMarkFieldVisible('showCountryOfOrigin')"
+                density="compact"
+                hide-details
+                label="COUNTRY OF ORIGIN"
+                :readonly="isReadonly"
+                @update:model-value="(v) => updateMark('showCountryOfOrigin', v)"
+              />
+              <VCheckbox
+                :model-value="isMarkFieldVisible('showPalletNote')"
+                density="compact"
+                hide-details
+                label="TWENTY PALLETS ONLY"
+                :readonly="isReadonly"
+                @update:model-value="(v) => updateMark('showPalletNote', v)"
+              />
+            </div>
+
+            <div
+              v-if="isMarkFieldVisible('showHsCode')"
+              class="mark-hs-row"
+            >
               <span class="mark-hs-row__label">HS CODE :</span>
               <VSelect
                 v-if="!isReadonly"
@@ -343,12 +373,33 @@
               <span v-else>{{ formData.shippingMark?.hsCode }}</span>
             </div>
 
-            <div class="mark-info">
+            <div
+              v-if="isMarkFieldVisible('showCountryOfOrigin')"
+              class="mark-info"
+            >
               COUNTRY OF ORIGIN : {{ formData.shippingMark?.countryOfOrigin || 'THAILAND' }}
             </div>
 
-            <div class="mark-info">
-              {{ formData.shippingMark?.palletNote }}
+            <div
+              v-if="isMarkFieldVisible('showPalletNote')"
+              class="mark-info"
+            >
+              <div>{{ formData.shippingMark?.palletNote }}</div>
+              <VTextField
+                v-if="!isReadonly"
+                :model-value="formData.shippingMark?.palletNoteExtra"
+                variant="outlined"
+                density="compact"
+                hide-details
+                class="mark-pallet-extra-input"
+                @update:model-value="(v) => updateMark('palletNoteExtra', v)"
+              />
+              <div
+                v-else-if="formData.shippingMark?.palletNoteExtra"
+                class="mark-info__extra"
+              >
+                {{ formData.shippingMark.palletNoteExtra }}
+              </div>
             </div>
           </div>
         </div>
@@ -518,6 +569,10 @@ function handleDeleteNote(noteId) {
 
 function updateMark(field, value) {
   updateField('shippingMark', { ...formData.value.shippingMark, [field]: value })
+}
+
+function isMarkFieldVisible(field) {
+  return formData.value.shippingMark?.[field] !== false
 }
 
 function updateSeal(field, value) {

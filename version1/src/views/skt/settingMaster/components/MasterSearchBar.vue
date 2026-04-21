@@ -23,12 +23,15 @@
             v-if="field.type !== 'select'"
             :model-value="modelValue[field.key]"
             :label="field.label"
+            :type="field.type === 'number' ? 'number' : 'text'"
             variant="outlined"
             density="compact"
+            :maxlength="getMaxLength(field)"
+            :counter="getCounter(field)"
             hide-details
             class="search-input"
             bg-color="white"
-            @update:model-value="onUpdate(field.key, $event)"
+            @update:model-value="onUpdate(field, $event)"
           />
 
           <!-- Select -->
@@ -44,7 +47,7 @@
             hide-details
             class="search-input"
             bg-color="white"
-            @update:model-value="onUpdate(field.key, $event)"
+            @update:model-value="onUpdate(field, $event)"
           />
         </template>
       </div>
@@ -72,7 +75,7 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   /** ควบคุมการแสดง / ซ่อน */
   visible: {
     type: Boolean,
@@ -110,8 +113,23 @@ const emit = defineEmits([
 ])
 
 // ─── Helpers ──────────────────────────────────
-function onUpdate (key, val) {
-  emit('update:modelValue', { ...this?.modelValue, [key]: val })
+function getMaxLength(field) {
+  return Number.isFinite(Number(field.maxLength)) ? Number(field.maxLength) : undefined
+}
+
+function getCounter(field) {
+  return getMaxLength(field) ?? false
+}
+
+function limitValue(field, val) {
+  const maxLength = getMaxLength(field)
+  if (!maxLength || val === null || val === undefined) return val
+
+  return String(val).slice(0, maxLength)
+}
+
+function onUpdate (field, val) {
+  emit('update:modelValue', { ...props.modelValue, [field.key]: limitValue(field, val) })
 }
 </script>
 

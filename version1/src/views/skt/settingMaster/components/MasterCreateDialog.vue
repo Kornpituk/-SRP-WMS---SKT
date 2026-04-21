@@ -48,9 +48,11 @@
               :placeholder="`Enter ${field.label}`"
               variant="outlined"
               density="compact"
-              :rules="field.required ? [requiredRule] : []"
+              :maxlength="getMaxLength(field)"
+              :counter="getCounter(field)"
+              :rules="getRules(field)"
               hide-details="auto"
-              @update:model-value="onFieldUpdate(field.key, $event)"
+              @update:model-value="onFieldUpdate(field, $event)"
             />
 
             <VTextarea
@@ -60,9 +62,11 @@
               variant="outlined"
               density="compact"
               rows="3"
-              :rules="field.required ? [requiredRule] : []"
+              :maxlength="getMaxLength(field)"
+              :counter="getCounter(field)"
+              :rules="getRules(field)"
               hide-details="auto"
-              @update:model-value="onFieldUpdate(field.key, $event)"
+              @update:model-value="onFieldUpdate(field, $event)"
             />
 
             <VSelect
@@ -76,7 +80,7 @@
               density="compact"
               :rules="field.required ? [requiredRule] : []"
               hide-details="auto"
-              @update:model-value="onFieldUpdate(field.key, $event)"
+              @update:model-value="onFieldUpdate(field, $event)"
             />
           </div>
         </VForm>
@@ -135,8 +139,40 @@ const formRef = ref(null)
 const visibleFields = computed(() => props.fields.filter(field => !field.hideInForm))
 const requiredRule = v => !!v || 'This field is required'
 
-function onFieldUpdate(key, val) {
-  emit('field-update', key, val)
+function getMaxLength(field) {
+  return Number.isFinite(Number(field.maxLength)) ? Number(field.maxLength) : undefined
+}
+
+function getCounter(field) {
+  return getMaxLength(field) ?? false
+}
+
+function limitValue(field, val) {
+  const maxLength = getMaxLength(field)
+  if (!maxLength || val === null || val === undefined) return val
+
+  return String(val).slice(0, maxLength)
+}
+
+function getRules(field) {
+  const rules = []
+  const maxLength = getMaxLength(field)
+
+  if (field.required) rules.push(requiredRule)
+  if (maxLength) {
+    rules.push(value => (
+      value === null ||
+      value === undefined ||
+      String(value).length <= maxLength ||
+      `Maximum ${maxLength} characters`
+    ))
+  }
+
+  return rules
+}
+
+function onFieldUpdate(field, val) {
+  emit('field-update', field.key, limitValue(field, val))
 }
 
 async function handleSave() {

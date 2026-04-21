@@ -149,7 +149,18 @@
         <div class="party-grid">
           <!-- Payer — read-only from Shipment Plan -->
           <div class="party-block">
-            <span class="party-block__label">Payer :</span>
+            <VBtn
+              class="party-select-btn"
+              color="primary"
+              density="compact"
+              prepend-icon="mdi-account-search-outline"
+              size="small"
+              variant="text"
+              :disabled="isReadonly"
+              @click="openPartyDialog('payer')"
+            >
+              Payer :
+            </VBtn>
             <div class="party-block__body">
               <div>{{ formData.payer?.name }}</div>
               <div>{{ formData.payer?.address }}</div>
@@ -168,7 +179,18 @@
 
           <!-- Consignee — read-only from Shipment Plan -->
           <div class="party-block">
-            <span class="party-block__label">Consignee :</span>
+            <VBtn
+              class="party-select-btn"
+              color="primary"
+              density="compact"
+              prepend-icon="mdi-account-search-outline"
+              size="small"
+              variant="text"
+              :disabled="isReadonly"
+              @click="openPartyDialog('consignee')"
+            >
+              Consignee :
+            </VBtn>
             <div class="party-block__body">
               <div>{{ formData.consignee?.name }}</div>
               <div>{{ formData.consignee?.address }}</div>
@@ -849,6 +871,98 @@
       </div>
     </div>
 
+    <VDialog
+      v-model="partyDialogOpen"
+      max-width="980"
+      scrollable
+    >
+      <VCard>
+        <VCardTitle class="party-dialog__title">
+          Select {{ activePartyLabel }}
+        </VCardTitle>
+        <VCardText>
+          <VTextField
+            v-model="partySearch"
+            class="party-dialog__search"
+            clearable
+            density="compact"
+            hide-details
+            label="Search company, address, tel, tax id"
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+          />
+
+          <VTable
+            class="party-dialog__table"
+            density="compact"
+            hover
+          >
+            <thead>
+              <tr>
+                <th
+                  v-for="header in partyTableHeaders"
+                  :key="header.key"
+                  :class="header.class"
+                >
+                  {{ header.title }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="party in filteredPartyOptions"
+                :key="party.id"
+              >
+                <td>{{ party.name }}</td>
+                <td>
+                  <div class="party-dialog__address">
+                    <div>{{ party.address }}</div>
+                    <div v-if="party.address2">
+                      {{ party.address2 }}
+                    </div>
+                    <div v-if="party.address3">
+                      {{ party.address3 }}
+                    </div>
+                  </div>
+                </td>
+                <td>{{ party.country }}</td>
+                <td>{{ party.taxId }}</td>
+                <td>{{ party.tel }}</td>
+                <td>{{ party.attn }}</td>
+                <td class="party-dialog__action">
+                  <VBtn
+                    color="primary"
+                    size="small"
+                    variant="flat"
+                    @click="selectParty(party)"
+                  >
+                    Select
+                  </VBtn>
+                </td>
+              </tr>
+              <tr v-if="filteredPartyOptions.length === 0">
+                <td
+                  class="party-dialog__empty"
+                  colspan="7"
+                >
+                  No data found
+                </td>
+              </tr>
+            </tbody>
+          </VTable>
+        </VCardText>
+        <VCardActions>
+          <VSpacer />
+          <VBtn
+            variant="text"
+            @click="partyDialogOpen = false"
+          >
+            Close
+          </VBtn>
+        </VCardActions>
+      </VCard>
+    </VDialog>
+
     <TabActionBar
       v-model:selected-target="printTarget"
       :tab-key="TabKey.PACKING_LIST"
@@ -911,6 +1025,88 @@ const PAYMENT_OPTIONS = ['T/T in advance', 'L/C', 'D/P', 'D/A']
 const PORT_OPTIONS    = ['LAEM CHABANG, THAILAND', 'HCM CITY, VIETNAM', 'HAIPHONG, VIETNAM', 'BANGKOK, THAILAND']
 const PACKAGE_TYPES   = ['250KG PLASTIC DRUM', '200KG PLASTIC DRUM', '1000KG IBC TANK', '25KG BAG', 'BOTTLE']
 const UNIT_TYPES      = ['DRUM', 'CARTON', 'BAG', 'BOTTLE']
+
+const PARTY_OPTIONS = {
+  payer: [
+    {
+      id: 'payer-age-dor',
+      name: "AGE D'OR PTE LTD",
+      address: '25 BUKIT BATOK CRESCENT',
+      address2: '#06-13 THE ELITIST',
+      city: 'SINGAPORE',
+      country: '658066',
+      tel: '+65 6776 5228',
+      taxId: '198305357N',
+      attn: 'MS. POOI YEE',
+    },
+    {
+      id: 'payer-toyotsu',
+      name: 'TOYOTSU CHEMIPLAS(THAILAND)CO.,LTD.',
+      address: '607 ASOKE-DINDAENG ROAD',
+      address2: 'DINDAENG',
+      city: 'BANGKOK',
+      country: 'THAILAND',
+      tel: '+66 2 248 1000',
+      taxId: '0105530000000',
+      attn: 'PURCHASING DEPARTMENT',
+    },
+    {
+      id: 'payer-sanyo',
+      name: 'SANYO CHEMICAL INDUSTRIES, LTD.',
+      address: '11-1, IKEDA-CHO',
+      address2: 'HIGASHIYAMA-KU',
+      city: 'KYOTO',
+      country: 'JAPAN',
+      tel: '+81 75 541 4311',
+      taxId: 'JP-2000000000',
+      attn: 'EXPORT TEAM',
+    },
+  ],
+  consignee: [
+    {
+      id: 'consignee-ath',
+      name: 'ATH CO., LTD',
+      address: '53 QUANG TRUNG STREET',
+      address2: '#17-02B PRIME CENTRE',
+      address3: 'HAI BA TRUNG WARD',
+      city: 'HANOI',
+      country: 'VIETNAM',
+      tel: '(848) 822 9362 - 3',
+      taxId: '0101509379',
+      attn: 'MS. TRANG',
+    },
+    {
+      id: 'consignee-toyotsu',
+      name: 'TOYOTSU CHEMIPLAS(THAILAND)CO.,LTD.',
+      address: '607 ASOKE-DINDAENG ROAD',
+      address2: 'DINDAENG',
+      city: 'BANGKOK',
+      country: 'THAILAND',
+      tel: '+66 2 248 1000',
+      taxId: '0105530000000',
+    },
+    {
+      id: 'consignee-sanyo',
+      name: 'SANYO CHEMICAL INDUSTRIES, LTD.',
+      address: '11-1, IKEDA-CHO',
+      address2: 'HIGASHIYAMA-KU',
+      city: 'KYOTO',
+      country: 'JAPAN',
+      tel: '+81 75 541 4311',
+      taxId: 'JP-1000000000',
+    },
+  ],
+}
+
+const partyTableHeaders = [
+  { title: 'name', key: 'name' },
+  { title: 'address', key: 'address' },
+  { title: 'country', key: 'country' },
+  { title: 'tax no', key: 'taxId' },
+  { title: 'tel', key: 'tel' },
+  { title: 'ATTN', key: 'attn' },
+  { title: 'Action', key: 'actions', class: 'text-center' },
+]
 
 const FOOTER_FIELDS = [
   { key: 'packing',         label: 'PACKING :'           },
@@ -989,6 +1185,62 @@ const {
     return Object.keys(errors).length > 0 ? errors : null
   },
 })
+
+const partyDialogOpen = ref(false)
+const activePartyType = ref('payer')
+const partySearch = ref('')
+
+const activePartyLabel = computed(() => (
+  activePartyType.value === 'payer' ? 'Payer' : 'Consignee'
+))
+
+const filteredPartyOptions = computed(() => {
+  const keyword = String(partySearch.value || '').trim().toLowerCase()
+  const options = PARTY_OPTIONS[activePartyType.value] || []
+
+  if (!keyword) return options
+
+  return options.filter(option => [
+    option.name,
+    option.address,
+    option.address2,
+    option.address3,
+    option.city,
+    option.country,
+    option.tel,
+    option.attn,
+    option.taxId,
+  ].filter(Boolean).join(' ').toLowerCase().includes(keyword))
+})
+
+function openPartyDialog(type) {
+  if (isReadonly.value) return
+
+  activePartyType.value = type
+  partySearch.value = ''
+  partyDialogOpen.value = true
+}
+
+function syncPartyToLinkedTabs(type, partyData) {
+  Object.values(TabKey).forEach(tabKey => {
+    if (tabKey === TabKey.PACKING_LIST) return
+
+    const tabData = store.tabs?.[tabKey]?.data
+    if (!tabData || !(type in tabData)) return
+
+    store.updateTabData(tabKey, { [type]: { ...partyData } })
+  })
+}
+
+function selectParty(party) {
+  const partyData = { ...party }
+
+  delete partyData.id
+
+  updateField(activePartyType.value, partyData)
+  syncPartyToLinkedTabs(activePartyType.value, partyData)
+  partyDialogOpen.value = false
+}
 
 // const { print: handlePrint } = usePrint(TabKey.PACKING_LIST)
 

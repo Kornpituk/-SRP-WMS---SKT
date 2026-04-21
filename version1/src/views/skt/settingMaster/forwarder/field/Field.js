@@ -14,6 +14,7 @@ export const fields = [
     required: true,
     width: '80px',
     searchable: true,
+    maxLength: 30,
   },
   {
     key: 'forwarderName',
