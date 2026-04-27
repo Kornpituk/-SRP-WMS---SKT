@@ -20,7 +20,7 @@ export function useDocumentPermissions() {
     return {
       canApprove: !isLocked,
       canVoid: !isLocked,
-      canEdit: !isVoid,
+      canEdit: !isLocked,
       canPrint: true,
       isLocked,
     }

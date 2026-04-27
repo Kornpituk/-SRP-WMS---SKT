@@ -32,19 +32,33 @@
       :loading="tableState.loading"
       @update:options="handleTableOptions"
     />
+
+    <VSnackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="2500"
+      location="top right"
+    >
+      <VIcon start>
+        {{ snackbar.icon }}
+      </VIcon>
+      {{ snackbar.message }}
+    </VSnackbar>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { nextTick, reactive } from 'vue'
 import SearchFilterBar from './components/SearchFilterBar.vue'
 import ExpensesDataTable from './components/ExpensesDataTable.vue'
 import { useExpensesService } from './composables/useExpensesService'
-import { exportToExcel } from '@/views/skt/shippingDocument/utilities/exportExcel'
-import { mapTableToExcel } from '@/views/skt/shippingDocument/mappers/shippingDocExcel.mapper'
+import { exportToExcelWithHeader, mapTableToExcel } from '@/views/skt/shippingDocument/mappers/shippingDocExcel.mapper'
 import { headers } from './constants/ExportExpensesRecord'
 
 const { fetchExpenses } = useExpensesService()
+let requestId = 0
+
+const snackbar = reactive({ show: false, message: '', color: 'primary', icon: 'mdi-information' })
 
 function showToast(message, color = 'primary', icon = 'mdi-information') {
   Object.assign(snackbar, { show: true, message, color, icon })
@@ -71,10 +85,13 @@ const tableState = reactive({
   loading: false,
   page: 1,
   itemsPerPage: 10,
+  sortBy: [],
 })
 
 // ── Core data loader ───────────────────────────────────────────────────────
 async function loadData() {
+  const currentRequestId = ++requestId
+
   tableState.loading = true
   tableState.items = [] // ✅ เคลียร์ก่อน → skeleton ชัดขึ้น
 
@@ -85,12 +102,15 @@ async function loadData() {
       ...filters,
       page: tableState.page,
       itemsPerPage: tableState.itemsPerPage,
+      sortBy: tableState.sortBy,
     })
+
+    if (currentRequestId !== requestId) return
 
     tableState.items      = data
     tableState.totalItems = total
   } finally {
-    tableState.loading = false
+    if (currentRequestId === requestId) tableState.loading = false
   }
 }
 
@@ -100,9 +120,10 @@ async function loadData() {
  * v-data-table-server emits this on mount AND on every page/sort change.
  * This is the ONLY trigger for loadData() — no onMounted needed.
  */
-function handleTableOptions({ page, itemsPerPage }) {
+function handleTableOptions({ page, itemsPerPage, sortBy }) {
   tableState.page         = page
   tableState.itemsPerPage = itemsPerPage
+  tableState.sortBy       = sortBy ?? []
   loadData()
 }
 
@@ -136,11 +157,18 @@ function handleExport() {
     return
   }
 
-  const mapped = mapTableToExcel(tableState.items, headers, tableState)
+  const { rows, alignMap, colWidths, numberFormatMap } = mapTableToExcel(tableState.items, headers, tableState)
 
-  exportToExcel(
-    mapped,
+  exportToExcelWithHeader(
+    rows,
     `Export Expenses Record Page ${tableState.page}.xlsx`,
+    {
+      title: 'Export Expenses Record',
+      department: '-',
+      alignMap,
+      colWidths,
+      numberFormatMap,
+    },
   )
 
   showToast('Export success', 'success', 'mdi-check-circle-outline')

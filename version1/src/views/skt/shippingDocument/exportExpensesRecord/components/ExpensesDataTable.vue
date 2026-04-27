@@ -78,18 +78,18 @@
       <!-- Status — VChip (ต้องการ HTML component จึงใช้ slot) -->
       <template #item.status="{ item }">
         <VChip
-          :color="statusColor(item.status)"
+          :color="statusColor(item.raw?.status ?? item.status)"
           size="x-small"
           variant="flat"
           class="status-chip"
         >
-          {{ item.status }}
+          {{ item.raw?.status ?? item.status }}
         </VChip>
       </template>
 
       <!-- Total Cost — bold (ต้องการ class พิเศษ) -->
       <template #item.totalCost="{ item }">
-        <span class="currency-cell font-weight-bold">{{ formatNumber(item.totalCost) }}</span>
+        <span class="currency-cell font-weight-bold">{{ formatNumber(item.raw?.totalCost ?? item.totalCost) }}</span>
       </template>
     </VDataTableServer>
   </VCard>

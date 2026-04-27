@@ -7,14 +7,24 @@ export function mapTableToExcel(items, headers, pagination) {
     .filter(h => h.exportable !== false)
     .filter(h => h.key !== 'actions')
 
+  const titleCounts = exportableHeaders.reduce((counts, h) => {
+    counts[h.title] = (counts[h.title] ?? 0) + 1
+
+    return counts
+  }, {})
+
+  const exportTitle = h => titleCounts[h.title] > 1 ? `${h.title} (${h.key})` : h.title
+
   const rows = items.map((item, index) => {
     const row = {}
 
     exportableHeaders.forEach(h => {
+      const title = exportTitle(h)
+
       if (h.key === 'no') {
-        row[h.title] = (pagination.page - 1) * pagination.itemsPerPage + index + 1
+        row[title] = (pagination.page - 1) * pagination.itemsPerPage + index + 1
       } else {
-        row[h.title] = item[h.key] ?? ''
+        row[title] = item[h.key] ?? ''
       }
     })
     
@@ -25,7 +35,7 @@ export function mapTableToExcel(items, headers, pagination) {
   const alignMap = {}
 
   exportableHeaders.forEach(h => {
-    alignMap[h.title] = h.align === 'end' ? 'right'
+    alignMap[exportTitle(h)] = h.align === 'end' ? 'right'
       : h.align === 'center' ? 'center'
         : 'left'
   })
@@ -33,7 +43,7 @@ export function mapTableToExcel(items, headers, pagination) {
   // colWidths
   const colWidths = exportableHeaders.map(h => {
     const contentMax = rows.reduce((max, row) => {
-      return Math.max(max, String(row[h.title] ?? '').length)
+      return Math.max(max, String(row[exportTitle(h)] ?? '').length)
     }, 0)
 
     const auto = Math.max(contentMax, h.title.length) + 2
@@ -52,7 +62,7 @@ export function mapTableToExcel(items, headers, pagination) {
       const decimals   = '0'.repeat(h.decimal)
       const formatStr  = h.decimal > 0 ? `#,##0.${decimals}` : '#,##0'
 
-      numberFormatMap[h.title] = formatStr
+      numberFormatMap[exportTitle(h)] = formatStr
     }
   })
 

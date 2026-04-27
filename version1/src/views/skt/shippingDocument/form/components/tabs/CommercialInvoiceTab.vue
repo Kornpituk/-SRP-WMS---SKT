@@ -110,7 +110,7 @@
           <div class="air-ship-layout">
             <div class="air-ship-layout__left">
               <div class="air-ship-flight">
-                <span class="ship-label">Fight :</span>
+                <span class="ship-label">Flight :</span>
                 <div class="air-ship-flight__body">
                   <span class="ship-value">{{ formData.feeder }}</span>
                   <div class="air-ship-subfield">
@@ -161,7 +161,10 @@
               <span class="ship-label">{{ primaryShipLabel }}</span>
               <span class="ship-value">{{ formData.feeder }}</span>
             </div>
-            <div class="ship-cell ship-cell--wide">
+            <div
+              v-if="showVesselField"
+              class="ship-cell ship-cell--wide"
+            >
               <span class="ship-label">{{ secondaryShipLabel }}</span>
               <span class="ship-value">{{ formData.vessel }}</span>
             </div>
@@ -323,32 +326,8 @@
         </div>
       </div>
 
-      <!-- SECTION 5: Term of Pricing + CIF/FOB/Freight/Insurance -->
+      <!-- SECTION 5: CIF/FOB/Freight/Insurance -->
       <div class="section">
-        <!-- REQ-6: Term of Pricing dropdown -->
-        <div class="pricing-term-row">
-          <span class="pricing-term-row__label">Term of Pricing :</span>
-          <div class="pricing-term-row__control">
-            <VSelect
-              v-if="!isReadonly"
-              :model-value="formData.pricingTerm"
-              :items="PRICING_TERM_OPTIONS"
-              variant="outlined"
-              density="compact"
-              hide-details
-              data-testid="term-of-pricing-select"
-              @update:model-value="handlePricingTermChange"
-            />
-            <span
-              v-else
-              data-testid="term-of-pricing-display"
-              class="pricing-term-row__value"
-            >
-              {{ formData.pricingTerm }}
-            </span>
-          </div>
-        </div>
-
         <div
           v-for="row in visiblePricingRows"
           :key="row.key"
@@ -536,8 +515,15 @@ const route = useRoute()
 const shippMode = computed(() => route.query.mode || 'ocean')
 const isAirMode = computed(() => shippMode.value === 'air')
 const isCourierMode = computed(() => shippMode.value === 'courier')
-const primaryShipLabel = computed(() => (isCourierMode.value ? 'Courier :' : 'Feeder :'))
+const isTruckMode = computed(() => shippMode.value === 'truck')
+const primaryShipLabel = computed(() => {
+  if (isCourierMode.value) return 'Courier :'
+  if (isTruckMode.value) return 'Truck :'
+
+  return 'Feeder :'
+})
 const secondaryShipLabel = computed(() => (isCourierMode.value ? 'AWB No. :' : 'Vessel :'))
+const showVesselField = computed(() => !isTruckMode.value)
 
 
 // ---------------------------------------------------------------------------
@@ -549,9 +535,8 @@ const INSURANCE_RATE   = 0.0016   // 0.16%
 const INSURANCE_MIN    = 15       // minimum $15
 const INSURANCE_MARKUP = 1.1      // ×110%
 
-const CURRENCY_OPTIONS     = ['US$', 'THB', 'EUR', 'JPY']
-const PRICING_TERM_OPTIONS = ['CIF', 'FOB', 'EXWORK', 'C&F']
-const FOB_TYPE_OPTIONS     = ['CIF', 'FOB', 'CFR']
+const CURRENCY_OPTIONS = ['US$', 'THB', 'EUR', 'JPY']
+const FOB_TYPE_OPTIONS = ['CIF', 'FOB', 'CFR']
 
 /**
  * REQ-4: All bank accounts from Master Data.
@@ -712,15 +697,6 @@ const totalAmount = computed(() =>
   buildCommercialTotalAmount(invoiceItems.value),
 )
 
-/** REQ-2: Auto-calculated insurance. null when EXWORK. */
-const autoInsurance = computed(() => {
-  if (formData.value.pricingTerm === 'EXWORK') return null
-  const baseCost = Number(formData.value.fobValue || 0) + Number(formData.value.oceanFreight || 0)
-  const raw      = baseCost * INSURANCE_MARKUP * INSURANCE_RATE
-  
-  return Math.max(raw, INSURANCE_MIN)
-})
-
 /** REQ-5: Shipping mode from route query (used in ocean freight row label) */
 const modeFreight = computed(() => {
   const mode = String(route.query?.mode || 'OCEAN').toUpperCase()
@@ -859,13 +835,6 @@ function handlePricingInput(key, value) {
 }
 
 /** REQ-6: Pricing term change → seed insurance */
-function handlePricingTermChange(term) {
-  updateField('pricingTerm', term)
-  if (term !== 'EXWORK' && autoInsurance.value !== null) {
-    updateField('insurance', autoInsurance.value)
-  }
-}
-
 /** REQ-4: Update single banking field */
 function updateBanking(field, value) {
   updateField('bankingDetail', {

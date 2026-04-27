@@ -55,17 +55,17 @@
       >
         <template #item.status="{ item }">
           <VChip
-            :color="getDocStatusColor(item.status)"
+            :color="getDocStatusColor(item.raw?.status ?? item.status)"
             variant="flat"
             size="small"
           >
-            {{ item.status }}
+            {{ item.raw?.status ?? item.status }}
           </VChip>
         </template>
         <template #item.tabProgress="{ item }">
           <div class="d-flex gap-1">
             <VIcon
-              v-for="tab in item.tabStatuses || []"
+              v-for="tab in (item.raw?.tabStatuses ?? item.tabStatuses ?? [])"
               :key="tab.key"
               :color="getTabColor(tab.status)"
               :icon="getTabIcon(tab.status)"
@@ -82,6 +82,7 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"                          
 import { DocumentStatus } from "../types/shipDocument"
+import { shipDocumentApi } from "../services/shipDocumentApi"
 import {
   getDocumentStatusDisplay,
   getTabStatusDisplay,
@@ -114,9 +115,15 @@ const getTabIcon = s => getTabStatusDisplay(s).icon
 async function fetchData() {
   loading.value = true
   try {
-    // const res = await shipDocumentApi.getList({ page: page.value, pageSize: perPage.value, search: search.value, status: statusFilter.value })
-    // items.value = res.data.items
-    // total.value = res.data.total
+    const res = await shipDocumentApi.getList({
+      page: page.value,
+      pageSize: perPage.value,
+      search: search.value,
+      status: statusFilter.value,
+    })
+
+    items.value = res.data.items
+    total.value = res.data.total
   } finally {
     loading.value = false
   }

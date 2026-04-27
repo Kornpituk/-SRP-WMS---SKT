@@ -1,8 +1,12 @@
 import { formatNumber, formatDate } from '../utils/pdfmake-utils'
 import {
-  DEFAULT_SAMPLE_DESCRIPTION,
+  buildSampleDescription,
   buildPackingNames,
   buildPackagingSummary,
+  buildTotalGross,
+  buildTotalNet,
+  getItemTotalGross,
+  getItemTotalNet,
 } from '../../form/utils/packingDerived'
 
 /**
@@ -25,8 +29,8 @@ export default function packingListMapper(formData, options = {}) {
   } = options
 
   const items      = formData.items || []
-  const totalNet   = items.reduce((s, i) => s + (i.netWeight   || 0), 0)
-  const totalGross = items.reduce((s, i) => s + (i.grossWeight || 0), 0)
+  const totalNet   = buildTotalNet(items)
+  const totalGross = buildTotalGross(items)
   const packingSummary = buildPackingNames(items) || formData.packing
   const packagingSummary = buildPackagingSummary(items) || formData.packaging
 
@@ -132,7 +136,7 @@ export default function packingListMapper(formData, options = {}) {
     const showSub = show ? show('productDescription') : true
 
     const sampleDescription = item.isSample
-      ? `\n${item.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION}`
+      ? `\n${buildSampleDescription(item)}`
       : ''
 
     //              ↑ ถ้าไม่ส่ง show เข้ามา → แสดงเสมอ (backward compat)
@@ -276,8 +280,8 @@ export default function packingListMapper(formData, options = {}) {
             buildMarksAndNos(i),
             buildDescription(i, show),   // ← เพิ่ม show
             buildPackageDisplay(i),
-            { text: formatNumber(i.netWeight),   alignment: 'right' },
-            { text: formatNumber(i.grossWeight), alignment: 'right' },
+            { text: formatNumber(getItemTotalNet(i)),   alignment: 'right' },
+            { text: formatNumber(getItemTotalGross(i)), alignment: 'right' },
           ]),
 
           [
@@ -434,7 +438,7 @@ function buildPackageDisplay(item) {
 
 function buildDescription(item) {
   const sampleDescription = item.isSample
-    ? `\n${item.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION}`
+    ? `\n${buildSampleDescription(item)}`
     : ''
 
   return {

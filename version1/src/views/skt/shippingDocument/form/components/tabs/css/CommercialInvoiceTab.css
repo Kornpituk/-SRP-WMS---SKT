@@ -368,22 +368,29 @@
 
 .pricing-row__left {
   display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: center;
   gap: 12px;
+  padding-right: 24px;
 }
 
 .pricing-row__type-select {
-  flex: 0 0 80px;
+  flex: 0 0 96px;
 }
 
 .pricing-row__type-text {
+  flex: 0 0 48px;
   font-size: 14px;
   font-weight: 700;
+  text-align: left;
   color: #333;
 }
 
 .pricing-row__port {
+  min-width: 220px;
   font-size: 14px;
+  text-align: left;
   color: #333;
 }
 

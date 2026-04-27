@@ -161,29 +161,47 @@
         <div class="party-label">
           NOTIFY PARTY :
         </div>
-        <div class="notify-box">
-          <VTextarea
+        <div class="notify-party-control">
+          <VAutocomplete
             v-if="!isReadonly"
-            :model-value="formData.notifyParty.notifyParty"
+            :model-value="formData.notifyParty"
+            :items="NOTIFY_PARTY_OPTIONS"
+            item-title="name"
+            return-object
+            clearable
             density="compact"
             hide-details
-            auto-grow
-            rows="1"
-            class="notify-party-input"
-            @update:model-value="v => updateField('notifyParty.notifyParty', v)"
-          />
-
-          <span
-            v-else
-            class="notify-party-text"
+            label="Search notify party"
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+            class="notify-party-select"
+            @update:model-value="handleNotifyPartySelect"
           >
-            {{ formData.notifyParty?.notifyParty }}
-          </span>
+            <template #item="{ props, item }">
+              <VListItem
+                v-bind="props"
+                :title="item.raw.name"
+                :subtitle="formatPartySubtitle(item.raw)"
+              />
+            </template>
+          </VAutocomplete>
+
+          <div class="notify-box">
+            <div
+              v-for="line in notifyPartyLines"
+              :key="line"
+            >
+              {{ line }}
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="info-line">
+        <div
+          v-if="showPortOfReceipt"
+          class="info-line"
+        >
           <span class="info-line__label">PORT OF RECEIPT :</span>
           <span>{{ formData.portOfReceipt }}</span>
         </div>
@@ -196,20 +214,26 @@
       <div class="section">
         <div class="ship-row">
           <div class="ship-row__main">
-            <span class="ship-row__label">FEEDER :</span>
+            <span class="ship-row__label">{{ primaryTransportLabel }} :</span>
             <span>{{ formData.feeder }}</span>
           </div>
-          <div class="ship-row__end">
+          <div
+            class="ship-row__end"
+            :class="{ 'ship-row__end--center': isOceanMode }"
+          >
             <span class="chip chip--yellow">ETD : {{ formData.etd }}</span>
           </div>
         </div>
 
         <div class="ship-row ship-row--spaced">
           <div class="ship-row__main">
-            <span class="ship-row__label">VESSEL :</span>
+            <span class="ship-row__label">{{ secondaryTransportLabel }} :</span>
             <span>{{ formData.vessel }}</span>
           </div>
-          <div class="ship-row__mid">
+          <div
+            v-if="showContainerType"
+            class="ship-row__mid"
+          >
             <span class="ship-row__label">Container Type :</span>
             <VSelect
               v-if="!isReadonly"
@@ -223,7 +247,10 @@
             />
             <span v-else>{{ formData.containerType }}</span>
           </div>
-          <div class="ship-row__end">
+          <div
+            class="ship-row__end"
+            :class="{ 'ship-row__end--center': isOceanMode }"
+          >
             <span class="chip chip--yellow">ETA : {{ formData.eta }}</span>
           </div>
         </div>
@@ -237,7 +264,10 @@
         <div class="info-line">
           <span class="info-line__label">PORT OF DELIVERY :</span>
           <span>{{ formData.portOfDelivery }}</span>
-          <span class="info-line__extra">{{ formData.deliveryType || formData.containerType }}</span>
+          <span
+            v-if="showDeliveryType"
+            class="info-line__extra"
+          >{{ formData.deliveryType || formData.containerType }}</span>
         </div>
       </div>
 
@@ -328,78 +358,75 @@
               <span v-else>{{ formData.shippingMark?.extraNote || '-' }}</span>
             </div>
 
-            <div class="mark-display-options">
+            <div class="mark-print-row">
+              <div class="mark-hs-row">
+                <span class="mark-hs-row__label">HS CODE :</span>
+                <VSelect
+                  v-if="!isReadonly"
+                  :model-value="formData.shippingMark?.hsCode"
+                  :items="HS_CODES"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  class="mark-hs-row__select"
+                  @update:model-value="(v) => updateMark('hsCode', v)"
+                />
+                <span v-else>{{ formData.shippingMark?.hsCode }}</span>
+              </div>
               <VCheckbox
-                :model-value="isMarkFieldVisible('showHsCode')"
+                class="mark-print-checkbox"
+                :model-value="isMarkPrintEnabled('showHsCode')"
                 density="compact"
                 hide-details
-                label="HS CODE"
+                label="Show in Print Form"
                 :readonly="isReadonly"
                 @update:model-value="(v) => updateMark('showHsCode', v)"
               />
+            </div>
+
+            <div class="mark-print-row">
+              <div class="mark-info">
+                COUNTRY OF ORIGIN : {{ formData.shippingMark?.countryOfOrigin || 'THAILAND' }}
+              </div>
               <VCheckbox
-                :model-value="isMarkFieldVisible('showCountryOfOrigin')"
+                class="mark-print-checkbox"
+                :model-value="isMarkPrintEnabled('showCountryOfOrigin')"
                 density="compact"
                 hide-details
-                label="COUNTRY OF ORIGIN"
+                label="Show in Print Form"
                 :readonly="isReadonly"
                 @update:model-value="(v) => updateMark('showCountryOfOrigin', v)"
               />
+            </div>
+
+            <div class="mark-print-row mark-print-row--start">
+              <div class="mark-info">
+                <div>{{ formData.shippingMark?.palletNote }}</div>
+                <VTextField
+                  v-if="!isReadonly"
+                  :model-value="formData.shippingMark?.palletNoteExtra"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  class="mark-pallet-extra-input"
+                  @update:model-value="(v) => updateMark('palletNoteExtra', v)"
+                />
+                <div
+                  v-else-if="formData.shippingMark?.palletNoteExtra"
+                  class="mark-info__extra"
+                >
+                  {{ formData.shippingMark.palletNoteExtra }}
+                </div>
+              </div>
               <VCheckbox
-                :model-value="isMarkFieldVisible('showPalletNote')"
+                class="mark-print-checkbox"
+                :model-value="isMarkPrintEnabled('showPalletNote')"
                 density="compact"
                 hide-details
-                label="TWENTY PALLETS ONLY"
+                label="Show in Print Form"
                 :readonly="isReadonly"
                 @update:model-value="(v) => updateMark('showPalletNote', v)"
               />
-            </div>
-
-            <div
-              v-if="isMarkFieldVisible('showHsCode')"
-              class="mark-hs-row"
-            >
-              <span class="mark-hs-row__label">HS CODE :</span>
-              <VSelect
-                v-if="!isReadonly"
-                :model-value="formData.shippingMark?.hsCode"
-                :items="HS_CODES"
-                variant="outlined"
-                density="compact"
-                hide-details
-                class="mark-hs-row__select"
-                @update:model-value="(v) => updateMark('hsCode', v)"
-              />
-              <span v-else>{{ formData.shippingMark?.hsCode }}</span>
-            </div>
-
-            <div
-              v-if="isMarkFieldVisible('showCountryOfOrigin')"
-              class="mark-info"
-            >
-              COUNTRY OF ORIGIN : {{ formData.shippingMark?.countryOfOrigin || 'THAILAND' }}
-            </div>
-
-            <div
-              v-if="isMarkFieldVisible('showPalletNote')"
-              class="mark-info"
-            >
-              <div>{{ formData.shippingMark?.palletNote }}</div>
-              <VTextField
-                v-if="!isReadonly"
-                :model-value="formData.shippingMark?.palletNoteExtra"
-                variant="outlined"
-                density="compact"
-                hide-details
-                class="mark-pallet-extra-input"
-                @update:model-value="(v) => updateMark('palletNoteExtra', v)"
-              />
-              <div
-                v-else-if="formData.shippingMark?.palletNoteExtra"
-                class="mark-info__extra"
-              >
-                {{ formData.shippingMark.palletNoteExtra }}
-              </div>
             </div>
           </div>
         </div>
@@ -490,6 +517,46 @@ const HS_CODES = ['3906.90.20', '3906.90.90']
 const FREIGHT_TERM_OPTIONS = ['Freight Collect', 'Freight Collect in Japan', 'Freight Prepaid']
 const BL_TYPE_OPTIONS = ['Original B/L', 'Surrendered B/L', 'Sea Waybill', 'Truck Waybill', 'Air Waybill']
 
+const NOTIFY_PARTY_OPTIONS = [
+  {
+    id: 'notify-age-dor',
+    name: "AGE D'OR PTE LTD",
+    address: '25 BUKIT BATOK CRESCENT',
+    address2: '#06-13 THE ELITIST',
+    city: 'SINGAPORE',
+    country: '658066',
+    tel: '+65 6776 5228',
+    taxId: '198305357N',
+    attn: 'MS. POOI YEE',
+    email: 'poolyee@agedor.com.sg',
+  },
+  {
+    id: 'notify-ath',
+    name: 'ATH CO., LTD',
+    address: '53 QUANG TRUNG STREET',
+    address2: '#17-02B PRIME CENTRE',
+    address3: 'HAI BA TRUNG WARD',
+    city: 'HANOI',
+    country: 'VIETNAM',
+    tel: '(848) 822 9362 - 3',
+    taxId: '0101509379',
+    attn: 'MS. TRANG',
+    email: 'huong.dao@csplegal.com',
+  },
+  {
+    id: 'notify-sanyo',
+    name: 'SANYO CHEMICAL INDUSTRIES, LTD.',
+    address: '11-1, IKEDA-CHO',
+    address2: 'HIGASHIYAMA-KU',
+    city: 'KYOTO',
+    country: 'JAPAN',
+    tel: '+81 75 541 4311',
+    taxId: 'JP-2000000000',
+    attn: 'EXPORT TEAM',
+    email: 'export@sanyo-chemical.example',
+  },
+]
+
 const store = useShipDocumentStore()
 
 const {
@@ -523,6 +590,20 @@ const printTargets = [
 
 const route = useRoute()
 const shippMode = computed(() => route.query.mode || 'ocean')
+const normalizedShippingMode = computed(() => String(route.query.mode || store.shippingMode || 'ocean').toLowerCase())
+const isAirMode = computed(() => normalizedShippingMode.value === 'air')
+const isOceanMode = computed(() => normalizedShippingMode.value === 'ocean')
+const isTruckMode = computed(() => normalizedShippingMode.value === 'truck')
+const primaryTransportLabel = computed(() => {
+  if (isAirMode.value) return 'FLIGHT'
+  if (isTruckMode.value) return 'TRUCK'
+
+  return 'FEEDER'
+})
+const secondaryTransportLabel = computed(() => ((isAirMode.value || isTruckMode.value) ? 'CARRIER' : 'VESSEL'))
+const showPortOfReceipt = computed(() => !isTruckMode.value)
+const showContainerType = computed(() => !isOceanMode.value)
+const showDeliveryType = computed(() => !isAirMode.value && !isTruckMode.value)
 const packingListData = computed(() => store.tabs[TabKey.PACKING_LIST]?.data || {})
 const packingListItems = computed(() => packingListData.value.items || [])
 
@@ -546,6 +627,16 @@ const shippingProductDescriptions = computed(() => {
 
 const shippingNetWeight = computed(() => buildTotalNet(packingListItems.value) || formData.value.shippingMark?.netWeight)
 const shippingGrossWeight = computed(() => buildTotalGross(packingListItems.value) || formData.value.shippingMark?.grossWeight)
+
+const notifyPartyLines = computed(() => {
+  const party = formData.value.notifyParty || {}
+
+  if (party.notifyParty) {
+    return String(party.notifyParty).split('\n').map(line => line.trim()).filter(Boolean)
+  }
+
+  return buildPartyLines(party)
+})
 
 function handlePrint(payload) {
   print(
@@ -571,8 +662,45 @@ function updateMark(field, value) {
   updateField('shippingMark', { ...formData.value.shippingMark, [field]: value })
 }
 
-function isMarkFieldVisible(field) {
+function isMarkPrintEnabled(field) {
   return formData.value.shippingMark?.[field] !== false
+}
+
+function buildPartyLines(party) {
+  return [
+    party.name,
+    party.address,
+    party.address2,
+    party.address3,
+    [party.city, party.country].filter(Boolean).join(' '),
+    party.tel ? `TEL: ${party.tel}` : '',
+    party.taxId ? `TAX ID: ${party.taxId}` : '',
+    party.attn ? `ATTN: ${party.attn}` : '',
+    party.email ? `EMAIL: ${party.email}` : '',
+  ].filter(Boolean)
+}
+
+function formatNotifyPartyText(party) {
+  return buildPartyLines(party).join('\n')
+}
+
+function formatPartySubtitle(party) {
+  return [party.address, party.city, party.country].filter(Boolean).join(' | ')
+}
+
+function handleNotifyPartySelect(party) {
+  if (!party) {
+    updateField('notifyParty', {})
+
+    return
+  }
+
+  const notifyParty = { ...party }
+
+  delete notifyParty.id
+  notifyParty.notifyParty = formatNotifyPartyText(notifyParty)
+
+  updateField('notifyParty', notifyParty)
 }
 
 function updateSeal(field, value) {

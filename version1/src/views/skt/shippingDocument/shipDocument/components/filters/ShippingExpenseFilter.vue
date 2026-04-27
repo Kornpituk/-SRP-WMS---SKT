@@ -8,12 +8,17 @@
         <VSelect
           v-model="local.status"
           :items="statusOptions"
+          :loading="statusOptionsLoading"
           label="Select Status"
           density="compact"
           variant="outlined"
           hide-details
           clearable
-        />
+        >
+          <template #selection="{ item }">
+            <StatusBadge :status="getStatusLabel(item)" />
+          </template>
+        </VSelect>
       </VCol>
 
       <VCol
@@ -114,11 +119,20 @@
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { STATUS_OPTIONS } from '../../constants/shippingDocument.constants'
+import StatusBadge from '../shared/StatusBadge.vue'
 
 const props = defineProps({
   filters: { type: Object, required: true },
+  statusOptions: {
+    type: Array,
+    default: () => STATUS_OPTIONS,
+  },
+  statusOptionsLoading: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:filters', 'search', 'clear', 'export'])
@@ -132,5 +146,8 @@ watch(local, val => emit('update:filters', { ...val }))
 // รับ reset จาก parent (handleClear เรียก Object.assign ใน composable)
 watch(() => props.filters, val => Object.assign(local, val), { deep: true })
 
-const statusOptions = STATUS_OPTIONS
+const statusOptions = computed(() => props.statusOptions)
+
+const getStatusLabel = item =>
+  item?.raw?.title ?? item?.title ?? item?.value ?? local.status
 </script>

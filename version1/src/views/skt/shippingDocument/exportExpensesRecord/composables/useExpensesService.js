@@ -159,6 +159,32 @@ function createRecord(index) {
 /** Full mock dataset — 50 records, generated once at module load */
 const MOCK_DATA = Array.from({ length: 50 }, (_, i) => createRecord(i))
 
+function compareValues(a, b) {
+  if (typeof a === 'number' && typeof b === 'number') return a - b
+
+  return String(a ?? '').localeCompare(String(b ?? ''), undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  })
+}
+
+function applySort(rows, sortBy = []) {
+  if (!Array.isArray(sortBy) || !sortBy.length) return rows
+
+  return [...rows].sort((a, b) => {
+    for (const sort of sortBy) {
+      const key = sort.key
+      if (!key) continue
+
+      const direction = sort.order === 'desc' ? -1 : 1
+      const result = compareValues(a[key], b[key])
+      if (result !== 0) return result * direction
+    }
+
+    return 0
+  })
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Composable
 // ─────────────────────────────────────────────────────────────────────────────
@@ -190,7 +216,6 @@ export function useExpensesService() {
 
     // ── Apply filters ───────────────────────────────────────────
     let rows = [...MOCK_DATA]
-    console.log("mockData", MOCK_DATA)
 
     const contains = (field, value) =>
       !value?.trim() || field?.toLowerCase().includes(value.trim().toLowerCase())
@@ -212,6 +237,8 @@ export function useExpensesService() {
     if (params.etdTo) {
       rows = rows.filter(r => r.etd <= params.etdTo)
     }
+
+    rows = applySort(rows, params.sortBy)
 
     // ── Paginate ────────────────────────────────────────────────
     const total   = rows.length

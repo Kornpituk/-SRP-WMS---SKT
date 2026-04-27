@@ -49,6 +49,8 @@
       >
         <ShippingExpenseFilter
           :filters="filters"
+          :status-options="statusOptions"
+          :status-options-loading="statusOptionsLoading"
           @update:filters="val => Object.assign(filters, val)"
           @search="handleSearch"
           @clear="handleClear"
@@ -86,12 +88,12 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useShippingExpense } from '../../composables/useShippingExpense'
+import { useShippingDocStatusOptions } from '../../composables/useShippingDocStatusOptions'
 import ShippingExpenseFilter from '../filters/ShippingExpenseFilter.vue'
 import ShippingExpenseTable  from '../tables/ShippingExpenseTable.vue'
-import { ShippingDocStatus, SHIPPING_EXPENSE_HEADERS, PAGE_SIZE_OPTIONS } from '../../constants/shippingDocument.constants'
-import { exportToExcel } from '../../../utilities/exportExcel'
+import { ShippingDocStatus, SHIPPING_EXPENSE_HEADERS } from '../../constants/shippingDocument.constants'
 import { mapTableToExcel, exportToExcelWithHeader } from '../../../mappers/shippingDocExcel.mapper'
 import { useRouter } from 'vue-router'
 
@@ -109,6 +111,12 @@ const emit = defineEmits(['close', 'create'])
 
 
 const router = useRouter()
+
+const {
+  statusOptions,
+  loading: statusOptionsLoading,
+  loadStatusOptions,
+} = useShippingDocStatusOptions()
 
 
 // ─── Filter toggle ────────────────────────────────────────────
@@ -165,6 +173,8 @@ const {
 
 // ─── Toast ────────────────────────────────────────────────────
 const snackbar = reactive({ show: false, message: '', color: 'primary', icon: 'mdi-information' })
+
+onMounted(loadStatusOptions)
 
 function showToast(message, color = 'primary', icon = 'mdi-information') {
   Object.assign(snackbar, { show: true, message, color, icon })

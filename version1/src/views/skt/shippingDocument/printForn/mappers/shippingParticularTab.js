@@ -52,6 +52,7 @@ export default function shippingParticularMapper(formData, options = {}) {
 
   const netWeight = buildTotalNet(packingItems) || mark.netWeight
   const grossWeight = buildTotalGross(packingItems) || mark.grossWeight
+  const shouldPrintMarkField = field => mark[field] !== false
 
   // ─── helpers ──────────────────────────────────────────────────────────────
 
@@ -276,18 +277,27 @@ export default function shippingParticularMapper(formData, options = {}) {
             },
             ...productDescriptions.map(description => ({ text: description, margin: [0, 0, 0, 4] })),
             { text: mark.extraNote || '-',          margin: [0, 0, 0, 4] },
-            {
-              text: [{ text: 'HS CODE : ' }, { text: mark.hsCode || '' }],
-              margin: [0, 0, 0, 6],
-            },
-            {
+            shouldPrintMarkField('showHsCode')
+              ? {
+                text: [{ text: 'HS CODE : ' }, { text: mark.hsCode || '' }],
+                margin: [0, 0, 0, 6],
+              }
+              : null,
+            shouldPrintMarkField('showCountryOfOrigin') ? {
               columns: [
                 { width: 'auto', text: 'COUNTRY OF ORIGIN :', bold: true, margin: [0, 0, 8, 4] },
                 { width: '*',    text: mark.countryOfOrigin || 'THAILAND',  margin: [0, 0, 0, 4] },
               ],
-            },
-            { text: mark.palletNote || '', margin: [0, 4, 0, 0] },
-          ],
+            } : null,
+            shouldPrintMarkField('showPalletNote')
+              ? {
+                stack: [
+                  mark.palletNote ? { text: mark.palletNote, margin: [0, 4, 0, 0] } : null,
+                  mark.palletNoteExtra ? { text: mark.palletNoteExtra, margin: [0, 2, 0, 0] } : null,
+                ].filter(Boolean),
+              }
+              : null,
+          ].filter(Boolean),
         },
       ],
       margin: [0, 0, 0, 14],

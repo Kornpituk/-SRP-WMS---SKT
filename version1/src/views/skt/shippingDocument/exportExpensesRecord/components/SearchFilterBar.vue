@@ -182,8 +182,7 @@
               md="4"
             >
               <AppDateTimePicker
-                v-model="menPurops"
-                :model-value="etdDisplayValue"
+                v-model="etdRangeInput"
                 label="ETD"
                 placeholder="DD/MM/YYYY - DD/MM/YYYY"
                 :config="{ mode: 'range' }"
@@ -243,7 +242,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props & Emits
@@ -279,8 +278,7 @@ watch(() => props.filters, val => { localFilters.value = { ...val } }, { deep: t
 // ETD Date Range — single field logic
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Controls popover visibility */
-const etdMenuOpen = ref(false)
+const etdRangeInput = ref('')
 
 /**
  * The Date array bound to v-date-picker (multiple="range").
@@ -289,50 +287,16 @@ const etdMenuOpen = ref(false)
  */
 const etdRangeModel = ref([])
 
-/** Which month the calendar is showing */
-const calendarViewDate = ref(new Date())
-
-/** Formatted label shown in the nav header */
-const displayMonthLabel = computed(() =>
-  calendarViewDate.value.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }),
-)
-
-/** Text shown in the trigger field */
-const etdDisplayValue = computed(() => {
-  const { etdFrom, etdTo } = localFilters.value
-  if (!etdFrom && !etdTo) return ''
-
-  const fmt = iso => {
-    if (!iso) return ''
-    const [y, m, d] = iso.split('-')
-    
-    return `${d}/${m}/${y}`
-  }
-
-  if (etdFrom && etdTo) return `${fmt(etdFrom)} - ${fmt(etdTo)}`
-  
-  return fmt(etdFrom) || fmt(etdTo)
-})
-
-function prevMonth() {
-  const d = new Date(calendarViewDate.value)
-
-  d.setMonth(d.getMonth() - 1)
-  calendarViewDate.value = d
-}
-
-function nextMonth() {
-  const d = new Date(calendarViewDate.value)
-
-  d.setMonth(d.getMonth() + 1)
-  calendarViewDate.value = d
-}
-
 /**
  * Convert a Date object → "YYYY-MM-DD" string for the filter model.
  */
 function toIso(date) {
+  if (!date) return null
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date.trim())) return date.trim()
+
   const d = new Date(date)
+  if (Number.isNaN(d.getTime())) return null
+
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
@@ -344,18 +308,21 @@ function toIso(date) {
  * User clicked OK — extract start/end from the range array and
  * write into localFilters, then close the menu.
  */
-function confirmEtd() {
-  if (etdRangeModel.value.length >= 2) {
-    // Sort ascending in case user picked end before start
-    const sorted = [...etdRangeModel.value].sort((a, b) => new Date(a) - new Date(b))
+function syncEtdRange(value) {
+  const parts = Array.isArray(value)
+    ? value
+    : String(value || '').split(/\s+(?:to|-)\s+/i)
 
-    localFilters.value = {
-      ...localFilters.value,
-      etdFrom: toIso(sorted[0]),
-      etdTo: toIso(sorted[sorted.length - 1]),
-    }
+  const sorted = parts
+    .map(part => toIso(part))
+    .filter(Boolean)
+    .sort()
+
+  localFilters.value = {
+    ...localFilters.value,
+    etdFrom: sorted[0] ?? null,
+    etdTo: sorted[sorted.length - 1] ?? null,
   }
-  etdMenuOpen.value = false
 }
 
 /**
@@ -363,19 +330,24 @@ function confirmEtd() {
  */
 function clearEtd() {
   etdRangeModel.value = []
+  etdRangeInput.value = ''
   localFilters.value = {
     ...localFilters.value,
     etdFrom: null,
     etdTo: null,
   }
-  etdMenuOpen.value = false
 }
+
+watch(etdRangeInput, syncEtdRange)
 
 // If parent resets etd externally, clear the picker model too
 watch(
   () => [props.filters.etdFrom, props.filters.etdTo],
   ([from, to]) => {
-    if (!from && !to) etdRangeModel.value = []
+    if (!from && !to) {
+      etdRangeModel.value = []
+      etdRangeInput.value = ''
+    }
   },
 )
 
@@ -384,6 +356,7 @@ watch(
 // ─────────────────────────────────────────────────────────────────────────────
 function handleReset() {
   etdRangeModel.value = []
+  etdRangeInput.value = ''
   emit('reset')
 }
 </script>

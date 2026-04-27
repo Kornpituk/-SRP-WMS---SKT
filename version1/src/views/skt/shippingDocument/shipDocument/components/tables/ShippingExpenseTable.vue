@@ -119,7 +119,7 @@ const props = defineProps({
   items: { type: Array,   default: () => [] },
   total: { type: Number,  default: 0 },
   loading: { type: Boolean, default: false },
-  pagination: { type: Object,  default: () => ({ page: 1, itemsPerPage: 10 }) },
+  pagination: { type: Object,  default: () => ({ page: 1, itemsPerPage: 20 }) },
   sortBy: { type: Array,   default: () => [] },
 })
 
@@ -127,7 +127,7 @@ defineEmits(['update:options', 'update:sortBy', 'action'])
 
 const safePagination = computed(() => ({
   page: props.pagination?.page         ?? 1,
-  itemsPerPage: props.pagination?.itemsPerPage ?? 10,
+  itemsPerPage: props.pagination?.itemsPerPage ?? 20,
 }))
 
 const skeletonRows    = 6

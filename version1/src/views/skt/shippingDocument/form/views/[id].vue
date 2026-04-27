@@ -181,7 +181,7 @@ useUnsavedChangesGuard()
 
 const orderedTabs = getOrderedTabs()
 
-const shippingMode = computed(() => route.query.mode || 'ocean')
+const shippingMode = computed(() => route.query.mode || store.shippingMode || 'ocean')
 
 const visibleTabs = computed(() => {
   const allowedKeys = getVisibleTabs(shippingMode.value)

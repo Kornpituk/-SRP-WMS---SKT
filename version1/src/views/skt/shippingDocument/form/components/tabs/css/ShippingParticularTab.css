@@ -149,8 +149,16 @@
    Notify Party (bordered box)
    ================================================================= */
 
+.notify-party-control {
+  max-width: 520px;
+}
+
+.notify-party-select {
+  margin-bottom: 8px;
+}
+
 .notify-box {
-  max-width: 420px;
+  min-height: 72px;
   padding: 16px 20px;
   border: 1px solid #bdbdbd;
   border-radius: 4px;
@@ -233,6 +241,11 @@
 
 .ship-row__end {
   flex-shrink: 0;
+}
+
+.ship-row__end--center {
+  margin-right: auto;
+  margin-left: auto;
 }
 
 /* =================================================================
@@ -318,7 +331,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
 }
 
 .mark-hs-row__label {
@@ -333,15 +345,25 @@
   width: 160px;
 }
 
-.mark-display-options {
+.mark-print-row {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  max-width: 560px;
   margin-bottom: 8px;
 }
 
+.mark-print-row--start {
+  align-items: flex-start;
+}
+
+.mark-print-checkbox {
+  flex: 0 0 190px;
+}
+
 .mark-info {
-  margin-bottom: 6px;
+  flex: 1;
   font-size: 13px;
   color: #333;
 }

@@ -287,7 +287,7 @@
           <div class="air-ship-layout">
             <div class="air-ship-layout__left">
               <div class="air-ship-flight">
-                <span class="ship-label">Fight :</span>
+                <span class="ship-label">Flight :</span>
                 <div class="air-ship-flight__body">
                   <VTextField
                     v-if="!isReadonly"
@@ -295,6 +295,7 @@
                     variant="outlined"
                     density="compact"
                     hide-details
+                    class="air-ship-flight__input"
                     @update:model-value="(v) => updateField('feeder', v)"
                   />
                   <span v-else>{{ formData.feeder }}</span>
@@ -436,7 +437,10 @@
               <span v-else>{{ formData.feeder }}</span>
             </div>
 
-            <div class="ship-cell ship-cell--wide">
+            <div
+              v-if="!isTruckMode"
+              class="ship-cell ship-cell--wide"
+            >
               <span class="ship-label">{{ secondaryShipLabel }}</span>
               <VTextField
                 v-if="!isReadonly"
@@ -448,6 +452,11 @@
               />
               <span v-else>{{ formData.vessel }}</span>
             </div>
+            <div
+              v-else
+              class="ship-cell ship-cell--wide ship-cell--placeholder"
+              aria-hidden="true"
+            />
 
             <div class="ship-cell ship-cell--narrow">
               <span class="ship-label">ETD :</span>
@@ -586,17 +595,27 @@
                   class="sample-checkbox"
                   @update:model-value="(v) => handleItemUpdate(idx, 'isSample', v)"
                 />
-                <VTextarea
+                <div
                   v-if="item.isSample"
-                  :model-value="item.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  rows="4"
-                  auto-grow
-                  class="sample-description"
-                  @update:model-value="(v) => handleItemUpdate(idx, 'sampleDescription', v)"
-                />
+                  class="sample-subrow"
+                >
+                  <div
+                    v-if="item.descriptionOfGoods"
+                    class="sample-subrow__goods"
+                  >
+                    {{ item.descriptionOfGoods }}
+                  </div>
+                  <VTextarea
+                    :model-value="item.sampleDescription || createDefaultSampleDescription(item.subDescription)"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    rows="4"
+                    auto-grow
+                    class="sample-description"
+                    @update:model-value="(v) => handleItemUpdate(idx, 'sampleDescription', v)"
+                  />
+                </div>
               </template>
               <template v-else>
                 <div>{{ item.descriptionOfGoods }}</div>
@@ -608,11 +627,15 @@
                 </div>
                 <div
                   v-if="item.isSample"
-                  class="sample-text"
+                  class="sample-subrow"
                 >
+                  <div class="sample-subrow__goods">
+                    {{ item.descriptionOfGoods }}
+                  </div>
                   <div
-                    v-for="(line, li) in splitLines(item.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION)"
+                    v-for="(line, li) in splitLines(buildSampleDescription(item))"
                     :key="li"
+                    class="sample-subrow__line"
                   >
                     {{ line }}
                   </div>
@@ -691,6 +714,65 @@
                   />
                   <span v-else />
                 </div>
+                <div
+                  v-if="item.isSample"
+                  class="sample-subrow"
+                >
+                  <VSelect
+                    :model-value="item.samplePackageType"
+                    :items="PACKAGE_TYPES"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    class="pkg-type-select"
+                    @update:model-value="(v) => handleItemUpdate(idx, 'samplePackageType', v)"
+                  />
+                  <div class="pkg-tare-grid sample-pkg-grid">
+                    <VTextField
+                      :model-value="item.sampleQuantity"
+                      type="number"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      class="ptg-qty"
+                      @update:model-value="(v) => handleItemUpdate(idx, 'sampleQuantity', Number(v))"
+                    />
+                    <span class="ptg-pallet-label">{{ item.sampleUnitType }}</span>
+
+                    <span class="ptg-tare-text">Tare Weight (KG)</span>
+                    <span class="ptg-tare-val">{{ fmtDec(item.sampleTareWeightDrum) }}</span>
+
+                    <VTextField
+                      :model-value="item.samplePalletCount"
+                      type="number"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      class="ptg-pallet"
+                      @update:model-value="(v) => handleItemUpdate(idx, 'samplePalletCount', Number(v))"
+                    />
+                    <span class="ptg-pallet-label">PALLET</span>
+
+                    <span
+                      class="ptg-tare-text"
+                      :style="{ visibility: item.samplePalletCount > 0 ? 'visible' : 'hidden' }"
+                    >Tare Weight (KG)</span>
+
+                    <VSelect
+                      v-if="item.samplePalletCount > 0"
+                      :model-value="item.sampleTareWeightPallet"
+                      :items="TARE_PALLET_MASTER"
+                      item-title="value"
+                      item-value="value"
+                      variant="outlined"
+                      class="ptg-pallet"
+                      density="compact"
+                      hide-details
+                      @update:model-value="(v) => handleItemUpdate(idx, 'sampleTareWeightPallet', Number(v))"
+                    />
+                    <span v-else />
+                  </div>
+                </div>
 
               <!-- Row 4: packaging summary -->
               <!--
@@ -710,59 +792,121 @@
                 >
                   {{ buildPackagingLabel(item) }}
                 </div>
+                <div
+                  v-if="item.isSample"
+                  class="sample-subrow"
+                >
+                  <div>{{ item.samplePackageType }}</div>
+                  <div
+                    v-if="item.sampleQuantity"
+                    class="text-muted"
+                  >
+                    {{ item.sampleQuantity }} {{ item.sampleUnitType }}
+                    <template v-if="item.samplePalletCount">
+                      ({{ item.samplePalletCount }} PALLETS)
+                    </template>
+                  </div>
+                </div>
               </template>
             </div>
 
             <!-- Net Weight -->
             <div class="tbl-c tbl-c--wt text-right">
-              <VTextField
-                v-if="!isReadonly"
-                :model-value="item.netWeight"
-                type="number"
-                variant="outlined"
-                density="compact"
-                hide-details
-                style="min-width: 100px;"
-                reverse
-                @update:model-value="(v) => handleItemUpdate(idx, 'netWeight', Number(v))"
-              />
-              <span v-else>{{ fmtNum(item.netWeight) }}</span>
-            </div>
-
-            <!-- #4: Gross Weight — auto-calculated, read-only badge -->
-            <div class="tbl-c tbl-c--wt text-right">
-              <div
-                v-if="!isReadonly"
-                class="gross-weight-wrap"
-              >
+              <template v-if="!isReadonly">
                 <VTextField
-                  :model-value="item.grossWeight"
+                  :model-value="item.netWeight"
                   type="number"
                   variant="outlined"
                   density="compact"
                   hide-details
-                  reverse
                   style="min-width: 100px;"
-                  bg-color="grey-lighten-4"
-                  readonly
+                  reverse
+                  @update:model-value="(v) => handleItemUpdate(idx, 'netWeight', Number(v))"
                 />
-                <VTooltip
-                  text="Auto-calculated: Net + (Qty × Tare) + (Pallets × Tare Pallet)"
-                  location="top"
+                <div
+                  v-if="item.isSample"
+                  class="sample-subrow"
                 >
-                  <template #activator="{ props }">
-                    <VIcon
-                      v-bind="props"
-                      class="gross-info"
-                      size="14"
-                      color="info"
-                    >
-                      mdi-information-outline
-                    </VIcon>
-                  </template>
-                </VTooltip>
-              </div>
-              <span v-else>{{ fmtNum(item.grossWeight) }}</span>
+                  <VTextField
+                    :model-value="item.sampleNetWeight"
+                    type="number"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    reverse
+                    style="min-width: 100px;"
+                    @update:model-value="(v) => handleItemUpdate(idx, 'sampleNetWeight', Number(v))"
+                  />
+                </div>
+              </template>
+              <template v-else>
+                <div>{{ fmtNum(item.netWeight) }}</div>
+                <div
+                  v-if="item.isSample"
+                  class="sample-subrow sample-subrow--weight"
+                >
+                  {{ fmtNum(item.sampleNetWeight) }}
+                </div>
+              </template>
+            </div>
+
+            <!-- #4: Gross Weight — auto-calculated, read-only badge -->
+            <div class="tbl-c tbl-c--wt text-right">
+              <template v-if="!isReadonly">
+                <div class="gross-weight-wrap">
+                  <VTextField
+                    :model-value="item.grossWeight"
+                    type="number"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    reverse
+                    style="min-width: 100px;"
+                    bg-color="grey-lighten-4"
+                    readonly
+                  />
+                  <VTooltip
+                    text="Auto-calculated: Net + (Qty × Tare) + (Pallets × Tare Pallet)"
+                    location="top"
+                  >
+                    <template #activator="{ props }">
+                      <VIcon
+                        v-bind="props"
+                        class="gross-info"
+                        size="14"
+                        color="info"
+                      >
+                        mdi-information-outline
+                      </VIcon>
+                    </template>
+                  </VTooltip>
+                </div>
+                <div
+                  v-if="item.isSample"
+                  class="sample-subrow"
+                >
+                  <VTextField
+                    :model-value="item.sampleGrossWeight"
+                    type="number"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    reverse
+                    style="min-width: 100px;"
+                    bg-color="grey-lighten-4"
+                    readonly
+                  />
+                </div>
+              </template>
+              <template v-else>
+                <div>{{ fmtNum(item.grossWeight) }}</div>
+                <div
+                  v-if="item.isSample"
+                  class="sample-subrow sample-subrow--weight"
+                >
+                  {{ fmtNum(item.sampleGrossWeight) }}
+                </div>
+              </template>
             </div>
             <div
               v-if="!isReadonly"
@@ -873,14 +1017,12 @@
 
     <VDialog
       v-model="partyDialogOpen"
-      max-width="980"
+      max-width="1200"
       scrollable
     >
-      <VCard>
+      <VCard class="party-dialog">
         <VCardTitle class="party-dialog__title">
-          Select {{ activePartyLabel }}
-        </VCardTitle>
-        <VCardText>
+          <span>Select {{ activePartyLabel }}</span>
           <VTextField
             v-model="partySearch"
             class="party-dialog__search"
@@ -891,67 +1033,84 @@
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
           />
-
-          <VTable
-            class="party-dialog__table"
-            density="compact"
-            hover
-          >
-            <thead>
-              <tr>
-                <th
-                  v-for="header in partyTableHeaders"
-                  :key="header.key"
-                  :class="header.class"
-                >
-                  {{ header.title }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="party in filteredPartyOptions"
-                :key="party.id"
-              >
-                <td>{{ party.name }}</td>
-                <td>
-                  <div class="party-dialog__address">
-                    <div>{{ party.address }}</div>
-                    <div v-if="party.address2">
-                      {{ party.address2 }}
-                    </div>
-                    <div v-if="party.address3">
-                      {{ party.address3 }}
-                    </div>
-                  </div>
-                </td>
-                <td>{{ party.country }}</td>
-                <td>{{ party.taxId }}</td>
-                <td>{{ party.tel }}</td>
-                <td>{{ party.attn }}</td>
-                <td class="party-dialog__action">
-                  <VBtn
-                    color="primary"
-                    size="small"
-                    variant="flat"
-                    @click="selectParty(party)"
+        </VCardTitle>
+        <VCardText class="party-dialog__body">
+          <div class="party-dialog__table-wrap">
+            <VTable
+              class="party-dialog__table"
+              density="compact"
+              hover
+            >
+              <thead>
+                <tr>
+                  <th
+                    v-for="header in partyTableHeaders"
+                    :key="header.key"
+                    :class="header.class"
                   >
-                    Select
-                  </VBtn>
-                </td>
-              </tr>
-              <tr v-if="filteredPartyOptions.length === 0">
-                <td
-                  class="party-dialog__empty"
-                  colspan="7"
+                    {{ header.title }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="party in pagedPartyOptions"
+                  :key="party.id"
                 >
-                  No data found
-                </td>
-              </tr>
-            </tbody>
-          </VTable>
+                  <td class="party-dialog__name">
+                    {{ party.name }}
+                  </td>
+                  <td>
+                    <div class="party-dialog__address">
+                      <div>{{ party.address }}</div>
+                      <div v-if="party.address2">
+                        {{ party.address2 }}
+                      </div>
+                      <div v-if="party.address3">
+                        {{ party.address3 }}
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ party.country }}</td>
+                  <td>{{ party.taxId }}</td>
+                  <td>{{ party.tel }}</td>
+                  <td>{{ party.attn }}</td>
+                  <td class="party-dialog__action">
+                    <VBtn
+                      color="primary"
+                      size="small"
+                      variant="flat"
+                      @click="selectParty(party)"
+                    >
+                      Select
+                    </VBtn>
+                  </td>
+                </tr>
+                <tr v-if="filteredPartyOptions.length === 0">
+                  <td
+                    class="party-dialog__empty"
+                    colspan="7"
+                  >
+                    No data found
+                  </td>
+                </tr>
+              </tbody>
+            </VTable>
+          </div>
+
+          <div class="party-dialog__pagination">
+            <span class="party-dialog__page-info">
+              {{ partyPageStart }}-{{ partyPageEnd }} of {{ filteredPartyOptions.length }}
+            </span>
+            <VPagination
+              v-model="partyPage"
+              density="comfortable"
+              :length="partyPageCount"
+              :total-visible="5"
+            />
+          </div>
         </VCardText>
-        <VCardActions>
+        <VCardActions class="party-dialog__actions">
           <VSpacer />
           <VBtn
             variant="text"
@@ -1000,10 +1159,11 @@ import { usePrint } from '../../composables/usePrint'
 import { useShipDocumentStore } from '../../stores/shipDocumentStore'
 import { tabApiMap } from '../../services/shipDocumentApi'
 import {
-  DEFAULT_SAMPLE_DESCRIPTION,
+  createDefaultSampleDescription,
   buildItemPackageSummary,
   buildPackingNames,
   buildPackagingSummary,
+  buildSampleDescription,
   buildTotalGross,
   buildTotalNet,
 } from '../../utils/packingDerived'
@@ -1015,8 +1175,14 @@ const route = useRoute()
 // อ่าน ?mode=ocean จาก URL  ← แทน props.tabKey ที่ไม่มีค่า
 const shippMode = computed(() => route.query.mode || 'ocean')
 const isAirMode = computed(() => shippMode.value === 'air')
+const isTruckMode = computed(() => shippMode.value === 'truck')
 const isCourierMode = computed(() => shippMode.value === 'courier')
-const primaryShipLabel = computed(() => (isCourierMode.value ? 'Courier :' : 'Feeder :'))
+const primaryShipLabel = computed(() => {
+  if (isCourierMode.value) return 'Courier :'
+  if (isTruckMode.value) return 'Truck :'
+
+  return 'Feeder :'
+})
 const secondaryShipLabel = computed(() => (isCourierMode.value ? 'AWB No. :' : 'Vessel :'))
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -1061,7 +1227,85 @@ const PARTY_OPTIONS = {
       taxId: 'JP-2000000000',
       attn: 'EXPORT TEAM',
     },
+    {
+      id: 'payer-siam-polymer',
+      name: 'SIAM POLYMER INDUSTRY CO., LTD.',
+      address: '88 MOO 9 BANGNA-TRAD ROAD',
+      address2: 'BANGCHALONG',
+      city: 'SAMUT PRAKAN',
+      country: 'THAILAND',
+      tel: '+66 2 751 2345',
+      taxId: '0105547001234',
+      attn: 'FINANCE DEPARTMENT',
+    },
+    {
+      id: 'payer-mekong-trading',
+      name: 'MEKONG TRADING CO., LTD.',
+      address: '182 LE DUAN STREET',
+      address2: 'DISTRICT 1',
+      city: 'HO CHI MINH CITY',
+      country: 'VIETNAM',
+      tel: '+84 28 3822 4567',
+      taxId: '0312345678',
+      attn: 'MR. HUY',
+    },
+    {
+      id: 'payer-nippon-resins',
+      name: 'NIPPON RESINS CO., LTD.',
+      address: '2-15-8 NIHONBASHI',
+      address2: 'CHUO-KU',
+      city: 'TOKYO',
+      country: 'JAPAN',
+      tel: '+81 3 5220 8899',
+      taxId: 'JP-3000000000',
+      attn: 'SALES ADMIN',
+    },
+    {
+      id: 'payer-euro-link',
+      name: 'EURO LINK LOGISTICS PTE. LTD.',
+      address: '12 TUAS AVENUE 4',
+      address2: '#03-21',
+      city: 'SINGAPORE',
+      country: '639367',
+      tel: '+65 6861 2233',
+      taxId: '201912345K',
+      attn: 'MS. LIM',
+    },
+    {
+      id: 'payer-indo-chem',
+      name: 'INDO CHEMICAL SUPPLY PT',
+      address: 'JL. JEND. SUDIRMAN NO. 45',
+      address2: 'SETIABUDI',
+      city: 'JAKARTA',
+      country: 'INDONESIA',
+      tel: '+62 21 5790 1122',
+      taxId: '09.123.456.7-012.000',
+      attn: 'IMPORT TEAM',
+    },
+    {
+      id: 'payer-malaysia-tech',
+      name: 'MALAYSIA TECH MATERIALS SDN. BHD.',
+      address: 'LOT 17 JALAN INDUSTRI 3/2',
+      address2: 'RAWANG INDUSTRIAL ESTATE',
+      city: 'SELANGOR',
+      country: 'MALAYSIA',
+      tel: '+60 3 6091 7788',
+      taxId: 'MY1234567890',
+      attn: 'PROCUREMENT',
+    },
+    {
+      id: 'payer-global-specialty',
+      name: 'GLOBAL SPECIALTY CHEMICALS CO., LTD.',
+      address: '99 RATCHADAPHISEK ROAD',
+      address2: 'HUAI KHWANG',
+      city: 'BANGKOK',
+      country: 'THAILAND',
+      tel: '+66 2 168 9000',
+      taxId: '0105558123456',
+      attn: 'MS. NAPAPORN',
+    },
   ],
+
   consignee: [
     {
       id: 'consignee-ath',
@@ -1094,6 +1338,83 @@ const PARTY_OPTIONS = {
       country: 'JAPAN',
       tel: '+81 75 541 4311',
       taxId: 'JP-1000000000',
+    },
+    {
+      id: 'consignee-vina-plast',
+      name: 'VINA PLASTICS CO., LTD.',
+      address: 'LÔ B2, KCN THANG LONG',
+      address2: 'DONG ANH DISTRICT',
+      city: 'HANOI',
+      country: 'VIETNAM',
+      tel: '+84 24 3881 2233',
+      taxId: '0109988776',
+      attn: 'MR. SON',
+    },
+    {
+      id: 'consignee-bangkok-industrial',
+      name: 'BANGKOK INDUSTRIAL MATERIALS CO., LTD.',
+      address: '159 RAMA 3 ROAD',
+      address2: 'YANNAWA',
+      city: 'BANGKOK',
+      country: 'THAILAND',
+      tel: '+66 2 294 5678',
+      taxId: '0105544556677',
+      attn: 'WAREHOUSE TEAM',
+    },
+    {
+      id: 'consignee-kansai-trade',
+      name: 'KANSAI TRADE CORPORATION',
+      address: '5-22 UMEDA',
+      address2: 'KITA-KU',
+      city: 'OSAKA',
+      country: 'JAPAN',
+      tel: '+81 6 6341 7788',
+      taxId: 'JP-4000000000',
+      attn: 'MR. TANAKA',
+    },
+    {
+      id: 'consignee-singapore-advance',
+      name: 'SINGAPORE ADVANCE MATERIALS PTE. LTD.',
+      address: '18 PIONEER CRESCENT',
+      address2: '#05-07 WEST PARK BIZCENTRAL',
+      city: 'SINGAPORE',
+      country: '628567',
+      tel: '+65 6268 3344',
+      taxId: '201845678M',
+      attn: 'MS. TAN',
+    },
+    {
+      id: 'consignee-pt-surya',
+      name: 'PT SURYA ABADI CHEMICAL',
+      address: 'JL. RAYA BEKASI KM. 21',
+      address2: 'CAKUNG',
+      city: 'JAKARTA',
+      country: 'INDONESIA',
+      tel: '+62 21 460 9988',
+      taxId: '01.234.567.8-091.000',
+      attn: 'LOGISTICS',
+    },
+    {
+      id: 'consignee-penang-supply',
+      name: 'PENANG SPECIALTY SUPPLY SDN. BHD.',
+      address: 'NO. 27 LINTANG BAYAN LEPAS 2',
+      address2: 'BAYAN LEPAS',
+      city: 'PENANG',
+      country: 'MALAYSIA',
+      tel: '+60 4 641 2299',
+      taxId: 'MY0987654321',
+      attn: 'MS. SOO',
+    },
+    {
+      id: 'consignee-phnom-chem',
+      name: 'PHNOM CHEM IMPORT EXPORT CO., LTD.',
+      address: 'NO. 245 MONIVONG BLVD',
+      address2: 'BOEUNG KENG KANG',
+      city: 'PHNOM PENH',
+      country: 'CAMBODIA',
+      tel: '+855 23 998 221',
+      taxId: 'KH001234567',
+      attn: 'PURCHASE TEAM',
     },
   ],
 }
@@ -1189,6 +1510,8 @@ const {
 const partyDialogOpen = ref(false)
 const activePartyType = ref('payer')
 const partySearch = ref('')
+const partyPage = ref(1)
+const partyItemsPerPage = 5
 
 const activePartyLabel = computed(() => (
   activePartyType.value === 'payer' ? 'Payer' : 'Consignee'
@@ -1213,11 +1536,42 @@ const filteredPartyOptions = computed(() => {
   ].filter(Boolean).join(' ').toLowerCase().includes(keyword))
 })
 
+const partyPageCount = computed(() =>
+  Math.max(1, Math.ceil(filteredPartyOptions.value.length / partyItemsPerPage)),
+)
+
+const pagedPartyOptions = computed(() => {
+  const start = (partyPage.value - 1) * partyItemsPerPage
+
+  return filteredPartyOptions.value.slice(start, start + partyItemsPerPage)
+})
+
+const partyPageStart = computed(() => {
+  if (!filteredPartyOptions.value.length) return 0
+
+  return ((partyPage.value - 1) * partyItemsPerPage) + 1
+})
+
+const partyPageEnd = computed(() =>
+  Math.min(partyPage.value * partyItemsPerPage, filteredPartyOptions.value.length),
+)
+
+watch(partySearch, () => {
+  partyPage.value = 1
+})
+
+watch(filteredPartyOptions, () => {
+  if (partyPage.value > partyPageCount.value) {
+    partyPage.value = partyPageCount.value
+  }
+})
+
 function openPartyDialog(type) {
   if (isReadonly.value) return
 
   activePartyType.value = type
   partySearch.value = ''
+  partyPage.value = 1
   partyDialogOpen.value = true
 }
 
@@ -1359,6 +1713,16 @@ function calcGrossWeight(item) {
   return net + (qty * tare) + (pallets * tarePlt)
 }
 
+function calcSampleGrossWeight(item) {
+  const net     = Number(item.sampleNetWeight) || 0
+  const qty     = Number(item.sampleQuantity) || 0
+  const tare    = Number(item.sampleTareWeightDrum) || 0
+  const pallets = Number(item.samplePalletCount) || 0
+  const tarePlt = Number(item.sampleTareWeightPallet) || 0
+
+  return net + (qty * tare) + (pallets * tarePlt)
+}
+
 // ─── #7: PACKAGING label builder ─────────────────────────────────────────────
 // e.g. "160 DRUMS (40 PALLETS)" or "160 DRUMS"
 function buildPackagingLabel(item) {
@@ -1375,22 +1739,44 @@ function buildDefaultMarks() {
   return parts.join('\n')
 }
 
-function applyPackageDefaults(item, packageType) {
-  item.tareWeightDrum = TARE_WEIGHT_BY_PACKAGE[packageType] ?? 0
+function applyPackageDefaults(item, packageType, scope = 'main') {
+  const tareField = scope === 'sample' ? 'sampleTareWeightDrum' : 'tareWeightDrum'
+  const unitField = scope === 'sample' ? 'sampleUnitType' : 'unitType'
 
-  if (!item.unitType || packageType === 'BOTTLE') {
-    item.unitType = packageType === 'BOTTLE' ? 'BOTTLE' : 'DRUM'
+  item[tareField] = TARE_WEIGHT_BY_PACKAGE[packageType] ?? 0
+
+  if (!item[unitField] || packageType === 'BOTTLE') {
+    item[unitField] = packageType === 'BOTTLE' ? 'BOTTLE' : 'DRUM'
   }
 }
 
 function applyItemSideEffects(item, field, value) {
   if (field === 'packageType') applyPackageDefaults(item, value)
-  if (field === 'isSample' && value && !item.sampleDescription) item.sampleDescription = DEFAULT_SAMPLE_DESCRIPTION
+  if (field === 'samplePackageType') applyPackageDefaults(item, value, 'sample')
+  if (field === 'isSample' && value) {
+    if (!item.sampleDescription) item.sampleDescription = createDefaultSampleDescription(item.subDescription)
+    if (!item.samplePackageType) item.samplePackageType = 'BOTTLE'
+    if (!item.sampleUnitType) item.sampleUnitType = 'BOTTLE'
+    if (!Number(item.sampleTareWeightDrum)) applyPackageDefaults(item, item.samplePackageType, 'sample')
+  }
   if (field === 'palletCount' && Number(value) === 0) item.tareWeightPallet = 0
+  if (field === 'samplePalletCount' && Number(value) === 0) item.sampleTareWeightPallet = 0
 }
 
 function shouldRecalculateGross(field) {
   return ['netWeight', 'quantity', 'tareWeightDrum', 'palletCount', 'tareWeightPallet', 'packageType'].includes(field)
+}
+
+function shouldRecalculateSampleGross(field) {
+  return [
+    'sampleNetWeight',
+    'sampleQuantity',
+    'sampleTareWeightDrum',
+    'samplePalletCount',
+    'sampleTareWeightPallet',
+    'samplePackageType',
+    'isSample',
+  ].includes(field)
 }
 
 function shouldSyncSummaries(field) {
@@ -1414,6 +1800,9 @@ function handleItemUpdate(index, field, value) {
   // #4: Recalculate Gross Weight
   if (shouldRecalculateGross(field)) {
     items[index].grossWeight = calcGrossWeight(items[index])
+  }
+  if (shouldRecalculateSampleGross(field)) {
+    items[index].sampleGrossWeight = items[index].isSample ? calcSampleGrossWeight(items[index]) : 0
   }
 
   // #7: Auto-update total packing summaries from all items.
@@ -1445,6 +1834,14 @@ function createBlankItem() {
     tareWeightPallet: 0,
     netWeight: 0,
     grossWeight: 0,
+    samplePackageType: 'BOTTLE',
+    sampleQuantity: 0,
+    sampleUnitType: 'BOTTLE',
+    samplePalletCount: 0,
+    sampleTareWeightDrum: 0.1,
+    sampleTareWeightPallet: 0,
+    sampleNetWeight: 0,
+    sampleGrossWeight: 0,
     unitPrice: 0,
   }
 }
@@ -1516,14 +1913,30 @@ watch(
   items => {
     if (!items?.length) return
 
-    const updated = items.map(item => ({
-      ...item,
-      marksAndNos: item.marksAndNos || buildDefaultMarks(),
-    }))
+    const updated = items.map(item => {
+      const nextItem = {
+        ...item,
+        marksAndNos: item.marksAndNos || buildDefaultMarks(),
+      }
+
+      if (nextItem.isSample) {
+        if (!nextItem.sampleDescription) {
+          nextItem.sampleDescription = createDefaultSampleDescription(nextItem.subDescription)
+        }
+        if (!nextItem.samplePackageType) nextItem.samplePackageType = 'BOTTLE'
+        if (!nextItem.sampleUnitType) nextItem.sampleUnitType = 'BOTTLE'
+        if (!Number(nextItem.sampleTareWeightDrum)) {
+          nextItem.sampleTareWeightDrum = TARE_WEIGHT_BY_PACKAGE[nextItem.samplePackageType] ?? 0
+        }
+        nextItem.sampleGrossWeight = calcSampleGrossWeight(nextItem)
+      }
+
+      return nextItem
+    })
 
 
     // Only patch if any item was missing the default
-    const needsPatch = items.some((item, i) => item.marksAndNos !== updated[i].marksAndNos)
+    const needsPatch = items.some((item, i) => JSON.stringify(item) !== JSON.stringify(updated[i]))
     if (needsPatch) updateField('items', updated)
   },
   { immediate: true, deep: false },

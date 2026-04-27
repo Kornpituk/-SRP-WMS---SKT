@@ -5,6 +5,8 @@
 // USE_MOCK = false → ใช้ axios จริง (เปลี่ยนเมื่อ backend พร้อม)
 // ============================================================================
 
+import axiosIns from '@axios'
+import { urlApi } from '@/api'
 import { TabKey } from '../types/shipDocument'
 import { mockDocumentList, mockDocumentDetail, mockVoidedDocument } from '../mocks/mockData'
 import { getMapper } from '@/views/skt/shippingDocument/printForn/mappers'
@@ -12,8 +14,11 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 // ★★★ เปลี่ยนเป็น false เมื่อ backend พร้อม ★★★
-const USE_MOCK = true
+const API_MODE = import.meta.env?.VITE_SHIP_DOCUMENT_API_MODE || 'mock'
+const USE_MOCK = API_MODE !== 'api'
 const MOCK_DELAY = 500
+const BASE = import.meta.env?.VITE_SHIP_DOCUMENT_API_BASE || '/api/v1/ShippingDocument'
+const USE_BACKEND_PRINT = import.meta.env?.VITE_SHIP_DOCUMENT_PRINT_MODE === 'api'
 
 // ---------------------------------------------------------------------------
 // Real HTTP Client (uncomment เมื่อ backend พร้อม)
@@ -37,6 +42,51 @@ const MOCK_DELAY = 500
 const delay = (ms = MOCK_DELAY) => new Promise(r => setTimeout(r, ms))
 const ok = (data, msg = 'OK') => ({ success: true, data, message: msg })
 const clone = obj => JSON.parse(JSON.stringify(obj))
+const url = path => `${urlApi.value}${BASE}${path}`
+
+function normalizeResponse(payload, fallbackMessage = 'OK') {
+  if (payload && typeof payload === 'object' && 'success' in payload) {
+    return payload
+  }
+
+  return ok(payload, fallbackMessage)
+}
+
+function normalizeError(error) {
+  const payload = error?.response?.data
+
+  if (payload && typeof payload === 'object') {
+    return {
+      success: false,
+      data: payload.data ?? null,
+      message: payload.message || payload.title || 'Request failed',
+      errors: payload.errors || {},
+    }
+  }
+
+  return {
+    success: false,
+    data: null,
+    message: error?.message || 'Request failed',
+    errors: {},
+  }
+}
+
+async function request(method, path, data, config = {}) {
+  try {
+    const res = await axiosIns({
+      method,
+      url: url(path),
+      data,
+      ...config,
+    })
+
+    return normalizeResponse(res.data)
+  }
+  catch (error) {
+    return normalizeError(error)
+  }
+}
 
 // In-memory store — persists during browser session
 let _docs = clone([mockDocumentDetail, mockVoidedDocument])
@@ -53,7 +103,7 @@ if (!pdfMake.vfs) {
 // ฟังก์ชันนี้จะถูกเรียกเมื่อต้องการใช้ Backend (ให้แก้ไขตาม endpoint จริง)
 async function callBackendPrint(documentId, tabKey, target, formData) {
   // TODO: ใส่ URL จริง, headers, authentication
-  const response = await fetch(`/api/shipping-document/${documentId}/print`, {
+  const response = await fetch(url(`/${encodeURIComponent(documentId)}/print`), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ tabKey, target, formData }),
@@ -71,6 +121,10 @@ async function callBackendPrint(documentId, tabKey, target, formData) {
 export const shipDocumentApi = {
   // === Create ===
   async createDocument(mode, sourceId) {
+    if (!USE_MOCK) {
+      return request('post', '', { mode, sourceId })
+    }
+
     if (USE_MOCK) {
       await delay()
 
@@ -95,6 +149,10 @@ export const shipDocumentApi = {
 
   // === List ===
   async getList(params) {
+    if (!USE_MOCK) {
+      return request('get', '', null, { params })
+    }
+
     if (USE_MOCK) {
       await delay()
       let items = clone(_list)
@@ -114,6 +172,10 @@ export const shipDocumentApi = {
 
   // === Get By ID ===
   async getById(id) {
+    if (!USE_MOCK) {
+      return request('get', `/${encodeURIComponent(id)}`)
+    }
+
     if (USE_MOCK) {
       await delay()
 
@@ -127,6 +189,10 @@ export const shipDocumentApi = {
 
   // === Void ===
   async voidDocument(id) {
+    if (!USE_MOCK) {
+      return request('post', `/${encodeURIComponent(id)}/void`)
+    }
+
     if (USE_MOCK) {
       await delay(300)
 
@@ -142,6 +208,10 @@ export const shipDocumentApi = {
   },
 
   async approveDocument(id) {
+    if (!USE_MOCK) {
+      return request('post', `/${encodeURIComponent(id)}/approve`)
+    }
+
     if (USE_MOCK) {
       await delay(300)
 
@@ -173,7 +243,7 @@ export const shipDocumentApi = {
   // === Print ===
 
   async printTab(documentId, tabKey, shippMode,  target, displayFields, formData) {
-    const useBackend = false
+    const useBackend = USE_BACKEND_PRINT
 
     if (useBackend) {
       return callBackendPrint(documentId, tabKey, target, formData)
@@ -198,6 +268,10 @@ export const shipDocumentApi = {
 
   // === Internal mock helpers ===
   async _save(docId, tabKey, data) {
+    if (!USE_MOCK) {
+      return request('put', `/${encodeURIComponent(docId)}/tabs/${encodeURIComponent(tabKey)}/draft`, data)
+    }
+
     if (USE_MOCK) {
       await delay()
 
@@ -215,6 +289,10 @@ export const shipDocumentApi = {
   },
 
   async _confirm(docId, tabKey, data) {
+    if (!USE_MOCK) {
+      return request('post', `/${encodeURIComponent(docId)}/tabs/${encodeURIComponent(tabKey)}/confirm`, data)
+    }
+
     if (USE_MOCK) {
       await delay()
 

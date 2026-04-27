@@ -55,7 +55,7 @@ export const SHIPPING_MODE_OPTIONS = [
   { title: 'TRUCK', value: 'TRUCK' },
 ]
 
-export const PAGE_SIZE_OPTIONS = [10, 25, 50]
+export const PAGE_SIZE_OPTIONS = [20, 50, 100]
 
 // ============================================================
 // TABLE HEADERS — ShippingDoc (Tab LIST & VOID)
@@ -68,9 +68,10 @@ export const SHIPPING_DOC_HEADERS = [
   { title: 'Invoice',         key: 'invoice',      sortable: true,                  minWidth: 14 },
   { title: 'Payer Name',      key: 'payerName',    sortable: true,                  minWidth: 20 },
   { title: 'Consignee',       key: 'consignee',    sortable: true,                  minWidth: 20 },
-  { title: 'Item',            key: 'item',         sortable: true                               },
-  { title: 'Qty',             key: 'qty',          sortable: true,  align: 'end',   maxWidth: 8, decimal: 2  },
-  { title: 'UOM',             key: 'uom',          sortable: false,                 maxWidth: 8  },
+
+  // { title: 'Item',            key: 'item',         sortable: true                               },
+  // { title: 'Qty',             key: 'qty',          sortable: true,  align: 'end',   maxWidth: 8, decimal: 2  },
+  // { title: 'UOM',             key: 'uom',          sortable: false,                 maxWidth: 8  },
   { title: 'Term Of Pricing', key: 'termOfPricing', sortable: true,                  minWidth: 16 },
   { title: 'Shipping Mode',   key: 'shippingMode', sortable: true,                  minWidth: 14 },
   { title: 'ETD',             key: 'etd',          sortable: true,                  maxWidth: 12 },
@@ -85,11 +86,21 @@ export const SHIPPING_DOC_HEADERS = [
 // ============================================================
 
 export const SHIPPING_EXPENSE_HEADERS = [
-  { title: 'No.',            key: 'no',            sortable: false, width: 60 },
-  { title: 'Status',         key: 'status',        sortable: true             },
-  { title: 'Invoice In SAP', key: 'invoiceInSAP',  sortable: true             },
-  { title: 'Invoice',        key: 'invoice',       sortable: true             },
-  { title: 'Payer Name',     key: 'payerName',     sortable: true             },
-  { title: 'ETD',            key: 'etd',           sortable: true             },
-  { title: 'Action',         key: 'actions',       sortable: false, align: 'center' },
+  { title: 'No.',             key: 'no',           sortable: false, align: 'center', maxWidth: 6  },
+  { title: 'Status',          key: 'status',       sortable: true,                  minWidth: 12 },
+  { title: 'Invoice In SAP',  key: 'invoiceInSAP', sortable: true,                  minWidth: 16 },
+  { title: 'Invoice',         key: 'invoice',      sortable: true,                  minWidth: 14 },
+  { title: 'Payer Name',      key: 'payerName',    sortable: true,                  minWidth: 20 },
+  { title: 'Consignee',       key: 'consignee',    sortable: true,                  minWidth: 20 },
+
+  // { title: 'Item',            key: 'item',         sortable: true                               },
+  // { title: 'Qty',             key: 'qty',          sortable: true,  align: 'end',   maxWidth: 8, decimal: 2  },
+  // { title: 'UOM',             key: 'uom',          sortable: false,                 maxWidth: 8  },
+  { title: 'Term Of Pricing', key: 'termOfPricing', sortable: true,                  minWidth: 16 },
+  { title: 'Shipping Mode',   key: 'shippingMode', sortable: true,                  minWidth: 14 },
+  { title: 'ETD',             key: 'etd',          sortable: true,                  maxWidth: 12 },
+  { title: 'Destination',     key: 'destination',  sortable: true,                  minWidth: 14 },
+  { title: 'Updated Date',    key: 'updatedDate',  sortable: true,                  maxWidth: 14 },
+  { title: 'Updated By',      key: 'updatedBy',    sortable: true,                  minWidth: 14 },
+  { title: 'Action',          key: 'actions',      sortable: false, align: 'center'              },
 ]

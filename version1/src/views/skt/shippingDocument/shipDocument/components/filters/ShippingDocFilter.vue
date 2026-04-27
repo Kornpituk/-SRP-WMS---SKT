@@ -10,12 +10,17 @@
           v-model="local.status"
           :items="statusOptions"
           :disabled="statusFilterDisabled"
+          :loading="statusOptionsLoading"
           label="Select Status"
           density="compact"
           variant="outlined"
           hide-details
           clearable
-        />
+        >
+          <template #selection="{ item }">
+            <StatusBadge :status="getStatusLabel(item)" />
+          </template>
+        </VSelect>
       </VCol>
 
       <VCol
@@ -116,7 +121,6 @@
       >
         <AppDateTimePicker
           v-model="local.etdRange"
-          :model-value="etdDisplayValue"
           label="ETD dd/mm/yyyy - dd/mm/yyyy"
           density="compact"
           :config="{ mode: 'range' }"
@@ -153,7 +157,11 @@
           style="color: #fff !important;"
           @click="$emit('export')"
         >
-          <VIcon size="25" color="primary" icon="mdi-microsoft-excel" />Export
+          <VIcon
+            size="25"
+            color="primary"
+            icon="mdi-microsoft-excel"
+          />Export
         </VBtn>
       </VCol>
     </VRow>
@@ -161,8 +169,9 @@
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { STATUS_OPTIONS, SHIPPING_MODE_OPTIONS } from '../../constants/shippingDocument.constants'
+import StatusBadge from '../shared/StatusBadge.vue'
 
 // ─── Props & Emits ────────────────────────────────────────────
 const props = defineProps({
@@ -171,6 +180,14 @@ const props = defineProps({
     required: true,
   },
   statusFilterDisabled: {
+    type: Boolean,
+    default: false,
+  },
+  statusOptions: {
+    type: Array,
+    default: () => STATUS_OPTIONS,
+  },
+  statusOptionsLoading: {
     type: Boolean,
     default: false,
   },
@@ -204,6 +221,9 @@ watch(
 )
 
 // ─── Options ──────────────────────────────────────────────────
-const statusOptions       = STATUS_OPTIONS
+const statusOptions       = computed(() => props.statusOptions)
 const shippingModeOptions = SHIPPING_MODE_OPTIONS
+
+const getStatusLabel = item =>
+  item?.raw?.title ?? item?.title ?? item?.value ?? local.status
 </script>

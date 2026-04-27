@@ -2,6 +2,23 @@ export const DEFAULT_SAMPLE_DESCRIPTION = `(FREE SAMPLE)
 (NO COMMERCIAL VALUE)
 (VALUE SHOWN FOR CUSTOMS PURPOSE ONLY)`
 
+export function createDefaultSampleDescription(subDescription = '') {
+  const lines = []
+  const normalizedSubDescription = String(subDescription || '').trim()
+
+  if (normalizedSubDescription) {
+    lines.push(
+      normalizedSubDescription.startsWith('(') && normalizedSubDescription.endsWith(')')
+        ? normalizedSubDescription
+        : `(${normalizedSubDescription})`,
+    )
+  }
+
+  lines.push(...DEFAULT_SAMPLE_DESCRIPTION.split('\n'))
+
+  return lines.join('\n')
+}
+
 function asNumber(value) {
   return Number(value) || 0
 }
@@ -31,7 +48,19 @@ export function getPackingItems(packingListData) {
 }
 
 export function buildSampleDescription(item) {
-  return item?.sampleDescription || DEFAULT_SAMPLE_DESCRIPTION
+  const sampleNote = String(item?.sampleDescription || '').trim()
+
+  if (sampleNote) return sampleNote
+
+  return createDefaultSampleDescription(item?.subDescription)
+}
+
+export function getItemTotalNet(item) {
+  return asNumber(item?.netWeight) + (item?.isSample ? asNumber(item?.sampleNetWeight) : 0)
+}
+
+export function getItemTotalGross(item) {
+  return asNumber(item?.grossWeight) + (item?.isSample ? asNumber(item?.sampleGrossWeight) : 0)
 }
 
 export function buildItemPackageSummary(item, { includePallet = true } = {}) {
@@ -72,11 +101,11 @@ export function buildPackagingSummary(items) {
 }
 
 export function buildTotalNet(items) {
-  return getPackingItems({ items }).reduce((sum, item) => sum + asNumber(item.netWeight), 0)
+  return getPackingItems({ items }).reduce((sum, item) => sum + getItemTotalNet(item), 0)
 }
 
 export function buildTotalGross(items) {
-  return getPackingItems({ items }).reduce((sum, item) => sum + asNumber(item.grossWeight), 0)
+  return getPackingItems({ items }).reduce((sum, item) => sum + getItemTotalGross(item), 0)
 }
 
 export function buildCommercialInvoiceRows(items) {

@@ -30,7 +30,7 @@ export const fields = [
     type: 'textarea',
     required: true,
     width: '300px',
-    searchable: false,
+    searchable: true,
   },
   {
     key: 'contractName',
@@ -43,6 +43,14 @@ export const fields = [
   {
     key: 'contractNo',
     label: 'Contact No.',
+    type: 'text',
+    required: true,
+    width: '150px',
+    searchable: true,
+  },
+  {
+    key: 'email',
+    label: 'Contact Email',
     type: 'text',
     required: true,
     width: '150px',

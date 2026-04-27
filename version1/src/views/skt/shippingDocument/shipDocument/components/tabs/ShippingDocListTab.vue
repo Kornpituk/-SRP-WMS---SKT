@@ -53,6 +53,8 @@
         <ShippingDocFilter
           :filters="filters"
           :status-filter-disabled="statusFilterDisabled"
+          :status-options="statusOptions"
+          :status-options-loading="statusOptionsLoading"
           @update:filters="val => Object.assign(filters, val)"
           @search="handleSearch"
           @clear="handleClear"
@@ -101,16 +103,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useShippingDocList } from '../../composables/useShippingDocList'
+import { useShippingDocStatusOptions } from '../../composables/useShippingDocStatusOptions'
 import ShippingDocFilter from '../filters/ShippingDocFilter.vue'
 import ShippingDocTable  from '../tables/ShippingDocTable.vue'
 import VoidConfirmDialog    from '@/views/skt/components/dialog/voidConfirmDialog.vue'
-import { ShippingDocStatus, SHIPPING_DOC_HEADERS, PAGE_SIZE_OPTIONS } from '../../constants/shippingDocument.constants'
-import { exportToExcel } from '../../../utilities/exportExcel'
+import { ShippingDocStatus, SHIPPING_DOC_HEADERS } from '../../constants/shippingDocument.constants'
 import { mapTableToExcel, exportToExcelWithHeader } from '../../../mappers/shippingDocExcel.mapper'
 
-import { useCookieStore, useItemStore } from '@/stores/skt/receingFormStore/itemStore'
+import { useItemStore } from '@/stores/skt/receingFormStore/itemStore'
 
 // ─── Props ────────────────────────────────────────────────────
 const props = defineProps({
@@ -123,6 +125,12 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'create'])
 const itemStore = useItemStore()
+
+const {
+  statusOptions,
+  loading: statusOptionsLoading,
+  loadStatusOptions,
+} = useShippingDocStatusOptions()
 
 // ─── Filter toggle ────────────────────────────────────────────
 const filterVisible = ref(true)
@@ -188,6 +196,7 @@ const {
   statusFilterDisabled,
   handleSearch, handleClear,
   handleUpdateOptions,
+  reload,
 } = useShippingDocList(props.mode)
 
 // ─── Void Dialog state ────────────────────────────────────────
@@ -268,15 +277,10 @@ function handleAction(item) {
   showToast(`Opening detail: ${invoice}`, 'primary', 'mdi-file-eye-outline')
 }
 
-function handleVoid(item) {
-  const invoice = item.raw?.invoiceInSAP ?? item.invoiceInSAP
-
-  showToast(`Voiding: ${invoice}`, 'error', 'mdi-file-cancel-outline')
-}
-
-
 // ─── Export Excel ────────────────────────────────────────
 const NameDepartment = ref(itemStore.getItemDetails('UserDataCookies').departmentName)
+
+onMounted(loadStatusOptions)
 
 function handleExport() {
   if (!items.value.length) {

@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { useTabPermissions } from './usePermissions'
 import { shipDocumentApi } from '../services/shipDocumentApi'
 import { useShipDocumentStore } from '../stores/shipDocumentStore'
@@ -18,7 +18,7 @@ export function usePrint(tabKey, getFormData) {
     console.log("display", display)
     console.log("shippMode", shippMode)
 
-    // if (!permissions.value?.canPrint) return
+    if (!permissions.value?.canPrint) return false
 
     isPrinting.value = true
 

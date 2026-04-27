@@ -21,24 +21,31 @@ export function useShippingDocList(mode) {
   const items      = ref([])
   const total      = ref(0)
   const filters    = reactive(createDefaultFilters())
-  const pagination = reactive({ page: 1, itemsPerPage: 10 })
+  const pagination = reactive({ page: 1, itemsPerPage: 20 })
   const sortBy     = ref([])
+  let requestId = 0
 
   const statusFilterDisabled = computed(() => mode === 'void')
 
   async function loadData() {
+    const currentRequestId = ++requestId
+
     loading.value = true
     try {
-      const { data, total: t } = await fetchShippingDocs({ ...filters }, mode)
+      const { data, total: t } = await fetchShippingDocs({
+        ...filters,
+        page: pagination.page,
+        itemsPerPage: pagination.itemsPerPage,
+        sortBy: sortBy.value,
+      }, mode)
+
+      if (currentRequestId !== requestId) return
 
       items.value = data
       total.value = t
-
-      console.log('items.value', items.value)
-      console.log('total.value', total.value)
     }
     finally {
-      loading.value = false
+      if (currentRequestId === requestId) loading.value = false
     }
   }
 
@@ -50,7 +57,7 @@ export function useShippingDocList(mode) {
   function handleClear() {
     Object.assign(filters, createDefaultFilters())
     pagination.page = 1
-    pagination.itemsPerPage = 10
+    pagination.itemsPerPage = 20
     sortBy.value = []
     loadData()
   }

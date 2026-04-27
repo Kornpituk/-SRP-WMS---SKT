@@ -17,6 +17,11 @@ export const useShipDocumentStore = defineStore('shipDocument', () => {
   const createdAt = ref('')
   const updatedAt = ref('')
   const createdBy = ref('')
+  const shippingMode = ref('')
+  const nextInvoiceNumber = ref('')
+  const lastInvoiceDate = ref('')
+  const packingListNotes = ref([])
+  const commercialInvoiceNote = ref(null)
   const isLoading = ref(false)
   const activeTabKey = ref(TabKey.PACKING_LIST)
 
@@ -62,6 +67,11 @@ export const useShipDocumentStore = defineStore('shipDocument', () => {
     documentId.value = doc.id
     documentNo.value = doc.documentNo
     documentStatus.value = doc.status
+    shippingMode.value = doc.shippingMode || ''
+    nextInvoiceNumber.value = doc.nextInvoiceNumber || doc.documentNo || ''
+    lastInvoiceDate.value = doc.lastInvoiceDate || ''
+    packingListNotes.value = doc.packingListNotes || []
+    commercialInvoiceNote.value = doc.commercialInvoiceNote || null
     createdAt.value = doc.createdAt
     updatedAt.value = doc.updatedAt
     createdBy.value = doc.createdBy
@@ -128,6 +138,32 @@ export const useShipDocumentStore = defineStore('shipDocument', () => {
     documentStatus.value = DocumentStatus.APPROVED
   }
 
+  function syncVessel(vessel) {
+    const linkedTabs = [
+      TabKey.COMMERCIAL_INVOICE,
+      TabKey.PACKING_DECLARATION,
+      TabKey.SHIPPING_PARTICULAR,
+    ]
+
+    for (const key of linkedTabs) {
+      const data = tabs.value[key]?.data
+      if (!data) continue
+
+      const patch = {}
+      if ('vessel' in data) patch.vessel = vessel
+      if ('vesselName' in data) patch.vesselName = vessel
+      if (Object.keys(patch).length) updateTabData(key, patch)
+    }
+  }
+
+  function savePackingListNotes(notes) {
+    packingListNotes.value = Array.isArray(notes) ? notes : []
+  }
+
+  function saveCommercialInvoiceNote(note) {
+    commercialInvoiceNote.value = note || null
+  }
+
   function setActiveTab(tabKey) {
     activeTabKey.value = tabKey
   }
@@ -136,6 +172,11 @@ export const useShipDocumentStore = defineStore('shipDocument', () => {
     documentId.value = ''
     documentNo.value = ''
     documentStatus.value = DocumentStatus.ACTIVE
+    shippingMode.value = ''
+    nextInvoiceNumber.value = ''
+    lastInvoiceDate.value = ''
+    packingListNotes.value = []
+    commercialInvoiceNote.value = null
     createdAt.value = ''
     updatedAt.value = ''
     createdBy.value = ''
@@ -147,9 +188,11 @@ export const useShipDocumentStore = defineStore('shipDocument', () => {
   }
 
   return {
-    documentId, documentNo, documentStatus, createdAt, updatedAt, createdBy, isLoading, activeTabKey, tabs,
+    documentId, documentNo, documentStatus, shippingMode, nextInvoiceNumber, lastInvoiceDate,
+    packingListNotes, commercialInvoiceNote, createdAt, updatedAt, createdBy, isLoading, activeTabKey, tabs,
     isVoided, isApproved, isActionLocked, getTab, activeTab, hasUnsavedChanges, tabStatusSummary, confirmedTabCount, allTabsConfirmed,
     loadDocument, updateTabData, setTabLoading, setTabErrors, clearTabErrors,
-    executeTransition, canExecute, getAvailableActions, voidDocument, approveDocument, setActiveTab, $reset,
+    executeTransition, canExecute, getAvailableActions, voidDocument, approveDocument,
+    syncVessel, savePackingListNotes, saveCommercialInvoiceNote, setActiveTab, $reset,
   }
 })

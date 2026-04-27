@@ -384,7 +384,6 @@ const props = defineProps({
   isPrinting: { type: Boolean, default: false },
   showPrintOptions: { type: Boolean, default: true },
   notes: { type: Array, default: () => [] },
-  isPrinting: Boolean,
   canPrint: Boolean,
   printTargets: {
     type: Array,
@@ -552,8 +551,9 @@ function handlePrintMenuConfirm() {
     displaySelections.value = []
     displayDialog.value = true
   } else {
-    emit('confirm', {
+    emit('print', {
       target: selectedTarget.value,
+      display: [],
     })
   }
 
